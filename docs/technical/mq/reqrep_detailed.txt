@@ -38,6 +38,23 @@ You will get a reply like this: ::
     ['client.detail.result', '{"domogik-diskfree.darkstar": {"status": "unknown", "name": "diskfree", "data": {"configuration": [{"description": "Automatically start plugin at Domogik startup", "default": false, "required": false, "options": [], "key": "startup-plugin", "type": "boolean", "id": "0"}, {"description": "Interval between each poll (minute)", "default": 5, "required": false, "value": "7", "options": [], "key": "interval", "type": "integer", "id": "1"}]}, "configured": true, "pid": 0, "package_id": "plugin-diskfree", "host": "darkstar", "type": "plugin"}}']
 
 
+client.conversion.get
+==================
+
+Request : XplGW
+Reply : manager
+
+To get the clients conversions, the XplGW send on startup a MQ request *client.conversion.get* to the manager.
+
+To get updates, the XplGW should subscribe to the appropriate MQ publisher : *client.conversion*.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_client_conversion.py*.
+
+You will get a reply like this: ::
+
+    ['client.conversion.result', '{"plugin-onewire.darkstar": {}, "plugin-rfxcom.darkstar": {}, "plugin-velbus.darkstar": {"from_level_to_DT_Switch": "def from_level_to_DT_Switch(x):\\n    if x == \'255\':\\n        return int(1)\\n    if x == \'0\':\\n        return int(0)\\n\\n", "from_DT_Scaling_to_level": "def from_DT_Scaling_to_level(x):\\n    # 0 - 100 translated to 0 - 255\\n    return round(int(x) / 100 * 255)\\n\\n", "from_level_to_DT_Scaling": "def from_level_to_DT_Scaling(x):\\n    # 0 - 255 translated to 0 - 100\\n    return round(int(x) / 255 * 100)\\n", "from_input_to_DT_State": "def from_input_to_DT_State(x):\\n    if x == \'LOW\':\\n        return 0\\n    else:\\n        return 1\\n\\n", "from_DT_Switch_to_level": "def from_DT_Switch_to_level(x):\\n    if x == \'1\':\\n        return int(255)\\n    else:\\n        return int(0)\\n\\n"}, "plugin-diskfree.darkstar": {}}']
+
+
 config.get
 ==========
 

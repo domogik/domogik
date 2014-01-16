@@ -439,6 +439,11 @@ class Manager(XplPlugin):
             self.log.info(u"Clients details request : {0}".format(msg))
             self._mdp_reply_clients_detail()
 
+        # retrieve the clients conversions
+        elif msg.get_action() == "client.conversion.get":
+            self.log.info(u"Clients conversion request : {0}".format(msg))
+            self._mdp_reply_clients_conversion()
+
         # start clients
         elif msg.get_action() == "plugin.start.do":
             self.log.info(u"Plugin startup request : {0}".format(msg))
@@ -498,6 +503,17 @@ class Manager(XplPlugin):
         clients = self._clients.get_detail() 
         for key in clients:
             msg.add_data(key, clients[key])
+        self.reply(msg.get())
+
+
+    def _mdp_reply_clients_conversion(self):
+        """ Reply on the MQ
+        """
+        msg = MQMessage()
+        msg.set_action('client.conversion.result')
+        conv = self._clients.get_conversions() 
+        for key in conv:
+            msg.add_data(key, conv[key])
         self.reply(msg.get())
 
 
@@ -634,8 +650,7 @@ class GenericComponent():
     def register_component(self):
         """ register the component as a client
         """
-        self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data, self.configured)
-        #self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data)
+        self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data, self.conversions, self.configured)
 
     def unregister(self):
         """ unregister the component 
@@ -1086,6 +1101,7 @@ class Clients():
         self._stop = stop
         self._clients = {}
         self._clients_with_details = {}
+        self._conversions = {}
 
         ### init logger
         log = logger.Logger('manager')
@@ -1119,7 +1135,7 @@ class Clients():
                         self.set_status(a_client, STATUS_DEAD)
             self._stop.wait(STATUS_HBEAT)
 
-    def add(self, host, type, name, client_id, xpl_source, data, configured = None):
+    def add(self, host, type, name, client_id, xpl_source, data, conversions, configured = None):
         """ Add a client to the list of clients
             @param host : client hostname or ip or dns
             @param type : client type
@@ -1128,6 +1144,7 @@ class Clients():
             @param data : client data : only for clients details
             @param configured : True/False : for a plugin : True if the plugin is configured, else False
                                 None : for type != 'plugin'
+            @param conversions : conversions info for the client
         """
         self.log.info(u"Add new client : host={0}, type={1}, name={2}, client_id={3}, data={4}".format(host, type, name, client_id, str(data)))
         client = { "host" : host,
@@ -1151,6 +1168,7 @@ class Clients():
                    "data" : data}
         self._clients[client_id] = client
         self._clients_with_details[client_id] = client_with_details
+        self._conversions[client_id] = conversions
         self.publish_update()
 
     def remove(self, client_id):
@@ -1216,7 +1234,7 @@ class Clients():
     def get_conversions(self):
         """ Return the clients conversions elements
         """
-        return "TODO TODO TODO"
+        return self._conversions
 
     def publish_update(self):
         """ Publish the clients list update over the MQ
@@ -1226,6 +1244,8 @@ class Clients():
                              self._clients)
         self._pub.send_event('client.detail', 
                              self._clients_with_details)
+        self._pub.send_event('client.conversion', 
+                             self._conversions)
 
 
 

@@ -59,6 +59,7 @@ Starting to create the json file without being clear on these elements is useles
 
   * :doc:`Data types <data_types/index>`
   * :doc:`Field types <field_types/index>`
+  * :doc:`Conversion files <conversion/index>`
 
 Python part
 ===========
