@@ -11,6 +11,7 @@ How are sensor values catched ?
 ===============================
 
 For each device feature a listener is created based on the content of the tables *core_xplstat* and *core_xplstat_param*. When the listener catch a message, it will extract the values from it, apply some transformations (history cleanup, round, ...) and store them in database.
+:doc:`Some conversions may be applied depending on the device features </package_development/plugins/conversion/index>`.
 
 How a xPL command is sent ?
 ===========================
