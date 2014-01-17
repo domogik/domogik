@@ -67,8 +67,15 @@ def client_devices_known(client_id):
 @app.route('/client/<client_id>/devices/detected')
 @login_required
 def client_devices_detected(client_id):
-    # TODO get them
-    devices = {}
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device.new.get')
+    res = cli.request(str(client_id), msg.get(), timeout=10)
+    if res is not None:
+        data = res.get_data()
+        devices = data['devices']
+    else:
+        devices = {}
     return render_template('client_detected.html',
             devices = devices,
             clientid = client_id,

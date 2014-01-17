@@ -4,6 +4,35 @@
 {% include "client_menu.html" %}
 <div class="container">
     <h2>{% trans %}Detected devices{% endtrans %}</h2>
-    {{ devices }}
+    {% if devices|length > 0 %}
+      <table class="table table-condensed" style="border-collapse:collapse;">
+            <thead>
+                    <tr>
+                        <td>{% trans %}Device Type{% endtrans %}</td>
+                        <td>{% trans %}Feature{% endtrans %}</td>
+                        <td>{% trans %}Data{% endtrans %}</td>
+                    </tr>
+            </thead>
+            <tbody>
+            {% for dev in devices %}
+                    <tr>
+			<td>{{ dev.device_type_id }}</td>
+			<td>{{ dev.feature }}</td>
+			<td>{{ dev.data }}</td>
+                    </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <script type="text/javascript">
+                ws.onmessage = function(e) {
+                        data = JSON.parse(e.data);
+                        if (data.msgid == "device.new" ) {
+				alert(data.content);
+                        }
+                }
+        </script>
+    {% else %}
+    <div class="alert alert-warning">{% trans %}No new devices found{% endtrans %}</div>
+    {% endif %}
 </div>
 {% endblock %}
