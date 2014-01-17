@@ -435,9 +435,10 @@ class XplPlugin(BasePlugin, MQRep):
 
                 # publish new devices update
                 self._pub.send_event('device.new',
-                                     {"type" : type,
+                                     {"type" : "plugin",
                                       "name" : self._name,
                                       "host" : self.get_sanitized_hostname(),
+                                      "client_id" : "plugin-{0}.{1}".format(self._name, self.get_sanitized_hostname()),
                                       "devices" : self.new_devices})
 
                 # TODO : later (0.4.0+), publish one "new device" notification with only the new device detected

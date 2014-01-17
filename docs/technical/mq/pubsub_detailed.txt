@@ -125,7 +125,7 @@ An example to catch these messages is available as *src/domogik/examples/mq-pyth
 
 You will get messages like this: ::
 
-    {u'host': u'darkstar', u'type': u'xpl_stats', u'name': u'rfxcom', u'devices': [{u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'temperature', u'data': {u'address': u'th1 0x2504'}}, {u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'humidity', u'data': {u'address': u'th1 0x2504'}}, {u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'temperature', u'data': {u'address': u'th1 0xd601'}}, {u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'humidity', u'data': {u'address': u'th1 0xd601'}}]}
+    {u'client_id': u'plugin-rfxcom.darkstar', u'host': u'darkstar', u'type': u'plugin', u'name': u'rfxcom', u'devices': [{u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'temperature', u'data': {u'device': u'th1 0x2504', u'reference': u'THGN122/123, THGN132, THGR122/228/238/268'}}, {u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'humidity', u'data': {u'device': u'th1 0x2504', u'reference': u'THGN122/123, THGN132, THGR122/228/238/268'}}, {u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'temperature', u'data': {u'device': u'th1 0xd601', u'reference': u'THGN122/123, THGN132, THGR122/228/238/268'}}, {u'device_type_id': u'rfxcom.temperature_humidity', u'type': u'xpl_stats', u'feature': u'humidity', u'data': {u'device': u'th1 0xd601', u'reference': u'THGN122/123, THGN132, THGR122/228/238/268'}}]}
 
 
 
