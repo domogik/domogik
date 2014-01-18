@@ -63,10 +63,14 @@ The following tutorials are not mandatory to use Domogik. You can pick just what
 Quick start guide
 -----------------
 
+.. todo::
+    complete
+
 * :doc:`Terms </enduser/quick_start/terms>`
 * :doc:`First use : go to the admin </enduser/quick_start/first_use>`
 * :doc:`Find and install a package </enduser/quick_start/install_a_package>`
 * configure a client and create its devices
+* :doc:`What is an orphan device ? <enduser/packages/orphans>`
 * start a client
 * :doc:`Clients status </enduser/quick_start/clients_status>`
 
