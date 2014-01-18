@@ -46,6 +46,8 @@ XplGW                   manager             client.conversion.get client.convers
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 Rest                    manager             device_types.get      device_types.result      req_device_types.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
+Plugins                 dbmgr               device.get            device.result            req_device.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
 UIs                     manager             package.detail.get    package.detail.result    req_package_detail.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 UIs                     manager             plugin.start.do       plugin.start.result      req_plugin_start.py
