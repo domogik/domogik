@@ -116,7 +116,7 @@
             "device_type_id": "roowifi.command", 
             "feature_type": "sensor", 
             "id": "roowifi.command.charging_state", 
-            "name": "Docker", 
+            "name": "State", 
             "parameters": "{}", 
             "return_confirmation": "0", 
             "stat_key": "charging-state", 
