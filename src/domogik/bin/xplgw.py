@@ -40,15 +40,16 @@ from domogik.mq.pubsub.publisher import MQPub
 from domogik.mq.pubsub.subscriber import MQSyncSub
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
+from domogik.mq.pubsub.subscriber import MQAsyncSub
 import time
 import traceback
 import calendar
 import zmq
 import json
-from domogik.common.utils import call_package_conversion
+import sys
 
 ################################################################################
-class XplManager(XplPlugin):
+class XplManager(XplPlugin, MQAsyncSub):
     """ Statistics manager
     """
 
@@ -56,12 +57,16 @@ class XplManager(XplPlugin):
         """ Initiate DbHelper, Logs and config
         """
         XplPlugin.__init__(self, 'xplgw')
+        MQAsyncSub.__init__(self, self.zmq, 'xplgw', ['client.conversion', 'client.list'])
+
         self.log.info(u"XPL manager initialisation...")
         self._db = DbHelper()
         self.pub = MQPub(zmq.Context(), 'xplgw')
         self.stats = None
         self.client_xpl_map = {}
+	self.client_conversion_map = {}
         self._load_client_to_xpl_target()
+	self._load_conversions()
         self.load()
         self.ready()
 
@@ -77,18 +82,45 @@ class XplManager(XplPlugin):
 	elif msg.get_action() == "cmd.send":
             self._send_xpl_command(msg)
 
+    def on_message(self, msgid, content):
+        if msgid == 'client.conversion':
+            self._parse_conversions(content)
+        elif msgid == 'client.list':
+            self._parse_xpl_target(content)
+
     def _load_client_to_xpl_target(self):
         cli = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action('client.list.get')
         response = cli.request('manager', msg.get(), timeout=10)
         if response:
-            data = response.get_data()
-            for cli in data:
-                self.client_xpl_map[cli] = data[cli]['xpl_source']
+            self._parse_xpl_target(response.get_data())
         else:
             self.log.error(u"Updating client list was not successfull, no response from manager")
 
+    def _parse_xpl_target(self, data):
+        print "============================ target"
+        tmp = {}
+        for cli in data:
+            tmp[cli] = data[cli]['xpl_source']
+        self.client_xpl_map = tmp
+    
+    def _load_conversions(self):
+        print "============================ conversion"
+        cli = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('client.conversion.get')
+        response = cli.request('manager', msg.get(), timeout=10)
+        if response:
+            self._parse_conversions(response.get_data())
+        else:
+            self.log.error(u"Updating client conversion list was not successfull, no response from manager")
+
+    def _parse_conversions(self, data):
+        tmp = {}
+        for cli in data:
+            tmp[cli] = data[cli]
+        self.client_conversion_map = tmp
 
     def _send_xpl_command(self, data):
         """ Reply to config.get MQ req
@@ -136,9 +168,10 @@ class XplManager(XplPlugin):
 				    value = request['cmdparams'][p.key]
 				    # chieck if we need a conversion
 				    if p.conversion is not None and p.conversion != '':
-				        value = call_package_conversion(\
-						self.log, dev['client_id'], \
-						p.conversion, value)
+                                        if dev['client_id'] in self.client_conversion_map:
+ 				            if p.conversion in self.client_conversion_map[dev['client_id']]:
+                                                exec(self.client_conversion_map[dev['client_id']][p.conversion])
+					        value = locals()[p.conversion](value)
 				    msg.add_data({p.key : value})
 				else:
 				    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(p.key)
@@ -215,10 +248,10 @@ class XplManager(XplPlugin):
                     continue
                 # xpl-trig
                 self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
-                                  "xpl-trig", self.log, self._db, self.pub))
+                                  "xpl-trig", self.log, self._db, self.pub, self.client_conversion_map))
                 # xpl-stat
                 self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
-                                  "xpl-stat", self.log, self._db, self.pub))
+                                  "xpl-stat", self.log, self._db, self.pub, self.client_conversion_map))
         except:
             self.log.error(u"%s" % traceback.format_exc())
         self._db.close_session()
@@ -229,7 +262,7 @@ class XplManager(XplPlugin):
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, dev, stat, sensor, xpl_type, log_stats, dbh, pub):
+        def __init__(self, xpl, dev, stat, sensor, xpl_type, log_stats, dbh, pub, conversions):
             """ Initialize a stat instance
             @param xpl : A xpl manager instance
             @param dev : A Device reference
@@ -244,6 +277,7 @@ class XplManager(XplPlugin):
             self._stat = stat
             self._sen = sensor
             self._pub = pub
+	    self._conv = conversions
 
             ### build the filter
             params = {'schema': stat.schema, 'xpltype': xpl_type}
@@ -288,11 +322,10 @@ class XplManager(XplPlugin):
                             if store:
                                 # check if we need a conversion
                                 if self._sen.conversion is not None and self._sen.conversion != '':
-                                    value = call_package_conversion(\
-                                                self._log_stats, \
-                                                self._dev['client_id'], \
-                                                self._sen.conversion, \
-                                                value)
+                                    if self._dev['client_id'] in self._conv:
+ 				        if self._sen.conversion in self._conv[self._dev['client_id']]:
+                                            exec(self._conv[self._dev['client_id']][self._sen.conversion])
+					    value = locals()[self._sen.conversion](value)
                                 self._log_stats.info( \
                                         "Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
                                         .format(self._dev['name'], self._dev['id'], self._sen.name, self._sen.id, param.key, value))
