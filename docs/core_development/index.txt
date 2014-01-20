@@ -1,0 +1,6 @@
+================
+Core development
+================
+
+.. todo::
+    Add some informations for core developpers

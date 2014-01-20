@@ -52,10 +52,12 @@ Each item has several properties:
 * **conversion** : if not an empty string, what conversion function to call before storing the value in the db, the function should return the data in the format acording to the data_type. More informations in the :doc:`conversion chapter </package_development/plugins/conversion/index>`.
 * **history** : some extra parameters that can be used to define what to store in the history table
     * **store** : can be True or False, if True the values will be stored in the sensor_history table
-    * **max** : max number of records that will be stored in the history table, if 0 the max number is infinate, this will only be evaluated if tstore is True
+    * **max** : max number of records that will be stored in the history table, if 0 the max number is infinate, this will only be evaluated if store is True
     * **expire** : how long the history needs to be kept, if 0 the stats will bekept forever. Its counted in days, so a value of 10 means keep the history for 10 days. This will only be evaluated if store is True
-    * **round_value** : a number that will be used for the reduced stats storage. This will only be evaluated if tstore is True
+    * **round_value** : a number that will be used for the reduced stats storage. This will only be evaluated if store is True
     * **duplicate** : if set to true, duplicate values following each other will be stored, if set to false this will not happen
 
-What happens if a sensor value needs to be store
-================================================
+
+.. todo::
+    * Tell what happens if both max and expire != 0
+    * Explain round_value with examples
