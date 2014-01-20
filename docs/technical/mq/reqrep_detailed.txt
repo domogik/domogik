@@ -55,6 +55,23 @@ You will get a reply like this: ::
     ['client.conversion.result', '{"plugin-onewire.darkstar": {}, "plugin-rfxcom.darkstar": {}, "plugin-velbus.darkstar": {"from_level_to_DT_Switch": "def from_level_to_DT_Switch(x):\\n    if x == \'255\':\\n        return int(1)\\n    if x == \'0\':\\n        return int(0)\\n\\n", "from_DT_Scaling_to_level": "def from_DT_Scaling_to_level(x):\\n    # 0 - 100 translated to 0 - 255\\n    return round(int(x) / 100 * 255)\\n\\n", "from_level_to_DT_Scaling": "def from_level_to_DT_Scaling(x):\\n    # 0 - 255 translated to 0 - 100\\n    return round(int(x) / 255 * 100)\\n", "from_input_to_DT_State": "def from_input_to_DT_State(x):\\n    if x == \'LOW\':\\n        return 0\\n    else:\\n        return 1\\n\\n", "from_DT_Switch_to_level": "def from_DT_Switch_to_level(x):\\n    if x == \'1\':\\n        return int(255)\\n    else:\\n        return int(0)\\n\\n"}, "plugin-diskfree.darkstar": {}}']
 
 
+device.get
+==============
+
+Request : a plugin
+Reply : Dbmgr
+
+To get the devices of a client, the client send on startup a MQ request *device.get* to the Dbmgr
+
+There is no way to dynamically get updates with pub/sub messages.
+
+An example to send the request is available as *src/domogik/examples/mq-python/req_device.py*.
+
+You will get a reply like this: ::
+
+    ['device.result', '{"status": true, "name": "diskfree", "reason": "", "devices": [{"xpl_stats": {"get_total_space": {"json_id": "get_total_space", "name": "Total space", "id": 21, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "total_space"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_total_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_free_space": {"json_id": "get_free_space", "name": "Free space", "id": 23, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "free_space"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_free_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_used_space": {"json_id": "get_used_space", "name": "Used space", "id": 24, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "used_space"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_used_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_percent_used": {"json_id": "get_percent_used", "name": "Percent used", "id": 22, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "percent_used"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_percent_used", "key": "current"}]}, "schema": "sensor.basic"}}, "commands": {}, "description": "", "reference": "", "xpl_commands": {}, "client_id": "plugin-diskfree.darkstar", "device_type_id": "diskfree.disk_usage", "sensors": {"get_total_space": {"conversion": "", "name": "Total Space", "data_type": "DT_Byte", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 21, "reference": "get_total_space"}, "get_free_space": {"conversion": "", "name": "Free Space", "data_type": "DT_Byte", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 23, "reference": "get_free_space"}, "get_used_space": {"conversion": "", "name": "Used Space", "data_type": "DT_Byte", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 24, "reference": "get_used_space"}, "get_percent_used": {"conversion": "", "name": "Percent used", "data_type": "DT_Scaling", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 22, "reference": "get_percent_used"}}, "parameters": {"interval": {"key": "interval", "type": "integer", "id": 1, "value": "1"}}, "id": 7, "name": "/tmp"}], "host": "darkstar", "type": "plugin"}']
+
+
 device.new.get
 ==============
 

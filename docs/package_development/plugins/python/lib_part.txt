@@ -73,3 +73,22 @@ Listen for xPL messages
 -----------------------
 
 As explained in the binary part, there is nothing to do in the library about catching some xPL messages. The xPL messages are catched in the binary part, they are analysed and to finish, some functions or methods from the library are directly called from the binary part. So, you just need to prepare the needed function with the parameters you need and call these functions from the binary part.
+
+
+Focus on devices
+================
+
+Stop the plugin if no device has been created ?
+---------------------------------------------
+
+.. todo::
+    It depends on the plugin :). If there is devices detection, it should not stop for example.
+    Give some examples
+
+Detected devices
+----------------
+
+In some plugins, the hardware or service is able to see all devices, even if the user didn't create a Domogik device for it! If so, you should implement the automatic devices detection. So, all detected devices informations will be sent over MQ and the user interfaces will be able to display them.
+
+:doc:`More informations in the detected devices chapter <detected_devices>`
+

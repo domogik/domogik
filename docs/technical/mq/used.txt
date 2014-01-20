@@ -27,8 +27,8 @@ Rules to apply
   * status = True / False
   * reason = "a reason if status = False, empty is status = True"
 
-======================= =================== ===================== ====================== ========================
-Source                  Destination         action req          action rep             Python example
+======================= =================== ===================== ======================== ========================
+Source                  Destination         action req            action rep               Python example
 ======================= =================== ===================== ======================== ========================
 rest                    xplgw               reload                reload.result            req_reload.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
@@ -45,6 +45,8 @@ UIs                     manager             client.detail.get     client.detail.
 XplGW                   manager             client.conversion.get client.conversion.result req_client_conversion.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 Rest                    manager             device_types.get      device_types.result      req_device_types.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+Plugins                 dbmgr               device.get            device.result            req_device.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 UIs                     manager             package.detail.get    package.detail.result    req_package_detail.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
@@ -78,7 +80,7 @@ UIs                     scenario            scenario.create       scenario.resul
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 UIs                     scenario            scenario.eval         scenario.result
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
-rest, scenario          xplgw               cmd.send              cmd.send.result        req_xplcmd_send.py
+rest, scenario          xplgw               cmd.send              cmd.send.result          req_xplcmd_send.py
 ======================= =================== ===================== ======================== ========================
 
 *clients.\** and *package.\** may seems similar. It is not the case! *clients.\** are related to all the xpl clients which are a package installed on a Domogik host.

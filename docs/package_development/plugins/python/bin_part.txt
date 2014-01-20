@@ -187,9 +187,9 @@ The plugin global configuration
 If you except the mandatory *auto_startup* key, a plugin can have no configuration elements and another one can have multimple configuration elements. A plugin without configuration elements can be started without any configuration from the user (but maybe the user will need to create some devices : we will see this later). But for plugins with some configuration elements, the plugin developper may want to check that the plugin has been configured before the plugin can start!
 This can be done by calling the function ``self.check_configured()``* and check its return value: ::
 
-            # check if the plugin is configured. If not, this will stop the plugin and log an error
-            if not self.check_configured():
-                return
+    # check if the plugin is configured. If not, this will stop the plugin and log an error
+    if not self.check_configured():
+        return
 
 How this functions works ? It is quite simple: when the user save the plugin configuration on a user interface, a *configured* key is inserted in database for the plugin and the host on which it is installed. If this key is not set to true in database, when you call this function, it will return False.
 
@@ -201,79 +201,79 @@ To retrieve a configuration parameter value, you just need to do this: ::
 This function will check in database if a value is set for the key *interval* and the host where the plugin is installed. If there is such a value, it will be cast returned and casted to the data type configured in the json file. If there is no value, the default value configured in the json file will be returned.
 So, you don't need to cast the value and you don't need to handle some default value as it is already done in the json file. 
 
-Notice that the *auto_startup* configuration key which is mandatory in the json file is not to handle in the plugin. This is a configuration key used only by the *manager*.
+Notice that the *auto_startup* configuration key which is dynamically added to the configuration parameters set in the *info.json* file is not to handle in the plugin. This is a configuration key used only by the *manager*.
 
 Get the created devices list for a plugin
 -----------------------------------------
 
 Some plugins may need to know the devices on which they need to interact. To get the devices list, just do: ::
 
-            # get the devices list
-            self.devices = self.get_device_list(quit_if_no_device = True)
+    # get the devices list
+    self.devices = self.get_device_list(quit_if_no_device = True)
 
 If your plugin needs some devices to be created to be run, set the parameter *quit_if_no_device* to *True*. If you do so and if no device exists when the plugin starts, the plugin will stop itself and log an error about this.
 
 Then, you can make a look on the device list and for each device get its parameters and do something (launch a thread, create a listener, ...). Example for the loop: ::
 
-            # loop on all found devices
-            for a_device in self.devices:
-                try:
-                    # get the configuration values for the key 'the_key' for the sensor 'the_sensor' of the device
-                    the_value = self.get_parameter_for_feature(a_device, "xpl_stats", "the_sensor", "the_key")
+    # loop on all found devices
+    for a_device in self.devices:
+        try:
+            # get the configuration values for the key 'the_key' for the sensor 'the_sensor' of the device
+            the_value = self.get_parameter_for_feature(a_device, "xpl_stats", "the_sensor", "the_key")
 
-                    # do something
-                except:
-                    # if there is an error, log it
-                    self.log.error(traceback.format_exc())
-                    # if the error is something blocking (a hardware gateway unavailable for exemple), you may want the plugin to stop. 
-                    # if so, uncomment the following lines
-                    #self.force_leave()
-                    #return
+            # do something
+        except:
+            # if there is an error, log it
+            self.log.error(traceback.format_exc())
+            # if the error is something blocking (a hardware gateway unavailable for exemple), you may want the plugin to stop. 
+            # if so, uncomment the following lines
+            #self.force_leave()
+            #return
 
 Here is an example from the *diskfree* plugin: ::
 
-            # get the devices list
-            self.devices = self.get_device_list(quit_if_no_device = True)
-            
-            # instantiate the class of the library
-            # notice that we sent as parameters some callbacks :
-            # * the logger object (self.log)
-            # * the function to send a xPL messages
-            # * a function to help to stop the plugin
-            disk_manager = Disk(self.log, self.send_xpl, self.get_stop())
-            
-            # loop on all found devices
-            threads = {}
-            for a_device in self.devices:
-                try:
-                    ### feature get_total_space
-                    # get the path to check for the sensor 'get_total_space' of the device. The configuration key is 'device'
-                    path = self.get_parameter_for_feature(a_device, "xpl_stats", "get_total_space", "device")
-                    # get the interval between each check for the sensor 'get_total_space' of the device. The configuration key is 'interval'
-                    interval = self.get_parameter_for_feature(a_device, "xpl_stats", "get_total_space", "interval")
-
-                    self.log.info("Start monitoring totel space for '%s'" % path)
-                    # start a thread
-                    # the thread must be named to be explicit in the logs 
-                    thr_name = "{0}-{1}".format(a_device['name'], "get_total_space")
-                    # create the thread
-                    threads[thr_name] = threading.Thread(None,
-                                                   disk_manager.get_total_space,
-                                                  thr_name,
-                                                  (path, interval,),
-                                                  {})
-                    # start the thread
-                    threads[thr_name].start()
-
-                    # [...] 3 other features are managed like this in the plugin
+    # get the devices list
+    self.devices = self.get_device_list(quit_if_no_device = True)
     
-                except:
-                    # if there is an error, log it
-                    self.log.error(traceback.format_exc())
-                    # we don't quit plugin if an error occured
-                    # a disk can have been unmounted for a while
-                    #self.force_leave()
-                    #return
+    # instantiate the class of the library
+    # notice that we sent as parameters some callbacks :
+    # * the logger object (self.log)
+    # * the function to send a xPL messages
+    # * a function to help to stop the plugin
+    disk_manager = Disk(self.log, self.send_xpl, self.get_stop())
+            
+    # loop on all found devices
+    threads = {}
+    for a_device in self.devices:
+        try:
+            ### feature get_total_space
+            # get the path to check for the sensor 'get_total_space' of the device. The configuration key is 'device'
+            path = self.get_parameter_for_feature(a_device, "xpl_stats", "get_total_space", "device")
+            # get the interval between each check for the sensor 'get_total_space' of the device. The configuration key is 'interval'
+            interval = self.get_parameter_for_feature(a_device, "xpl_stats", "get_total_space", "interval")
+
+            self.log.info("Start monitoring totel space for '%s'" % path)
+            # start a thread
+            # the thread must be named to be explicit in the logs 
+            thr_name = "{0}-{1}".format(a_device['name'], "get_total_space")
+            # create the thread
+            threads[thr_name] = threading.Thread(None,
+                                           disk_manager.get_total_space,
+                                          thr_name,
+                                          (path, interval,),
+                                          {})
+            # start the thread
+            threads[thr_name].start()
+
+            # [...] 3 other features are managed like this in the plugin
+
+        except:
+            # if there is an error, log it
+            self.log.error(traceback.format_exc())
+            # we don't quit plugin if an error occured
+            # a disk can have been unmounted for a while
+            #self.force_leave()
+            #return
 
 Notice in this example that we get the devices list, then instantiate the class of the library and finally, for each device, call a method (or more if needed) from the library class in a thread.
 
@@ -282,8 +282,8 @@ Focus on the end : plugin ready
 
 At the end of your *__init__* function, just add these 2 lines: ::
 
-            self.ready()
-            self.log.info("Plugin ready :)")
+    self.ready()
+    self.log.info("Plugin ready :)")
 
 
 Focus on the logs
@@ -356,33 +356,33 @@ To allow the plugin to send some xPL messages, you must create such a function i
 
 Here is a template: ::
 
-        def send_xpl(self, arg1, arg2, ...):
-            """ Send xPL message on network
-            """
-            self.log.debug("Sending xPL message for arg1={0}, arg2={1}...".format(arg1, arg2))
-            msg = XplMessage()
-            msg.set_type("xpl-stat")
-            msg.set_schema("aschema.basic")
-            msg.add_data({"key1" : arg1})
-            msg.add_data({"key2" : arg2})
-            # ...
-            self.myxpl.send(msg)
+    def send_xpl(self, arg1, arg2, ...):
+        """ Send xPL message on network
+        """
+        self.log.debug("Sending xPL message for arg1={0}, arg2={1}...".format(arg1, arg2))
+        msg = XplMessage()
+        msg.set_type("xpl-stat")
+        msg.set_schema("aschema.basic")
+        msg.add_data({"key1" : arg1})
+        msg.add_data({"key2" : arg2})
+        # ...
+        self.myxpl.send(msg)
 
 This function should be called from the library part. To allow the library part to call this function, you must sends this function as a callback parameter to the library.
 
 Here is an example of the function for the *sensor.basic* xPL message: ::
 
-        def send_xpl(self, address, type, value):
-            """ Send xPL message on network
-            """
-            self.log.debug("Values for {0} on {1} : {2}".format(type, address, value))
-            msg = XplMessage()
-            msg.set_type("xpl-stat")
-            msg.set_schema("sensor.basic")
-            msg.add_data({"device" : address})
-            msg.add_data({"type" : type})
-            msg.add_data({"current" : value})
-            self.myxpl.send(msg)
+    def send_xpl(self, address, type, value):
+        """ Send xPL message on network
+        """
+        self.log.debug("Values for {0} on {1} : {2}".format(type, address, value))
+        msg = XplMessage()
+        msg.set_type("xpl-stat")
+        msg.set_schema("sensor.basic")
+        msg.add_data({"device" : address})
+        msg.add_data({"type" : type})
+        msg.add_data({"current" : value})
+        self.myxpl.send(msg)
 
 Let's see how to use it with the library...
 
@@ -396,7 +396,8 @@ As you can see here, the ``self.send_xpl`` function is set as a parameter. We wi
 Listen for xPL messages
 -----------------------
 
-TODO
+.. todo::
+    TODO !
 
 
 Focus on launching threads 
