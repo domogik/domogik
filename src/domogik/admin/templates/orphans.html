@@ -3,6 +3,12 @@
 {% block content %}
 <div class="container">
     <h2>{% trans %}Orphan Devices{% endtrans %}</h2>
+    <p>{% trans %}Orphan devices are devices created for a client which is no more detected by Domogik. Many reasons can explain this:{% endtrans %}</p>
+    <ul>
+        <li>{% trans %}The hostname of the server has been changed.{% endtrans %}</li>
+        <li>{% trans %}The device was created for a plugin which has been uninstalled.{% endtrans %}</li>
+        <li>{% trans %}The device is related to a xPL client which is not part of Domogik. If this xPL client is shut or unplug, Domogik doesn't see it anymore and the device is set as orphan. If the client come back to life, the device won't be an orphan anymore.{% endtrans %}</li>
+    </ul></p>
     {% if devices|length > 0 %}
       <table class="table table-striped table-hover table-condensed">
             <thead>

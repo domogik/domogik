@@ -23,16 +23,18 @@
             {% endfor %}
             </tbody>
         </table>
+    {% else %}
+    <div class="alert alert-warning">{% trans %}No new devices found{% endtrans %}</div>
+    {% endif %}
         <script type="text/javascript">
                 ws.onmessage = function(e) {
                         data = JSON.parse(e.data);
                         if (data.msgid == "device.new" ) {
-				alert(data.content);
+				if (data.content.client_id == "{{ client_id }}") {
+					alert(data.devices);
+				}
                         }
                 }
         </script>
-    {% else %}
-    <div class="alert alert-warning">{% trans %}No new devices found{% endtrans %}</div>
-    {% endif %}
 </div>
 {% endblock %}
