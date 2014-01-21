@@ -94,7 +94,7 @@ class roowifi(XplPlugin):
                         self._send_XPL_STAT("xpl-stat", self._name, "buttons", self._sensors["Buttons"])
                         #self._send_XPL_STAT("xpl-stat", self._name, "distance", self._sensors["Distance"])
                         #self._send_XPL_STAT("xpl-stat", self._name, "angle", self._sensors["Angle"])
-                        self._send_XPL_STAT("xpl-stat", self._name, "charging-state", str(self._sensors["Charging State"]))
+                        self._send_XPL_STAT("xpl-stat", self._name, "state", str(self._sensors["State"]))
                         #self._send_XPL_STAT("xpl-stat", self._name, "voltage", self._sensors["Voltage"])
                         self._send_XPL_STAT("xpl-stat", self._name, "current", self._sensors["Current"])
                         self._send_XPL_STAT("xpl-stat", self._name, "temperature", self._sensors["Temperature"])
