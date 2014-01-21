@@ -44,7 +44,7 @@ import sys
 
 FlagDebug = False # pour debug eviter recurtion +2, passé a True pour debug
 
-OZWPLuginVers = "0.2c4"
+OZWPLuginVers = "0.2c2"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])
@@ -72,14 +72,17 @@ Capabilities = ['Primary Controller', 'Secondary Controller', 'Static Update Con
 # Listes de commandes Class reconnues comme device domogik
 CmdsClassAvailable = ['COMMAND_CLASS_BASIC', 'COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 
                                'COMMAND_CLASS_SENSOR_MULTILEVEL', 'COMMAND_CLASS_BATTERY',  'COMMAND_CLASS_METER', 
-                               'COMMAND_CLASS_SWITCH_MULTILEVEL', 'COMMAND_CLASS_THERMOSTAT_SETPOINT' ]
+                               'COMMAND_CLASS_SWITCH_MULTILEVEL', 'COMMAND_CLASS_THERMOSTAT_SETPOINT',  'COMMAND_CLASS_ALARM', 
+                               'COMMAND_CLASS_SENSOR_ALARM']
                                
 # Listes des types reconnues comme device domogik (label openzwave)
 DomogikTypeAvailable = ['temperature', 'relative-humidity', 'humidity', 'battery-level', 'sensor', 'status', # sensor
                                   'power', 'energy', 'previous-reading', 'luminance',  'general', 'motion',
-                                  'alarm-type', 'alarm-level', 'count', 'instant-energy-production', 'total-energy-production',
+                                  'count', 'instant-energy-production', 'total-energy-production',
                                   'energy-production-today', 'total-production-time', 'indicator', 'locked', 'level',
-                                  'operating-state', 
+                                  'operating-state',
+                                  'alarm-type', 'alarm-level','general', 'tamper-event',  'low-battery', 'smoke',
+                                  'carbonmonoxide', 'carbondioxide', 'heat', 'flood', 
                                   'basic', 'switch', 'level', 'step-size', 'inc', 'dec', 'bright', 'dim',  'toggle-switch',  # Actuaror
                                   'fan-mode',  'fan-state', 'mode',  'operating-state',  'setpoint', 'heating']
 

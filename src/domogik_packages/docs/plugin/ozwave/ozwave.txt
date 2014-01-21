@@ -322,10 +322,9 @@ In Domogik administration, go to the ozwave configuration page.
 |                |               |     openzwavecpp/src/Manager.cpp at line 320, in Driver* Manager::GetDriver          |
 |                |               |     function, comment assert(0) function : // assert(0);                             |
 |                |               |                                                                                      |
-|                |               |     Then, delete libopenzwave then uninstall python-openzwave.                       |
-|                |               |     Compile and reinstall python-openzwave.                                          |
+|                |               |     You must compile and reinstall python-openzwave.                                    |
 |                |               |     This modification is not recommended if you don't control svn repposit,          |
-|                |               |     the next update of openzwave revision will require manual intervention.          |
+|                |               |     the next update of openzwave revision could require manual intervention.          |
 +----------------+---------------+--------------------------------------------------------------------------------------+
 | ozwlog         | false         | Activate openzwave log. Only for debuging action.                                    |
 |                |               |                                                                                      |
