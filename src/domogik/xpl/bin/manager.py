@@ -250,26 +250,9 @@ class SysManager(XplPlugin):
                 self._list_external_models()
  
             # Start plugins at manager startup
-            self.log.debug("Check non-system plugins to start at manager startup...")
-            self._write_fifo("INFO", "Check non-system plugins to start at manager startup.\n")
-            comp_thread = {}
-            for plugin in self._plugins:
-                if plugin["check_startup_option"]:
-                    name = plugin["name"]
-                    self.log.debug("%s..." % name)
-                    self._config = Query(self.myxpl, self.log)
-                    startup = self._config.query(name, 'startup-plugin')
-                    # start plugin
-                    if startup == 'True':
-                        self.log.debug("Starting %s" % name)
-                        self._inc_startup_lock()
-                        comp_thread[name] = Thread(None,
-                                                       self._start_plugin,
-                                                       "start_plugin_%s" % name,
-                                                       (name,),
-                                                       {"startup" : True})
-                        self.register_thread(comp_thread[name])
-                        comp_thread[name].start()
+            startup_plugins = Thread(None, self._startup_plugins, "th_startup_plugins", (), {})
+            self.register_thread(startup_plugins)
+            startup_plugins.start()
             
             # Define listeners
             Listener(self._system_action_cb, self.myxpl, {
@@ -367,6 +350,71 @@ class SysManager(XplPlugin):
         except:
             self.log.error("%s" % traceback.format_exc())
             print("%s" % traceback.format_exc())
+
+    def _startup_plugins(self):
+        """ Start plugins, with auto start option, after rest full init.
+            Called during manager startup.
+        """
+        # waiting for rest response
+        if self._waitForRest() :
+            self.log.debug("Check non-system plugins to start at manager startup...")
+            self._write_fifo("INFO", "Check non-system plugins to start at manager startup.\n")
+            comp_thread = {}
+            for plugin in self._plugins:
+                if plugin["check_startup_option"]:
+                    name = plugin["name"]
+                    self.log.debug("%s..." % name)
+                    self._config = Query(self.myxpl, self.log)
+                    startup = self._config.query(name, 'startup-plugin')
+                    # start plugin
+                    if startup == 'True':
+                        self.log.debug("Starting %s" % name)
+                        self._inc_startup_lock()
+                        comp_thread[name] = Thread(None,
+                                                       self._start_plugin,
+                                                       "start_plugin_%s" % name,
+                                                       (name,),
+                                                       {"startup" : True})
+                        self.register_thread(comp_thread[name])
+                        comp_thread[name].start()
+        else : 
+            self.log.warning("Manager start-up can't start plugins, REST don't response.")
+
+    def _waitForRest(self):
+        """ Wait until the rest http server is available, timeout = 180s output.
+        """
+        import urllib2
+        
+        cfg_rest = Loader('rest')
+        config_rest = cfg_rest.load()
+        conf_rest = dict(config_rest[1])
+        if conf_rest['rest_use_ssl'] == 'False' : protocol = 'http'
+        else : protocol = 'https'
+        rest = "%s://%s:%s" % (protocol, conf_rest['rest_server_ip'], conf_rest['rest_server_port'])
+        the_url = "%s/base/device/list" % (rest)
+        rest_ok = False
+        time_out = False
+        t = time.time()
+        while not self.get_stop().isSet() and not time_out and not rest_ok:
+            self.log.debug("Try to join rest at :{0}".format(the_url))
+            try :
+                req = urllib2.Request(the_url)
+                handle = urllib2.urlopen(req)
+                devices = handle.read()
+            except IOError,  e:
+                if time.time() - t >= 180 : time_out = True
+                else : 
+                    self.log.debug("REST no response, wait 3s for next try. {0}".format(e.reason))
+                    self.get_stop().wait(3)
+            else : rest_ok = True
+        if rest_ok : return True
+        else:
+            if time_out :
+                self.log.error("REST not response (by timeout) plugins don't process auto-start :(")
+                return False
+            else :
+                self.log.error("REST not response (by stop manager) plugins don't process auto-start :(")
+                return False
 
     def _reload_configuration_file(self):
         """ reload all plugins and external list
