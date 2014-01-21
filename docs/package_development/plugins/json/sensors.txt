@@ -52,12 +52,61 @@ Each item has several properties:
 * **conversion** : if not an empty string, what conversion function to call before storing the value in the db, the function should return the data in the format acording to the data_type. More informations in the :doc:`conversion chapter </package_development/plugins/conversion/index>`.
 * **history** : some extra parameters that can be used to define what to store in the history table
     * **store** : can be True or False, if True the values will be stored in the sensor_history table
-    * **max** : max number of records that will be stored in the history table, if 0 the max number is infinate, this will only be evaluated if store is True
-    * **expire** : how long the history needs to be kept, if 0 the stats will bekept forever. Its counted in days, so a value of 10 means keep the history for 10 days. This will only be evaluated if store is True
-    * **round_value** : a number that will be used for the reduced stats storage. This will only be evaluated if store is True
+    * **max** : max number of records that will be stored in the history table, if 0 the max number is infinate.
+    * **expire** : how long the history needs to be kept, if 0 the stats will bekept forever. Its counted in days, so a value of 10 means keep the history for 10 days.
+    * **round_value** : a number that will be used for the reduced stats storage. This will only be evaluated if tstore is True
     * **duplicate** : if set to true, duplicate values following each other will be stored, if set to false this will not happen
 
+What happens if a sensor value needs to be store
+================================================
 
-.. todo::
-    * Tell what happens if both max and expire != 0
-    * Explain round_value with examples
+1. Check that the value is not in the ignore_values list of a xpl stat parameter, else abort the store process.
+2. If a conversion is defined for this sensor, run the conversion code, the next steps will happen on the converted value.
+3. If the incremental value is set, the difference between the received value and the last stored value is calculate, the result will be sued in the next steps.
+4. If the duplicate flag is set to false, and the last stored value is the same as the value at the end of step 3, abort the storage of this value
+5. If round_value is set, check if we need to store this value (check the round value section for more info).
+6. If store is set to true and the value is not the same as the previous stored value, store the value in the sensor_history table. If store is set to False the sensor history table will not be updated, only the last_value on the sensor will be udpated.
+7. If max is bigger then 0, delete all oldes values in the sensor_history table intul we only have 'max' num of items in taht table
+8. If expire is bigger then 0, delete all entries in the sensor_history table that are older then 'expire' num of days.
+
+Round Value explanation
+=======================
+The round value is used to reduce the number of stored history values.
+
+As an example why this would be needed:
+Some device can collect data every 10 seconds, in 24 hours, the device can collect 8640 items a day. If we have 10 such a devices it would result in 86400 items a day or 2678400 items a week. This would be to much data and is not usefull. To solve this problem we introduced the round_value key. Basically the round_value key will delete values that fall within a predefined range. An example explains this the best:
+
+Below is a list of received values from a sensor:
+1. 10
+2. 11
+3. 12
+4. 9
+5. 15
+6. 16
+7. 18
+8. 19
+9. 20
+
+So lets see wath will happend if round_value is set to 2:
+
+On step 1 and 2 the round value will do nothing as it needs at least 2 stored values to work.
+On step 3 the round value will do its first action, it will see that the difference between value from step 1 is smaller or equal to round_value key, meaning that it will delete the value received in step 2.
+On setp 4 it will kick in action again, at this point the data in the table is the folowing
+* 10
+* 12
+The received value is 9, as the round_value is set to 2, it will not delete anything.
+The same happend is step 5 and 6.
+On step 7 the difference is again <= round_value, so the value received in step 6 is deleted.
+So if we see whta data we will ahve after value 9 is received:
+
+* 10
+* 12
+* 9
+* 15
+* 18
+* 20
+
+In this example this will save use 66% of storage space, so for the example in the beginning of this section we will go from 2678400 items a week to 1767744 items a week.
+
+For this sytem to work its verry important that the round_value is set to a logical number for that type of sensor.
+

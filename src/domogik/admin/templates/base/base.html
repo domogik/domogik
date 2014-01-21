@@ -39,7 +39,23 @@
     {%- endblock navbar %}
     {% block content -%}
     {%- endblock content %}
-
+    <!-- set up the modal to start hidden and fade in and out -->
+    <div id="deleteConfirm" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<!-- dialog body -->
+			<div class="modal-body">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				{% trans %}Are you sure you want to delete this item?{% endtrans %}
+			</div>
+			<!-- dialog buttons -->
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary">{% trans %}YES{% endtrans %}</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal">{% trans %}NO{% endtrans %}</button>
+			</div>
+		</div>
+	</div>
+     </div>
     {% block scripts %}
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/bootstrap-notify.js"></script>

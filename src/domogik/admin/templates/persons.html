@@ -21,7 +21,7 @@
                         <td>{{ data.first_name }}</td>
                         <td>{{ data.birthdate }}</td>
                         <td>
-				<a href="/persons/{{ data.id }}">
+				<a data-toggle="modal" data-target="#deleteConfirm">
                                 {% trans %}Edit{% endtrans %}
 				</a> |
 				<a href="/persons/del/{{ data.id }}">

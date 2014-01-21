@@ -42,6 +42,7 @@
                                                     <td>{% trans %}Data Type{% endtrans %}</td>
                                                     <td>{% trans %}Last value{% endtrans %}</td>
                                                     <td>{% trans %}Last received{% endtrans %}</td>
+						    <td>&nbsp;</td>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -51,7 +52,10 @@
                                                                 <td>{{ sen.name }}</td>
                                                                 <td>{{ sen.data_type }}</td>
                                                                 <td>{{ sen.last_value }}</td>
-                                                                <td>{{ sen.last_received|datetime }} </td>
+                                                                <td>{{ sen.last_received|datetime }}</td>
+								<td>
+									<a href="client/{{ client_id }}/sensors/edit">Edit</a>
+								</td>
                                                         </tr>
                                                 {% endfor %}
                                                 </tbody>
