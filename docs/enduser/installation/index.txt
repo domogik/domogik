@@ -31,6 +31,10 @@ Even if you have python2.6 or higher installed, check that the development packa
 
     $ apt-get install python2.X-dev gcc
 
+Install setuptools: ::
+
+    $ sudo apt-get install python-setuptools
+
 Install SSL librairies: ::
 
     $ apt-get install libssl-dev 
