@@ -58,7 +58,7 @@ Each item has several properties:
     * **duplicate** : if set to true, duplicate values following each other will be stored, if set to false this will not happen
 
 .. note::
-    The values in the subsection history can be adapted after sensor creation, the cganhes will be visible in the sensor_history table once a new value is stored for that sensor.
+    The values in the subsection history can be adapted after sensor creation, the changes will be visible in the sensor_history table once a new value is stored for that sensor.
 
 .. note::
     If a sensor is set as incremental its not a good idea to set round_value to anythign different then 0. This could result in corrupt data in the sensor_history table.
@@ -82,7 +82,7 @@ The parameter is used for sensors like a kWH sensor, these sensors typically sen
 
 This means that only the difference between the last stored value will be stored, to explain it exactly w'll work with an example.
 
-For a sensor that has incremental set tue, the folowing values are received:
+For a sensor that has incremental set tue, the following values are received:
 1. 10
 2. 11
 3. 12
