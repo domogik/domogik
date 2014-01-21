@@ -48,7 +48,7 @@ Each item has several properties:
 
 * **name** : it is a string used to display this sensor on the UI
 * **data_type** : the data type used for this sensor
-* **incremental** : if set to True, store the difference between the last value and the current value
+* **incremental** : if set to True, store the difference between the last value and the current value, check the incremental section for more info.
 * **conversion** : if not an empty string, what conversion function to call before storing the value in the db, the function should return the data in the format acording to the data_type. More informations in the :doc:`conversion chapter </package_development/plugins/conversion/index>`.
 * **history** : some extra parameters that can be used to define what to store in the history table
     * **store** : can be True or False, if True the values will be stored in the sensor_history table
@@ -56,6 +56,12 @@ Each item has several properties:
     * **expire** : how long the history needs to be kept, if 0 the stats will bekept forever. Its counted in days, so a value of 10 means keep the history for 10 days.
     * **round_value** : a number that will be used for the reduced stats storage. This will only be evaluated if tstore is True
     * **duplicate** : if set to true, duplicate values following each other will be stored, if set to false this will not happen
+
+.. note::
+    The values in the subsection history can be adapted after sensor creation, the cganhes will be visible in the sensor_history table once a new value is stored for that sensor.
+
+.. note::
+    If a sensor is set as incremental its not a good idea to set round_value to anythign different then 0. This could result in corrupt data in the sensor_history table.
 
 What happens if a sensor value needs to be store
 ================================================
@@ -68,6 +74,34 @@ What happens if a sensor value needs to be store
 6. If store is set to true and the value is not the same as the previous stored value, store the value in the sensor_history table. If store is set to False the sensor history table will not be updated, only the last_value on the sensor will be udpated.
 7. If max is bigger then 0, delete all oldes values in the sensor_history table intul we only have 'max' num of items in taht table
 8. If expire is bigger then 0, delete all entries in the sensor_history table that are older then 'expire' num of days.
+
+
+Incremental explanation
+=======================
+The parameter is used for sensors like a kWH sensor, these sensors typically send over an absolute value, if we would store this value we would just get a climing chart, so the charts would not be representative. To solve this we intruduced the incremental sensor type.
+
+This means that only the difference between the last stored value will be stored, to explain it exactly w'll work with an example.
+
+For a sensor that has incremental set tue, the folowing values are received:
+1. 10
+2. 11
+3. 12
+4. 15
+5. 16
+6. 18
+
+So on the receival of the first value, incremental will just keep this value in memory, so it can calculate the diffrence on the next received values.
+
+On step 2 we will store the difference between the value received on step 1 and the one received in step 2, so we will store 1.
+The same happens on all the next steps. As a result we will get the folowing stored values:
+1. 0
+2. 1
+3. 1
+4. 3
+5. 1
+6. 2
+
+This will result in a chart that will really display the used kWH during the time period between the 2 steps.
 
 Round Value explanation
 =======================
@@ -109,4 +143,5 @@ So if we see whta data we will ahve after value 9 is received:
 In this example this will save use 66% of storage space, so for the example in the beginning of this section we will go from 2678400 items a week to 1767744 items a week.
 
 For this sytem to work its verry important that the round_value is set to a logical number for that type of sensor.
+
 
