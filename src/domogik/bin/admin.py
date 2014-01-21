@@ -83,6 +83,7 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
                 else:
                     print cli.request('manager', msg.get(), timeout=10).get()
         else:
+	    print msg
             # this is a mq message
             for cli in AdminWebSocket.clients:
                 cli.write_message({"msgid": msg, "content": content})
