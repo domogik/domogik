@@ -46,7 +46,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                {% for name, sen in data.sensors.iteritems() %}
+                                                {% for name, sen in data.sensors|sortid %}
                                                         <tr>
                                                                 <td>{{ sen.id }}</td>
                                                                 <td>{{ sen.name }}</td>
@@ -64,7 +64,7 @@
 				{% if data.commands|length > 0 %}
 				    <span class="label label-default">{% trans %}Commands{% endtrans %}</span>
                                         <table class="table table-bordered">
-					{% for name, cmd in data.commands.iteritems() %}
+					{% for name, cmd in data.commands|sortid %}
                                                 <tr>
                                                     <th>{% trans %}ID{% endtrans %}</th>
                                                     <td>{{ cmd.id }}</td>

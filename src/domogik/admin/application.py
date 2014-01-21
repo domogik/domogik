@@ -38,7 +38,11 @@ def format_babel_datetime(value, format='medium'):
         format="EE dd.MM.y HH:mm"
     return format_datetime(value, format)
 
+def sort_by_id(value):
+    return sorted(value.items(), key=lambda x: x[1]['id'])
+
 app.jinja_env.filters['datetime'] = format_babel_datetime
+app.jinja_env.filters['sortid'] = sort_by_id
 
 # import all files inside the view module
 from domogik.admin.views.index import *
