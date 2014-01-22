@@ -29,6 +29,63 @@ How the UI will get the status/value of the device feature ?
 REST only sends http code as response. If http code = 200, then the user interface should request REST to get the last sensor value (a command is always linked to a sensor in the *info.json* file).
 To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/sensor** url to get the last value.
 
+I am a user interface developper and I don't understand the values to use for the parameters in the url options!
+================================================================================================================
+
+To help you to understand with real examples, or to check you are building your **/cmd** urls in the correct way, you can go in *Domogik admin* and check the details of a device. You will see all the **/cmd** available urls for the commands and all **/sensor** available urls for the sensors.
+
+Which values should be used ?
+=============================
+
+You device is related to a :doc:`data type </package_development/plugins/data_types/index>`. Depending on the data type, you will be able to use some values.
+
+
+Example 1 : DT_Switch
+---------------------
+
+The data type *DT_Switch* allows these values: ::
+
+    DT_Switch
+            labels:
+                    1 = On
+                    0 = Off
+
+The related part in the json file which describes the data types is: ::
+
+    "DT_Switch": {
+        "labels": {
+            "0": "Off",
+            "1": "On"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+
+So, the available values that can be used in the url are *0* and *1*. The labels *on* and *off* are used only for display in the user interface : the button to send the value *0* will be named as *off*.
+
+.. note::
+    Notice that is *0* and *1* are the values of the /cmd url, these values can be translated to something else (off/on, low/high, ...) in the generated xPL message. More informations in the :doc:`conversion chapter </package_development/plugins/conversion/index>`.
+
+   The goal of the **/cmd** url is really to be the same for all devices features of the same data type! If the xPL messages are not the same for 2 plugins which use the same data type, this is handled by the plugins thanks to the *conversions*.
+
+Example 2 : DT_State (which is a boolean data type as DT_Switch)
+----------------------------------------------------------------
+
+Here is the related json part for the data type: ::
+
+    "DT_State": {
+        "labels": {
+            "0": "Inactive",
+            "1": "Active"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+
+As you can see, the only difference with the *DT_Switch* are the labels values.
+
+
+
 Flow
 ====
 
