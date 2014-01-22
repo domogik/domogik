@@ -2,12 +2,38 @@
 /cmd - send commands to devices
 ===============================
 
+Purpose
+=======
+
 The **/cmd** entry in REST is used by User Interfaces to send commands to devices. 
 
 For a xPL plugin, the translation of the url in a xPL message is done based on the database content (the device feature options) and the *info.json* file of the plugin.
 
+Url description
+===============
+
+::
+
+    http://ip:port/cmd/<command id>?<key1>=<value1>&<key2>=<value2>&...
+
+The goal is to be able to generate a xpl message based on a simple url.
+
+The url is formatted like this :
+
+* the first param is command id, this is a defined command in the DB
+* the options are corresponding to the parameters of the command, for example the status to apply to a light (on, off) or the dim level to apply to the light. The values that can be used for a device feature are related to the device feature data type.
+
+How the UI will get the status/value of the device feature ?
+============================================================
+
+REST only sends http code as response. If http code = 200, then the user interface should request REST to get the last sensor value (a command is always linked to a sensor in the *info.json* file).
+To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/sensor** url to get the last value.
+
 Flow
 ====
+
+Here is what is done when the **/cmd/...** is called:
+
 .. actdiag::
 
     actdiag {
@@ -43,30 +69,16 @@ Flow
         }
     }
 
-Developper notes 
-================
+Examples
+========
 
-Url description
----------------
-
-::
-
-    http://ip:port/cmd/<command id>?<key1>=<value1>&<key2>=<value2>&...
-
-The goal is to be able to generate a xpl message based on a simple url.
-
-The url is formatted like this :
-
-* the first param is command id, this is a defined command in the DB
-* the options are corresponding to the parameters of the command, for example the status to apply to a light (on, off) or the dim level to apply to the light. The values that can be used for a device feature are related to the device feature data type.
-
-Example
--------
+.. todo::
+    Add more examples
 
 The folowiong data is in the DB:
 
 Device
-++++++
+------
 
 ::
     
@@ -76,7 +88,7 @@ Device
     type = x10.relay
 
 Commands
-++++++++
+--------
 
 ::
     
@@ -85,7 +97,7 @@ Commands
     xpl_command_id = 12
 
 Command params
-++++++++++++++
+--------------
 
 ::
     
@@ -93,7 +105,7 @@ Command params
     key = level
 
 Xpl command
-+++++++++++
+-----------
 
 ::
     
@@ -102,7 +114,7 @@ Xpl command
     schema = lighting.device
 
 Xpl command param 
-+++++++++++++++++
+-----------------
 
 ::
 
@@ -122,8 +134,3 @@ This example demonstrates how the url can generate any type of xpl message, the 
 The commands are dynamic parameters and need to be sent via the url, the xpl command params are staticly defined, these definitions are done during device creation and are not changeable afterwards.
 
 
-How UI will get status of device ?
-==================================
-
-REST only send http code as response. If http code = 200, then the user interface should request REST to get the last sensor value.
-To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/sensor** url to get the last value.
