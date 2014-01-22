@@ -410,7 +410,7 @@ class SysManager(XplPlugin):
         if rest_ok : return True
         else:
             if time_out :
-                self.log.error("REST didn't respond (timeout 180s), plugins are not started with auto start :(")
+                self.log.error("REST didn't respond (timeout 180s), plugins are not started with auto start option:(")
                 return False
             else :
                 self.log.error("Waiting for REST response stopped in starting process, plugins are not started.")
