@@ -141,5 +141,3 @@ class roowifi(XplPlugin):
 
 if __name__ == "__main__":
     inst = roowifi()
-
-chris@EeeBox:/var/lib/domogik/domogik_packages/xpl/b
