@@ -29,6 +29,11 @@ How the UI will get the status/value of the device feature ?
 REST only sends http code as response. If http code = 200, then the user interface should request REST to get the last sensor value (a command is always linked to a sensor in the *info.json* file).
 To get (for example), the level of a dimmable device after a "+10" increasing command, UI will use **/sensor** url to get the last value.
 
+How do I find the command id ?
+==============================
+
+To find the *command id* of a device command, you first need to :doc:`query the /device url <device>` and parse the *commands* part.
+
 I am a user interface developper and I don't understand the values to use for the parameters in the url options!
 ================================================================================================================
 
