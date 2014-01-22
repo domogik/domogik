@@ -11,7 +11,7 @@ Flow
 .. actdiag::
 
     actdiag {
-get -> decode -> lookup -> gxpl -> gxpl2 -> precv -> psend -> xplgw -> lookup2 -> event -> encode -> http -> result
+        get -> decode -> lookup -> gxpl -> gxpl2 -> precv -> psend -> xplgw -> lookup2 -> event -> encode -> http -> result
 
         lane ui {
             label = "User"
