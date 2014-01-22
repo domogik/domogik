@@ -38,7 +38,7 @@ class roowifi(XplPlugin):
 
                 XplPlugin.__init__(self, name = 'roowifi')
 
-				### Create Roomba object
+                                ### Create Roomba object
                 self._roombamanager = Command(self.log)
                 # Create listeners
                 Listener(self.roowifi_command, self.myxpl, {'schema': 'roowifi.basic', 'xpltype': 'xpl-cmnd'})
@@ -63,8 +63,8 @@ class roowifi(XplPlugin):
 
                                 self.log.info("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (self._name, self._ip, self._port, self._user, self._delay))
                                 #print ("Configuration : name=%s, ip=%s, port=%s, user=%s, password=No_Log, delay=%s" % (self._name, self._ip, self._port, self._user, self._delay))
-                                
-								self.roombas[self._name] = {"ip" : self._ip, "port" : self._port, "user" : self._user,"password" : self._password, "delay" : self._delay}
+
+                                self.roombas[self._name] = {"ip" : self._ip, "port" : self._port, "user" : self._user,"password" : self._password, "delay" : self._delay}
 
                                 self._probe_thr = XplTimer(int(self._delay), self._send_probe, self.myxpl)
                                 self._probe_thr.start()
@@ -78,9 +78,9 @@ class roowifi(XplPlugin):
                 ##
                 #Uncomment line to get according XPL-Stat message !
                 ##
-                
-                self._sensors = self._roombamanager.sensor(self._ip, self._port, self._name, self._user,self._password)
 
+                self._sensors = self._roombamanager.sensor(self._ip, self._port, self._name, self._user,self._password)
+                print self._sensors
                 if self._sensors <> "N/A" :
                         #self._send_XPL_STAT("xpl-stat", self._name, "bumps-wheeldrops", self._sensors["Bumps Wheeldrops"])
                         #self._send_XPL_STAT("xpl-stat", self._name, "wall", self._sensors["Wall"])
@@ -121,13 +121,13 @@ class roowifi(XplPlugin):
                         device = message.data['device']
 
                 if 'command' in message.data:
-                        
+
                         lacommand = message.data['command']
                         self.log.debug("%s command receive for %s" % (lacommand,device))
                         print ("%s command receive for %s" % (lacommand,device))
-                        
+
                         status = self._roombamanager.command( self.roombas[device]["ip"], self.roombas[device]["port"],device, lacommand)
-                     
+
                         if status == True:
                                 print ("On va envoyer le xpl-trig pour acker la commande %s" % lacommand)
                                 self.log.debug("Ack de la command %s on %s" % (lacommand, device))
@@ -142,3 +142,4 @@ class roowifi(XplPlugin):
 if __name__ == "__main__":
     inst = roowifi()
 
+chris@EeeBox:/var/lib/domogik/domogik_packages/xpl/b
