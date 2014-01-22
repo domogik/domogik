@@ -378,7 +378,7 @@ class SysManager(XplPlugin):
                         self.register_thread(comp_thread[name])
                         comp_thread[name].start()
         else : 
-            self.log.warning("Manager start-up can't start plugins, REST don't response.")
+            self.log.warning("Manager start-up can't start plugins, REST doesn't respond.")
 
     def _waitForRest(self):
         """ Wait until the rest http server is available, timeout = 180s output.
@@ -410,10 +410,10 @@ class SysManager(XplPlugin):
         if rest_ok : return True
         else:
             if time_out :
-                self.log.error("REST not response (by timeout) plugins don't process auto-start :(")
+                self.log.error("REST didn't respond (timeout 180s), plugins are not started with auto start :(")
                 return False
             else :
-                self.log.error("REST not response (by stop manager) plugins don't process auto-start :(")
+                self.log.error("Waiting for REST response stopped in starting process, plugins are not started.")
                 return False
 
     def _reload_configuration_file(self):
