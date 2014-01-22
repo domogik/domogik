@@ -16,7 +16,7 @@
 					<key name="type" value="buttons"/>
 					<key name="type" value="distance"/>
 					<key name="type" value="angle"/>
-					<key name="type" value="charging-state"/>
+					<key name="type" value="state"/>
 					<key name="type" value="voltage"/>
 					<key name="type" value="current"/>
 					<key name="type" value="temperature"/>
@@ -53,8 +53,8 @@
 					   filter_key="type" filter_value="distance" />
 				<value field="current" new_name="angle" 
 					   filter_key="type" filter_value="angle" />
-				<value field="current" new_name="charging-state" 
-					   filter_key="type" filter_value="charging-state" />
+				<value field="current" new_name="state" 
+					   filter_key="type" filter_value="state" />
 				<value field="current" new_name="voltage" 
 					   filter_key="type" filter_value="voltage" />
 				<value field="current" new_name="current" 

@@ -63,8 +63,6 @@ table = {
                 "NUM_BYTES_PACKET_0" : 26
                 }
 
-
-
 sensors = {
                 "Bumps Wheeldrops" : 0 ,
                 "Wall" : 0 ,
@@ -89,7 +87,7 @@ sensors = {
                 "Battery-level" : 0
                 }
 
-ChargingState = {
+State = {
                 0 : "Not charging" ,
                 1 : "Charging Recovery" ,
                 2 : "Charging" ,
@@ -98,6 +96,7 @@ ChargingState = {
                 5 : "Charging Error" ,
                 6 : "Cleaning",
                 7 : "Docking",
+                8 : "Maximun",
                 }
 
 class Command:
@@ -123,10 +122,14 @@ class Command:
                         self.s.close()
                         print ("%s command Success on %s" % (command,device))
                         self._log.info("%s command Success on %s" % (command,device))
+
                         if str(command) == "clean":
-                                sensors['State'] =  ChargingState[int(6)]
+                                sensors['State'] = State[int(6)]
                         if str(command) == "dock" :
-                                sensors['State'] =  ChargingState[int(7)]
+                                sensors['State'] =  State[int(7)]
+                        if str(command) == "max" :
+                                sensors['State'] =  State[int(8)]
+
                         return True
                 except:
                         print (" %s Command Failed on %s" % (command,device))
@@ -182,8 +185,8 @@ class Command:
                         sensors['Buttons'] = self.j['response']['r11']['value']
                         sensors['Distance'] = self.j['response']['r12']['value']
                         sensors['Angle'] = self.j['response']['r13']['value']
-                        #sensors['State'] = ChargingState[int(self.j['response']['r14']['value'])]
-                        #sensors['State'] = self.j['response']['r14']['value']
+                        sensors['State'] = State[int(self.j['response']['r14']['value'])]
+
                         sensors['Voltage'] = self.j['response']['r15']['value']
                         sensors['Current'] = self.j['response']['r16']['value']
                         sensors['Temperature'] = self.j['response']['r17']['value']
@@ -192,13 +195,11 @@ class Command:
                         sensors['battery-level'] =  int(self.j['response']['r18']['value'])*100 / int (self.j['response']['r19']['value'])
 
                         if int(self.j['response']['r16']['value']) > (0):
-                                sensors['State'] = ChargingState[int(self.j['response']['r14']['value'])]
+                                sensors['State'] = State[int(self.j['response']['r14']['value'])]
                         if (-200) < int(self.j['response']['r16']['value']) < (0):
-                                sensors['State'] = ChargingState[int(4)]
+                                sensors['State'] = State[int(4)]
 
                         return sensors
                 except:
             #self._log.error("Sensor read Failed ")
                         return "N/A"
-
-
