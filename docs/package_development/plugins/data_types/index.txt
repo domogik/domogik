@@ -5,7 +5,7 @@ Domogik data types
 Purpose
 =======
 
-Domogik data type are used to....
+Domogik data type are used to define the availables values for a device type.
 
 
 Where can I find the list of the data types ?
