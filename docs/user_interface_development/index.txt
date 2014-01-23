@@ -25,6 +25,7 @@ First, you should do some specifications to see what you want to do and how to d
 
 .. note::
     There are already user interfaces for :
+
     * browsers : *Domoweb*, *phpMyDomo*
     * Android devices : *Domodroid*
     * iOS devices : *iDomotic*
