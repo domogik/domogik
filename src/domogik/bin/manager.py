@@ -640,6 +640,7 @@ class GenericComponent():
         self.type = "unknown - not setted yet"
         self.configured = None
         self._clients = clients
+        self.conversions = None
         self.data = {}
 
         ### init logger
