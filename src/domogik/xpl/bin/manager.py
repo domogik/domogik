@@ -187,6 +187,9 @@ class SysManager(XplPlugin):
         self._plugins = []
         self._externals = []
         self._external_models = []
+        
+        # To ensure rest is started
+        self._rest_started = False
 
         if self.options.allow_ping:
             msg = "xpl ping activated"
@@ -384,7 +387,7 @@ class SysManager(XplPlugin):
         """ Wait until the rest http server is available, timeout = 180s output.
         """
         import urllib2
-        
+
         cfg_rest = Loader('rest')
         config_rest = cfg_rest.load()
         conf_rest = dict(config_rest[1])
@@ -395,18 +398,28 @@ class SysManager(XplPlugin):
         rest_ok = False
         time_out = False
         t = time.time()
+        cptTry = 1
+        waitTime = 3
         while not self.get_stop().isSet() and not time_out and not rest_ok:
-            self.log.debug("Try to join rest at :{0}".format(the_url))
-            try :
-                req = urllib2.Request(the_url)
-                handle = urllib2.urlopen(req)
-                devices = handle.read()
-            except IOError,  e:
+            if self._rest_started :
+                self.log.debug("Try to join rest HTTP at :{0}".format(the_url))
+                try :
+                    req = urllib2.Request(the_url)
+                    handle = urllib2.urlopen(req)
+                    devices = handle.read()
+                except IOError,  e:
+                    if time.time() - t >= 180 : time_out = True
+                    else : 
+                        if cptTry >= 2 : waitTime = 2
+                        cptTry +=1
+                        self.log.debug("REST no response, wait {0}s for try {1}. {2}".format(waitTime, cptTry,  e.reason))
+                        self.get_stop().wait(waitTime)
+                else : rest_ok = True
+            else :
                 if time.time() - t >= 180 : time_out = True
-                else : 
-                    self.log.debug("REST no response, wait 3s for next try. {0}".format(e.reason))
+                else:
+                    self.log.debug("REST not started, wait 3s more (waiting time {0:.2f}s).".format(time.time() - t))
                     self.get_stop().wait(3)
-            else : rest_ok = True
         if rest_ok : return True
         else:
             if time_out :
@@ -574,6 +587,7 @@ class SysManager(XplPlugin):
             time.sleep(READ_NETWORK_TIMEOUT + 0.5) # time a plugin took to die.
             # component started
             if self._check_component_is_running(plg):
+                if plg == "rest" : self._rest_started = True
                 self.log.debug("Component %s started with pid %s" % (plg,
                         pid))
                 if startup:
