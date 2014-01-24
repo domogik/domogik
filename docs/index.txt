@@ -174,4 +174,5 @@ Developers Documentation
 * :doc:`Developing a plugin </package_development/plugins/index>`
 * :doc:`Developing a user interface </user_interface_development/index>`
 * :doc:`Core development </core_development/index>`
+* :doc:`Releasing tasks </core_development/releasing>`
 * :doc:`Tools </tools/index>`

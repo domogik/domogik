@@ -4,3 +4,5 @@ Core development
 
 .. todo::
     Add some informations for core developpers
+
+* :doc:`Releasing tasks <releasing>`
