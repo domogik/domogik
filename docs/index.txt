@@ -43,7 +43,7 @@ Then, you will need to:
 * Configure Domogik over the administration interface
 * Install a control user interface like Domoweb or Domodroid
 
-.. note
+.. note::
     **If you upgrade from 0.3 to 0.4**
     Please check the :doc:`upgrade 0.3 to 0.4.0 tutorial <enduser/upgrade/0.3_to_0.4.0>`.
 
