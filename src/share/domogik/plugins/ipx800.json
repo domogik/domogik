@@ -255,14 +255,14 @@
         "author": "Fritz", 
         "author_email": "fritz.smh at gmail.com", 
         "category": "relayboard", 
-        "changelog": "0.2\n- adapt plugin for release 0.2.0\n- add support for ipx800 v3 (new features)\n\n0.1\n- plugin creation", 
+        "changelog": "0.3\n- fix #1865, fix #1879\n\n0.2\n- adapt plugin for release 0.2.0\n- add support for ipx800 v3 (new features)\n\n0.1\n- plugin creation", 
         "dependencies": [], 
         "description": "IPX800 relayboard support.\nSupported  models :\n- IPX 800\n- IPX 800 pro\n- IPX 800 v2\n- IPX 800 v3\nSupported features :\n- Relay : set and get state\n- Digital input \n- Analog input", 
         "documentation": "http://wiki.domogik.org/plugin_ipx800", 
         "domogik_min_version": "0.2.0", 
         "id": "ipx800", 
         "type": "plugin", 
-        "version": "0.2"
+        "version": "0.3"
     }, 
     "json_version": 1, 
     "technology": {

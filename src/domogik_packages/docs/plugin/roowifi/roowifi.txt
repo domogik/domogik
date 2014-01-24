@@ -54,22 +54,13 @@ In Domogik administration, go to the roowifi configuration page.
 |               |               | Smallest value can impact cpu performance                                                           |
 +---------------+---------------+-----------------------------------------------------------------------------------------------------+
 
-<<<<<<< HEAD
 .. image:: pluginconfig.png
-=======
-
-.. image:: pluginconfig.png.png
->>>>>>> capof-0.3
 
 Creating devices for roowifi
 -----------------------------
 In administration, go to Organization > Devices page to create your devices.
 
-<<<<<<< HEAD
-.. image:: createdeive.png
-=======
 .. image:: createdevice.png
->>>>>>> capof-0.3
 
 note : when i write those lines, roomba usage is not yet done, so choose another one...
 +--------------------+-------------------+--------------------------------------------------------------------------------------------+
@@ -101,10 +92,6 @@ You can now place widgets on Domoweb main page.
 
 Then choose your roomba on the left, a list of 6 features will appear.
 
-<<<<<<< HEAD
-
-=======
->>>>>>> capof-0.3
 .. image:: widgetchoice.png
 
 ..Docker : will display docker status :

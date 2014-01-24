@@ -194,7 +194,15 @@ class IPX:
             @param interval : interval between each read of status
         """
         while not self._stop.isSet():
-            self.get_status()
+            print("Listen...")
+            
+            try:
+                self.get_status()
+                
+                
+            except IPXException:
+                self._log.debug("get_status failed, keep thread...")
+        
             self._stop.wait(interval)
 
 
@@ -312,14 +320,17 @@ class IPX:
         self._log.debug("Status changed : %s" % data)
         device = "%s-%s%s" % (self.name, data['elt'], data['num'])
 
+        self._log.debug("Translating : elt: %s , value: %s " % ( data['elt'] , data['value'] )  )
+
+
         # translate values
         if data['elt'] == "led" and data['value'] == IPX_LED_HIGH:
             current = "high"
-        elif data['elt'] == "led" and (data['value'] == IPX_BTN_LOW or data['value'] == IPX_BTN_LOW2):
+        elif data['elt'] == "led" and data['value'] == IPX_LED_LOW:
             current = "low"
         elif data['elt'] == "btn" and data['value'] == IPX_BTN_HIGH:
             current = "high"
-        elif data['elt'] == "btn" and data['value'] == IPX_BTN_LOW:
+        elif data['elt'] == "btn" and ( data['value'] == IPX_BTN_LOW or data['value'] == IPX_BTN_LOW2 ) :
             current = "low"
         else:
             current = float(data['value'])
