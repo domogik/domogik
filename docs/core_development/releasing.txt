@@ -1,0 +1,49 @@
+===============
+Releasing tasks
+===============
+
+Resources
+=========
+
+* branching model to follow : http://nvie.com/posts/a-successful-git-branching-model/
+
+
+0.4.0 specific tasks
+====================
+
+* apply the branching model and communicate on it with all developpers! * master => release-0.4 * create develop from master
+* write doc about it for plugins
+* write doc about it for the core (add a dedicated section about core dev in the doc) : hotfixes, features branches, ...
+* set up the new download manager
+
+Before releasing
+================
+
+Here are the tasks to do before releasing a package:
+
+* review the quality (pylint)
+* check the tickets about this release
+* decide if this is alpha/beta/candidate/final
+* create the release-0.4.0 branch (from master in 0.4.0, from develop after) which will be used for the final steps (this allow to continue developments for next releases in the develop branch)
+* check the release doc page and fill it if necessary
+
+Specific tasks for the final release
+------------------------------------
+
+* update the install documentation to use the package instead of git
+* doc: create the release doc : update banner, create a dedicated cron task which use the release-0.4.0 branch (for example)
+* update the roadmap for the next releases and communicate about it (at least a tweet + mail to ML to the udpated page)
+
+Packaging
+=========
+
+* update package.sh
+* generate the package, check its content
+* test the package (installation, basic tests)
+* set the tag on git master branch
+* upload the package
+* add it on wordpress
+* create the delivery articles
+* create the mail for ML
+* tweet the release : link to the website article
+
