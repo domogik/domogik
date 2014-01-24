@@ -703,6 +703,9 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         ### set the component type
         self.type = "core"
 
+        ### change the cilent id as 'core-....'
+        self.client_id = "{0}-{1}.{2}".format("core", self.name, self.host)
+
         ### component data (empty)
         self.data = {}
 
