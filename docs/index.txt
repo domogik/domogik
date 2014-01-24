@@ -44,8 +44,7 @@ Then, you will need to:
 * Install a control user interface like Domoweb or Domodroid
 
 .. note::
-    **If you upgrade from 0.3 to 0.4**
-    Please check the :doc:`upgrade 0.3 to 0.4.0 tutorial <enduser/upgrade/0.3_to_0.4.0>`.
+    **If you upgrade from 0.3 to 0.4**, please check the :doc:`upgrade 0.3 to 0.4.0 tutorial <enduser/upgrade/0.3_to_0.4.0>`.
 
 Uninstallation
 **************
