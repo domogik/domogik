@@ -22,7 +22,7 @@ This new model is really more efficient that the previous one and will allow us 
 Domogik Datatypes
 -----------------
 
-All data comming from and going to the domogik database is now in an unifmorm format, the domogik datatypes. For example here are the available datatypes for boolean based data:
+All data comming from and going to the domogik database is now in an uniform format, the domogik datatypes. For example here are the available datatypes for boolean based data:
 
 * DT_Bool
 * DT_Switch
