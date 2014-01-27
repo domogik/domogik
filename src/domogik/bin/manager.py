@@ -63,6 +63,7 @@ import math
 import tempfile
 import re
 import signal
+import json
 
 from threading import Event, Thread, Lock, Semaphore
 from argparse import ArgumentParser
@@ -413,47 +414,56 @@ class Manager(XplPlugin):
         """ Handle Requests over MQ 
             @param msg : MQ req message
         """
-        # XplPlugin handles MQ Req/rep also
-        XplPlugin.on_mdp_request(self, msg)
+        try:
+            # XplPlugin handles MQ Req/rep also
+            XplPlugin.on_mdp_request(self, msg)
+    
+            ### packages details
+            # retrieve the packages details
+            if msg.get_action() == "package.detail.get":
+                self.log.info(u"Packages details request : {0}".format(msg))
+                self._mdp_reply_packages_detail()
+    
+            ### device_types
+            # retrieve the device_types
+            elif msg.get_action() == "device_types.get":
+                self.log.info(u"Device types request : {0}".format(msg))
+                self._mdp_reply_device_types(msg)
+    
+            ### clients list and details
+            # retrieve the clients list
+            elif msg.get_action() == "client.list.get":
+                self.log.info(u"Clients list request : {0}".format(msg))
+                self._mdp_reply_clients_list()
+    
+            # retrieve the clients details
+            elif msg.get_action() == "client.detail.get":
+                self.log.info(u"Clients details request : {0}".format(msg))
+                self._mdp_reply_clients_detail()
+    
+            # retrieve the clients conversions
+            elif msg.get_action() == "client.conversion.get":
+                self.log.info(u"Clients conversion request : {0}".format(msg))
+                self._mdp_reply_clients_conversion()
+    
+            # retrieve the datatypes
+            elif msg.get_action() == "datatype.get":
+                self.log.info(u"Clients datatype request : {0}".format(msg))
+                self._mdp_reply_datatype()
+    
+            # start clients
+            elif msg.get_action() == "plugin.start.do":
+                self.log.info(u"Plugin startup request : {0}".format(msg))
+                self._mdp_reply_plugin_start(msg)
+    
+            # stop clients
+            # nothing is done in the manager directly :
+            # a stop request is sent to a plugin
+            # the plugin publish  new status : STATUS_STOP_REQUEST
+            # Then, when the manager catches this (done in class Plugin), it will check after a time if the client is stopped
 
-        ### packages details
-        # retrieve the packages details
-        if msg.get_action() == "package.detail.get":
-            self.log.info(u"Packages details request : {0}".format(msg))
-            self._mdp_reply_packages_detail()
-
-        ### device_types
-        # retrieve the device_types
-        elif msg.get_action() == "device_types.get":
-            self.log.info(u"Device types request : {0}".format(msg))
-            self._mdp_reply_device_types(msg)
-
-        ### clients list and details
-        # retrieve the clients list
-        elif msg.get_action() == "client.list.get":
-            self.log.info(u"Clients list request : {0}".format(msg))
-            self._mdp_reply_clients_list()
-
-        # retrieve the clients details
-        elif msg.get_action() == "client.detail.get":
-            self.log.info(u"Clients details request : {0}".format(msg))
-            self._mdp_reply_clients_detail()
-
-        # retrieve the clients conversions
-        elif msg.get_action() == "client.conversion.get":
-            self.log.info(u"Clients conversion request : {0}".format(msg))
-            self._mdp_reply_clients_conversion()
-
-        # start clients
-        elif msg.get_action() == "plugin.start.do":
-            self.log.info(u"Plugin startup request : {0}".format(msg))
-            self._mdp_reply_plugin_start(msg)
-
-        # stop clients
-        # nothing is done in the manager directly :
-        # a stop request is sent to a plugin
-        # the plugin publish  new status : STATUS_STOP_REQUEST
-        # Then, when the manager catches this (done in class Plugin), it will check after a time if the client is stopped
+        except:
+            self.log.error("Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
 
 
     def _mdp_reply_packages_detail(self):
@@ -481,6 +491,20 @@ class Manager(XplPlugin):
                 msg.add_data(device_type, self._device_types[device_type])
             else:
                 msg.add_data(device_type, None)
+        self.reply(msg.get())
+
+
+    def _mdp_reply_datatype(self):
+        """ Reply on the MQ
+            @param data : message data
+        """
+        msg = MQMessage()
+        msg.set_action('datatype.result')
+
+
+        json_file = "{0}/datatypes.json".format(self.get_resources_directory())
+        data = json.load(open(json_file))
+        msg.add_data("datatypes", data)
         self.reply(msg.get())
 
 
