@@ -1,0 +1,95 @@
+=========================================================
+Test security of the Administration interface with Wapiti
+=========================================================
+
+
+Purpose
+=======
+
+Before releasing, we must check the security of the administration web interface thanks to Wapiti : http://wapiti.sourceforge.net/
+
+Install
+=======
+
+On Debian based: ::
+
+    # apt-get install wapiti
+
+Do the test!
+============
+
+Test 1 : no authentication
+--------------------------
+
+First, run Domogik as usual. Then, simply run wapiti without options: ::
+
+    $ wapiti  http://192.168.1.10:40406
+
+Here is an example of what you should get:
+
+.. todo::
+    Update in english
+
+::
+
+    Wapiti-2.2.1 (wapiti.sourceforge.net)
+    ..
+     Note 
+    ========
+    Cette session de scan a été enregistrée dans le fichier /home/fritz/scans/192.168.1.10:40406.xml
+    Vous pouvez l'utiliser pour lancer des attaques sans scanner à nouveau le siteweb avec le paramêtre "-k"
+    [*] Chargement des modules :
+            mod_crlf, mod_exec, mod_file, mod_sql, mod_xss, mod_backup, mod_htaccess, mod_blindsql, mod_permanentxss, mod_nikto
+    
+    [+] Lancement du module crlf
+    
+    [+] Lancement du module exec
+    
+    [+] Lancement du module file
+    
+    [+] Lancement du module sql
+    
+    [+] Lancement du module xss
+    
+    [+] Lancement du module blindsql
+    
+    [+] Lancement du module permanentxss
+    
+    Rapport
+    ------
+    Un rapport a été généré dans le fichier generated_report
+    Ouvrez generated_report/index.html avec un navigateur pour voir ce rapport.
+    
+Here there are no errors.
+
+
+Test 2 : authentication is done
+-------------------------------
+
+To authenticate with wapiti, you must download wapiti sources, for example: ::
+
+    $ wget http://sourceforge.net/projects/wapiti/files/wapiti/wapiti-2.3.0/wapiti-2.3.0.zip
+    $ unzip wapiti-2.3.0.zip
+    $ cd wapiti-2.3.0/bin/
+    $ chmod u+x *
+
+Then, assuming http://192.168.1.10:40406/login is the login page, just do: ::
+
+    $ ./wapiti-getcookie /tmp/cookies.txt http://192.168.1.10:40406/login
+    <Cookie session=eyJfaWQiOnsiIGIiOiJOakV6TUdFd09EUTBaV05tT0dWaFl6Z3hOR1ZtWlRFME56UmlOMlppTkdNPSJ9fQ.BchpcA.XHRIKY8BaXEcC_r8FJfiRujtiZk for 192.168.1.10/>
+    Please enter values for the following form:
+    url = http://192.168.1.10:40406/login
+    user (default) : admin
+    passwd (letmein) : 123
+    <Cookie session=eyJfZnJlc2giOnRydWUsIl9pZCI6eyIgYiI6Ik5qRXpNR0V3T0RRMFpXTm1PR1ZoWXpneE5HVm1aVEUwTnpSaU4yWmlOR009In0sInVzZXJfaWQiOjF9.BchpeA.-vOHvUD-cDyDahfuZ5AcLuI2Udw for 192.168.1.10/>
+
+You can now launch wapiti: ::
+
+    $ wapiti  http://192.168.1.10:40406 -cookie /tmp/cookies.txt -v 2 -x http://192.168.1.10:40406/logout
+
+.. todo::
+    We still need to check the all urls are called and the auth has been correctly done
+
+
+
+

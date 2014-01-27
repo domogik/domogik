@@ -26,6 +26,7 @@ Before releasing
 Here are the tasks to do before releasing a package:
 
 * review the quality (pylint)
+* :doc:`review the security with Wapiti <wapiti>`
 * check the tickets about this release
 * decide if this is alpha/beta/candidate/final
 * create the release-0.4.0 branch (from master in 0.4.0, from develop after) which will be used for the final steps (this allow to continue developments for next releases in the develop branch)
