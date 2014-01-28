@@ -1095,6 +1095,9 @@ class DbHelper():
                             UserAccount
                         ).filter_by(login=ucode(a_login)
                         ).first()
+        # the user doesn't exists
+        if user_acc == None:
+            return None
 	if user_acc.password == _make_crypted_password(a_password):
 	    return user_acc
         else:

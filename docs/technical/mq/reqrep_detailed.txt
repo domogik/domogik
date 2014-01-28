@@ -187,6 +187,40 @@ You will get a reply like this: ::
     ['device_types.result', '{"diskfree.disk_usage": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": [], "identity": {"category": "computer", "description": "Send over xPL disk usage", "author": "Fritz", "author_email": "fritz.smh at gmail.com", "documentation": "http://wiki.domogik.org/plugin_diskfree", "changelog": "0.1\\n- plugin creation", "domogik_min_version": "0.2.0", "package_id": "plugin-diskfree", "dependencies": [], "version": "0.1a0", "icon_file": "/var/lib/domogik/packages/plugin_diskfree/design/icon.png", "type": "plugin", "name": "diskfree"}}}']
 
 
+datatype.get
+============
+
+Request : Admin
+Reply : manager
+
+To get the available datatypes, Domogik admin can send a MQ request *datatype.get* to the manager.
+
+You will get a reply like this: ::
+
+    ['datatype.result', '{"datatypes": {"DT_HVACVent": {"childs": [], "values": {"1": "Heat", "0": "Auto", "3": "Fan only", 
+"2": "Cool", "4": "Dry"}}, "DT_OpenClose": {"labels": {"1": "Close", "0": "Open"}, "childs": [], "parent": "DT_Bool"}, "
+DT_GByte": {"max": null, "childs": [], "unit": "Gb", "parent": "DT_Number", "min": null}, "DT_ColorCII": {"childs": [], 
+"values": {"B": "Blue", "W": "White", "G": "Green", "O": "Orange", "Bk": "Black", "R": "Red", "Br": "Brown", "Y": "Yello
+w"}}, "DT_Time": {"childs": [], "parent": "DT_DateTime", "format": "hh:mm:ss.s"}, "DT_Start": {"labels": {"1": "Start", 
+"0": "Stop"}, "childs": [], "parent": "DT_Bool"}, "DT_Speed": {"max": null, "childs": [], "unit": "m/s", "parent": "DT_N
+umber", "min": null}, "DT_Date": {"childs": [], "parent": "DT_DateTime", "format": "YYYY-MM-DD"}, "DT_mSecond": {"max": 
+999, "childs": [], "unit": "ms", "parent": "DT_Number", "min": 0}, "DT_DayOfWeek": {"childs": [], "values": {"1": "Monda
+y", "0": "no day", "3": "Wednesday", "2": "Tuesday", "5": "Friday", "4": "Thursday", "7": "Sunday", "6": "Saturday"}}, "
+DT_State": {"labels": {"1": "Active", "0": "Inactive"}, "childs": [], "parent": "DT_Bool"}, "DT_Trigger": {"labels": {"1
+": "Triggered"}, "childs": []}, "DT_MByte": {"max": null, "childs": [], "unit": "Mb", "parent": "DT_Number", "min": null
+}, "DT_Month": {"max": 12, "childs": [], "unit": "Month", "parent": "DT_Number", "min": 1}, "DT_ColorCMYK": {"childs": [
+], "parent": "DT_List", "format": "(C 0-100%),(M 0-100%),(Y 0-100%),(K 0-100%)"}, "DT_Step": {"labels": {"1": "Increase"
+, "0": "Decrease"}, "childs": [], "parent": "DT_Bool"}, "DT_Enable": {"labels": {"1": "Enable", "0": "Disable"}, "childs
+": [], "parent": "DT_Bool"}, "DT_Bool": {"labels": {"1": "True", "0": "False"}, "childs": ["DT_Switch", "DT_Enable", "DT
+_Binary", "DT_Step", "DT_UpDown", "DT_OpenClose", "DT_Start", "DT_State"]}, "DT_List": {"childs": ["DT_ColorRGB", "DT_Co
+lorCMYK"], "format": null}, "DT_ColorRGBHexa": {"childs": [], "maxLengh": 6, "parent": "DT_Hexa", "format": "RRGGBB"}, "
+DT_Scaling": {"max": 100, "childs": [], "unit": "%", "parent": "DT_Number", "min": 0}, "DT_kmhSpeed": {"max": null, "chi
+lds": [], "unit": "km/h", "parent": "DT_Number", "min": null}, "DT_mActiveEnergy": {"max": null, "childs": [], "unit": "
+mWh", "parent": "DT_Number", "min": null}, "DT_Pression": {"max": null, "childs": [], "unit": "Pa", "parent": "DT_Number
+", "min": null}, "DT_kActiveEnergy": {"max": null, "childs": [], "unit": "kWh", "parent": "DT_Number", "min": null}, "DT
+_Current": {"max": null, "childs": [], "unit": "A", "parent": "DT_Number", "min": null}, "DT_kCurrent": {"max": null, "c hilds": [], "unit": "kA", "parent": "DT_Number", "min": null}, "DT_Volt": {"max": null, "childs": [], "unit": "V", "parent": "DT_Number", "min": null}, "DT_Minute": {"max": 59, "childs": [], "unit": "min", "parent": "DT_Number", "min": 0}, "DT_String": {"childs": ["DT_Phone", "DT_Hexa", "DT_ColorRGBHexa"], "maxLengh": null, "format": null}, "DT_Switch": {"labels": {"1": "On", "0": "Off"}, "childs": [], "parent": "DT_Bool"}, "DT_TempK": {"max": null, "childs": [], "unit": "K", "parent": "DT_Number", "min": null}, "DT_ActiveEnergy": {"max": null, "childs": [], "unit": "Wh", "parent": "DT_Number", "min": null}, "DT_AirQuality": {"max": null, "childs": [], "unit": "ppm", "parent": "DT_Number", "min": null}, "DT_Humidity": {"max": null, "childs": [], "unit": "%", "parent": "DT_Number", "min": null}, "DT_mMeterHour": {"max": null, "childs": [], "unit": "mm/h", "parent": "DT_Number", "min": null}, "DT_Timestamp": {"max": null, "childs": [], "unit": null, "parent": "DT_Number", "min": null}, "DT_Binary": {"labels": {"1": "High", "0": "Low"}, "childs": [], "parent": "DT_Bool"}, "DT_Year": {"max": null, "childs": [], "unit": "Year", "parent": "DT_Number", "min": null}, "DT_Hour": {"max": 23, "childs": [], "unit": "h", "parent": "DT_Number", "min": 0}, "DT_Second": {"max": 59, "childs": [], "unit": "s", "parent": "DT_Number", "min": 0}, "DT_Number": {"max": null, "childs": ["DT_Scaling", "DT_Angle", "DT_Brightness", "DT_Temp", "DT_TempK", "DT_TempF", "DT_Pression", "DT_Humidity", "DT_AirQuality", "DT_Volt", "DT_mVolt", "DT_kVolt", "DT_Current", "DT_mCurrent", "DT_kCurrent", "DT_Power", "DT_mPower", "DT_kPower", "DT_ActiveEnergy", "DT_kActiveEnergy", "DT_ApparantEnergy", "DT_Speed", "DT_kmhSpeed", "DT_Year", "DT_Month", "DT_Day", "DT_Hour", "DT_Minute", "DT_Second", "DT_mSecond", "DT_Timestamp", "DT_mMeter", "DT_mMeterHour", "DT_Byte", "DT_kByte", "DT_MByte", "DT_GByte"], "unit": null, "min": null}, "DT_Char": {"childs": []}, "DT_Day": {"max": 31, "childs": [], "unit": "Day", "parent": "DT_Number", "min": 1}, "DT_mMeter": {"max": null, "childs": [], "unit": "mm", "parent": "DT_Number", "min": null}, "DT_Hexa": {"childs": ["DT_ColorRGBHexa"], "maxLengh": null, "parent": "DT_String", "format": null}, "DT_Phone": {"childs": [], "maxLengh": null, "parent": "DT_String", "format": "+00000000000"}, "DT_mPower": {"max": null, "childs": [], "unit": "mW", "parent": "DT_Number", "min": null}, "DT_DateTime": {"childs": ["DT_Date", "DT_Time"], "format": "YYYY-MM-DDThh:mm:ss.s"}, "DT_ApparantEnergy": {"max": null, "childs": [], "unit": "VAh", "parent": "DT_Number", "min": null}, "DT_kByte": {"max": null, "childs": [], "unit": "kb", "parent": "DT_Number", "min": null}, "DT_Power": {"max": null, "childs": [], "unit": "W", "parent": "DT_Number", "min": null}, "DT_kVolt": {"max": null, "childs": [], "unit": "kV", "parent": "DT_Number", "min": null}, "DT_ColorRGB": {"childs": [], "parent": "DT_List", "format": "(R 0-255),(G 0-255),(B 0-255)"}, "DT_HVACMode": {"childs": [], "values": {"1": "Comfort", "0": "Auto", "3": "Economy", "2": "Standby", "4": "Building Protection"}}, "DT_kPower": {"max": null, "childs": [], "unit": "kW", "parent": "DT_Number", "min": null}, "DT_Byte": {"max": null, "childs": [], "unit": "b", "parent": "DT_Number", "min": null}, "DT_Brightness": {"max": null, "childs": [], "unit": "lux", "parent": "DT_Number", "min": null}, "DT_mCurrent": {"max": null, "childs": [], "unit": "mA", "parent": "DT_Number", "min": null}, "DT_mVolt": {"max": null, "childs": [], "unit": "mV", "parent": "DT_Number", "min": null}, "DT_TempF": {"max": null, "childs": [], "unit": "\\u00b0F", "parent": "DT_Number", "min": null}, "DT_Temp": {"max": null, "childs": [], "unit": "\\u00b0C", "parent": "DT_Number", "min": null}, "DT_Angle": {"max": 360, "childs": [], "unit": "\\u00b0", "parent": "DT_Number", "min": 0}, "DT_HVACHeat": {"childs": [], "values": {"1": "Comfort", "0": "Auto", "3": "Economy", "2": "Standby", "4": "Building Protection"}}, "DT_UpDown": {"labels": {"1": "Down", "0": "Up"}, "childs": [], "parent": "DT_Bool"}}}']
+
+
 package.detail.get
 ===================
 

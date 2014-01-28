@@ -44,6 +44,8 @@ UIs                     manager             client.detail.get     client.detail.
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 XplGW                   manager             client.conversion.get client.conversion.result req_client_conversion.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
+Admin                   manager             datatype.get          datatype.result          req_datatype.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
 Rest                    manager             device_types.get      device_types.result      req_device_types.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 Plugins                 dbmgr               device.get            device.result            req_device.py
