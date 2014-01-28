@@ -42,6 +42,7 @@
                                                     <td>{% trans %}Data Type{% endtrans %}</td>
                                                     <td>{% trans %}Last value{% endtrans %}</td>
                                                     <td>{% trans %}Last received{% endtrans %}</td>
+                                                    <td>{% trans %}Rest URL{% endtrans %}</td>
 						    <td>&nbsp;</td>
                                                 </tr>
                                                 </thead>
@@ -53,6 +54,7 @@
                                                                 <td>{{ sen.data_type }}</td>
                                                                 <td>{{ sen.last_value }}&nbsp;{{ datatypes[sen.data_type].unit }}</td>
                                                                 <td>{{ sen.last_received|datetime }}</td>
+                                                                <td>/sensorhistory/id/{{ sen.id }}/last/10</td>
 								<td>
 									<a href="/client/{{ clientid }}/sensors/edit/{{ sen.id }}">Edit</a>
 								</td>
