@@ -149,11 +149,8 @@ class Admin(XplPlugin):
         # logger
         for log in self.log.handlers:
             admin_app.logger.addHandler(log)
-        # db access
-        admin_app.db = DbHelper()
         admin_app.zmq_context = self.zmq
-        # handler for getting the paths
-        admin_app.resources_directory = self.get_resources_directory()
+        admin_app.db = DbHelper()
         
 	tapp = Application([
 		(r"/ws", AdminWebSocket),
