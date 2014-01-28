@@ -1159,6 +1159,7 @@ class Clients():
                 if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
                     delta = now - self._clients[a_client]['last_seen']
                     if delta > 2*STATUS_HBEAT:
+                        self.log.debug("DEAD : delta = {0} / STATUS_HBEAT = {1}".format(delta, STATUS_HBEAT))
                         # client is dead!
                         self.set_status(a_client, STATUS_DEAD)
             self._stop.wait(STATUS_HBEAT)
