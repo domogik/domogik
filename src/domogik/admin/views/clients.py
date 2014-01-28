@@ -73,11 +73,23 @@ def client_sensor_edit(client_id, sensor_id):
         MyForm = model_form(Sensor, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
-                        exclude=['core_device', 'name', 'reference', 'incremental', 'formula', 'data_type', 'conversion', 'last_value', 'last_received'])
+                        exclude=['core_device', 'name', 'reference', 'incremental', 'formula', 'data_type', 'conversion', 'last_value', 'last_received', 'history_duplicate'])
+	#MyForm.history_duplicate.kwargs['validators'] = []
+	MyForm.history_store.kwargs['validators'] = []
         form = MyForm(request.form, sensor)
 
         if request.method == 'POST' and form.validate():
-            flash(gettext("TODO Changes saved"), "success")
+            if request.form['history_store'] == 'y':
+                store = 1 
+            else:
+                store = 0
+            app.db.update_sensor(sensor_id, \
+                     history_round=request.form['history_round'], \
+                     history_store=store, \
+                     history_max=request.form['history_max'], \
+                     history_expire=request.form['history_expire'])
+
+            flash(gettext("Changes saved"), "success")
             return redirect("/client/{0}/devices/known".format(client_id))
             pass
 	else:
