@@ -126,8 +126,16 @@ class Admin(XplPlugin):
 		self.cert_file = ""
                 self.clean_json = False
             self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
-            # TODO : delete
-            #self.db = DbHelper()
+	    
+	    # get all datatypes
+            cli = MQSyncReq(self.zmq)
+            msg = MQMessage()
+            msg.set_action('datatype.get')
+            res = cli.request('manager', msg.get(), timeout=10)
+            if res is not None:
+                self.datatypes = res.get_data()['datatypes']
+            else:
+                self.datatypes = {}
 
  	    # Launch server, stats
             self.log.info(u"Admin Initialisation OK")
@@ -151,6 +159,7 @@ class Admin(XplPlugin):
             admin_app.logger.addHandler(log)
         admin_app.zmq_context = self.zmq
         admin_app.db = DbHelper()
+        admin_app.datatypes = self.datatypes
         
 	tapp = Application([
 		(r"/ws", AdminWebSocket),

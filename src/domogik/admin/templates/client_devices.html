@@ -51,10 +51,10 @@
                                                                 <td>{{ sen.id }}</td>
                                                                 <td>{{ sen.name }}</td>
                                                                 <td>{{ sen.data_type }}</td>
-                                                                <td>{{ sen.last_value }}</td>
+                                                                <td>{{ sen.last_value }}&nbsp;{{ datatypes[sen.data_type].unit }}</td>
                                                                 <td>{{ sen.last_received|datetime }}</td>
 								<td>
-									<a href="client/{{ client_id }}/sensors/edit">Edit</a>
+									<a href="/client/{{ clientid }}/sensors/edit/{{ sen.id }}">Edit</a>
 								</td>
                                                         </tr>
                                                 {% endfor %}
@@ -82,12 +82,70 @@
 						{% for param in cmd.parameters %}
 						<tr>
 						    <td>{{ param.key }}</td>
-						    <td>{{ param.data_type }}</td>
+						    <td>{{ param.data_type }}
+							{{ datatypes[param.data_type] }}</td>
 						</tr>
 						{% endfor %}
 					{% endfor %}
                                         </table>
 				{% endif %}
+				{% if data.xpl_stats|length > 0 %}
+				    <span class="label label-default">{% trans %}Xplstats{% endtrans %}</span>
+                                        <table class="table table-bordered">
+					{% for name in data.xpl_stats %}
+                                                <tr>
+                                                    <th>{% trans %}Name{% endtrans %}</th>
+                                                    <td>{{ name }}</td>
+                                                    <th>{% trans %}Schema{% endtrans %}</th>
+                                                    <td>{{ data.xpl_stats[name].schema }}</td>
+                                                </tr>
+						<tr>
+                                                    <th>{% trans %}Type{% endtrans %}</th>
+						    <th>{% trans %}Key{% endtrans %}</th>
+						    <th colspan="2">{% trans %}Value{% endtrans %} {% trans %}or{% endtrans %} {% trans %}Sensor{% endtrans %}</th>
+						</tr>
+						{% for param in data.xpl_stats[name].parameters.static %}
+						<tr>
+                                                    <td>Static</td>
+						    <td>{{ param.key }}</td>
+						    <td colspan="2">{{ param.value }}</td>
+						</tr>
+						{% endfor %}
+						{% for param in data.xpl_stats[name].parameters.dynamic %}
+						<tr>
+                                                    <td>Dynamic</td>
+						    <td>{{ param.key }}</td>
+						    <td colspan="2">{{ param.sensor_name }}</td>
+						</tr>
+						{% endfor %}
+					{% endfor %}
+                                        </table>
+				{% endif %}
+				{% if data.xpl_commands|length > 0 %}
+				    <span class="label label-default">{% trans %}Xpl commands{% endtrans %}</span>
+                                        <table class="table table-bordered">
+					{% for name in data.xpl_commands %}
+                                                <tr>
+                                                    <th>{% trans %}Name{% endtrans %}</th>
+                                                    <td>{{ name }}</td>
+                                                    <th>{% trans %}Schema{% endtrans %}</th>
+                                                    <td>{{ data.xpl_commands[name].schema }}</td>
+                                                </tr>
+						<tr>
+                                                    <th colspan="2">{% trans %}Type{% endtrans %}</th>
+						    <th colspan="2">{% trans %}Value{% endtrans %}</th>
+						</tr>
+						{% for param in data.xpl_commands[name].parameters %}
+						<tr>
+						    <td colspan="2">{{ param.key }}</td>
+						    <td colspan="2">{{ param.value }}</td>
+						</tr>
+						{% endfor %}
+					{% endfor %}
+                                        </table>
+				{% endif %}
+
+
                                 </div> 
  
                             </td>

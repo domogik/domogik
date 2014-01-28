@@ -10,7 +10,7 @@ from flask_login import login_required
 from flask.ext.babel import gettext, ngettext
 
 from domogik.rest.urls.device import get_device_params
-from domogik.common.sql_schema import Device
+from domogik.common.sql_schema import Device, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form
 
 @app.route('/clients')
@@ -58,11 +58,35 @@ def client_devices_known(client_id):
     with app.db.session_scope():
         devices = app.db.list_devices_by_plugin(client_id)
     return render_template('client_devices.html',
+            datatypes = app.datatypes,
             devices = devices,
             clientid = client_id,
             mactve="clients",
             active = 'devices'
             )
+
+@app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
+@login_required
+def client_sensor_edit(client_id, sensor_id):
+    with app.db.session_scope():
+        sensor = app.db.get_sensor(sensor_id)
+        MyForm = model_form(Sensor, \
+                        base_class=Form, \
+                        db_session=app.db.get_session(),
+                        exclude=['core_device', 'name', 'reference', 'incremental', 'formula', 'data_type', 'conversion', 'last_value', 'last_received'])
+        form = MyForm(request.form, sensor)
+
+        if request.method == 'POST' and form.validate():
+            flash(gettext("TODO Changes saved"), "success")
+            return redirect("/client/{0}/devices/known".format(client_id))
+            pass
+	else:
+    	    return render_template('client_sensor.html',
+		    form = form,
+		    clientid = client_id,
+		    mactve="clients",
+		    active = 'devices'
+		    )
 
 @app.route('/client/<client_id>/devices/detected')
 @login_required
