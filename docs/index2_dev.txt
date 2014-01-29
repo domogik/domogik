@@ -1,6 +1,6 @@
-=======
-Domogik
-=======
+=======================================
+Technical and developpers documentation
+=======================================
 
 Technical Documentation
 =======================

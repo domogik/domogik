@@ -1,6 +1,6 @@
-=======
-Domogik
-=======
+======================
+End user documentation
+======================
 
 
 Overview
