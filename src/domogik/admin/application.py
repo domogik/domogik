@@ -50,7 +50,7 @@ app.jinja_env.filters['sortid'] = sort_by_id
 def write_access_log_after(response):
     app.logger.debug(' => response status code: {0}'.format(response.status_code))
     app.logger.debug(' => response content_type: {0}'.format(response.content_type))
-    app.logger.debug(' => response data: {0}'.format(response.response))
+    #app.logger.debug(' => response data: {0}'.format(response.response))
     return response
 
 @app.before_request
