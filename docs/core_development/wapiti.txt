@@ -11,9 +11,13 @@ Before releasing, we must check the security of the administration web interface
 Install
 =======
 
-On Debian based: ::
+::
 
-    # apt-get install wapiti
+    $ wget http://sourceforge.net/projects/wapiti/files/wapiti/wapiti-2.3.0/wapiti-2.3.0.zip
+    $ unzip wapiti-2.3.0.zip
+    $ cd wapiti-2.3.0/bin/
+    $ chmod u+x *
+    $ sudo python setup.py install
 
 Do the test!
 ============
@@ -23,7 +27,7 @@ Test 1 : no authentication
 
 First, run Domogik as usual. Then, simply run wapiti without options: ::
 
-    $ wapiti  http://192.168.1.10:40406
+    $ ./bin/wapiti  http://192.168.1.10:40406
 
 Here is an example of what you should get:
 
@@ -85,7 +89,7 @@ Then, assuming http://192.168.1.10:40406/login is the login page, just do: ::
 
 You can now launch wapiti: ::
 
-    $ wapiti  http://192.168.1.10:40406 -cookie /tmp/cookies.txt -v 2 -x http://192.168.1.10:40406/logout
+    $ wapiti  http://192.168.1.10:40406 --cookie /tmp/cookies.txt -v 2 -x http://192.168.1.10:40406/logout
 
 .. todo::
     We still need to check the all urls are called and the auth has been correctly done
