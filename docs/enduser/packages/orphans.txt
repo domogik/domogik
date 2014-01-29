@@ -3,6 +3,7 @@ Orphan devices
 ==============
 
 Orphan devices are devices created for a client which is no more detected by Domogik. Many reasons can explain this : 
+
 * the hostname of the server has been changed.
 * the device was created for a plugin which has been uninstalled.
 * the device is related to a xPL client which is not part of Domogik. If this xPL client is shut or unplug, Domogik doesn't see it anymore and the device is set as orphan. If the client come back to life, the device won't be an orphan anymore.
