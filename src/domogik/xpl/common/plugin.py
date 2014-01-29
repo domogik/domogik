@@ -679,6 +679,8 @@ class XplPlugin(BasePlugin, MQRep):
         # TODO : we could optimize by resetting the timer each time the status is sent
         # but as this is used only to check for dead plugins by the manager, it is not very important ;)
         while not self._stop.isSet():
+            # TODO : remove
+            self.log.debug("SEND STATUS LOOP")
             self._send_status()
             self._stop.wait(STATUS_HBEAT)
 
