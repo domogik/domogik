@@ -117,18 +117,17 @@ class ZWaveValueNode:
             if msgtrig : 
                 self._node._ozwmanager._cb_sendxPL_trig(msgtrig)
     
-    def getOZWValue(self):
-        """Retourne la valeur réelle lut par openzwave"""
+    def RefreshOZWValue(self):
+        """Effectue une requette pour rafraichir la valeur réelle lut par openzwave"""
         if self.valueData['genre'] != 'Config' :
-            print 'Request a getOZValue ++++++++'
-            retval = self._node._manager.getValue(self.valueData['id'])
-            self._valueData['value'] = retval
-            self._lastUpdate = time.time()
-            return retval
+            if self._node._manager.refreshValue(self.valueData['id']):
+                print "++++++++++ Node {0} Request a RefreshOZWValue : {1}".format(self._valueData['nodeId'],  self._valueData['label'])
+                return True
         else :
-            print "getOZWValue : call requestConfigParam waiting ValueChanged..."
+            print "RefreshOZWValue : call requestConfigParam waiting ValueChanged..."
             self._node._manager.requestConfigParam(self.homeId,  self.nodeId,  self.valueData['index'])
-            return self._valueData['value'] 
+            return True
+        return False
         
     def getCmdClassAssociateValue(self):
         """retourn la commandClass, son Label et son instance qui peut-etre associé à un type bouton ou autre."""
@@ -431,7 +430,7 @@ class ZWaveValueNode:
                 if self.valueData['units'] != '': msgtrig ['data'] ['units'] = self.valueData['units']
             elif self.valueData['commandClass'] == 'COMMAND_CLASS_SENSOR_ALARM' :  # considère toute valeur != 0 comme True
                 msgtrig['schema'] = 'alarm.basic'
-                msgtrig ['data'] = {'type': self.labelDomogik, 'current' : 'true' if self.valueData['value']   else 'false'} # gestion du sensor binary pour widget binary
+                msgtrig ['data'] = {'type': self.labelDomogik, 'status' : 'high' if self.valueData['value']   else 'low'} # gestion du sensor binary pour widget binary
 
         print "*** valueToxPLTrig : {0}".format(msgtrig)
         return msgtrig

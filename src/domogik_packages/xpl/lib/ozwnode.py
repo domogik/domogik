@@ -143,6 +143,11 @@ class ZWaveNode:
         self._sleeping = state;
         m = 'Device goes to sleep.' if state else 'Sleeping device wakes up.'
         self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : m,  'data': {'typestate': 'sleep', 'state sleeping': state}})
+        if state : 
+            # le node est réveillé, fait une request, pour le prochain réveille, de niveau de battery si la command class existe.
+            values = self._getValuesForCommandClass(0x80)  # COMMAND_CLASS_BATTERY
+            if values:
+                for value in values : value.RefreshOZWValue()
         
     def markAsFailed(self): 
         """Le node est marqué comme HS."""

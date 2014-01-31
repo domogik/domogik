@@ -44,7 +44,7 @@ import sys
 
 FlagDebug = False # pour debug eviter recurtion +2, passé a True pour debug
 
-OZWPLuginVers = "0.2c2"
+OZWPLuginVers = "0.2c4"
 # Déclaration de tuple nomée pour la clarification des infos des noeuds zwave (node)
 # Juste à rajouter ici la déclaration pour future extension.
 NamedPair = namedtuple('NamedPair', ['id', 'name'])
@@ -80,21 +80,20 @@ DomogikTypeAvailable = ['temperature', 'relative-humidity', 'humidity', 'battery
                                   'power', 'energy', 'previous-reading', 'luminance',  'general', 'motion',
                                   'count', 'instant-energy-production', 'total-energy-production',
                                   'energy-production-today', 'total-production-time', 'indicator', 'locked', 'level',
-                                  'operating-state',
-                                  'alarm-type', 'alarm-level','general', 'tamper-event',  'low-battery', 'smoke',
+                                  'operating-state', 'power-applied', 'tamper-event',  'low-battery', 'smoke',
                                   'carbonmonoxide', 'carbondioxide', 'heat', 'flood', 
                                   'basic', 'switch', 'level', 'step-size', 'inc', 'dec', 'bright', 'dim',  'toggle-switch',  # Actuaror
                                   'fan-mode',  'fan-state', 'mode',  'operating-state',  'setpoint', 'heating']
 
 # Notifications reportés sur le hub xPL pour l'UI
 UICtrlReportType = ['plugin-state', 'driver-ready', 'driver-remove', 'init-process', 'ctrl-error', 'ctrl-action',
-                                'node-state-changed', 'value-changed', 'polling']
+                            'node-state-changed', 'value-changed', 'polling']
                                
 # Listes de commandes Class pour conversion des notifications NodeEvent en ValueChanged                               
 CmdsClassBasicType = ['COMMAND_CLASS_SWITCH_BINARY', 'COMMAND_CLASS_SENSOR_BINARY', 'COMMAND_CLASS_SENSOR_MULTILEVEL', 
                                 'COMMAND_CLASS_SWITCH_MULTILEVEL',  'COMMAND_CLASS_SWITCH_ALL',  'COMMAND_CLASS_SWITCH_TOGGLE_BINARY',  
                                 'COMMAND_CLASS_SWITCH_TOGGLE_MULTILEVEL', 'COMMAND_CLASS_SENSOR_MULTILEVEL','COMMAND_CLASS_METER', 
-                                'COMMAND_CLASS_THERMOSTAT_SETPOINT ' ]
+                                'COMMAND_CLASS_THERMOSTAT_SETPOINT', 'COMMAND_CLASS_SENSOR_ALARM']
 
 BasicDeviceType = {1: 'TYPE_CONTROLLER', 2: 'TYPE_STATIC_CONTROLLER', 3: 'TYPE_SLAVE', 4 :'TYPE_ROUTING_SLAVE'}
 GenericDeviceType = { 0x00:'TYPE_SPECIFIC_TYPE_NOT_USED', 0x01: 'TYPE_CONTROLLER', 

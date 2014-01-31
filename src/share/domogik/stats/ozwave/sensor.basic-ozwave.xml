@@ -17,8 +17,6 @@
                     <key name="type" value="luminance"/>
                     <key name="type" value="general"/>
                     <key name="type" value="motion"/>
-                    <key name="type" value="alarm-type"/>
-                    <key name="type" value="alarm-level"/>
                     <key name="type" value="count"/>
                     <key name="type" value="instant-energy-production"/>
                     <key name="type" value="total-energy-production"/>
@@ -59,10 +57,6 @@
                        filter_key="type" filter_value="general" />
                 <value field="current" new_name="motion"
                        filter_key="type" filter_value="motion" />
-                <value field="current" new_name="alarm-type"
-                       filter_key="type" filter_value="alarm-type" />
-                <value field="current" new_name="alarm-level"
-                       filter_key="type" filter_value="alarm-level" />
                 <value field="current" new_name="meterpulse"
                        filter_key="type" filter_value="count" />
                 <value field="current" new_name="instant-energy-production"
