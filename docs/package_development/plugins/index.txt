@@ -59,6 +59,7 @@ Starting to create the json file without being clear on these elements is useles
 
   * :doc:`Data types <data_types/index>`
   * :doc:`Field types <field_types/index>`
+  * :doc:`Conversion files <conversion/index>`
 
 Python part
 ===========
@@ -76,6 +77,7 @@ After creating a start script (used only by the developpers), you will now creat
     * log in a file
     * manage infinite loop without *while True*
     * create a timer
+    * :doc:`Make the new devices available in the user interface <python/detected_devices>`
     * ...
 
 To finish...

@@ -13,6 +13,14 @@
 		<button id="start" type="button" class="btn btn-primary btn-lg btn-success" {% if data.status == "alive" %}disabled="disabbled"{% endif %}>Start</button>
 		<button id="stop" type="button" class="btn btn-primary btn-lg btn-danger" {% if data.status != "alive" %}disabled="disabbled"{% endif %}>Stop</button>
 	</div>
+	{% if data.data.udev_rules|length > 0 %}
+	<h2>{% trans %}Udev{% endtrans %}</h2>
+	<ul>
+	{% for key, rule in data.data.udev_rules.items() %}
+		<li><b>{{ key }}</b>:<br /><pre>{{ rule }}</pre></li>
+	{% endfor %}
+	</ul>
+	{% endif %}
 	<script type="text/javascript">
 	$( document ).ready(function() {
 		$("#start").click(function() {

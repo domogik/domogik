@@ -63,6 +63,7 @@ import math
 import tempfile
 import re
 import signal
+import json
 
 from threading import Event, Thread, Lock, Semaphore
 from argparse import ArgumentParser
@@ -413,42 +414,56 @@ class Manager(XplPlugin):
         """ Handle Requests over MQ 
             @param msg : MQ req message
         """
-        # XplPlugin handles MQ Req/rep also
-        XplPlugin.on_mdp_request(self, msg)
+        try:
+            # XplPlugin handles MQ Req/rep also
+            XplPlugin.on_mdp_request(self, msg)
+    
+            ### packages details
+            # retrieve the packages details
+            if msg.get_action() == "package.detail.get":
+                self.log.info(u"Packages details request : {0}".format(msg))
+                self._mdp_reply_packages_detail()
+    
+            ### device_types
+            # retrieve the device_types
+            elif msg.get_action() == "device_types.get":
+                self.log.info(u"Device types request : {0}".format(msg))
+                self._mdp_reply_device_types(msg)
+    
+            ### clients list and details
+            # retrieve the clients list
+            elif msg.get_action() == "client.list.get":
+                self.log.info(u"Clients list request : {0}".format(msg))
+                self._mdp_reply_clients_list()
+    
+            # retrieve the clients details
+            elif msg.get_action() == "client.detail.get":
+                self.log.info(u"Clients details request : {0}".format(msg))
+                self._mdp_reply_clients_detail()
+    
+            # retrieve the clients conversions
+            elif msg.get_action() == "client.conversion.get":
+                self.log.info(u"Clients conversion request : {0}".format(msg))
+                self._mdp_reply_clients_conversion()
+    
+            # retrieve the datatypes
+            elif msg.get_action() == "datatype.get":
+                self.log.info(u"Clients datatype request : {0}".format(msg))
+                self._mdp_reply_datatype()
+    
+            # start clients
+            elif msg.get_action() == "plugin.start.do":
+                self.log.info(u"Plugin startup request : {0}".format(msg))
+                self._mdp_reply_plugin_start(msg)
+    
+            # stop clients
+            # nothing is done in the manager directly :
+            # a stop request is sent to a plugin
+            # the plugin publish  new status : STATUS_STOP_REQUEST
+            # Then, when the manager catches this (done in class Plugin), it will check after a time if the client is stopped
 
-        ### packages details
-        # retrieve the packages details
-        if msg.get_action() == "package.detail.get":
-            self.log.info(u"Packages details request : {0}".format(msg))
-            self._mdp_reply_packages_detail()
-
-        ### device_types
-        # retrieve the device_types
-        elif msg.get_action() == "device_types.get":
-            self.log.info(u"Device types request : {0}".format(msg))
-            self._mdp_reply_device_types(msg)
-
-        ### clients list and details
-        # retrieve the clients list
-        elif msg.get_action() == "client.list.get":
-            self.log.info(u"Clients list request : {0}".format(msg))
-            self._mdp_reply_clients_list()
-
-        # retrieve the clients details
-        elif msg.get_action() == "client.detail.get":
-            self.log.info(u"Clients details request : {0}".format(msg))
-            self._mdp_reply_clients_detail()
-
-        # start clients
-        elif msg.get_action() == "plugin.start.do":
-            self.log.info(u"Plugin startup request : {0}".format(msg))
-            self._mdp_reply_plugin_start(msg)
-
-        # stop clients
-        # nothing is done in the manager directly :
-        # a stop request is sent to a plugin
-        # the plugin publish  new status : STATUS_STOP_REQUEST
-        # Then, when the manager catches this (done in class Plugin), it will check after a time if the client is stopped
+        except:
+            self.log.error("Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
 
 
     def _mdp_reply_packages_detail(self):
@@ -479,6 +494,20 @@ class Manager(XplPlugin):
         self.reply(msg.get())
 
 
+    def _mdp_reply_datatype(self):
+        """ Reply on the MQ
+            @param data : message data
+        """
+        msg = MQMessage()
+        msg.set_action('datatype.result')
+
+
+        json_file = "{0}/datatypes.json".format(self.get_resources_directory())
+        data = json.load(open(json_file))
+        msg.add_data("datatypes", data)
+        self.reply(msg.get())
+
+
     def _mdp_reply_clients_list(self):
         """ Reply on the MQ
         """
@@ -498,6 +527,17 @@ class Manager(XplPlugin):
         clients = self._clients.get_detail() 
         for key in clients:
             msg.add_data(key, clients[key])
+        self.reply(msg.get())
+
+
+    def _mdp_reply_clients_conversion(self):
+        """ Reply on the MQ
+        """
+        msg = MQMessage()
+        msg.set_action('client.conversion.result')
+        conv = self._clients.get_conversions() 
+        for key in conv:
+            msg.add_data(key, conv[key])
         self.reply(msg.get())
 
 
@@ -620,9 +660,11 @@ class GenericComponent():
         self.host = host
         self.xpl_source = "{0}-{1}.{2}".format(DMG_VENDOR_ID, self.name, self.host)
         self.client_id = "{0}-{1}.{2}".format("plugin", self.name, self.host)
+        self.folder = "{0}_{1}".format("plugin", self.name)
         self.type = "unknown - not setted yet"
         self.configured = None
         self._clients = clients
+        self.conversions = None
         self.data = {}
 
         ### init logger
@@ -633,8 +675,7 @@ class GenericComponent():
     def register_component(self):
         """ register the component as a client
         """
-        self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data, self.configured)
-        #self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data)
+        self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data, self.conversions, self.configured)
 
     def unregister(self):
         """ unregister the component 
@@ -685,6 +726,9 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
         ### set the component type
         self.type = "core"
+
+        ### change the cilent id as 'core-....'
+        self.client_id = "{0}-{1}.{2}".format("core", self.name, self.host)
 
         ### component data (empty)
         self.data = {}
@@ -849,6 +893,47 @@ class Plugin(GenericComponent, MQAsyncSub):
         else:
             #self.set_configured(False)
             self.configured = False
+
+        ### get udev rules informations
+        udev_rules = {}
+        udev_dir = "{0}/{1}/udev_rules/".format(self._packages_directory, self.folder)
+        
+        # parse all conversion files
+        try:
+            for udev_file in os.listdir(udev_dir): 
+                if udev_file.endswith(".rules"):
+                    self.log.info("Udev rule discovered for '{0}' : {1}".format(self.client_id, udev_file))
+                    # read the content of the file
+                    with open ("{0}/{1}".format(udev_dir, udev_file), "r") as myfile:
+                        data = myfile.read()
+                        udev_rules[os.path.splitext(udev_file)[0]] = data
+        except OSError as err:
+            if err.errno == 2:
+                self.log.info("There is no udev rules file for '{0}'".format(self.client_id))
+            else:
+                self.log.error("Error while looking for udev rules for '{0}' : {1}".format(self.client_id, err))
+
+        # add in the data
+        self.data["udev_rules"] = udev_rules
+
+        ### get conversion informations
+        self.conversions = {}
+        conv_dir = "{0}/{1}/conversion/".format(self._packages_directory, self.folder)
+        
+        # parse all conversion files
+        try:
+            for conv_file in os.listdir(conv_dir): 
+                if conv_file.endswith(".py") and conv_file != "__init__.py":
+                    self.log.info("Conversion discovered for '{0}' : {1}".format(self.client_id, conv_file))
+                    # read the content of the file
+                    with open ("{0}/{1}".format(conv_dir, conv_file), "r") as myfile:
+                        data = myfile.read()
+                        self.conversions[os.path.splitext(conv_file)[0]] = data
+        except OSError as err:
+            if err.errno == 2:
+                self.log.info("There is no conversion file for '{0}'".format(self.client_id))
+            else:
+                self.log.error("Error while looking for udev rules for '{0}' : {1}".format(self.client_id, err))
 
         ### register the plugin as a client
         self.register_component()
@@ -1044,6 +1129,7 @@ class Clients():
         self._stop = stop
         self._clients = {}
         self._clients_with_details = {}
+        self._conversions = {}
 
         ### init logger
         log = logger.Logger('manager')
@@ -1073,11 +1159,13 @@ class Clients():
                 if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
                     delta = now - self._clients[a_client]['last_seen']
                     if delta > 2*STATUS_HBEAT:
+                        # TODO : remove
+                        self.log.debug("DEAD : delta = {0} / STATUS_HBEAT = {1}".format(delta, STATUS_HBEAT))
                         # client is dead!
                         self.set_status(a_client, STATUS_DEAD)
             self._stop.wait(STATUS_HBEAT)
 
-    def add(self, host, type, name, client_id, xpl_source, data, configured = None):
+    def add(self, host, type, name, client_id, xpl_source, data, conversions, configured = None):
         """ Add a client to the list of clients
             @param host : client hostname or ip or dns
             @param type : client type
@@ -1086,6 +1174,7 @@ class Clients():
             @param data : client data : only for clients details
             @param configured : True/False : for a plugin : True if the plugin is configured, else False
                                 None : for type != 'plugin'
+            @param conversions : conversions info for the client
         """
         self.log.info(u"Add new client : host={0}, type={1}, name={2}, client_id={3}, data={4}".format(host, type, name, client_id, str(data)))
         client = { "host" : host,
@@ -1109,6 +1198,7 @@ class Clients():
                    "data" : data}
         self._clients[client_id] = client
         self._clients_with_details[client_id] = client_with_details
+        self._conversions[client_id] = conversions
         self.publish_update()
 
     def remove(self, client_id):
@@ -1171,6 +1261,11 @@ class Clients():
         """
         return self._clients_with_details
 
+    def get_conversions(self):
+        """ Return the clients conversions elements
+        """
+        return self._conversions
+
     def publish_update(self):
         """ Publish the clients list update over the MQ
         """
@@ -1179,6 +1274,8 @@ class Clients():
                              self._clients)
         self._pub.send_event('client.detail', 
                              self._clients_with_details)
+        self._pub.send_event('client.conversion', 
+                             self._conversions)
 
 
 

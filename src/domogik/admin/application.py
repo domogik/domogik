@@ -19,6 +19,7 @@ login_manager = LoginManager()
 babel = Babel()
 
 app = Flask(__name__)
+app.debug = True
 login_manager.init_app(app)
 babel.init_app(app)
 
@@ -38,7 +39,23 @@ def format_babel_datetime(value, format='medium'):
         format="EE dd.MM.y HH:mm"
     return format_datetime(value, format)
 
+def sort_by_id(value):
+    return sorted(value.items(), key=lambda x: x[1]['id'])
+
 app.jinja_env.filters['datetime'] = format_babel_datetime
+app.jinja_env.filters['sortid'] = sort_by_id
+
+# create acces_log
+@app.after_request
+def write_access_log_after(response):
+    app.logger.debug(' => response status code: {0}'.format(response.status_code))
+    app.logger.debug(' => response content_type: {0}'.format(response.content_type))
+    #app.logger.debug(' => response data: {0}'.format(response.response))
+    return response
+
+@app.before_request
+def write_acces_log_before():
+    app.logger.info('http request for {0} received'.format(request.path))
 
 # import all files inside the view module
 from domogik.admin.views.index import *

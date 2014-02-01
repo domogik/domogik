@@ -1,0 +1,80 @@
+======================
+End user documentation
+======================
+
+
+Overview
+========
+
+* :doc:`Domogik overview </overview/index>` 
+* :doc:`Domogik requirements </overview/requirements>`
+
+End User Documentation
+======================
+
+Releases history
+----------------
+* :doc:`Release 0.4.0 </releases/0.4.0>` 
+* :doc:`Release 0.3.0 </releases/0.3.0>`
+* :doc:`Release 0.2.0 </releases/0.2.0>`
+* :doc:`Release 0.1.0 </releases/0.1.0>`
+
+Installation
+------------
+
+.. todo::
+    complete standard installation part
+    links to domoweb/domodroid doc
+  
+Basic installation
+******************
+
+First, you will need to do the :doc:`standard installation </enduser/installation/index>`
+
+If you encounter some errors, please check :doc:`the errors and solutions page </enduser/errors/index>`
+
+Then, you will need to:
+
+* Configure Domogik over the administration interface
+* Install a control user interface like Domoweb or Domodroid
+
+.. note::
+    **If you upgrade from 0.3 to 0.4**, please check the :doc:`upgrade 0.3 to 0.4.0 tutorial <enduser/upgrade/0.3_to_0.4.0>`.
+
+Uninstallation
+**************
+
+If you want to uninstall Domogik, you will need to :doc:`use the uninstall tool </enduser/installation/uninstall>` .
+
+Advanced installation tutorials
+*******************************
+
+The following tutorials are not mandatory to use Domogik. You can pick just what you need for what you want.
+
+* :doc:`Install Domogik from a script </enduser/installation/install_from_a_script>`
+* :doc:`Use postgresql instead of mysql </enduser/installation/postgresql>`
+* Configure external access to Domogik administration interface
+* :doc:`Install Domogik in a python virtualenv </enduser/installation/virtualenv>`
+* :doc:`Configure SSL </enduser/installation/ssl>`
+
+
+Quick start guide
+-----------------
+
+.. todo::
+    complete
+
+* :doc:`Terms </enduser/quick_start/terms>`
+* :doc:`First use : go to the admin </enduser/quick_start/first_use>`
+* :doc:`Find and install a package </enduser/quick_start/install_a_package>`
+* configure a client and create its devices
+* :doc:`What is an orphan device ? <enduser/packages/orphans>`
+* start a client
+* :doc:`Clients status </enduser/quick_start/clients_status>`
+
+Detailed guide
+--------------
+
+* :doc:`Manage packages </enduser/packages/index>` 
+
+ 

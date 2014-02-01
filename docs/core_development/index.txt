@@ -1,0 +1,13 @@
+================
+Core development
+================
+
+.. todo::
+    Add some informations for core developpers
+
+* :doc:`Releasing tasks <releasing>`
+
+Security
+========
+
+* :doc:`Check Domogik administration interface with Wapiti <wapiti>`

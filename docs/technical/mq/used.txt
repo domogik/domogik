@@ -27,55 +27,63 @@ Rules to apply
   * status = True / False
   * reason = "a reason if status = False, empty is status = True"
 
-======================= =================== =================== ====================== ========================
-Source                  Destination         action req          action rep             Python example
-======================= =================== =================== ====================== ========================
-rest                    xplgw               reload              reload.result          req_reload.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-plugin (any)            dbmgr               config.get          config.result          req_config_get.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     dbmgr               config.set          config.result          req_config_set.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     dbmgr               config.delete       config.result          req_config_delete.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     manager             client.list.get     client.list.result     req_client_list.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     manager             client.detail.get   client.detail.result   req_client_detail.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-Rest                    manager             device_types.get    device_types.result    req_device_types.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     manager             package.detail.get  package.detail.result  req_package_detail.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     manager             plugin.start.do     plugin.start.result    req_plugin_start.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     plugin (by id)      plugin.stop.do      plugin.stop.result     req_plugin_stop.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     plugin (by id)      helper.list.get     helper.list.result     req_helper_list.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     plugin (by id)      helper.help.get     helper.help.result     req_helper_help.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     plugin (by id)      helper.do           helper.do.result       req_helper_do.py
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     scenario            test.list           scenario.result
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     scenario            test.create         scenario.result
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     scenario            action.list         scenario.result
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     scenario            action.create       scenario.result
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     scenario            parameter.list      scenario.result
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     scenario            scenario.list       scenario.result
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     scenario            scenario.get        scenario.result
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     scenario            scenario.create     scenario.result
------------------------ ------------------- ------------------- ---------------------- ------------------------
-UIs                     scenario            scenario.eval       scenario.result
------------------------ ------------------- ------------------- ---------------------- ------------------------
-rest, scenario          xplgw               cmd.send            cmd.send.result        req_xplcmd_send.py
-======================= =================== =================== ====================== ========================
+======================= =================== ===================== ======================== ========================
+Source                  Destination         action req            action rep               Python example
+======================= =================== ===================== ======================== ========================
+rest                    xplgw               reload                reload.result            req_reload.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+plugin (any)            dbmgr               config.get            config.result            req_config_get.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     dbmgr               config.set            config.result            req_config_set.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     dbmgr               config.delete         config.result            req_config_delete.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     manager             client.list.get       client.list.result       req_client_list.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     manager             client.detail.get     client.detail.result     req_client_detail.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+XplGW                   manager             client.conversion.get client.conversion.result req_client_conversion.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+Admin                   manager             datatype.get          datatype.result          req_datatype.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+Rest                    manager             device_types.get      device_types.result      req_device_types.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+Plugins                 dbmgr               device.get            device.result            req_device.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     manager             package.detail.get    package.detail.result    req_package_detail.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     manager             plugin.start.do       plugin.start.result      req_plugin_start.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     plugin (by id)      plugin.stop.do        plugin.stop.result       req_plugin_stop.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     plugin (by id)      device.new.get        device.new.result        req_device_new.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     plugin (by id)      helper.list.get       helper.list.result       req_helper_list.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     plugin (by id)      helper.help.get       helper.help.result       req_helper_help.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     plugin (by id)      helper.do             helper.do.result         req_helper_do.py
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     scenario            test.list             scenario.result
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     scenario            test.create           scenario.result
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     scenario            action.list           scenario.result
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     scenario            action.create         scenario.result
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     scenario            parameter.list        scenario.result
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     scenario            scenario.list         scenario.result
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     scenario            scenario.get          scenario.result
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     scenario            scenario.create       scenario.result
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+UIs                     scenario            scenario.eval         scenario.result
+----------------------- ------------------- --------------------- ------------------------ ------------------------
+rest, scenario          xplgw               cmd.send              cmd.send.result          req_xplcmd_send.py
+======================= =================== ===================== ======================== ========================
 
 *clients.\** and *package.\** may seems similar. It is not the case! *clients.\** are related to all the xpl clients which are a package installed on a Domogik host.
 
@@ -97,9 +105,13 @@ plugin (any)            manager             plugin.status          sub_plugin_st
 plugin (any)            manager             plugin.configuration   sub_plugin_configuration.py
                         UIs
 ----------------------- ------------------- ---------------------- ---------------------
+plugin (any)            UIs                 device.new             sub_device_new.py
+----------------------- ------------------- ---------------------- ---------------------
 manager                 UIs                 client.list            sub_client_list.py
 ----------------------- ------------------- ---------------------- ---------------------
 manager                 UIs                 client.detail          sub_client_detail.py
+----------------------- ------------------- ---------------------- ---------------------
+manager                 XplGW               client.conversion      sub_client_conversion.py
 ----------------------- ------------------- ---------------------- ---------------------
 manager                 UIs                 package.detail         sub_package_detail.py
 ----------------------- ------------------- ---------------------- ---------------------

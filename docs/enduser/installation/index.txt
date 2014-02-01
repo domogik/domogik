@@ -96,6 +96,7 @@ Use git to get the sources: ::
 
     $ sudo apt-get install git
     $ git clone https://github.com/domogik/domogik.git
+    $ cd domogik
     $ git checkout master
 
 Install Domogik 

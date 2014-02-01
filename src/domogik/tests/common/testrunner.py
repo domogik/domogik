@@ -117,7 +117,7 @@ class TestRunner():
 	    return False
 
 	# cehck if we have a json file
-	self.json_file = "{0}tests.json".format(self.path)
+	self.json_file = "{0}/tests.json".format(self.path)
         if not os.path.isfile(self.json_file):
 	    self.log.error("Path {0} has no tests.json file".format(self.path))
 	    return False

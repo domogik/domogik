@@ -10,7 +10,7 @@ from flask_login import login_required
 from flask.ext.babel import gettext, ngettext
 
 from domogik.rest.urls.device import get_device_params
-from domogik.common.sql_schema import Device
+from domogik.common.sql_schema import Device, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form
 
 @app.route('/clients')
@@ -58,17 +58,60 @@ def client_devices_known(client_id):
     with app.db.session_scope():
         devices = app.db.list_devices_by_plugin(client_id)
     return render_template('client_devices.html',
+            datatypes = app.datatypes,
             devices = devices,
             clientid = client_id,
             mactve="clients",
             active = 'devices'
             )
 
+@app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
+@login_required
+def client_sensor_edit(client_id, sensor_id):
+    with app.db.session_scope():
+        sensor = app.db.get_sensor(sensor_id)
+        MyForm = model_form(Sensor, \
+                        base_class=Form, \
+                        db_session=app.db.get_session(),
+                        exclude=['core_device', 'name', 'reference', 'incremental', 'formula', 'data_type', 'conversion', 'last_value', 'last_received', 'history_duplicate'])
+	#MyForm.history_duplicate.kwargs['validators'] = []
+	MyForm.history_store.kwargs['validators'] = []
+        form = MyForm(request.form, sensor)
+
+        if request.method == 'POST' and form.validate():
+            if request.form['history_store'] == 'y':
+                store = 1 
+            else:
+                store = 0
+            app.db.update_sensor(sensor_id, \
+                     history_round=request.form['history_round'], \
+                     history_store=store, \
+                     history_max=request.form['history_max'], \
+                     history_expire=request.form['history_expire'])
+
+            flash(gettext("Changes saved"), "success")
+            return redirect("/client/{0}/devices/known".format(client_id))
+            pass
+	else:
+    	    return render_template('client_sensor.html',
+		    form = form,
+		    clientid = client_id,
+		    mactve="clients",
+		    active = 'devices'
+		    )
+
 @app.route('/client/<client_id>/devices/detected')
 @login_required
 def client_devices_detected(client_id):
-    # TODO get them
-    devices = {}
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device.new.get')
+    res = cli.request(str(client_id), msg.get(), timeout=10)
+    if res is not None:
+        data = res.get_data()
+        devices = data['devices']
+    else:
+        devices = {}
     return render_template('client_detected.html',
             devices = devices,
             clientid = client_id,

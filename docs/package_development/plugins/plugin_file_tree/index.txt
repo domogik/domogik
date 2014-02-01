@@ -23,10 +23,11 @@ The plugin file tree will at least contains (assuming the plugin name is *myplug
 .. todo::
     Conversion part must be updated
 
-* **conversions** : the python conversion functions
+* **conversion** : the python conversion functions
 
-  * **conversions/__init__.py** : an empty file needed by python
-  * **conversions/myplugin.py** : the python conversion functions
+  * **conversion/__init__.py** : an empty file needed by python
+  * **conversion/from_foo_to_bar.py** : a python conversion function
+  * **conversion/from_fii_to_bur.py** : another python conversion function
 
 * **doc/** : the sphynx documentation in ReST format
 * **design/** : this folder will contain all graphical resources (icons, ...)

@@ -47,6 +47,12 @@ Example: ::
 /sensor/<sensor id>
 ---------------------
 
+.. note::
+
+    To find the *sensor id* of a device sensor, you first need to :doc:`query the /device url <device>` and parse the *sensors* part.
+
+    If you are totally lost, you can go in *Domogik admin* and check a device details. You will see the various **/sensor** url that can be called (with the correct id) for this device features.
+
 The sensor corresponding to the given id will be returned in a json.
 
 Example: ::

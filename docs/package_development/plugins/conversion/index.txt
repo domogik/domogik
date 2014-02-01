@@ -1,0 +1,33 @@
+====================
+Conversion functions
+====================
+
+Example
+=======
+
+Some conversion may be needed for some features of a plugin. For example, the *velbus* plugin has some level features. Velbus hardware handle these levels with values from 0 to 255. For such features, Domogik has a datatype named *DT_Scaling* which allows a range from 0 to 100. So when data is sent from the *velbus* plugin over xPL, the data is in the range [0, 255]. When the *xplgw* component received it, before storing it in database, it will convert the value for the needed Domogik datatype : from [0-255] to [0-100]. To allow this, the plugin is delivered with a file **from_level_to_DT_Scaling.py** which contains: ::
+
+    def from_level_to_DT_Scaling(x):
+        # 0 - 255 translated to 0 - 100
+        return round(int(x) / 255 * 100)
+
+This conversion function is used by a sensor, defined in the *info.json* file: ::
+
+    "sensors": {
+        ...
+        "level_range": {
+                "name": "level sensor",
+                "data_type": "DT_Scaling",
+                "conversion": "from_level_to_DT_Scaling",
+                "incremental": false,
+                "history": {
+                    "store": true,
+                    "duplicate": false,
+                    "max": 0,
+                    "expire": 0,
+                    "round_value": 0
+                }
+        },
+        ...
+
+So, each time a value is catched by *xplgw* for such a sensor, it will be translated thanks to the conversion function to the appropriate value.

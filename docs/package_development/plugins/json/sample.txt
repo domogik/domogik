@@ -7,9 +7,6 @@ Here is a sample of the json file. There are some comments in the sample. Please
 Sample
 ======
 
-.. todo:: 
-    update conversion related fields after conversion has been implemented in the final state
-
 Part of the json sample 
 -----------------------
 
