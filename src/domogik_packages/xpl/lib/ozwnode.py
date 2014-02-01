@@ -106,7 +106,7 @@ class ZWaveNode:
     isReceiver = property(lambda self: self._receiver)
     isReady = property(lambda self: self._ready)
     isNamed = property(lambda self: self._named)
-    isFailed = property(lambda self: self._failed)
+    isFailed = property(lambda self: self._isFailed())
     level = property(lambda self: self._getLevel())
     isOn = property(lambda self: self._getIsOn())
     batteryLevel = property(lambda self: self._getBatteryLevel())
@@ -143,6 +143,11 @@ class ZWaveNode:
         self._sleeping = state;
         m = 'Device goes to sleep.' if state else 'Sleeping device wakes up.'
         self.reportToUI({'notifytype': 'node-state-changed', 'usermsg' : m,  'data': {'typestate': 'sleep', 'state sleeping': state}})
+        if state : 
+            # le node est réveillé, fait une request, pour le prochain réveille, de niveau de battery si la command class existe.
+            values = self._getValuesForCommandClass(0x80)  # COMMAND_CLASS_BATTERY
+            if values:
+                for value in values : value.RefreshOZWValue()
         
     def markAsFailed(self): 
         """Le node est marqué comme HS."""
@@ -216,6 +221,14 @@ class ZWaveNode:
             else : return 'Undefined'
         else : return 'Undefined'
         
+    def GetCurrentQueryStage(self):
+        """ Retourn le stade ou le node est dans sa procédure d'indentification.
+            "ProtocolInfo", "Probe", "WakeUp", "ManufacturerSpecific1", "NodeInfo", "ManufacturerSpecific2", "Versions", "Instances",
+            "Static", "Probe1", "Associations", "Neighbors", "Session", "Dynamic", "Configuration", "Complete", "None", "Unknow"
+        """
+        return self._manager.getNodeQueryStage(self._homeId,  self._nodeId)
+        
+        
     def GetNodeStateNW(self):
         """Retourne une chaine décrivant l'état d'initialisation du device  
            Status = {0:'Uninitialized',
@@ -235,7 +248,7 @@ class ZWaveNode:
         if self.isReady : retval = NodeStatusNW[1]
         if self.isReady and self.isNamed : retval = NodeStatusNW[2]
         if self.isFailed : retval = NodeStatusNW[6]
-        print ('node state linked:',  self.isLinked, ' isReceiver:', self.isReceiver, ' isReady:', self.isReady, 'isNamed:', self.isNamed, ' isFailed:', self.isFailed )
+        print ('node state linked:',  self.isLinked, ' isReceiver:', self.isReceiver, ' isReady:', self.isReady, 'isNamed:', self.isNamed, ' isFailed:', self._failed )
         return retval
         
     def getMemoryUsage(self):
@@ -410,17 +423,19 @@ class ZWaveNode:
         )
     
     def  _isSleeping(self):
-        "Interroge le node pour voir son etat"
-        # TODO: A perfectionner, pour l'instant basé d'après la notification d'openzwave (plus sur la capacité du node et non son etat réel).
-        retval = self._sleeping
-    #     if 'Listening' in self._capabilities : retval = False
-    #    else : 
-    #        if (time.time() - self.lastUpdate) > 30 :
-    #            retval = True
-    #        else :  retval = False
-    #    print '+++++ node ', self._nodeId,  ' is Sleeping ? :', retval, ' ++++'
-    #   if retval : print "WakeUp commandClass : ",  self._manager.getNodeClassInformation(self._homeId, self._nodeId, 0x84 ) # 'COMMAND_CLASS_WAKE_UP
-        return retval              
+        "Interroge le node pour voir son etat et envoi une notification UI si changement."
+        state = not self._manager.isNodeAwake(self._homeId, self._nodeId)
+        if self._sleeping != state : self.setSleeping(state)
+        return self._sleeping         
+    
+    def _isFailed(self):
+        "Interroge le node pour voir son etat et envoi une notification UI si changement."
+        state = self._manager.isNodeFailed(self._homeId, self._nodeId)
+        if self._failed != state : 
+            if state : self.markAsFailed()
+            else : self.markAsOK()
+        return self._failed         
+     
     
     def _updateNeighbors(self):
         """Mise à jour de la liste des nodes voisins"""
@@ -620,7 +635,7 @@ class ZWaveNode:
         self._updateCommandClasses()
         retval["HomeID"] ="0x%.8x" % self.homeId
         retval["Model"]= self.manufacturer + " -- " + self.product
-        retval["State sleeping"] = True if self.isSleeping else False
+        retval["State sleeping"] = self.isSleeping
         retval["Node"] = self.nodeId
         retval["Name"] = self.name if self.name else 'Undefined'
         retval["Location"] = self.location if self.location else 'Undefined'
@@ -630,6 +645,7 @@ class ZWaveNode:
         retval["Groups"] = self._getGroupsDict()
         retval["Capabilities"] = list(self._capabilities) if  self._capabilities else list(['No one'])
         retval["InitState"] = self.GetNodeStateNW()
+        retval["Stage"] = self.GetCurrentQueryStage()
         retval["Polled"] = self.isPolled
         retval["ComQuality"] = self.getComQuality()
         retval["BatteryLevel"] = self._getBatteryLevel()

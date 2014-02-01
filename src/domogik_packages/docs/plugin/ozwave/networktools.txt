@@ -70,18 +70,30 @@ Representation of the node according to the initialisation state.
 +------------+----------------------------------------------------------+---------------+
 
 
-Network statistic
-=================
+Network statistic and tests
+===========================
+
+Tree actions possible :
+
+- Get information about network statistic.
+- Start a healing process with reroute all node (node byn node).
+- Send test message for all node awake (not sleeping node) - Enter number of send test message per node.
 
 .. |netw-stats| image:: ozwave_netw-stats.png
     :width: 750px
 
 |netw-stats|
 
-Node statistic
-=================
+Node statistic and tests
+========================
 
-Enter node number and click button refresh.
+two actions possible :
+
+- Get information about a node statistic - Enter node number and click button refresh.
+- Send test message for all node awake (not sleeping node) - Enter number of send test message per node.
+
+.. note ::
+    To heal a specific node use button on columm "Action" `of nodes table <ctldevtools.html#get-zwave-devices-nodes-informations>`_ .
 
 .. |node-stats| image:: ozwave_node-stats.png
     :width: 750px

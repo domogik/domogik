@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>  
+<statistic technology="ozwave">
+    <schema name="alarm.basic">
+        <xpltype type="*">
+            <listener>
+                <filter>
+                    <key name="type" value="alarm-type"/>
+                    <key name="type" value="alarm-level"/>
+                    <key name="type" value="tamper-event"/>
+                    <key name="type" value="low-battery"/>
+                    <key name="type" value="general"/>
+                    <key name="type" value="smoke"/>
+                    <key name="type" value="carbonmonoxide"/>
+                    <key name="type" value="carbondioxide"/>
+                    <key name="type" value="heat"/>
+                    <key name="type" value="flood"/>
+                    <key name="type" value="count"/>
+                </filter>
+            </listener>
+            <mapping>
+                <device field="device"/>
+                <value field="current" new_name="alarm-type"
+                       filter_key="type" filter_value="alarm-type" />
+                <value field="current" new_name="alarm-level"
+                       filter_key="type" filter_value="alarm-level" />
+                <value field="status" new_name="tamper-event"
+                       filter_key="type" filter_value="tamper-event" />
+                <value field="status" new_name="low-battery"
+                       filter_key="type" filter_value="low-battery" />
+                <value field="current" new_name="general"
+                       filter_key="type" filter_value="general" />
+                <value field="status" new_name="smoke"
+                       filter_key="type" filter_value="smoke" />
+                <value field="status" new_name="carbonmonoxide"
+                       filter_key="type" filter_value="carbonmonoxide" />
+                <value field="status" new_name="carbondioxide"
+                       filter_key="type" filter_value="carbondioxide" />
+                <value field="status" new_name="heat"
+                       filter_key="type" filter_value="heat" />
+                <value field="status" new_name="flood"
+                       filter_key="type" filter_value="flood" />
+                <value field="status" new_name="count"
+                       filter_key="type" filter_value="count" />
+            </mapping>
+        </xpltype>
+    </schema>
+</statistic>
+

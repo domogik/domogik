@@ -4,18 +4,30 @@ Change log
 
 New instructions to apply changes from immediatly previous version.
 
+- 0.2c4 : (31-01-2014) Compatibily library : OpenZwave >= 1.0.711 (/branches/2013-11-13_release_testing), python_openzwave >= 0.2.5 (rev >= 3bef0f1cb27f)
+    - Target : python-openzwave, domogik (0.2c4), domoweb (0.2c3)
+    - An `insert_data <changelog.html#do-an-insert-data>`_ or a reinstall is necessary.
+    - Update, compile and install python_openzwave.
+        - checkout openzwave branch : goto python-openzwave/openzwave,
+        - do command: svn checkout http://open-zwave.googlecode.com/svn/branches/2013-11-13_release_testing
+    - Change log :
+        - Add heal node/network functions.
+        - Add command_class_sensor_alarm.
+        - Add auto battery level request at wakeup node.
+        - Update doc
+
 - 0.2c3 : (06-01-2014) Compatibily library : OpenZwave >= 1.0.706, python_openzwave >= 0.2.5 (rev >= 75d9b6a8dd77), Compatibilty with ws4py last update >= 0.3.3
     - Target : OpenZwave, python-openzwave, ws4py, domogik (0.2c3), domoweb (0.2c2)
     - Update ws4py with pip or easy_install or update source and compile it.
     - Update, compile and install python_openzwave.
     - Change log :
-        - GetPollIntensity add in openzwave lib
+        - GetPollIntensity add in openzwave lib.
         - Add log debug information for wsServer.
-        - Fix auto-startup failure (rest no response)
+        - Fix auto-startup failure (rest no response).
         - Fix automatique COMMAND_CLASS_SENSOR_BINARY type set for xpl (recreate devices and widget for changes).
         - Fix issue in monitornodes xpl-report if no conforme xpl_msg.
-        - Fix wsClient error if ack = undefined (domoweb)
-        - Force default name for controler device if not defined (CtrlMustBeCreate.1.1)
+        - Fix wsClient error if ack = undefined (domoweb).
+        - Force default name for controler device if not defined (CtrlMustBeCreate.1.1).
         - Update doc
         
 - 0.2c2 : (30-10-2013) Compatibily library : The same, Warning in case of ws4py install or update use >= 0.3.0-beta rev eec3a7dcb33b322eac598f5125425e62c0050969, see instructions in `dependencies page. <dependencies.html>`_
