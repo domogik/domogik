@@ -185,8 +185,7 @@ class Command:
                         sensors['Buttons'] = self.j['response']['r11']['value']
                         sensors['Distance'] = self.j['response']['r12']['value']
                         sensors['Angle'] = self.j['response']['r13']['value']
-                        sensors['State'] = State[int(self.j['response']['r14']['value'])]
-
+                        #sensors['State'] = State[int(self.j['response']['r14']['value'])]
                         sensors['Voltage'] = self.j['response']['r15']['value']
                         sensors['Current'] = self.j['response']['r16']['value']
                         sensors['Temperature'] = self.j['response']['r17']['value']
