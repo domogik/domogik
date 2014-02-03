@@ -37,6 +37,7 @@ Implements
 from domogik.xpl.common.plugin import XplPlugin
 from domogik import __version__ as DMG_VERSION
 from domogik.common import logger
+from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
 from argparse import ArgumentParser
 import os
 import json
@@ -147,7 +148,10 @@ class TestRunner():
 
     def _run_testcases(self):
         for (test, config) in self.testcases.items():
-	    os.system("python {0}{1}.py".format(self.path, test))
+            # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+            cmd = "{0} && python {1}/{2}.py".format(STARTED_BY_MANAGER, self.path, test)
+            print cmd
+	    os.system(cmd)
 
 
 def main():
