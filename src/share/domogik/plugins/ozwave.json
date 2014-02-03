@@ -544,7 +544,7 @@
                 "type": "python"
             }
 		],
-		"version" : "0.2c3",
+		"version" : "0.2c4",
 		"type" : "plugin",
 		"id" : "ozwave"
 	}, "json_version" : 1
