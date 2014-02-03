@@ -149,7 +149,7 @@ class TestRunner():
     def _run_testcases(self):
         for (test, config) in self.testcases.items():
             # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
-            cmd = "{0} && python {1}/{2}.py".format(STARTED_BY_MANAGER, self.path, test)
+            cmd = "{0} && cd {1} && python ./{2}.py".format(STARTED_BY_MANAGER, self.path, test)
             print cmd
 	    os.system(cmd)
 
