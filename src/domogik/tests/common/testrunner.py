@@ -44,6 +44,14 @@ import json
 import traceback
 import imp
 import unittest
+import sys
+from subprocess import Popen, PIPE
+
+LOW = "low"
+MEDIUM = "medium"
+HIGH = "high"
+
+criticity_level = { LOW : 0, MEDIUM : 1, HIGH : 2 }
 
 class TestRunner():
     """ Package installer class
@@ -55,52 +63,45 @@ class TestRunner():
         l.set_format_mode("messageOnly")
         self.log = l.get_logger()
 
-        parser = ArgumentParser()
+        parser = ArgumentParser(description="Launch all the tests that don't need hardware.")
 	parser.add_argument("directory",
                           help="What directory to run")
         parser.add_argument("-a", 
-                          "--no-automatic", 
-                          dest="automatic",
-                          action="store_false",
-                          help="Install a package from a path, a zip file or an url to a zip file or to a github repository and branch")
-        parser.add_argument("-n", 
-                          "--need-hardware", 
-                          dest="hardware", 
+                          "--allow-alter", 
+                          dest="allow_alter",
                           action="store_true",
-                          help="Run test that need hardware")
-        parser.add_argument("-m", 
-                          "--use-mock", 
-                          dest="mock", 
-                          action="store_true",
-                          help="Run test that use virtual devices")
+                          help="Launch the tests that can alter the configuration of the plugin or the setup (devices, ...)")
+        parser.add_argument("-c", 
+                          "--criticity", 
+                          dest="criticity", 
+                          help="Set the minimum level of criticity to use to filter the tests to execute. low/medium/high. Default is low.")
         self.options = parser.parse_args()
 	self.testcases = {}
         self.results = {}
 
+        # options
         self.log.info("Domogik release : {0}".format(DMG_VERSION))
         self.log.info("Running test with the folowing parameters:")
-	if self.options.automatic:
-	    self.log.info("   - automatic testcases")
-	if self.options.hardware:
-	    self.log.info("   - testcases that need hardware")
-	if self.options.mock:
-	    self.log.info("   - testcases that use virtualdevices")
+	if self.options.allow_alter:
+	    self.log.info("- allow to alter the configuration or setup.")
+	if self.options.criticity not in (LOW, MEDIUM, HIGH):
+            self.options.criticity = LOW
+	self.log.info("- criticity : {0}".format(self.options.criticity))
 
+        # check tests folder
+	self.log.info("- path {0}".format(self.options.directory))
         if not self.check_dir():
-            return
-	self.log.info("   - path {0}".format(self.options.directory))
+            return False
 
+        # check and load the json file
+        self.log.info("- json file {0}".format(self.json_file))
 	if not self.load_json():
-	    return
-        self.log.info("   - json file {0}".format(self.json_file))
+	    return False
 
-	self.log.info("")
-        self.log.info("Will run the folowing testcases:")
-        for test in self.testcases.keys():
-            self.log.info("   - {0}".format(test))
-        
         self._run_testcases()
         print self.results
+        # TODO : return False is some tests fails
+        return True
 
     def check_dir(self):
         self.path = None
@@ -132,30 +133,44 @@ class TestRunner():
             self.log.error("Error during json file reading: {0}".format(traceback.format_exc()))
             return False
 
-	for (test, config) in self.json.iteritems():
-	#{u'mock_available': False, u'need_hardware': False, u'alter_configuration_or_setup': u'true', u'automatic': True}
-            to_add = True
-	    if config['mock_available'] != self.options.mock:
-                to_add = False
-	    if config['need_hardware'] != self.options.hardware:
-                to_add = False
-	    if config['automatic'] != self.options.automatic:
-                to_add = False
-            print to_add
-            if to_add:
-               self.testcases[test] = config
+        self.log.info("List of the tests (keep in mind that tests which need hardware will be skipped) :")
+        for (test, config) in self.json.iteritems():
+            to_run = True
+            if config['need_hardware']:
+                to_run = False
+            if (not self.options.allow_alter) and config['alter_configuration_or_setup']:
+                to_run = False
+            if criticity_level[self.options.criticity] > criticity_level[config['criticity']]:
+                to_run = False
+            if to_run:
+                indicator = "[ TO RUN  ]"
+                self.testcases[test] = config
+            else:
+                indicator = "[ SKIPPED ]"
+            self.log.info("{0} {1} : need hardware={2}, alter config or setup={3}, criticity={4}".format(indicator, test, config['need_hardware'], config['alter_configuration_or_setup'], config['criticity']))
         return True
 
     def _run_testcases(self):
         for (test, config) in self.testcases.items():
             # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+            self.log.info("")
+            self.log.info("Launching {0}".format(test))
             cmd = "{0} && cd {1} && python ./{2}.py".format(STARTED_BY_MANAGER, self.path, test)
-            print cmd
-	    os.system(cmd)
+            subp = Popen(cmd,
+                         shell=True)
+            pid = subp.pid
+            subp.communicate()
+            self.results[test] = { 'return_code' : subp.returncode }
+
 
 
 def main():
-    testr = TestRunner()
+    try:
+        testr = TestRunner()
+        if testr == False:
+            sys.exit(1)
+    except:
+        sys.exit(2)
 
 if __name__ == "__main__":
     main()
