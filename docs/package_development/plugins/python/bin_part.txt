@@ -50,7 +50,7 @@ On demande features
 
 TODO : ready, config, library, packages, resources, data getter functions
 
-TODO : logging, force_leave,
+TODO : logging, force_leave (and return code),
 
 TODO : MQ usage
 

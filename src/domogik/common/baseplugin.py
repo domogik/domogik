@@ -40,12 +40,16 @@ from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import pwd
+import traceback
 
 from domogik.common.daemon.daemon import DaemonContext
 from domogik.common.defaultloader import DefaultLoader
 from domogik.common import logger
 from domogik.common.utils import is_already_launched
 from argparse import ArgumentParser
+
+FIFO_DIR = "/var/run/domogik/"
+
 
 class BasePlugin():
     """ Basic plugin class, manage common part of all plugins.
@@ -59,7 +63,6 @@ class BasePlugin():
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
         '''
-
         ### First, check if the user is allowed to launch the plugin. The user must be the same as the one defined
         # in the file /etc/default/domogik : DOMOGIK_USER
         Default = DefaultLoader()
@@ -80,6 +83,17 @@ class BasePlugin():
         res, pid_list = is_already_launched(self.log, name)
         if res:
             sys.exit(2)
+
+        ### Create a file to handle the return code
+        # this is used by the function set_return_code and get_return_code
+        # this is needed as a Domogik process is forked, there is no way to send from a class a return code from the child to the parent.
+        try: 
+            self.return_code_filename = "{0}/{1}_return_code_{2}".format(FIFO_DIR, self._plugin_name, os.getpid())
+            # just touch the file to create it
+            open(self.return_code_filename, 'a').close()
+        except:
+            self.log.error("Error while creating return_code file '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))
+            sys.exit(3)
 
         ### Start the plugin...
         self._threads = []
@@ -224,6 +238,51 @@ class BasePlugin():
         """
         #return gethostname().lower().split('.')[0].replace('-','')[0:16]
         return get_sanitized_hostname()
+
+    def set_return_code(self, value):
+        """ Helper to set the return code 
+            @param value : return code to set
+        """
+        # the fifo is created in the __init__ :
+        # x = os.mkfifo(filename)
+        try:
+            file = os.open(self.return_code_filename, os.O_WRONLY)
+            os.write(file, "{0}".format(value))
+        except:
+            self.log.error("Error while setting return code in '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))
+        
+
+    def get_return_code(self):
+        """ Helper to get the return code set with set_return_code 
+            @return : return code
+        """
+        # the fifo is created in the __init__ :
+        # x = os.mkfifo(filename)
+        try:
+            file = open(self.return_code_filename, 'r')
+            lines = file.readline()
+            # just in case the file is empty (no return code set)
+            if lines == '':
+                lines = 0
+            return int(lines)
+        except:
+            self.log.error("Error while getting return code in '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))
+            return 0
+        # http://stackoverflow.com/questions/3806210/python-interprocess-querying-control
+
+    def clean_return_code_file(self):
+        """ To be called when we exit (Watcher class) to delete the file used to handle the retur code
+        """
+        try:
+            # TODO : 
+            # delete the file
+            # delete also in /etc/init.d/domogik start|stop ???
+            self.log.debug("Delete the file {0}".format(self.return_code_filename))
+            os.unlink(self.return_code_filename)
+        except:
+            self.log.error("Error while deleting the file '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))
+
+        
 
     def __del__(self):
         if hasattr(self, log):

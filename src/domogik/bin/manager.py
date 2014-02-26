@@ -74,6 +74,7 @@ from domogik.common import logger
 from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
 from domogik.xpl.common.plugin import XplPlugin, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID, STATUS_HBEAT
 from domogik.common.queryconfig import Query
+from domogik.common.baseplugin import FIFO_DIR
 
 import zmq
 from domogik.mq.pubsub.subscriber import MQAsyncSub
@@ -86,7 +87,7 @@ from domogik.xpl.common.xplconnector import XplTimer
 from domogik.common.packagejson import PackageJson, PackageException
 
 ### constants
-FIFO_DIR = "/var/run/domogik/"
+
 PYTHON = sys.executable
 WAIT_AFTER_STOP_REQUEST = 15
 CHECK_FOR_NEW_PACKAGES_INTERVAL = 60
