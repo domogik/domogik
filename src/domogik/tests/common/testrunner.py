@@ -34,7 +34,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.xpl.common.plugin import XplPlugin
+#from domogik.xpl.common.plugin import XplPlugin
 from domogik import __version__ as DMG_VERSION
 from domogik.common import logger
 from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
@@ -98,10 +98,21 @@ class TestRunner():
 	if not self.load_json():
 	    return False
 
+        # run the test cases
         self._run_testcases()
-        print self.results
-        # TODO : return False is some tests fails
-        return True
+
+        # Display a summary and manager return code
+        rc = 0
+        self.log.info("")
+        self.log.info("Tests summary :")
+        self.log.info("---------------")
+       
+        for res in self.results:
+            if self.results[res]['return_code'] == 0:
+                self.log.info("Test {0} : OK".format(res))
+            else:
+                self.log.info("Test {0} : ERROR".format(res))
+                rc = 1
 
     def check_dir(self):
         self.path = None
@@ -162,15 +173,22 @@ class TestRunner():
             subp.communicate()
             self.results[test] = { 'return_code' : subp.returncode }
 
+    def get_result(self):
+        """ Return 0 if all is ok
+            Return 1 if there are some tests failed
+        """
+        # Display a summary and manager return code
+        for res in self.results:
+            # when errors, return 1
+            if self.results[res]['return_code'] != 0:
+                return 1
+        return 0
 
 
 def main():
-    try:
-        testr = TestRunner()
-        if testr == False:
-            sys.exit(1)
-    except:
-        sys.exit(2)
+    testr = TestRunner()
+    cr = testr.get_result()
+    sys.exit(cr)
 
 if __name__ == "__main__":
     main()

@@ -264,6 +264,10 @@ class BasePlugin():
             # just in case the file is empty (no return code set)
             if lines == '':
                 lines = 0
+            #elif lines == 'True':
+            #    lines = 0
+            #elif lines == 'False':
+            #    lines = 1
             return int(lines)
         except:
             self.log.error("Error while getting return code in '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))
