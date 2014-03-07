@@ -165,7 +165,9 @@ class TestRunner():
         for (test, config) in self.testcases.items():
             # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
             self.log.info("")
+            self.log.info("---------------------------------------------------------------------------------------")
             self.log.info("Launching {0}".format(test))
+            self.log.info("---------------------------------------------------------------------------------------")
             cmd = "{0} && cd {1} && python ./{2}.py".format(STARTED_BY_MANAGER, self.path, test)
             subp = Popen(cmd,
                          shell=True)
