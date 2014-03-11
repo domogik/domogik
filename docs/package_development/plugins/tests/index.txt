@@ -70,6 +70,7 @@ A test file is made of 2 parts:
 * the main part which will do some actions and launch the test cases.
 
 Here are the actions that can be done in the main part:
+
 * if needed, define some global variables (polling interval, ...). Example: ::
 
     if __name__ == "__main__":
@@ -85,5 +86,12 @@ Here are the actions that can be done in the main part:
                                parser = None,
                                nohub = True,
                                test  = True)
+
+* define the configuration of the plugin. If no configuration is required for the plugin, at least you must set up the *configured* key to *True*. Example: ::
+
+        # set up the configuration of the plugin
+        # configuration is done in test_0010_configure_the_plugin with the cfg content
+        # notice that the old configuration is deleted before
+        cfg = { 'configured' : True }
 
  
