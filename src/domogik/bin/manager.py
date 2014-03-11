@@ -944,7 +944,7 @@ class Plugin(GenericComponent, MQAsyncSub):
 
         ### check if the plugin must be started on manager startup
         startup = self._config.query(self.name, 'auto_startup')
-        if startup == '1':
+        if startup == 'y':
             startup = True
         if startup == True:
             self.log.info(u"Plugin {0} configured to be started on manager startup. Starting...".format(name))
