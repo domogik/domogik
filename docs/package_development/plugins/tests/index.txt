@@ -30,18 +30,60 @@ Then, depending on your plugin, you can have only one test file: ::
 
     tests/
       ..
-      010_tests.py
+      tests.py
 
-Or several files. If so, there are some naming rules to follow:
-
-* *1xx_foo.py* : all these tests file *must not alter* the plugin configuration or the existing devices. Users could launch them to test some features and so help developpers to resolve the issues. These tests will require some user actions.
-* *2xx_foo.py* : all these tests *alter* the plugin configuration or existing devices. They use *real hardware devices* (if the plugin use some hardware). The difference with the *1xx* serie is that these tests can go deeper in the features as all is permitted.
-* *3xx_foo.py* : all these tests *alter* the plugin configuration or existing devices. They use only mocks (virtual devices) and can be executed without hardware. These tests are used for test automation.
-
-Example: ::
+Or several files: ::
 
     tests/
       ..
-      TODO
+      test_feature_A.py
+      test_feature_B.py
+      test_feature_C.py
 
 
+tests.json 
+==========
+
+This file is very important! It will be used by :doc:`the testrunner.py tool <testrunner>`. 
+
+Example: ::
+    
+    {
+        "tests" : {
+            "alter_configuration_or_setup" : true,
+            "need_hardware" : false,
+            "criticity" : "high"
+        }
+    }
+
+* alter_configuration_or_setup: *true* if the test need to alter the plugin configuration or some devices. The test should not be run on a production environment! *false* if the test doesn't alter anything and can be run safely on a production environment.
+* need_hardware: *true* if some hardware is needed by the test. Please note that :doc:`the testrunner.py tool <testrunner>` will never run the tests that need some hardware.
+* criticity: *high*, *medium* or *low*.
+
+Each test file must be listed in the *tests.json* file.
+
+A test file
+===========
+
+A test file is made of 2 parts:
+* a class which inherits from *PluginTestCase*. This class will contain all the test cases related to the plugin.
+* the main part which will do some actions and launch the test cases.
+
+Here are the actions that can be done in the main part:
+* if needed, define some global variables (polling interval, ...). Example: ::
+
+    if __name__ == "__main__":
+        ### global variables
+        interval = 1
+        path = "/home"
+
+* set up the xpl features for the test file. A *XplPlugin* instance will be created with some special parameters (please always use these parameters, even the generic name). Example: ::
+
+        # set up the xpl features
+        xpl_plugin = XplPlugin(name = 'test',
+                               daemonize = False,
+                               parser = None,
+                               nohub = True,
+                               test  = True)
+
+ 
