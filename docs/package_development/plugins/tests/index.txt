@@ -145,7 +145,7 @@ Here are the actions that can be done in the main part:
         suite.addTest(DiskfreeTestCase("test_9900_hbeat", xpl_plugin, name, cfg))
         suite.addTest(DiskfreeTestCase("test_9990_stop_the_plugin", xpl_plugin, name, cfg))
 
-* and finally get the status of the tests. If there were some errors, the python test file will return 1. This is very important for the continuous integration tools and *testrunner*.
+* and finally get the status of the tests. If there were some errors, the python test file will return 1. This is very important for the continuous integration tools and *testrunner*. Example: ::
 
         # quit
         res = unittest.TextTestRunner().run(suite)
