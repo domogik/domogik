@@ -84,12 +84,15 @@ DMG_VENDOR_ID = "domogik"
 # time between each read of cpu/memory usage for process
 TIME_BETWEEN_EACH_PROCESS_STATUS = 60
 
+
 class XplPlugin(BasePlugin, MQRep):
     '''
     Global plugin class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by xPL plugin
     This class is a Singleton
     '''
+
+
     def __init__(self, name, stop_cb = None, is_manager = False, reload_cb = None, dump_cb = None, parser = None,
                  daemonize = True, nohub = False, test = False):
         '''
@@ -350,7 +353,6 @@ class XplPlugin(BasePlugin, MQRep):
                     self.force_leave()
                     return []
             for a_device in device_list:
-                print type(a_device['name'])
                 self.log.info(u"- id : {0}  /  name : {1}  /  device type id : {2}".format(a_device['id'], \
                                                                                     a_device['name'], \
                                                                                     a_device['device_type_id']))
@@ -445,7 +447,6 @@ class XplPlugin(BasePlugin, MQRep):
 
             else:
                 self.log.debug(u"The device has already been detected since the plugin startup")
-            #print self.new_devices
 
 
     def get_parameter(self, a_device, key):
@@ -581,7 +582,6 @@ class XplPlugin(BasePlugin, MQRep):
                 command = "self.{0}(".format(self.helpers[contens['command']]['call'])
                 command += ", ".join(params)
                 command += ")"
-                print(command)
                 result = eval(command)
                 # run the command with all params
                 msg = MQMessage()
@@ -845,10 +845,14 @@ class XplPlugin(BasePlugin, MQRep):
         """
         self.myxpl._network.join()
 
-    def force_leave(self, status = False):
-        '''
-        Leave threads & timers
-        '''
+    def force_leave(self, status = False, return_code = None):
+        """ Leave threads & timers
+        """
+        if return_code != None:
+            self.set_return_code(return_code)
+            self.log.info("Return code set to {0} when calling force_leave()".format(return_code))
+
+
         # avoid ready() to be launched
         self.dont_run_ready = True
         # stop IOLoop
@@ -898,6 +902,7 @@ class XplPlugin(BasePlugin, MQRep):
                 if hasattr(self, "log"):
                     self.log.debug(u"Thread stopped %s" % t)
                 #t._Thread__stop()
+
         #Finally, we try to delete all remaining threads
         for t in threading.enumerate():
             if t != threading.current_thread() and t.__class__ != threading._MainThread:
@@ -906,6 +911,7 @@ class XplPlugin(BasePlugin, MQRep):
                 t.join()
                 if hasattr(self, "log"):
                     self.log.info(u"Thread %s stopped." % t.name)
+
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
                 self.log.warn(u"There are more than 1 thread remaining : %s" % threading.enumerate())
@@ -988,7 +994,9 @@ class Watcher:
             self.kill()
         except OSError:
             print(u"OSError")
-        sys.exit()
+        return_code = self._plugin.get_return_code()
+        self._plugin.clean_return_code_file()
+        sys.exit(return_code)
 
     def kill(self):
         try:

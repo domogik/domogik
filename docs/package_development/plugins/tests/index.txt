@@ -30,18 +30,131 @@ Then, depending on your plugin, you can have only one test file: ::
 
     tests/
       ..
-      010_tests.py
+      tests.py
 
-Or several files. If so, there are some naming rules to follow:
-
-* *1xx_foo.py* : all these tests file *must not alter* the plugin configuration or the existing devices. Users could launch them to test some features and so help developpers to resolve the issues. These tests will require some user actions.
-* *2xx_foo.py* : all these tests *alter* the plugin configuration or existing devices. They use *real hardware devices* (if the plugin use some hardware). The difference with the *1xx* serie is that these tests can go deeper in the features as all is permitted.
-* *3xx_foo.py* : all these tests *alter* the plugin configuration or existing devices. They use only mocks (virtual devices) and can be executed without hardware. These tests are used for test automation.
-
-Example: ::
+Or several files: ::
 
     tests/
       ..
-      TODO
+      test_feature_A.py
+      test_feature_B.py
+      test_feature_C.py
+
+
+tests.json 
+==========
+
+This file is very important! It will be used by :doc:`the testrunner.py tool <testrunner>`. 
+
+Example: ::
+    
+    {
+        "tests" : {
+            "alter_configuration_or_setup" : true,
+            "need_hardware" : false,
+            "criticity" : "high"
+        }
+    }
+
+* alter_configuration_or_setup: *true* if the test need to alter the plugin configuration or some devices. The test should not be run on a production environment! *false* if the test doesn't alter anything and can be run safely on a production environment.
+* need_hardware: *true* if some hardware is needed by the test. Please note that :doc:`the testrunner.py tool <testrunner>` will never run the tests that need some hardware.
+* criticity: *high*, *medium* or *low*.
+
+Each test file must be listed in the *tests.json* file.
+
+A test file
+===========
+
+A test file is made of 2 parts:
+* a class which inherits from *PluginTestCase*. This class will contain all the test cases related to the plugin.
+* the main part which will do some actions and launch the test cases.
+
+Here are the actions that can be done in the main part:
+
+* if needed, define some global variables (polling interval, ...). Example: ::
+
+    if __name__ == "__main__":
+        ### global variables
+        interval = 1
+        path = "/home"
+
+* set up the xpl features for the test file. A *XplPlugin* instance will be created with some special parameters (please always use these parameters, even the generic name). Example: ::
+
+        # set up the xpl features
+        xpl_plugin = XplPlugin(name = 'test',
+                               daemonize = False,
+                               parser = None,
+                               nohub = True,
+                               test  = True)
+
+* define the configuration of the plugin. If no configuration is required for the plugin, at least you must set up the *configured* key to *True*. Example: ::
+
+        # set up the configuration of the plugin
+        # configuration is done in test_0010_configure_the_plugin with the cfg content
+        # notice that the old configuration is deleted before
+        cfg = { 'configured' : True }
+
+* start the common tests by setting up the *TestDevice* class which helps to manage the devices. Example: ::
+
+        ### start tests
+        # load the test devices class
+        td = TestDevice()
+
+* if needed, delete all the existing devices of the plugin on the current host. If you do this, you must set *alter_configuration_or_setup* to True in the json. Example: ::
+
+        # delete existing devices for this plugin on this host
+        client_id = "{0}-{1}.{2}".format("plugin", name, get_sanitized_hostname())
+        try:
+            td.del_devices_by_client(client_id)
+        except:
+            print(u"Error while deleting all the test device for the client id '{0}' : {1}".format(client_id, traceback.format_exc()))
+            sys.exit(1)
+ 
+* if needed, create some devices. If you do this, you must set *alter_configuration_or_setup* to True in the json. Notice that the device parameters should come from the global variables defined before. Example: ::
+
+        # create a test device
+        try:
+            device_id = td.create_device(client_id, "test_device_diskfree", "diskfree.disk_usage")
+            td.configure_global_parameters({"device" : path, "interval" : interval})
+        except:
+            print(u"Error while creating the test devices : {0}".format(traceback.format_exc()))
+            sys.exit(1)
+
+* then, call the common tests related to the plugin. These tests are common to all plugins and are defined in the class *PluginTestCase*. The first one will just check if Domogik is running (if not, the plugin will not be able to start). The second one will configure the plugin and the last one will start the plugin. Example: ::
+
+        ### prepare and run the test suite
+        suite = unittest.TestSuite()
+        # check domogik is running, configure the plugin
+        suite.addTest(DiskfreeTestCase("test_0001_domogik_is_running", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_0010_configure_the_plugin", xpl_plugin, name, cfg))
+    
+        # start the plugin
+        suite.addTest(DiskfreeTestCase("test_0050_start_the_plugin", xpl_plugin, name, cfg))
+
+* launch all the tests you created in the *YourpluginTestCase* class. Example: ::
+
+        # do the specific plugin tests
+        suite.addTest(DiskfreeTestCase("test_0110_total_space", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_0120_free_space", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_0130_used_space", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_0140_percent_used", xpl_plugin, name, cfg))
+
+* launch some common tests related to the plugin stopping process. The first one will check that the plugin sends hbeat messages and can take several minutes! The second one will try to stop the plugin and check if the plugin can be stopped. Example: ::
+
+        # do some tests comon to all the plugins
+        suite.addTest(DiskfreeTestCase("test_9900_hbeat", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_9990_stop_the_plugin", xpl_plugin, name, cfg))
+
+* and finally get the status of the tests. If there were some errors, the python test file will return 1. This is very important for the continuous integration tools and *testrunner*. Example: ::
+
+        # quit
+        res = unittest.TextTestRunner().run(suite)
+        if res.wasSuccessful() == True:
+            rc = 0   # tests are ok so the shell return code is 0
+        else:
+            rc = 1   # tests are ok so the shell return code is != 0
+        xpl_plugin.force_leave(return_code = rc)
+
+
 
 

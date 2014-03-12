@@ -8,171 +8,26 @@ Domogik
     Some parts of this documentation still need to be updated!
 
 
-Overview
-========
+.. |user| image:: index_user.png
+    :target: index_user.html
 
-* :doc:`Domogik overview </overview/index>` 
-* :doc:`Domogik requirements </overview/requirements>`
-
-End User Documentation
-======================
-
-Releases history
-----------------
-* :doc:`Release 0.4.0 </releases/0.4.0>` 
-* :doc:`Release 0.3.0 </releases/0.3.0>`
-* :doc:`Release 0.2.0 </releases/0.2.0>`
-* :doc:`Release 0.1.0 </releases/0.1.0>`
-
-Installation
-------------
-
-.. todo::
-    complete standard installation part
-    links to domoweb/domodroid doc
-  
-Basic installation
-******************
-
-First, you will need to do the :doc:`standard installation </enduser/installation/index>`
-
-If you encounter some errors, please check :doc:`the errors and solutions page </enduser/errors/index>`
-
-Then, you will need to:
-
-* Configure Domogik over the administration interface
-* Install a control user interface like Domoweb or Domodroid
-
-.. note::
-    **If you upgrade from 0.3 to 0.4**, please check the :doc:`upgrade 0.3 to 0.4.0 tutorial <enduser/upgrade/0.3_to_0.4.0>`.
-
-Uninstallation
-**************
-
-If you want to uninstall Domogik, you will need to :doc:`use the uninstall tool </enduser/installation/uninstall>` .
-
-Advanced installation tutorials
-*******************************
-
-The following tutorials are not mandatory to use Domogik. You can pick just what you need for what you want.
-
-* :doc:`Install Domogik from a script </enduser/installation/install_from_a_script>`
-* :doc:`Use postgresql instead of mysql </enduser/installation/postgresql>`
-* Configure external access to Domogik administration interface
-* :doc:`Install Domogik in a python virtualenv </enduser/installation/virtualenv>`
-* :doc:`Configure SSL </enduser/installation/ssl>`
+.. |dev| image:: index_dev.png
+    :target: index_dev.html
 
 
-Quick start guide
------------------
+====== ============================================================================
+|user| :doc:`End users documentation <index_user>` 
 
-.. todo::
-    complete
+       * Domogik overview
+       * Installation
+       * Documentation
 
-* :doc:`Terms </enduser/quick_start/terms>`
-* :doc:`First use : go to the admin </enduser/quick_start/first_use>`
-* :doc:`Find and install a package </enduser/quick_start/install_a_package>`
-* configure a client and create its devices
-* :doc:`What is an orphan device ? <enduser/packages/orphans>`
-* start a client
-* :doc:`Clients status </enduser/quick_start/clients_status>`
+|dev|  :doc:`Technical and developpers documentation <index_dev>`
 
-Detailed guide
---------------
+       * Technical descriptions 
+       * Plugin development
+       * Core development
+       * User interfaces development
+====== ============================================================================
 
-* :doc:`Manage packages </enduser/packages/index>` 
 
- 
-Technical Documentation
-=======================
-
-General informations
--------------------
-
-General informations:
-
-* :doc:`Network ports used by Domogik </technical/network_ports>`
-* :doc:`Database model </technical/database>`
-
-Terms:
-
-* :doc:`Commands </technical/command>`
-* :doc:`Sensors </technical/sensor>`
-
-xPL Hub
--------
-* :doc:`The xPL hub </xplhub/index>`
-
-Message queue (zeroMQ)
-----------------------
-
-* :doc:`Overview </technical/mq/overview>`
-* :doc:`Request Reply </technical/mq/reqrep>`
-* :doc:`Publish Subscribe </technical/mq/pubsub>`
-* :doc:`Used messages </technical/mq/used>`
-* :doc:`Detail on Request Reply used messages </technical/mq/reqrep_detailed>`
-* :doc:`Detail on Publish Subscribe used messages</technical/mq/pubsub_detailed>`
-
-Core component : manager
-------------------------
-
-* :doc:`Manager </technical/core/manager>`
-
-Core component : dbmgr
-----------------------
-
-* :doc:`Dbmgr </technical/core/dbmgr>`
-
-Core component : xplgw
-----------------------
-
-* :doc:`XplGW </technical/core/xplgw>`
-
-Core component : admin
-----------------------
-
-* :doc:`Administration user interface </technical/admin/index>`
-
-Core component : REST
----------------------
-
-.. todo::
-    Review
-
-* :doc:`Overview </technical/rest/index>`
-* :doc:`/ </technical/rest/status>`: Status ouput for rest
-* :doc:`/map </technical/rest/map>`: A dynamicly generated list of all possible REST urls
-* :doc:`/datatype </technical/rest/datatype>`: The output of all known datatypes by domogik
-* Devices
-    * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
-    * Devices parameters management
-        * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
-        * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
-    * Sensors of the devices
-        * :doc:`/sensor </technical/rest/sensor>`: manage sensors (list, update)
-        * :doc:`/sensorhistory </technical/rest/sensorhistory>`: list sensorhistory values
-    * Command sending
-        * :doc:`/cmd </technical/rest/cmd>`: execute an already created command
-* Accounts and persons
-    * :doc:`/account </technical/rest/account>`: manage accounts (list, create, update, delete, authenticate)
-    * :doc:`/person </technical/rest/person>`: manage persons (list, create, update, delete)
-* Old Domogik 0.2/0.3 devices migration
-    * :doc:`/device/old </technical/rest/device_old>`: list the old devices (created with Domogik <= 0.3)
-
-Packages
---------
-
-* :doc:`Packages overview </technical/packages/index>`
-* :doc:`Package type : xPL plugin </technical/packages/xpl_plugin>`
-
-Developers Documentation
-========================
-
-.. todo::
-    All this part is currently in progress
-
-* :doc:`Developing a plugin </package_development/plugins/index>`
-* :doc:`Developing a user interface </user_interface_development/index>`
-* :doc:`Core development </core_development/index>`
-* :doc:`Releasing tasks </core_development/releasing>`
-* :doc:`Tools </tools/index>`
