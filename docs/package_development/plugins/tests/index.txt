@@ -94,4 +94,67 @@ Here are the actions that can be done in the main part:
         # notice that the old configuration is deleted before
         cfg = { 'configured' : True }
 
+* start the common tests by setting up the *TestDevice* class which helps to manage the devices. Example: ::
+
+        ### start tests
+        # load the test devices class
+        td = TestDevice()
+
+* if needed, delete all the existing devices of the plugin on the current host. If you do this, you must set *alter_configuration_or_setup* to True in the json. Example: ::
+
+        # delete existing devices for this plugin on this host
+        client_id = "{0}-{1}.{2}".format("plugin", name, get_sanitized_hostname())
+        try:
+            td.del_devices_by_client(client_id)
+        except:
+            print(u"Error while deleting all the test device for the client id '{0}' : {1}".format(client_id, traceback.format_exc()))
+            sys.exit(1)
  
+* if needed, create some devices. If you do this, you must set *alter_configuration_or_setup* to True in the json. Notice that the device parameters should come from the global variables defined before. Example: ::
+
+        # create a test device
+        try:
+            device_id = td.create_device(client_id, "test_device_diskfree", "diskfree.disk_usage")
+            td.configure_global_parameters({"device" : path, "interval" : interval})
+        except:
+            print(u"Error while creating the test devices : {0}".format(traceback.format_exc()))
+            sys.exit(1)
+
+* then, call the common tests related to the plugin. These tests are common to all plugins and are defined in the class *PluginTestCase*. The first one will just check if Domogik is running (if not, the plugin will not be able to start). The second one will configure the plugin and the last one will start the plugin. Example: ::
+
+        ### prepare and run the test suite
+        suite = unittest.TestSuite()
+        # check domogik is running, configure the plugin
+        suite.addTest(DiskfreeTestCase("test_0001_domogik_is_running", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_0010_configure_the_plugin", xpl_plugin, name, cfg))
+    
+        # start the plugin
+        suite.addTest(DiskfreeTestCase("test_0050_start_the_plugin", xpl_plugin, name, cfg))
+
+* launch all the tests you created in the *YourpluginTestCase* class. Example: ::
+
+        # do the specific plugin tests
+        suite.addTest(DiskfreeTestCase("test_0110_total_space", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_0120_free_space", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_0130_used_space", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_0140_percent_used", xpl_plugin, name, cfg))
+
+* launch some common tests related to the plugin stopping process. The first one will check that the plugin sends hbeat messages and can take several minutes! The second one will try to stop the plugin and check if the plugin can be stopped. Example: ::
+
+        # do some tests comon to all the plugins
+        suite.addTest(DiskfreeTestCase("test_9900_hbeat", xpl_plugin, name, cfg))
+        suite.addTest(DiskfreeTestCase("test_9990_stop_the_plugin", xpl_plugin, name, cfg))
+
+* and finally get the status of the tests. If there were some errors, the python test file will return 1. This is very important for the continuous integration tools and *testrunner*.
+
+        # quit
+        res = unittest.TextTestRunner().run(suite)
+        if res.wasSuccessful() == True:
+            rc = 0   # tests are ok so the shell return code is 0
+        else:
+            rc = 1   # tests are ok so the shell return code is != 0
+        xpl_plugin.force_leave(return_code = rc)
+
+
+
+
