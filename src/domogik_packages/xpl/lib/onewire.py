@@ -114,7 +114,8 @@ class ComponentDs18b20:
                         my_type = "xpl-trig"
                     self.old_temp[my_id] = temperature
                     print("type=%s, id=%s, temp=%s" % (my_type, my_id, temperature))
-                    self.callback(my_type, {"device" : my_id,
+                    if temperature != 85: # Temp = 85 when read error occurs - Can safely be ignored
+                        self.callback(my_type, {"device" : my_id,
                                          "type" : "temp",
                                          "current" : temperature})
             self._stop.wait(self.interval)
