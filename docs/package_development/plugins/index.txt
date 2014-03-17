@@ -90,6 +90,15 @@ Preparing some automated tests is something really important for a plugin. It wi
   * :doc:`Travis CI (continuous integration) <tests/travis_templates>`
   * :doc:`The testrunner tool <tests/testrunner>`
 
+Documentation
+=============
+
+The documentation is a part important of a plugin! If it is not enough clear, the user may have some difficulties to use the plugin.
+
+  * :doc:`Doc tree <doc/tree>`
+  * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
+  * :doc:`What should contain the documentation ? <doc/content>`
+  * :doc:`The developpers part <doc/dev>`
 
 To finish...
 ============
@@ -106,12 +115,6 @@ To finish...
   * :doc:`Icon <graphical/icon_file>`
 
 * Data files
-* Documentation
-
-  * :doc:`Doc tree <doc/tree>`
-  * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
-  * :doc:`What should contain the documentation ? <doc/content>`
-  * :doc:`The developpers part <doc/dev>`
 
 * Tests
 * Nightly builds
