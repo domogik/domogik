@@ -13,6 +13,11 @@ Some libraries have been created in the Domogik project to help you to create th
 
 **Be carefull : executing the tests may delete your existing devices and so you can loose some data!!!!**
 
+When should the tests be launched ?
+===================================
+
+Well, after each plugin update! But as this could be time consuming, you can automate this step thanks to  :doc:`the testrunner.py tool <testrunner>` and :doc:`Travis, the continuous integration service <travis_templates>`.
+
 File tree
 =========
 
