@@ -162,9 +162,15 @@ The function **self.is_interval_of()** takes 2 parameters:
 
 Notice that the function will allow a margin of 5%: if you expect for 100 seconds and there are 105 seconds in the reality, the test will be ok.
 
+Send a xPL message
+******************
 
-Example : wait for a xPL message and check its content
-------------------------------------------------------
+.. todo ::
+
+    Explain
+
+Example 1 : wait for a xPL message and check its content
+--------------------------------------------------------
 
 The following example if one function from the *diskfree* plugin tests. It will wait for a given xPL message, check if the value in the xPL message is correct and is inserted in database, wait for a second message, check that the interval between the 2 messages is ok.
 
@@ -220,6 +226,14 @@ Example: ::
                                           timeout = interval * 60))
         msg2_time = datetime.now()
         self.assertTrue(self.is_interval_of(interval * 60, msg2_time - msg1_time))
+
+
+Example 2 : send a xPL command and check for its response
+---------------------------------------------------------
+
+.. todo ::
+
+    Example
 
 
 A test file : the main part
@@ -310,7 +324,7 @@ Here are the actions that can be done in the main part:
             rc = 1   # tests are ok so the shell return code is != 0
         xpl_plugin.force_leave(return_code = rc)
 
-..todo ::
+.. todo ::
     Explain how to use the serial mock
 
 
