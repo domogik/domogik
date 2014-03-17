@@ -69,11 +69,125 @@ A test file is made of 2 parts:
 * a class which inherits from *PluginTestCase*. This class will contain all the test cases related to the plugin.
 * the main part which will do some actions and launch the test cases.
 
+The class which inherits from PluginTestCase
+--------------------------------------------
+
+In this class, you will define the tests that will be executed on the plugin. 
+
+There is a norm to name the functions in this class: *test_9999_thetestname*.
+
+* *test_0xxx_xxx* : these functions are reserved, declared in *PluginTestCase* and related to the preparation of the plugin.
+* *test_9xxx_xxx* : these functions are reserved, declared in *PluginTestCase* and related to the end of the plugin tests (hbeat test, plugin stop).
+* *test_1xxx_xxx* to *test_8xxx_xxx* : these functions are free for use.
+
+Dummy example
+*************
+
+Here is an example of a dummy test which is always good: ::
+
+    class DiskfreeTestCase(PluginTestCase):
+
+        def test_0100_dummy(self):
+            self.assertTrue(True)
+
+Usefull functions
+*****************
+
+Wait for a xPL message
+++++++++++++++++++++++
+
+::
+
+        self.assertTrue(self.wait_for_xpl(xpltype = "xpl-stat",
+                                          xplschema = "sensor.basic",
+                                          xplsource = "domogik-{0}.{1}".format(self.name, get_sanitized_hostname()),
+                                          data = {"type" : "total_space",
+                                                  "device" : path,
+                                                  "current" : du_total},
+                                          timeout = interval * 60))
+
+The function *self.wait_for_xpl* is a blocking function : it will wait until the required xPL message is reveived or until the timeout is reached.
+
+* xpltype : the type of the xPL message waited. Available values are *xpl-stat*, *xpl-trig*, *xpl-cmnd*.
+* xplschema : the required xPL schema.
+* xplsource : the xPL source of the plugin to test. Always use this value for a plugin : *"domogik-{0}.{1}".format(self.name, get_sanitized_hostname())*
+* data : a dictionnary with the required content of the xPL message. If you know exactly the value you are waiting for, just add it in the dictionnary. If you can't guess the value, just put all the known values (device address, ...) in the dictionnary and check after the value with *self.xpl_data.data*.
+* timeout : the timeout in seconds. Once reached, the function will return False as no expected message has been received. Please notice that a 5% margin is allowed, so il you set a timeout of 100 seconds, the function will really use a timeout of 105 seconds : this allows to avoid some errors due to some processing which could, for example, add 1 or 2 seconds between 2 messages.
+
+Once a xPL message is received, its content is stored in *self.xpl_data.data*. For exemple, to get the value of the key *current*, you can do: ::
+
+    current_value = self.xpl_data.data['current']
+
+
+Example : wait for a xPL message and check its content
+******************************************************
+
+The following example if one function from the *diskfree* plugin tests. It will wait for a given xPL message, check if the value in the xPL message is correct and is inserted in database, wait for a second message, check that the interval between the 2 messages is ok.
+
+Example: ::
+    def test_0110_total_space(self):
+        """ check if the xpl messages about total space are OK
+            Sample message :
+            xpl-stat
+            {
+            hop=1
+            source=domogik-diskfree.darkstar
+            target=*
+            }
+            sensor.basic
+            {
+            device=/home
+            type=total_space
+            current=19465224
+            }
+        """
+        global interval
+        global path
+        global device_id
+
+
+        # get the current total space on the device
+        du = os.statvfs(path)
+        du_total = (du.f_blocks * du.f_frsize) / 1024
+
+        # do the test
+        print(u"Check that a message about total space is sent. The message must be received each {0} minute(s)".format(interval))
+
+        self.assertTrue(self.wait_for_xpl(xpltype = "xpl-stat",
+                                          xplschema = "sensor.basic",
+                                          xplsource = "domogik-{0}.{1}".format(self.name, get_sanitized_hostname()),
+                                          data = {"type" : "total_space",
+                                                  "device" : path,
+                                                  "current" : du_total},
+                                          timeout = interval * 60))
+        print(u"Check that the value of the xPL message has been inserted in database")
+        sensor = TestSensor(device_id, "get_total_space")
+        self.assertTrue(sensor.get_last_value()[1] == self.xpl_data.data['current'])
+        msg1_time = datetime.now()
+
+        print(u"Check there is a second message is sent and the interval between them")
+        self.assertTrue(self.wait_for_xpl(xpltype = "xpl-stat",
+                                          xplschema = "sensor.basic",
+                                          xplsource = "domogik-{0}.{1}".format(self.name, get_sanitized_hostname()),
+                                          data = {"type" : "total_space",
+                                                  "device" : path,
+                                                  "current" : du_total},
+                                          timeout = interval * 60))
+        msg2_time = datetime.now()
+        self.assertTrue(self.is_interval_of(interval * 60, msg2_time - msg1_time))
+
+
+
+
+
+
+The main part
+-------------
+
 Here are the actions that can be done in the main part:
 
 * if needed, define some global variables (polling interval, ...). Example: ::
 
-    if __name__ == "__main__":
         ### global variables
         interval = 1
         path = "/home"
@@ -154,6 +268,10 @@ Here are the actions that can be done in the main part:
         else:
             rc = 1   # tests are ok so the shell return code is != 0
         xpl_plugin.force_leave(return_code = rc)
+
+..todo ::
+    Explain how to use the serial mock
+
 
 
 
