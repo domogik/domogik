@@ -69,8 +69,8 @@ A test file is made of 2 parts:
 * a class which inherits from *PluginTestCase*. This class will contain all the test cases related to the plugin.
 * the main part which will do some actions and launch the test cases.
 
-The class which inherits from PluginTestCase
---------------------------------------------
+A test file : the class which inherits from PluginTestCase
+==========================================================
 
 In this class, you will define the tests that will be executed on the plugin. 
 
@@ -81,7 +81,7 @@ There is a norm to name the functions in this class: *test_9999_thetestname*.
 * *test_1xxx_xxx* to *test_8xxx_xxx* : these functions are free for use.
 
 Dummy example
-*************
+-------------
 
 Here is an example of a dummy test which is always good: ::
 
@@ -91,10 +91,10 @@ Here is an example of a dummy test which is always good: ::
             self.assertTrue(True)
 
 Usefull functions
-*****************
+-----------------
 
 Wait for a xPL message
-++++++++++++++++++++++
+**********************
 
 ::
 
@@ -120,11 +120,12 @@ Once a xPL message is received, its content is stored in *self.xpl_data.data*. F
 
 
 Example : wait for a xPL message and check its content
-******************************************************
+------------------------------------------------------
 
 The following example if one function from the *diskfree* plugin tests. It will wait for a given xPL message, check if the value in the xPL message is correct and is inserted in database, wait for a second message, check that the interval between the 2 messages is ok.
 
 Example: ::
+
     def test_0110_total_space(self):
         """ check if the xpl messages about total space are OK
             Sample message :
@@ -177,12 +178,8 @@ Example: ::
         self.assertTrue(self.is_interval_of(interval * 60, msg2_time - msg1_time))
 
 
-
-
-
-
-The main part
--------------
+A test file : the main part
+===========================
 
 Here are the actions that can be done in the main part:
 
