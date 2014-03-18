@@ -96,8 +96,7 @@ def build_file_list(user):
         d_files.append(('/etc/rc.d/', [user, 0755], \
                 ['src/domogik/examples/init/domogik']))
     else:
-        fail("Can't find firectory for init script")
-        exit(0)
+        warning("Can't find firectory for init script: Require manual install")
 
     hub = get_c_hub()
     if hub is not None:
