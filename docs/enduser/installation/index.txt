@@ -90,11 +90,13 @@ Download Domogik
     
     * don't download Domogik sources in */root* or */*
 
-The 0.4 release is still in development so you need to get domogik from the sources.
+.. info::
+   Please keep in mind that the folder which will be used to get the sources will be the one used by Domogik installation. So please put it in a proper folder (the following command lines will use **/opt/**).
 
-Use git to get the sources: ::
+Use git to get the sources (be sure that your user is able to create some directories where you will clone the sources): ::
 
     $ sudo apt-get install git
+    $ cd /opt/
     $ git clone https://github.com/domogik/domogik.git
     $ cd domogik
     $ git checkout master
@@ -104,7 +106,7 @@ Install Domogik
 
 Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
 
-    $ cd domogik/
+    $ cd /opt/domogik/
     $ sudo ./install.py
 
 .. note:: 
