@@ -344,6 +344,11 @@ def install():
             print "Python version is to low, at least python 2.6 is needed"
             exit(0)
 
+        # CHECK sources not in / or /root
+        info("Check the sources location (not in /root/ or /")
+        print os.getcwd()
+        assert os.getcwd().startswith("/root/") == False, "Domogik sources must not be located in the /root/ folder"
+
         # CHECK run as root
         info("Check this script is started as root")
         assert os.getuid() == 0, "This script must be started as root"
