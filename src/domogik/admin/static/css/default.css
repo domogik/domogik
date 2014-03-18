@@ -12,6 +12,7 @@ Domogik admin default theme
 	color: #eee;
 }
 
+.dropdown-menu,
 .navbar-dmg .nav > li > a:focus,
 .navbar-dmg .nav > li > a:hover {
 	background-color: #005774;
@@ -46,6 +47,15 @@ Domogik admin default theme
 }
 .navbar-dmg .navbar-toggle .icon-bar {
     background-color: #000000;
+}
+
+.navbar-dmg .navbar-nav > .active > a, 
+.navbar-dmg .navbar-nav > .active > a:hover, 
+.navbar-dmg .navbar-nav > .active > a:focus,
+.navbar-dmg .navbar-nav > .open > a, 
+.navbar-dmg .navbar-nav > .open > a:hover, 
+.navbar-dmg .navbar-nav > .open > a:focus {
+	background-color: #005774;
 }
 
 /* collapse table */
