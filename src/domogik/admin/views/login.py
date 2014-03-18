@@ -27,7 +27,7 @@ def rediret_to_login():
 
 @babel.localeselector
 def get_locale():
-    return 'nl_BE'
+    return 'en'
 
 @app.route('/login', methods=('GET', 'POST'))
 def login():
