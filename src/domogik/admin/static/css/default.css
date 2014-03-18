@@ -2,6 +2,52 @@
 Domogik admin default theme
 */
 
+/** navbar **/
+.navbar-dmg {
+	background-color: #2D2C2F;
+	border-bottom: 5px solid #005774;
+}
+
+.navbar-dmg a {
+	color: #eee;
+}
+
+.navbar-dmg .nav > li > a:focus,
+.navbar-dmg .nav > li > a:hover {
+	background-color: #005774;
+}
+
+.navbar-nav .open .dropdown-menu > li > a {
+	color: #eee;
+}
+
+.navbar-nav .open .dropdown-menu > li > a:hover, 
+.navbar-nav .open .dropdown-menu > li > a:focus {
+	color: #333333;
+}
+
+.navbar-dmg .navbar-brand {
+	background: url('../images/dmg-logo.png') 0 50% no-repeat;
+	padding-left: 52px;
+}
+
+.navbar-dmg .navbar-brand:hover,
+.navbar-dmg .navbar-brand:focus {
+    background-color: #005774;
+}
+
+.navbar-dmg .navbar-toggle {
+	background-color:#eee;
+}
+
+.navbar-dmg .navbar-toggle:hover,
+.navbar-dmg .navbar-toggle:focus {
+    background-color: #005774;
+}
+.navbar-dmg .navbar-toggle .icon-bar {
+    background-color: #000000;
+}
+
 /* collapse table */
 .hiddenRow {
     padding: 0 !important;
@@ -16,8 +62,6 @@ Domogik admin default theme
 .current_status {
     background-color: #cccccc;
 }
-
-
 
 
 /*** delete below ****/
