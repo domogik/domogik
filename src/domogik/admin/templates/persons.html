@@ -20,13 +20,9 @@
                         <td>{{ data.last_name }}</td>
                         <td>{{ data.first_name }}</td>
                         <td>{{ data.birthdate }}</td>
-                        <td>
-				<a data-toggle="modal" data-target="#deleteConfirm">
-                                {% trans %}Edit{% endtrans %}
-				</a> |
-				<a href="/persons/del/{{ data.id }}">
-                                {% trans %}Delete{% endtrans %}
-				</a>
+                        <td><a href="/persons/{{ data.id }}">{% trans %}Update{% endtrans %}</a>
+
+				<a data-toggle="modal" data-target="#deleteConfirm" href="/persons/del/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
 			</td>
                     </tr>
             {% endfor %}

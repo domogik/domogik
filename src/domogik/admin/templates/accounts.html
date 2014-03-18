@@ -19,9 +19,9 @@
                         <td>{{ data.is_admin }}</td>
                         <td>
                                 <a href="/accounts/{{ data.id }}">
-                                {% trans %}Details{% endtrans %}
+                                {% trans %}Update{% endtrans %}
                                 </a> |
-                                <a href="/accounts/del/{{ data.id }}">
+                                <a  data-toggle="modal" data-target="#deleteConfirm" href="/accounts/del/{{ data.id }}">
                                 {% trans %}Delete{% endtrans %}
                                 </a>
 
