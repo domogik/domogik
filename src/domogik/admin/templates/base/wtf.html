@@ -21,15 +21,28 @@
         {{ field() }}
     {% elif field.type == 'CSRFTokenField' %}
         {{ field() }}
+    {% elif field.type == 'BooleanField' %}
+      <div class="form-group{% if field.errors %} has-error{% endif %}">
+          <div class="col-sm-offset-2 col-sm-10">
+      <div class="checkbox">
+        <label>
+          {{ field(**kwargs) }}{{ field.label.text }}
+        </label>
+      </div>
+    </div>
+      </div>
     {% else %}
-	<div class="form-group{% if field.errors %} has-error{% endif %}">
-	    <label class="control-label" or="{{field.id}}">{{ field.label.text }}</label>
-	    {{ field(**kwargs) }}
-	{% if field.description %}
+	     <div class="form-group{% if field.errors %} has-error{% endif %}">
+	         <label class="col-sm-2 control-label" for="{{field.id}}">{{ field.label.text }}</label>
+          <div class="col-sm-10">
+	           {{ field(class='form-control', **kwargs) }}
+          </div>
+
+	     {% if field.description %}
             <span class="help-block">{{ field.description }}</span>
-    	{% endif %}
+      {% endif %}
             {{ form_field_errors(field) }}
-	</div>
+	     </div>
     {% endif %}
 {%- endmacro -%}
 
@@ -37,7 +50,6 @@
     {% for field in fields %}
         {{ form_field(field) }}
     {% endfor %}
-  </fieldset>
 {%- endmacro -%}
 
 {# valid form types are "basic", "inline" and "horizontal" #}
@@ -46,7 +58,7 @@
                     method="post",
                     extra_classes=None,
                     role="form",
-                    form_type="basic",
+                    form_type="horizontal",
                     horizontal_columns=('lg', 2, 10),
                     enctype=None,
                     add_submit="",

@@ -2,7 +2,67 @@
 Travis CI templates
 ===================
 
+What is Travis CI ?
+===================
 
-..todo ::
+`Travis CI <https://travis-ci.org/>` is a continuous integration tool.
 
-    Plugins templates
+How to add a github repository to Travis CI
+===========================================
+
+Enable the repository
+---------------------
+
+.. todo ::
+    Explain with screenshots
+
+Add a .travis.yml file to your repository root
+--------------------------------------------------
+
+Travis CI uses a file named **.travis.yml** to execute the tests.  This file contains several part and you will find all the needed informations on Travis CI official website.
+
+For Domogik plugins, you must use this template to create your **.travis.yml** file. ::
+
+
+    # This file is used for automated tests with Travis CI : travis-ci.org
+    # based on the template version 1
+    # the templates are availables in the documentation on http://docs.domogik.org/domogik/dev/en/package_development/plugins/tests/travis_templates.html
+    #
+    # Template version : 0.1
+    
+    language: python
+    python:
+      - "2.7"
+    mysql:
+      adapter: mysql2
+      database: domogik
+      username: travis
+      encoding: utf8
+    env:
+      DMG_BRANCH=master
+      DMG_PLUGIN=diskfree
+    install:
+      - cd ~
+      - git clone https://github.com/domogik/domogik.git
+      - cd domogik
+      - git checkout $DMG_BRANCH
+      - ~/domogik/src/domogik/tests/travis/travis-install-dependencies.sh
+    before_script:
+      - ~/domogik/src/domogik/tests/travis/travis-setup-database.sh
+      - ~/domogik/src/domogik/tests/travis/travis-install-domogik.sh
+      - ~/domogik/src/domogik/tests/travis/travis-install-plugin.sh
+      - sudo ~/domogik/src/domogik/tests/travis/travis-start-domogik.sh
+    script:
+      - echo $TRAVIS_BUILD_DIR
+      - cd $TRAVIS_BUILD_DIR
+      - python ~/domogik/src/domogik/tests/bin/testrunner.py -a /var/lib/domogik/domogik_packages/plugin_$DMG_PLUGIN/tests/
+    after_script:
+      - ~/domogik/src/domogik/tests/travis/travis-after.sh
+    notifications:
+      irc: "irc.freenode.net#domogik"
+      on_success: never
+      on_failure: always
+    
+* Currently, only *python 2.7* is tested as Domogik isn't entirely compliant with *python 3.x*.
+* *DMG_BRANCH* should be let to *master* as the *master* branch of Domogik repository is the last stable version of Domogik.
+* *DMG_PLUGIN* myst be set to the plugin name.

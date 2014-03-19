@@ -3,9 +3,9 @@
 {% block content %}
 <div class="container">
     <h1>{% trans %}Person list{% endtrans %}</h1>
-    <a id="start" class="btn btn-lg btn-success" href="/persons/0">{% trans %}Add new{% endtrans%}</a>
+    <a id="start" class="btn btn-success" href="/persons/0">{% trans %}Add new{% endtrans%}</a>
     {% if persons|length > 0 %}
-      <table class="table table-condensed" style="border-collapse:collapse;">
+      <table class="table table-striped" style="border-collapse:collapse;">
             <thead>
                     <tr>
                         <td>{% trans %}Last Name{% endtrans %}</td>
@@ -20,13 +20,9 @@
                         <td>{{ data.last_name }}</td>
                         <td>{{ data.first_name }}</td>
                         <td>{{ data.birthdate }}</td>
-                        <td>
-				<a data-toggle="modal" data-target="#deleteConfirm">
-                                {% trans %}Edit{% endtrans %}
-				</a> |
-				<a href="/persons/del/{{ data.id }}">
-                                {% trans %}Delete{% endtrans %}
-				</a>
+                        <td><a href="/persons/{{ data.id }}">{% trans %}Update{% endtrans %}</a>
+
+				<a data-toggle="modal" data-target="#deleteConfirm" href="/persons/del/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
 			</td>
                     </tr>
             {% endfor %}

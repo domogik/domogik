@@ -1,8 +1,30 @@
-/var/log/xplhub/*.log {
-        weekly
+/var/log/xplhub/client_list.txt {
+        daily
         missingok
-        rotate 9
+        rotate 31
+        copytruncate
+        nocompress
+        notifempty
+        dateext
+}
+
+/var/log/xplhub/*.csv {
+        daily
+        missingok
+        rotate 31
         copytruncate
         compress
         notifempty
+        dateext
 }
+
+/var/log/xplhub/*.log {
+        daily
+        missingok
+        rotate 31
+        copytruncate
+        compress
+        notifempty
+        dateext
+}
+

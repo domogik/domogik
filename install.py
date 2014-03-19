@@ -96,8 +96,7 @@ def build_file_list(user):
         d_files.append(('/etc/rc.d/', [user, 0755], \
                 ['src/domogik/examples/init/domogik']))
     else:
-        fail("Can't find firectory for init script")
-        exit(0)
+        warning("Can't find firectory for init script: Require manual install")
 
     hub = get_c_hub()
     if hub is not None:
@@ -343,6 +342,11 @@ def install():
         if sys.version_info < (2, 6):
             print "Python version is to low, at least python 2.6 is needed"
             exit(0)
+
+        # CHECK sources not in / or /root
+        info("Check the sources location (not in /root/ or /")
+        print os.getcwd()
+        assert os.getcwd().startswith("/root/") == False, "Domogik sources must not be located in the /root/ folder"
 
         # CHECK run as root
         info("Check this script is started as root")

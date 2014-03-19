@@ -46,7 +46,6 @@ def persons_edit(person_id):
 			db_session=app.db.get_session(),
 			exclude=['user_accounts'])
 	form = MyForm(request.form, person)
-
         if request.method == 'POST' and form.validate():
 	    if int(person_id) > 0:
                 app.db.update_person(person_id, \
@@ -62,11 +61,11 @@ def persons_edit(person_id):
             return redirect("/persons")
 	    pass
 	elif request.method == 'POST' and not form.validate():
-	    flash(gettext("Invallid input"), "error")    	
+	    flash(gettext("Invalid input"), "error")    	
 
     return render_template('person_edit.html',
             form = form,
             personid = person_id,
-            mactve="auth"
+            mactve="auth",
             )
 

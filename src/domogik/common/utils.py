@@ -38,10 +38,14 @@ from socket import gethostname
 from subprocess import Popen, PIPE
 import os
 import sys
+import re
 from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
+
+REGEXP_PS_SEPARATOR = re.compile('[\s]+')
+
 
 def get_interfaces():
     return interfaces()
@@ -130,7 +134,8 @@ def is_already_launched(log, id, manager=True):
     # the manager add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
     # the final 'grep -v sudo' is here to exclude the lines launched by sudo from the search : using sudo make 2 results be in the grep result : one with sudo and the other one with the command (but this second one is filtered thanks to its pid)
     if manager:
-        cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v pgrep | grep -v {2} | grep -v sudo | grep -v su".format(id, STARTED_BY_MANAGER, my_pid)
+        #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
+        cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner ".format(id, STARTED_BY_MANAGER, my_pid)
         print "is manager"
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
@@ -141,11 +146,17 @@ def is_already_launched(log, id, manager=True):
     is_launched = False
     subp = Popen(cmd, shell=True, stdout=PIPE)
     pid_list = []
+    # example of return :
+    # fritz     7419  0.0  0.3 108604 13168 ?        S    15:17   0:00 /usr/bin/python /var/lib/domogik//domogik_packages/plugin_diskfree/bin/diskfree.py
+    # fritz     7420  0.4  0.3 617068 15012 ?        Sl   15:17   0:01 /usr/bin/python /var/lib/domogik//domogik_packages/plugin_diskfree/bin/diskfree.py
+
     for line in subp.stdout:
         is_launched = True
         if log:
             log.info("Process found : {0}".format(line.rstrip("\n")))
-        pid_list.append(line.rstrip("\n").split(" ")[0])
+        the_pid = REGEXP_PS_SEPARATOR.split(line)[1]
+        pid_list.append(the_pid)
+        #pid_list.append(line.rstrip("\n").split(" ")[0])
     subp.wait()  
     if is_launched:
         if log:

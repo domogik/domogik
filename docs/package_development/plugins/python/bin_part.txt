@@ -50,7 +50,7 @@ On demande features
 
 TODO : ready, config, library, packages, resources, data getter functions
 
-TODO : logging, force_leave,
+TODO : logging, force_leave (and return code),
 
 TODO : MQ usage
 
@@ -264,6 +264,8 @@ Here is an example from the *diskfree* plugin: ::
                                           {})
             # start the thread
             threads[thr_name].start()
+            self.register_thread(threads[thr_name])
+
 
             # [...] 3 other features are managed like this in the plugin
 
@@ -436,4 +438,7 @@ Then, you can create your thread. Example: ::
                                           {})
             # start the thread
             my_thread.start()
+            self.register_thread(my_thread)
+
+Notice that a function **self.register_thread()** has been called. This function is important is it register the thread in a list. When the plugin is requested to stop, this list is used to help killing the existing threads! If your plugin doesn't stop, please check that all your threads are registered.
 
