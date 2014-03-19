@@ -12,3 +12,5 @@ UNINSTALL
 =========
 
 * Launch src/domogik/install/uninstall.sh (it won't delete the database)
+
+
