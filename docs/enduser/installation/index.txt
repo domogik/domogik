@@ -52,6 +52,10 @@ Install a library for mako: ::
 
     $ sudo apt-get install python-mako
 
+Install a library for libffi: ::
+
+    $ sudo apt-get install libffi-dev
+
 
 .. note::
     Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
