@@ -238,13 +238,16 @@ def test_user_config_file(user_home, user_entry):
 
     # check [database] section
     info("Parse [database] section")
+    print "toto"
     assert database['type'] == 'mysql', "Only mysql database type is supported at the moment"
 
     uid = user_entry.pw_uid
     os.setreuid(0,uid)
     old_home = os.environ['HOME']
     os.environ['HOME'] = user_home
+    print "toto1"
     from domogik.common.database import DbHelper
+    print "toto2"
     d = DbHelper()
     os.setreuid(0,0)
     os.environ['HOME'] = old_home

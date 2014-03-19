@@ -28,30 +28,47 @@ domogik_chroot_git=domogik_chroot+"/root/domogik "
 domogik_chroot_clean="/srv/chroot/domogik_clean"
 
 aptitude_pkg = "\
-    cvs\
-    rpm\
-    m4\
-    bison\
-    gettext\
-    qawk\
-    g++\
-    make\
-    zlib1g-dev\
-    ncurses-dev\
-    libglib2.0-dev\
-    uboot-mkimage\
-    mtd-utils\
-    atftpd\
-    nfs-kernel-server\
-    minicom\
-    llvm    \
-    expat   \
-    libc6-dev-i386 \
-    xsltproc \
-    xutils-dev \
-    intltool \
-    "
-# libc6-dev-i386 for grub bits/predefs.h !!
+                python \
+                python-setuptools \
+                build-essential \
+                python-dev \
+                pkg-config \
+                libzmq-dev \
+                postgresql-common \
+                libpq-dev \
+                python-mysqldb \
+                python-argparse \
+                python-sqlalchemy \
+                alembic \
+                python-simplejson \
+                python-openssl \
+                python-psutil  \
+                python-mysqldb  \
+                python-psycopg2 \
+                python-serial \
+                python-netifaces \
+                python-twisted \
+                python-flask \
+                python-flaskext.wtf \
+                python-tornado \
+                python-requests \
+                python-daemon \
+                python-magic \
+                "
+#   too old but will try with it 
+aptitude_pkg += "\
+                python-zmq \
+                libzmq-dev \
+                "
+#   for debian jessie (testing) only
+aptitude_pkg += "\
+                 python-flask-login \
+                 python-flask-babel \
+                 "
+# not needed in chroot use host mysql
+#                 mysql-server \
+
+#python-pip \
 
 
 #password
@@ -126,53 +143,23 @@ def install():
     check_call("sudo cp /tmp/domogik_chroot.conf /etc/schroot/chroot.d/ ",shell=True)
 
     shell_in_chroot("domogik_clean","aptitude install \
-                    python \
-                    python-setuptools \
-                    build-essential \
-                    python-dev \
-                    pkg-config \
-                    libzmq-dev \
-                    ")
+                    apt-show-versions " +
+                    aptitude_pkg 
+                    )
 
-    shell_in_chroot("domogik_clean","aptitude install \
-                    postgresql-common \
-                    libpq-dev \
-                    python-mysqldb \
-                    ")
+    shell_in_chroot("domogik_clean","apt-show-versions " +
+                    aptitude_pkg 
+                    )
 
-    shell_in_chroot("domogik_clean","aptitude install \
-                    python-argparse \
-                    python-sqlalchemy \
-                    alembic \
-                    python-simplejson \
-                    python-openssl \
-                    python-psutil  \
-                    python-mysqldb  \
-                    python-psycopg2 \
-                    python-pip \
-                    python-serial \
-                    python-netifaces \
-                    python-twisted \
-                    python-flask \
-                    python-flaskext.wtf \
-                    python-tornado \
-                    python-requests \
-                    python-daemon \
-                    ")
-#   too old but will try with it 
-    shell_in_chroot("domogik_clean","aptitude install \
-                    python-zmq \
-                    libzmq-dev \
-                    ")
-#   for debian jessie (testing) only
-    shell_in_chroot("domogik_clean","aptitude install \
-                    python-flask-login \
-                    python-flask-babel \
-                    ")
+
+
 
     clean_chroot()
+    chroot_intall()
 
+def chroot_intall():
     shell_in_chroot("domogik","./install.py","/root/domogik/domogik")
+
 
 """
 
@@ -195,10 +182,12 @@ mkdir /var/run/domogik
 """
 
 def clean_chroot():
-    shell("sudo rsync "+RSYNC_OPTION+" "+domogik_chroot_clean+"/* "+domogik_chroot+" ")
+    shell("sudo rsync --exclude=proc "+RSYNC_OPTION+" "+domogik_chroot_clean+"/* "+domogik_chroot+" ")
     if not os.path.exists(domogik_chroot_git):
         check_call("sudo mkdir "+domogik_chroot_git,shell=True)
     shell("sudo rsync "+RSYNC_OPTION+" "+domogik_git+" "+domogik_chroot_git)
+    shell("sudo mkdir "+domogik_git+"/proc")
+    shell("sudo mount -o bind /proc/ "+domogik_git+"/proc")
 
 if __name__ == '__main__' :
 
@@ -210,20 +199,27 @@ if __name__ == '__main__' :
         schroot_user = os.environ['USER']
         log.info("use %s"%schroot_user)
 
-    
-    if 'clean' in sys.argv:
-        cmd = "sudo rm -rf * .c* .l* .h* .t* "
-        log.info(cmd)
-        check_call(cmd,shell = True)
+    if 'db' in sys.argv:
+        print """
+create database domogik;
+grant usage on *.* to domogik@localhost identified by 'domopass';
+grant all privileges on domogik.* to domogik@localhost ;
+        """
 
     if 'install' in sys.argv:
         install()
+
+    if 'clean' in sys.argv:
+        clean_chroot()
 
     if 'chroot' in sys.argv:
         shell_in_chroot("domogik")
 
     if 'chroot-clean' in sys.argv:
         shell_in_chroot("domogik_clean")
+
+    if 'chroot-install' in sys.argv:
+        chroot_intall()
 
 
 
