@@ -48,6 +48,11 @@ Install libraries for postgresql: ::
 
     $ sudo apt-get install libpq-dev python-psycopg2
 
+Install a library for mako: ::
+
+    $ sudo apt-get install python-mako
+
+
 .. note::
     Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
 
