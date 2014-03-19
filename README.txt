@@ -1,2 +1,14 @@
 Official website : www.domogik.org
-For cloning use: git clone --recursive git@github.com:domogik/domogik.git
+
+INSTALL
+=======
+
+See http://docs.domogik.org/domogik/dev/en/ for the complete installation guide.
+
+* Install the needed dependencies.
+* Launch the installer : sudo ./install.py
+
+UNINSTALL
+=========
+
+* Launch src/domogik/install/uninstall.sh (it won't delete the database)
