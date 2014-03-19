@@ -3,9 +3,9 @@
 {% block content %}
 <div class="container">
     <h1>{% trans %}Account list{% endtrans %}</h1>
-    <a id="start" class="btn btn-lg btn-success" href="/accounts/0">{% trans %}Add new{% endtrans%}</a>
+    <a id="start" class="btn btn-success" href="/accounts/0">{% trans %}Add new{% endtrans%}</a>
     {% if accounts|length > 0 %}
-      <table class="table table-condensed" style="border-collapse:collapse;">
+      <table class="table table-striped" style="border-collapse:collapse;">
             <thead>
                     <tr>
                         <td>{% trans %}Login{% endtrans %}</td>
@@ -19,9 +19,9 @@
                         <td>{{ data.is_admin }}</td>
                         <td>
                                 <a href="/accounts/{{ data.id }}">
-                                {% trans %}Details{% endtrans %}
+                                {% trans %}Update{% endtrans %}
                                 </a> |
-                                <a href="/accounts/del/{{ data.id }}">
+                                <a  data-toggle="modal" data-target="#deleteConfirm" href="/accounts/del/{{ data.id }}">
                                 {% trans %}Delete{% endtrans %}
                                 </a>
 

@@ -10,8 +10,8 @@
 	    <li>{% trans %}Email{% endtrans %} : {{ data.data.identity.author_email }}</li>
 	</ul>
 	<div>
-		<button id="start" type="button" class="btn btn-primary btn-lg btn-success" {% if data.status == "alive" %}disabled="disabbled"{% endif %}>Start</button>
-		<button id="stop" type="button" class="btn btn-primary btn-lg btn-danger" {% if data.status != "alive" %}disabled="disabbled"{% endif %}>Stop</button>
+		<button id="start" type="button" class="btn btn-primary btn-success" {% if data.status == "alive" %}disabled="disabbled"{% endif %}>Start</button>
+		<button id="stop" type="button" class="btn btn-primary btn-danger" {% if data.status != "alive" %}disabled="disabbled"{% endif %}>Stop</button>
 	</div>
 	{% if data.data.udev_rules|length > 0 %}
 	<h2>{% trans %}Udev{% endtrans %}</h2>

@@ -1,8 +1,10 @@
 /var/log/domogik/*.log {
-        weekly
+        daily
         missingok
-        rotate 9
+        rotate 31
         copytruncate
         compress
         notifempty
+        dateext
 }
+

@@ -1,38 +1,32 @@
-<nav class="navbar navbar-default navbar-inverse navbar-static-top" role="navigation">
-  <!-- Brand and toggle get grouped for better mobile display -->
-  <div class="navbar-header visible-md visible-lg">
-    <a class="navbar-brand" href="/">Domo Admin</a>
-  </div>
+<nav class="navbar navbar-dmg navbar-static-top" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Admin</a>
+    </div>
 
-  <!-- Collect the nav links, forms, and other content for toggling -->
-  <div class="navbar-inner">
-    <ul class="nav navbar-nav visible-md visible-lg">
-      <li{% if mactive == "clients" %} class="active" {% endif %}><a href="/clients">{% trans %}Clients{% endtrans %}</a></li>
-      <li{% if mactive == "orphans" %} class="active" {% endif %}><a href="/orphans">{% trans %}Orphans{% endtrans %}</a></li>
-      <li class="dropdown{% if mactive == "auth" %} active{% endif %}">
-	<a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Auth{% endtrans %} <b class="caret"></b></a>
-	<ul class="dropdown-menu">
-	    <li><a href="/accounts">{% trans %}Accounts{% endtrans %}</a></li>
-	    <li><a href="/persons">{% trans %}Persons{% endtrans %}</a></li>
-	</ul>
-      </li>
-    </ul>
-    <ul class="nav navbar-nav visible-md visible-lg navbar-right">
-        <li><a href="/logout">{% trans %}Logout{% endtrans%}</a></li>
-    </ul>
-    <ul class="nav navbar-nav navbar-right hidden-md hidden-lg">
-      <li class="dropdown">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Menu{% endtrans %} <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-            <li><a href="/">{% trans %}Home{% endtrans %}</a></li>
-            <li><a href="/clients">{% trans %}Clients{% endtrans %}</a></li>
-            <li><a href="/orphans">{% trans %}Orphans{% endtrans %}</a></li>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li{% if mactive == "clients" %} class="active" {% endif %}><a href="/clients">{% trans %}Clients{% endtrans %}</a></li>
+        <li{% if mactive == "orphans" %} class="active" {% endif %}><a href="/orphans">{% trans %}Orphans{% endtrans %}</a></li>
+        <li class="dropdown{% if mactive == "auth" %} active{% endif %}">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Auth{% endtrans %} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
             <li><a href="/accounts">{% trans %}Accounts{% endtrans %}</a></li>
             <li><a href="/persons">{% trans %}Persons{% endtrans %}</a></li>
-          <li class="divider"></li>
-          <li><a href="/logout">{% trans %}Logout{% endtrans %}</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div><!-- /.navbar-collapse -->
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/logout">{% trans %}Logout{% endtrans%}</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
 </nav>
