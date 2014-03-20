@@ -83,7 +83,7 @@ def build_file_list(user):
 
     if os.path.exists('/etc/logrotate.d'):
         debug("Found a directory for the logrotate script: /etc/logrotate.d")
-        d_files.append(('/etc/logrotate.d', [user, None], \
+        d_files.append(('/etc/logrotate.d', ['root', None], \
                 ['src/domogik/examples/logrotate/domogik', \
                 'src/domogik/xpl/hub/examples/logrotate/xplhub']))
 
