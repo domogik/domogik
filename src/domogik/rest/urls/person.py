@@ -3,7 +3,7 @@ from flask import request
 from flask.views import MethodView
 
 class personAPI(MethodView):
-    decorators = [json_response]
+    decorators = [json_response, timeit]
 
     def get(self, id):
         if id != None:

@@ -45,6 +45,7 @@ def api_root():
 
 @urlHandler.route('/map')
 @json_response
+@timeit
 def api_map():
     rules = []
     for rule in urlHandler.url_map.iter_rules():
