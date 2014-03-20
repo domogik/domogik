@@ -679,8 +679,6 @@ class XplPlugin(BasePlugin, MQRep):
         # TODO : we could optimize by resetting the timer each time the status is sent
         # but as this is used only to check for dead plugins by the manager, it is not very important ;)
         while not self._stop.isSet():
-            # TODO : remove
-            self.log.debug("SEND STATUS LOOP")
             self._send_status()
             self._stop.wait(STATUS_HBEAT)
 
@@ -773,19 +771,6 @@ class XplPlugin(BasePlugin, MQRep):
                                  {"origin" : self._mq_name,
                                   "key": key,
                                   "data": data})
-
-    # TODO :remove
-    #def get_stats_files_directory(self):
-    #   """ Return the directory where a plugin developper can store data files
-    #   """
-    #   cfg = Loader('domogik')
-    #   my_conf = cfg.load()
-    #   config = dict(my_conf[1])
-    #   if config.has_key('package_path'):
-    #       path = "%s/domogik_packages/stats/%s" % (config['package_path'], self._name)
-    #   else:
-    #       path = "%s/share/domogik/stats/%s" % (config['src_prefix'], self._name)
-    #   return path
 
     def enable_hbeat(self, lock = False):
         """ Wrapper for xplconnector.enable_hbeat()
