@@ -118,6 +118,8 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
     $ cd /opt/domogik/
     $ sudo ./install.py
 
+.. note::
+   Domogik uses a configuration file which is created and configured by the *install.py* script. This file is */etc/domogik/domogik.cfg*. For more informations, please read :doc:`the page related to the configuration file <domogik_cfg_file>`.
 .. note:: 
 
     During installation, a new user will be created if necessary.
