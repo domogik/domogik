@@ -28,12 +28,13 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.rest.url import json_response, register_api, urlHandler
+from domogik.rest.url import json_response, timeit, register_api, urlHandler
 from flask import request
 from flask.views import MethodView
 
 @urlHandler.route('/account/password/', methods=['PUT'])
 @json_response
+@timeit
 def user_password():
     change_ok = urlHandler.db.change_password(request.args.get("id"), \
                                           request.args.get("old"), \
@@ -46,6 +47,7 @@ def user_password():
 
 @urlHandler.route('/account/auth/<login>/<password>/', methods=['GET'])
 @json_response
+@timeit
 def account_auth(login, password):
         login_ok = urlHandler.db.authenticate(login, password)
         if login_ok == True:
@@ -56,7 +58,7 @@ def account_auth(login, password):
 
 class AccountAPI(MethodView):
     """ class to handle all /account urls """
-    decorators = [json_response]
+    decorators = [json_response, timeit]
 
     def get(self, aid):
         """ GET /account/<aid> """

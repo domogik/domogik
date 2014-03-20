@@ -8,12 +8,14 @@ from domogik.mq.message import MQMessage
 
 @urlHandler.route('/device/old/', methods=['GET'])
 @json_response
+@timeit
 def device_list_old():
     b = urlHandler.db.list_old_devices()
     return 200, b
 
 @urlHandler.route('/device/params/<dev_type_id>', methods=['GET'])
 @json_response
+@timeit
 def device_params(dev_type_id):
     try:
         result = get_device_params(dev_type_id)
@@ -88,6 +90,7 @@ def get_device_params(dev_type_id, zmq=None):
 
 @urlHandler.route('/device/addglobal/<int:did>', methods=['PUT'])
 @json_response
+@timeit
 def device_globals(did):
     #- if static field == 1 => this is a static param
     #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
@@ -111,6 +114,7 @@ def device_globals(did):
 
 @urlHandler.route('/device/xplcmdparams/<int:did>', methods=['PUT'])
 @json_response
+@timeit
 def device_xplcmd_params(did):
     # get the command
     cmd = urlHandler.db.get_xpl_command(did)
@@ -154,6 +158,7 @@ def device_xplcmd_params(did):
 
 @urlHandler.route('/device/xplstatparams/<int:did>', methods=['PUT'])
 @json_response
+@timeit
 def device_xplstat_params(did):
     cmd = urlHandler.db.get_xpl_stat(device_id)
     if cmd == None:
@@ -196,7 +201,7 @@ def device_xplstat_params(did):
     return 204, ""
 
 class deviceAPI(MethodView):
-    decorators = [json_response]
+    decorators = [json_response, timeit]
 
     def get(self, did):
         if did != None:

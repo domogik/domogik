@@ -14,6 +14,7 @@ from domogik.mq.message import MQMessage
 
 @urlHandler.route('/cmd/id/<int:cid>', methods=['GET'])
 @json_response
+@timeit
 def api_ncommand(cid):
     cli = MQSyncReq(urlHandler.zmq_context)
     msg = MQMessage()
