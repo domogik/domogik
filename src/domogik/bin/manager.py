@@ -283,9 +283,6 @@ class Manager(XplPlugin):
                             ### Register all the device types
                             for device_type in self._packages[pkg_id].get_device_types():
                                 self.log.info(u"Register device type : {0}".format(device_type))
-                                # TODO : delete
-                                #if self._device_types.has_key(device_type):
-                                #    self.log.error(u"Duplicate device type detected : {0} for package {1}. There is already such a device_type : please fix one of the 2 packages!. Here are the informations about the other device type entry : {3}".format(device_type, pkg_id, self._device_types[device_type]))
                                 self._device_types[device_type] = self._packages[pkg_id].get_json()
     
             # finally, check if some packages has been uninstalled/removed
@@ -1091,6 +1088,7 @@ class Plugin(GenericComponent, MQAsyncSub):
                 os.kill(int(the_pid), signal.SIGKILL)
                 # TODO : add one more check ?
                 # do a while loop over is_already.... ?
+                # update on 20/03/14 : it seems this is not needed currently
             self.log.info(u"The plugin {0} should be killed now (kill -9)".format(self.name))
         else:
             self.log.info(u"The plugin {0} has stopped itself properly.".format(self.name))
@@ -1160,8 +1158,6 @@ class Clients():
                 if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
                     delta = now - self._clients[a_client]['last_seen']
                     if delta > 2*STATUS_HBEAT:
-                        # TODO : remove
-                        self.log.debug("DEAD : delta = {0} / STATUS_HBEAT = {1}".format(delta, STATUS_HBEAT))
                         # client is dead!
                         self.set_status(a_client, STATUS_DEAD)
             self._stop.wait(STATUS_HBEAT)
