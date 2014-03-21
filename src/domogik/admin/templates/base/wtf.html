@@ -23,26 +23,29 @@
         {{ field() }}
     {% elif field.type == 'BooleanField' %}
       <div class="form-group{% if field.errors %} has-error{% endif %}">
-          <div class="col-sm-offset-2 col-sm-10">
-      <div class="checkbox">
-        <label>
-          {{ field(**kwargs) }}{{ field.label.text }}
-        </label>
-      </div>
-    </div>
-      </div>
-    {% else %}
-	     <div class="form-group{% if field.errors %} has-error{% endif %}">
-	         <label class="col-sm-2 control-label" for="{{field.id}}">{{ field.label.text }}</label>
-          <div class="col-sm-10">
-	           {{ field(class='form-control', **kwargs) }}
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              {{ field(**kwargs) }}{{ field.label.text }}
+            </label>
           </div>
-
-	     {% if field.description %}
-            <span class="help-block">{{ field.description }}</span>
-      {% endif %}
-            {{ form_field_errors(field) }}
-	     </div>
+        </div>
+      </div>
+    {% elif field.type == 'SubmitField' %}
+          <div class="col-sm-offset-2">
+            {{ field(class='btn btn-primary', **kwargs) }}
+          </div>
+    {% else %}
+         <div class="form-group{% if field.errors %} has-error{% endif %}">
+          <label class="col-sm-2 control-label" for="{{field.id}}">{{ field.label.text }}</label>
+          <div class="col-sm-10">
+            {{ field(class='form-control', **kwargs) }}
+          {% if field.description %}
+          <div class="help-block">{{ field.description }}</div>
+          {% endif %}
+          {{ form_field_errors(field) }}
+          </div>
+        </div>
     {% endif %}
 {%- endmacro -%}
 

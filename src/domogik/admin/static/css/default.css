@@ -47,7 +47,7 @@ body {
 	color: #eee;
 }
 
-.dropdown-menu,
+.navbar-dmg .dropdown-menu,
 .navbar-dmg .nav > li > a:focus,
 .navbar-dmg .nav > li > a:hover {
 	background-color: #005774;

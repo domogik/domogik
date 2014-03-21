@@ -226,7 +226,7 @@ def client_config(client_id):
         # add the field
         setattr(F, item["key"], field)
     # add the submit button
-    field = submit = SubmitField("Send")
+    field = submit = SubmitField("Save config")
     setattr(F, "submit", field)
 
     form = F()

@@ -7,29 +7,28 @@
       <table class="table table-striped" style="border-collapse:collapse;">
             <thead>
                     <tr>
-                        <td>{% trans %}ID{% endtrans %}</td>
-                        <td>{% trans %}Type{% endtrans %}</td>
-                        <td>{% trans %}Status{% endtrans %}</td>
-                        <td>{% trans %}Configured{% endtrans %}</td>
-                        <td>{% trans %}Details{% endtrans %}</td>
+                        <th scope="col">{% trans %}ID{% endtrans %}</td>
+                        <th scope="col">{% trans %}Type{% endtrans %}</td>
+                        <th scope="col">{% trans %}Status{% endtrans %}</td>
+                        <th scope="col">{% trans %}Configured{% endtrans %}</td>
+                        <th scope="col">{% trans %}Actions{% endtrans %}</td>
                     </tr>
             </thead>
             <tbody>
             {% for name, data in clients.iteritems() %}
+                {% if data.type != 'core' %}
                     <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle" id="{{data.pid}}">
                         <td>{{ name }}</td>
                         <td>{{ data.type }}</td>
                         <td>{{ data.status }}</td>
                         <td>{{ data.configured }}</td>
                         <td>
-			    {% if data.type != 'core' %}
-				    {% if data.configured %}
-					<a href="/client/{{ name }}">
-				    {% else %}
-					<a href="/client/{{ name }}/config">
-				    {% endif %}
-				    {% trans %}Details{% endtrans %}
-			    {% endif %}
+        				    {% if data.configured %}
+        					<a class="btn btn-primary" href="/client/{{ name }}">
+        				    {% else %}
+        					<a href="/client/{{ name }}/config">
+        				    {% endif %}
+        				    {% trans %}Details{% endtrans %}
                             </a>
                         </td>
                     </tr>
@@ -38,6 +37,35 @@
                             {% include 'client_overview.html' %}
                         </td>
                     </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <h2>{% trans %}Core components{% endtrans %}</h2>
+      <table class="table table-striped" style="border-collapse:collapse;">
+            <thead>
+                    <tr>
+                        <th scope="col">{% trans %}ID{% endtrans %}</td>
+                        <th scope="col">{% trans %}Type{% endtrans %}</td>
+                        <th scope="col">{% trans %}Status{% endtrans %}</td>
+                        <th scope="col">{% trans %}Configured{% endtrans %}</td>
+                    </tr>
+            </thead>
+            <tbody>
+            {% for name, data in clients.iteritems() %}
+                {% if data.type == 'core' %}
+                    <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle" id="{{data.pid}}">
+                        <td>{{ name }}</td>
+                        <td>{{ data.type }}</td>
+                        <td>{{ data.status }}</td>
+                        <td>{{ data.configured }}</td>
+                    </tr>
+                    <tr id="d{{data.pid}}">
+                        <td colspan="4" class="hiddenRow">
+                            {% include 'client_overview.html' %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
             </tbody>
         </table>
