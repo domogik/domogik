@@ -1,1 +1,2 @@
+ssh-keygen -t rsa -b 2048
 git clone --recursive https://github.com/pnb990/domogik
