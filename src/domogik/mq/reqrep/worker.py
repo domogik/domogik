@@ -34,13 +34,16 @@ import zmq
 from zmq.eventloop.zmqstream import ZMQStream
 from zmq.eventloop.ioloop import IOLoop, DelayedCallback, PeriodicCallback
 
-from domogik.mq.common import split_address
-from domogik.mq.message import MQMessage
-from domogik.mq.socket import ZmqSocket
 try:
         from domogik.common.configloader import Loader
+	from domogik.mq.common import split_address
+	from domogik.mq.message import MQMessage
+	from domogik.mq.socket import ZmqSocket
 except ImportError:
         from domoweb.models import Parameter
+	from domoweb.mq.common import split_address
+	from domoweb.mq.message import MQMessage
+	from domoweb.mq.socket import ZmqSocket
 
 class MQRep(object):
 
