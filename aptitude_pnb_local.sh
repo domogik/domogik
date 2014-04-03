@@ -1,4 +1,4 @@
-#!/bin/bash    
+#!/bin/bash -x
 
 pkg_list="\
          build-essential \
@@ -43,7 +43,7 @@ sudo dpkg -l $pkg_list
 
 
 
-echo << TXT
+cat << TXT
 to create data base:
 mysql -p -u root
 =============cut here=============
