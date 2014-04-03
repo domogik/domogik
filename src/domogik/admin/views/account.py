@@ -2,9 +2,9 @@ from domogik.admin.application import app
 from flask import render_template, request, flash, redirect
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
-from flask.ext.babel import gettext, ngettext
+from flask_babel import gettext, ngettext
 from flask_login import login_required
-from flask_wtf import Form
+from flaskext.wtf import Form
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField
 from wtforms.validators import Required
