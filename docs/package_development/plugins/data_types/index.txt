@@ -11,6 +11,4 @@ Domogik data type are used to define the availables values for a device type.
 Where can I find the list of the data types ?
 =============================================
 
-The data types allowed by Domogik are listed in this files (installed with a Domogik release): */var/lib/domogik/resources/datatypes.json*.
-
-:doc:`You can find the list here <list>`
+The data types allowed by Domogik are defined in the file *src/domogik/common/datatypes.json* in the sources. Here is for example `the content of the file for the *master* branch <https://github.com/domogik/domogik/blob/master/src/domogik/common/datatypes.json>`_
