@@ -12,3 +12,15 @@ Where can I find the list of the data types ?
 =============================================
 
 The data types allowed by Domogik are defined in the file *src/domogik/common/datatypes.json* in the sources. Here is for example `the content of the file for the *master* branch <https://github.com/domogik/domogik/blob/master/src/domogik/common/datatypes.json>`_
+
+How to choose a data type ?
+===========================
+
+If the device can be used for various use cases, you should choose a parent type, for example *DT_Bool* for a True/False usage. If the device is specific to an usage, you can use a child type, for example, instead of *DT_Bool*, use *DT_Switch* for a light, *DT_OpenClose* for a door sensor.
+
+Notice about widgets
+====================
+
+A widget should handle both the parent and child type to be compliant with most of the plugins : an on/off light widget whould handle both *DT_Bool* and *DT_Switch*.
+
+
