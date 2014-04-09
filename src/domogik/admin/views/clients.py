@@ -55,6 +55,15 @@ def client_detail(client_id):
 @app.route('/client/<client_id>/devices/known')
 @login_required
 def client_devices_known(client_id):
+    if app.datatypes == {}:
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is not None:
+            app.datatypes = res.get_data()['datatypes']
+        else:
+            app.datatypes = {}
     with app.db.session_scope():
         devices = app.db.list_devices_by_plugin(client_id)
     return render_template('client_devices.html',
