@@ -1,0 +1,18 @@
+<technology id="scene">
+  <command name="preset_dim">
+    <schema>scene.basic</schema>
+    <command-key>command</command-key>	
+    <address-key>number</address-key>	
+    <command-xpl-value>fake-dim</command-xpl-value>  
+    <parameters>                                                                                            
+      <parameter key="level" location="1"/>                                                           
+    </parameters>                                                                                           
+  </command>	
+  <listener>
+    <schema>scene.basic</schema>
+    <xpltype>xpl-trig</xpltype>
+    <filter>
+      <key name="number" value="@address@"/>
+    </filter>
+  </listener>
+</technology>

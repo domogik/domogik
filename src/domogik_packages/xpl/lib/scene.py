@@ -320,12 +320,14 @@ class Mscene():
        print ("type de action:%s" %type(actions))
        if self.initstat != '1':
           for action in actions:
+             self.log_scene('info',action)
              if actions[action]['techno'] == 'command' and actions[action]['address']== 'command' and actions[action]['command']=='command':
                 subp = subprocess.Popen(actions[action]['value'], shell=True)
              elif actions[action]['techno'] == 'send-xpl':
                 self.send_action_xpl(actions[action])
              elif actions[action]['techno'] == 'Wait':
-                self.wait_action(action['value'])
+                ###self.wait_action(action['value'])
+                time.sleep(action['value'])
              else:
                 self.rinor_command(actions[action])
        else:
