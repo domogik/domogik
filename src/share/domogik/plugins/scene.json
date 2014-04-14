@@ -41,6 +41,27 @@
       "return_confirmation": "1",
       "stat_key": "stats",
       "value_type": "binary"
+     },
+     {
+     "device_type_id":"scene.Percent",
+     "feature_type":"actuator",
+     "id":"scene.percent.value",
+     "name":"Range_Percent",
+     "parameters": "{&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:0,&quot;valueMax&quot;:100}",
+     "return_confirmation" : "1",
+     "stat_key":"stats",
+     "value_type": "range"
+     },
+
+    {
+     "device_type_id":"scene.thermostat",
+     "feature_type":"actuator",
+     "id":"scene.thermostat.value", 
+     "name":"thermostat_7to_30",
+     "parameters": "{&quot;step&quot;:&quot;0.1&quot;,&quot;unit&quot;:&quot;\\u00B0C&quot;,&quot;command&quot;:&quot;preset_dim&quot;,&quot;valueMin&quot;:7,&quot;valueMax&quot;:30}",
+     "return_confirmation" : "1",
+     "stat_key":"stats",
+     "value_type": "range"
      }
     ],
     "device_types": [
@@ -53,6 +74,16 @@
     "description": "Fake device",
     "id": "scene.fake",
     "name": "Fake Device"
+    },
+    {
+    "description":"Fake Range Percent",
+    "id": "scene.percent",
+    "name":"Percent"
+    },
+    {
+    "description":"Fake thermostat",
+    "id": "scene.thermostat",
+    "name":"Thermostat"
     } 
   ],
     "files": [
@@ -66,6 +97,7 @@
            "/src/share/domogik/url2xpl/scene/Read.xml",
            "/src/share/domogik/url2xpl/scene/true.xml",
            "/src/share/domogik/url2xpl/scene/false.xml",
+           "/src/share/domogik/url2xpl/scene/range.xml",
            "/src/share/domogik/url2xpl/scene/Create.xml"
 ],
     "identity": {

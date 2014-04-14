@@ -143,10 +143,11 @@ class SceneManager(XplPlugin):
 
    def cmd_fake(self, message):
 ### sub send an answer for fake device of scene plugin
+       print message
        if message.data['number'] not in self.fake_stat:
           self.fake_stat[message.data['number']]=''
        if message.data['command'] == "fake-true" or message.data['command'] == "fake-false" and message.type == "xpl-cmnd":
-          print("Réception xpl cmnd")
+          print("Réception xpl cmnd binary")
           msg=XplMessage()
           msg.set_schema('scene.basic')
           sender= "domogik-scene0.%s" %self.get_sanitized_hostname()
@@ -161,8 +162,23 @@ class SceneManager(XplPlugin):
           if message.data['command'] == "fake-false":
               msg.add_data({'stats': 'false'})
           msg.add_data({'number': message.data['number']})
+       else:
+##       if message.data['command'] == "fake-dim" and message.type == "xpl-cmnd":
+          print("Réception xpl cmnd range")
+          msg=XplMessage()
+          msg.set_schema('scene.basic')
+          sender= "domogik-scene0.%s" %self.get_sanitized_hostname()
+          msg.set_source(sender)
+          if self.fake_stat[message.data['number']] != message.data['level']:
+             msg.set_type('xpl-trig')
+             self.fake_stat[message.data['number']] = message.data['level']
+          else:
+             msg.set_type('xpl-stat')
+          msg.add_data({'stats': message.data['level']})
+###          msg.add_data({'command':'dim-ack'})
+          msg.add_data({'number': message.data['number']})
          
-          self.myxpl.send(msg)
+       self.myxpl.send(msg)
           
    def Create_scene_msg(self, data):
        devices = {}
