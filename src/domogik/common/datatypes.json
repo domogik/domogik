@@ -517,6 +517,19 @@
         },
         "childs": []
     },
+    "DT_HVACFan": {
+        "values": {
+            "0": "Unknown",
+            "1": "Auto",
+            "2": "Lower",
+            "3": "Speed 1",
+            "4": "Speed 2",
+            "5": "Speed 3",
+            "6": "Speed 4",
+            "7": "Speed 5"
+        },
+        "childs": []
+    },
     "DT_ColorCII": {
         "values": {
             "W": "White",
