@@ -222,6 +222,10 @@ def client_config(client_id):
             default = item["default"]
         # build the field
         if item["type"] == "boolean":
+            if default == 'Y':
+	        default = True
+            else:
+                default = False
             field = BooleanField(item["name"], arguments, description=item["description"], default=default)
         elif item["type"] == "number":
             field = IntegerField(item["name"], arguments, description=item["description"], default=default)
@@ -245,7 +249,12 @@ def client_config(client_id):
         data = {}
         for arg, value in list(request.form.items()):
             if arg in known_items:
-                data[arg] = value
+		data[arg] = getattr(form, arg).data
+	if 'auto_startup' in data.keys():
+            data['auto_startup'] = 'Y'
+        else:
+            data['auto_startup'] = 'N'
+        print data
         # build the message
         msg = MQMessage()
         msg.set_action('config.set')
