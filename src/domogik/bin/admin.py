@@ -27,7 +27,7 @@ Plugin purpose
 Implements
 ==========
 
-class Admin(XplPlugin)
+class Admin(Plugin)
 class AdminWebSocket(WebSocketHandler, MQAsyncSub)
 
 @author: 	Friz <fritz.smh@gmail.com>
@@ -37,7 +37,7 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub)
 @organization: Domogik
 """
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.xpl.common.plugin import XplPlugin
+from domogik.common.plugin import Plugin
 from domogik.common import logger
 from domogik.common.configloader import Loader
 from domogik.common.utils import get_ip_for_interfaces
@@ -87,7 +87,7 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
             for cli in AdminWebSocket.clients:
                 cli.write_message({"msgid": msg, "content": content})
 
-class Admin(XplPlugin):
+class Admin(Plugin):
     """ Admin Server 
         - create a HTTP server 
         - handle the admin interface urls
@@ -100,7 +100,7 @@ class Admin(XplPlugin):
             @param server_port :  port of HTTP server
         """
 
-        XplPlugin.__init__(self, name = 'admin', nohub = True)
+        Plugin.__init__(self, name = 'admin')
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())

@@ -39,7 +39,7 @@ from domogik.mq.reqrep.client import MQSyncReq
 #from domogik.mq.pubsub.subscriber import MQSyncSub
 from domogik.mq.pubsub.subscriber import MQAsyncSub
 from domogik.mq.message import MQMessage
-from domogik.xpl.common.plugin import STATUS_ALIVE, STATUS_STOPPED
+from domogik.common.plugin import STATUS_ALIVE, STATUS_STOPPED
 import json
 
 class TestPlugin(MQAsyncSub):
