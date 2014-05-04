@@ -22,7 +22,7 @@
                         <td>{{ data.birthdate }}</td>
                         <td><a href="/persons/{{ data.id }}">{% trans %}Update{% endtrans %}</a>
 
-				<a data-toggle="modal" data-target="#deleteConfirm" href="/persons/del/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
+				<a data-toggle="confirmation" data-placement="bottom" data-href="/persons/del/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
 			</td>
                     </tr>
             {% endfor %}

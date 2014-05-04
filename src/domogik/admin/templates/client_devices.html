@@ -18,15 +18,16 @@
             </thead>
             <tbody>
             {% for data in devices %}
-                    <tr data-toggle="collapse" data-target=".detail-{{ data.id }}" class="accordion-toggle">
+                    <tr class="accordion-toggle">
                             <td>{{ data.id }}</td>
                             <td>{{ data.name }}</td>
                             <td>{{ data.reference }}</td>
                             <td>{{ data.device_type_id }}</td>
                             <td>{{ data.description }}</td>
                             <td>
+                                <a data-toggle="collapse" data-target=".detail-{{ data.id }}" href="#">Details</a> | 
                                 <a href="/client/{{ clientid }}/devices/edit/{{ data.id }}">{% trans %}Edit{% endtrans %}</a> |
-                                <a href="/client/{{ clientid }}/devices/delete/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
+                                <a data-toggle="confirmation" data-placement="bottom" data-href="/client/{{ clientid }}/devices/delete/{{ data.id }}">{% trans %}Delete{% endtrans %}</a>
                             </td>
                     </tr>
                     <tr>

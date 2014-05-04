@@ -40,7 +40,7 @@ from domogik.tests.common.helpers import check_domogik_is_running
 from domogik.tests.common.helpers import delete_configuration
 from domogik.tests.common.helpers import configure, check_config
 from domogik.tests.common.testplugin import TestPlugin
-from domogik.xpl.common.plugin import STATUS_ALIVE, STATUS_STOPPED
+from domogik.common.plugin import STATUS_ALIVE, STATUS_STOPPED
 import time
 
 

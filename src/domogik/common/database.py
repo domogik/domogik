@@ -42,7 +42,7 @@ import datetime, hashlib, time
 
 import json
 import sqlalchemy
-from sqlalchemy import Table, MetaData, and_, or_, not_
+from sqlalchemy import Table, MetaData, and_, or_, not_, desc
 from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker, defer
 
@@ -878,9 +878,9 @@ class DbHelper():
 
     def list_sensor_history(self, sid, num=None):
         if num is None:
-            return self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).all()
+            return self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).all()
         else:
-            return self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).limit(num).all()
+            return self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).limit(num).all()
             
     def list_sensor_history_between(self, sid, frm, to=None):
         if to:
