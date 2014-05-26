@@ -454,10 +454,11 @@ class MulticastPingPong(DatagramProtocol):
         """
         addresses = []
         if xpl.target == "*":
-            msg = "Target=*. Client ids for delivery : *"
+            msg = "Target=*. Client ids for delivery : * "
             for client in self._client_list:
                 addresses.append((client['ip'], client['port']))
-                msg += "%s, " % client['id']
+                msg += "%s:" % client['ip']
+                msg += "%s, "% client['port']
         else:
             msg = "Target=%s. Client id for delivery : " % xpl.target
             for client in self._client_list:
@@ -628,10 +629,23 @@ class MulticastPingPong(DatagramProtocol):
         self.log.info("Data received from %s : %s" % (repr(address), repr(datagram)))
         ip = address[0]
         port = address[1]
+
+        # decode xpl message
+        is_xpl, xpl = self._decode2xpl(datagram)
+
+        # ip and port extraction to correctly identify the client
+        try:
+            msg = "Remote %s, in message %s - " % (ip, xpl.data['remote-ip'])
+            msg += "port %s, in message %s" % (port, xpl.data['port'])
+            self.log.info(msg)
+            port = int(xpl.data['port'])
+            ip = xpl.data['remote-ip']
+        except:
+            pass
+
         client_id = self._get_client_id(ip, port)
  
         # check if this is a valid xpl message
-        is_xpl, xpl = self._decode2xpl(datagram)
         if is_xpl:
             # Nothing to do, just continue
             self._inc_valid_counter(client_id)
@@ -644,12 +658,12 @@ class MulticastPingPong(DatagramProtocol):
             return
 
         # TODO : needed ????
-        # When the hub receives a hbeat.app or config.app message, the hub should extract the "remote-ip" value from the message body and compare the IP address with the list of addresses the hub is currently bound to for the local computer. If the address does not match any local addresses, the packet moves on to the delivery/rebroadcast step. 
+        # When the hub receives a hbeat.app or config.app message, the hub should extract the "remote-ip" value from the message body and compare the IP address with the list of addresses the hub is currently bound to for the local computer. If the address does not match any local addresses, the packet moves on to the delivery/rebroadcast step.
 
         # check if this is a local hbeat message
         if self._is_local_client(ip) and self._is_hbeat(xpl):
             # handle new clients
-            if self._is_new_client(client_id):  
+            if self._is_new_client(client_id):
                 self._add_client(ip, port, xpl)
                 self._display_clients()
             else:
