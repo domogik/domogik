@@ -573,7 +573,7 @@
             "output_overload": "UPS output overload",
             "output_ok": "UPS output returns ok",
             "temp_high": "UPS temperature too high",
-            "temp_ok": "UPS temperature return ok"
+            "temp_ok": "UPS temperature returns ok"
         },
         "childs": []
     }
