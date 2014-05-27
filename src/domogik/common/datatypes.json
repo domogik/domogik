@@ -542,5 +542,39 @@
             "Br": "Brown"
         },
         "childs": []
+    },
+    "DT_UPSState": {
+        "values": {
+            "OL": "mains",
+            "OB": "battery",
+            "LB": "unknown"
+        },
+        "childs": []
+    },
+    "DT_UPSEvent": {
+        "values": {
+            "0": "onmains",
+            "1": "onbattery",
+            "2": "battlow",
+            "3": "battfull",
+            "4": "bti",
+            "5": "btp",
+            "6": "btf",
+            "7": "comms_lost",
+            "8": "comms_ok",
+            "9": "input_freq_error",
+            "10": "input_freq_ok",
+            "11": "input_voltage_high",
+            "12": "input_voltage_low",
+            "13": "input_voltage_ok",
+            "14": "output_voltage_high",
+            "15": "output_voltage_low",
+            "16": "output_voltage_ok",
+            "17": "output_overload",
+            "18": "output_ok",
+            "19": "temp_high",
+            "20": "temp_ok"
+        },
+        "childs": []
     }
 }
