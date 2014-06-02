@@ -149,7 +149,7 @@ class DeviceUsageTestCase(GenericTestCase):
         except DbHelperException:
             pass
 
-class DeviceTypeTestCase(GenericTestCase):
+class InstanceTypeTestCase(GenericTestCase):
     """Test instance types"""
 
     def setUp(self):
