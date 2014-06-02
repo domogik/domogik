@@ -224,7 +224,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                     self.myxpl.del_listener(stat.get_listener())
 
             ### Load stats
-            # key1, key2 = device_type_id, schema
+            # key1, key2 = instance_type_id, schema
             self.stats = []
             for sen in self._db.get_all_sensor():
                 self.log.debug(sen)

@@ -225,24 +225,24 @@ class PackageJson():
                         raise PackageException("Product {0} instance {1} has an unknown type {2}".format(prd, ins, inst["type"]))
                     self._validate_keys(expected, " product {0} instance {1}".format(prd, ins), inst.keys(), optional)
 
-            #validate the device_type
+            #validate the instance_type
             for devtype in self.json["instance_types"]:
                 devt = self.json["instance_types"][devtype]
                 expected = ['id', 'name', 'description', 'commands', 'sensors', 'parameters']
-                self._validate_keys(expected, "device_type {0}".format(devtype), devt.keys())
-                #check that all commands exists inisde each device_type
+                self._validate_keys(expected, "instance_type {0}".format(devtype), devt.keys())
+                #check that all commands exists inisde each instance_type
                 for cmd in devt["commands"]:
                     if cmd not in self.json["commands"].keys():    
-                        raise PackageException("cmd {0} defined in device_type {1} is not found".format(cmd, devtype))
+                        raise PackageException("cmd {0} defined in instance_type {1} is not found".format(cmd, devtype))
                 #check that all sensors exists inside each device type
                 for sens in devt["sensors"]:
                     if sens not in self.json["sensors"].keys():    
-                        raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
-                #see that each xplparam inside device_type has the following keys: key, description, type
+                        raise PackageException("sensor {0} defined in instance_type {1} is not found".format(sens, devtype))
+                #see that each xplparam inside instance_type has the following keys: key, description, type
                 expected = ["key", "type", "description", "xpl"]
                 optional = ["max_value", "min_value", "choices", "mask", "multiline"]
                 for par in devt["parameters"]:
-                    self._validate_keys(expected, "a param for device_type {0}".format(devtype), par.keys(), optional)
+                    self._validate_keys(expected, "a param for instance_type {0}".format(devtype), par.keys(), optional)
 
             #validate the commands
             for cmdid in self.json["commands"]:
@@ -344,7 +344,7 @@ class PackageJson():
         print(u"Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
         print(u"---------------------------------------------------------")
 
-    def find_xplstats_for_device_type(self, devtype):
+    def find_xplstats_for_instance_type(self, devtype):
         if self.json["json_version"] != 2:
             return "Bad json version for the plugin"
         ret = {}

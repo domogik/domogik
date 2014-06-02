@@ -58,33 +58,33 @@ class TestDevice():
 
         # device informations
         self.device_name = None
-        self.device_type = None
+        self.instance_type = None
 
-    def create_device(self, client_id, device_name, device_type):
+    def create_device(self, client_id, device_name, instance_type):
         """ Call POST /device/... to create the device
             @param client_id : client id
             @param device_name : the device name
-            @param device_type : the device type
+            @param instance_type : the device type
             @return : the device id for the device created
         """
         # package informations
         self.client_id = client_id
         # device informations
         self.device_name = device_name
-        self.device_type = device_type
+        self.instance_type = instance_type
         description = "a test device"
         reference = "for test only"
         print(u"Create a test device for {0}. Device type is '{1}', name is '{2}'".format(self.client_id,
-                                                                                                          self.device_type,
+                                                                                                          self.instance_type,
                                                                                                           self.device_name))
 
         response = requests.post("{0}/device/".format(self.rest_url), \
             headers={'content-type':'application/x-www-form-urlencoded'},
-            data="name={0}&client_id={1}&description={2}&reference={3}&device_type={4}".format(self.device_name,
+            data="name={0}&client_id={1}&description={2}&reference={3}&instance_type={4}".format(self.device_name,
                                                                                                self.client_id,
                                                                                                description,
                                                                                                reference,
-                                                                                               self.device_type))
+                                                                                               self.instance_type))
         print(u"Response : [{0}]".format(response.status_code))
         #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:

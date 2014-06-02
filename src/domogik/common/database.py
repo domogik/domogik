@@ -393,7 +393,7 @@ class DbHelper():
                         'name' : device.name, 
                         'reference' : device.reference, 
                         'description' : device.description, 
-                        'device_type_id' : device.device_type_id, 
+                        'instance_type_id' : device.instance_type_id, 
                         'client_id' : device.client_id
                       }
         # params
@@ -533,7 +533,7 @@ class DbHelper():
         return xplstat 
 
 
-    def add_device_and_commands(self, name, device_type, client_id, description, reference, client_data):
+    def add_device_and_commands(self, name, instance_type, client_id, description, reference, client_data):
         """ Create a device : fill the following tables with data from the related client json file
             - core_device
             - ...
@@ -544,21 +544,21 @@ class DbHelper():
 
         ### Add the device itself
         self.log.debug(u"Device creation : inserting data in core_device...")
-        device = Device(name=name, device_type_id=device_type, \
+        device = Device(name=name, instance_type_id=instance_type, \
                 client_id=client_id, client_version=client_data['identity']['version'], \
                 description=description, reference=reference)
         self.__session.add(device)
         self.__session.flush()
 
         ### Table core_sensor
-        # first, get the sensors associated to the device_type
+        # first, get the sensors associated to the instance_type
         self.log.debug(u"Device creation : start to process the sensors")
-        device_type_sensors = client_data['device_types'][device_type]['sensors']
-        self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
+        instance_type_sensors = client_data['instance_types'][instance_type]['sensors']
+        self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(instance_type_sensors))
 
         # then, for each sensor, create it in databse for the device
         stats_list = []
-        for a_sensor in device_type_sensors:
+        for a_sensor in instance_type_sensors:
             self.log.debug(u"Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
             sensor_in_client_data = client_data['sensors'][a_sensor]
             sensor = Sensor(name = sensor_in_client_data['name'], \
@@ -593,12 +593,12 @@ class DbHelper():
 	del stats_list
 
         ### Table core_command
-        # first, get the commands associated to the device_type
+        # first, get the commands associated to the instance_type
         self.log.debug(u"Device creation : start to process the commands")
-        device_type_commands = client_data['device_types'][device_type]['commands']
-        self.log.debug(u"Device creation : list of commands available for the device : {0}".format(device_type_commands))
+        instance_type_commands = client_data['instance_types'][instance_type]['commands']
+        self.log.debug(u"Device creation : list of commands available for the device : {0}".format(instance_type_commands))
 
-        for a_command in device_type_commands:
+        for a_command in instance_type_commands:
             self.log.debug(u"Device creation : inserting data in core_command for '{0}'...".format(a_command))
             command_in_client_data = client_data['commands'][a_command]
             command = Command(name = command_in_client_data['name'], \
@@ -664,7 +664,7 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         device = Device(name=d_name, description=d_description, reference=d_reference, \
-                        device_type_id=d_type_id, client_id=d_client_id)
+                        instance_type_id=d_type_id, client_id=d_client_id)
         self.__session.add(device)
         try:
             self.__session.commit()
