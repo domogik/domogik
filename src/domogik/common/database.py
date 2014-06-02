@@ -654,7 +654,7 @@ class DbHelper():
         """Add a device item
 
         @param d_name : name of the device
-        @param d_type_id : device type id (x10.Switch, x10.Dimmer, Computer.WOL...)
+        @param d_type_id : instance type id (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param d_client_id : the plugin that controls this device
         @param d_description : extended device description, optional
         @param d_reference : device reference (ex. AM12 for x10), optional

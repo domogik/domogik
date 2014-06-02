@@ -176,7 +176,7 @@ class Manager(XplPlugin):
         ### Create the packages list
         self._packages = {}
 
-        ### Create the device types list
+        ### Create the instance types list
         self._instance_types = {}
 
         ### Create the plugins list
@@ -281,9 +281,9 @@ class Manager(XplPlugin):
                                 ### Create a DeviceType collection in order to send them over MQ
                                 # this is only done when a new package is found
 
-                            ### Register all the device types
+                            ### Register all the instance types
                             for instance_type in self._packages[pkg_id].get_instance_types():
-                                self.log.info(u"Register device type : {0}".format(instance_type))
+                                self.log.info(u"Register instance type : {0}".format(instance_type))
                                 self._instance_types[instance_type] = self._packages[pkg_id].get_json()
     
             # finally, check if some packages has been uninstalled/removed
@@ -629,7 +629,7 @@ class Package():
         return self.json
 
     def get_instance_types(self):
-        """ Return all the device types available or the package
+        """ Return all the instance types available or the package
         """
         dt_list = []
         for dt in self.json['instance_types']:

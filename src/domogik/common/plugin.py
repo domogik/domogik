@@ -336,7 +336,7 @@ class Plugin(BasePlugin, MQRep):
                     self.force_leave()
                     return []
             for a_device in device_list:
-                self.log.info(u"- id : {0}  /  name : {1}  /  device type id : {2}".format(a_device['id'], \
+                self.log.info(u"- id : {0}  /  name : {1}  /  instance type id : {2}".format(a_device['id'], \
                                                                                     a_device['name'], \
                                                                                     a_device['instance_type_id']))
                 # log some informations about the device
@@ -386,7 +386,7 @@ class Plugin(BasePlugin, MQRep):
         # browse all devices to find if the device exists
         found = False
         for a_device in self.devices:
-            # first, search for device type
+            # first, search for instance type
             if a_device['instance_type_id'] == instance_type:
                 params = a_device[type][feature]['parameters']['static']
                 found = True

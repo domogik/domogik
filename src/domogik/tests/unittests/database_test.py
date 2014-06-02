@@ -150,7 +150,7 @@ class DeviceUsageTestCase(GenericTestCase):
             pass
 
 class DeviceTypeTestCase(GenericTestCase):
-    """Test device types"""
+    """Test instance types"""
 
     def setUp(self):
         self.remove_all_instance_types()
@@ -358,8 +358,8 @@ class DeviceTestCase(GenericTestCase):
         assert len(db.list_devices()) == 2
 
     def test_list_and_get(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'x10 device type')
-        dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
+        dt1 = db.add_device_technology('x10', 'x10', 'x10 instance type')
+        dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus instance type')
         du1 = db.add_device_usage('appliance', 'Appliance')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id,
                                   dty_description='My beautiful switch')

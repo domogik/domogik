@@ -125,7 +125,7 @@ class Device(Base):
         @param address : device address (like 'A3' for x10, or '01.123456789ABC' for 1wire)
         @param reference : internal reference of the device (like AM12 for a X10 device)
         @param client_id : what plugin controls this device
-        @param instance_type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
+        @param instance_type_id : 'link to the instance type (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param description : extended description, optional
 
         """
