@@ -46,7 +46,7 @@ XplGW                   manager             client.conversion.get client.convers
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 Admin                   manager             datatype.get          datatype.result          req_datatype.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
-Rest                    manager             device_types.get      device_types.result      req_device_types.py
+Rest                    manager             instance_types.get    instance_types.result    req_instance_types.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------
 Plugins                 dbmgr               device.get            device.result            req_device.py
 ----------------------- ------------------- --------------------- ------------------------ ------------------------

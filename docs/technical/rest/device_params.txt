@@ -4,17 +4,17 @@
 
 Available actions : 
 
-* GET : get the parameters associated to a device type
+* GET : get the parameters associated to an instance type
 
 GET /device/params
 ==================
 
-This method is used to get the list of the parameters associated to a device type. This list is needed by the user interfaces to create the form to set the parameters of a device.
+This method is used to get the list of the parameters associated to an instance type. This list is needed by the user interfaces to create the form to set the parameters of a device.
 
 Example: ::
 
     Method : GET
-    Url : http://127.0.0.1:40405/device/params/<device_type : diskfree.disk_usage, ...>
+    Url : http://127.0.0.1:40405/device/params/<instance_type : diskfree.disk_usage, ...>
     Response (application/json) : 
     {
         "xpl_stat": [],

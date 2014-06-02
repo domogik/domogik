@@ -30,7 +30,7 @@ Example: ::
             "client_id": "domogik-aplugin.ahostname",
             "commands": {...},
             "description": "a description",
-            "device_type_id": "a.device.type",
+            "instance_type_id": "a.device.type",
             "id": 666,
             "name": "a name for the device"
             "parameters": {...},
@@ -45,7 +45,7 @@ Example: ::
 * client_id : this is the client (a plugin on a server for example) for which the device has been created.
 * commands : the list of the availables commands for the device.
 * description : the device description.
-* device_type_id : the id of the device type choosen during the device creation. The list of commands and sensors are related to the device type choosen on the device creation.
+* instance_type_id : the id of the instance type choosen during the device creation. The list of commands and sensors are related to the instance type choosen on the device creation.
 * id : the device id.
 * name : the device name.
 * parameters : some parameters which are not related to the device itself. It can be a polling delay for example. In the plugin diskfree, each device has an *interval* parameter which is the time between 2 disk space analysis.
@@ -78,7 +78,7 @@ This example come from the *velbus* plugin: ::
                 }
             }, 
             "description": "", 
-            "device_type_id": "velbus.dimmer", 
+            "instance_type_id": "velbus.dimmer", 
             "id": 2, 
             "name": "Vt", 
             "parameters": {}, 
@@ -163,7 +163,7 @@ Example: ::
         "client_id": "domogik-aplugin.ahostname",
         "commands": {...},
         "description": "a description",
-        "device_type_id": "a.device.type",
+        "instance_type_id": "a.device.type",
         "id": 666,
         "name": "a name for the device"
         "parameters": {...},
@@ -191,13 +191,13 @@ Example: ::
         client_id=The client id
         description=some description about the device
         reference=some reference about the device
-        device_type=the type of the device we want to create (diskfree.disk_usage, ...)
+        instance_type=the type of the device we want to create (diskfree.disk_usage, ...)
     Response (application/json):
     {
         "client_id": "domogik-aplugin.ahostname",
         "commands": {...},
         "description": "a description",
-        "device_type_id": "a.device.type",
+        "instance_type_id": "a.device.type",
         "id": 666,
         "name": "a name for the device"
         "parameters": {...},
@@ -236,7 +236,7 @@ Example: ::
         "client_id": "domogik-aplugin.ahostname",
         "commands": {...},
         "description": "a description",
-        "device_type_id": "a.device.type",
+        "instance_type_id": "a.device.type",
         "id": 666,
         "name": "a name for the device"
         "parameters": {...},
@@ -261,7 +261,7 @@ Example: ::
         "client_id": "domogik-aplugin.ahostname",
         "commands": {...},
         "description": "a description",
-        "device_type_id": "a.device.type",
+        "instance_type_id": "a.device.type",
         "id": 666,
         "name": "a name for the device"
         "parameters": {...},

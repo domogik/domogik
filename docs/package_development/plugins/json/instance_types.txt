@@ -1,20 +1,20 @@
 ============================================
-info.json for plugins - device_types section
+info.json for plugins - instance_types section
 ============================================
 
 Purpose
 =======
 
-The device_types section describes all the device types that are handled by the plugin. A *device type* is a sort of device (for example an analog input, a digital input, a temperature sensor, a temperature and humidity sensor, ...). 
-A device type is linked to some *commands* and some *sensors*. For example, a temperature sensor will have only a temperature  sensor. A temperature and humidity sensor will have 2 sensors : a temperature sensor and a humidity sensor. In some technologies, an on/off lighting device type will have 1 command : on/off (which may be named switch) and a dimmer device type will have 2 commands: on/off (switch) and dimmer (which could be simply named dimmer).
-Finally a device type has some parameters. For simple device type, there will be only one parameter : the device address. For some complex device type (some KNX or Chacon devices for example), you will have several parameters : the address which is split in 2 parts (chacon devices), the actuator address which is not the same as the sensor one (KNX devices), ...
+The instance_types section describes all the instance types that are handled by the plugin. An *instance type* is a sort of device (for example an analog input, a digital input, a temperature sensor, a temperature and humidity sensor, ...). 
+An instance type is linked to some *commands* and some *sensors*. For example, a temperature sensor will have only a temperature  sensor. A temperature and humidity sensor will have 2 sensors : a temperature sensor and a humidity sensor. In some technologies, an on/off lighting instance type will have 1 command : on/off (which may be named switch) and a dimmer instance type will have 2 commands: on/off (switch) and dimmer (which could be simply named dimmer).
+Finally an instance type has some parameters. For simple instance type, there will be only one parameter : the device address. For some complex instance type (some KNX or Chacon devices for example), you will have several parameters : the address which is split in 2 parts (chacon devices), the actuator address which is not the same as the sensor one (KNX devices), ...
 
 The known datatypes can be found in /var/lib/domogik/resources/datatypes.json.
 
 Example 1
 =========
 
-This example is the *diskfree* plugin. This plugin has only one device type named *diskfree.disk_usage*. This device type feature is to look at the disk space status on a filesystem. There are 4 informations which are available for this feature: 
+This example is the *diskfree* plugin. This plugin has only one instance type named *diskfree.disk_usage*. This instance type feature is to look at the disk space status on a filesystem. There are 4 informations which are available for this feature: 
 
 * the total space available
 * the free space available
@@ -23,14 +23,14 @@ This example is the *diskfree* plugin. This plugin has only one device type name
 
 These 4 informations are here given by 4 sensors.
 
-To check these sensors the plugin need 2 information for the device type:
+To check these sensors the plugin need 2 information for the instance type:
 
 * the path to look at on the filesystem
 * the interval between each check
 
 ::
 
-        "device_types": {
+        "instance_types": {
             "diskfree.disk_usage": {
                 "description": "Disk usage",
                 "id": "diskfree.disk_usage",
@@ -58,12 +58,12 @@ To check these sensors the plugin need 2 information for the device type:
 Description
 -----------
 
-* *id* : this is the device type id
-* *name* : the device type name
-* *description* : a short description of the device type
-* *commands* : the list of commands supported by this device type
-* *sensors* : the list of sensors supported by this device type
-* *params* : list of parameters that are common to ALL xpl messages for this device type
+* *id* : this is the instance type id
+* *name* : the instance type name
+* *description* : a short description of the instance type
+* *commands* : the list of commands supported by this instance type
+* *sensors* : the list of sensors supported by this instance type
+* *params* : list of parameters that are common to ALL xpl messages for this instance type
 
   * *key* : the xpl key for the message
   * *xpl* : is this an xpl parameter or nit, if set to true this parameter will be included in the xplcommands and expected in the xplstats/triggers, if set to false it will only be availble internal in domogik or in the plugin if it requests the devices

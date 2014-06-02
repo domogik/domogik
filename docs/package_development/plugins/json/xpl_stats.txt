@@ -10,7 +10,7 @@ The xpl_stats section will describe all xPL messages that may be received by som
 Example 1
 =========
 
-This example is the *diskfree* plugin. See the :doc:`device types documentation <device_types>` for more informations.
+This example is the *diskfree* plugin. See the :doc:`instance types documentation <instance_types>` for more informations.
 
 ::
 

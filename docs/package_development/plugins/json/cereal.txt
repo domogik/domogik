@@ -125,8 +125,8 @@ These data will be inserted in database during the package installation.
   * description : short description of the technology.
 
 
-Device types
-------------
+Instance types
+--------------
 
 ========================================== ======= =========
 Package type :                             Plugin  External 
@@ -138,7 +138,7 @@ Example
 *******
 ::
 
-        "device_types": {
+        "instance_types": {
             "onewire.thermometer" {
                 "description": "Thermometer",
                 "id": "onewire.thermometer",
@@ -161,14 +161,14 @@ Description
 ***********
 These data will be inserted in database during the package installation.
 
-* device_types : dictionary of device types, indexed on device_type id
+* instance_types : dictionary of instance types, indexed on instance_type id
 
-  * id : device type id
-  * name : device type name
-  * description :  short description of the device type
-  * commands : list of commands supported by this device type
-  * sensors : list of sensors supported by this device type
-  * params : list of parameters that are common to ALL xpl messages for this device type
+  * id : instance type id
+  * name : instance type name
+  * description :  short description of the instance type
+  * commands : list of commands supported by this instance type
+  * sensors : list of sensors supported by this instance type
+  * params : list of parameters that are common to ALL xpl messages for this instance type
 	* key : the xpl key for the message
         * description :  short description of this field
         * type : the value type for this field 
