@@ -38,7 +38,7 @@ Implements
 from domogik import __version__ as DMG_VERSION
 from domogik.common import logger
 from domogik.common.configloader import Loader
-from domogik.xpl.common.plugin import PACKAGES_DIR
+from domogik.common.plugin import PACKAGES_DIR
 from domogik.common.packagejson import PackageJson, PackageException
 from argparse import ArgumentParser
 import re
