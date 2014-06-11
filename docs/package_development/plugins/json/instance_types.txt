@@ -37,7 +37,7 @@ To check these sensors the plugin need 2 information for the instance type:
                 "name": "Disk usage",
                 "commands": [],
                 "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"],
-                "params": [
+                "parameters": [
                     {  
                         "key": "device",
                         "xpl": true,
@@ -63,7 +63,7 @@ Description
 * *description* : a short description of the instance type
 * *commands* : the list of commands supported by this instance type
 * *sensors* : the list of sensors supported by this instance type
-* *params* : list of parameters that are common to ALL xpl messages for this instance type
+* *parameters* : list of parameters that are common to ALL xpl messages for this instance type
 
   * *key* : the xpl key for the message
   * *xpl* : is this an xpl parameter or nit, if set to true this parameter will be included in the xplcommands and expected in the xplstats/triggers, if set to false it will only be availble internal in domogik or in the plugin if it requests the devices
