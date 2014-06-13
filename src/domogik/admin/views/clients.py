@@ -299,9 +299,9 @@ def client_devices_new(client_id):
     else:
         dtypes = list(data["instance_types"].keys())
     products = {}
-    if "products" in data:
-        for prod in data["products"]:
-            products[prod["name"]] = prod["type"]
+    #if "products" in data:
+    #    for prod in data["products"]:
+    #        products[prod["name"]] = prod["type"]
  
     return render_template('client_device_new.html',
             instance_types = dtypes,

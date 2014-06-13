@@ -11,13 +11,13 @@
         {% endfor %}
     {% endif %}
 
-    {% if device_types|length > 0 %}
-    <h3>{% trans %}Create by device type{% endtrans %}</h3>
-        {% for dev in device_types %}
+    {% if instance_types|length > 0 %}
+    <h3>{% trans %}Create by instance type{% endtrans %}</h3>
+        {% for dev in instance_types %}
         <a href="/client/{{ clientid }}/devices/new/type/{{ dev }}"><button type="button" class="btn btn-default btn-sm">{{ dev }}</button></a>
         {% endfor %}
     {% else %}
-    <div class="alert alert-warning">{% trans %}No device types found{% endtrans %}</div>
+    <div class="alert alert-warning">{% trans %}No instance types found{% endtrans %}</div>
     {% endif %}
 </div>
 {% endblock %}
