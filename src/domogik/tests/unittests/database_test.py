@@ -65,13 +65,13 @@ class GenericTestCase(unittest.TestCase):
                 found = found + 1
         return found == len(item_name_list)
 
-    def remove_all_devices(self):
-        for device in db.list_devices():
-            db.del_device(device.id)
+    def remove_all_instances(self):
+        for instance in db.list_instances():
+            db.del_instance(instance.id)
 
-    def remove_all_device_usages(self):
-        for du in db.list_device_usages():
-            db.del_device_usage(du.id, cascade_delete=True)
+    def remove_all_instance_usages(self):
+        for du in db.list_instance_usages():
+            db.del_instance_usage(du.id, cascade_delete=True)
 
     def remove_all_instance_types(self):
         for dty in db.list_instance_types():
@@ -81,13 +81,13 @@ class GenericTestCase(unittest.TestCase):
         for plc in db.list_all_plugin_config():
             db.del_plugin_config(plc.id, plc.hostname)
 
-    def remove_all_device_technologies(self):
-        for dt in db.list_device_technologies():
-            db.del_device_technology(dt.id, cascade_delete=True)
+    def remove_all_instance_technologies(self):
+        for dt in db.list_instance_technologies():
+            db.del_instance_technology(dt.id, cascade_delete=True)
 
-    def remove_all_device_stats(self):
-        for device in db.list_devices():
-            db.del_device_stats(device.id)
+    def remove_all_instance_stats(self):
+        for instance in db.list_instances():
+            db.del_instance_stats(instance.id)
 
     def remove_all_persons(self):
         for person in db.list_persons():
@@ -98,53 +98,53 @@ class GenericTestCase(unittest.TestCase):
             db.del_user_account(user.id)
 
 class DeviceUsageTestCase(GenericTestCase):
-    """Test device usages"""
+    """Test instance usages"""
 
     def setUp(self):
-        self.remove_all_device_usages()
+        self.remove_all_instance_usages()
 
     def tearDown(self):
-        self.remove_all_device_usages()
+        self.remove_all_instance_usages()
 
     def test_empty_list(self):
-        assert len(db.list_device_usages()) == 0
+        assert len(db.list_instance_usages()) == 0
 
     def test_add(self):
-        du1 = db.add_device_usage(du_id='du1_id', du_name='du1', du_description='desc1',
+        du1 = db.add_instance_usage(du_id='du1_id', du_name='du1', du_description='desc1',
                                   du_default_options='def opt1')
         print(du1)
         assert du1.name == 'du1'
         assert du1.description == 'desc1'
         assert du1.default_options == 'def opt1'
-        du2 = db.add_device_usage(du_id='du2_id', du_name='du2')
-        assert len(db.list_device_usages()) == 2
-        assert self.has_item(db.list_device_usages(), ['du1', 'du2'])
+        du2 = db.add_instance_usage(du_id='du2_id', du_name='du2')
+        assert len(db.list_instance_usages()) == 2
+        assert self.has_item(db.list_instance_usages(), ['du1', 'du2'])
 
     def test_update(self):
-        du = db.add_device_usage(du_id='du1_id', du_name='du1')
-        du_u = db.update_device_usage(du_id=du.id, du_name='du2', du_description='description 2',
+        du = db.add_instance_usage(du_id='du1_id', du_name='du1')
+        du_u = db.update_instance_usage(du_id=du.id, du_name='du2', du_description='description 2',
                                       du_default_options='def opt2')
         assert du_u.name == 'du2'
         assert du_u.description == 'description 2'
         assert du_u.default_options == 'def opt2'
-        du_u = db.update_device_usage(du_id=du.id, du_description='', du_default_options='')
+        du_u = db.update_instance_usage(du_id=du.id, du_description='', du_default_options='')
         assert du_u.description is None
         assert du_u.default_options is None
 
     def test_list_and_get(self):
-        du1 = db.add_device_usage(du_id='du1_id', du_name='du1')
-        assert db.get_device_usage_by_name('Du1').name == 'du1'
+        du1 = db.add_instance_usage(du_id='du1_id', du_name='du1')
+        assert db.get_instance_usage_by_name('Du1').name == 'du1'
 
     def test_del(self):
-        du1 = db.add_device_usage(du_id='du1_id', du_name='du1')
-        du2 = db.add_device_usage(du_id='du2_id', du_name='du2')
+        du1 = db.add_instance_usage(du_id='du1_id', du_name='du1')
+        du2 = db.add_instance_usage(du_id='du2_id', du_name='du2')
         du2_id = du2.id
-        du_del = db.del_device_usage(du2.id)
-        assert self.has_item(db.list_device_usages(), ['du1'])
-        assert not self.has_item(db.list_device_usages(), ['du2'])
+        du_del = db.del_instance_usage(du2.id)
+        assert self.has_item(db.list_instance_usages(), ['du1'])
+        assert not self.has_item(db.list_instance_usages(), ['du2'])
         assert du_del.id == du2_id
         try:
-            db.del_device_usage(12345678910)
+            db.del_instance_usage(12345678910)
             TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
         except DbHelperException:
             pass
@@ -154,7 +154,7 @@ class InstanceTypeTestCase(GenericTestCase):
 
     def setUp(self):
         self.remove_all_instance_types()
-        self.remove_all_device_technologies()
+        self.remove_all_instance_technologies()
 
     def tearDown(self):
         self.remove_all_instance_types()
@@ -163,49 +163,49 @@ class InstanceTypeTestCase(GenericTestCase):
         assert len(db.list_instance_types()) == 0
 
     def test_add(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
+        dt1 = db.add_instance_technology('x10', 'x10', 'desc dt1')
         try:
             db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=u'99999999999')
-            TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
+            TestCase.fail(self, "An exception should have been raised : instance techno id does not exist")
         except DbHelperException:
             pass
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         print(dty1)
         assert dty1.name == 'Switch'
         assert dty1.description == 'desc1'
-        assert dty1.device_technology_id == dt1.id
+        assert dty1.instance_technology_id == dt1.id
         dty2 = db.add_instance_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
         assert len(db.list_instance_types()) == 2
         assert self.has_item(db.list_instance_types(), ['Switch', 'Dimmer'])
 
     def test_update(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dt2 = db.add_device_technology('plcbus', 'PLCBus', 'desc dt2')
+        dt1 = db.add_instance_technology('x10', 'x10', 'desc dt1')
+        dt2 = db.add_instance_technology('plcbus', 'PLCBus', 'desc dt2')
         dty = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         try:
             db.update_instance_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=u'99999999999')
-            TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
+            TestCase.fail(self, "An exception should have been raised : instance techno id does not exist")
         except DbHelperException:
             pass
         dty_u = db.update_instance_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=dt2.id, dty_description='desc2')
         assert dty_u.name == 'x10 Dimmer'
         assert dty_u.description == 'desc2'
-        assert dty_u.device_technology_id == dt2.id
+        assert dty_u.instance_technology_id == dt2.id
 
     def test_list_and_get(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
+        dt1 = db.add_instance_technology('x10', 'x10', 'desc dt1')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         assert db.get_instance_type_by_id('x10.switch').name == 'Switch'
         assert db.get_instance_type_by_name('Switch').name == 'Switch'
 
     def test_del(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
+        dt1 = db.add_instance_technology('x10', 'x10', 'desc dt1')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id)
         dty2 = db.add_instance_type(dty_id='x10.dimmer', dty_name='Dimmer', dt_id=dt1.id)
         dty2_id = dty2.id
         dty_del = db.del_instance_type(dty2.id)
         assert self.has_item(db.list_instance_types(), ['Switch'])
-        assert not self.has_item(db.list_device_usages(), ['x10 Dimmer'])
+        assert not self.has_item(db.list_instance_usages(), ['x10 Dimmer'])
         assert dty_del.id == dty2_id
         try:
             db.del_instance_type(12345678910)
@@ -214,49 +214,49 @@ class InstanceTypeTestCase(GenericTestCase):
             pass
 
 class DeviceTechnologyTestCase(GenericTestCase):
-    """Test device technologies"""
+    """Test instance technologies"""
 
     def setUp(self):
-        self.remove_all_device_technologies()
+        self.remove_all_instance_technologies()
 
     def tearDown(self):
-        self.remove_all_device_technologies()
+        self.remove_all_instance_technologies()
 
     def test_empty_list(self):
-        assert len(db.list_device_technologies()) == 0
+        assert len(db.list_instance_technologies()) == 0
 
     def test_add(self):
-        dt1 = db.add_device_technology('1wire', '1-Wire', 'desc dt1')
+        dt1 = db.add_instance_technology('1wire', '1-Wire', 'desc dt1')
         print(dt1)
         assert dt1.id == '1wire'
         assert dt1.name == '1-Wire'
         assert dt1.description == 'desc dt1'
-        dt2 = db.add_device_technology('x10', 'x10', 'desc dt2')
-        dt3 = db.add_device_technology('plcbus', 'PLCBus', 'desc dt3')
-        assert len(db.list_device_technologies()) == 3
-        assert self.has_item(db.list_device_technologies(), ['x10', '1-Wire', 'PLCBus'])
+        dt2 = db.add_instance_technology('x10', 'x10', 'desc dt2')
+        dt3 = db.add_instance_technology('plcbus', 'PLCBus', 'desc dt3')
+        assert len(db.list_instance_technologies()) == 3
+        assert self.has_item(db.list_instance_technologies(), ['x10', '1-Wire', 'PLCBus'])
 
     def test_update(self):
-        dt = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dt_u = db.update_device_technology(dt.id, dt_description='desc dt2')
+        dt = db.add_instance_technology('x10', 'x10', 'desc dt1')
+        dt_u = db.update_instance_technology(dt.id, dt_description='desc dt2')
         assert dt_u.description == 'desc dt2'
 
     def test_list_and_get(self):
-        dt2 = db.add_device_technology('1wire', '1-Wire', 'desc dt2')
-        assert db.get_device_technology_by_id('1wire').id == '1wire'
+        dt2 = db.add_instance_technology('1wire', '1-Wire', 'desc dt2')
+        assert db.get_instance_technology_by_id('1wire').id == '1wire'
 
     def test_del(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dt2 = db.add_device_technology('1wire', '1-Wire', 'desc dt2')
+        dt1 = db.add_instance_technology('x10', 'x10', 'desc dt1')
+        dt2 = db.add_instance_technology('1wire', '1-Wire', 'desc dt2')
         dt_del = dt2
         dt2_id = dt2.id
-        dt3 = db.add_device_technology('plcbus', 'PLCBus', 'desc dt3')
-        db.del_device_technology(dt2.id)
-        assert self.has_item(db.list_device_technologies(), ['x10', 'PLCBus'])
-        assert not self.has_item(db.list_device_technologies(), ['1-Wire'])
+        dt3 = db.add_instance_technology('plcbus', 'PLCBus', 'desc dt3')
+        db.del_instance_technology(dt2.id)
+        assert self.has_item(db.list_instance_technologies(), ['x10', 'PLCBus'])
+        assert not self.has_item(db.list_instance_technologies(), ['1-Wire'])
         assert dt_del.id == dt2_id
         try:
-            db.del_device_technology(12345678910)
+            db.del_instance_technology(12345678910)
             TestCase.fail(self, "Device technology does not exist, an exception should have been raised")
         except DbHelperException:
             pass
@@ -322,230 +322,230 @@ class PluginConfigTestCase(GenericTestCase):
 
 
 class DeviceTestCase(GenericTestCase):
-    """Test device"""
+    """Test instance"""
 
     def setUp(self):
-        self.remove_all_device_usages()
-        self.remove_all_devices()
-        self.remove_all_device_technologies()
+        self.remove_all_instance_usages()
+        self.remove_all_instances()
+        self.remove_all_instance_technologies()
 
     def tearDown(self):
-        self.remove_all_device_usages()
-        self.remove_all_devices()
-        self.remove_all_device_technologies()
+        self.remove_all_instance_usages()
+        self.remove_all_instances()
+        self.remove_all_instance_technologies()
 
     def test_empty_list(self):
-        assert len(db.list_devices()) == 0
+        assert len(db.list_instances()) == 0
 
     def test_add(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        du1 = db.add_device_usage('du1_id', 'du1')
+        dt1 = db.add_instance_technology('x10', 'x10', 'desc dt1')
+        du1 = db.add_instance_usage('du1_id', 'du1')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         try:
-            db.add_device(d_name='device1', d_address = 'A1', d_type_id = u'9999999999', d_usage_id = du1.id)
+            db.add_instance(d_name='instance1', d_address = 'A1', d_type_id = u'9999999999', d_usage_id = du1.id)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
-            db.add_device(d_name='device1', d_address = 'A1', d_type_id = dty1.id, d_usage_id = u'9999999999999')
+            db.add_instance(d_name='instance1', d_address = 'A1', d_type_id = dty1.id, d_usage_id = u'9999999999999')
             TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
         except DbHelperException:
             pass
-        device1 = db.add_device(d_name='device1', d_address='A1',
+        instance1 = db.add_instance(d_name='instance1', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
-        assert device1.name == 'device1' and device1.description == 'desc1'
-        print(device1)
-        assert len(db.list_devices()) == 1
-        device2 = db.add_device(d_name='device2', d_address='A2',
+        assert instance1.name == 'instance1' and instance1.description == 'desc1'
+        print(instance1)
+        assert len(db.list_instances()) == 1
+        instance2 = db.add_instance(d_name='instance2', d_address='A2',
                     d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
-        assert len(db.list_devices()) == 2
+        assert len(db.list_instances()) == 2
 
     def test_list_and_get(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'x10 instance type')
-        dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus instance type')
-        du1 = db.add_device_usage('appliance', 'Appliance')
+        dt1 = db.add_instance_technology('x10', 'x10', 'x10 instance type')
+        dt2 = db.add_instance_technology('plcbus', 'PLCBus', 'PLCBus instance type')
+        du1 = db.add_instance_usage('appliance', 'Appliance')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id,
                                   dty_description='My beautiful switch')
         dty2 = db.add_instance_type(dty_id='plcbus.switch', dty_name='Switch', dt_id=dt2.id,
                                   dty_description='Another beautiful switch')
-        device1 = db.add_device(d_name='Toaster', d_address='A1',
+        instance1 = db.add_instance(d_name='Toaster', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
-        device2 = db.add_device(d_name='Washing machine', d_address='A1',
+        instance2 = db.add_instance(d_name='Washing machine', d_address='A1',
                                 d_type_id=dty2.id, d_usage_id=du1.id, d_description='Laden')
-        device3 = db.add_device(d_name='Mixer', d_address='A2',
+        instance3 = db.add_instance(d_name='Mixer', d_address='A2',
                                 d_type_id=dty2.id, d_usage_id=du1.id, d_description='Moulinex')
-        search_dev1 = db.get_device_by_technology_and_address(dt1.id, 'A1')
+        search_dev1 = db.get_instance_by_technology_and_address(dt1.id, 'A1')
         assert search_dev1.name == 'Toaster'
-        search_dev2 = db.get_device_by_technology_and_address(dt1.id, 'A2')
+        search_dev2 = db.get_instance_by_technology_and_address(dt1.id, 'A2')
         assert search_dev2 == None
 
     def test_update(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
+        dt1 = db.add_instance_technology('x10', 'x10', 'desc dt1')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage('du1_id', 'du1')
-        device1 = db.add_device(d_name='device1', d_address='A1',
+        du1 = db.add_instance_usage('du1_id', 'du1')
+        instance1 = db.add_instance(d_name='instance1', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
-        device_id = device1.id
+        instance_id = instance1.id
         try:
-            db.update_device(d_id=device1.id, d_usage_id=u'9999999999999')
+            db.update_instance(d_id=instance1.id, d_usage_id=u'9999999999999')
             TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
         except DbHelperException:
             pass
-        device1 = db.update_device(d_id=device1.id, d_description='desc2', d_reference='A1')
-        device1 = db.get_device(device_id)
-        assert device1.description == 'desc2'
-        assert device1.reference == 'A1'
-        assert device1.device_usage_id == du1.id
-        du2 = db.add_device_usage('du2_id', 'du2')
-        device1 = db.update_device(d_id=device1.id, d_reference='', d_usage_id=du2.id)
-        assert device1.reference == None
-        assert device1.device_usage_id == du2.id
+        instance1 = db.update_instance(d_id=instance1.id, d_description='desc2', d_reference='A1')
+        instance1 = db.get_instance(instance_id)
+        assert instance1.description == 'desc2'
+        assert instance1.reference == 'A1'
+        assert instance1.instance_usage_id == du1.id
+        du2 = db.add_instance_usage('du2_id', 'du2')
+        instance1 = db.update_instance(d_id=instance1.id, d_reference='', d_usage_id=du2.id)
+        assert instance1.reference == None
+        assert instance1.instance_usage_id == du2.id
 
     def test_del(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
+        dt1 = db.add_instance_technology('x10', 'x10', 'desc dt1')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage('du1_id', 'du1')
-        du2 = db.add_device_usage('du2_id', 'du2')
-        device1 = db.add_device(d_name='device1', d_address='A1',
+        du1 = db.add_instance_usage('du1_id', 'du1')
+        du2 = db.add_instance_usage('du2_id', 'du2')
+        instance1 = db.add_instance(d_name='instance1', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
-        device2 = db.add_device(d_name='device2', d_address='A2',
+        instance2 = db.add_instance(d_name='instance2', d_address='A2',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
 
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device2.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device2.id)
-        assert len(db.list_device_stats(device2.id)) == 2
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, instance2.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, instance2.id)
+        assert len(db.list_instance_stats(instance2.id)) == 2
 
-        device3 = db.add_device(d_name='device3', d_address='A3', d_type_id=dty1.id, d_usage_id=du1.id)
-        device_del = device2
-        device2_id = device2.id
-        db.del_device(device2.id)
+        instance3 = db.add_instance(d_name='instance3', d_address='A3', d_type_id=dty1.id, d_usage_id=du1.id)
+        instance_del = instance2
+        instance2_id = instance2.id
+        db.del_instance(instance2.id)
         # Check cascade deletion
-        assert len(db.list_device_stats(device2.id)) == 0
-        assert len(db.list_devices()) == 2
-        for dev in db.list_devices():
+        assert len(db.list_instance_stats(instance2.id)) == 0
+        assert len(db.list_instances()) == 2
+        for dev in db.list_instances():
             assert dev.address in ('A1', 'A3')
-        assert device_del.id == device2.id
+        assert instance_del.id == instance2.id
         try:
-            db.del_device(12345678910)
+            db.del_instance(12345678910)
             TestCase.fail(self, "Device does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
 class DeviceStatsTestCase(GenericTestCase):
-    """Test device stats"""
+    """Test instance stats"""
 
     def setUp(self):
-        self.remove_all_device_usages()
-        self.remove_all_device_technologies()
-        self.remove_all_device_stats()
+        self.remove_all_instance_usages()
+        self.remove_all_instance_technologies()
+        self.remove_all_instance_stats()
 
     def tearDown(self):
-        self.remove_all_device_usages()
-        self.remove_all_device_technologies()
-        self.remove_all_device_stats()
+        self.remove_all_instance_usages()
+        self.remove_all_instance_technologies()
+        self.remove_all_instance_stats()
 
     def test_empty_list(self):
-        assert len(db.list_device_stats()) == 0
-        assert db.device_has_stats() == False
+        assert len(db.list_instance_stats()) == 0
+        assert db.instance_has_stats() == False
 
 
-    def __has_stat_values(self, device_stats_values, expected_values):
-        if len(device_stats_values) != len(expected_values): return False
-        for item in device_stats_values:
+    def __has_stat_values(self, instance_stats_values, expected_values):
+        if len(instance_stats_values) != len(expected_values): return False
+        for item in instance_stats_values:
             if item.value not in expected_values: return False
         return True
 
     def test_add_list_get(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
+        dt1 = db.add_instance_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage('lighting', 'Lighting')
+        du1 = db.add_instance_usage('lighting', 'Lighting')
 
-        # Add device stats
-        device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
-        device2 = db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
-        ds1 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 0, device1.id)
+        # Add instance stats
+        instance1 = db.add_instance(d_name='instance1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
+        instance2 = db.add_instance(d_name='instance2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
+        ds1 = db.add_instance_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 0, instance1.id)
         print(ds1)
         assert ds1.skey == 'val1' and ds1.value == '0'
         assert ds1.timestamp == make_ts(2010, 04, 9, 12, 0)
-        ds2 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val_char', 'plop', device1.id)
+        ds2 = db.add_instance_stat(make_ts(2010, 04, 9, 12, 0), 'val_char', 'plop', instance1.id)
         assert ds2.skey == 'val_char' and ds2.value == 'plop'
 
-        # Add for device1
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 3, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val1', 4, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val2', 5, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 6, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val2', 7, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 8, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val2', 9, device1.id)
+        # Add for instance1
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 3, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 2), 'val1', 4, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 2), 'val2', 5, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 6, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 3), 'val2', 7, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 8, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 4), 'val2', 9, instance1.id)
 
-        # Add for device2
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 100, device2.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 200, device2.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 300, device2.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 400, device2.id)
+        # Add for instance2
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 100, instance2.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 200, instance2.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 300, instance2.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 400, instance2.id)
 
-        assert db.get_last_stat_of_device( device1.id, 'val1').value == '8'
-        assert db.get_last_stat_of_device( device1.id, 'val2').value == '9'
+        assert db.get_last_stat_of_instance( instance1.id, 'val1').value == '8'
+        assert db.get_last_stat_of_instance( instance1.id, 'val2').value == '9'
 
-        stats_l = db.list_last_n_stats_of_device(device1.id,'val1', 3)
+        stats_l = db.list_last_n_stats_of_instance(instance1.id,'val1', 3)
         assert len(stats_l) == 3
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
 
-        stats_l = db.list_stats_of_device_between_by_key( device1.id, 'val1', make_ts(2010, 04, 9, 12, 2),
+        stats_l = db.list_stats_of_instance_between_by_key( instance1.id, 'val1', make_ts(2010, 04, 9, 12, 2),
                                                          make_ts(2010, 04, 9, 12, 4))
         assert len(stats_l) == 3
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
-        stats_l = db.list_stats_of_device_between_by_key(device1.id, 'val1',
+        stats_l = db.list_stats_of_instance_between_by_key(instance1.id, 'val1',
                                                          make_ts(2010, 04, 9, 12, 3))
         assert len(stats_l) == 2
         assert stats_l[0].value == '6' and stats_l[1].value == '8'
-        stats_l = db.list_stats_of_device_between_by_key(device1.id, 'val1', 
+        stats_l = db.list_stats_of_instance_between_by_key(instance1.id, 'val1', 
                                                          end_date_ts=make_ts(2010, 04, 9, 12, 2))
         assert len(stats_l) == 3
         assert stats_l[0].get_date_as_timestamp() == 1270810800.0
 
-        # Verify for unified list_device_stats
-        assert len(db.list_device_stats()) == 15
-        assert len(db.list_device_stats(None, None)) == 15
-        assert len(db.list_device_stats(device1.id)) == 11
-        assert len(db.list_device_stats(device2.id)) == 4
-        assert len(db.list_device_stats(device1.id,'val1')) == 5
-        assert len(db.list_device_stats(device1.id,'val2')) == 5
-        assert len(db.list_device_stats(device2.id,'val1')) == 2
-        assert len(db.list_device_stats(device2.id,'val2')) == 2
-        assert len(db.list_device_stats(None,'val1')) == 7
-        assert len(db.list_device_stats(None,'val2')) == 7
+        # Verify for unified list_instance_stats
+        assert len(db.list_instance_stats()) == 15
+        assert len(db.list_instance_stats(None, None)) == 15
+        assert len(db.list_instance_stats(instance1.id)) == 11
+        assert len(db.list_instance_stats(instance2.id)) == 4
+        assert len(db.list_instance_stats(instance1.id,'val1')) == 5
+        assert len(db.list_instance_stats(instance1.id,'val2')) == 5
+        assert len(db.list_instance_stats(instance2.id,'val1')) == 2
+        assert len(db.list_instance_stats(instance2.id,'val2')) == 2
+        assert len(db.list_instance_stats(None,'val1')) == 7
+        assert len(db.list_instance_stats(None,'val2')) == 7
 
-        assert db.device_has_stats() == True
-        assert db.device_has_stats(None, None) == True
-        assert db.device_has_stats(device1.id,'val1') == True
-        assert db.device_has_stats(device1.id,'val3') == False
+        assert db.instance_has_stats() == True
+        assert db.instance_has_stats(None, None) == True
+        assert db.instance_has_stats(instance1.id,'val1') == True
+        assert db.instance_has_stats(instance1.id,'val3') == False
 
     def test_add_with_hist_size(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
+        dt1 = db.add_instance_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage('lighting', 'Lighting')
-        device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1000, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 1, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val1', 2, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 3, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 4, device1.id)
-        assert len(db.list_device_stats(device1.id)) == 5
-        assert len(db.list_device_stats(device1.id,'val1' )) == 4
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 5), 'val1', 5, device1.id, 2)
-        stat_list = db.list_device_stats( device1.id,'val1')
+        du1 = db.add_instance_usage('lighting', 'Lighting')
+        instance1 = db.add_instance(d_name='instance1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1000, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 1, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 2), 'val1', 2, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 3, instance1.id)
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 4, instance1.id)
+        assert len(db.list_instance_stats(instance1.id)) == 5
+        assert len(db.list_instance_stats(instance1.id,'val1' )) == 4
+        db.add_instance_stat(make_ts(2010, 04, 9, 12, 5), 'val1', 5, instance1.id, 2)
+        stat_list = db.list_instance_stats( instance1.id,'val1')
         assert len(stat_list) == 2
         for stat in stat_list:
             assert stat.value in ['4', '5']
-        assert len(db.list_device_stats(device1.id)) == 3
+        assert len(db.list_instance_stats(instance1.id)) == 3
 
     def test_filter(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
+        dt1 = db.add_instance_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage('lighting', 'Lighting')
-        device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
-        device2 = db.add_device(d_name='device2', d_address = "A2", d_type_id = dty1.id, d_usage_id = du1.id)
+        du1 = db.add_instance_usage('lighting', 'Lighting')
+        instance1 = db.add_instance(d_name='instance1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
+        instance2 = db.add_instance(d_name='instance2', d_address = "A2", d_type_id = dty1.id, d_usage_id = du1.id)
 
         # Minutes
         start_p = make_ts(2010, 2, 21, 15, 48, 0)
@@ -554,15 +554,15 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            skey=u'valm', value=(i/insert_step), device_id=device1.id)
+                            skey=u'valm', value=(i/insert_step), instance_id=instance1.id)
             )
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            skey=u'valm2', value=(i/insert_step+200), device_id=device1.id)
+                            skey=u'valm2', value=(i/insert_step+200), instance_id=instance1.id)
             )
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            skey=u'valm', value=(i/insert_step+100), device_id=device2.id)
+                            skey=u'valm', value=(i/insert_step+100), instance_id=instance2.id)
             )
         db._DbHelper__session.commit()
 
@@ -576,7 +576,7 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+            results = db.filter_stats_of_instance_by_key(ds_instance_id=instance1.id,
                                                        ds_key='valm', 
                                                        start_date_ts=make_ts(2010, 2, 21, 15, 57, 0),
                                                        end_date_ts=make_ts(2010, 2, 21, 16, 3, 0),
@@ -592,7 +592,7 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            skey=u'valh', value=i/insert_step, device_id=device1.id)
+                            skey=u'valh', value=i/insert_step, instance_id=instance1.id)
             )
         db._DbHelper__session.commit()
 
@@ -610,7 +610,7 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+            results = db.filter_stats_of_instance_by_key(ds_instance_id=instance1.id,
                                                        ds_key='valh', 
                                                        start_date_ts=make_ts(2010, 6, 22, 17, 48, 0),
                                                        end_date_ts=make_ts(2010, 6, 23, 1, 48, 0),
@@ -627,7 +627,7 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            skey=u'vald', value=i/insert_step, device_id=device1.id)
+                            skey=u'vald', value=i/insert_step, instance_id=instance1.id)
             )
         db._DbHelper__session.commit()
 
@@ -641,7 +641,7 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+            results = db.filter_stats_of_instance_by_key(ds_instance_id=instance1.id,
                                                        ds_key='vald', 
                                                        start_date_ts=make_ts(2010, 6, 22, 15, 48, 0),
                                                        end_date_ts=make_ts(2010, 7, 26, 15, 48, 0),
@@ -658,7 +658,7 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            skey=u'valw', value=i/insert_step, device_id=device1.id)
+                            skey=u'valw', value=i/insert_step, instance_id=instance1.id)
             )
         db._DbHelper__session.commit()
 
@@ -672,8 +672,8 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results = db.filter_stats_of_device_by_key(ds_key='valw', 
-                                                       ds_device_id=device1.id,
+            results = db.filter_stats_of_instance_by_key(ds_key='valw', 
+                                                       ds_instance_id=instance1.id,
                                                        start_date_ts=make_ts(2010, 7, 22, 15, 48, 0),
                                                        end_date_ts=make_ts(2010, 8, 26, 15, 48, 0),
                                                        step_used='week', function_used=func)
@@ -689,7 +689,7 @@ class DeviceStatsTestCase(GenericTestCase):
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
                 DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
-                            skey=u'valmy', value=i/insert_step, device_id=device1.id)
+                            skey=u'valmy', value=i/insert_step, instance_id=instance1.id)
             )
         db._DbHelper__session.commit()
         expected_results = {
@@ -705,7 +705,7 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results =  db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+            results =  db.filter_stats_of_instance_by_key(ds_instance_id=instance1.id,
                                                         ds_key='valmy', 
                                                         start_date_ts=make_ts(2010, 6, 25, 15, 48, 0),
                                                         end_date_ts=make_ts(2011, 7, 29, 15, 48, 0),
@@ -716,7 +716,7 @@ class DeviceStatsTestCase(GenericTestCase):
                                                         and results['global_values']['avg'] == 13.5
 
         # Test with no end date
-        results =  db.filter_stats_of_device_by_key(ds_device_id=device1.id, ds_key='valmy', 
+        results =  db.filter_stats_of_instance_by_key(ds_instance_id=instance1.id, ds_key='valmy', 
                                                     start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
                                                     end_date_ts=None, step_used='month', function_used='avg')
         ym_list = [(r[0], r[1]) for r in results['values']]
@@ -737,7 +737,7 @@ class DeviceStatsTestCase(GenericTestCase):
         }
         for func in ('avg', 'min', 'max'):
             start_t = time.time()
-            results =  db.filter_stats_of_device_by_key(ds_device_id=device1.id,
+            results =  db.filter_stats_of_instance_by_key(ds_instance_id=instance1.id,
                                                         ds_key='valmy', 
                                                         start_date_ts=make_ts(2010, 6, 21, 15, 48, 0),
                                                         end_date_ts=make_ts(2012, 6, 21, 15, 48, 0),
@@ -748,31 +748,31 @@ class DeviceStatsTestCase(GenericTestCase):
                                                         and results['global_values']['avg'] == 24
 
     def test_del(self):
-        dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
+        dt1 = db.add_instance_technology('x10', 'x10', 'this is x10')
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        du1 = db.add_device_usage('lighting', 'Lighting')
-        device1 = db.add_device(d_name='device1', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
-        device2 = db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
+        du1 = db.add_instance_usage('lighting', 'Lighting')
+        instance1 = db.add_instance(d_name='instance1', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
+        instance2 = db.add_instance(d_name='instance2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
 
         now_ts = time.mktime(datetime.datetime.now().timetuple())
-        db.add_device_stat(now_ts, 'val1', '10', device1.id)
-        db.add_device_stat(now_ts, 'val2', '10.5' , device1.id)
-        db.add_device_stat(now_ts + 1, 'val1', '10', device1.id)
-        db.add_device_stat(now_ts + 1, 'val2', '10.5' , device1.id)
+        db.add_instance_stat(now_ts, 'val1', '10', instance1.id)
+        db.add_instance_stat(now_ts, 'val2', '10.5' , instance1.id)
+        db.add_instance_stat(now_ts + 1, 'val1', '10', instance1.id)
+        db.add_instance_stat(now_ts + 1, 'val2', '10.5' , instance1.id)
 
-        db.add_device_stat(now_ts + 2, 'val1', '40', device2.id)
-        db.add_device_stat(now_ts + 2, 'val2', '41' , device2.id)
+        db.add_instance_stat(now_ts + 2, 'val1', '40', instance2.id)
+        db.add_instance_stat(now_ts + 2, 'val2', '41' , instance2.id)
 
-        l_stats = db.list_device_stats(device1.id)
-        d_stats_list_d = db.del_device_stats(device1.id)
+        l_stats = db.list_instance_stats(instance1.id)
+        d_stats_list_d = db.del_instance_stats(instance1.id)
         assert len(d_stats_list_d) == len(l_stats)
-        l_stats = db.list_device_stats(device1.id)
+        l_stats = db.list_instance_stats(instance1.id)
         assert len(l_stats) == 0
-        l_stats = db.list_device_stats(device2.id)
+        l_stats = db.list_instance_stats(instance2.id)
         assert len(l_stats) == 2
-        db.del_device_stats(device2.id, 'val2')
-        assert len(db.list_device_stats(device2.id)) == 1
-        assert db.list_device_stats(device2.id)[0].value == '40'
+        db.del_instance_stats(instance2.id, 'val2')
+        assert len(db.list_instance_stats(instance2.id)) == 1
+        assert db.list_instance_stats(instance2.id)[0].value == '40'
 
 class PersonAndUserAccountsTestCase(GenericTestCase):
     """Test person and user accounts"""

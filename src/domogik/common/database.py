@@ -349,22 +349,22 @@ class DbHelper():
 ###
 # Devices
 ###
-    def list_devices(self):
-        """Return a list of devices
-        @return a list of Device objects (only the devices that are known by this realease)
+    def list_instances(self):
+        """Return a list of instances
+        @return a list of Device objects (only the instances that are known by this realease)
         """
         #return self.__session.query(Device).filter(Device.address==None).all()
-        device_list = []
-        for device in self.__session.query(Device).filter(Device.address==None).all():
-            device_list.append(self.get_device(device=device))
-        return device_list
+        instance_list = []
+        for instance in self.__session.query(Device).filter(Device.address==None).all():
+            instance_list.append(self.get_instance(instance=instance))
+        return instance_list
 
-    def list_devices_by_plugin(self, p_id):
+    def list_instances_by_plugin(self, p_id):
         #return self.__session.query(Device).filter_by(client_id=p_id).all()
-        device_list = []
-        for device in self.__session.query(Device).filter_by(client_id=p_id).all():
-            device_list.append(self.get_device(device=device))
-        return device_list
+        instance_list = []
+        for instance in self.__session.query(Device).filter_by(client_id=p_id).all():
+            instance_list.append(self.get_instance(instance=instance))
+        return instance_list
 
     def list_old_devices(self):
         """Return a list of devices
@@ -372,43 +372,43 @@ class DbHelper():
         """
         return self.__session.query(Device).filter(Device.address!=None).all()
 
-    def get_device_sql(self, d_id):
+    def get_instance_sql(self, d_id):
         return self.__session.query(Device).filter_by(id=d_id).first()
 
-    def get_device(self, d_id=None, device=None):
-        """Return a device by its id
+    def get_instance(self, d_id=None, instance=None):
+        """Return a instance by its id
 
-        @param d_id : The device id
-        @param device : The Device object (sqlalchemy)
+        @param d_id : The instance id
+        @param instance : The Device object (sqlalchemy)
         @return a Device object
 
         """
-        if device is None and d_id is not None:
-            device = self.__session.query(Device).filter_by(id=d_id).first()
+        if instance is None and d_id is not None:
+            instance = self.__session.query(Device).filter_by(id=d_id).first()
         
-        if device == None:
+        if instance == None:
             return None
-        # fill basic informations about the device
-        json_device = { 'id' : device.id, 
-                        'name' : device.name, 
-                        'reference' : device.reference, 
-                        'description' : device.description, 
-                        'instance_type_id' : device.instance_type_id, 
-                        'client_id' : device.client_id
+        # fill basic informations about the instance
+        json_instance = { 'id' : instance.id, 
+                        'name' : instance.name, 
+                        'reference' : instance.reference, 
+                        'description' : instance.description, 
+                        'instance_type_id' : instance.instance_type_id, 
+                        'client_id' : instance.client_id
                       }
         # params
-        json_device['parameters'] = {}
-        for a_param in device.params:
+        json_instance['parameters'] = {}
+        for a_param in instance.params:
             json_param = { 'id': a_param.id,
                            'key': a_param.key,
                            'type': a_param.type,
                            'value': a_param.value
                            }
-            json_device['parameters'][a_param.key] = json_param
+            json_instance['parameters'][a_param.key] = json_param
         
         # complete with sensors informations
-        json_device['sensors'] = {}
-        for a_sensor in device.sensors:
+        json_instance['sensors'] = {}
+        for a_sensor in instance.sensors:
             json_sensor = { 'id' : a_sensor.id,
                             'name' : a_sensor.name,
                             'incremental' : a_sensor.incremental,
@@ -419,11 +419,11 @@ class DbHelper():
                             'last_received' : a_sensor.last_received,
                             'reference' : a_sensor.reference
                           }
-            json_device['sensors'][a_sensor.reference] = json_sensor
+            json_instance['sensors'][a_sensor.reference] = json_sensor
 
         # complete with commands information
-        json_device['commands'] = {}
-        for a_cmd in device.commands:
+        json_instance['commands'] = {}
+        for a_cmd in instance.commands:
             json_command = {
                     'id': a_cmd.id,
                     'name': a_cmd.name,
@@ -436,11 +436,11 @@ class DbHelper():
                                                     'data_type': a_cmd_param.data_type,
                                                     'conversion': a_cmd_param.conversion
                                                 })
-            json_device['commands'][a_cmd.reference] = json_command
+            json_instance['commands'][a_cmd.reference] = json_command
 
         # complete for each xpl_stat information
-        json_device['xpl_stats'] = {}
-        for a_xplstat in device.xpl_stats:
+        json_instance['xpl_stats'] = {}
+        for a_xplstat in instance.xpl_stats:
             json_xplstat = { 'id' : a_xplstat.id,
                              'json_id' : a_xplstat.json_id,
                              'name' : a_xplstat.name,
@@ -457,7 +457,7 @@ class DbHelper():
             for a_xplstat_param in a_xplstat.params:
                 if a_xplstat_param.static == False and a_xplstat_param.sensor_id is not None:
                     if a_xplstat_param.sensor_id:
-                        for sen in device.sensors:
+                        for sen in instance.sensors:
                             if sen.id == a_xplstat_param.sensor_id:
                                 sensor_name = sen.reference
                     else:
@@ -472,11 +472,11 @@ class DbHelper():
                                                                   'value' :  a_xplstat_param.value,
                                                                 })
                  
-            json_device['xpl_stats'][a_xplstat.json_id] = json_xplstat
+            json_instance['xpl_stats'][a_xplstat.json_id] = json_xplstat
 
         # xpl_commands
-        json_device['xpl_commands'] = {}
-        for a_xplcmd in device.xpl_commands:
+        json_instance['xpl_commands'] = {}
+        for a_xplcmd in instance.xpl_commands:
             json_xplcmd = { 'id': a_xplcmd.id,
                             'name' : a_xplcmd.name,
                             'schema' : a_xplcmd.schema,
@@ -487,15 +487,15 @@ class DbHelper():
                 json_xplcmd['parameters'].append({ 'key' :  a_xplcmd_param.key,
                                                    'value' :  a_xplcmd_param.value
                                                 })
-            json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
-        return json_device
+            json_instance['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
+        return json_instance
 
 
-    def add_device_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data):
+    def add_instance_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data):
         self.log.debug(u"Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
         xplstat = XplStat(name = xplstat_in_client_data['name'], \
               schema = xplstat_in_client_data['schema'], \
-              device_id = devid, \
+              instance_id = devid, \
               json_id = a_xplstat)
         self.__session.add(xplstat)
         self.__session.flush()
@@ -533,36 +533,36 @@ class DbHelper():
         return xplstat 
 
 
-    def add_device_and_commands(self, name, instance_type, client_id, description, reference, client_data):
-        """ Create a device : fill the following tables with data from the related client json file
-            - core_device
+    def add_instance_and_commands(self, name, instance_type, client_id, description, reference, client_data):
+        """ Create a instance : fill the following tables with data from the related client json file
+            - core_instance
             - ...
         """
         created_xpl_stats = {}
 	created_sensors = {}
         self.__session.expire_all()
 
-        ### Add the device itself
-        self.log.debug(u"Device creation : inserting data in core_device...")
-        device = Device(name=name, instance_type_id=instance_type, \
+        ### Add the instance itself
+        self.log.debug(u"Device creation : inserting data in core_instance...")
+        instance = Device(name=name, instance_type_id=instance_type, \
                 client_id=client_id, client_version=client_data['identity']['version'], \
                 description=description, reference=reference)
-        self.__session.add(device)
+        self.__session.add(instance)
         self.__session.flush()
 
         ### Table core_sensor
         # first, get the sensors associated to the instance_type
         self.log.debug(u"Device creation : start to process the sensors")
         instance_type_sensors = client_data['instance_types'][instance_type]['sensors']
-        self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(instance_type_sensors))
+        self.log.debug(u"Device creation : list of sensors available for the instance : {0}".format(instance_type_sensors))
 
-        # then, for each sensor, create it in databse for the device
+        # then, for each sensor, create it in databse for the instance
         stats_list = []
         for a_sensor in instance_type_sensors:
             self.log.debug(u"Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
             sensor_in_client_data = client_data['sensors'][a_sensor]
             sensor = Sensor(name = sensor_in_client_data['name'], \
-                            device_id  = device.id, \
+                            instance_id  = instance.id, \
                             reference = a_sensor, \
                             incremental = sensor_in_client_data['incremental'], \
                             data_type = sensor_in_client_data['data_type'], \
@@ -588,7 +588,7 @@ class DbHelper():
 	    self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
 	    xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
 	    for param in xplstat_in_client_data['parameters']['dynamic']:
-		xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors, a_xplstat, xplstat_in_client_data)
+		xplstat = self.add_instance_and_commands_xplstat(instance.id, created_sensors, a_xplstat, xplstat_in_client_data)
 		created_xpl_stats[a_xplstat] = xplstat.id
 	del stats_list
 
@@ -596,13 +596,13 @@ class DbHelper():
         # first, get the commands associated to the instance_type
         self.log.debug(u"Device creation : start to process the commands")
         instance_type_commands = client_data['instance_types'][instance_type]['commands']
-        self.log.debug(u"Device creation : list of commands available for the device : {0}".format(instance_type_commands))
+        self.log.debug(u"Device creation : list of commands available for the instance : {0}".format(instance_type_commands))
 
         for a_command in instance_type_commands:
             self.log.debug(u"Device creation : inserting data in core_command for '{0}'...".format(a_command))
             command_in_client_data = client_data['commands'][a_command]
             command = Command(name = command_in_client_data['name'], \
-                              device_id = device.id, \
+                              instance_id = instance.id, \
                               reference = a_command, \
                               return_confirmation = command_in_client_data['return_confirmation'])
             self.__session.add(command)
@@ -625,12 +625,12 @@ class DbHelper():
                     xplstatid = created_xpl_stats[x_command['xplstat_name']]
                 else:
                     xplstat_in_client_data = client_data['xpl_stats'][x_command['xplstat_name']]
-                    xplstat = self.add_device_and_commands_xplstat(device.id, None, x_command['xplstat_name'], xplstat_in_client_data)
+                    xplstat = self.add_instance_and_commands_xplstat(instance.id, None, x_command['xplstat_name'], xplstat_in_client_data)
                     xplstatid = xplstat.id
                 xplcommand = XplCommand(cmd_id=command.id, \
                                         name=x_command['name'], \
                                         schema=x_command['schema'], \
-                                        device_id=device.id, stat_id=xplstatid, \
+                                        instance_id=instance.id, stat_id=xplstatid, \
                                         json_id=command_in_client_data['xpl_command'])
                 self.__session.add(xplcommand)
                 self.__session.flush()
@@ -646,87 +646,87 @@ class DbHelper():
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, False)
 
-        ### Return the created device as json
-        d = self.get_device(device.id)
+        ### Return the created instance as json
+        d = self.get_instance(instance.id)
         return d
 
-    def add_device(self, d_name, d_type_id, d_client_id, d_description=None, d_reference=None):
-        """Add a device item
+    def add_instance(self, d_name, d_type_id, d_client_id, d_description=None, d_reference=None):
+        """Add a instance item
 
-        @param d_name : name of the device
+        @param d_name : name of the instance
         @param d_type_id : instance type id (x10.Switch, x10.Dimmer, Computer.WOL...)
-        @param d_client_id : the plugin that controls this device
-        @param d_description : extended device description, optional
-        @param d_reference : device reference (ex. AM12 for x10), optional
+        @param d_client_id : the plugin that controls this instance
+        @param d_description : extended instance description, optional
+        @param d_reference : instance reference (ex. AM12 for x10), optional
         @return the new Device object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device = Device(name=d_name, description=d_description, reference=d_reference, \
+        instance = Device(name=d_name, description=d_description, reference=d_reference, \
                         instance_type_id=d_type_id, client_id=d_client_id)
-        self.__session.add(device)
+        self.__session.add(instance)
         try:
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device
+        return instance
 
-    def update_device(self, d_id, d_name=None, d_description=None, d_reference=None, d_address=None):
-        """Update a device item
+    def update_instance(self, d_id, d_name=None, d_description=None, d_reference=None, d_address=None):
+        """Update a instance item
 
         If a param is None, then the old value will be kept
 
         @param d_id : Device id
-        @param d_name : device name (optional)
+        @param d_name : instance name (optional)
         @param d_description : Extended item description (optional)
         @return the updated Device object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device = self.__session.query(Device).filter_by(id=d_id).first()
-        if device is None:
+        instance = self.__session.query(Device).filter_by(id=d_id).first()
+        if instance is None:
             self.__raise_dbhelper_exception("Device with id %s couldn't be found" % d_id)
         if d_name is not None:
-            device.name = ucode(d_name)
+            instance.name = ucode(d_name)
         if d_address is not None:
-            device.address = ucode(d_address)
+            instance.address = ucode(d_address)
         if d_description is not None:
             if d_description == '': d_description = None
-            device.description = ucode(d_description)
+            instance.description = ucode(d_description)
         if d_reference is not None:
             if d_reference == '': d_reference = None
-            device.reference = ucode(d_reference)
-        self.__session.add(device)
+            instance.reference = ucode(d_reference)
+        self.__session.add(instance)
         try:
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device
+        return instance
 
-    def del_device(self, d_id):
-        """Delete a device
+    def del_instance(self, d_id):
+        """Delete a instance
 
-        @param d_id : device id
-        @return the deleted device
+        @param d_id : instance id
+        @return the deleted instance
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        device = self.__session.query(Device).filter_by(id=d_id).first()
-        if device is None:
+        instance = self.__session.query(Device).filter_by(id=d_id).first()
+        if instance is None:
             self.__raise_dbhelper_exception("Device with id %s couldn't be found" % d_id)
         
         # Use this method rather than cascade deletion (much faster)
         meta = MetaData(bind=DbHelper.__engine)
         t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
         self.__session.execute(
-            t_stats.delete().where(t_stats.c.device_id == d_id)
+            t_stats.delete().where(t_stats.c.instance_id == d_id)
         )
 
         # delete sensor history data
-        ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
+        ssens = self.__session.query(Sensor).filter_by(instance_id=d_id).all()
         meta = MetaData(bind=DbHelper.__engine)
         t_hist = Table(SensorHistory.__tablename__, meta, autoload=True)
         for sen in ssens:
@@ -734,12 +734,12 @@ class DbHelper():
                 t_hist.delete().where(t_hist.c.sensor_id == sen.id)
             )
         
-        self.__session.delete(device)
+        self.__session.delete(instance)
         try:
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return device
+        return instance
 
 ####
 # stats upgrade
@@ -753,7 +753,7 @@ class DbHelper():
 
     def upgrade_list_new(self):
         return self.__session.query(Device.id, Device.name, Sensor.name, Sensor.id).\
-                     filter(Device.id==Sensor.device_id).\
+                     filter(Device.id==Sensor.instance_id).\
                      filter(Device.address==None).\
                      order_by(Device.id).\
                      distinct()
@@ -762,7 +762,7 @@ class DbHelper():
         self.__session.expire_all()
         oldvals = self.__session.query(DeviceStats.id, DeviceStats.value, DeviceStats.timestamp).\
                      filter(DeviceStats.skey==okey).\
-                     filter(DeviceStats.device_id ==oid)
+                     filter(DeviceStats.instance_id ==oid)
         num = 0
         for val in oldvals:
             # add the value
@@ -773,7 +773,7 @@ class DbHelper():
         meta = MetaData(bind=DbHelper.__engine)
         t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
         self.__session.execute(
-            t_stats.delete().where(and_(t_stats.c.device_id == oid, t_stats.c.skey == okey))
+            t_stats.delete().where(and_(t_stats.c.instance_id == oid, t_stats.c.skey == okey))
         )
         try:
             self.__session.commit()
@@ -808,7 +808,7 @@ class DbHelper():
             # only store stats if the value is different
             if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
                 # handle history_round
-                # reduce device stats
+                # reduce instance stats
                 if sensor.history_round > 0:
                     last = self.__session.query(SensorHistory) \
                         .filter(SensorHistory.sensor_id == sid) \
@@ -1385,8 +1385,8 @@ class DbHelper():
     def get_sensor(self, id):
         return self.__session.query(Sensor).filter_by(id=id).first()
 
-    def get_sensor_by_device_id(self, did):
-        return self.__session.query(Sensor).filter_by(device_id=did).all()
+    def get_sensor_by_instance_id(self, did):
+        return self.__session.query(Sensor).filter_by(instance_id=did).all()
 
     def update_sensor(self, sid, history_round=None, \
             history_store=None, history_max=None, \
@@ -1420,12 +1420,12 @@ class DbHelper():
     def get_command(self, id):
         return self.__session.query(Command).filter_by(id=id).first()
     
-    def get_command_by_device_id(self, d_id):
-        return self.__session.query(Command).filter_by(device_id=d_id).all()
+    def get_command_by_instance_id(self, d_id):
+        return self.__session.query(Command).filter_by(instance_id=d_id).all()
 
-    def add_command(self, device_id, name, reference, return_confirmation):
+    def add_command(self, instance_id, name, reference, return_confirmation):
         self.__session.expire_all()
-        cmd = Command(name=name, device_id=device_id, reference=reference, return_confirmation=return_confirmation)
+        cmd = Command(name=name, instance_id=instance_id, reference=reference, return_confirmation=return_confirmation)
         self.__session.add(cmd)
         try:
             self.__session.commit()
@@ -1455,12 +1455,12 @@ class DbHelper():
     def get_xpl_command(self, p_id):
         return self.__session.query(XplCommand).filter_by(id=p_id).first()
 
-    def get_xpl_command_by_device_id(self, d_id):
-        return self.__session.query(XplCommand).filter_by(device_id=d_id).all()
+    def get_xpl_command_by_instance_id(self, d_id):
+        return self.__session.query(XplCommand).filter_by(instance_id=d_id).all()
 
-    def add_xpl_command(self, cmd_id, name, schema, device_id, stat_id, json_id):
+    def add_xpl_command(self, cmd_id, name, schema, instance_id, stat_id, json_id):
         self.__session.expire_all()
-        cmd = XplCommand(cmd_id=cmd_id, name=name, schema=schema, device_id=device_id, stat_id=stat_id, json_id=json_id)
+        cmd = XplCommand(cmd_id=cmd_id, name=name, schema=schema, instance_id=instance_id, stat_id=stat_id, json_id=json_id)
         self.__session.add(cmd)
         try:
             self.__session.commit()
@@ -1481,7 +1481,7 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-command with id %s : it doesn't exist" % id)
 
-    def update_xpl_command(self, id, cmd_id=None, name=None, schema=None, device_id=None, stat_id=None):
+    def update_xpl_command(self, id, cmd_id=None, name=None, schema=None, instance_id=None, stat_id=None):
         """Update a xpl_stat
         """
         # Make sure previously modified objects outer of this method won't be commited
@@ -1493,8 +1493,8 @@ class DbHelper():
             cmd.cmd_id = cmd_id
         if schema is not None:
             cmd.schema = ucode(schema)
-        if device_id is not None:
-            cmd.device_id = device_id
+        if instance_id is not None:
+            cmd.instance_id = instance_id
         if stat_id is not None:
             cmd.stat_id = stat_id
         if name is not None:
@@ -1516,12 +1516,12 @@ class DbHelper():
     def get_xpl_stat(self, p_id):
         return self.__session.query(XplStat).filter_by(id=p_id).first()
     
-    def get_xpl_stat_by_device_id(self, d_id):
-        return self.__session.query(XplStat).filter_by(device_id=d_id).all()
+    def get_xpl_stat_by_instance_id(self, d_id):
+        return self.__session.query(XplStat).filter_by(instance_id=d_id).all()
 
-    def add_xpl_stat(self, name, schema, device_id, json_id):
+    def add_xpl_stat(self, name, schema, instance_id, json_id):
         self.__session.expire_all()
-        stat = XplStat(name=name, schema=schema, device_id=device_id, json_id=json_id)
+        stat = XplStat(name=name, schema=schema, instance_id=instance_id, json_id=json_id)
         self.__session.add(stat)
         try:
             self.__session.commit()
@@ -1542,7 +1542,7 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id %s : it doesn't exist" % id)
     
-    def update_xpl_stat(self, id, name=None, schema=None, device_id=None):
+    def update_xpl_stat(self, id, name=None, schema=None, instance_id=None):
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         stat = self.__session.query(XplStat).filter_by(id=id).first()
@@ -1550,8 +1550,8 @@ class DbHelper():
             self.__raise_dbhelper_exception("XplStat with id %s couldn't be found" % id)
         if schema is not None:
             stat.schema = ucode(schema)
-        if device_id is not None:
-            stat.device_id = device_id
+        if instance_id is not None:
+            stat.instance_id = instance_id
         if name is not None:
             stat.name = name
         self.__session.add(stat)
@@ -1757,9 +1757,9 @@ class DbHelper():
 ###################
 # Device Config
 ###################
-    def add_device_param(self, d_id, key, value, type): 
+    def add_instance_param(self, d_id, key, value, type): 
         self.__session.expire_all()
-        config = DeviceParam(device_id=d_id, key=key, value=value, type=type)
+        config = DeviceParam(instance_id=d_id, key=key, value=value, type=type)
         self.__session.add(config)
         try:
             self.__session.commit()
@@ -1767,7 +1767,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return config
 
-    def udpate_device_param(self, dc_id, key=None, value=None):
+    def udpate_instance_param(self, dc_id, key=None, value=None):
         self.__session.expire_all()
         config = self.__session.query(DeviceParam).filter_by(id=dc_id).first()
         if config is None:

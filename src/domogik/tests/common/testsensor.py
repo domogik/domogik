@@ -46,7 +46,7 @@ class TestSensor():
     """ Tool to handle sensors
     """
 
-    def __init__(self, device_id, sensor_reference):
+    def __init__(self, instance_id, sensor_reference):
         """ Construtor
             @param rest_url : url of the rest server
             @param sensor_reference : sensor reference
@@ -55,7 +55,7 @@ class TestSensor():
         self.rest_url = get_rest_url()
 
         # package informations
-        self.device_id = device_id
+        self.instance_id = instance_id
         self.sensor_reference = sensor_reference
         try:
             self.sensor_id = self.get_sensor_id()
@@ -64,10 +64,10 @@ class TestSensor():
 
 
     def get_sensor_id(self):
-        """ Call GET /device/<id> to get the sensor id corresponding to the sensor name
+        """ Call GET /instance/<id> to get the sensor id corresponding to the sensor name
         """
-        print(u"Get the sensor id for device_id={0}, sensor_reference={1}".format(self.device_id, self.sensor_reference))
-        response = requests.get("{0}/device/{1}".format(self.rest_url, self.device_id), \
+        print(u"Get the sensor id for instance_id={0}, sensor_reference={1}".format(self.instance_id, self.sensor_reference))
+        response = requests.get("{0}/instance/{1}".format(self.rest_url, self.instance_id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
         #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
@@ -75,19 +75,19 @@ class TestSensor():
             raise RuntimeError("Error when looking for the sensor id")
 
         # get the sensor id 
-        device = json.loads(response.text)
-        if not device['sensors'].has_key(self.sensor_reference):
-            raise RuntimeError("There is no sensor named '{0}' for the device id {1}".format(self.sensor_reference, self.device_id))
-        sensor_id = device['sensors'][self.sensor_reference]['id']
+        instance = json.loads(response.text)
+        if not instance['sensors'].has_key(self.sensor_reference):
+            raise RuntimeError("There is no sensor named '{0}' for the instance id {1}".format(self.sensor_reference, self.instance_id))
+        sensor_id = instance['sensors'][self.sensor_reference]['id']
 
         # TODO  : nico's proposal that doesn't work :). To delete after checking with him what he wanted to do...
         #sensor_id = False
-        #for sensor in device['sensors'] :
-        #    if device['sensors'][sensor]['name'] == self.sensor_name:
-        #        sensor_id = device['sensors'][sensor]['id']
+        #for sensor in instance['sensors'] :
+        #    if instance['sensors'][sensor]['name'] == self.sensor_name:
+        #        sensor_id = instance['sensors'][sensor]['id']
         #        break
         #if not sensor_id:
-        #     raise RuntimeError("There is no sensor named '{0}' for the device id {1}".format(self.sensor_name, self.device_id))
+        #     raise RuntimeError("There is no sensor named '{0}' for the instance id {1}".format(self.sensor_name, self.instance_id))
         print(u"The sensor id is '{0}'".format(sensor_id))
         return sensor_id
 

@@ -43,7 +43,7 @@ import sys
 
 
 class TestDevice():
-    """ Tool to create test devices
+    """ Tool to create test instances
     """
 
     def __init__(self):
@@ -56,31 +56,31 @@ class TestDevice():
         # package informations
         self.client_id = None
 
-        # device informations
-        self.device_name = None
+        # instance informations
+        self.instance_name = None
         self.instance_type = None
 
-    def create_device(self, client_id, device_name, instance_type):
-        """ Call POST /device/... to create the device
+    def create_instance(self, client_id, instance_name, instance_type):
+        """ Call POST /instance/... to create the instance
             @param client_id : client id
-            @param device_name : the device name
+            @param instance_name : the instance name
             @param instance_type : the instance type
-            @return : the device id for the device created
+            @return : the instance id for the instance created
         """
         # package informations
         self.client_id = client_id
-        # device informations
-        self.device_name = device_name
+        # instance informations
+        self.instance_name = instance_name
         self.instance_type = instance_type
-        description = "a test device"
+        description = "a test instance"
         reference = "for test only"
-        print(u"Create a test device for {0}. Device type is '{1}', name is '{2}'".format(self.client_id,
+        print(u"Create a test instance for {0}. Device type is '{1}', name is '{2}'".format(self.client_id,
                                                                                                           self.instance_type,
-                                                                                                          self.device_name))
+                                                                                                          self.instance_name))
 
-        response = requests.post("{0}/device/".format(self.rest_url), \
+        response = requests.post("{0}/instance/".format(self.rest_url), \
             headers={'content-type':'application/x-www-form-urlencoded'},
-            data="name={0}&client_id={1}&description={2}&reference={3}&instance_type={4}".format(self.device_name,
+            data="name={0}&client_id={1}&description={2}&reference={3}&instance_type={4}".format(self.instance_name,
                                                                                                self.client_id,
                                                                                                description,
                                                                                                reference,
@@ -88,16 +88,16 @@ class TestDevice():
         print(u"Response : [{0}]".format(response.status_code))
         #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:
-            raise RuntimeError("Error when creating the device : {0}".format(response.text))
+            raise RuntimeError("Error when creating the instance : {0}".format(response.text))
 
-        # get the device id for later calls to REST
-        device = json.loads(response.text)
-        self.device_id = device['id']
-        print(u"The device id is '{0}'".format(self.device_id))
-        return self.device_id
+        # get the instance id for later calls to REST
+        instance = json.loads(response.text)
+        self.instance_id = instance['id']
+        print(u"The instance id is '{0}'".format(self.instance_id))
+        return self.instance_id
 
     def configure_global_parameters(self, params):
-        """ Call PUT /device/addglobal/... to set the global parameters for a device
+        """ Call PUT /instance/addglobal/... to set the global parameters for a instance
             @param params : dict of params
         """
         print(u"Configure the global parameters...")
@@ -110,45 +110,45 @@ class TestDevice():
             else:
                 first = False
             data += "{0}={1}".format(key, params[key])
-        response = requests.put("{0}/device/addglobal/{1}".format(self.rest_url, self.device_id), \
+        response = requests.put("{0}/instance/addglobal/{1}".format(self.rest_url, self.instance_id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'},
                                  data="{0}".format(data))
         print(u"Response : [{0}]".format(response.status_code))
         #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
+            raise RuntimeError("Error when configuring the instance global parameters : {0}".format(response.text))
 
-    def del_device(self, id):
-        """ Call DELETE /device/... to delete a device
-            @param id : device id
+    def del_instance(self, id):
+        """ Call DELETE /instance/... to delete a instance
+            @param id : instance id
         """
-        print(u"Delete the device : id = {0}".format(id))
-        response = requests.delete("{0}/device/{1}".format(self.rest_url, id), \
+        print(u"Delete the instance : id = {0}".format(id))
+        response = requests.delete("{0}/instance/{1}".format(self.rest_url, id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
+            raise RuntimeError("Error when configuring the instance global parameters : {0}".format(response.text))
 
-    def del_devices_by_client(self, client_id):
-        """ Call GET /device to get all devices
-            Then, call del_device for each device of the given client_id
-            @param client_id: the client id for which we want to delete all the devices
+    def del_instances_by_client(self, client_id):
+        """ Call GET /instance to get all instances
+            Then, call del_instance for each instance of the given client_id
+            @param client_id: the client id for which we want to delete all the instances
         """
-        print(u"Delete all the devices for the client id '{0}'".format(client_id))
-        # first, retrieve all the devices
-        response = requests.get("{0}/device/".format(self.rest_url), \
+        print(u"Delete all the instances for the client id '{0}'".format(client_id))
+        # first, retrieve all the instances
+        response = requests.get("{0}/instance/".format(self.rest_url), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
+            raise RuntimeError("Error when configuring the instance global parameters : {0}".format(response.text))
         if response.text == "":
-            print(u"There is no device to delete")
+            print(u"There is no instance to delete")
             return
-        devices = device = json.loads(response.text)
-        for device in devices:
-            #print(u"Id = {0} / Client_id = {1}".format(device['id'], device['client_id']))
-            if device['client_id'] == client_id:
-                self.del_device(device['id'])
+        instances = instance = json.loads(response.text)
+        for instance in instances:
+            #print(u"Id = {0} / Client_id = {1}".format(instance['id'], instance['client_id']))
+            if instance['client_id'] == client_id:
+                self.del_instance(instance['id'])
         
         
 
@@ -156,10 +156,10 @@ class TestDevice():
 if __name__ == "__main__":
 
     td = TestDevice()
-    #td.create_device("plugin-diskfree.{0}".format(get_sanitized_hostname()), "avec un accent é comme ça", "diskfree.disk_usage")
-    td.create_device("plugin-diskfree.{0}".format(get_sanitized_hostname()), "test_device_diskfree", "diskfree.disk_usage")
-    td.configure_global_parameters({"device" : "/home", "interval" : 1})
-    #td.del_device(td.device_id)
-    #td.del_devices_by_client("foo")
-    #td.del_devices_by_client("plugin-diskfree.darkstar")
+    #td.create_instance("plugin-diskfree.{0}".format(get_sanitized_hostname()), "avec un accent é comme ça", "diskfree.disk_usage")
+    td.create_instance("plugin-diskfree.{0}".format(get_sanitized_hostname()), "test_instance_diskfree", "diskfree.disk_usage")
+    td.configure_global_parameters({"instance" : "/home", "interval" : 1})
+    #td.del_instance(td.instance_id)
+    #td.del_instances_by_client("foo")
+    #td.del_instances_by_client("plugin-diskfree.darkstar")
 

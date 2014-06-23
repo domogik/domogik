@@ -9,7 +9,7 @@ from wtforms.validators import Required
 from flask_login import login_required
 from flask.ext.babel import gettext, ngettext
 
-from domogik.rest.urls.device import get_device_params
+from domogik.rest.urls.instance import get_instance_params
 from domogik.common.sql_schema import Device, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form
 
@@ -52,9 +52,9 @@ def client_detail(client_id):
             active = 'home'
             )
 
-@app.route('/client/<client_id>/devices/known')
+@app.route('/client/<client_id>/instances/known')
 @login_required
-def client_devices_known(client_id):
+def client_instances_known(client_id):
     if app.datatypes == {}:
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
@@ -65,13 +65,13 @@ def client_devices_known(client_id):
         else:
             app.datatypes = {}
     with app.db.session_scope():
-        devices = app.db.list_devices_by_plugin(client_id)
-    return render_template('client_devices.html',
+        instances = app.db.list_instances_by_plugin(client_id)
+    return render_template('client_instances.html',
             datatypes = app.datatypes,
-            devices = devices,
+            instances = instances,
             clientid = client_id,
             mactve="clients",
-            active = 'devices'
+            active = 'instances'
             )
 
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
@@ -82,7 +82,7 @@ def client_sensor_edit(client_id, sensor_id):
         MyForm = model_form(Sensor, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
-                        exclude=['core_device', 'name', 'reference', 'incremental', 'formula', 'data_type', 'conversion', 'last_value', 'last_received', 'history_duplicate'])
+                        exclude=['core_instance', 'name', 'reference', 'incremental', 'formula', 'data_type', 'conversion', 'last_value', 'last_received', 'history_duplicate'])
 	#MyForm.history_duplicate.kwargs['validators'] = []
 	MyForm.history_store.kwargs['validators'] = []
         form = MyForm(request.form, sensor)
@@ -99,49 +99,49 @@ def client_sensor_edit(client_id, sensor_id):
                      history_expire=request.form['history_expire'])
 
             flash(gettext("Changes saved"), "success")
-            return redirect("/client/{0}/devices/known".format(client_id))
+            return redirect("/client/{0}/instances/known".format(client_id))
             pass
 	else:
     	    return render_template('client_sensor.html',
 		    form = form,
 		    clientid = client_id,
 		    mactve="clients",
-		    active = 'devices'
+		    active = 'instances'
 		    )
 
-@app.route('/client/<client_id>/devices/detected')
+@app.route('/client/<client_id>/instances/detected')
 @login_required
-def client_devices_detected(client_id):
+def client_instances_detected(client_id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
-    msg.set_action('device.new.get')
+    msg.set_action('instance.new.get')
     res = cli.request(str(client_id), msg.get(), timeout=10)
     if res is not None:
         data = res.get_data()
-        devices = data['devices']
+        instances = data['instances']
     else:
-        devices = {}
+        instances = {}
     return render_template('client_detected.html',
-            devices = devices,
+            instances = instances,
             clientid = client_id,
             mactve="clients",
-            active = 'devices'
+            active = 'instances'
             )
 
-@app.route('/client/<client_id>/devices/edit/<did>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/instances/edit/<did>', methods=['GET', 'POST'])
 @login_required
-def client_devices_edit(client_id, did):
+def client_instances_edit(client_id, did):
     with app.db.session_scope():
-        device = app.db.get_device_sql(did)
+        instance = app.db.get_instance_sql(did)
         MyForm = model_form(Device, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
                         exclude=['params', 'commands', 'sensors', 'address', 'xpl_commands', 'xpl_stats', 'instance_type_id', 'client_id', 'client_version'])
-        form = MyForm(request.form, device)
+        form = MyForm(request.form, instance)
 
 	if request.method == 'POST' and form.validate():
             # save it
-	    app.db.update_device(did, \
+	    app.db.update_instance(did, \
 				d_name=request.form['name'], \
 				d_description=request.form['description'], \
 				d_reference=request.form['reference'])
@@ -153,41 +153,41 @@ def client_devices_edit(client_id, did):
             msg.set_action( 'reload' )
             resp = req.request('xplgw', msg.get(), 100)
             # redirect
-            return redirect("/client/{0}/devices/known".format(client_id))
+            return redirect("/client/{0}/instances/known".format(client_id))
 	else:
-            return render_template('client_device_edit.html',
+            return render_template('client_instance_edit.html',
 	        form = form,
                 clientid = client_id,
                 mactve="clients",
-                active = 'devices'
+                active = 'instances'
                 )
 
-app.route('/client/<client_id>/devices/delete/<did>')
+app.route('/client/<client_id>/instances/delete/<did>')
 @login_required
-def client_devices_delete(client_id, did):
+def client_instances_delete(client_id, did):
     with app.db.session_scope():
-        app.db.del_device(did)
+        app.db.del_instance(did)
     flash(gettext("Device deleted"), 'success')
     # reload stats
     req = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action( 'reload' )
     resp = req.request('xplgw', msg.get(), 100)
-    return redirect("/client/{0}/devices/known".format(client_id))
+    return redirect("/client/{0}/instances/known".format(client_id))
 
 
 
-@app.route('/client/<client_id>/devices/delete/<did>')
+@app.route('/client/<client_id>/instances/delete/<did>')
 @login_required
-def client_devices_delete(client_id, did):
+def client_instances_delete(client_id, did):
     with app.db.session_scope():
-        app.db.del_device(did)
+        app.db.del_instance(did)
     # reload stats
     req = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action( 'reload' )
     resp = req.request('xplgw', msg.get(), 100)
-    return redirect("/client/{0}/devices/known".format(client_id))
+    return redirect("/client/{0}/instances/known".format(client_id))
 
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
@@ -282,9 +282,9 @@ def client_config(client_id):
             active = 'config'
             )
 
-@app.route('/client/<client_id>/devices/new')
+@app.route('/client/<client_id>/instances/new')
 @login_required
-def client_devices_new(client_id):
+def client_instances_new(client_id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('client.detail.get')
@@ -303,37 +303,37 @@ def client_devices_new(client_id):
     #    for prod in data["products"]:
     #        products[prod["name"]] = prod["type"]
  
-    return render_template('client_device_new.html',
+    return render_template('client_instance_new.html',
             instance_types = dtypes,
             products = products,
             clientid = client_id,
             mactve="clients",
-            active = 'devices'
+            active = 'instances'
             )
 
-@app.route('/client/<client_id>/devices/new/type/<instance_type_id>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/instances/new/type/<instance_type_id>', methods=['GET', 'POST'])
 @login_required
-def client_devices_new_type(client_id, instance_type_id):
-    return client_devices_new_wiz(client_id, instance_type_id, None)
+def client_instances_new_type(client_id, instance_type_id):
+    return client_instances_new_wiz(client_id, instance_type_id, None)
 
-@app.route('/client/<client_id>/devices/new/type/<instance_type_id>/prod/<product>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/instances/new/type/<instance_type_id>/prod/<product>', methods=['GET', 'POST'])
 @login_required
-def client_devices_new_prod(client_id, instance_type_id, product):
-    return client_devices_new_wiz(client_id, instance_type_id, product)
+def client_instances_new_prod(client_id, instance_type_id, product):
+    return client_instances_new_wiz(client_id, instance_type_id, product)
 
-def client_devices_new_wiz(client_id, instance_type_id, product):
+def client_instances_new_wiz(client_id, instance_type_id, product):
     # TODO get them
-    params = get_device_params(instance_type_id, app.zmq_context)
+    params = get_instance_params(instance_type_id, app.zmq_context)
 
     # dynamically generate the wtfform
     class F(Form):
-        name = TextField("Device", [Required()], description=gettext("the display name for this device"))
-        description = TextField("Description", description=gettext("A description for this device"))
+        name = TextField("Device", [Required()], description=gettext("the display name for this instance"))
+        description = TextField("Description", description=gettext("A description for this instance"))
         if product:
             default = product
         else:
             default = None
-        reference = TextField("Reference", description=gettext("A reference for this device"), default=default)
+        reference = TextField("Reference", description=gettext("A reference for this instance"), default=default)
         pass
     # add the global params
     for item in params["global"]:
@@ -355,10 +355,10 @@ def client_devices_new_wiz(client_id, instance_type_id, product):
         else:
             flash(gettext("Device creation failed"), "warning")
             flash(gettext("Can not find this client id"), "danger")
-            return redirect("/client/{0}/devices/known".format(client_id))
+            return redirect("/client/{0}/instances/known".format(client_id))
         with app.db.session_scope():
-            # create the device
-            created_device = app.db.add_device_and_commands(
+            # create the instance
+            created_instance = app.db.add_instance_and_commands(
                 name=request.form.get('name'),
                 instance_type=instance_type_id,
                 client_id=client_id,
@@ -367,31 +367,31 @@ def client_devices_new_wiz(client_id, instance_type_id, product):
                 client_data=client_data
             )
             # add the global
-            for x in app.db.get_xpl_command_by_device_id(created_device["id"]):
+            for x in app.db.get_xpl_command_by_instance_id(created_instance["id"]):
                 for p in params['global']:
                     if p["xpl"] is True:
                         app.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
-            for x in app.db.get_xpl_stat_by_device_id(created_device["id"]):
+            for x in app.db.get_xpl_stat_by_instance_id(created_instance["id"]):
                 for p in params['global']:
                     if p["xpl"] is True:
                         app.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
             for p in params['global']:
                 if p["xpl"] is not True:
-                    app.db.add_device_param(created_device["id"], p["key"], request.form.get(p['key']), p['type'])
+                    app.db.add_instance_param(created_instance["id"], p["key"], request.form.get(p['key']), p['type'])
             # reload stats
             req = MQSyncReq(app.zmq_context)
             msg = MQMessage()
             msg.set_action( 'reload' )
             resp = req.request('xplgw', msg.get(), 100)
             # inform the user
-            flash(gettext("device created"), "success")
-            return redirect("/client/{0}/devices/known".format(client_id))
+            flash(gettext("instance created"), "success")
+            return redirect("/client/{0}/instances/known".format(client_id))
 
-    return render_template('client_device_new_wiz.html',
+    return render_template('client_instance_new_wiz.html',
             form = form,
             params = params,
             dtype = instance_type_id,
             clientid = client_id,
             mactve="clients",
-            active = 'devices'
+            active = 'instances'
             )

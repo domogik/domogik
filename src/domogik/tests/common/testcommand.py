@@ -52,7 +52,7 @@ class TestCommand():
     """ Tool to handle commands
     """
 
-    def __init__(self, managerTestCase, device_id, command_name):
+    def __init__(self, managerTestCase, instance_id, command_name):
         """ Construtor
             @param rest_url : url of the rest server
         """
@@ -60,11 +60,11 @@ class TestCommand():
         self.rest_url = get_rest_url()
         # package informations
         self.managerTestCase = managerTestCase
-        self.device_id = device_id
+        self.instance_id = instance_id
         self.command_name = command_name
         try:
             self.command_id = self.get_command_id()
-         #   self.sensor = TestSensor(device_id, "get_total_space")
+         #   self.sensor = TestSensor(instance_id, "get_total_space")
         except:
             self.command_id = None
             self.sensor = None
@@ -80,42 +80,42 @@ class TestCommand():
             print (u"Command reference as changed to {0} , id {1}".format(self.command_name,  self.command_id))
 
     def get_command_id(self):
-        """ Call GET /device/<id> to get the command id corresponding to the command name
+        """ Call GET /instance/<id> to get the command id corresponding to the command name
         """
-        print(u"Get the command id for device_id={0} and command_name={1}".format(self.device_id, self.command_name))
-        response = requests.get("{0}/device/{1}".format(self.rest_url, self.device_id), \
+        print(u"Get the command id for instance_id={0} and command_name={1}".format(self.instance_id, self.command_name))
+        response = requests.get("{0}/instance/{1}".format(self.rest_url, self.instance_id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
         if response.status_code != 200:
             raise RuntimeError("Error when looking for the command id")
 
         # get the command id 
-        device = json.loads(response.text)
-   #     print device
-        if not device['commands'].has_key(self.command_name):
-            print "There is no command named '{0}' for the device id {1}".format(self.command_name, self.device_id)
-            raise RuntimeError("There is no command named '{0}' for the device id {1}".format(self.command_name, self.device_id))
-        self._device = device
-        command_id = device['commands'][self.command_name]['id']
+        instance = json.loads(response.text)
+   #     print instance
+        if not instance['commands'].has_key(self.command_name):
+            print "There is no command named '{0}' for the instance id {1}".format(self.command_name, self.instance_id)
+            raise RuntimeError("There is no command named '{0}' for the instance id {1}".format(self.command_name, self.instance_id))
+        self._instance = instance
+        command_id = instance['commands'][self.command_name]['id']
         print(u"The command id is '{0}'".format(command_id))
         return command_id
 
     def get_return_confirmation(self):
         """Return True if cmd must have en ack msg
         """
-        if self._device and self.command_name :
-            return self._device['commands'][self.command_name]['return_confirmation'] 
+        if self._instance and self.command_name :
+            return self._instance['commands'][self.command_name]['return_confirmation'] 
         else : return False
 
     def get_XplStat_id(self):
         """Return  XplStat Json id corresponding to command id, return false if there is no return_confirmation.
         """
-        if self._device and self.command_name :
-            cmd = self._device['commands'][self.command_name]
+        if self._instance and self.command_name :
+            cmd = self._instance['commands'][self.command_name]
             if cmd['return_confirmation'] :
-                for xplAck in self._device['xpl_commands'] :
+                for xplAck in self._instance['xpl_commands'] :
                     if xplAck == cmd['xpl_command'] :
-                        xplstat = self._device['xpl_commands'][xplAck]['xpl_stat_ack']
+                        xplstat = self._instance['xpl_commands'][xplAck]['xpl_stat_ack']
                         if xplstat != "" : return xplstat
         return False
 
@@ -139,12 +139,12 @@ class TestCommand():
         """
         xplstat = self.get_XplStat_id()
         if xplstat :
-            schema = self._device['xpl_stats'][xplstat]['schema']
+            schema = self._instance['xpl_stats'][xplstat]['schema']
             data = {}
             statResult ={}
-            for param in self._device['xpl_stats'][xplstat]['parameters']['static']:
+            for param in self._instance['xpl_stats'][xplstat]['parameters']['static']:
                 data[param['key']] = param['value']
-            for param in self._device['xpl_stats'][xplstat]['parameters']['dynamic']:
+            for param in self._instance['xpl_stats'][xplstat]['parameters']['dynamic']:
                 data[param['key']] = None
                 statResult[param['key']] = None
             if edata :
@@ -166,7 +166,7 @@ class TestCommand():
             time.sleep(1)
         else : 
             print (u"No ack required for {0}".format(self.command_name))
-        if self._device and self.command_id :
+        if self._instance and self.command_id :
             cli = MQSyncReq(zmq.Context())
             msg = MQMessage()
             msg.set_action('cmd.send')
@@ -191,17 +191,17 @@ class TestCommand():
         sensorsRef =[]
         xplStat = self.get_XplStat_id()
         if xplStat :
-   #         print "dynamic params : {0}".format(self._device['xpl_stats'][xplStat]['parameters']['dynamic'])
-            for aparam in self._device['xpl_stats'][xplStat]['parameters']['dynamic'] :
+   #         print "dynamic params : {0}".format(self._instance['xpl_stats'][xplStat]['parameters']['dynamic'])
+            for aparam in self._instance['xpl_stats'][xplStat]['parameters']['dynamic'] :
                 # Check if sensor exist
-                for sensorId in self._device['sensors']:
+                for sensorId in self._instance['sensors']:
                     if aparam['sensor_name'] == sensorId:
                         dynParam = {}
                         for k in statResult:
                             if aparam['key'] == k: 
                                 dynParam[k] = statResult[k]
                                 break
-                        sensor = TestSensor(self.device_id, sensorId)
+                        sensor = TestSensor(self.instance_id, sensorId)
                         sensorsRef.append({'sensor': sensor, 'name' : aparam['sensor_name'],  'param' : dynParam})
         return sensorsRef
         

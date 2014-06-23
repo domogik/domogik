@@ -131,7 +131,7 @@ class AbstractParameter:
         The 'type' and 'description' are only informative, but the more precise you will be, the easier it will be for UI 
         to send correct data without looking at your code to guess what you expect.
         Most of the time, only one value will be enough (time, operator, etc ...), but with more complex parameters, 
-        maybe you'll need more (for a device state for ex, you may need the technology, the device address, maybe some 
+        maybe you'll need more (for a instance state for ex, you may need the technology, the instance address, maybe some 
         usercode, etc ...
         @return a list of expected parameters, or 
         """
@@ -152,7 +152,7 @@ class AbstractParameter:
         """ Set the type.
         @param tname : name of the parameter's type.
         The type is only a one-word to describe your parameter, it will help the UIs to better describes what you wait 
-        to the users (the "form" for a device or a timestamp won't be the same)
+        to the users (the "form" for a instance or a timestamp won't be the same)
         @raise ValueError if @tname is not a one-word string
         """
         if ( tname == None ) or ( type(tname) != str ) or ( len(tname.split(' ')) != 1 ):
@@ -245,7 +245,7 @@ class AbstractParameter:
         """ This method is called by the Test to evaluate the parameter.
         This method must return None if the value of the parameter can't be determined yet, or the value if it can
         Most of the time, the value can be determined as soon as the @fill@ method has been called. But sometimes not,
-        for ex. the state of the device may need to wait for an xPL message. In that case None mus tbe returned until 
+        for ex. the state of the instance may need to wait for an xPL message. In that case None mus tbe returned until 
         the state is knonw.
         This method MUST be implemented in parameters child classes
         @return None if the value can't be determined, the value elsewhere

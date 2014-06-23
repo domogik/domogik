@@ -6,7 +6,7 @@ class sensorAPI(MethodView):
     decorators = [json_response, timeit]
 
     def get(self, id):
-        urlHandler.json_stop_at = ["core_device"]
+        urlHandler.json_stop_at = ["core_instance"]
         if id != None:
             b = urlHandler.db.get_sensor(id)
         else:

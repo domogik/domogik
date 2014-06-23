@@ -38,7 +38,7 @@ from domogik.tests.unittests.database_test import make_ts
 import benchmarks_config as config
 
 _db = None
-_device1 = None
+_instance1 = None
 _insert_data = True
 
 def run_stats_filter(period_filter_list):
@@ -54,11 +54,11 @@ def run_stats_filter(period_filter_list):
         add_data(start_p=time.mktime(config.DATA_START_DATE), end_p=time.mktime(config.DATA_END_DATE),
                  insert_step=config.DATA_INSERT_STEP, key='keysample')
     else:
-        # Just get device id that was used to record stats
-        global _device1
-        # All records have the same device id
+        # Just get instance id that was used to record stats
+        global _instance1
+        # All records have the same instance id
         ds = _db._DbHelper__session.query(DeviceStats).first()
-        _device1 = _db.get_device(ds.device_id)
+        _instance1 = _db.get_instance(ds.instance_id)
 
     # Minutes
     start_p = time.mktime(config.MINUTE_START_PERIOD)
@@ -67,7 +67,7 @@ def run_stats_filter(period_filter_list):
         print(u"Executing minute filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                               datetime.datetime.utcfromtimestamp(end_p)))
         start_t = time.time()
-        results = _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
+        results = _db.filter_stats_of_instance_by_key(ds_key='keysample', ds_instance_id=_instance1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='minute', function_used='avg')
         print(u"\tExecution time = %s" % (time.time() - start_t))
 
@@ -78,7 +78,7 @@ def run_stats_filter(period_filter_list):
         print(u"Executing hour filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                             datetime.datetime.utcfromtimestamp(end_p)))
         start_t = time.time()
-        results = _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
+        results = _db.filter_stats_of_instance_by_key(ds_key='keysample', ds_instance_id=_instance1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='hour', function_used='avg')
         print(u"\tExecution time = %s" % (time.time() - start_t))
 
@@ -89,7 +89,7 @@ def run_stats_filter(period_filter_list):
         print(u"Executing day filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                            datetime.datetime.utcfromtimestamp(end_p)))
         start_t = time.time()
-        results = _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
+        results = _db.filter_stats_of_instance_by_key(ds_key='keysample', ds_instance_id=_instance1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='day', function_used='avg')
         print(u"\tExecution time = %s" % (time.time() - start_t))
 
@@ -100,7 +100,7 @@ def run_stats_filter(period_filter_list):
         print(u"Executing week filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                             datetime.datetime.utcfromtimestamp(end_p)))
         start_t = time.time()
-        results = _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
+        results = _db.filter_stats_of_instance_by_key(ds_key='keysample', ds_instance_id=_instance1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='week', function_used='avg')
         print(u"\tExecution time = %s" % (time.time() - start_t))
 
@@ -111,7 +111,7 @@ def run_stats_filter(period_filter_list):
         print(u"Executing month filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                              datetime.datetime.utcfromtimestamp(end_p)))
         start_t = time.time()
-        results =  _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
+        results =  _db.filter_stats_of_instance_by_key(ds_key='keysample', ds_instance_id=_instance1.id, start_date_ts=start_p,
                                                      end_date_ts=end_p, step_used='month', function_used='avg')
         print(u"\tExecution time = %s" % (time.time() - start_t))
 
@@ -122,7 +122,7 @@ def run_stats_filter(period_filter_list):
         print(u"Executing year filter : period = %s / %s" % (datetime.datetime.utcfromtimestamp(start_p),
                                                             datetime.datetime.utcfromtimestamp(end_p)))
         start_t = time.time()
-        results=  _db.filter_stats_of_device_by_key(ds_key='keysample', ds_device_id=_device1.id, start_date_ts=start_p,
+        results=  _db.filter_stats_of_instance_by_key(ds_key='keysample', ds_instance_id=_instance1.id, start_date_ts=start_p,
                                                     end_date_ts=end_p, step_used='year', function_used='avg')
         print(u"Execution time = %s" % (time.time() - start_t))
 
@@ -147,7 +147,7 @@ def add_data(start_p, end_p, insert_step, key):
         count += 1
         cur_date = start_p + i
         ins = ds_table.insert().values(date=datetime.datetime.utcfromtimestamp(cur_date), timestamp=cur_date,
-                                       key=u'val', value=i/insert_step, value_num=i/insert_step, device_id=_device1.id)
+                                       key=u'val', value=i/insert_step, value_num=i/insert_step, instance_id=_instance1.id)
         conn.execute(ins)
         """
         if (count % 50000 == 0):
@@ -157,15 +157,15 @@ def add_data(start_p, end_p, insert_step, key):
     print(u"\tExecution time = %s" % (time.time() - start_t))
 
 def init_required_data_for_stats():
-    """Add pre-required data to build stats samples (eg. device)"""
+    """Add pre-required data to build stats samples (eg. instance)"""
     print(init_required_data_for_stats.__doc__)
-    global _device1
-    dt1 = _db.add_device_technology('x10', 'x10', 'this is x10')
+    global _instance1
+    dt1 = _db.add_instance_technology('x10', 'x10', 'this is x10')
     dty1 = _db.add_instance_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
-    du1 = _db.add_device_usage('lighting', 'Lighting')
+    du1 = _db.add_instance_usage('lighting', 'Lighting')
     area1 = _db.add_area('area1','description 1')
     room1 = _db.add_room('room1', area1.id)
-    _device1 = _db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
+    _instance1 = _db.add_instance(d_name='instance1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
 
 
 def remove_all_stats():
@@ -178,8 +178,8 @@ def remove_all_stats():
     print(u"\tcreating DeviceStats table")
     ds_table.create(bind=engine)
 
-    for dt in _db.list_device_technologies():
-        _db.del_device_technology(dt.id, cascade_delete=True)
+    for dt in _db.list_instance_technologies():
+        _db.del_instance_technology(dt.id, cascade_delete=True)
     _db._DbHelper__session.commit()
 
 def check_args(argv):

@@ -6,25 +6,25 @@ import zmq
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 
-@urlHandler.route('/device/old/', methods=['GET'])
+@urlHandler.route('/instance/old/', methods=['GET'])
 @json_response
 @timeit
-def device_list_old():
+def instance_list_old():
     b = urlHandler.db.list_old_devices()
     return 200, b
 
-@urlHandler.route('/device/params/<dev_type_id>', methods=['GET'])
+@urlHandler.route('/instance/params/<dev_type_id>', methods=['GET'])
 @json_response
 @timeit
-def device_params(dev_type_id):
+def instance_params(dev_type_id):
     try:
-        result = get_device_params(dev_type_id)
+        result = get_instance_params(dev_type_id)
     except Exception as e:
-        return 500, "Error while getting device params: {0}".format(e)
+        return 500, "Error while getting instance params: {0}".format(e)
     # return the info
     return 200, result
 
-def get_device_params(dev_type_id, zmq=None):
+def get_instance_params(dev_type_id, zmq=None):
     if zmq:
         cli = MQSyncReq(zmq)
     else:
@@ -49,7 +49,7 @@ def get_device_params(dev_type_id, zmq=None):
         ret['global']  = pjson['instance_types'][dev_type_id]['parameters']
     ret['xpl_stat'] = []
     ret['xpl_cmd'] = []
-    # find all features for this device
+    # find all features for this instance
     for c in pjson['instance_types'][dev_type_id]['commands']:
         if not c in pjson['commands']:
             break
@@ -75,12 +75,12 @@ def get_device_params(dev_type_id, zmq=None):
         stat = pjson['xpl_stats'][cmd['xplstat_name']].copy()
         stat['id'] = cmd['xplstat_name']
         # remove all parameters
-        cmd['parameters'] = cmd['parameters']['device']
+        cmd['parameters'] = cmd['parameters']['instance']
         del cmd['parameters']
         ret['xpl_cmd'].append(cmd)
         if stat is not None:
             # remove all parameters
-            stat['parameters'] = stat['parameters']['device']
+            stat['parameters'] = stat['parameters']['instance']
             del stat['parameters']
             ret['xpl_stat'].append(stat)
         del stat
@@ -88,41 +88,41 @@ def get_device_params(dev_type_id, zmq=None):
     ret['global'] = [x for i,x in enumerate(ret['global']) if x not in ret['global'][i+1:]]
     return ret
 
-@urlHandler.route('/device/addglobal/<int:did>', methods=['PUT'])
+@urlHandler.route('/instance/addglobal/<int:did>', methods=['PUT'])
 @json_response
 @timeit
-def device_globals(did):
+def instance_globals(did):
     #- if static field == 1 => this is a static param
-    #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
+    #- if static field == 0 and no sensor id is defined => this is a instance param => value will be filled in
     #- if statis == 0 and it has a sensor id => its a dynamic param
-    device = urlHandler.db.get_device(did)
-    js = get_device_params(device['instance_type_id'])
-    for x in urlHandler.db.get_xpl_command_by_device_id(did):
+    instance = urlHandler.db.get_instance(did)
+    js = get_instance_params(instance['instance_type_id'])
+    for x in urlHandler.db.get_xpl_command_by_instance_id(did):
         for p in js['global']:
             if p["xpl"] is True:
                 urlHandler.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
-    for x in urlHandler.db.get_xpl_stat_by_device_id(did):
+    for x in urlHandler.db.get_xpl_stat_by_instance_id(did):
         for p in js['global']:
             if p["xpl"] is True:
                 #urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True)
                 urlHandler.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
     for p in js['global']:
         if p["xpl"] is not True:
-            urlHandler.db.add_device_param(did, p["key"], request.form.get(p['key']), p["type"])
+            urlHandler.db.add_instance_param(did, p["key"], request.form.get(p['key']), p["type"])
     urlHandler.reload_stats()
     return 200, "{}"
 
-@urlHandler.route('/device/xplcmdparams/<int:did>', methods=['PUT'])
+@urlHandler.route('/instance/xplcmdparams/<int:did>', methods=['PUT'])
 @json_response
 @timeit
-def device_xplcmd_params(did):
+def instance_xplcmd_params(did):
     # get the command
     cmd = urlHandler.db.get_xpl_command(did)
     if cmd == None:
         # ERROR
         return
-    # get the device
-    dev = urlHandler.db.get_device(cmd.device_id)
+    # get the instance
+    dev = urlHandler.db.get_instance(cmd.instance_id)
     if dev == None:
         # ERROR
         return
@@ -143,11 +143,11 @@ def device_xplcmd_params(did):
     if pjson['json_version'] < 2:
         # ERROR
         return
-    # get the json device params for this command
+    # get the json instance params for this command
     if pjson['xpl_commands'][cmd.name] is None:
         # ERROR
         return
-    for p in pjson['xpl_commands'][cmd.name]['parameters']['device']:
+    for p in pjson['xpl_commands'][cmd.name]['parameters']['instance']:
         if request.form.get(p['key']) is None:
             # ERROR
             return
@@ -156,16 +156,16 @@ def device_xplcmd_params(did):
     urlHandler.reload_stats()        
     return 204, ""
 
-@urlHandler.route('/device/xplstatparams/<int:did>', methods=['PUT'])
+@urlHandler.route('/instance/xplstatparams/<int:did>', methods=['PUT'])
 @json_response
 @timeit
-def device_xplstat_params(did):
-    cmd = urlHandler.db.get_xpl_stat(device_id)
+def instance_xplstat_params(did):
+    cmd = urlHandler.db.get_xpl_stat(instance_id)
     if cmd == None:
         # ERROR
         return
-    # get the device
-    dev = urlHandler.db.get_device(cmd.device_id)
+    # get the instance
+    dev = urlHandler.db.get_instance(cmd.instance_id)
     if dev == None:
         # ERROR
         return
@@ -187,11 +187,11 @@ def device_xplstat_params(did):
     if pjson['json_version'] < 2:
         # ERROR
         return
-    # get the json device params for this command
+    # get the json instance params for this command
     if pjson['xpl_stats'][cmd.name] is None:
         # ERROR
         return
-    for p in pjson['xpl_stats'][cmd.name]['parameters']['device']:
+    for p in pjson['xpl_stats'][cmd.name]['parameters']['instance']:
         if request.form.get(p['key']) is None:
             # ERROR
             return
@@ -200,28 +200,28 @@ def device_xplstat_params(did):
     urlHandler.reload_stats()        
     return 204, ""
 
-class deviceAPI(MethodView):
+class instanceAPI(MethodView):
     decorators = [json_response, timeit]
 
     def get(self, did):
         if did != None:
-            b = urlHandler.db.get_device(did)
+            b = urlHandler.db.get_instance(did)
         else:
-            b = urlHandler.db.list_devices()
+            b = urlHandler.db.list_instances()
         if b == None:
             return 404, b
         else:
             return 200, b
 
     def delete(self, did):
-        b = urlHandler.db.del_device(did)
+        b = urlHandler.db.del_instance(did)
         urlHandler.reload_stats()        
         return 200, b
 
     def post(self):
-        """ Create a new device
+        """ Create a new instance
             Get all the clients details
-            Finally, call the database function to create the device and give it the instance types list and clients details : they will be used to fill the database as the json structure is recreated in the database
+            Finally, call the database function to create the instance and give it the instance types list and clients details : they will be used to fill the database as the json structure is recreated in the database
         """
         cli = MQSyncReq(urlHandler.zmq_context)
 
@@ -250,9 +250,9 @@ class deviceAPI(MethodView):
         else:
             return 500, "Error : there is no client id named '{0}'".format(request.form.get('client_id'))
 
-        # create the device in database
-        # notice that we don't give any address for the device as this will be done with another url later
-        created_device = urlHandler.db.add_device_and_commands(
+        # create the instance in database
+        # notice that we don't give any address for the instance as this will be done with another url later
+        created_instance = urlHandler.db.add_instance_and_commands(
             name=request.form.get('name'),
             instance_type=request.form.get('instance_type'),
             client_id=request.form.get('client_id'),
@@ -261,16 +261,16 @@ class deviceAPI(MethodView):
             client_data=client_data
         )
         urlHandler.reload_stats()        
-        return 201, created_device
+        return 201, created_instance
 
     def put(self, did):
-        b = urlHandler.db.update_device(
+        b = urlHandler.db.update_instance(
             did,
             request.form.get('name'),
             request.form.get('description'),
             request.form.get('reference'),
         )
         urlHandler.reload_stats()        
-        return 200, urlHandler.db.get_device(did)
+        return 200, urlHandler.db.get_instance(did)
 
-register_api(deviceAPI, 'device', '/device/', pk='did', pk_type='int')
+register_api(instanceAPI, 'instance', '/instance/', pk='did', pk_type='int')

@@ -118,9 +118,9 @@ class DBConnector(XplPlugin, MQRep):
                 self._mdp_reply_config_set(msg)
             elif msg.get_action() == "config.delete":
                 self._mdp_reply_config_delete(msg)
-            # devices list
-            elif msg.get_action() == "device.get":
-                self._mdp_reply_devices_result(msg)
+            # instances list
+            elif msg.get_action() == "instance.get":
+                self._mdp_reply_instances_result(msg)
 
     def _mdp_reply_config_get(self, data):
         """ Reply to config.get MQ req
@@ -332,12 +332,12 @@ class DBConnector(XplPlugin, MQRep):
             return "None"
 
 
-    def _mdp_reply_devices_result(self, data):
-        """ Reply to device.get MQ req
+    def _mdp_reply_instances_result(self, data):
+        """ Reply to instance.get MQ req
             @param data : MQ req message
         """
         msg = MQMessage()
-        msg.set_action('device.result')
+        msg.set_action('instance.result')
         status = True
 
         msg_data = data.get_data()
@@ -362,7 +362,7 @@ class DBConnector(XplPlugin, MQRep):
             #    type = DMG_VENDOR_ID
             name = msg_data['name']
             host = msg_data['host']
-            dev_list = self._db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
+            dev_list = self._db.list_instances_by_plugin("{0}-{1}.{2}".format(type, name, host))
             #dev_json = json.dumps(dev_list, cls=domogik_encoder(), check_circular=False),
             dev_json = dev_list
             print(dev_json)
@@ -371,7 +371,7 @@ class DBConnector(XplPlugin, MQRep):
             msg.add_data('type', type)
             msg.add_data('name', name)
             msg.add_data('host', host)
-            msg.add_data('devices', dev_json)
+            msg.add_data('instances', dev_json)
 
         self.reply(msg.get())
 
