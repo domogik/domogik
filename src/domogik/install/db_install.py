@@ -68,7 +68,7 @@ class DbInstall():
         from alembic import command
 
         info("Installing or upgrading the db")
-        if not sql_schema.Device.__table__.exists(bind=self._engine):
+        if not sql_schema.Instance.__table__.exists(bind=self._engine):
             sql_schema.metadata.drop_all(self._engine)
             ok("Droping all existing tables...")
             sql_schema.metadata.create_all(self._engine)

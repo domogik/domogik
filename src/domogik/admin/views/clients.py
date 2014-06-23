@@ -10,7 +10,7 @@ from flask_login import login_required
 from flask.ext.babel import gettext, ngettext
 
 from domogik.rest.urls.instance import get_instance_params
-from domogik.common.sql_schema import Device, Sensor
+from domogik.common.sql_schema import Instance, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form
 
 @app.route('/clients')
@@ -133,7 +133,7 @@ def client_instances_detected(client_id):
 def client_instances_edit(client_id, did):
     with app.db.session_scope():
         instance = app.db.get_instance_sql(did)
-        MyForm = model_form(Device, \
+        MyForm = model_form(Instance, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
                         exclude=['params', 'commands', 'sensors', 'address', 'xpl_commands', 'xpl_stats', 'instance_type_id', 'client_id', 'client_version'])
@@ -146,7 +146,7 @@ def client_instances_edit(client_id, did):
 				d_description=request.form['description'], \
 				d_reference=request.form['reference'])
             # message the suer
-            flash(gettext("Device saved"), 'success')
+            flash(gettext("Instance saved"), 'success')
             # reload stats
             req = MQSyncReq(app.zmq_context)
             msg = MQMessage()
@@ -167,7 +167,7 @@ app.route('/client/<client_id>/instances/delete/<did>')
 def client_instances_delete(client_id, did):
     with app.db.session_scope():
         app.db.del_instance(did)
-    flash(gettext("Device deleted"), 'success')
+    flash(gettext("Instance deleted"), 'success')
     # reload stats
     req = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -327,7 +327,7 @@ def client_instances_new_wiz(client_id, instance_type_id, product):
 
     # dynamically generate the wtfform
     class F(Form):
-        name = TextField("Device", [Required()], description=gettext("the display name for this instance"))
+        name = TextField("Instance", [Required()], description=gettext("the display name for this instance"))
         description = TextField("Description", description=gettext("A description for this instance"))
         if product:
             default = product
@@ -353,7 +353,7 @@ def client_instances_new_wiz(client_id, instance_type_id, product):
             detaila = res.get_data()
             client_data = detaila[client_id]['data']
         else:
-            flash(gettext("Device creation failed"), "warning")
+            flash(gettext("Instance creation failed"), "warning")
             flash(gettext("Can not find this client id"), "danger")
             return redirect("/client/{0}/instances/known".format(client_id))
         with app.db.session_scope():

@@ -33,7 +33,7 @@ Benchmarks for the database API
 import getopt, sys
 import datetime, time
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.common.sql_schema import DeviceStats
+from domogik.common.sql_schema import InstanceStats
 from domogik.tests.unittests.database_test import make_ts
 import benchmarks_config as config
 
@@ -57,7 +57,7 @@ def run_stats_filter(period_filter_list):
         # Just get instance id that was used to record stats
         global _instance1
         # All records have the same instance id
-        ds = _db._DbHelper__session.query(DeviceStats).first()
+        ds = _db._DbHelper__session.query(InstanceStats).first()
         _instance1 = _db.get_instance(ds.instance_id)
 
     # Minutes
@@ -140,7 +140,7 @@ def add_data(start_p, end_p, insert_step, key):
            % (datetime.datetime.utcfromtimestamp(start_p), datetime.datetime.utcfromtimestamp(end_p), insert_step,
               (end_p - start_p) / insert_step))
     conn = _db._DbHelper__engine.connect()
-    ds_table = DeviceStats.__table__
+    ds_table = InstanceStats.__table__
     count = 0
     start_t = time.time()
     for i in range(0, int(end_p - start_p), insert_step):
@@ -172,10 +172,10 @@ def remove_all_stats():
     """Remove all existing data"""
     print(u"Removing existing data")
     engine = _db._DbHelper__engine
-    ds_table = DeviceStats.__table__
-    print(u"\tdropping DeviceStats table")
+    ds_table = InstanceStats.__table__
+    print(u"\tdropping InstanceStats table")
     ds_table.drop(bind=engine)
-    print(u"\tcreating DeviceStats table")
+    print(u"\tcreating InstanceStats table")
     ds_table.create(bind=engine)
 
     for dt in _db.list_instance_technologies():

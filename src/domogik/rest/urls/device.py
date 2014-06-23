@@ -10,7 +10,7 @@ from domogik.mq.message import MQMessage
 @json_response
 @timeit
 def instance_list_old():
-    b = urlHandler.db.list_old_devices()
+    b = urlHandler.db.list_old_instances()
     return 200, b
 
 @urlHandler.route('/instance/params/<dev_type_id>', methods=['GET'])
@@ -40,7 +40,7 @@ def get_instance_params(dev_type_id, zmq=None):
         raise Exception("Bad instance type (json)")
     pjson = pjson[dev_type_id]
     if pjson is None:
-        raise Exception("Device type not found")
+        raise Exception("Instance type not found")
     # parse the data
     ret = {}
     ret['commands'] = []
@@ -225,8 +225,8 @@ class instanceAPI(MethodView):
         """
         cli = MQSyncReq(urlHandler.zmq_context)
 
-        #self.log.info(u"Device creation request for {0} {1} on {2} : name = '{3}', instance_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('instance_type'), request.form.get('reference')))
-        #urlHandler.log.info("Device creation request for {0} {1} on {2} : name = '{3}', instance_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('instance_type'), request.form.get('reference')))
+        #self.log.info(u"Instance creation request for {0} {1} on {2} : name = '{3}', instance_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('instance_type'), request.form.get('reference')))
+        #urlHandler.log.info("Instance creation request for {0} {1} on {2} : name = '{3}', instance_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('instance_type'), request.form.get('reference')))
 
         # get the client details
         msg = MQMessage()

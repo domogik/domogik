@@ -381,7 +381,7 @@ class Plugin(BasePlugin, MQRep):
             @param type : xpl_stats, xpl_commands
             @param feature : a xpl_stat or xpl_command feature
         """
-        self.log.debug(u"Device detected : instance_type = {0}, data = {1}".format(instance_type, data))
+        self.log.debug(u"Instance detected : instance_type = {0}, data = {1}".format(instance_type, data))
         #self.log.debug(u"Already existing instances : {0}".format(self.instances))
         # browse all instances to find if the instance exists
         found = False

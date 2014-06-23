@@ -265,7 +265,7 @@ class XplManager(XplPlugin, MQAsyncSub):
         def __init__(self, xpl, dev, stat, sensor, xpl_type, log_stats, dbh, pub, conversions):
             """ Initialize a stat instance
             @param xpl : A xpl manager instance
-            @param dev : A Device reference
+            @param dev : A Instance reference
             @param stat : A XplStat reference
             @param sensor: A Sensor reference
             @param xpl-type: what xpl-type to listen for
