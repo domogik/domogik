@@ -1503,15 +1503,11 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
         id = gh(data, 3,2)
         address = "rain%s 0x%s" %(subtype[1], id)
         rain = int(gh(data, 5, 2), 16)
-        if subtype == "02":
-            print rain
+        if subtype == "02": 
             rain = rain / 100.0
-            print rain
         rain_total = int(gh(data, 7, 3), 16)
         if subtype in ["01", "02", "03", "04", "05"] :
-            print rain_total
             rain_total = rain_total / 10.0
-            print rain_total
         battery = int(gh(data, 10)[0], 16) * 10  # percent
         rssi = int(gh(data, 10)[1], 16) * 100/16 # percent
  
