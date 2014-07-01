@@ -58,6 +58,54 @@ from Queue import Queue, Empty, Full
 
 WAIT_BETWEEN_TRIES = 1
 
+RFX_TYPE = {
+    "0x50" : "310MHz",
+    "0x51" : "315MHz",
+    "0x52" : "433.92MHz receiver only",
+    "0x53" : "433.92MHz transceiver",
+    "0x54" : "433.42MHz",
+    "0x55" : "868.00MHz",
+    "0x56" : "868.00MHz FSK",
+    "0x57" : "868.30MHz",
+    "0x58" : "868.30MHz FSK",
+    "0x59" : "868.35MHz",
+    "0x5A" : "868.35MHz FSK",
+    "0x5B" : "868.95MHz"
+    }
+
+PROTOCOLS = {
+    0 : {
+        128 : "Enable display of undecoded",
+        64 : "RFU",
+        32: "Byron SX",
+        16 : "RSL",
+        8 : "Lighting4",
+        4 : "FineOffset/Viking",
+        2 : "Rubicson",
+        1 : "AE Blyss"
+        },
+    1 : {
+        128 : "BlindsT1",
+        64 : "BlindsT0",
+        32 : "ProGuard",
+        16 : "FS20",
+        8 : "La Crosse",
+        4 : "Hideki/UPM",
+        2 : "AD LightwaveRF",
+        1 : "Mertik"
+        },
+    2 : {
+        128 : "Visonic",
+        64 : "ATI",
+        32 : "Oregon Scientific",
+        16 : "Meiantech",
+        8 : "HomeEasy EU",
+        4 : "AC",
+        2 : "ARC",
+        1 : "X10"
+        }
+    }
+
 HUMIDITY_STATUS = {
   "0x00" : "dry",
   "0x01" : "comfort",
@@ -321,6 +369,8 @@ class RfxcomUsb:
         self._cb_send_trig = cb_send_trig
         self._stop = stop
         self._rfxcom = None
+        self.firmware = ''
+        self.rfxcomOK = False
         # TODO : how to get proper value ?
         self.seqnbr = 0
 
@@ -341,7 +391,7 @@ class RfxcomUsb:
         """ Open RFXCOM device
             @param device : RFXCOM device (/dev/ttyACMx)
 
-            SDK version : 4.8
+            SDK version : 6.22
         """
         try:
             self._log.info("Try to open RFXCOM : %s" % device)
@@ -351,9 +401,30 @@ class RfxcomUsb:
             self._rfxcom.write(binascii.unhexlify("0D00000000000000000000000000"))
             self._log.info("Wait 1s...")
             time.sleep(1)
+            self._rfxcom.flushInput()
+            self._rfxcom.flushOutput()
+            while not self.rfx_response.empty():
+                self.rfx_response.get_nowait()
+            print ("Send 'get status' message")
             self._log.info("Send 'get status' message")
             self._rfxcom.write(binascii.unhexlify("0D00000102000000000000000000"))
-            # TODO (not urgent) : add a check on response from the get status
+            # Wait for response
+            timeOut = 0
+            try:
+                while not self._stop.isSet() and not self.rfxcomOK and timeOut < 20:
+                    self.read()
+                    time.sleep(0.5)
+                    timeOut += 0.5
+            except serial.SerialException:
+                error = "Error while reading rfxcom device (disconnected ?) : %s" % traceback.format_exc()
+                print(error)
+                self._log.error(error)
+            if self.rfxcomOK :
+                print ("RFXCOM initialized on serial %s" % device)
+                self._log.info("RFXCOM initialized on serial %s" % device)
+            else :
+                print ("ERROR RFXCOM not initialized on serial %s" % device)
+                self._log.warning("ERROR RFXCOM not initialized on serial %s" % device)
         except:
             error = "Error while opening RFXCOM : %s. Check if it is the good device or if you have the good permissions on it." % device
             raise RfxcomException(error)
@@ -424,28 +495,35 @@ class RfxcomUsb:
         while not self._stop.isSet():
 
             # Wait for a packet in the queue
-            data = self.write_rfx.get(block = True)
-            seqnbr = data["seqnbr"]
-            packet = data["packet"]
-            trig_msg = data["trig_msg"]
-            print("Get from Queue : %s > %s" % (seqnbr, packet))
-            self._log.debug("Get from Queue : %s > %s" % (seqnbr, packet))
-            self._rfxcom.write(binascii.unhexlify(packet))
+            try :
+                data = self.write_rfx.get(True,  0.5)
+                seqnbr = data["seqnbr"]
+                packet = data["packet"]
+                trig_msg = data["trig_msg"]
+                print("Get from Queue : %s > %s" % (seqnbr, packet))
+                self._log.debug("Get from Queue : %s > %s" % (seqnbr, packet))
+                self._rfxcom.write(binascii.unhexlify(packet))
+                # TODO : read in queue in which has been stored data readen from rfx
+                loop = True
+                while loop == True and not self._stop.isSet():
+                    print "Waiting for ack"
+                    try :
+                        res = self.rfx_response.get(True, 0.5)
+                        if res["status"] == "NACK":
+                            print("Failed to write. Retry in %s : %s > %s" % (WAIT_BETWEEN_TRIES, seqnbr, packet))
+                            self.debug.warning("Failed to write. Retry in %s : %s > %s" % (WAIT_BETWEEN_TRIES, seqnbr, packet))
+                            time.sleep(WAIT_BETWEEN_TRIES)
+                            self._rfxcom.write(binascii.unhexlify(packet))
+                        else:
+                            print("Command succesfully sent")
+                            self._log.debug("Command succesfully sent")
+                            self._cb_send_trig(trig_msg)
+                            loop = False
+                    except Empty :
+                        pass
+            except Empty :
+                pass
 
-            # TODO : read in queue in which has been stored data readen from rfx
-            loop = True
-            while loop == True:
-                res = self.rfx_response.get(block = True)
-                if res["status"] == "NACK":
-                    self.debug.warning("Failed to write. Retry in %s : %s > %s" % (WAIT_BETWEEN_TRIES, seqnbr, packet))
-                    time.sleep(WAIT_BETWEEN_TRIES)
-                    self._rfxcom.write(binascii.unhexlify(packet))
-                else:
-                    print("Command succesfully sent")
-                    self._log.debug("Command succesfully sent")
-                    self._cb_send_trig(trig_msg)
-                    loop = False
-            
     def get_seqnbr(self):
         """ Return seqnbr and then increase it
         """
@@ -548,17 +626,34 @@ class RfxcomUsb:
 
     def _process_01(self, data):
         """ Interface Response
-        
-            !!! TODO !!!
-            
+                TODO : Send informations to Plugin Manager (xPL ?)
             Type : sensor
-            SDK version : 2.04
-            Tested : No
+            SDK version : 6.22
+            Tested : Yes
         """
         # process data
         # don't send xpl until helpers are implemented
         # log also the informations in INFO level
-        pass
+        print '**** Interface Response : ',  data
+        subtype = gh(data, 1)
+        seqnbr = gh(data, 2)
+        if subtype == "00":
+            cmnd = gh(data, 3)
+            type = "0x" + gh(data, 4)
+            trType = RFX_TYPE[type] if type in RFX_TYPE else 'unknown'
+            self.firmware = gh(data, 5)
+            print 'RFX command {0} response : receiver/transceiver type : {1}, Firmware : {2}'.format(cmnd,  trType, self.firmware)
+            self._log.info('RFX command {0} response : receiver/transceiver type : {1}, Firmware : {2}'.format(cmnd,  trType, self.firmware))
+            protocols = []
+            for p in PROTOCOLS :
+                proto = gh(data, p + 6)
+                for b in PROTOCOLS[p] :
+                    if int(proto, 16) & b : protocols.append(PROTOCOLS[p][b])
+            print 'protocols : {0}'.format(protocols)
+            self._log.info('Enabled protocols : {0}'.format(protocols))
+            if cmnd == "02" :
+                if protocols and self.firmware and trType != 'unknown' : self.rfxcomOK = True
+                else : self.rfxcomOK = False
 
     def _process_02(self, data):
         """ Receiver/Transmitter Message
@@ -1400,7 +1495,7 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
         """ Rain sensors
         
             Type : sensor
-            SDK version : 2.06
+            SDK version : 6.22
             Tested : No
         """
         subtype = gh(data, 1)
@@ -1409,8 +1504,14 @@ So to make it simple you can always use subtype=0x00 for an X10 sec command.
         address = "rain%s 0x%s" %(subtype[1], id)
         rain = int(gh(data, 5, 2), 16)
         if subtype == "02":
-            rain = 100 * rain
+            print rain
+            rain = rain / 100.0
+            print rain
         rain_total = int(gh(data, 7, 3), 16)
+        if subtype in ["01", "02", "03", "04", "05"] :
+            print rain_total
+            rain_total = rain_total / 10.0
+            print rain_total
         battery = int(gh(data, 10)[0], 16) * 10  # percent
         rssi = int(gh(data, 10)[1], 16) * 100/16 # percent
  
