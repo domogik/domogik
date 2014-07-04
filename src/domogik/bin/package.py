@@ -53,6 +53,8 @@ import magic
 import tempfile
 from distutils import version
 import time
+import hashlib
+
 
 
 JSON_FILE = "info.json"
@@ -93,6 +95,10 @@ class PackageInstaller():
                           "--uninstall", 
                           dest="uninstall", 
                           help="Uninstall a package. Example : plugin_rfxcom")
+        parser.add_argument("-H", 
+                          "--hash", 
+                          dest="hash", 
+                          help="Hash value to check the package integrity. Only for zip files!")
         self.options = parser.parse_args()
 
         # get install path for packages
@@ -103,7 +109,10 @@ class PackageInstaller():
 
         # install a package
         if self.options.install:
-            self.install(self.options.install)
+            if self.options.hash:
+                self.install(self.options.install, self.options.hash)
+            else:
+                self.install(self.options.install)
  
         # uninstall a package
         elif self.options.uninstall:
@@ -114,7 +123,7 @@ class PackageInstaller():
             self.list_packages()
 
 
-    def install(self, package):
+    def install(self, package, hash = None):
         """ Install a package
             Check what is the package
             if package is a folder : 
@@ -132,11 +141,11 @@ class PackageInstaller():
         elif URL_REGEXP.search(package):
             downloaded_file, mime = self.download_from_url(package)
             if downloaded_file != None and mime == MIME_ZIP:
-                self.install_zip_file(downloaded_file)
+                self.install_zip_file(downloaded_file, hash)
 
         # check if the package is a zip file
         elif zipfile.is_zipfile(package):
-            self.install_zip_file(package)
+            self.install_zip_file(package, hash)
 
         # the package format is not handled
         else:
@@ -178,10 +187,19 @@ class PackageInstaller():
         self.log.info("Package installed!")
         
 
-    def install_zip_file(self, path):
+    def install_zip_file(self, path, hash):
         """ Install the zip file
         """
         self.log.info("Install a package from a zip file : {0}".format(path))
+
+        # check the hash of the file
+        # hash format is sha256 
+        zip_hash = hashlib.sha256(open(path, 'rb').read()).hexdigest()
+        if zip_hash == hash:
+             self.log.info("The package has the correct hash : {0}".format(hash))
+        else:
+             self.log.error("The package hash '{0}' is different from the expected hash '{1}'. The package will not be installed!".format(zip_hash, hash))
+             return
 
         # check the zip file contains what we need
         with zipfile.ZipFile(path, 'r') as myzip:
