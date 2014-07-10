@@ -223,7 +223,7 @@ class PackageJson():
                 for cmd in devt["commands"]:
                     if cmd not in self.json["commands"].keys():    
                         raise PackageException("cmd {0} defined in instance_type {1} is not found".format(cmd, devtype))
-                #check that all sensors exists inside each instance type
+                #check that all sensors exists inside each device type
                 for sens in devt["sensors"]:
                     if sens not in self.json["sensors"].keys():    
                         raise PackageException("sensor {0} defined in instance_type {1} is not found".format(sens, devtype))

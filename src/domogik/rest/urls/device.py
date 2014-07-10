@@ -34,10 +34,10 @@ def get_device_params(dev_type_id, zmq=None):
     msg.add_data('instance_type', dev_type_id)
     res = cli.request('manager', msg.get(), timeout=10)
     if res is None:
-        raise Exception("Bad instance type (MQ)")
+        raise Exception("Bad device type (MQ)")
     pjson = res.get_data()
     if pjson is None:
-        raise Exception("Bad instance type (json)")
+        raise Exception("Bad device type (json)")
     pjson = pjson[dev_type_id]
     if pjson is None:
         raise Exception("Device type not found")
@@ -138,7 +138,7 @@ def device_xplcmd_params(did):
     msg.add_data('instance_type', dev.instance_type_id)
     res = cli.request('manager', msg.get(), timeout=10)
     if res is None:
-        return "Bad instance type"
+        return "Bad device type"
     pjson = res.get_data()
     if pjson['json_version'] < 2:
         # ERROR
@@ -181,7 +181,7 @@ def device_xplstat_params(did):
     msg.add_data('instance_type', dev.instance_type_id)
     res = cli.request('manager', msg.get(), timeout=10)
     if res is None:
-        return "Bad instance type"
+        return "Bad device type"
     pjson = res.get_data()
  
     if pjson['json_version'] < 2:
@@ -221,7 +221,7 @@ class deviceAPI(MethodView):
     def post(self):
         """ Create a new device
             Get all the clients details
-            Finally, call the database function to create the device and give it the instance types list and clients details : they will be used to fill the database as the json structure is recreated in the database
+            Finally, call the database function to create the device and give it the device types list and clients details : they will be used to fill the database as the json structure is recreated in the database
         """
         cli = MQSyncReq(urlHandler.zmq_context)
 

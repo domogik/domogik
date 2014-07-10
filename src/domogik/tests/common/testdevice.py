@@ -64,7 +64,7 @@ class TestDevice():
         """ Call POST /device/... to create the device
             @param client_id : client id
             @param device_name : the device name
-            @param instance_type : the instance type
+            @param instance_type : the device type
             @return : the device id for the device created
         """
         # package informations
