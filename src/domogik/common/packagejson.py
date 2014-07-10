@@ -194,8 +194,8 @@ class PackageJson():
     def _validate_02(self):
         try:
             #check that all main keys are in the file
-            expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "instance_types", "identity", "json_version", "products"]
-            self._validate_keys(expected, "file", self.json.keys(), ["external"])
+            expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "json_version"]
+            self._validate_keys(expected, "file", self.json.keys(), ["products", "external"])
 
             # validate identity
             expected = ["author", "author_email", "description", "domogik_min_version", "name", "type", "version"]
@@ -209,25 +209,14 @@ class PackageJson():
                 self._validate_keys(expected, "a configuration item param", conf.keys(), optional)
 
             # validate products
-            for prd in self.json["products"]:
-                prod = self.json["products"][prd]
-                expected = ["name", "documentation", "instances"]
-                self._validate_keys(expected, " product {0}".format(prd), prod.keys())
-                for ins in prod["instances"].keys():
-                    inst = self.json['products'][prd]['instances'][ins]
-                    if inst["type"] == "fixed":
-                        expected = ["type", "instance_types"]
-                    elif inst["type"] == "duplicate":
-                        expected = ["type", "instance_types", "range"]
-                    elif inst["type"] == "select":
-                        expected = ["type", "options"]
-                    else:
-                        raise PackageException("Product {0} instance {1} has an unknown type {2}".format(prd, ins, inst["type"]))
-                    self._validate_keys(expected, " product {0} instance {1}".format(prd, ins), inst.keys(), optional)
+            if 'products' in self.json.keys():
+                expected = ["name", "id", "documentation", "type"]
+                for prod in self.json['products']:
+                    self._validate_keys(expected, "a product", prod.keys())
 
-            #validate the instance_type
-            for devtype in self.json["instance_types"]:
-                devt = self.json["instance_types"][devtype]
+            #validate the device_type
+            for devtype in self.json["device_types"]:
+                devt = self.json["device_types"][devtype]
                 expected = ['id', 'name', 'description', 'commands', 'sensors', 'parameters']
                 self._validate_keys(expected, "instance_type {0}".format(devtype), devt.keys())
                 #check that all commands exists inisde each instance_type
@@ -352,7 +341,7 @@ class PackageJson():
         for xstatid in self.json["xpl_stats"]:
             xstat = self.json["xpl_stats"][xstatid]
             for stat in xstat['parameters']['dynamic']:
-                if stat['sensor'] in self.json["instance_types"][devtype]['sensors']:
+                if stat['sensor'] in self.json["device_types"][devtype]['sensors']:
                     if stat['sensor'] not in ret:
                         ret[stat['sensor']] = []
                     ret[stat['sensor']].append( xstatid )
