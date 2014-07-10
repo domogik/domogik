@@ -4,11 +4,11 @@
         <li {% if active == "home" %} class="active" {% endif %}><a href="/client/{{ clientid }}">{% trans %}Home{% endtrans %}</a></li>
         <li {% if active == "config" %} class="active" {% endif %}><a href="/client/{{ clientid }}/config">{% trans %}Config{% endtrans %}</a></li>
         <li {% if active == "devices" %} class="active" {% endif %} class="dropdown">
-        <a href="/client/{{ clientid }}/devices" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Devices{% endtrans %} <b class="caret"></b></a>
+        <a href="/client/{{ clientid }}/dmg_devices" class="dropdown-toggle" data-toggle="dropdown">{% trans %}dmg_devices{% endtrans %} <b class="caret"></b></a>
             <ul class="dropdown-menu">
-                <li><a href="/client/{{ clientid }}/devices/known">{% trans %}Known{% endtrans %}</a></li>
-                <li><a href="/client/{{ clientid }}/devices/detected">{% trans %}Detected{% endtrans %}</a></li>
-                <li><a href="/client/{{ clientid }}/devices/new">{% trans %}New{% endtrans %}</a></li>
+                <li><a href="/client/{{ clientid }}/dmg_devices/known">{% trans %}Known{% endtrans %}</a></li>
+                <li><a href="/client/{{ clientid }}/dmg_devices/detected">{% trans %}Detected{% endtrans %}</a></li>
+                <li><a href="/client/{{ clientid }}/dmg_devices/new">{% trans %}New{% endtrans %}</a></li>
             </ul>
         </li>
     </ul>

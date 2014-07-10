@@ -52,7 +52,7 @@ def client_detail(client_id):
             active = 'home'
             )
 
-@app.route('/client/<client_id>/devices/known')
+@app.route('/client/<client_id>/dmg_devices/known')
 @login_required
 def client_devices_known(client_id):
     if app.datatypes == {}:
@@ -109,7 +109,7 @@ def client_sensor_edit(client_id, sensor_id):
 		    active = 'devices'
 		    )
 
-@app.route('/client/<client_id>/devices/detected')
+@app.route('/client/<client_id>/dmg_devices/detected')
 @login_required
 def client_devices_detected(client_id):
     cli = MQSyncReq(app.zmq_context)
@@ -128,7 +128,7 @@ def client_devices_detected(client_id):
             active = 'devices'
             )
 
-@app.route('/client/<client_id>/devices/edit/<did>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/dmg_devices/edit/<did>', methods=['GET', 'POST'])
 @login_required
 def client_devices_edit(client_id, did):
     with app.db.session_scope():
@@ -153,7 +153,7 @@ def client_devices_edit(client_id, did):
             msg.set_action( 'reload' )
             resp = req.request('xplgw', msg.get(), 100)
             # redirect
-            return redirect("/client/{0}/devices/known".format(client_id))
+            return redirect("/client/{0}/dmg_devices/known".format(client_id))
 	else:
             return render_template('client_device_edit.html',
 	        form = form,
@@ -162,7 +162,7 @@ def client_devices_edit(client_id, did):
                 active = 'devices'
                 )
 
-app.route('/client/<client_id>/devices/delete/<did>')
+app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required
 def client_devices_delete(client_id, did):
     with app.db.session_scope():
@@ -173,11 +173,11 @@ def client_devices_delete(client_id, did):
     msg = MQMessage()
     msg.set_action( 'reload' )
     resp = req.request('xplgw', msg.get(), 100)
-    return redirect("/client/{0}/devices/known".format(client_id))
+    return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
 
 
-@app.route('/client/<client_id>/devices/delete/<did>')
+@app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required
 def client_devices_delete(client_id, did):
     with app.db.session_scope():
@@ -187,7 +187,7 @@ def client_devices_delete(client_id, did):
     msg = MQMessage()
     msg.set_action( 'reload' )
     resp = req.request('xplgw', msg.get(), 100)
-    return redirect("/client/{0}/devices/known".format(client_id))
+    return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
@@ -282,7 +282,7 @@ def client_config(client_id):
             active = 'config'
             )
 
-@app.route('/client/<client_id>/devices/new')
+@app.route('/client/<client_id>/dmg_devices/new')
 @login_required
 def client_devices_new(client_id):
     cli = MQSyncReq(app.zmq_context)
@@ -311,12 +311,12 @@ def client_devices_new(client_id):
             active = 'devices'
             )
 
-@app.route('/client/<client_id>/devices/new/type/<device_type_id>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>', methods=['GET', 'POST'])
 @login_required
 def client_devices_new_type(client_id, device_type_id):
     return client_devices_new_wiz(client_id, device_type_id, None)
 
-@app.route('/client/<client_id>/devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
 @login_required
 def client_devices_new_prod(client_id, device_type_id, product):
     return client_devices_new_wiz(client_id, device_type_id, product)
@@ -355,7 +355,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         else:
             flash(gettext("Device creation failed"), "warning")
             flash(gettext("Can not find this client id"), "danger")
-            return redirect("/client/{0}/devices/known".format(client_id))
+            return redirect("/client/{0}/dmg_devices/known".format(client_id))
         with app.db.session_scope():
             # create the device
             created_device = app.db.add_device_and_commands(
@@ -385,7 +385,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             resp = req.request('xplgw', msg.get(), 100)
             # inform the user
             flash(gettext("device created"), "success")
-            return redirect("/client/{0}/devices/known".format(client_id))
+            return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
     return render_template('client_device_new_wiz.html',
             form = form,
