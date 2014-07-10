@@ -33,7 +33,7 @@ You an find all the errors with this command: ::
 Example: ::
 
     /var/log/domogik/manager.log:2013-12-06 14:35:24,371 domogik-manager ERROR Package plugin-onewire : invalid json file
-    /var/log/domogik/manager.log:2013-12-06 14:35:24,371 domogik-manager ERROR Package plugin-onewire : Error validating the json: key 'xpl' not found in a param for instance_type onewire.serial_number
+    /var/log/domogik/manager.log:2013-12-06 14:35:24,371 domogik-manager ERROR Package plugin-onewire : Error validating the json: key 'xpl' not found in a param for device_type onewire.serial_number
 
 Check the process status
 ------------------------

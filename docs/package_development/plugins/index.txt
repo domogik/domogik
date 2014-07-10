@@ -48,7 +48,7 @@ Starting to create the json file without being clear on these elements is useles
 * :doc:`Convert the json file from Domogik 0.2/0.3 format to the new Domogik 0.4 format <json/json_file_upgrade>`
 * :doc:`Identity part <json/identity>`
 * :doc:`Configuration part <json/configuration>`
-* :doc:`Instance types part <json/instance_types>`
+* :doc:`Device types part <json/device_types>`
 * :doc:`Sensors part <json/sensors>` 
 * :doc:`Xpl stats part <json/xpl_stats>`
 * :doc:`Commands part <json/commands>` ....................................TODO 

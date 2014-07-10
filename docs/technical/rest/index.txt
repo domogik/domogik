@@ -45,7 +45,7 @@ In the RESTClient interface menu go in **Headers > Custom Header** and :
 Next, go back on the RESTClient main interface and fill the fields. Example for creating a new device:
 
 * **method**: 'POST', **url**: 'http://xxxxx:40405/device/'
-* **body** : name=device%20name&type=plugin&id=diskfree&host=darkstar&description=desc&reference=ref&instance_type=diskfree.disk_usage
+* **body** : name=device%20name&type=plugin&id=diskfree&host=darkstar&description=desc&reference=ref&device_type=diskfree.disk_usage
  
 Then, click on **Send**
 

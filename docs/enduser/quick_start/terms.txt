@@ -35,10 +35,10 @@ Terms to know before using Domogik
         A client is a package instance. For example, a plugin installed on a server is a client. The same plugin installed on another server is another client.
 
     Device
-        A device is a reference to a hardware, software or online service element. A device is related to an instance type. A device is linked to a client. If the client is uninstalled or disappear (is this is some external xPL device for example), the device will become orphan.
+        A device is a reference to a hardware, software or online service element. A device is related to a device type. A device is linked to a client. If the client is uninstalled or disappear (is this is some external xPL device for example), the device will become orphan.
 
-    Instance type
-        A plugin will allow to create various kind of devices (for example a temperature sensor or a temperature and humidity sensor). A kind of device is an instance type. An instance type can have several features. 
+    Device type
+        A plugin will allow to create various kind of devices (for example a temperature sensor or a temperature and humidity sensor). A kind of device is a device type. A device type can have several features. 
 
     Device feature
         A device feature can be a sensor or a command. Each device feature can have its own parameters (address, polling interval, ...).

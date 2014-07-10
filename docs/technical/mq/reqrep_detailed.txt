@@ -69,7 +69,7 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 
 You will get a reply like this: ::
 
-    ['device.result', '{"status": true, "name": "diskfree", "reason": "", "devices": [{"xpl_stats": {"get_total_space": {"json_id": "get_total_space", "name": "Total space", "id": 21, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "total_space"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_total_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_free_space": {"json_id": "get_free_space", "name": "Free space", "id": 23, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "free_space"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_free_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_used_space": {"json_id": "get_used_space", "name": "Used space", "id": 24, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "used_space"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_used_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_percent_used": {"json_id": "get_percent_used", "name": "Percent used", "id": 22, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "percent_used"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_percent_used", "key": "current"}]}, "schema": "sensor.basic"}}, "commands": {}, "description": "", "reference": "", "xpl_commands": {}, "client_id": "plugin-diskfree.darkstar", "instance_type_id": "diskfree.disk_usage", "sensors": {"get_total_space": {"conversion": "", "name": "Total Space", "data_type": "DT_Byte", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 21, "reference": "get_total_space"}, "get_free_space": {"conversion": "", "name": "Free Space", "data_type": "DT_Byte", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 23, "reference": "get_free_space"}, "get_used_space": {"conversion": "", "name": "Used Space", "data_type": "DT_Byte", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 24, "reference": "get_used_space"}, "get_percent_used": {"conversion": "", "name": "Percent used", "data_type": "DT_Scaling", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 22, "reference": "get_percent_used"}}, "parameters": {"interval": {"key": "interval", "type": "integer", "id": 1, "value": "1"}}, "id": 7, "name": "/tmp"}], "host": "darkstar", "type": "plugin"}']
+    ['device.result', '{"status": true, "name": "diskfree", "reason": "", "devices": [{"xpl_stats": {"get_total_space": {"json_id": "get_total_space", "name": "Total space", "id": 21, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "total_space"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_total_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_free_space": {"json_id": "get_free_space", "name": "Free space", "id": 23, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "free_space"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_free_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_used_space": {"json_id": "get_used_space", "name": "Used space", "id": 24, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "used_space"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_used_space", "key": "current"}]}, "schema": "sensor.basic"}, "get_percent_used": {"json_id": "get_percent_used", "name": "Percent used", "id": 22, "parameters": {"static": [{"type": "string", "key": "device", "value": "/tmp"}, {"type": null, "key": "type", "value": "percent_used"}], "dynamic": [{"ignore_values": "", "sensor_name": "get_percent_used", "key": "current"}]}, "schema": "sensor.basic"}}, "commands": {}, "description": "", "reference": "", "xpl_commands": {}, "client_id": "plugin-diskfree.darkstar", "device_type_id": "diskfree.disk_usage", "sensors": {"get_total_space": {"conversion": "", "name": "Total Space", "data_type": "DT_Byte", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 21, "reference": "get_total_space"}, "get_free_space": {"conversion": "", "name": "Free Space", "data_type": "DT_Byte", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 23, "reference": "get_free_space"}, "get_used_space": {"conversion": "", "name": "Used Space", "data_type": "DT_Byte", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 24, "reference": "get_used_space"}, "get_percent_used": {"conversion": "", "name": "Percent used", "data_type": "DT_Scaling", "incremental": false, "last_received": null, "formula": null, "last_value": null, "id": 22, "reference": "get_percent_used"}}, "parameters": {"interval": {"key": "interval", "type": "integer", "id": 1, "value": "1"}}, "id": 7, "name": "/tmp"}], "host": "darkstar", "type": "plugin"}']
 
 
 device.new.get
@@ -86,7 +86,7 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 
 You will get a reply like this: ::
 
-    ['device.new.result', '{"devices": [{"instance_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "temperature", "data": {"address": "th1 0x2504"}}, {"instance_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "humidity", "data": {"address": "th1 0x2504"}}, {"instance_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "temperature", "data": {"address": "th1 0xd601"}}, {"instance_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "humidity", "data": {"address": "th1 0xd601"}}]}']
+    ['device.new.result', '{"devices": [{"device_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "temperature", "data": {"address": "th1 0x2504"}}, {"device_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "humidity", "data": {"address": "th1 0x2504"}}, {"device_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "temperature", "data": {"address": "th1 0xd601"}}, {"device_type_id": "rfxcom.temperature_humidity", "type": "xpl_stats", "feature": "humidity", "data": {"address": "th1 0xd601"}}]}']
 
 
 config.get
@@ -167,24 +167,24 @@ You will get a reply like this: ::
     ['config.result', '{"status": true, "reason": "", "type": "plugin", "host": "darkstar", "name": "diskfree"}']
 
 
-instance_types.get
+device_types.get
 ================
 
 Request : Rest
 Reply : manager
 
-To get the instance_types associated data, Rest may send a MQ request *instance_types.get* to the manager.
+To get the device_types associated data, Rest may send a MQ request *device_types.get* to the manager.
 The result is build in this way : 
-* for each package detected by the manager, all *instance_types* in the json file are listed. Then, each is added in a dictionnary with the package json file content as value.
+* for each package detected by the manager, all *device_types* in the json file are listed. Then, each is added in a dictionnary with the package json file content as value.
 
-    request : instance_types.get
-    data : instance_type = <an instance type>  (optionnal : if not provided, all the instance_types are returned)
+    request : device_types.get
+    data : device_type = <a device type>  (optionnal : if not provided, all the device_types are returned)
 
-An example to send the request is available as *src/domogik/examples/mq-python/req_instance_types.py*.
+An example to send the request is available as *src/domogik/examples/mq-python/req_device_types.py*.
 
 You will get a reply like this: ::
 
-    ['instance_types.result', '{"diskfree.disk_usage": {"instance_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": [], "identity": {"category": "computer", "description": "Send over xPL disk usage", "author": "Fritz", "author_email": "fritz.smh at gmail.com", "documentation": "http://wiki.domogik.org/plugin_diskfree", "changelog": "0.1\\n- plugin creation", "domogik_min_version": "0.2.0", "package_id": "plugin-diskfree", "dependencies": [], "version": "0.1a0", "icon_file": "/var/lib/domogik/packages/plugin_diskfree/design/icon.png", "type": "plugin", "name": "diskfree"}}}']
+    ['device_types.result', '{"diskfree.disk_usage": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": [], "identity": {"category": "computer", "description": "Send over xPL disk usage", "author": "Fritz", "author_email": "fritz.smh at gmail.com", "documentation": "http://wiki.domogik.org/plugin_diskfree", "changelog": "0.1\\n- plugin creation", "domogik_min_version": "0.2.0", "package_id": "plugin-diskfree", "dependencies": [], "version": "0.1a0", "icon_file": "/var/lib/domogik/packages/plugin_diskfree/design/icon.png", "type": "plugin", "name": "diskfree"}}}']
 
 
 datatype.get
@@ -237,7 +237,7 @@ An example to send the request is available as *src/domogik/examples/mq-python/r
 
 You will get a reply like this: ::
 
-    ['package.detail.result', '{"plugin-diskfree": {"instance_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": []}}']
+    ['package.detail.result', '{"plugin-diskfree": {"device_types": {"diskfree.disk_usage": {"commands": [], "description": "Disk usage", "params": [{"type": "string", "description": "The path to look at", "key": "device"}], "sensors": ["get_total_space", "get_percent_used", "get_free_space", "get_used_space"], "id": "diskfree.disk_usage", "name": "Disk usage"}}, "udev_rules": []}}']
 
 
 plugin.start.do

@@ -15,7 +15,7 @@ The sensors section will quickly describe each sensor with:
 Example 1
 =========
 
-This example is the *diskfree* plugin. See the :doc:`instance types documentation <instance_types>` for more informations.
+This example is the *diskfree* plugin. See the :doc:`device types documentation <device_types>` for more informations.
 
 For each sensor, we define a name and no conversion option. Then, depending of the sensor we use 2 data types:
 

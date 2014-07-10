@@ -14,14 +14,14 @@ Part of the json sample
 
     # Here part of json declaration
     
-        "instance_types": {                                           # instance type declaration who appears in user interface list to create device
+        "device_types": {                                           # device type declaration who appears in user interface list to create device
             "fooplugin.device_name": {
                 "id": "fooplugin.device_name",                          # device id for internal reference (no Xpl)
                 "description": "A short description", 
-                "name": "The instance type name",
+                "name": "The device type name",
                 "commands": ["cmd_one", "cmd_two"],                     # link to list of commands
                 "sensors": ["sensor_one", "sensor_two"],                # link to list of sensors
-                "parameters": [                                             # parameters that are common to ALL xpl messages for this instance type
+                "params": [                                             # parameters that are common to ALL xpl messages for this device type
                     {
                         "key": "key1_devicetype",                       # key copied to the xpl messages, this a static key like device address
                         "description": "A short description",
@@ -41,7 +41,7 @@ Part of the json sample
         },
         
     
-        "commands": {                                                   # commands who are call by instance_types, A command can be call by many instance_types
+        "commands": {                                                   # commands who are call by device_types, A command can be call by many device_types
            "cmd_one": {
                "name": "The cmd name",
                "return_confirmation": true,                             # at true a confirmation xpl message should be send at command return. It is strongly recommended to use confirmation
@@ -70,7 +70,7 @@ Part of the json sample
             }
         },
         
-        sensors": {                                                     # sensors who are used by instance_types, A sensors can be use by many instance_types
+        sensors": {                                                     # sensors who are used by device_types, A sensors can be use by many device_types
             "sensor_one": {
                 "name": "The sensor name",
                 "data_type": "DT_Switch",

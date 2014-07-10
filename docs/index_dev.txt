@@ -65,7 +65,7 @@ Core component : REST
 * Devices
     * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
     * Devices parameters management
-        * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to an instance type
+        * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
         * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
     * Sensors of the devices
         * :doc:`/sensor </technical/rest/sensor>`: manage sensors (list, update)
