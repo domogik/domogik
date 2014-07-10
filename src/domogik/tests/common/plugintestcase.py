@@ -79,7 +79,7 @@ class PluginTestCase(TemplateTestCase):
             self.assertTrue(check_config("plugin", self.name, get_sanitized_hostname(), key, self.configuration[key]))
 
     # this function is the same for all plugins
-    def test_0020_create_the_instances(self):
+    def test_0020_create_the_devices(self):
         pass
 
     # this function is the same for all plugins
@@ -107,5 +107,5 @@ class PluginTestCase(TemplateTestCase):
     def configure(self):
         raise NotImplementedError
 
-    def create_instance(self):
+    def create_device(self):
         raise NotImplementedError

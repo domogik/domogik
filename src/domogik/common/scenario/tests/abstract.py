@@ -32,7 +32,7 @@ class AbstractTest:
     It must not be instanciated directly but need to be extended
     A test contains :
      - A certain number of parameters. Each parameter can be :
-       * A instance entry
+       * A device entry
        * An operator entry
        * A "text" entry
        * A date entry
@@ -100,8 +100,8 @@ class AbstractTest:
         The method will return a list of parameters. Each parameter is a dictionnary with as keys:
              - name : name of parameter, can be any string
          and as value another dictionnary with :
-             - type : a string which describes the type, ex : "instance", "operator", "time"
-             - filter : dictionnary of filters to apply (ex : a technology or an housecode for instance, a month for time, etc ...)
+             - type : a string which describes the type, ex : "device", "operator", "time"
+             - filter : dictionnary of filters to apply (ex : a technology or an housecode for device, a month for time, etc ...)
              - list_of_values : a list of possible values (for "text" entries)
              - default : default value
              - expected: list of expected keys

@@ -53,10 +53,10 @@ class ScenarioManager:
         combination of many tests,
         and a list of actions
         Each test can be :
-         - test on the test of any instance
+         - test on the test of any device
          - test on the time
          - action triggered by user (click on UI for ex)
-        The test on instances are managed directly by xpl Listeners
+        The test on devices are managed directly by xpl Listeners
         The test on time will be managed by a TimeManager
         The actions will be managed by an ActionManager
         { 

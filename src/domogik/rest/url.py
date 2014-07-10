@@ -117,7 +117,7 @@ import domogik.rest.urls.datatype
 import domogik.rest.urls.sensorhistory
 
 # more complex URLS
-from domogik.rest.urls.instance import *
+from domogik.rest.urls.device import *
 
 # Pure REST API
 from domogik.rest.urls.person import personAPI

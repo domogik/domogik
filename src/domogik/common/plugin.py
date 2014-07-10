@@ -188,10 +188,10 @@ class Plugin(BasePlugin, MQRep):
         if self._name not in CORE_COMPONENTS and self._test == False:
             self._load_json()
 
-        # init an empty instances list
-        self.instances = []
-        # init an empty 'new' instances list
-        self.new_instances = []
+        # init an empty devices list
+        self.devices = []
+        # init an empty 'new' devices list
+        self.new_devices = []
 
         # check for products pictures
         if self._name not in CORE_COMPONENTS and self._test == False:
@@ -311,84 +311,84 @@ class Plugin(BasePlugin, MQRep):
             return value
         return value
 
-    def get_instance_list(self, quit_if_no_instance = False):
-        """ Request the dbmgr component over MQ to get the instances list for this client
-            @param quit_if_no_instance: if True, exit the plugin if there is no instances
+    def get_device_list(self, quit_if_no_device = False):
+        """ Request the dbmgr component over MQ to get the devices list for this client
+            @param quit_if_no_device: if True, exit the plugin if there is no devices
         """
-        self.log.info(u"Retrieve the instances list for this client...")
+        self.log.info(u"Retrieve the devices list for this client...")
         mq_client = MQSyncReq(self.zmq)
         msg = MQMessage()
-        msg.set_action('instance.get')
+        msg.set_action('device.get')
         msg.add_data('type', 'plugin')
         msg.add_data('name', self._name)
         msg.add_data('host', self.get_sanitized_hostname())
         result = mq_client.request('dbmgr', msg.get(), timeout=10)
         if not result:
-            self.log.error(u"Unable to retrieve the instance list")
+            self.log.error(u"Unable to retrieve the device list")
             self.force_leave()
             return []
         else:
-            instance_list = result.get_data()['instances']
-            if instance_list == []:
-                self.log.warn(u"There is no instance created for this client")
-                if quit_if_no_instance:
-                    self.log.warn(u"The developper requested to stop the client if there is no instance created")
+            device_list = result.get_data()['devices']
+            if device_list == []:
+                self.log.warn(u"There is no device created for this client")
+                if quit_if_no_device:
+                    self.log.warn(u"The developper requested to stop the client if there is no device created")
                     self.force_leave()
                     return []
-            for a_instance in instance_list:
-                self.log.info(u"- id : {0}  /  name : {1}  /  instance type id : {2}".format(a_instance['id'], \
-                                                                                    a_instance['name'], \
-                                                                                    a_instance['instance_type_id']))
-                # log some informations about the instance
+            for a_device in device_list:
+                self.log.info(u"- id : {0}  /  name : {1}  /  instance type id : {2}".format(a_device['id'], \
+                                                                                    a_device['name'], \
+                                                                                    a_device['instance_type_id']))
+                # log some informations about the device
                 # notice that even if we are not in the XplPlugin class we will display xpl related informations :
                 # for some no xpl plugins, there will just be nothing to display.
 
                 # first : the stats
                 self.log.info(u"  xpl_stats features :")
-                for a_xpl_stat in a_instance['xpl_stats']:
+                for a_xpl_stat in a_device['xpl_stats']:
                     self.log.info(u"  - {0}".format(a_xpl_stat))
                     self.log.info(u"    Static Parameters :")
-                    for a_feature in a_instance['xpl_stats'][a_xpl_stat]['parameters']['static']:
+                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['static']:
                         self.log.info(u"    - {0} = {1}".format(a_feature['key'], a_feature['value']))
                     self.log.info(u"    Dynamic Parameters :")
-                    for a_feature in a_instance['xpl_stats'][a_xpl_stat]['parameters']['dynamic']:
+                    for a_feature in a_device['xpl_stats'][a_xpl_stat]['parameters']['dynamic']:
                         self.log.info(u"    - {0}".format(a_feature['key']))
 
                 # then, the commands
                 self.log.info(u"  xpl_commands features :")
-                for a_xpl_cmd in a_instance['xpl_commands']:
+                for a_xpl_cmd in a_device['xpl_commands']:
                     self.log.info(u" - {0}".format(a_xpl_cmd))
                     self.log.info(u" + Parameters :")
-                    for a_feature in a_instance['xpl_commands'][a_xpl_cmd]['parameters']:
+                    for a_feature in a_device['xpl_commands'][a_xpl_cmd]['parameters']:
                         self.log.info(u" - {0} = {1}".format(a_feature['key'], a_feature['value']))
 
-            self.instances = instance_list
-            return instance_list
+            self.devices = device_list
+            return device_list
 
 
-    def instance_detected(self, instance_type, type, feature, data):
-        """ The plugin developpers can call this function when a instance is detected
-            This function will check if a corresponding instance exists and : 
+    def device_detected(self, instance_type, type, feature, data):
+        """ The plugin developpers can call this function when a device is detected
+            This function will check if a corresponding device exists and : 
             - if so, do nothing
-            - if not, add the instance in a 'new instances' list
-                 - if the instance is already in the 'new instances list', does nothing
-                 - if not : add it into the list and send a MQ message : an event for the UI to say a new instance is detected
+            - if not, add the device in a 'new devices' list
+                 - if the device is already in the 'new devices list', does nothing
+                 - if not : add it into the list and send a MQ message : an event for the UI to say a new device is detected
 
-            ### TODO : implement a req/rep MQ message to allow UI to get the new instances list
+            ### TODO : implement a req/rep MQ message to allow UI to get the new devices list
 
-            @param instance_type : instance_type of the detected instance
-            @param data : data about the instance (address or any other configuration element of a instance for this plugin)
+            @param instance_type : instance_type of the detected device
+            @param data : data about the device (address or any other configuration element of a device for this plugin)
             @param type : xpl_stats, xpl_commands
             @param feature : a xpl_stat or xpl_command feature
         """
         self.log.debug(u"Device detected : instance_type = {0}, data = {1}".format(instance_type, data))
-        #self.log.debug(u"Already existing instances : {0}".format(self.instances))
-        # browse all instances to find if the instance exists
+        #self.log.debug(u"Already existing devices : {0}".format(self.devices))
+        # browse all devices to find if the device exists
         found = False
-        for a_instance in self.instances:
+        for a_device in self.devices:
             # first, search for instance type
-            if a_instance['instance_type_id'] == instance_type:
-                params = a_instance[type][feature]['parameters']['static']
+            if a_device['instance_type_id'] == instance_type:
+                params = a_device[type][feature]['parameters']['static']
                 found = True
                 for key in data:
                     for a_param in params:
@@ -398,72 +398,72 @@ class Plugin(BasePlugin, MQRep):
                 if found:
                     break
         if found:
-            self.log.debug(u"The instance already exists : id={0}.".format(a_instance['id']))
+            self.log.debug(u"The device already exists : id={0}.".format(a_device['id']))
         else:
-            self.log.debug(u"The instance doesn't exists in database")
+            self.log.debug(u"The device doesn't exists in database")
          
-            # add the instance feature in the new instances list : self.new_instances[instance_type][type][feature] = data
-            self.log.debug(u"Check if the instance has already be marked as new...")
+            # add the device feature in the new devices list : self.new_devices[instance_type][type][feature] = data
+            self.log.debug(u"Check if the device has already be marked as new...")
             found = False
-            for a_instance in self.new_instances:
-                if a_instance['instance_type_id'] == instance_type and \
-                   a_instance['type'] == type and \
-                   a_instance['feature'] == feature:
+            for a_device in self.new_devices:
+                if a_device['instance_type_id'] == instance_type and \
+                   a_device['type'] == type and \
+                   a_device['feature'] == feature:
 
-                   if data == a_instance['data']:
+                   if data == a_device['data']:
                         found = True
                     
             if found == False:
-                new_instance ={'instance_type_id' : instance_type,
+                new_device ={'instance_type_id' : instance_type,
                              'type' : type,
                              'feature' : feature,
                              'data' : data}
-                self.log.info(u"New instance feature detected and added in the new instances list : {0}".format(new_instance))
-                self.new_instances.append(new_instance)
+                self.log.info(u"New device feature detected and added in the new devices list : {0}".format(new_device))
+                self.new_devices.append(new_device)
 
-                # publish new instances update
-                self._pub.send_event('instance.new',
+                # publish new devices update
+                self._pub.send_event('device.new',
                                      {"type" : "plugin",
                                       "name" : self._name,
                                       "host" : self.get_sanitized_hostname(),
                                       "client_id" : "plugin-{0}.{1}".format(self._name, self.get_sanitized_hostname()),
-                                      "instances" : self.new_instances})
+                                      "devices" : self.new_devices})
 
-                # TODO : later (0.4.0+), publish one "new instance" notification with only the new instance detected
+                # TODO : later (0.4.0+), publish one "new device" notification with only the new device detected
 
             else:
-                self.log.debug(u"The instance has already been detected since the plugin startup")
+                self.log.debug(u"The device has already been detected since the plugin startup")
 
 
-    def get_parameter(self, a_instance, key):
-        """ For a instance feature, return the required parameter value
-            @param a_instance: the instance informations
+    def get_parameter(self, a_device, key):
+        """ For a device feature, return the required parameter value
+            @param a_device: the device informations
             @param key: the parameter key
         """
         try:
             self.log.debug(u"Get parameter '{0}'".format(key))
-            for a_param in a_instance['parameters']:
+            for a_param in a_device['parameters']:
                 if a_param == key:
-                    value = self.cast(a_instance['parameters'][a_param]['value'], a_instance['parameters'][a_param]['type'])
+                    value = self.cast(a_device['parameters'][a_param]['value'], a_device['parameters'][a_param]['type'])
                     self.log.debug(u"Parameter value found: {0}".format(value))
                     return value
             self.log.warning(u"Parameter not found : return None")
             return None
         except:
-            self.log.error(u"Error while looking for a instance parameter. Return None. Error: {0}".format(traceback.format_exc()))
+            self.log.error(u"Error while looking for a device parameter. Return None. Error: {0}".format(traceback.format_exc()))
             return None
          
 
-    def get_parameter_for_feature(self, a_instance, type, feature, key):
-        """ For a instance feature, return the required parameter value
-            @param a_instance: the instance informations
+    def get_parameter_for_feature(self, a_device, type, feature, key):
+        """ For a device feature, return the required parameter value
+            @param a_device: the device informations
             @param type: the parameter type (xpl_stats, ...)
             @param feature: the parameter feature
             @param key: the parameter key
         """
         try:
             self.log.debug(u"Get parameter '{0}' for '{1}', feature '{2}'".format(key, type, feature))
-            for a_param in a_instance[type][feature]['parameters']['static']:
+            for a_param in a_device[type][feature]['parameters']['static']:
                 if a_param['key'] == key:
                     value = self.cast(a_param['value'], a_param['type'])
                     self.log.debug(u"Parameter value found: {0}".format(value))
@@ -471,7 +471,7 @@ class Plugin(BasePlugin, MQRep):
             self.log.warning(u"Parameter not found : return None")
             return None
         except:
-            self.log.error(u"Error while looking for a instance feature parameter. Return None. Error: {0}".format(traceback.format_exc()))
+            self.log.error(u"Error while looking for a device feature parameter. Return None. Error: {0}".format(traceback.format_exc()))
             return None
          
 
@@ -544,9 +544,9 @@ class Plugin(BasePlugin, MQRep):
         elif msg.get_action() == "helper.do":
             self.log.info(u"Plugin helper action request : {0}".format(msg))
             self._mdp_reply_helper_do(msg)
-        elif msg.get_action() == "instance.new.get":
-            self.log.info(u"Plugin new instances request : {0}".format(msg))
-            self._mdp_reply_instance_new_get(msg)
+        elif msg.get_action() == "device.new.get":
+            self.log.info(u"Plugin new devices request : {0}".format(msg))
+            self._mdp_reply_device_new_get(msg)
     
     def _mdp_reply_helper_do(self, msg):
         contens = msg.get_data()
@@ -621,14 +621,14 @@ class Plugin(BasePlugin, MQRep):
         msg.add_data('actions', self.helpers.keys())
         self.reply(msg.get())
 
-    def _mdp_reply_instance_new_get(self, data):
-        """ Return a list of new instances detected
+    def _mdp_reply_device_new_get(self, data):
+        """ Return a list of new devices detected
             @param data : MQ req message
         """
         ### Send the ack over MQ Rep
         msg = MQMessage()
-        msg.set_action('instance.new.result')
-        msg.add_data('instances', self.new_instances)
+        msg.set_action('device.new.result')
+        msg.add_data('devices', self.new_devices)
         self.reply(msg.get())
 
 

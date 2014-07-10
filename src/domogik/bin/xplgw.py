@@ -146,8 +146,8 @@ class XplManager(XplPlugin, MQAsyncSub):
 		        xplcmd = cmd.xpl_command
 			xplstat = self._db.get_xpl_stat(xplcmd.stat_id)
 			if xplstat is not None:
-			    # get the instance from the db
-			    dev = self._db.get_instance(int(cmd.instance_id))
+			    # get the device from the db
+			    dev = self._db.get_device(int(cmd.device_id))
 			    msg = XplMessage()
                             # update the client list
                             if not dev['client_id'] in self.client_xpl_map.keys():
@@ -174,7 +174,7 @@ class XplManager(XplPlugin, MQAsyncSub):
 					        value = locals()[p.conversion](value)
 				    msg.add_data({p.key : value})
 				else:
-				    failed = "Parameter ({0}) for instance command msg is not provided in the mq message".format(p.key)
+				    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(p.key)
                             if not failed:
 			        # send out the msg
 			        self.log.debug(u"sending xplmessage: {0}".format(msg))
@@ -184,7 +184,7 @@ class XplManager(XplPlugin, MQAsyncSub):
 			        if xplstat != None:
 				    # get xpl message from queue
 				    self.log.debug(u"Command : wait for answer...")
-				    sub = MQSyncSub( self.zmq, 'rest-command', ['instance-stats'] )
+				    sub = MQSyncSub( self.zmq, 'rest-command', ['device-stats'] )
 				    stat = sub.wait_for_event()
 				    if stat is not None:
 				        reply = json.loads(stat['content'])
@@ -240,10 +240,10 @@ class XplManager(XplPlugin, MQAsyncSub):
                             'Corresponding xpl-stat can not be found for xplstatparam {0}' \
                             .format(statparam))
                     continue
-                dev = self._db.get_instance(stat.instance_id)
+                dev = self._db.get_device(stat.device_id)
                 if dev is None:
                     self.log.error(\
-                            'Corresponding instance can not be found for xpl-stat {0}' \
+                            'Corresponding device can not be found for xpl-stat {0}' \
                             .format(stat))
                     continue
                 # xpl-trig
@@ -298,7 +298,7 @@ class XplManager(XplPlugin, MQAsyncSub):
             """ Callback for the xpl message
             @param message : the Xpl message received
             """
-            self._log_stats.debug("Stat received for instance {0}." \
+            self._log_stats.debug("Stat received for device {0}." \
                     .format(self._dev['name']))
             current_date = calendar.timegm(time.gmtime())
             stored_value = None
@@ -327,7 +327,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                                             exec(self._conv[self._dev['client_id']][self._sen.conversion])
 					    value = locals()[self._sen.conversion](value)
                                 self._log_stats.info( \
-                                        "Storing stat for instance '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
+                                        "Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
                                         .format(self._dev['name'], self._dev['id'], self._sen.name, self._sen.id, param.key, value))
                                 # do the store
                                 stored_value = value
@@ -347,9 +347,9 @@ class XplManager(XplPlugin, MQAsyncSub):
             except:
                 self._log_stats.error(traceback.format_exc())
             # publish the result
-            self._pub.send_event('instance-stats', \
+            self._pub.send_event('device-stats', \
                           {"timestamp" : current_date, \
-                          "instance_id" : self._dev['id'], \
+                          "device_id" : self._dev['id'], \
                           "sensor_id" : self._sen.id, \
                           "stored_value" : stored_value})
 

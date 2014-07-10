@@ -17,10 +17,10 @@ def orphans():
         client_list = res.get_data()
     else:
         client_list = {}
-    # get all instances
+    # get all devices
     with app.db.session_scope():
-        devs = app.db.list_instances()
-    # loop over the instances
+        devs = app.db.list_devices()
+    # loop over the devices
     orphan_devs = []
     for dev in devs:
         if dev["client_id"] not in list(client_list.keys()):
@@ -28,14 +28,14 @@ def orphans():
 
     return render_template('orphans.html',
         mactve="orphans",
-        instances=orphan_devs
+        devices=orphan_devs
         )
 
 @app.route('/orphansi/delete/<did>')
 @login_required
 def orphans_delete(did):
     with app.db.session_scope():
-        app.db.del_instance(did)
+        app.db.del_device(did)
     # reload stats
     req = MQSyncReq(app.zmq_context)
     msg = MQMessage()

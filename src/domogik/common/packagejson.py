@@ -271,16 +271,16 @@ class PackageJson():
                 expected = ["name", "schema", "xplstat_name", "parameters"]
                 self._validate_keys(expected, "xpl_command {0}".format(xcmdid), xcmd.keys())
                 # parameters
-                expected = ["static", "instance"]
+                expected = ["static", "device"]
                 self._validate_keys(expected, "parameters for xpl_command {0}".format(xcmdid), xcmd['parameters'].keys())
                 # static parameter
                 expected = ["key", "value"]
                 for stat in xcmd['parameters']['static']:
                     self._validate_keys(expected, "a static parameter for xpl_command {0}".format(xcmdid), stat.keys())
-                # instance parameter
+                # device parameter
                 expected = ["key", "description", "type"]
-                for stat in xcmd['parameters']['instance']:
-                    self._validate_keys(expected, "a instance parameter for xpl_command {0}".format(xcmdid), stat.keys())
+                for stat in xcmd['parameters']['device']:
+                    self._validate_keys(expected, "a device parameter for xpl_command {0}".format(xcmdid), stat.keys())
                 # see that the xpl_stat is defined
                 if xcmd["xplstat_name"] not in self.json["xpl_stats"].keys():
                     raise PackageException("xplstat_name {0} defined in xpl_command {1} is not found".format(xcmd["xplstat_name"], xcmdid))
@@ -291,16 +291,16 @@ class PackageJson():
                 expected = ["name", "schema", "parameters"]
                 self._validate_keys(expected, "xpl_command {0}".format(xstatid), xstat.keys())
                 # parameters
-                expected = ["static", "instance", "dynamic"]
+                expected = ["static", "device", "dynamic"]
                 self._validate_keys(expected, "parameters for xpl_stat {0}".format(xstatid), xstat['parameters'].keys())
                 # static parameter
                 expected = ["key", "value"]
                 for stat in xstat['parameters']['static']:
                     self._validate_keys(expected, "a static parameter for xpl_stat {0}".format(xstatid), stat.keys())
-                # instance parameter
+                # device parameter
                 expected = ["key", "description", "type"]
-                for stat in xstat['parameters']['instance']:
-                    self._validate_keys(expected, "a instance parameter for xpl_stat {0}".format(xstatid), stat.keys())
+                for stat in xstat['parameters']['device']:
+                    self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys())
                 # dynamic parameter
                 expected = ["key", "sensor"]
                 opt = ["ignore_values"]

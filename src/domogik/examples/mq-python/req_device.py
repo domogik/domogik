@@ -7,7 +7,7 @@ from domogik.mq.message import MQMessage
 
 cli = MQSyncReq(zmq.Context())
 msg = MQMessage()
-msg.set_action('instance.get')
+msg.set_action('device.get')
 msg.add_data('type', 'plugin')
 msg.add_data('name', 'diskfree')
 msg.add_data('host', 'darkstar')

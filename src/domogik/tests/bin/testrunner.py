@@ -70,7 +70,7 @@ class TestRunner():
                           "--allow-alter", 
                           dest="allow_alter",
                           action="store_true",
-                          help="Launch the tests that can alter the configuration of the plugin or the setup (instances, ...)")
+                          help="Launch the tests that can alter the configuration of the plugin or the setup (devices, ...)")
         parser.add_argument("-c", 
                           "--criticity", 
                           dest="criticity", 
