@@ -43,13 +43,14 @@ sudo dpkg -l $pkg_list
 
 
 
-echo << TXT
+echo << TXT "
 to create data base:
 mysql -p -u root
 =============cut here=============
 create database domogik;
 grant usage on *.* to domogik@localhost identified by 'domopass';
 grant all privileges on domogik.* to domogik@localhost ;
-=============cut here=============
+=============cut here============= 
+"
 TXT
 
