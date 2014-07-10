@@ -278,7 +278,7 @@ class Manager(XplPlugin):
                                                            self.get_sanitized_hostname())
                                 # The automatic startup is handled in the Plugin class in __init__
 
-                                ### Create a InstanceType collection in order to send them over MQ
+                                ### Create a DeviceType collection in order to send them over MQ
                                 # this is only done when a new package is found
 
                             ### Register all the instance types
