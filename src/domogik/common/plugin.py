@@ -484,17 +484,16 @@ class Plugin(BasePlugin, MQRep):
         if self.json_data.has_key('products'):
             for product in self.json_data['products']:
                 ok_product = False
-                pdict = self.json_data['products'][product]
                 for ext in PRODUCTS_PICTURES_EXTENSIONS:
-                    file = "{0}.{1}".format(product, ext)
+                    file = "{0}.{1}".format(product['id'], ext)
                     if os.path.isfile("{0}/{1}".format(self.get_products_directory(), file)):
                         ok_product = True
                         break
                 if ok_product:
-                    self.log.debug(u"- OK : {0} ({1})".format(pdict['name'], file))
+                    self.log.debug(u"- OK : {0} ({1})".format(product['name'], file))
                 else:
                     ok = False
-                    self.log.warning(u"- Missing : {0} ({1}.{2})".format(pdict['name'], product, PRODUCTS_PICTURES_EXTENSIONS))
+                    self.log.warning(u"- Missing : {0} ({1}.{2})".format(product['name'], product['id'], PRODUCTS_PICTURES_EXTENSIONS))
         if ok == False:
             self.log.warning(u"Some pictures are missing!")
         else:
