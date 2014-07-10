@@ -161,7 +161,7 @@ def init_required_data_for_stats():
     print(init_required_data_for_stats.__doc__)
     global _device1
     dt1 = _db.add_device_technology('x10', 'x10', 'this is x10')
-    dty1 = _db.add_instance_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+    dty1 = _db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
     du1 = _db.add_device_usage('lighting', 'Lighting')
     area1 = _db.add_area('area1','description 1')
     room1 = _db.add_room('room1', area1.id)

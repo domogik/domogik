@@ -338,7 +338,7 @@ class Plugin(BasePlugin, MQRep):
             for a_device in device_list:
                 self.log.info(u"- id : {0}  /  name : {1}  /  device type id : {2}".format(a_device['id'], \
                                                                                     a_device['name'], \
-                                                                                    a_device['instance_type_id']))
+                                                                                    a_device['device_type_id']))
                 # log some informations about the device
                 # notice that even if we are not in the XplPlugin class we will display xpl related informations :
                 # for some no xpl plugins, there will just be nothing to display.
@@ -366,7 +366,7 @@ class Plugin(BasePlugin, MQRep):
             return device_list
 
 
-    def device_detected(self, instance_type, type, feature, data):
+    def device_detected(self, device_type, type, feature, data):
         """ The plugin developpers can call this function when a device is detected
             This function will check if a corresponding device exists and : 
             - if so, do nothing
@@ -376,18 +376,18 @@ class Plugin(BasePlugin, MQRep):
 
             ### TODO : implement a req/rep MQ message to allow UI to get the new devices list
 
-            @param instance_type : instance_type of the detected device
+            @param device_type : device_type of the detected device
             @param data : data about the device (address or any other configuration element of a device for this plugin)
             @param type : xpl_stats, xpl_commands
             @param feature : a xpl_stat or xpl_command feature
         """
-        self.log.debug(u"Device detected : instance_type = {0}, data = {1}".format(instance_type, data))
+        self.log.debug(u"Device detected : device_type = {0}, data = {1}".format(device_type, data))
         #self.log.debug(u"Already existing devices : {0}".format(self.devices))
         # browse all devices to find if the device exists
         found = False
         for a_device in self.devices:
             # first, search for device type
-            if a_device['instance_type_id'] == instance_type:
+            if a_device['device_type_id'] == device_type:
                 params = a_device[type][feature]['parameters']['static']
                 found = True
                 for key in data:
@@ -402,11 +402,11 @@ class Plugin(BasePlugin, MQRep):
         else:
             self.log.debug(u"The device doesn't exists in database")
          
-            # add the device feature in the new devices list : self.new_devices[instance_type][type][feature] = data
+            # add the device feature in the new devices list : self.new_devices[device_type][type][feature] = data
             self.log.debug(u"Check if the device has already be marked as new...")
             found = False
             for a_device in self.new_devices:
-                if a_device['instance_type_id'] == instance_type and \
+                if a_device['device_type_id'] == device_type and \
                    a_device['type'] == type and \
                    a_device['feature'] == feature:
 
@@ -414,7 +414,7 @@ class Plugin(BasePlugin, MQRep):
                         found = True
                     
             if found == False:
-                new_device ={'instance_type_id' : instance_type,
+                new_device ={'device_type_id' : device_type,
                              'type' : type,
                              'feature' : feature,
                              'data' : data}

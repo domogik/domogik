@@ -136,7 +136,7 @@ def client_devices_edit(client_id, did):
         MyForm = model_form(Device, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
-                        exclude=['params', 'commands', 'sensors', 'address', 'xpl_commands', 'xpl_stats', 'instance_type_id', 'client_id', 'client_version'])
+                        exclude=['params', 'commands', 'sensors', 'address', 'xpl_commands', 'xpl_stats', 'device_type_id', 'client_id', 'client_version'])
         form = MyForm(request.form, device)
 
 	if request.method == 'POST' and form.validate():
@@ -294,36 +294,36 @@ def client_devices_new(client_id):
         data = detaila[client_id]['data']
     else:
         data = {}
-    if type(data["instance_types"]) is not dict:
+    if type(data["device_types"]) is not dict:
         dtypes = {}
     else:
-        dtypes = list(data["instance_types"].keys())
+        dtypes = list(data["device_types"].keys())
     products = {}
     if "products" in data:
         for prod in data["products"]:
             products[prod["name"]] = prod["type"]
  
     return render_template('client_device_new.html',
-            instance_types = dtypes,
+            device_types = dtypes,
             products = products,
             clientid = client_id,
             mactve="clients",
             active = 'devices'
             )
 
-@app.route('/client/<client_id>/devices/new/type/<instance_type_id>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/devices/new/type/<device_type_id>', methods=['GET', 'POST'])
 @login_required
-def client_devices_new_type(client_id, instance_type_id):
-    return client_devices_new_wiz(client_id, instance_type_id, None)
+def client_devices_new_type(client_id, device_type_id):
+    return client_devices_new_wiz(client_id, device_type_id, None)
 
-@app.route('/client/<client_id>/devices/new/type/<instance_type_id>/prod/<product>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
 @login_required
-def client_devices_new_prod(client_id, instance_type_id, product):
-    return client_devices_new_wiz(client_id, instance_type_id, product)
+def client_devices_new_prod(client_id, device_type_id, product):
+    return client_devices_new_wiz(client_id, device_type_id, product)
 
-def client_devices_new_wiz(client_id, instance_type_id, product):
+def client_devices_new_wiz(client_id, device_type_id, product):
     # TODO get them
-    params = get_device_params(instance_type_id, app.zmq_context)
+    params = get_device_params(device_type_id, app.zmq_context)
 
     # dynamically generate the wtfform
     class F(Form):
@@ -360,7 +360,7 @@ def client_devices_new_wiz(client_id, instance_type_id, product):
             # create the device
             created_device = app.db.add_device_and_commands(
                 name=request.form.get('name'),
-                instance_type=instance_type_id,
+                device_type=device_type_id,
                 client_id=client_id,
                 description=request.form.get('description'),
                 reference=request.form.get('reference'),
@@ -390,7 +390,7 @@ def client_devices_new_wiz(client_id, instance_type_id, product):
     return render_template('client_device_new_wiz.html',
             form = form,
             params = params,
-            dtype = instance_type_id,
+            dtype = device_type_id,
             clientid = client_id,
             mactve="clients",
             active = 'devices'

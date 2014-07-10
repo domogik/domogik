@@ -109,7 +109,7 @@ class Device(Base):
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
     address = Column(Unicode(255), nullable=True)
-    instance_type_id = Column(Unicode(80), nullable=False, index=True)
+    device_type_id = Column(Unicode(80), nullable=False, index=True)
     client_id = Column(Unicode(80), nullable=False)
     client_version = Column(Unicode(32), nullable=False)
     params = relationship("DeviceParam", backref=__tablename__, cascade="all", passive_deletes=True)
@@ -118,20 +118,20 @@ class Device(Base):
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all", passive_deletes=True)
 
-    def __init__(self, name, reference, instance_type_id, client_id, client_version, description=None):
+    def __init__(self, name, reference, device_type_id, client_id, client_version, description=None):
         """Class constructor
 
         @param name : short name of the device
         @param address : device address (like 'A3' for x10, or '01.123456789ABC' for 1wire)
         @param reference : internal reference of the device (like AM12 for a X10 device)
         @param client_id : what plugin controls this device
-        @param instance_type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
+        @param device_type_id : 'link to the device type (x10.Switch, x10.Dimmer, Computer.WOL...)
         @param description : extended description, optional
 
         """
         self.name = ucode(name)
         self.reference = ucode(reference)
-        self.instance_type_id = ucode(instance_type_id)
+        self.device_type_id = ucode(device_type_id)
         self.client_id = ucode(client_id)
         self.client_version = ucode(client_version)
         self.description = ucode(description)
@@ -140,7 +140,7 @@ class Device(Base):
         """Return an internal representation of the class"""
         return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', client_version='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
-                  self.instance_type_id, self.client_id, self.client_version, \
+                  self.device_type_id, self.client_id, self.client_version, \
                   self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
 

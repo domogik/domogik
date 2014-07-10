@@ -177,7 +177,7 @@ class Manager(XplPlugin):
         self._packages = {}
 
         ### Create the device types list
-        self._instance_types = {}
+        self._device_types = {}
 
         ### Create the plugins list
         self._plugins = {}
@@ -282,9 +282,9 @@ class Manager(XplPlugin):
                                 # this is only done when a new package is found
 
                             ### Register all the device types
-                            for instance_type in self._packages[pkg_id].get_instance_types():
-                                self.log.info(u"Register device type : {0}".format(instance_type))
-                                self._instance_types[instance_type] = self._packages[pkg_id].get_json()
+                            for device_type in self._packages[pkg_id].get_device_types():
+                                self.log.info(u"Register device type : {0}".format(device_type))
+                                self._device_types[device_type] = self._packages[pkg_id].get_json()
     
             # finally, check if some packages has been uninstalled/removed
             pkg_to_unregister = []
@@ -423,11 +423,11 @@ class Manager(XplPlugin):
                 self.log.info(u"Packages details request : {0}".format(msg))
                 self._mdp_reply_packages_detail()
     
-            ### instance_types
-            # retrieve the instance_types
-            elif msg.get_action() == "instance_types.get":
+            ### device_types
+            # retrieve the device_types
+            elif msg.get_action() == "device_types.get":
                 self.log.info(u"Device types request : {0}".format(msg))
-                self._mdp_reply_instance_types(msg)
+                self._mdp_reply_device_types(msg)
     
             ### clients list and details
             # retrieve the clients list
@@ -475,21 +475,21 @@ class Manager(XplPlugin):
         self.reply(msg.get())
 
 
-    def _mdp_reply_instance_types(self, data):
+    def _mdp_reply_device_types(self, data):
         """ Reply on the MQ
             @param data : message data
         """
         msg = MQMessage()
-        msg.set_action('instance_types.result')
-        if 'instance_type' not in data.get_data():
-            for dev in self._instance_types:
-                msg.add_data(dev, self._instance_types[dev])
+        msg.set_action('device_types.result')
+        if 'device_type' not in data.get_data():
+            for dev in self._device_types:
+                msg.add_data(dev, self._device_types[dev])
         else:
-            instance_type = data.get_data()['instance_type']
-            if self._instance_types.has_key(instance_type):
-                msg.add_data(instance_type, self._instance_types[instance_type])
+            device_type = data.get_data()['device_type']
+            if self._device_types.has_key(device_type):
+                msg.add_data(device_type, self._device_types[device_type])
             else:
-                msg.add_data(instance_type, None)
+                msg.add_data(device_type, None)
         self.reply(msg.get())
 
 
@@ -628,11 +628,11 @@ class Package():
         """
         return self.json
 
-    def get_instance_types(self):
+    def get_device_types(self):
         """ Return all the device types available or the package
         """
         dt_list = []
-        for dt in self.json['instance_types']:
+        for dt in self.json['device_types']:
             dt_list.append(dt)
         return dt_list
 

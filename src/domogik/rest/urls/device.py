@@ -30,8 +30,8 @@ def get_device_params(dev_type_id, zmq=None):
     else:
         cli = MQSyncReq(urlHandler.zmq_context)
     msg = MQMessage()
-    msg.set_action('instance_types.get')
-    msg.add_data('instance_type', dev_type_id)
+    msg.set_action('device_types.get')
+    msg.add_data('device_type', dev_type_id)
     res = cli.request('manager', msg.get(), timeout=10)
     if res is None:
         raise Exception("Bad device type (MQ)")
@@ -45,12 +45,12 @@ def get_device_params(dev_type_id, zmq=None):
     ret = {}
     ret['commands'] = []
     ret['global'] = []
-    if 'parameters' in pjson['instance_types'][dev_type_id]:
-        ret['global']  = pjson['instance_types'][dev_type_id]['parameters']
+    if 'parameters' in pjson['device_types'][dev_type_id]:
+        ret['global']  = pjson['device_types'][dev_type_id]['parameters']
     ret['xpl_stat'] = []
     ret['xpl_cmd'] = []
     # find all features for this device
-    for c in pjson['instance_types'][dev_type_id]['commands']:
+    for c in pjson['device_types'][dev_type_id]['commands']:
         if not c in pjson['commands']:
             break
         cm = pjson['commands'][c]
@@ -96,7 +96,7 @@ def device_globals(did):
     #- if static field == 0 and no sensor id is defined => this is a device param => value will be filled in
     #- if statis == 0 and it has a sensor id => its a dynamic param
     device = urlHandler.db.get_device(did)
-    js = get_device_params(device['instance_type_id'])
+    js = get_device_params(device['device_type_id'])
     for x in urlHandler.db.get_xpl_command_by_device_id(did):
         for p in js['global']:
             if p["xpl"] is True:
@@ -126,16 +126,16 @@ def device_xplcmd_params(did):
     if dev == None:
         # ERROR
         return
-    # get the instance_type
-    dt = urlHandler.db.get_instance_type_by_id(dev.instance_type_id)
+    # get the device_type
+    dt = urlHandler.db.get_device_type_by_id(dev.device_type_id)
     if dt == None:
         # ERROR
         return
     # get the json
     cli = MQSyncReq(urlHandler.zmq_context)
     msg = MQMessage()
-    msg.set_action('instance_types.get')
-    msg.add_data('instance_type', dev.instance_type_id)
+    msg.set_action('device_types.get')
+    msg.add_data('device_type', dev.device_type_id)
     res = cli.request('manager', msg.get(), timeout=10)
     if res is None:
         return "Bad device type"
@@ -169,16 +169,16 @@ def device_xplstat_params(did):
     if dev == None:
         # ERROR
         return
-    # get the instance_type
-    dt = urlHandler.db.get_instance_type_by_id(dev.instance_type_id)
+    # get the device_type
+    dt = urlHandler.db.get_device_type_by_id(dev.device_type_id)
     if dt == None:
         # ERROR
         return
     # get the json
     cli = MQSyncReq(urlHandler.zmq_context)
     msg = MQMessage()
-    msg.set_action('instance_types.get')
-    msg.add_data('instance_type', dev.instance_type_id)
+    msg.set_action('device_types.get')
+    msg.add_data('device_type', dev.device_type_id)
     res = cli.request('manager', msg.get(), timeout=10)
     if res is None:
         return "Bad device type"
@@ -225,8 +225,8 @@ class deviceAPI(MethodView):
         """
         cli = MQSyncReq(urlHandler.zmq_context)
 
-        #self.log.info(u"Device creation request for {0} {1} on {2} : name = '{3}', instance_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('instance_type'), request.form.get('reference')))
-        #urlHandler.log.info("Device creation request for {0} {1} on {2} : name = '{3}', instance_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('instance_type'), request.form.get('reference')))
+        #self.log.info(u"Device creation request for {0} {1} on {2} : name = '{3}', device_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('device_type'), request.form.get('reference')))
+        #urlHandler.log.info("Device creation request for {0} {1} on {2} : name = '{3}', device_type = '{4}', reference = '{5}'".format(request.form.get('type'), request.form.get('id'), request.form.get('host'), request.form.get('device_type'), request.form.get('reference')))
 
         # get the client details
         msg = MQMessage()
@@ -254,7 +254,7 @@ class deviceAPI(MethodView):
         # notice that we don't give any address for the device as this will be done with another url later
         created_device = urlHandler.db.add_device_and_commands(
             name=request.form.get('name'),
-            instance_type=request.form.get('instance_type'),
+            device_type=request.form.get('device_type'),
             client_id=request.form.get('client_id'),
             description=request.form.get('description'),
             reference=request.form.get('reference'),

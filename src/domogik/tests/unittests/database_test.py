@@ -73,9 +73,9 @@ class GenericTestCase(unittest.TestCase):
         for du in db.list_device_usages():
             db.del_device_usage(du.id, cascade_delete=True)
 
-    def remove_all_instance_types(self):
-        for dty in db.list_instance_types():
-            db.del_instance_type(dty.id, cascade_delete=True)
+    def remove_all_device_types(self):
+        for dty in db.list_device_types():
+            db.del_device_type(dty.id, cascade_delete=True)
 
     def remove_all_plugin_config(self):
         for plc in db.list_all_plugin_config():
@@ -153,62 +153,62 @@ class DeviceTypeTestCase(GenericTestCase):
     """Test device types"""
 
     def setUp(self):
-        self.remove_all_instance_types()
+        self.remove_all_device_types()
         self.remove_all_device_technologies()
 
     def tearDown(self):
-        self.remove_all_instance_types()
+        self.remove_all_device_types()
 
     def test_empty_list(self):
-        assert len(db.list_instance_types()) == 0
+        assert len(db.list_device_types()) == 0
 
     def test_add(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         try:
-            db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=u'99999999999')
+            db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=u'99999999999')
             TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
         except DbHelperException:
             pass
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         print(dty1)
         assert dty1.name == 'Switch'
         assert dty1.description == 'desc1'
         assert dty1.device_technology_id == dt1.id
-        dty2 = db.add_instance_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
-        assert len(db.list_instance_types()) == 2
-        assert self.has_item(db.list_instance_types(), ['Switch', 'Dimmer'])
+        dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dty_description='desc2', dt_id=dt1.id)
+        assert len(db.list_device_types()) == 2
+        assert self.has_item(db.list_device_types(), ['Switch', 'Dimmer'])
 
     def test_update(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'desc dt2')
-        dty = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         try:
-            db.update_instance_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=u'99999999999')
+            db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=u'99999999999')
             TestCase.fail(self, "An exception should have been raised : device techno id does not exist")
         except DbHelperException:
             pass
-        dty_u = db.update_instance_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=dt2.id, dty_description='desc2')
+        dty_u = db.update_device_type(dty_id=dty.id, dty_name='x10 Dimmer', dt_id=dt2.id, dty_description='desc2')
         assert dty_u.name == 'x10 Dimmer'
         assert dty_u.description == 'desc2'
         assert dty_u.device_technology_id == dt2.id
 
     def test_list_and_get(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
-        assert db.get_instance_type_by_id('x10.switch').name == 'Switch'
-        assert db.get_instance_type_by_name('Switch').name == 'Switch'
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        assert db.get_device_type_by_id('x10.switch').name == 'Switch'
+        assert db.get_device_type_by_name('Switch').name == 'Switch'
 
     def test_del(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id)
-        dty2 = db.add_instance_type(dty_id='x10.dimmer', dty_name='Dimmer', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id)
+        dty2 = db.add_device_type(dty_id='x10.dimmer', dty_name='Dimmer', dt_id=dt1.id)
         dty2_id = dty2.id
-        dty_del = db.del_instance_type(dty2.id)
-        assert self.has_item(db.list_instance_types(), ['Switch'])
+        dty_del = db.del_device_type(dty2.id)
+        assert self.has_item(db.list_device_types(), ['Switch'])
         assert not self.has_item(db.list_device_usages(), ['x10 Dimmer'])
         assert dty_del.id == dty2_id
         try:
-            db.del_instance_type(12345678910)
+            db.del_device_type(12345678910)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
         except DbHelperException:
             pass
@@ -340,7 +340,7 @@ class DeviceTestCase(GenericTestCase):
     def test_add(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
         du1 = db.add_device_usage('du1_id', 'du1')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         try:
             db.add_device(d_name='device1', d_address = 'A1', d_type_id = u'9999999999', d_usage_id = du1.id)
             TestCase.fail(self, "Device type does not exist, an exception should have been raised")
@@ -361,9 +361,9 @@ class DeviceTestCase(GenericTestCase):
         dt1 = db.add_device_technology('x10', 'x10', 'x10 device type')
         dt2 = db.add_device_technology('plcbus', 'PLCBus', 'PLCBus device type')
         du1 = db.add_device_usage('appliance', 'Appliance')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id,
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dt_id=dt1.id,
                                   dty_description='My beautiful switch')
-        dty2 = db.add_instance_type(dty_id='plcbus.switch', dty_name='Switch', dt_id=dt2.id,
+        dty2 = db.add_device_type(dty_id='plcbus.switch', dty_name='Switch', dt_id=dt2.id,
                                   dty_description='Another beautiful switch')
         device1 = db.add_device(d_name='Toaster', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='My new toaster')
@@ -378,7 +378,7 @@ class DeviceTestCase(GenericTestCase):
 
     def test_update(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('du1_id', 'du1')
         device1 = db.add_device(d_name='device1', d_address='A1',
                                 d_type_id=dty1.id, d_usage_id=du1.id, d_description='desc1')
@@ -400,7 +400,7 @@ class DeviceTestCase(GenericTestCase):
 
     def test_del(self):
         dt1 = db.add_device_technology('x10', 'x10', 'desc dt1')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='x10 Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('du1_id', 'du1')
         du2 = db.add_device_usage('du2_id', 'du2')
         device1 = db.add_device(d_name='device1', d_address='A1',
@@ -454,7 +454,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_add_list_get(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('lighting', 'Lighting')
 
         # Add device stats
@@ -523,7 +523,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_add_with_hist_size(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('lighting', 'Lighting')
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1000, device1.id)
@@ -542,7 +542,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_filter(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('lighting', 'Lighting')
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         device2 = db.add_device(d_name='device2', d_address = "A2", d_type_id = dty1.id, d_usage_id = du1.id)
@@ -749,7 +749,7 @@ class DeviceStatsTestCase(GenericTestCase):
 
     def test_del(self):
         dt1 = db.add_device_technology('x10', 'x10', 'this is x10')
-        dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
+        dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('lighting', 'Lighting')
         device1 = db.add_device(d_name='device1', d_address='A1', d_type_id=dty1.id, d_usage_id=du1.id)
         device2 = db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
