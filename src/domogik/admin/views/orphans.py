@@ -41,5 +41,5 @@ def orphans_delete(did):
     msg = MQMessage()
     msg.set_action( 'reload' )
     resp = req.request('xplgw', msg.get(), 100)
-    flash(gettext("Instance deleted"), "success")
+    flash(gettext("Device deleted"), "success")
     return redirect("/orphans")

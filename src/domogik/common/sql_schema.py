@@ -27,8 +27,8 @@ Implements
 ==========
 
 - class PluginConfig
-- class Instance
-- class InstanceStats
+- class Device
+- class DeviceStats
 - class Person
 - class UserAccount
 
@@ -99,8 +99,8 @@ class PluginConfig(Base):
         """Return the table name associated to the class"""
         return PluginConfig.__tablename__
 
-class Instance(Base):
-    """Instance"""
+class Device(Base):
+    """Device"""
 
     __tablename__ = '%s_instance' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
@@ -112,7 +112,7 @@ class Instance(Base):
     instance_type_id = Column(Unicode(80), nullable=False, index=True)
     client_id = Column(Unicode(80), nullable=False)
     client_version = Column(Unicode(32), nullable=False)
-    params = relationship("InstanceParam", backref=__tablename__, cascade="all", passive_deletes=True)
+    params = relationship("DeviceParam", backref=__tablename__, cascade="all", passive_deletes=True)
     commands = relationship("Command", backref=__tablename__, cascade="all", passive_deletes=True)
     sensors = relationship("Sensor", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
@@ -138,7 +138,7 @@ class Instance(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Instance(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', client_version='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
+        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', client_version='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
                % (self.id, self.name, self.description, self.reference,\
                   self.instance_type_id, self.client_id, self.client_version, \
                   self.commands, \
@@ -147,15 +147,15 @@ class Instance(Base):
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
-        return Instance.__tablename__
+        return Device.__tablename__
 
-class InstanceParam(Base):
-    """Instance config, some config parameters that are only accessable over the mq, or inside domogik, these have nothin todo with xpl"""
+class DeviceParam(Base):
+    """Device config, some config parameters that are only accessable over the mq, or inside domogik, these have nothin todo with xpl"""
 
     __tablename__ = '%s_instance_param' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    instance_id = Column(Integer, ForeignKey('%s.id' % Instance.get_tablename(), ondelete="cascade"), nullable=False)
+    instance_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
@@ -175,16 +175,16 @@ class InstanceParam(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<InstanceParam(id={0}, instance_id={1}, key='{2}', value='{3}', type='{4}')>"\
+        return "<DeviceParam(id={0}, instance_id={1}, key='{2}', value='{3}', type='{4}')>"\
                .format(self.id, self.instance_id, self.key, self.value, self.type)\
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
-        return Instance.__tablename__
+        return Device.__tablename__
 
-class InstanceStats(Base):
-    """Instance stats (values that were associated to the instance)"""
+class DeviceStats(Base):
+    """Device stats (values that were associated to the instance)"""
 
     __tablename__ = '%s_instance_stats' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
@@ -193,8 +193,8 @@ class InstanceStats(Base):
     # This is used for mysql compatibility reasons as timestamps are NOT handled in Unix Time format
     timestamp = Column(Integer, nullable=False)
     skey = Column(Unicode(30), nullable=False, index=True)
-    instance_id = Column(Integer, ForeignKey('%s.id' % Instance.get_tablename()), nullable=False)
-    instance = relation(Instance)
+    instance_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
+    instance = relation(Device)
     # We have both types for value field because we need an explicit numerical field in case we want to compute
     # arithmetical operations (min/max/avg etc.). If it is a numerical value, both fields are filled in. If it is a
     # character value only 'value' field is filled in.
@@ -228,13 +228,13 @@ class InstanceStats(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<InstanceStats(%s, date='%s', (%s, %s), instance=%s)>" % (self.id, self.date, self.skey, self.value,
+        return "<DeviceStats(%s, date='%s', (%s, %s), instance=%s)>" % (self.id, self.date, self.skey, self.value,
                                                                       self.instance)
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
-        return InstanceStats.__tablename__
+        return DeviceStats.__tablename__
 
 class Person(Base):
     """Persons registered in the app"""
@@ -330,7 +330,7 @@ class Command(Base):
     __tablename__ = '%s_command' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True) 
-    instance_id = Column(Integer, ForeignKey('%s.id' % Instance.get_tablename(), ondelete="cascade"), nullable=False)
+    instance_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255), nullable=False)
     reference = Column(Unicode(64))
     return_confirmation = Column(Boolean, nullable=False)
@@ -382,7 +382,7 @@ class Sensor(Base):
     __tablename__ = '%s_sensor' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True) 
-    instance_id = Column(Integer, ForeignKey('%s.id' % Instance.get_tablename(), ondelete="cascade"), nullable=False)
+    instance_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     incremental = Column(Boolean, nullable=False)
@@ -460,7 +460,7 @@ class XplStat(Base):
     __tablename__ = '%s_xplstat' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    instance_id = Column(Integer, ForeignKey('%s.id' % Instance.get_tablename(), ondelete="cascade"), nullable=False)
+    instance_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
     name = Column(Unicode(64), nullable=False)
     schema = Column(Unicode(32), nullable=False)
@@ -519,7 +519,7 @@ class XplCommand(Base):
     __tablename__ = '%s_xplcommand' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    instance_id = Column(Integer, ForeignKey('%s.id' % Instance.get_tablename(), ondelete="cascade"), nullable=False)
+    instance_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
     name = Column(Unicode(64), nullable=False)

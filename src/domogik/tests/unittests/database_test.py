@@ -40,7 +40,7 @@ from sqlalchemy import create_engine
 
 from domogik.common import sql_schema
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.common.sql_schema import InstanceStats
+from domogik.common.sql_schema import DeviceStats
 
 
 def make_ts(year, month, day, hours=0, minutes=0, seconds=0):
@@ -97,7 +97,7 @@ class GenericTestCase(unittest.TestCase):
         for user in db.list_user_accounts():
             db.del_user_account(user.id)
 
-class InstanceUsageTestCase(GenericTestCase):
+class DeviceUsageTestCase(GenericTestCase):
     """Test instance usages"""
 
     def setUp(self):
@@ -145,7 +145,7 @@ class InstanceUsageTestCase(GenericTestCase):
         assert du_del.id == du2_id
         try:
             db.del_instance_usage(12345678910)
-            TestCase.fail(self, "Instance usage does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -209,11 +209,11 @@ class InstanceTypeTestCase(GenericTestCase):
         assert dty_del.id == dty2_id
         try:
             db.del_instance_type(12345678910)
-            TestCase.fail(self, "Instance type does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device type does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
-class InstanceTechnologyTestCase(GenericTestCase):
+class DeviceTechnologyTestCase(GenericTestCase):
     """Test instance technologies"""
 
     def setUp(self):
@@ -257,7 +257,7 @@ class InstanceTechnologyTestCase(GenericTestCase):
         assert dt_del.id == dt2_id
         try:
             db.del_instance_technology(12345678910)
-            TestCase.fail(self, "Instance technology does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device technology does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
@@ -321,7 +321,7 @@ class PluginConfigTestCase(GenericTestCase):
         assert len(db.list_plugin_config('x10', '192.168.0.2')) == 1
 
 
-class InstanceTestCase(GenericTestCase):
+class DeviceTestCase(GenericTestCase):
     """Test instance"""
 
     def setUp(self):
@@ -343,9 +343,9 @@ class InstanceTestCase(GenericTestCase):
         dty1 = db.add_instance_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         try:
             db.add_instance(d_name='instance1', d_address = 'A1', d_type_id = u'9999999999', d_usage_id = du1.id)
-            TestCase.fail(self, "Instance type does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device type does not exist, an exception should have been raised")
             db.add_instance(d_name='instance1', d_address = 'A1', d_type_id = dty1.id, d_usage_id = u'9999999999999')
-            TestCase.fail(self, "Instance usage does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
         except DbHelperException:
             pass
         instance1 = db.add_instance(d_name='instance1', d_address='A1',
@@ -385,7 +385,7 @@ class InstanceTestCase(GenericTestCase):
         instance_id = instance1.id
         try:
             db.update_instance(d_id=instance1.id, d_usage_id=u'9999999999999')
-            TestCase.fail(self, "Instance usage does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device usage does not exist, an exception should have been raised")
         except DbHelperException:
             pass
         instance1 = db.update_instance(d_id=instance1.id, d_description='desc2', d_reference='A1')
@@ -424,11 +424,11 @@ class InstanceTestCase(GenericTestCase):
         assert instance_del.id == instance2.id
         try:
             db.del_instance(12345678910)
-            TestCase.fail(self, "Instance does not exist, an exception should have been raised")
+            TestCase.fail(self, "Device does not exist, an exception should have been raised")
         except DbHelperException:
             pass
 
-class InstanceStatsTestCase(GenericTestCase):
+class DeviceStatsTestCase(GenericTestCase):
     """Test instance stats"""
 
     def setUp(self):
@@ -553,15 +553,15 @@ class InstanceStatsTestCase(GenericTestCase):
         insert_step = 10
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                InstanceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             skey=u'valm', value=(i/insert_step), instance_id=instance1.id)
             )
             db._DbHelper__session.add(
-                InstanceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             skey=u'valm2', value=(i/insert_step+200), instance_id=instance1.id)
             )
             db._DbHelper__session.add(
-                InstanceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             skey=u'valm', value=(i/insert_step+100), instance_id=instance2.id)
             )
         db._DbHelper__session.commit()
@@ -591,7 +591,7 @@ class InstanceStatsTestCase(GenericTestCase):
         insert_step = 2500
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                InstanceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             skey=u'valh', value=i/insert_step, instance_id=instance1.id)
             )
         db._DbHelper__session.commit()
@@ -626,7 +626,7 @@ class InstanceStatsTestCase(GenericTestCase):
         insert_step = 28000
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                InstanceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             skey=u'vald', value=i/insert_step, instance_id=instance1.id)
             )
         db._DbHelper__session.commit()
@@ -657,7 +657,7 @@ class InstanceStatsTestCase(GenericTestCase):
         insert_step = 12 * 3600
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                InstanceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             skey=u'valw', value=i/insert_step, instance_id=instance1.id)
             )
         db._DbHelper__session.commit()
@@ -688,7 +688,7 @@ class InstanceStatsTestCase(GenericTestCase):
         insert_step = 3600 * 24 * 15
         for i in range(0, int(end_p - start_p), insert_step):
             db._DbHelper__session.add(
-                InstanceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
+                DeviceStats(date=datetime.datetime.fromtimestamp(start_p + i), timestamp=start_p + i,
                             skey=u'valmy', value=i/insert_step, instance_id=instance1.id)
             )
         db._DbHelper__session.commit()

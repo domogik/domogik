@@ -426,7 +426,7 @@ class Manager(XplPlugin):
             ### instance_types
             # retrieve the instance_types
             elif msg.get_action() == "instance_types.get":
-                self.log.info(u"Instance types request : {0}".format(msg))
+                self.log.info(u"Device types request : {0}".format(msg))
                 self._mdp_reply_instance_types(msg)
     
             ### clients list and details

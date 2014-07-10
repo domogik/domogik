@@ -343,15 +343,15 @@ class DBConnector(XplPlugin, MQRep):
         msg_data = data.get_data()
         if 'type' not in msg_data:
             status = False
-            reason = "Instances request : missing 'type' field : {0}".format(data)
+            reason = "Devices request : missing 'type' field : {0}".format(data)
 
         if 'name' not in msg_data:
             status = False
-            reason = "Instances request : missing 'name' field : {0}".format(data)
+            reason = "Devices request : missing 'name' field : {0}".format(data)
 
         if 'host' not in msg_data:
             status = False
-            reason = "Instances request : missing 'host' field : {0}".format(data)
+            reason = "Devices request : missing 'host' field : {0}".format(data)
 
         if status == False:
             self.log.error(reason)

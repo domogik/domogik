@@ -42,7 +42,7 @@ import json
 import sys
 
 
-class TestInstance():
+class TestDevice():
     """ Tool to create test instances
     """
 
@@ -74,7 +74,7 @@ class TestInstance():
         self.instance_type = instance_type
         description = "a test instance"
         reference = "for test only"
-        print(u"Create a test instance for {0}. Instance type is '{1}', name is '{2}'".format(self.client_id,
+        print(u"Create a test instance for {0}. Device type is '{1}', name is '{2}'".format(self.client_id,
                                                                                                           self.instance_type,
                                                                                                           self.instance_name))
 
@@ -155,7 +155,7 @@ class TestInstance():
 
 if __name__ == "__main__":
 
-    td = TestInstance()
+    td = TestDevice()
     #td.create_instance("plugin-diskfree.{0}".format(get_sanitized_hostname()), "avec un accent é comme ça", "diskfree.disk_usage")
     td.create_instance("plugin-diskfree.{0}".format(get_sanitized_hostname()), "test_instance_diskfree", "diskfree.disk_usage")
     td.configure_global_parameters({"instance" : "/home", "interval" : 1})
