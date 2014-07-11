@@ -323,9 +323,10 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 # check if we need a conversion
                                 if self._sen.conversion is not None and self._sen.conversion != '':
                                     if self._dev['client_id'] in self._conv:
- 				        if self._sen.conversion in self._conv[self._dev['client_id']]:
+ 				                         if self._sen.conversion in self._conv[self._dev['client_id']]:
+                                            self._log_stats.debug("Running conversion {1}".format(self._sen.conversion))
                                             exec(self._conv[self._dev['client_id']][self._sen.conversion])
-					    value = locals()[self._sen.conversion](value)
+					                        value = locals()[self._sen.conversion](value)
                                 self._log_stats.info( \
                                         "Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
                                         .format(self._dev['name'], self._dev['id'], self._sen.name, self._sen.id, param.key, value))
