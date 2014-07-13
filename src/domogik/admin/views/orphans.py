@@ -31,7 +31,7 @@ def orphans():
         devices=orphan_devs
         )
 
-@app.route('/orphansi/delete/<did>')
+@app.route('/orphans/delete/<did>')
 @login_required
 def orphans_delete(did):
     with app.db.session_scope():
