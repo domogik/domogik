@@ -388,6 +388,9 @@ class SysManager(XplPlugin):
         """
         import urllib2
 
+        ### Wait for rest to start to avoid odd mutual flock condition on Loader (config)
+        self.get_stop().wait(3)
+
         cfg_rest = Loader('rest')
         config_rest = cfg_rest.load()
         conf_rest = dict(config_rest[1])
@@ -854,7 +857,6 @@ class SysManager(XplPlugin):
         for external_model in self._external_models:
             msg_vendor_device = "%s-%s" % (external_model["vendor_id"], 
                                            external_model["device_id"])
-            unknown = True
             if vendor_device == msg_vendor_device:
                 unknown = False
                 self.log.debug("Refresh external members list with : %s" % str(message))
@@ -1189,11 +1191,13 @@ class SysManager(XplPlugin):
         self.log.debug("Call _packagge_cb")
 
         command = message.data['command']
-        print("Package action : %s" % command)
+        self.log.debug("Package action : %s" % command)
         try:
             host = message.data['host']
         except KeyError:
             host = "*"
+
+        self.log.debug("Host : %s" % host)
 
         # check if message is for us
         if self.get_sanitized_hostname() != host and host != "*":
@@ -1318,6 +1322,7 @@ class SysManager(XplPlugin):
         while message.data.has_key("dep%s" % idx):
             dep = message.data["dep%s" % idx]
             mess.add_data({"dep%s" % idx : dep})
+            self.log.debug("Checking %s" % dep)
             if PATTERN_DISTUTILS_VERSION.findall(dep) == []:
                 msg = "Wrong version format for '%s' : should be 'foo (...)'" % dep
                 self.log.warning(msg)
