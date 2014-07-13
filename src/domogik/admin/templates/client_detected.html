@@ -4,8 +4,7 @@
 {% include "client_menu.html" %}
 <div class="container">
     <h2>{% trans %}Detected devices{% endtrans %}</h2>
-    {% if devices|length > 0 %}
-      <table class="table table-condensed" style="border-collapse:collapse;">
+    <table id="detected" class="table table-condensed" style="border-collapse:collapse;">
             <thead>
                     <tr>
                         <td>{% trans %}Device Type{% endtrans %}</td>
@@ -22,16 +21,16 @@
                     </tr>
             {% endfor %}
             </tbody>
-        </table>
-    {% else %}
-    <div class="alert alert-warning">{% trans %}No new devices found{% endtrans %}</div>
-    {% endif %}
+    </table>
     <script type="text/javascript">
         ws.onmessage = function(e) {
             data = JSON.parse(e.data);
             if (data.msgid == "device.new" ) {
-				if (data.content.client_id == "{{ client_id }}") {
-					alert(data.devices);
+				if (data.content.client_id == "{{ clientid }}") {
+                    for (index = 0; index < data.content['devices'].length; ++index ) {
+                        dev = data.content['devices'][index];
+                        $('#detected > tbody:last').append('<tr><td>' + dev.device_type_id +'</td><td>' + dev.feature + '</td><td>' + JSON.stringify(dev.data) + '</td></tr>');
+                    }
 				}
             }
         }
