@@ -200,11 +200,15 @@ class PackageJson():
             # validate identity
             expected = ["author", "author_email", "description", "domogik_min_version", "name", "type", "version"]
             optional = ["tags", "dependencies", "package_id", "icon_file"]
+            if type(self.json["identity"]) != dict:
+                raise PackageException("Identity part is NOT a dictionary!")
             self._validate_keys(expected, "an identity param", self.json["identity"].keys(), optional)
 
             # validate configuration
             expected = ["default", "description", "key", "name", "required", "type"]
             optional = ["sort", "max_value", "min_value", "choices", "mask", "multiline"]
+            if type(self.json["configuration"]) != list:
+                raise PackageException("Configuration part is NOT a list!")
             for conf in self.json["configuration"]:
                 self._validate_keys(expected, "a configuration item param", conf.keys(), optional)
 
@@ -215,25 +219,35 @@ class PackageJson():
                     self._validate_keys(expected, "a product", prod.keys())
 
             #validate the device_type
+            if type(self.json["device_types"]) != dict:
+                raise PackageException("Device_types part is NOT a dictionary!")
             for devtype in self.json["device_types"]:
                 devt = self.json["device_types"][devtype]
                 expected = ['id', 'name', 'description', 'commands', 'sensors', 'parameters']
                 self._validate_keys(expected, "device_type {0}".format(devtype), devt.keys())
                 #check that all commands exists inisde each device_type
+                if type(devt["commands"]) != list:
+                    raise PackageException("Commands list for device_type {0} is NOT a list!".format(devtype))
                 for cmd in devt["commands"]:
                     if cmd not in self.json["commands"].keys():    
                         raise PackageException("cmd {0} defined in device_type {1} is not found".format(cmd, devtype))
                 #check that all sensors exists inside each device type
+                if type(devt["sensors"]) != list:
+                    raise PackageException("Sensors list for device_type {0} is NOT a list!".format(devtype))
                 for sens in devt["sensors"]:
                     if sens not in self.json["sensors"].keys():    
                         raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
                 #see that each xplparam inside device_type has the following keys: key, description, type
                 expected = ["key", "type", "description", "xpl"]
                 optional = ["max_value", "min_value", "choices", "mask", "multiline"]
+                if type(devt["parameters"]) != list:
+                    raise PackageException("Parameters list for device_type {0} is NOT a list!".format(devtype))
                 for par in devt["parameters"]:
                     self._validate_keys(expected, "a param for device_type {0}".format(devtype), par.keys(), optional)
 
             #validate the commands
+            if type(self.json["commands"]) != dict:
+                raise PackageException("Commands part is NOT a dictionary!")
             for cmdid in self.json["commands"]:
                 cmd = self.json["commands"][cmdid]
                 expected = ['name', 'return_confirmation', 'parameters', 'xpl_command']
@@ -249,6 +263,8 @@ class PackageJson():
                     raise PackageException("xpl_command {0} defined in command {1} is not found".format(cmd["xpl_command"], cmdid))
 
             #validate the sensors
+            if type(self.json["sensors"]) != dict:
+                raise PackageException("Sensor part is NOT a dictionary!")
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
                 expected = ['name', 'data_type', 'conversion', 'history', 'incremental']
@@ -257,6 +273,8 @@ class PackageJson():
                 self._validate_keys(hexpected, "sensor {0} history".format(senid), list(sens['history'].keys()))
 
             #validate the xpl command
+            if type(self.json["xpl_commands"]) != dict:
+                raise PackageException("Xpl_commands part is NOT a dictionary!")
             for xcmdid in self.json["xpl_commands"]:
                 xcmd = self.json["xpl_commands"][xcmdid]
                 expected = ["name", "schema", "xplstat_name", "parameters"]
@@ -266,10 +284,14 @@ class PackageJson():
                 self._validate_keys(expected, "parameters for xpl_command {0}".format(xcmdid), xcmd['parameters'].keys())
                 # static parameter
                 expected = ["key", "value"]
+                if type(xcmd['parameters']['static']) != list:
+                    raise PackageException("Static parameters for xpl_command {0} is not a list".format(xcmdid))
                 for stat in xcmd['parameters']['static']:
                     self._validate_keys(expected, "a static parameter for xpl_command {0}".format(xcmdid), stat.keys())
                 # device parameter
                 expected = ["key", "description", "type"]
+                if type(xcmd['parameters']['device']) != list:
+                    raise PackageException("Device parameters for xpl_command {0} is not a list".format(xcmdid))
                 for stat in xcmd['parameters']['device']:
                     self._validate_keys(expected, "a device parameter for xpl_command {0}".format(xcmdid), stat.keys())
                 # see that the xpl_stat is defined
@@ -277,6 +299,8 @@ class PackageJson():
                     raise PackageException("xplstat_name {0} defined in xpl_command {1} is not found".format(xcmd["xplstat_name"], xcmdid))
 
             #validate the xpl stats
+            if type(self.json["xpl_stats"]) != dict:
+                raise PackageException("Xpl_stats part is NOT a dictionary!")
             for xstatid in self.json["xpl_stats"]:
                 xstat = self.json["xpl_stats"][xstatid]
                 expected = ["name", "schema", "parameters"]
@@ -286,15 +310,21 @@ class PackageJson():
                 self._validate_keys(expected, "parameters for xpl_stat {0}".format(xstatid), xstat['parameters'].keys())
                 # static parameter
                 expected = ["key", "value"]
+                if type(xstat['parameters']['static']) != list:
+                    raise PackageException("Static parameters for xpl_stat {0} is not a list".format(xstatid))
                 for stat in xstat['parameters']['static']:
                     self._validate_keys(expected, "a static parameter for xpl_stat {0}".format(xstatid), stat.keys())
                 # device parameter
                 expected = ["key", "description", "type"]
+                if type(xstat['parameters']['device']) != list:
+                    raise PackageException("Device parameters for xpl_stat {0} is not a list".format(xstatid))
                 for stat in xstat['parameters']['device']:
                     self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys())
                 # dynamic parameter
                 expected = ["key", "sensor"]
                 opt = ["ignore_values"]
+                if type(xstat['parameters']['dynamic']) != list:
+                    raise PackageException("Dynamic parameters for xpl_stat {0} is not a list".format(xstatid))
                 for stat in xstat['parameters']['dynamic']:
                     self._validate_keys(expected, "a dynamic parameter for xpl_stat {0}".format(xstatid), stat.keys(), opt)
                     # check that the sensor exists
