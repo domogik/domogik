@@ -222,7 +222,7 @@ def client_config(client_id):
             default = item["default"]
         # build the field
         if item["type"] == "boolean":
-            if default == 'Y':
+            if default == 'Y' or default == 1 or default == True:
 	        default = True
             else:
                 default = False
