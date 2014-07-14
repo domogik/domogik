@@ -1,1 +1,5 @@
 sphinxcontrib-blockdiag==1.1.1
+sphinxcontrib.nwdiag
+sphinxcontrib.seqdiag
+sphinxcontrib.actdiag
+
