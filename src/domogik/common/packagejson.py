@@ -240,6 +240,8 @@ class PackageJson():
                 self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys())
                 # validate the params
                 expected = ['key', 'data_type', 'conversion']
+                if type(cmd['parameters']) != list:
+                    raise PackageException("Parameters for command {0} is not a list".format(cmdid))
                 for par in cmd['parameters']:
                     self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
                 # see that the xpl_command is defined
