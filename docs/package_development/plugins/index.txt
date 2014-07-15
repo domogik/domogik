@@ -37,6 +37,7 @@ Before coding : branching to 'develop'
 ======================================
 
 * :doc:`Switch to the *develop* branch to start your developments <git/switch_to_develop>`
+* :doc:`If you want you can create in one shot the main folders and files <plugin_file_tree/create_sample>`
 
 * TODO : submit the development package zip
 
