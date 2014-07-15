@@ -7,16 +7,18 @@
       <table class="table table-striped" style="border-collapse:collapse;">
             <thead>
                     <tr>
-                        <th scope="col">{% trans %}ID{% endtrans %}</td>
-                        <th scope="col">{% trans %}Type{% endtrans %}</td>
-                        <th scope="col">{% trans %}Status{% endtrans %}</td>
-                        <th scope="col">{% trans %}Configured{% endtrans %}</td>
-                        <th scope="col">{% trans %}Actions{% endtrans %}</td>
+                        <th scope="col">{% trans %}ID{% endtrans %}</th>
+                        <th scope="col">{% trans %}Type{% endtrans %}</th>
+                        <th scope="col">{% trans %}Status{% endtrans %}</th>
+                        <th scope="col">{% trans %}Configured{% endtrans %}</th>
+                        <th scope="col">{% trans %}Actions{% endtrans %}</th>
                     </tr>
             </thead>
             <tbody>
+	    {% set count = 0 %}
             {% for name, data in clients.iteritems() %}
                 {% if data.type != 'core' %}
+                    {% set count = count + 1 %}
                     <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle" id="{{data.pid}}">
                         <td>{{ name }}</td>
                         <td>{{ data.type }}</td>
@@ -39,16 +41,21 @@
                     </tr>
                 {% endif %}
             {% endfor %}
+            {% if count == 0 %}
+                <tr>
+                    <td colspan="5" class="alert alert-warning">{% trans %}At least one plugin should be installed to see a client{% endtrans %}</td>
+                </tr>
+            {% endif %}
             </tbody>
-        </table>
-        <h2>{% trans %}Core components{% endtrans %}</h2>
+      </table>
+      <h2>{% trans %}Core components{% endtrans %}</h2>
       <table class="table table-striped" style="border-collapse:collapse;">
             <thead>
                     <tr>
-                        <th scope="col">{% trans %}ID{% endtrans %}</td>
-                        <th scope="col">{% trans %}Type{% endtrans %}</td>
-                        <th scope="col">{% trans %}Status{% endtrans %}</td>
-                        <th scope="col">{% trans %}Configured{% endtrans %}</td>
+                        <th scope="col">{% trans %}ID{% endtrans %}</th>
+                        <th scope="col">{% trans %}Type{% endtrans %}</th>
+                        <th scope="col">{% trans %}Status{% endtrans %}</th>
+                        <th scope="col">{% trans %}Configured{% endtrans %}</th>
                     </tr>
             </thead>
             <tbody>
@@ -68,13 +75,13 @@
                 {% endif %}
             {% endfor %}
             </tbody>
-        </table>
-	<script type="text/javascript">
+      </table>
+      <script type="text/javascript">
 		ws.onmessage = function(e) {
 			data = JSON.parse(e.data);
 			if (data.msgid == "client.list" ) {
 				for (plugin in data.content) {
-                                        content = data.content[plugin]
+                    content = data.content[plugin]
 					$('tr#d' + content.pid + ' div.status div').removeClass('current_status');
 					$('tr#d' + content.pid + ' div.status div.status_' + content.status).addClass('current_status');
 					$('tr#' + content.pid + " td:nth-child(3)").html(content.status);
@@ -82,9 +89,9 @@
 				}
 			}
 		}
-	</script>
+       </script>
     {% else %}
-    <div class="alert alert-warning">{% trans %}No clients found{% endtrans %}</div>
+    <div class="alert alert-warning">{% trans %}No clients found: Is manager running?{% endtrans %}</div>
     {% endif %}
 </div>
 {% endblock %}

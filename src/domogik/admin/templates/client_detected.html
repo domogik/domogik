@@ -26,15 +26,15 @@
     {% else %}
     <div class="alert alert-warning">{% trans %}No new devices found{% endtrans %}</div>
     {% endif %}
-        <script type="text/javascript">
-                ws.onmessage = function(e) {
-                        data = JSON.parse(e.data);
-                        if (data.msgid == "device.new" ) {
+    <script type="text/javascript">
+        ws.onmessage = function(e) {
+            data = JSON.parse(e.data);
+            if (data.msgid == "device.new" ) {
 				if (data.content.client_id == "{{ client_id }}") {
 					alert(data.devices);
 				}
-                        }
-                }
-        </script>
+            }
+        }
+    </script>
 </div>
 {% endblock %}

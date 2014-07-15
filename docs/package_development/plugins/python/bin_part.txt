@@ -442,3 +442,12 @@ Then, you can create your thread. Example: ::
 
 Notice that a function **self.register_thread()** has been called. This function is important is it register the thread in a list. When the plugin is requested to stop, this list is used to help killing the existing threads! If your plugin doesn't stop, please check that all your threads are registered.
 
+
+Focus on the json file
+======================
+
+If you need, for some reasons to access the json file content, please notice that:
+
+* you should really ask yourself if the data you are looking for is not available somewhere else (over MQ or over REST).
+* the json content is available in *self.json_data*. Don't write in it!!!
+
