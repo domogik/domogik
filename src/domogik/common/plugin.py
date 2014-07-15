@@ -427,7 +427,7 @@ class Plugin(BasePlugin, MQRep):
                                       "name" : self._name,
                                       "host" : self.get_sanitized_hostname(),
                                       "client_id" : "plugin-{0}.{1}".format(self._name, self.get_sanitized_hostname()),
-                                      "devices" : self.new_devices})
+                                      "device" : new_device})
 
                 # TODO : later (0.4.0+), publish one "new device" notification with only the new device detected
 
