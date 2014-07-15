@@ -5,7 +5,7 @@ The Domogik branching model
 Overview
 ========
 
-For any Domogik package on git, you should follow the branching model described here : `http://nvie.com/posts/a-successful-git-branching-model/`_.
+For any Domogik package on git, you should follow the branching model described here : http://nvie.com/posts/a-successful-git-branching-model/
 
 Basically :
 * the *master* branch contains the last stable release
