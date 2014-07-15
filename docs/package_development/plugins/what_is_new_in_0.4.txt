@@ -2,6 +2,9 @@
 What is new in Domogik 0.4+ plugins format ? And why ?
 ======================================================
 
+Some big changes
+================
+
 With Domogik 0.4, the plugin format changes a lot. But don't be afraid, it is the last big change of the plugins format : as Domogik 0.4 is the new base for the next Domogik releases, the plugins format won't change like it did from 0.1 to 0.2 and from 0.3 to 0.4!
 
 The 0.4 release come with a new database model, more powerfull, more efficient. This model will allow to handle multi addresses technologies, like KNX or Chacon devices with the RFXCOM (for which the address is *unit+id*). It will also allow a more accurate choice of data types.
@@ -11,4 +14,8 @@ There are several important changes about the plugins format:
 * All the xml files *url2xpl* and *stats* are not needed anymore and all what a plugin needs to know to speak xpl is centralized in a json file, named *info.json*.
 * In Domogik previous releases, the plugins file tree was complex : there were some files in *src/domogik_packages*, *src/share* and 2 sort of file tree depending on the installation mode. Now, whatever your installation will be done (from sources, from a packaged release, from a debian package, ...), all the plugins will be installed in the same way, in the same place. And moreover, each plugin will have its own dedicated folder!
 
-To deploy a plugin from its author sources, you will just have to grab the sources or a zip file, extract it somewhere in your filesystem and just create a symbolic link in */var/lib/domogik/domogik_packages* to the plugin directory! Nothing else to do! :doc:More informations about packages installation in the dedicated chapter </enduser/quick_start/install_a_package>`
+The plugins are easier to install
+=================================
+
+To deploy a plugin from its author sources, you will just have to grab the sources or a zip file, extract it somewhere in your filesystem and just create a symbolic link in */var/lib/domogik/domogik_packages* to the plugin directory! Nothing else to do! 
+And there is a tool which will do that for you. :doc:More informations about packages installation in the dedicated chapter </enduser/packages/index>.

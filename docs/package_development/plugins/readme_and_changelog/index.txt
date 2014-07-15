@@ -22,7 +22,10 @@ You may create the file like this (assuming the plugin id is *myplugin*): ::
     
     This is a plugin for Domogik : http://www.domogik.org
 
-    You can find the documentation source in the **doc/** folder and if this package is a candidate for the nightly builds, you may find the build documentation on http://docs.domogik.org" > README.md
+    You can find the documentation source in the **docs/** folder and if this package is a candidate for the nightly builds, you may find the build documentation on http://domogik-plugin-$PLUGIN_ID.readthedocs.org/en/latest/" > README.md
+
+Please notice that the content of this file assume that you will use `http://readthedocs.org`_ to host your plugin documentation as the related part of the documentation will suggest you to do ;)
+
 
 
 CHANGELOG
@@ -30,4 +33,4 @@ CHANGELOG
 
 The real changelog file must be located in **doc/changelog.txt**. To allow the user to find it quickly, please create a CHANGELOG in the root directory like this: ::
 
-    echo "The changelog informations are available in doc/changelog.txt" > CHANGELOG
+    echo "The changelog informations are available in docs/changelog.txt" > CHANGELOG

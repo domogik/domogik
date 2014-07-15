@@ -1,0 +1,16 @@
+===========================
+The Domogik branching model
+===========================
+
+Overview
+========
+
+For any Domogik package on git, you should follow the branching model described here : `http://nvie.com/posts/a-successful-git-branching-model/`_.
+
+Basically :
+* the *master* branch contains the last stable release
+* the *develop* branch contains the release which is currently developped. It you have to do any upgrade or fix, you should do them in this branch.
+* when a development release is ready (in the *develop* branch), you merge it in the *master* branch and put a tag for the release in the *master* branch.
+
+Example for a new plugin
+========================

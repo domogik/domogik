@@ -1,0 +1,46 @@
+============================
+Switch to the develop branch
+============================
+
+Why ?
+=====
+
+Before coding anything you must switch to the *develop* branch : as the *master* branch content must be the last stable release of your plugin, you must not do any development in this branch (*master*) until the plugin is not stable.
+
+Do the switch
+=============
+
+First, if this is not already done, commit the changes on the *master* branch (README.md, CHANGELOG, .gitignore): ::
+
+    $ git status
+    ...
+            .gitignore
+            CHANGELOG
+            README.md
+    ...
+    
+    $ git add .gitignore CHANGELOG README.md
+    
+    $ git commit -m "Initial commit"
+    [master (commit racine) e86b189] Initial commit
+    3 files changed, 9 insertions(+)
+    ...
+
+    $ git push
+    ...
+    To git@github.com:fritz-smh/domogik-plugin-teleinfo.git
+     * [new branch]      master -> master
+
+Then, create the new branch and push it: ::
+
+    $ git branch develop
+    
+    $ git push --set-upstream origin develop
+    ...
+    To git@github.com:fritz-smh/domogik-plugin-teleinfo.git
+     * [new branch]      develop -> develop
+    ...
+
+You can now start your plugin!
+
+

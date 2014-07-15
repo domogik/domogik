@@ -1,0 +1,7 @@
+=========================
+In git what is a branch ?
+=========================
+
+If you don't know what are branches in git, please read this link : `http://gitref.org/branching/`_
+
+
