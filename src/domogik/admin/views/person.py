@@ -4,7 +4,11 @@ from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 from flask_babel import gettext, ngettext
 from flask_login import login_required
-from flaskext.wtf import Form
+try:
+    from flask_wtf import Form
+except ImportError:
+    from flaskext.wtf import Form
+    pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField
 from wtforms.validators import Required
