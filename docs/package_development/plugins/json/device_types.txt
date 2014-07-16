@@ -5,11 +5,13 @@ info.json for plugins - device_types section
 Purpose
 =======
 
-The device_types section describes all the device types that are handled by the plugin. A *device type* is a sort of device (for example an analog input, a digital input, a temperature sensor, a temperature and humidity sensor, ...). 
-A device type is linked to some *commands* and some *sensors*. For example, a temperature sensor will have only a temperature  sensor. A temperature and humidity sensor will have 2 sensors : a temperature sensor and a humidity sensor. In some technologies, an on/off lighting device type will have 1 command : on/off (which may be named switch) and a dimmer device type will have 2 commands: on/off (switch) and dimmer (which could be simply named dimmer).
+The device_types section describes all the Domogik device types that are handled by the plugin. A **Domogikdevice type** is a sort of device (for example an analog input, a digital input, a temperature sensor, a temperature and humidity sensor, ...). 
+
+A device type is linked to some **commands** and some **sensors**. For example, a temperature sensor will have only a temperature  sensor. A temperature and humidity sensor will have 2 sensors : a temperature sensor and a humidity sensor. In some technologies, an on/off lighting device type will have 1 command : on/off (which may be named switch) and a dimmer device type will have 2 commands: on/off (switch) and dimmer (which could be simply named dimmer).
+
 Finally a device type has some parameters. For simple device type, there will be only one parameter : the device address. For some complex device type (some KNX or Chacon devices for example), you will have several parameters : the address which is split in 2 parts (chacon devices), the actuator address which is not the same as the sensor one (KNX devices), ...
 
-The known datatypes can be found in /var/lib/domogik/resources/datatypes.json.
+The known datatypes can be found in the file **/var/lib/domogik/resources/datatypes.json**.
 
 Example 1
 =========
@@ -64,6 +66,7 @@ Description
 * *commands* : the list of commands supported by this device type
 * *sensors* : the list of sensors supported by this device type
 * *params* : list of parameters that are common to ALL xpl messages for this device type
+
   * *key* : the xpl key for the message
   * *xpl* : is this an xpl parameter or nit, if set to true this parameter will be included in the xplcommands and expected in the xplstats/triggers, if set to false it will only be availble internal in domogik or in the plugin if it requests the devices
   * *description* :  short description of this field
