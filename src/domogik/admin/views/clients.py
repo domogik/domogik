@@ -4,7 +4,8 @@ from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 from flask_wtf import Form
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
-            BooleanField, SubmitField, SelectField, IntegerField
+            BooleanField, SubmitField, SelectField, IntegerField, \
+            DateField, DateTimeField, FloatField
 from wtforms.validators import Required
 from flask_login import login_required
 from flask.ext.babel import gettext, ngettext
@@ -227,14 +228,21 @@ def client_config(client_id):
             else:
                 default = False
             field = BooleanField(item["name"], arguments, description=item["description"], default=default)
-        elif item["type"] == "number":
+        elif item["type"] == "integer":
             field = IntegerField(item["name"], arguments, description=item["description"], default=default)
-        elif item["type"] == "enum":
+        elif item["type"] == "date":
+            field = DateField(item["name"], arguments, description=item["description"], default=default)
+        elif item["type"] == "datetime":
+            field = DateTimeField(item["name"], arguments, description=item["description"], default=default)
+        elif item["type"] == "float":
+            field = DateTimeField(item["name"], arguments, description=item["description"], default=default)
+        elif item["type"] == "choice":
             choices = []
             for choice in item["choices"]:
                 choices.append((choice, choice))
             field = SelectField(item["name"], arguments, description=item["description"], choices=choices, default=default)
         else:
+            # time, email, ipv4, ipv6, url
             field = TextField(item["name"], arguments, description=item["description"], default=default)
         # add the field
         setattr(F, item["key"], field)
@@ -337,10 +345,30 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         pass
     # add the global params
     for item in params["global"]:
-        if item["type"] == "integer":
-            field = IntegerField("Global {0}".format(item["key"]), [Required()], description=item["description"])
+        # build the field
+        name = "Global {0}".format(item["key"])
+        if item["type"] == "boolean":
+            if default == 'Y' or default == 1 or default == True:
+                default = True
+            else:
+                default = False
+            field = BooleanField(name, [Required()], description=item["description"])
+        elif item["type"] == "integer":
+            field = IntegerField(name, [Required()], description=item["description"])
+        elif item["type"] == "date":
+            field = DateField(name, [Required()], description=item["description"])
+        elif item["type"] == "datetime":
+            field = DateTimeField(name, [Required()], description=item["description"])
+        elif item["type"] == "float":
+            field = DateTimeField(name, [Required()], description=item["description"])
+        elif item["type"] == "choice":
+            choices = []
+            for choice in item["choices"]:
+                choices.append((choice, choice))
+            field = SelectField(name, [Required()], description=item["description"], choices=choices)
         else:
-            field = TextField("Global {0}".format(item["key"]), [Required()], description=item["description"])
+            # time, email, ipv4, ipv6, url
+            field = TextField(name, [Required()], description=item["description"])
         setattr(F, item["key"], field)
     form = F()
 
