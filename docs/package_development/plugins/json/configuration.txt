@@ -6,7 +6,7 @@ Purpose
 =======
 
 The configuration section describes the plugin configuration items. 
-This part is only related to global configuration ! All the configuration elements which are related to a device are to be defined in :doc:`the domogik device types part<json/device_types>`.
+This part is only related to global configuration ! All the configuration elements which are related to a device are to be defined in :doc:`the domogik device types part<device_types>`.
 
 
 Example
