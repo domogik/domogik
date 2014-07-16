@@ -46,10 +46,15 @@ Let's say you will work in you home directory. Clone your repository: ::
     $ cd $HOME
     $ git clone git@github.com:fritz-smh/domogik-plugin-diskfree.git
 
-And activate the plugin on Domogik side: ::
+If you want, you can activate the plugin on Domogik side: ::
 
     $ cd /var/lib/domogik/domogik_packages
-    $ ln -s /home/fritz/domogik-plugin-diskfree plugin_diskfree
+    $ ln -s /home/youruser/domogik-plugin-diskfree plugin_diskfree
+
+Notice that you could wait for your plugin to have a valid json first and then use the *dmg_package* tool to install it : ::
+
+    $ dmg_package -i $HOME/domogik-plugin-diskfree
+
 
 Assuming you cloned an already working plugin, Domogik will automatically detect the plugin after a few seconds and you will be able to configure it and start it.
 

@@ -18,6 +18,12 @@ First, create a repository and write some specifications
 * :doc:`Create the plugin repository on GitHub <create_repository/index>`
 * :doc:`Write specifications <specifications/index>`
 
+Branches management
+===================
+
+* :doc:`What is a branch in git ? <git/what_is_a_branch>`
+* :doc:`The branching model you should/must follow <git/branching_model>`
+
 Prepare the plugin
 ==================
 
@@ -26,6 +32,14 @@ Now, you will have to create a few files for your plugin.
 * :doc:`Plugin file tree <plugin_file_tree/index>`
 * :doc:`Readme and changelog files <readme_and_changelog/index>`
 * :doc:`.gitignore file <git/gitignore>`
+
+Before coding : branching to 'develop'
+======================================
+
+* :doc:`Switch to the *develop* branch to start your developments <git/switch_to_develop>`
+* :doc:`If you want you can create in one shot the main folders and files <plugin_file_tree/create_sample>`
+
+* TODO : submit the development package zip
 
 Json file
 =========
@@ -100,8 +114,22 @@ The documentation is a part important of a plugin! If it is not enough clear, th
   * :doc:`What should contain the documentation ? <doc/content>`
   * :doc:`The developpers part <doc/dev>`
 
-To finish...
-============
+Your plugin is ready ? Switch to the master branch
+==================================================
+
+Now, your plugin may be functionnal, documented and the tests are automated. It is time to release a version!
+
+* TODO : merge in the master  branch
+* TODO : set a tag/release
+* TODO : submit the plugin
+
+
+
+
+
+
+Some other points
+=================
 
   * Helpers
 
