@@ -192,6 +192,7 @@ class PackageJson():
                 raise PackageException("unknown key '{0}' found in {1}".format(item, name))
 
     def _validate_02(self):
+        fieldTypes = ["boolean", "string", "choice", "date", "time", "datetime", "float", "integer", "email", "ipv4", "ipv6", "url"]
         try:
             #check that all main keys are in the file
             expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "json_version"]
@@ -211,6 +212,8 @@ class PackageJson():
                 raise PackageException("Configuration part is NOT a list!")
             for conf in self.json["configuration"]:
                 self._validate_keys(expected, "a configuration item param", conf.keys(), optional)
+                if conf['type'] not in fieldTypes:
+                    raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(conf['type'], fieldTypes))
 
             # validate products
             if 'products' in self.json.keys():
@@ -244,6 +247,8 @@ class PackageJson():
                     raise PackageException("Parameters list for device_type {0} is NOT a list!".format(devtype))
                 for par in devt["parameters"]:
                     self._validate_keys(expected, "a param for device_type {0}".format(devtype), par.keys(), optional)
+                    if par['type'] not in fieldTypes:
+                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(par['type'], fieldTypes))
 
             #validate the commands
             if type(self.json["commands"]) != dict:
@@ -320,6 +325,8 @@ class PackageJson():
                     raise PackageException("Device parameters for xpl_stat {0} is not a list".format(xstatid))
                 for stat in xstat['parameters']['device']:
                     self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys())
+                    if stat['type'] not in fieldTypes:
+                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(stat['type'], fieldTypes))
                 # dynamic parameter
                 expected = ["key", "sensor"]
                 opt = ["ignore_values"]
