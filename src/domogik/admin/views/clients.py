@@ -370,6 +370,16 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             # time, email, ipv4, ipv6, url
             field = TextField(name, [Required()], description=item["description"])
         setattr(F, item["key"], field)
+    for cmd in params['xpl_cmd']:
+        for par in cmd['parameters']:
+            name = "Command {0} parameter {1}".format(cmd['name'], par['key'])
+            field = TextField(name, [Required()], description=par["description"])
+        setattr(F, "cmd_{0}".format(par["key"]), field)
+    for stat in params['xpl_stat']:
+        for par in stat['parameters']:
+            name = "Stat {0} parameter {1}".format(stat['name'], par['key'])
+            field = TextField(name, [Required()], description=par["description"])
+        setattr(F, "stat_{0}".format(par['key']), field)
     form = F()
 
     if request.method == 'POST' and form.validate():
