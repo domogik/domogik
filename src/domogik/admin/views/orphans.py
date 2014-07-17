@@ -27,7 +27,7 @@ def orphans():
             orphan_devs.append(dev)
 
     return render_template('orphans.html',
-        mactve="orphans",
+        mactive="orphans",
         devices=orphan_devs
         )
 

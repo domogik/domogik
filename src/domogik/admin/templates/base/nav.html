@@ -23,6 +23,7 @@
             <li><a href="/persons">{% trans %}Persons{% endtrans %}</a></li>
           </ul>
         </li>
+        <li{% if mactive == "rest" %} class="active" {% endif %}><a href="/rest">{% trans %}Rest API{% endtrans %}</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/logout">{% trans %}Logout{% endtrans%}</a></li>

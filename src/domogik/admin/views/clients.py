@@ -27,7 +27,7 @@ def clients():
         client_list = {}
 
     return render_template('clients.html',
-        mactve="clients",
+        mactive="clients",
 	overview_state="collapse",
         clients=client_list
         )
@@ -49,7 +49,7 @@ def client_detail(client_id):
             loop = {'index': 1},
             clientid = client_id,
             data = detail,
-            mactve="clients",
+            mactive="clients",
             active = 'home'
             )
 
@@ -71,7 +71,7 @@ def client_devices_known(client_id):
             datatypes = app.datatypes,
             devices = devices,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'devices'
             )
 
@@ -106,7 +106,7 @@ def client_sensor_edit(client_id, sensor_id):
     	    return render_template('client_sensor.html',
 		    form = form,
 		    clientid = client_id,
-		    mactve="clients",
+		    mactive="clients",
 		    active = 'devices'
 		    )
 
@@ -125,7 +125,7 @@ def client_devices_detected(client_id):
     return render_template('client_detected.html',
             devices = devices,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'devices'
             )
 
@@ -159,7 +159,7 @@ def client_devices_edit(client_id, did):
             return render_template('client_device_edit.html',
 	        form = form,
                 clientid = client_id,
-                mactve="clients",
+                mactive="clients",
                 active = 'devices'
                 )
 
@@ -286,7 +286,7 @@ def client_config(client_id):
     return render_template('client_config.html',
             form = form,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'config'
             )
 
@@ -315,7 +315,7 @@ def client_devices_new(client_id):
             device_types = dtypes,
             products = products,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'devices'
             )
 
@@ -420,6 +420,6 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             params = params,
             dtype = device_type_id,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'devices'
             )

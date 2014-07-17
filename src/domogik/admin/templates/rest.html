@@ -1,0 +1,25 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+{{ urls.text }}
+<div class="container">
+  <h1>Rest URLS</h1>
+  <table class="table table-striped table-hover table-condensed">
+	<thead>
+		<tr>
+			<td>URL</td>
+			<td>Method</td>
+			<td>Arguments</td>
+		</tr>
+	</thead>
+	<tbody>
+	{% for url in urls %}
+        <tr>
+            <td>{{ url.url }}</td>
+            <td>{{ url.method }}</td>
+            <td>{{ url.arguments }}</td>
+        </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
