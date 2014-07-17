@@ -3,6 +3,7 @@ from domogik.rest.url import urlHandler, json_response, register_api, timeit
 from flask.views import MethodView
 from flask import request
 import zmq
+import copy
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 
@@ -61,12 +62,10 @@ def get_device_params(dev_type_id, zmq=None):
         # we have an xpl_command => find it
         if not cm['xpl_command'] in pjson['xpl_commands']:
             raise "Command references an unexisting xpl_command"
-        # find the xpl commands that are neede for this feature
-        cmd = pjson['xpl_commands'][cm['xpl_command']].copy()
+        cmd = pjson['xpl_commands'][cm['xpl_command']]
         cmd['id'] = c
-        # finc the xpl_stat message
-        cmd = pjson['xpl_commands'][cm['xpl_command']].copy()
-        cmd['id'] = c
+        cmd['parameters'] = pjson['xpl_commands'][cm['xpl_command']]['parameters']['device']
+        ret['xpl_cmd'].append(cmd)
         # finc the xpl_stat message
         if not 'xplstat_name' in cmd:
             break
@@ -75,13 +74,9 @@ def get_device_params(dev_type_id, zmq=None):
         stat = pjson['xpl_stats'][cmd['xplstat_name']].copy()
         stat['id'] = cmd['xplstat_name']
         # remove all parameters
-        cmd['parameters'] = cmd['parameters']['device']
-        del cmd['parameters']
-        ret['xpl_cmd'].append(cmd)
         if stat is not None:
             # remove all parameters
-            stat['parameters'] = stat['parameters']['device']
-            del stat['parameters']
+            stat['parameters'] = pjson['xpl_stats'][cmd['xplstat_name']]['parameters']['device']
             ret['xpl_stat'].append(stat)
         del stat
         del cmd
