@@ -23,11 +23,12 @@ Then, execute all these commands: ::
     mkdir lib
     touch lib/__init__.py
     touch bin/$PLUGIN_ID
+    mkdir conversions
+    touch conversions/__init__.py
     
     # various
     mkdir data
     mkdir udev
-    mkdir conversions
     mkdir design
     
     # tests
