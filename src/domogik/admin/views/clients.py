@@ -368,8 +368,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             field = DateTimeField(name, [Required()], description=item["description"])
         elif item["type"] == "choice":
             choices = []
-            for choice in item["choices"]:
-                choices.append((choice, choice))
+            for key in item["choices"]:
+                choices.append((key, item["choices"][key]))
             field = SelectField(name, [Required()], description=item["description"], choices=choices)
         else:
             # time, email, ipv4, ipv6, url
@@ -395,8 +395,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             field = DateTimeField(name, [Required()], description=item["description"])
         elif item["type"] == "choice":
             choices = []
-            for choice in item["choices"]:
-                choices.append((choice, choice))
+            for key in item["choices"]:
+                choices.append((key, item["choices"][key]))
             field = SelectField(name, [Required()], description=item["description"], choices=choices)
         else:
             # time, email, ipv4, ipv6, url
@@ -422,8 +422,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 field = DateTimeField(name, [Required()], description=item["description"])
             elif item["type"] == "choice":
                 choices = []
-                for choice in item["choices"]:
-                    choices.append((choice, choice))
+                for key in item["choices"]:
+                    choices.append((key, item["choices"][key]))
                 field = SelectField(name, [Required()], description=item["description"], choices=choices)
             else:
                 # time, email, ipv4, ipv6, url
@@ -449,8 +449,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 field = DateTimeField(name, [Required()], description=item["description"])
             elif item["type"] == "choice":
                 choices = []
-                for choice in item["choices"]:
-                    choices.append((choice, choice))
+                for key in item["choices"]:
+                    choices.append((key, item["choices"][key]))
                 field = SelectField(name, [Required()], description=item["description"], choices=choices)
             else:
                 # time, email, ipv4, ipv6, url
