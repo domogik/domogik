@@ -378,6 +378,7 @@ class DBConnector(XplPlugin, MQRep):
         # we have the json now, build the params
         msg = MQMessage()
         msg.set_action('device.params.result')
+        stats = []
         result = {}
         result['device_type'] = dev_type_id
         result['name'] = ""
@@ -387,16 +388,35 @@ class DBConnector(XplPlugin, MQRep):
         result['xpl'] = []
         result['no-xpl'] = []
         for param in pjson['device_types'][dev_type_id]['parameters']:
-            print param
             if param['xpl']:
                 del param['xpl']
                 result['xpl'].append(param)
             else:
                 del param['xpl']
-                result['no-xpl'].append(p)
-        # find the commands + xplCommands
-        # find the sensors + xplStats
-
+                result['no-xpl'].append(param)
+        # find the xplCommands
+        result['xpl_commands'] = {}
+        for cmdn in pjson['device_types'][dev_type_id]['commands']:
+            cmd = pjson['commands'][cmdn]
+            if 'xpl_command'in cmd:
+                xcmdn = cmd['xpl_command']
+                xcmd = pjson['xpl_commands'][cmdn]
+                result['xpl_commands'][xcmdn] = []
+                stats.append( xcmd['xplstat_name'] )
+                for param in xcmd['parameters']['device']:
+                    result['xpl_commands'][xcmdn].append(param)
+        # find the xplStats
+        sensors = pjson['device_types'][dev_type_id]['sensors']
+        for xstatn in pjson['xpl_stats']:
+            xstat = pjson['xpl_stats'][xstatn]
+            if xstat['parameters']['dynamic'] in sensors:
+                stats.append(xstatn)
+        result['xpl_stats'] = {}
+        for xstatn in stats:
+            xtat = pjson['xpl_stats'][xstatn]
+            result['xpl_stats'][xstatn] = []
+            for param in xstat['parameters']['device']:
+                result['xpl_stats'][xstatn].append(param)
         # return the data
         msg.add_data('result', result)
         self.log.debug(msg.get())
