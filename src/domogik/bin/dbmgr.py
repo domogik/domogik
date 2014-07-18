@@ -338,6 +338,20 @@ class DBConnector(XplPlugin, MQRep):
             self.log.warn(msg)
             return "None"
 
+    def _mdp_reply_devices_create_result(self, data):
+        msg_data = data.get_data()
+        print msg_data
+        msg = MQMessage()
+        msg.set_action('config.result')
+        status = True
+        reason = ""
+        
+        msg.add_data('reason', reason)
+        msg.add_data('status', status)
+
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
     def _mdp_reply_devices_params_result(self, data):
         """
             Reply to device.params mq req
