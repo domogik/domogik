@@ -490,6 +490,10 @@ class DbHelper():
             json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
         return json_device
 
+    def add_full_device(self, params, json):
+        print params
+        print json
+        return True
 
     def add_device_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data):
         self.log.debug(u"Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))

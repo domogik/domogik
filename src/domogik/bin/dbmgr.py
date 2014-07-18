@@ -339,16 +339,39 @@ class DBConnector(XplPlugin, MQRep):
             return "None"
 
     def _mdp_reply_devices_create_result(self, data):
-        msg_data = data.get_data()
-        print msg_data
-        msg = MQMessage()
-        msg.set_action('config.result')
         status = True
         reason = ""
-        
+        # get the filled package json
+        params = data.get_data()['data']
+        # get the json
+        cli = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('device_types.get')
+        msg.add_data('device_type', params['device_type'])
+        res = cli.request('manager', msg.get(), timeout=10)
+        del cli
+        if res is None:
+            status = False
+            reason = "Manager is not replying to the mq request" 
+        pjson = res.get_data()
+        if pjson is None:
+            status = False
+            reason = "No data for {0} found by manager".format(params['device_type']) 
+        pjson = pjson[params['device_type']]
+        if pjson is None:
+            status = False
+            reason = "The json for {0} found by manager is empty".format(params['device_type']) 
+
+        if status:
+            # call the add device function
+            if not self._db.add_full_device(params, pjson):
+                status = False
+                reason = "DB failed"
+
+        msg = MQMessage()
+        msg.set_action('device.create.result')
         msg.add_data('reason', reason)
         msg.add_data('status', status)
-
         self.log.debug(msg.get())
         self.reply(msg.get())
 
