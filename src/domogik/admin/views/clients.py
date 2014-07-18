@@ -257,7 +257,7 @@ def client_config(client_id):
         for arg, value in list(request.form.items()):
             if arg in known_items:
 		data[arg] = getattr(form, arg).data
-	if 'auto_startup' in data.keys():
+        if 'auto_startup' in data.keys():
             data['auto_startup'] = 'Y'
         else:
             data['auto_startup'] = 'N'
@@ -462,6 +462,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         # aprams hold the stucture,
         # append a vlaue key everywhere with the value submitted
         # or fill in the key
+        params['client_id'] = client_id
         for item in request.form:
             if item in ["name", "reference", "description"]:
                 # handle the global things
