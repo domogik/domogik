@@ -44,6 +44,7 @@ from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.database import DbHelper
 from domogik.mq.reqrep.worker import MQRep
+from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
 import time
@@ -121,6 +122,12 @@ class DBConnector(XplPlugin, MQRep):
             # devices list
             elif msg.get_action() == "device.get":
                 self._mdp_reply_devices_result(msg)
+            # device get params
+            elif msg.get_action() == "device.params":
+                self._mdp_reply_devices_params_result(msg)
+            # device create
+            elif msg.get_action() == "device.create":
+                self._mdp_reply_devices_create_result(msg)
 
     def _mdp_reply_config_get(self, data):
         """ Reply to config.get MQ req
@@ -331,6 +338,69 @@ class DBConnector(XplPlugin, MQRep):
             self.log.warn(msg)
             return "None"
 
+    def _mdp_reply_devices_params_result(self, data):
+        """
+            Reply to device.params mq req
+            @param data : MQ req message
+                => should contain
+                    - device_type
+        """
+        status = True
+
+        # check we have all the needed info
+        msg_data = data.get_data()
+        if 'device_type' not in msg_data:
+            status = False
+            reason = "Device params request : missing 'cevice_type' field : {0}".format(data)
+        else:
+            dev_type_id = msg_data['device_type']
+
+        # check the received info
+        if status:
+            cli = MQSyncReq(self.zmq)
+            msg = MQMessage()
+            msg.set_action('device_types.get')
+            msg.add_data('device_type', dev_type_id)
+            res = cli.request('manager', msg.get(), timeout=10)
+            del cli
+            if res is None:
+                status = False
+                reason = "Manager is not replying to the mq request" 
+            pjson = res.get_data()
+            if pjson is None:
+                status = False
+                reason = "No data for {0} found by manager".format(msg_data['device_type']) 
+            pjson = pjson[dev_type_id]
+            if pjson is None:
+                status = False
+                reason = "The json for {0} found by manager is empty".format(msg_data['device_type']) 
+
+        # we have the json now, build the params
+        msg = MQMessage()
+        msg.set_action('device.params.result')
+        result = {}
+        result['device_type'] = dev_type_id
+        result['name'] = ""
+        result['reference'] = ""
+        result['description'] = ""
+        # append the global xpl and on-xpl params
+        result['xpl'] = []
+        result['no-xpl'] = []
+        for param in pjson['device_types'][dev_type_id]['parameters']:
+            print param
+            if param['xpl']:
+                del param['xpl']
+                result['xpl'].append(param)
+            else:
+                del param['xpl']
+                result['no-xpl'].append(p)
+        # find the commands + xplCommands
+        # find the sensors + xplStats
+
+        # return the data
+        msg.add_data('result', result)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
 
     def _mdp_reply_devices_result(self, data):
         """ Reply to device.get MQ req
