@@ -488,12 +488,15 @@ class DbHelper():
                                                    'value' :  a_xplcmd_param.value
                                                 })
             json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
+
+        # global parameters
         return json_device
 
     def add_full_device(self, params, client_data):
         print params
         print json
         created_xpl_stats = {}
+        created_xpl_cmd = {}
         created_sensors = {}
         self.__session.expire_all()
 
@@ -504,6 +507,10 @@ class DbHelper():
                 description=params['description'], reference=params['reference'])
         self.__session.add(device)
         self.__session.flush()
+
+        ### Table code_device_params
+        for p in params['no-xpl']:
+            self.add_device_param(device.id, p["key"], p["value"], p["type"])
 
         ### Table core_sensor
         # first, get the sensors associated to the device_type
@@ -545,6 +552,7 @@ class DbHelper():
 	        for param in xplstat_in_client_data['parameters']['dynamic']:
 		        xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors, a_xplstat, xplstat_in_client_data, params)
 		        created_xpl_stats[a_xplstat] = xplstat.id
+                
         del stats_list
 
         ### Table core_command
@@ -594,8 +602,35 @@ class DbHelper():
                     par = XplCommandParam(cmd_id=xplcommand.id, \
                                          key=p['key'], value=p['value'])
                     self.__session.add(par)
-                print "TODO ================> device"
-                # TODO device
+                for p in x_command['parameters']['device']:
+                    for p2 in params["xpl_commands"][command_in_client_data['xpl_command']]:
+                        if p["key"] == p2["key"]:
+                            if "value" in p2:
+                                par = XplCommandParam(cmd_id=xplcommand.id, \
+                                                     key=p['key'], value=p2["value"])
+                                self.__session.add(par)
+        ### Add the global params
+        for cmd in self.get_xpl_command_by_device_id(device.id):
+            for p in client_data['device_types'][params['device_type']]['parameters']:
+                if p['xpl']:
+                    for p2 in params['xpl']:
+                        if p2['key'] == p['key']:
+                            par = XplCommandParam(cmd_id=cmd.id, \
+                                                 key=p['key'], value=p2["value"])
+                            self.__session.add(par)
+        for stat in self.get_xpl_stat_by_device_id(device.id):
+            for p in client_data['device_types'][params['device_type']]['parameters']:
+                if p['xpl']:
+                    for p2 in params['xpl']:
+                        if p2['key'] == p['key']:
+                            par = XplStatParam(xplstat_id = stat.id , \
+                                      sensor_id = None, \
+                                      key = p['key'], \
+                                      value = p2["value"], \
+                                      static = True, \
+                                      ignore_values = None, \
+                                      type = p2["type"])
+                            self.__session.add(par)
 
         ### Finally, commit all !
         try:
