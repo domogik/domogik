@@ -33,6 +33,29 @@
                     <tr>
                             <td colspan="6" class="hiddenRow"> 
                                 <div class="accordian-body collapse detail-{{ data.id }}">
+                {% if data.parameters|length > 0 %}
+				    <span class="label label-default">{% trans %}Parameters{% endtrans %}</span>
+                                         <table class="table table-bordered">
+                                              <thead>
+                                                <tr>
+                                                    <td>{% trans %}ID{% endtrans %}</td>
+                                                    <td>{% trans %}Name{% endtrans %}</td>
+                                                    <td>{% trans %}Value{% endtrans %}</td>
+                                                    <td>{% trans %}Type{% endtrans %}</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for tmp in data.parameters %}
+                                                    <tr>
+                                                        <td>{{ data.parameters[tmp].id }}</td>
+                                                        <td>{{ data.parameters[tmp].key }}</td>
+                                                        <td>{{ data.parameters[tmp].value }}</td>
+                                                        <td>{{ data.parameters[tmp].type }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                {% endif %}
 				{% if data.sensors|length > 0 %}
 				    <span class="label label-default">{% trans %}Sensors{% endtrans %}</span>
                                         <table class="table table-bordered">
