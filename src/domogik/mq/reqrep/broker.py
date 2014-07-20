@@ -185,7 +185,10 @@ class MDPBroker(object):
                 wrep = self._workers[wid]
             except KeyError:
                 # not registered, ignore
-                self.log.warning("The worker wid={0} service={1} is not registered, ignoring the disconnect request".format(wid, wrep.service))
+                if wrep:
+                    self.log.warning("The worker wid={0} service={1} is not registered, ignoring the disconnect request".format(wid, wrep.service))
+                else:
+                    self.log.warning("The worker wid={0} is not registered, ignoring the disconnect request".format(wid))
                 return
             to_send = [ wid, self.WORKER_PROTO, b'\x05' ]
             self.main_stream.send_multipart(to_send)
