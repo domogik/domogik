@@ -60,63 +60,36 @@ class TestDevice():
         self.device_name = None
         self.device_type = None
 
-    def create_device(self, client_id, device_name, device_type):
+    def get_params(self, client_id, device_type):
+        """CALL GET /device/params/<device_Type>
+        """
+        url = "{0}/device/params/{1}/{2}".format(self.rest_url, client_id, device_type)
+        print(u"Getting device_type params {0}".format(device_type))
+
+        response = requests.get(url)
+        print(u"Response : [{0}]".format(response.status_code))
+        if response.status_code != 200:
+            raise RuntimeError("Can not get the device_type params : {0}".format(response.text))
+
+        params = json.loads(response.text)
+        print(u"The parasm are: {0}".format(params))
+        return params
+
+    def create_device(self, params):
         """ Call POST /device/... to create the device
-            @param client_id : client id
-            @param device_name : the device name
-            @param device_type : the device type
+            @param params : The filled params
             @return : the device id for the device created
         """
-        # package informations
-        self.client_id = client_id
-        # device informations
-        self.device_name = device_name
-        self.device_type = device_type
-        description = "a test device"
-        reference = "for test only"
-        print(u"Create a test device for {0}. Device type is '{1}', name is '{2}'".format(self.client_id,
-                                                                                                          self.device_type,
-                                                                                                          self.device_name))
+        print(u"Create a test device with {0}".format(params))
 
         response = requests.post("{0}/device/".format(self.rest_url), \
-            headers={'content-type':'application/x-www-form-urlencoded'},
-            data="name={0}&client_id={1}&description={2}&reference={3}&device_type={4}".format(self.device_name,
-                                                                                               self.client_id,
-                                                                                               description,
-                                                                                               reference,
-                                                                                               self.device_type))
+            headers={'content-type':'application/x-www-form-urlencoded'}, \
+            data="params={0}".format(json.dumps(params)))
+        
         print(u"Response : [{0}]".format(response.status_code))
         #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:
             raise RuntimeError("Error when creating the device : {0}".format(response.text))
-
-        # get the device id for later calls to REST
-        device = json.loads(response.text)
-        self.device_id = device['id']
-        print(u"The device id is '{0}'".format(self.device_id))
-        return self.device_id
-
-    def configure_global_parameters(self, params):
-        """ Call PUT /device/addglobal/... to set the global parameters for a device
-            @param params : dict of params
-        """
-        print(u"Configure the global parameters...")
-        # build the data part
-        first = True
-        data = ""
-        for key in params:
-            if first == False:
-                data += "&"
-            else:
-                first = False
-            data += "{0}={1}".format(key, params[key])
-        response = requests.put("{0}/device/addglobal/{1}".format(self.rest_url, self.device_id), \
-                                 headers={'content-type':'application/x-www-form-urlencoded'},
-                                 data="{0}".format(data))
-        print(u"Response : [{0}]".format(response.status_code))
-        #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
-        if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
 
     def del_device(self, id):
         """ Call DELETE /device/... to delete a device

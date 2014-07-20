@@ -4,6 +4,7 @@ from flask.views import MethodView
 from flask import request
 import zmq
 import copy
+import json
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 
@@ -14,10 +15,10 @@ def device_list_old():
     b = urlHandler.db.list_old_devices()
     return 200, b
 
-@urlHandler.route('/device/params/<dev_type_id>', methods=['GET'])
+@urlHandler.route('/device/params/<client_id>/<dev_type_id>', methods=['GET'])
 @json_response
 @timeit
-def device_params(dev_type_id):
+def device_params(client_id, dev_type_id):
     cli = MQSyncReq(urlHandler.zmq_context)
     msg = MQMessage()
     msg.set_action('device.params')
@@ -27,6 +28,7 @@ def device_params(dev_type_id):
     if res:
         res = res.get_data()
         result = res['result'];
+        result["client_id"] = client_id
     # return the info
     return 200, result
 
@@ -53,10 +55,13 @@ class deviceAPI(MethodView):
             Get all the clients details
             Finally, call the database function to create the device and give it the device types list and clients details : they will be used to fill the database as the json structure is recreated in the database
         """
+        print "=========="
+        print request.form
+        type(json.loads(request.form.get('params')))
         cli = MQSyncReq(urlHandler.zmq_context)
         msg = MQMessage()
         msg.set_action('device.create')
-        msg.set_data({'data': request.form.get('params')})
+        msg.set_data({'data': json.loads(request.form.get('params'))})
         res = cli.request('dbmgr', msg.get(), timeout=10)
         if res is not None:
             data = res.get_data()
