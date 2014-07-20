@@ -76,7 +76,7 @@
                                                                 <td>{{ sen.id }}</td>
                                                                 <td>{{ sen.name }}</td>
                                                                 <td>{{ sen.data_type }}</td>
-                                                                <td>{{ sen.last_value }}&nbsp;{{ datatypes[sen.data_type].unit }}</td>
+                                                                <td>{{ sen.last_value }}{% if datatypes[sen.data_type].unit %}&nbsp;{{ datatypes[sen.data_type].unit }}{% endif %}</td>
                                                                 <td>{{ sen.last_received|datetime }}</td>
                                                                 <td>/sensorhistory/id/{{ sen.id }}/last/10</td>
 								<td>
