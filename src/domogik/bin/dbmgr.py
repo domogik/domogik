@@ -50,6 +50,7 @@ from zmq.eventloop.ioloop import IOLoop
 import time
 import zmq
 import json
+import traceback
 
 DATABASE_CONNECTION_NUM_TRY = 50
 DATABASE_CONNECTION_WAIT = 30
@@ -108,26 +109,32 @@ class DBConnector(XplPlugin, MQRep):
         """ Handle Requests over MQ
             @param msg : MQ req message
         """
-        with self._db.session_scope():
-            # XplPlugin handles MQ Req/rep also
-            XplPlugin.on_mdp_request(self, msg)
+        try:
+            with self._db.session_scope():
+                # XplPlugin handles MQ Req/rep also
+                XplPlugin.on_mdp_request(self, msg)
 
-            # configuration
-            if msg.get_action() == "config.get":
-                self._mdp_reply_config_get(msg)
-            elif msg.get_action() == "config.set":
-                self._mdp_reply_config_set(msg)
-            elif msg.get_action() == "config.delete":
-                self._mdp_reply_config_delete(msg)
-            # devices list
-            elif msg.get_action() == "device.get":
-                self._mdp_reply_devices_result(msg)
-            # device get params
-            elif msg.get_action() == "device.params":
-                self._mdp_reply_devices_params_result(msg)
-            # device create
-            elif msg.get_action() == "device.create":
-                self._mdp_reply_devices_create_result(msg)
+                # configuration
+                if msg.get_action() == "config.get":
+                    self._mdp_reply_config_get(msg)
+                elif msg.get_action() == "config.set":
+                    self._mdp_reply_config_set(msg)
+                elif msg.get_action() == "config.delete":
+                    self._mdp_reply_config_delete(msg)
+                # devices list
+                elif msg.get_action() == "device.get":
+                    self._mdp_reply_devices_result(msg)
+                # device get params
+                elif msg.get_action() == "device.params":
+                    self._mdp_reply_devices_params_result(msg)
+                # device create
+                elif msg.get_action() == "device.create":
+                    self._mdp_reply_devices_create_result(msg)
+        except exception as e:
+            msg = "Exception in on_mdp_request: {0}".format(e)
+            self.log.error(msg)
+            self.log.error(traceback.format_exc())
+            print msg
 
     def _mdp_reply_config_get(self, data):
         """ Reply to config.get MQ req
