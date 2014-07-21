@@ -21,4 +21,4 @@ Your documentation must be logic and structured. It should follow some logical s
   * give sample values and explain them
 
 * if your plugin has some helpers, explain their features and how to use them
-* fianlly you may add any informations that seem important for the user
+* finally you may add any informations that seem important for the user
