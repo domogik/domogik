@@ -444,7 +444,7 @@ class DBConnector(XplPlugin, MQRep):
             cmd = pjson['commands'][cmdn]
             if 'xpl_command'in cmd:
                 xcmdn = cmd['xpl_command']
-                xcmd = pjson['xpl_commands'][cmdn]
+                xcmd = pjson['xpl_commands'][xcmdn]
                 result['xpl_commands'][xcmdn] = []
                 stats.append( xcmd['xplstat_name'] )
                 for param in xcmd['parameters']['device']:
