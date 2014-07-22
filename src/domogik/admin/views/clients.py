@@ -12,7 +12,11 @@ from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             DateField, DateTimeField, FloatField
 from wtforms.validators import Required
 from flask_login import login_required
-from flask_babel import gettext, ngettext
+try:
+	from flask.ext.babel import gettext, ngettext
+except ImportError:
+	from flask_babel import gettext, ngettext
+	pass
 
 from domogik.common.sql_schema import Device, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form

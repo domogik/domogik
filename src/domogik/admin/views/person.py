@@ -2,7 +2,11 @@ from domogik.admin.application import app
 from flask import render_template, request, flash, redirect
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
-from flask_babel import gettext, ngettext
+try:
+	from flask.ext.babel import gettext, ngettext
+except ImportError:
+	from flask_babel import gettext, ngettext
+    pass
 from flask_login import login_required
 try:
     from flask_wtf import Form
