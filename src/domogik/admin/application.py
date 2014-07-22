@@ -6,10 +6,10 @@ except ImportError:
     pass
 from flask_login import LoginManager
 try:
-	from flask.ext.babel import Babel, get_locale, format_datetime
+    from flask.ext.babel import Babel, get_locale, format_datetime
 except ImportError:
-	from flask_babel import Babel, get_locale, format_datetime
-	pass
+    from flask_babel import Babel, get_locale, format_datetime
+    pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField
 from wtforms.validators import Required
