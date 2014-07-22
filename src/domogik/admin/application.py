@@ -5,7 +5,11 @@ except ImportError:
     from flaskext.wtf import Form, RecaptchaField
     pass
 from flask_login import LoginManager
-from flask_babel import Babel, get_locale, format_datetime
+try:
+	from flask.ext.babel import Babel, get_locale, format_datetime
+except ImportError:
+	from flask_babel import Babel, get_locale, format_datetime
+	pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField
 from wtforms.validators import Required
