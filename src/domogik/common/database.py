@@ -544,8 +544,10 @@ class DbHelper():
                 for param in stat['parameters']['dynamic']:
                     if param['sensor'] == a_sensor:
                         stats_list.append(a_stat)
+        
 
         ### Table core_xplstat
+        stats_list = list(set(stats_list))
         for a_xplstat in stats_list:
 	        self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
 	        xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
