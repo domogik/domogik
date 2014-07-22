@@ -9,6 +9,7 @@ pkg_list="\
          alembic \
          libzmq-dev \
          mysql-server \
+         gettext \
          \
          python \
          python-setuptools \
