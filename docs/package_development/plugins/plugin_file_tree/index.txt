@@ -20,9 +20,6 @@ The plugin file tree will at least contains (assuming the plugin name is *myplug
   * **lib/__init__.py** : an empty file needed by python
   * **lib/myplugin.py** : the python library part
 
-.. todo::
-    Conversion part must be updated
-
 * **conversion** : the python conversion functions
 
   * **conversion/__init__.py** : an empty file needed by python

@@ -9,8 +9,7 @@ TODO : "helpers" for special pages
 Purpose
 =======
 
-First, as already said in :doc:`the chapter about creating the plugin repository on GitHub <../create_repository/index>`, t
-here are some rules about a plugin name : don't forget to respect them.
+First, as already said in :doc:`the chapter about creating the plugin repository on GitHub <../create_repository/index>`, there are some rules about a plugin name : don't forget to respect them.
 
 The binary part of a plugin will in all cases be a single file. Assuming your plugin name is *myplugin*, the file name will be **bin/myplugin.py**.
 
@@ -32,7 +31,8 @@ Depending on your plugin, more actions may be done:
 XplPlugin and its usefull functions
 ===================================
 
-TODO : overview
+..todo ::
+    overview
 
 Helper function
 ---------------
@@ -43,16 +43,16 @@ Helper function
 Hidden but usefull features
 ---------------------------
 
-TODO : check plugin not laucnhed, status, ...
+..todo ::
+    check plugin not laucnhed, status, ...
 
 On demande features
 -------------------
 
-TODO : ready, config, library, packages, resources, data getter functions
-
-TODO : logging, force_leave (and return code),
-
-TODO : MQ usage
+..todo ::
+    * ready, config, library, packages, resources, data getter functions
+    * logging, force_leave (and return code),
+    * MQ usage
 
 Template of the binary part
 ===========================

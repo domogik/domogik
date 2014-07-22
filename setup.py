@@ -64,7 +64,7 @@ setup(
           'psycopg2',
 	      'pip >= 1.0',
 	      'pyserial >= 2.5',
-          netifaces,
+          'netifaces',
 	      'Twisted >= 12.0.0',
 	      'Flask >= 0.8',
 	      'Flask-WTF >= 0.6',
@@ -74,6 +74,19 @@ setup(
           'requests >= 0.12.1',
           'python-magic >= 0.4.3',
 	      'pyzmq >= 2.2.0'],
+    """
+=======
+	      'Twisted >= 12.1.0',
+	      'Flask >= 0.9',
+	      'Flask-WTF >= 0.9.3',
+          'Flask-Login',
+          'Flask-Babel',
+	      'tornado >= 3.1',
+          'requests >= 1.2.3',
+          'python-magic >= 0.4.3',
+	      'pyzmq >= 13.1.0'],
+>>>>>>> upstream/master
+"""
     zip_safe = False,
     license = 'GPL v3',
     #include_package_data = True,

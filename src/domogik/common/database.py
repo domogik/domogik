@@ -488,10 +488,163 @@ class DbHelper():
                                                    'value' :  a_xplcmd_param.value
                                                 })
             json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
+
+        # global parameters
         return json_device
 
+    def add_full_device(self, params, client_data):
+        print params
+        print json
+        created_xpl_stats = {}
+        created_xpl_cmd = {}
+        created_sensors = {}
+        self.__session.expire_all()
 
-    def add_device_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data):
+        ### Add the device itself
+        self.log.debug(u"Device creation : inserting data in core_device...")
+        device = Device(name=params['name'], device_type_id=params['device_type'], \
+                client_id=params['client_id'], client_version=client_data['identity']['version'], \
+                description=params['description'], reference=params['reference'])
+        self.__session.add(device)
+        self.__session.flush()
+
+        ### Table code_device_params
+        for p in params['no-xpl']:
+            self.add_device_param(device.id, p["key"], p["value"], p["type"])
+
+        ### Table core_sensor
+        # first, get the sensors associated to the device_type
+        self.log.debug(u"Device creation : start to process the sensors")
+        device_type_sensors = client_data['device_types'][params['device_type']]['sensors']
+        self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
+
+        # then, for each sensor, create it in databse for the device
+        stats_list = []
+        for a_sensor in device_type_sensors:
+            self.log.debug(u"Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
+            sensor_in_client_data = client_data['sensors'][a_sensor]
+            sensor = Sensor(name = sensor_in_client_data['name'], \
+                            device_id  = device.id, \
+                            reference = a_sensor, \
+                            incremental = sensor_in_client_data['incremental'], \
+                            data_type = sensor_in_client_data['data_type'], \
+                            conversion = sensor_in_client_data['conversion'], \
+                            h_store = sensor_in_client_data['history']['store'], \
+                            h_max = sensor_in_client_data['history']['max'], \
+                            h_expire = sensor_in_client_data['history']['expire'], \
+                            h_round = sensor_in_client_data['history']['round_value'], \
+                            h_duplicate = sensor_in_client_data['history']['duplicate'], \
+                            formula = None \
+                            )
+            self.__session.add(sensor)
+            self.__session.flush()
+            created_sensors[a_sensor] = sensor.id
+            for a_stat in client_data['xpl_stats']:
+                stat = client_data['xpl_stats'][a_stat]
+                for param in stat['parameters']['dynamic']:
+                    if param['sensor'] == a_sensor:
+                        stats_list.append(a_stat)
+        
+
+        ### Table core_xplstat
+        stats_list = list(set(stats_list))
+        self.log.debug(u"Device creation : xplstats to be created '{0}'...".format(stats_list))
+        for a_xplstat in stats_list:
+            self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
+            xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
+            xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors, a_xplstat, xplstat_in_client_data, params)
+            created_xpl_stats[a_xplstat] = xplstat.id
+                
+        del stats_list
+
+        ### Table core_command
+        # first, get the commands associated to the device_type
+        self.log.debug(u"Device creation : start to process the commands")
+        device_type_commands = client_data['device_types'][params['device_type']]['commands']
+        self.log.debug(u"Device creation : list of commands available for the device : {0}".format(device_type_commands))
+
+        for a_command in device_type_commands:
+            self.log.debug(u"Device creation : inserting data in core_command for '{0}'...".format(a_command))
+            command_in_client_data = client_data['commands'][a_command]
+            command = Command(name = command_in_client_data['name'], \
+                              device_id = device.id, \
+                              reference = a_command, \
+                              return_confirmation = command_in_client_data['return_confirmation'])
+            self.__session.add(command)
+            self.__session.flush()
+
+            self.log.debug(u"Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
+            for command_param in client_data['commands'][a_command]['parameters']:
+                pa = CommandParam(command.id, \
+                                  command_param['key'], \
+                                  command_param['data_type'], \
+                                  command_param['conversion'])
+                self.__session.add(pa)
+                self.__session.flush()
+
+            ### Table core_xplcommand
+            if 'xpl_command' in command_in_client_data:
+                self.log.debug(u"Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
+                x_command = client_data['xpl_commands'][command_in_client_data['xpl_command']]
+                if x_command['xplstat_name'] in created_xpl_stats.keys():
+                    xplstatid = created_xpl_stats[x_command['xplstat_name']]
+                else:
+                    xplstat_in_client_data = client_data['xpl_stats'][x_command['xplstat_name']]
+                    xplstat = self.add_device_and_commands_xplstat(device.id, None, x_command['xplstat_name'], xplstat_in_client_data, params)
+                    xplstatid = xplstat.id
+                xplcommand = XplCommand(cmd_id=command.id, \
+                                        name=x_command['name'], \
+                                        schema=x_command['schema'], \
+                                        device_id=device.id, stat_id=xplstatid, \
+                                        json_id=command_in_client_data['xpl_command'])
+                self.__session.add(xplcommand)
+                self.__session.flush()
+                ### Table core_xplcommand_param
+                for p in x_command['parameters']['static']:
+                    par = XplCommandParam(cmd_id=xplcommand.id, \
+                                         key=p['key'], value=p['value'])
+                    self.__session.add(par)
+                for p in x_command['parameters']['device']:
+                    for p2 in params["xpl_commands"][command_in_client_data['xpl_command']]:
+                        if p["key"] == p2["key"]:
+                            if "value" in p2:
+                                par = XplCommandParam(cmd_id=xplcommand.id, \
+                                                     key=p['key'], value=p2["value"])
+                                self.__session.add(par)
+        ### Add the global params
+        for cmd in self.get_xpl_command_by_device_id(device.id):
+            for p in client_data['device_types'][params['device_type']]['parameters']:
+                if p['xpl']:
+                    for p2 in params['xpl']:
+                        if p2['key'] == p['key']:
+                            par = XplCommandParam(cmd_id=cmd.id, \
+                                                 key=p['key'], value=p2["value"])
+                            self.__session.add(par)
+        for stat in self.get_xpl_stat_by_device_id(device.id):
+            for p in client_data['device_types'][params['device_type']]['parameters']:
+                if p['xpl']:
+                    for p2 in params['xpl']:
+                        if p2['key'] == p['key']:
+                            par = XplStatParam(xplstat_id = stat.id , \
+                                      sensor_id = None, \
+                                      key = p['key'], \
+                                      value = p2["value"], \
+                                      static = True, \
+                                      ignore_values = None, \
+                                      type = p2["type"])
+                            self.__session.add(par)
+
+        ### Finally, commit all !
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, False)
+
+        ### Return the created device as json
+        d = self.get_device(device.id)
+        return d
+
+    def add_device_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data, params):
         self.log.debug(u"Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
         xplstat = XplStat(name = xplstat_in_client_data['name'], \
               schema = xplstat_in_client_data['schema'], \
@@ -530,125 +683,20 @@ class DbHelper():
                 self.__session.add(parameter)
                 self.__session.flush()
 
-        return xplstat 
-
-
-    def add_device_and_commands(self, name, device_type, client_id, description, reference, client_data):
-        """ Create a device : fill the following tables with data from the related client json file
-            - core_device
-            - ...
-        """
-        created_xpl_stats = {}
-	created_sensors = {}
-        self.__session.expire_all()
-
-        ### Add the device itself
-        self.log.debug(u"Device creation : inserting data in core_device...")
-        device = Device(name=name, device_type_id=device_type, \
-                client_id=client_id, client_version=client_data['identity']['version'], \
-                description=description, reference=reference)
-        self.__session.add(device)
-        self.__session.flush()
-
-        ### Table core_sensor
-        # first, get the sensors associated to the device_type
-        self.log.debug(u"Device creation : start to process the sensors")
-        device_type_sensors = client_data['device_types'][device_type]['sensors']
-        self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
-
-        # then, for each sensor, create it in databse for the device
-        stats_list = []
-        for a_sensor in device_type_sensors:
-            self.log.debug(u"Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
-            sensor_in_client_data = client_data['sensors'][a_sensor]
-            sensor = Sensor(name = sensor_in_client_data['name'], \
-                            device_id  = device.id, \
-                            reference = a_sensor, \
-                            incremental = sensor_in_client_data['incremental'], \
-                            data_type = sensor_in_client_data['data_type'], \
-                            conversion = sensor_in_client_data['conversion'], \
-                            h_store = sensor_in_client_data['history']['store'], \
-                            h_max = sensor_in_client_data['history']['max'], \
-                            h_expire = sensor_in_client_data['history']['expire'], \
-                            h_round = sensor_in_client_data['history']['round_value'], \
-                            h_duplicate = sensor_in_client_data['history']['duplicate'], \
-                            formula = None \
-                            )
-            self.__session.add(sensor)
-            self.__session.flush()
-            created_sensors[a_sensor] = sensor.id
-            for a_stat in client_data['xpl_stats']:
-                stat = client_data['xpl_stats'][a_stat]
-                for param in stat['parameters']['dynamic']:
-                    if param['sensor'] == a_sensor:
-                        stats_list.append(a_stat)
-
-        ### Table core_xplstat
-        for a_xplstat in stats_list:
-	    self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
-	    xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
-	    for param in xplstat_in_client_data['parameters']['dynamic']:
-		xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors, a_xplstat, xplstat_in_client_data)
-		created_xpl_stats[a_xplstat] = xplstat.id
-	del stats_list
-
-        ### Table core_command
-        # first, get the commands associated to the device_type
-        self.log.debug(u"Device creation : start to process the commands")
-        device_type_commands = client_data['device_types'][device_type]['commands']
-        self.log.debug(u"Device creation : list of commands available for the device : {0}".format(device_type_commands))
-
-        for a_command in device_type_commands:
-            self.log.debug(u"Device creation : inserting data in core_command for '{0}'...".format(a_command))
-            command_in_client_data = client_data['commands'][a_command]
-            command = Command(name = command_in_client_data['name'], \
-                              device_id = device.id, \
-                              reference = a_command, \
-                              return_confirmation = command_in_client_data['return_confirmation'])
-            self.__session.add(command)
-            self.__session.flush()
-
-            self.log.debug(u"Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
-            for command_param in client_data['commands'][a_command]['parameters']:
-                pa = CommandParam(command.id, \
-                                  command_param['key'], \
-                                  command_param['data_type'], \
-                                  command_param['conversion'])
-                self.__session.add(pa)
-                self.__session.flush()
-
-            ### Table core_xplcommand
-            if 'xpl_command' in command_in_client_data:
-                self.log.debug(u"Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
-                x_command = client_data['xpl_commands'][command_in_client_data['xpl_command']]
-                if x_command['xplstat_name'] in created_xpl_stats.keys():
-                    xplstatid = created_xpl_stats[x_command['xplstat_name']]
-                else:
-                    xplstat_in_client_data = client_data['xpl_stats'][x_command['xplstat_name']]
-                    xplstat = self.add_device_and_commands_xplstat(device.id, None, x_command['xplstat_name'], xplstat_in_client_data)
-                    xplstatid = xplstat.id
-                xplcommand = XplCommand(cmd_id=command.id, \
-                                        name=x_command['name'], \
-                                        schema=x_command['schema'], \
-                                        device_id=device.id, stat_id=xplstatid, \
-                                        json_id=command_in_client_data['xpl_command'])
-                self.__session.add(xplcommand)
-                self.__session.flush()
-                ### Table core_xplcommand_param
-                for p in x_command['parameters']['static']:
-                    par = XplCommandParam(cmd_id=xplcommand.id, \
-                                         key=p['key'], value=p['value'])
+        # device parameters
+        for a_parameter in xplstat_in_client_data['parameters']['device']: 
+            self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
+            for p2 in params['xpl_stats'][xplstat_in_client_data['name']]:
+                if p2['key'] == a_parameter['key']:
+                    par = XplStatParam(xplstat_id = xplstat.id , \
+                                      sensor_id = None, \
+                                      key = p2['key'], \
+                                      value = p2["value"], \
+                                      static = True, \
+                                      ignore_values = None, \
+                                      type = p2["type"])
                     self.__session.add(par)
-
-        ### Finally, commit all !
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, False)
-
-        ### Return the created device as json
-        d = self.get_device(device.id)
-        return d
+        return xplstat 
 
     def add_device(self, d_name, d_type_id, d_client_id, d_description=None, d_reference=None):
         """Add a device item

@@ -6,6 +6,7 @@ Purpose
 =======
 
 The configuration section describes the plugin configuration items. 
+This part is only related to global configuration ! All the configuration elements which are related to a device are to be defined in :doc:`the domogik device types part<device_types>`.
 
 
 Example
@@ -61,10 +62,12 @@ Notice aboue special values
 ---------------------------
 
 In json format, you need to use for the boolean type :
+
 * true
 * false
 
 For undefined (None in python, undefined in javascript, Null in Java) values :
+
 * null
 
 auto_startup
@@ -82,183 +85,13 @@ Data types
 
 Notice that when retrieving the plugins values for the configuration elements, they are automatically casted in the appropriate format which is the one describe in this part of the json file!
 
-boolean
-*******
+Here are some type examples:
 
-Possible values: 
+* Boolean
+* String
+* ...
 
-* true
-* false
-
-Validation : check the value is *true* or *false*
-
-string
-******
-
-Parameters:
-
-* max_length: int (optional)
-* min_length: int (optional)
-* mask: str (optional). The following characters are allowed in the mask :
-
-  * 9: Any digit character
-  * A: Any letter character
-  * *: Any letter or digit character
-
-  Example for a x10 address : *A9*. A x10 address is build with 1 letter and 1 number
-
-* multiline: boolean (optional)
-
-Validation: 
-
-* validates max_length or min_length, if they are provided. 
-* validates mask if provided.
-
-Formatting:
-
-* if multiline, use a textarea or similar
-* if not multiline use an input text
-
-Example: ::
-
-    "configuration": [
-        ...
-        {
-            ...
-            "key": "some_string_item",
-            "type": "integer",
-            "max-length": 20,
-            "min-length": 10,
-            "mask": "(999) AAA-***",
-            "multiline": false,
-            ...
-        }
-
-enum
-****
-
-Parameters:
-
-* choices : An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this field.
-
-Validation: validates that the given value exists in the list of choices.
-
-Example: ::
-
-    "configuration": [
-        ...
-        {
-            ...
-            "key": "some_choice_item",
-            "type": "enum",
-            "choices" : {"a":"A", "b":"B", "c":"C"},
-            ...
-        }
-
-multiplechoice
-**************
-
-This will store a list of values separated with ','
-
-Parameters:
-
-* choices : An iterable (e.g., a list or tuple) of 2-tuples to use as choices for this field.
-
-Validation: validates that the given values exists in the list of choices.
-
-Example: ::
-
-    "configuration": [
-        ...
-        {
-            ...
-            "key": "some_multiplechoice_item",
-            "type": "multiplechoice",
-            "choices" : {"a":"A", "b":"B", "c":"C"},
-            ...
-        }
-
-date
-****
-
-Format is 'DD/MM/YYYY'
-
-Validation: validates that the given value respect the particular date format.
-
-time
-****
-
-Format is 'HH:MM:SS'
-
-Validation: validates that the given value respect the particular time format.
-
-datetime
-********
-
-Format is 'YYYY-MM-DD HH:MM:SS'
-
-Validation: validates that the given value respect the particular datetime format.
-
-float
-*****
-
-Parameters:
-
-* max_value:int (optional)
-* min_value:int (optional)
-
-Validation: validates that the given value is an float and is in the range (if set).
-
-Example: ::
-
-    "configuration": [
-        ...
-        {
-            ...
-            "key": "some_float_item",
-            "type": "float",
-            "max-value": 20,
-            "min-value": 10,
-            ...
-        }
-
-integer
-*******
-
-Parameters:
-
-* max_value:int (optional)
-* min_value:int (optional)
-
-Validation: Validates that the given value is an integer and is in the range (if set).
-
-Example: ::
-
-    "configuration": [
-        ...
-        {
-            ...
-            "key": "some_integer_item",
-            "type": "integer",
-            "max-value": 20,
-            "min-value": 10,
-            ...
-        }
-
-email
-*****
-
-Validation: validates that the given value is a valid email address.
-
-ipv4
-****
-
-Validation: validates that the given value is a valid IPv4 address.
-
-url
-***
-
-Validation: validates that the given value is a valid URL.
+:doc:`Please check the most of all available field types </package_development/plugins/field_types/index>`.
 
 
 

@@ -69,7 +69,7 @@ if __name__ == "__main__":
     print("====")
     print("Trying to evaluate : {0}".format(TEST.evaluate()))
     print("====")
-    print("set data for parameters")
+    print("set data for parameters cron")
     data = { "cron": { "cron" : "*/2 * * * *"} }
     TEST.fill_parameters(data)
     sleep(5)

@@ -1,0 +1,45 @@
+=========================================
+Create main folders and files in one shot
+=========================================
+
+
+If you are quite lazy, you can execute the below commands to create the main folders and files for your plugin.
+
+First, set *PLUGIN_ID*: ::
+
+    $ export PLUGIN_ID=myplugin
+
+Then, execute all these commands: ::
+
+    $ echo "
+    # json part
+    touch info.json
+    
+    # python part
+    touch __init__.py
+    mkdir bin
+    touch bin/__init__.py
+    touch bin/$PLUGIN_ID
+    mkdir lib
+    touch lib/__init__.py
+    touch bin/$PLUGIN_ID
+    mkdir conversions
+    touch conversions/__init__.py
+    
+    # various
+    mkdir data
+    mkdir udev
+    mkdir design
+    
+    # tests
+    touch .travis.yml
+    mkdir tests
+    
+    # docs
+    mkdir docs
+    " > /tmp/create_sample.sh
+    
+    $ bash /tmp/create_sample.sh
+
+
+

@@ -8,12 +8,12 @@ except ImportError:
     from flaskext.wtf import Form
     pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
-            BooleanField, SubmitField, SelectField, IntegerField
+            BooleanField, SubmitField, SelectField, IntegerField, \
+            DateField, DateTimeField, FloatField
 from wtforms.validators import Required
 from flask_login import login_required
 from flask_babel import gettext, ngettext
 
-from domogik.rest.urls.device import get_device_params
 from domogik.common.sql_schema import Device, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form
 
@@ -30,7 +30,7 @@ def clients():
         client_list = {}
 
     return render_template('clients.html',
-        mactve="clients",
+        mactive="clients",
 	overview_state="collapse",
         clients=client_list
         )
@@ -52,11 +52,11 @@ def client_detail(client_id):
             loop = {'index': 1},
             clientid = client_id,
             data = detail,
-            mactve="clients",
+            mactive="clients",
             active = 'home'
             )
 
-@app.route('/client/<client_id>/devices/known')
+@app.route('/client/<client_id>/dmg_devices/known')
 @login_required
 def client_devices_known(client_id):
     if app.datatypes == {}:
@@ -74,7 +74,7 @@ def client_devices_known(client_id):
             datatypes = app.datatypes,
             devices = devices,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'devices'
             )
 
@@ -109,11 +109,11 @@ def client_sensor_edit(client_id, sensor_id):
     	    return render_template('client_sensor.html',
 		    form = form,
 		    clientid = client_id,
-		    mactve="clients",
+		    mactive="clients",
 		    active = 'devices'
 		    )
 
-@app.route('/client/<client_id>/devices/detected')
+@app.route('/client/<client_id>/dmg_devices/detected')
 @login_required
 def client_devices_detected(client_id):
     cli = MQSyncReq(app.zmq_context)
@@ -128,11 +128,11 @@ def client_devices_detected(client_id):
     return render_template('client_detected.html',
             devices = devices,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'devices'
             )
 
-@app.route('/client/<client_id>/devices/edit/<did>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/dmg_devices/edit/<did>', methods=['GET', 'POST'])
 @login_required
 def client_devices_edit(client_id, did):
     with app.db.session_scope():
@@ -157,16 +157,16 @@ def client_devices_edit(client_id, did):
             msg.set_action( 'reload' )
             resp = req.request('xplgw', msg.get(), 100)
             # redirect
-            return redirect("/client/{0}/devices/known".format(client_id))
+            return redirect("/client/{0}/dmg_devices/known".format(client_id))
 	else:
             return render_template('client_device_edit.html',
 	        form = form,
                 clientid = client_id,
-                mactve="clients",
+                mactive="clients",
                 active = 'devices'
                 )
 
-app.route('/client/<client_id>/devices/delete/<did>')
+app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required
 def client_devices_delete(client_id, did):
     with app.db.session_scope():
@@ -177,11 +177,11 @@ def client_devices_delete(client_id, did):
     msg = MQMessage()
     msg.set_action( 'reload' )
     resp = req.request('xplgw', msg.get(), 100)
-    return redirect("/client/{0}/devices/known".format(client_id))
+    return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
 
 
-@app.route('/client/<client_id>/devices/delete/<did>')
+@app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required
 def client_devices_delete(client_id, did):
     with app.db.session_scope():
@@ -191,7 +191,7 @@ def client_devices_delete(client_id, did):
     msg = MQMessage()
     msg.set_action( 'reload' )
     resp = req.request('xplgw', msg.get(), 100)
-    return redirect("/client/{0}/devices/known".format(client_id))
+    return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
@@ -226,19 +226,26 @@ def client_config(client_id):
             default = item["default"]
         # build the field
         if item["type"] == "boolean":
-            if default == 'Y':
+            if default == 'Y' or default == 1 or default == True:
 	        default = True
             else:
                 default = False
             field = BooleanField(item["name"], arguments, description=item["description"], default=default)
-        elif item["type"] == "number":
+        elif item["type"] == "integer":
             field = IntegerField(item["name"], arguments, description=item["description"], default=default)
-        elif item["type"] == "enum":
+        elif item["type"] == "date":
+            field = DateField(item["name"], arguments, description=item["description"], default=default)
+        elif item["type"] == "datetime":
+            field = DateTimeField(item["name"], arguments, description=item["description"], default=default)
+        elif item["type"] == "float":
+            field = DateTimeField(item["name"], arguments, description=item["description"], default=default)
+        elif item["type"] == "choice":
             choices = []
             for choice in item["choices"]:
                 choices.append((choice, choice))
             field = SelectField(item["name"], arguments, description=item["description"], choices=choices, default=default)
         else:
+            # time, email, ipv4, ipv6, url
             field = TextField(item["name"], arguments, description=item["description"], default=default)
         # add the field
         setattr(F, item["key"], field)
@@ -254,7 +261,7 @@ def client_config(client_id):
         for arg, value in list(request.form.items()):
             if arg in known_items:
 		data[arg] = getattr(form, arg).data
-	if 'auto_startup' in data.keys():
+        if 'auto_startup' in data.keys():
             data['auto_startup'] = 'Y'
         else:
             data['auto_startup'] = 'N'
@@ -282,11 +289,11 @@ def client_config(client_id):
     return render_template('client_config.html',
             form = form,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'config'
             )
 
-@app.route('/client/<client_id>/devices/new')
+@app.route('/client/<client_id>/dmg_devices/new')
 @login_required
 def client_devices_new(client_id):
     cli = MQSyncReq(app.zmq_context)
@@ -311,91 +318,206 @@ def client_devices_new(client_id):
             device_types = dtypes,
             products = products,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'devices'
             )
 
-@app.route('/client/<client_id>/devices/new/type/<device_type_id>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>', methods=['GET', 'POST'])
 @login_required
 def client_devices_new_type(client_id, device_type_id):
     return client_devices_new_wiz(client_id, device_type_id, None)
 
-@app.route('/client/<client_id>/devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
+@app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
 @login_required
 def client_devices_new_prod(client_id, device_type_id, product):
     return client_devices_new_wiz(client_id, device_type_id, product)
 
 def client_devices_new_wiz(client_id, device_type_id, product):
-    # TODO get them
-    params = get_device_params(device_type_id, app.zmq_context)
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device.params')
+    msg.set_data({'device_type': device_type_id})
+    res = cli.request('dbmgr', msg.get(), timeout=10)
+    if res is not None:
+        detaila = res.get_data()
+        params = detaila['result']
+    else:
+        flash(gettext("Device creation failed"), "warning")
+        flash(gettext("DbMGR is not answering with device_type parameters"), "danger")
+        return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
     # dynamically generate the wtfform
     class F(Form):
         name = TextField("Device", [Required()], description=gettext("the display name for this device"))
         description = TextField("Description", description=gettext("A description for this device"))
-        if product:
-            default = product
-        else:
-            default = None
-        reference = TextField("Reference", description=gettext("A reference for this device"), default=default)
+        reference = TextField("Reference", description=gettext("A reference for this device"))
         pass
     # add the global params
-    for item in params["global"]:
-        if item["type"] == "integer":
-            field = IntegerField("Global {0}".format(item["key"]), [Required()], description=item["description"])
+    for item in params["no-xpl"]:
+        # build the field
+        name = "No-xpl Parameter {0}".format(item["key"])
+        if item["type"] == "boolean":
+            if default == 'Y' or default == 1 or default == True:
+                default = True
+            else:
+                default = False
+            field = BooleanField(name, [Required()], description=item["description"])
+        elif item["type"] == "integer":
+            field = IntegerField(name, [Required()], description=item["description"])
+        elif item["type"] == "date":
+            field = DateField(name, [Required()], description=item["description"])
+        elif item["type"] == "datetime":
+            field = DateTimeField(name, [Required()], description=item["description"])
+        elif item["type"] == "float":
+            field = DateTimeField(name, [Required()], description=item["description"])
+        elif item["type"] == "choice":
+            choices = []
+            for key in item["choices"]:
+                choices.append((key, item["choices"][key]))
+            field = SelectField(name, [Required()], description=item["description"], choices=choices)
         else:
-            field = TextField("Global {0}".format(item["key"]), [Required()], description=item["description"])
-        setattr(F, item["key"], field)
+            # time, email, ipv4, ipv6, url
+            field = TextField(name, [Required()], description=item["description"])
+        setattr(F, "noxpl|{0}".format(item["key"]), field)
+    # add the global params
+    for item in params["xpl"]:
+        # build the field
+        name = "Global XPL Parameter '{0}".format(item["key"])
+        if item["type"] == "boolean":
+            if default == 'Y' or default == 1 or default == True:
+                default = True
+            else:
+                default = False
+            field = BooleanField(name, [Required()], description=item["description"])
+        elif item["type"] == "integer":
+            field = IntegerField(name, [Required()], description=item["description"])
+        elif item["type"] == "date":
+            field = DateField(name, [Required()], description=item["description"])
+        elif item["type"] == "datetime":
+            field = DateTimeField(name, [Required()], description=item["description"])
+        elif item["type"] == "float":
+            field = DateTimeField(name, [Required()], description=item["description"])
+        elif item["type"] == "choice":
+            choices = []
+            for key in item["choices"]:
+                choices.append((key, item["choices"][key]))
+            field = SelectField(name, [Required()], description=item["description"], choices=choices)
+        else:
+            # time, email, ipv4, ipv6, url
+            field = TextField(name, [Required()], description=item["description"])
+        setattr(F, "xpl|{0}".format(item["key"]), field)
+    for cmd in params["xpl_commands"]:
+        for item in params["xpl_commands"][cmd]:
+            # build the fiel
+            name = "Xpl-Command '{0}' Parameter '{1}'".format(cmd, item["key"])
+            if item["type"] == "boolean":
+                if default == 'Y' or default == 1 or default == True:
+                    default = True
+                else:
+                    default = False
+                field = BooleanField(name, [Required()], description=item["description"])
+            elif item["type"] == "integer":
+                field = IntegerField(name, [Required()], description=item["description"])
+            elif item["type"] == "date":
+                field = DateField(name, [Required()], description=item["description"])
+            elif item["type"] == "datetime":
+                field = DateTimeField(name, [Required()], description=item["description"])
+            elif item["type"] == "float":
+                field = DateTimeField(name, [Required()], description=item["description"])
+            elif item["type"] == "choice":
+                choices = []
+                for key in item["choices"]:
+                    choices.append((key, item["choices"][key]))
+                field = SelectField(name, [Required()], description=item["description"], choices=choices)
+            else:
+                # time, email, ipv4, ipv6, url
+                field = TextField(name, [Required()], description=item["description"])
+            setattr(F, "cmd|{0}|{1}".format(cmd,item["key"]), field)
+    for cmd in params["xpl_stats"]:
+        for item in params["xpl_stats"][cmd]:
+            # build the fiel
+            name = "Xpl-Stat '{0}' Parameter '{1}'".format(cmd, item["key"])
+            if item["type"] == "boolean":
+                if default == 'Y' or default == 1 or default == True:
+                    default = True
+                else:
+                    default = False
+                field = BooleanField(name, [Required()], description=item["description"])
+            elif item["type"] == "integer":
+                field = IntegerField(name, [Required()], description=item["description"])
+            elif item["type"] == "date":
+                field = DateField(name, [Required()], description=item["description"])
+            elif item["type"] == "datetime":
+                field = DateTimeField(name, [Required()], description=item["description"])
+            elif item["type"] == "float":
+                field = DateTimeField(name, [Required()], description=item["description"])
+            elif item["type"] == "choice":
+                choices = []
+                for key in item["choices"]:
+                    choices.append((key, item["choices"][key]))
+                field = SelectField(name, [Required()], description=item["description"], choices=choices)
+            else:
+                # time, email, ipv4, ipv6, url
+                field = TextField(name, [Required()], description=item["description"])
+            setattr(F, "stat|{0}|{1}".format(cmd,item["key"]), field)
     form = F()
 
     if request.method == 'POST' and form.validate():
-        cli = MQSyncReq(app.zmq_context)
+        # aprams hold the stucture,
+        # append a vlaue key everywhere with the value submitted
+        # or fill in the key
+        params['client_id'] = client_id
+        for item in request.form:
+            if item in ["name", "reference", "description"]:
+                # handle the global things
+                params[item] = request.form.get(item)
+            elif item.startswith('xpl') or item.startswith('noxpl'):
+                # handle the global params
+                if item.startswith('xpl'):
+                    key = 'xpl'
+                else:
+                    key = 'no-xpl'
+                par = item.split('|')[1]
+                i = 0
+                while i < len(params[key]):
+                    param = params[key][i]
+                    if par == param['key']:
+                        params[key][i]['value'] = request.form.get(item)
+                    i = i + 1
+            elif item.startswith('stat') or item.startswith('cmd'):
+                if item.startswith('stat'):
+                    key = "xpl_stats"
+                else:
+                    key = "xpl_commands"
+                name = item.split('|')[1]
+                par = item.split('|')[2]
+                i = 0
+                while i < len(params[key][name]):
+                    param = params[key][name][i]
+                    if par == param['key']:
+                        params[key][name][i]['value'] = request.form.get(item)
+                    i = i + 1
+        # we now have the json to return
         msg = MQMessage()
-        msg.set_action('client.detail.get')
-        res = cli.request('manager', msg.get(), timeout=10)
+        msg.set_action('device.create')
+        msg.set_data({'data': params})
+        res = cli.request('dbmgr', msg.get(), timeout=10)
         if res is not None:
-            detaila = res.get_data()
-            client_data = detaila[client_id]['data']
+            data = res.get_data()
+            if data["status"]:
+                flash(gettext("Device cerated succesfully"), 'success')
+            else:
+                flash(gettext("Device creation failed"), 'warning')
+                flash(data["reason"], 'danger')
         else:
-            flash(gettext("Device creation failed"), "warning")
-            flash(gettext("Can not find this client id"), "danger")
-            return redirect("/client/{0}/devices/known".format(client_id))
-        with app.db.session_scope():
-            # create the device
-            created_device = app.db.add_device_and_commands(
-                name=request.form.get('name'),
-                device_type=device_type_id,
-                client_id=client_id,
-                description=request.form.get('description'),
-                reference=request.form.get('reference'),
-                client_data=client_data
-            )
-            # add the global
-            for x in app.db.get_xpl_command_by_device_id(created_device["id"]):
-                for p in params['global']:
-                    if p["xpl"] is True:
-                        app.db.add_xpl_command_param(cmd_id=x.id, key=p['key'], value=request.form.get(p['key']))
-            for x in app.db.get_xpl_stat_by_device_id(created_device["id"]):
-                for p in params['global']:
-                    if p["xpl"] is True:
-                        app.db.add_xpl_stat_param(statid=x.id, key=p['key'], value=request.form.get(p['key']), static=True, type=p['type'])
-            for p in params['global']:
-                if p["xpl"] is not True:
-                    app.db.add_device_param(created_device["id"], p["key"], request.form.get(p['key']), p['type'])
-            # reload stats
-            req = MQSyncReq(app.zmq_context)
-            msg = MQMessage()
-            msg.set_action( 'reload' )
-            resp = req.request('xplgw', msg.get(), 100)
-            # inform the user
-            flash(gettext("device created"), "success")
-            return redirect("/client/{0}/devices/known".format(client_id))
+            flash(gettext("DbMgr did not respond on the device.create, check the logs"), 'danger')
+        return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
     return render_template('client_device_new_wiz.html',
             form = form,
             params = params,
             dtype = device_type_id,
             clientid = client_id,
-            mactve="clients",
+            mactive="clients",
             active = 'devices'
             )

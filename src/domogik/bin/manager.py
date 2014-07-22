@@ -1228,6 +1228,8 @@ class Clients():
         if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED):
             self.log.error(u"Invalid status : {0}".format(new_status))
             return
+        if client_id not in self._clients:
+            return
         old_status = self._clients[client_id]['status']
         # in all cases, set the 'last seen' time for the clients which are not dead
         if new_status == STATUS_DEAD:

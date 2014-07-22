@@ -45,7 +45,7 @@ Part of the json sample
            "cmd_one": {
                "name": "The cmd name",
                "return_confirmation": true,                             # at true a confirmation xpl message should be send at command return. It is strongly recommended to use confirmation
-               "params": [                                              # parameters that are common to ALL xpl messages for this command
+               "parameters": [                                              # parameters that are common to ALL xpl messages for this command
                    {
                        "key": "key1_cmd_one",                           # key copied to the xpl messages, this a dynamic key that can be set in each Xpl message (dynamic)
                                                                         # key appears in the xpl as : {key1_cmd_two : dynamic value}
@@ -59,7 +59,7 @@ Part of the json sample
             "cmd_two": {
                "name": "The cmd name",
                "return_confirmation": false,
-               "params": [
+               "parameters": [
                    {
                        "key": "key1_cmd_two",             
                        "data_type": "DT_Scale",

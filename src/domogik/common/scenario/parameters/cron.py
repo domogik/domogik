@@ -69,7 +69,7 @@ if __name__ == "__main__":
     t = CronParameter(logging, None)
     print("Expected entries : {0}".format(t.get_expected_entries()))
     print("Evaluate should be None : {0}".format(t.evaluate()))
-    print("==> Setting some value for entry 'text'")
+    print("==> Setting some value for entry 'cron'")
     data = { "cron" : "*/2 * * * *" }
     t.fill(data)
     print("Evaluate should return true on even minuts : {0}".format(t.evaluate()))
