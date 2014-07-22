@@ -3,9 +3,9 @@ from flask import render_template, request, flash, redirect
 from domogik.mq.reqrep.client import MQSyncReq
 from domogik.mq.message import MQMessage
 try:
-	from flask.ext.babel import gettext, ngettext
+    from flask.ext.babel import gettext, ngettext
 except ImportError:
-	from flask_babel import gettext, ngettext
+    from flask_babel import gettext, ngettext
     pass
 from flask_login import login_required
 try:
@@ -29,7 +29,7 @@ def persons():
             persons.append(per.__dict__)
         return render_template('persons.html',
             persons=persons,
-	        mactive='auth'
+            mactive='auth'
         )
 
 @app.route('/persons/del/<pid>')
@@ -46,7 +46,7 @@ def persons_edit(person_id):
     with app.db.session_scope():
         if person_id > 0:
             person = app.db.get_person(person_id)
-	    else:
+        else:
             personn = None
 
         MyForm = model_form(Person, \
@@ -55,12 +55,12 @@ def persons_edit(person_id):
                 exclude=['user_accounts'])
         form = MyForm(request.form, person)
         if request.method == 'POST' and form.validate():
-	        if int(person_id) > 0:
+            if int(person_id) > 0:
                 app.db.update_person(person_id, \
                                      p_first_name=request.form['first_name'], \
                                      p_last_name=request.form['last_name'], \
                                      p_birthdate=request.form['birthdate'])
-	        else:
+            else:
                 app.db.add_person(\
                                   p_first_name=request.form['first_name'], \
                                   p_last_name=request.form['last_name'], \
@@ -69,7 +69,7 @@ def persons_edit(person_id):
             return redirect("/persons")
             pass
         elif request.method == 'POST' and not form.validate():
-            flash(gettext("Invalid input"), "error")    	
+            flash(gettext("Invalid input"), "error")        
 
     return render_template('person_edit.html',
             form = form,

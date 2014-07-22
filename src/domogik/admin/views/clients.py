@@ -13,10 +13,10 @@ from wtforms import TextField, HiddenField, ValidationError, RadioField,\
 from wtforms.validators import Required
 from flask_login import login_required
 try:
-	from flask.ext.babel import gettext, ngettext
+    from flask.ext.babel import gettext, ngettext
 except ImportError:
-	from flask_babel import gettext, ngettext
-	pass
+    from flask_babel import gettext, ngettext
+    pass
 
 from domogik.common.sql_schema import Device, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form
@@ -35,7 +35,7 @@ def clients():
 
     return render_template('clients.html',
         mactive="clients",
-	    overview_state="collapse",
+        overview_state="collapse",
         clients=client_list
         )
 
@@ -147,7 +147,7 @@ def client_devices_edit(client_id, did):
                         exclude=['params', 'commands', 'sensors', 'address', 'xpl_commands', 'xpl_stats', 'device_type_id', 'client_id', 'client_version'])
         form = MyForm(request.form, device)
 
-	    if request.method == 'POST' and form.validate():
+        if request.method == 'POST' and form.validate():
             # save it
             app.db.update_device(did, \
                     d_name=request.form['name'], \
@@ -162,9 +162,9 @@ def client_devices_edit(client_id, did):
             resp = req.request('xplgw', msg.get(), 100)
             # redirect
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
-	    else:
+        else:
             return render_template('client_device_edit.html',
-	            form = form,
+                form = form,
                 clientid = client_id,
                 mactive="clients",
                 active = 'devices'
@@ -231,7 +231,7 @@ def client_config(client_id):
         # build the field
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
-	            default = True
+                default = True
             else:
                 default = False
             field = BooleanField(item["name"], arguments, description=item["description"], default=default)
@@ -264,7 +264,7 @@ def client_config(client_id):
         data = {}
         for arg, value in list(request.form.items()):
             if arg in known_items:
-		        data[arg] = getattr(form, arg).data
+                data[arg] = getattr(form, arg).data
         if 'auto_startup' in data.keys():
             data['auto_startup'] = 'Y'
         else:
