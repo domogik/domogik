@@ -550,8 +550,8 @@ class DbHelper():
         stats_list = list(set(stats_list))
         self.log.debug(u"Device creation : xplstats to be created '{0}'...".format(stats_list))
         for a_xplstat in stats_list:
-	        self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
-	        xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
+            self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
+            xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
             xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors, a_xplstat, xplstat_in_client_data, params)
             created_xpl_stats[a_xplstat] = xplstat.id
                 
