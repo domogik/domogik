@@ -1,13 +1,16 @@
 #!/bin/bash -x
 
-pkg_list="\
+echo "
          build-essential \
          pkg-config \
          libzmq-dev \
          postgresql-common \
          libpq-dev \
-         alembic \
          libzmq-dev \
+         "
+
+pkg_list="\
+         alembic \
          mysql-server \
          gettext \
          \
@@ -51,6 +54,7 @@ mysql -p -u root
 create database domogik;
 grant usage on *.* to domogik@localhost identified by 'domopass';
 grant all privileges on domogik.* to domogik@localhost ;
+quit
 =============cut here============= 
 "
 TXT
