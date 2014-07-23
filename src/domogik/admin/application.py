@@ -1,7 +1,15 @@
 from flask import Flask, render_template
-from flask_wtf import Form, RecaptchaField
+try:
+    from flask_wtf import Form, RecaptchaField
+except ImportError:
+    from flaskext.wtf import Form, RecaptchaField
+    pass
 from flask_login import LoginManager
-from flask.ext.babel import Babel, get_locale, format_datetime
+try:
+	from flask.ext.babel import Babel, get_locale, format_datetime
+except ImportError:
+	from flask_babel import Babel, get_locale, format_datetime
+	pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField
 from wtforms.validators import Required
