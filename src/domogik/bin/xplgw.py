@@ -71,7 +71,7 @@ class XplManager(XplPlugin, MQAsyncSub):
         self.ready()
 
     def on_mdp_request(self, msg):
-	# XplPlugin handles MQ Req/rep also
+    # XplPlugin handles MQ Req/rep also
         XplPlugin.on_mdp_request(self, msg)
 
         if msg.get_action() == "reload":
@@ -137,60 +137,60 @@ class XplManager(XplPlugin, MQAsyncSub):
                 failed = "cmdparams not in message data"
             if not failed:
                 # get the command
-		    cmd = self._db.get_command(request['cmdid'])
-		    if cmd is not None:
-		        if cmd.xpl_command is not None:
-		            xplcmd = cmd.xpl_command
-                    xplstat = self._db.get_xpl_stat(xplcmd.stat_id)
-                    if xplstat is not None:
-                        # get the device from the db
-                        dev = self._db.get_device(int(cmd.device_id))
-                        msg = XplMessage()
-                        if not dev['client_id'] in self.client_xpl_map.keys():
-                            self._load_client_to_xpl_target()
-                        if not dev['client_id'] in self.client_xpl_map.keys():
-                            failed = "Can not fincd xpl source for {0} client_id".format(dev['client_id'])
-                        else:
-                            msg.set_target(self.client_xpl_map[dev['client_id']])
-                        msg.set_source(self.myxpl.get_source())
-                        msg.set_type("xpl-cmnd")
-                        msg.set_schema( xplcmd.schema)
-                        # static params
-                        for p in xplcmd.params:
-                            msg.add_data({p.key : p.value})
-			            # dynamic params
-                        for p in cmd.params:
-                            if p.key in request['cmdparams']:
-                                value = request['cmdparams'][p.key]
-                                # chieck if we need a conversion
-                                if p.conversion is not None and p.conversion != '':
-                                    if dev['client_id'] in self.client_conversion_map:
-                                        if p.conversion in self.client_conversion_map[dev['client_id']]:
-                                            exec(self.client_conversion_map[dev['client_id']][p.conversion])
-                                            value = locals()[p.conversion](value)
-                                msg.add_data({p.key : value})
+                cmd = self._db.get_command(request['cmdid'])
+                if cmd is not None:
+                    if cmd.xpl_command is not None:
+                        xplcmd = cmd.xpl_command
+                        xplstat = self._db.get_xpl_stat(xplcmd.stat_id)
+                        if xplstat is not None:
+                            # get the device from the db
+                            dev = self._db.get_device(int(cmd.device_id))
+                            msg = XplMessage()
+                            if not dev['client_id'] in self.client_xpl_map.keys():
+                                self._load_client_to_xpl_target()
+                            if not dev['client_id'] in self.client_xpl_map.keys():
+                                failed = "Can not fincd xpl source for {0} client_id".format(dev['client_id'])
                             else:
-				                failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(p.key)
-                        if not failed:
-                            # send out the msg
-                            self.log.debug(u"sending xplmessage: {0}".format(msg))
-                            self.myxpl.send(msg)
-                            ### Wait for answer
-                            stat_received = 0
-                            if xplstat != None:
-                                # get xpl message from queue
-                                self.log.debug(u"Command : wait for answer...")
-                                sub = MQSyncSub( self.zmq, 'rest-command', ['device-stats'] )
-                                stat = sub.wait_for_event()
-                                if stat is not None:
-                                    reply = json.loads(stat['content'])
-                                    reply_msg = MQMessage()
-                                    reply_msg.set_action('cmd.send.result')
-                                    reply_msg.add_data('stat', reply)
-                                    reply_msg.add_data('status', True)
-                                    reply_msg.add_data('reason', None)
-                                    self.log.debug(u"mq reply".format(reply_msg.get()))
-                                    self.reply(reply_msg.get())
+                                msg.set_target(self.client_xpl_map[dev['client_id']])
+                            msg.set_source(self.myxpl.get_source())
+                            msg.set_type("xpl-cmnd")
+                            msg.set_schema( xplcmd.schema)
+                            # static params
+                            for p in xplcmd.params:
+                                msg.add_data({p.key : p.value})
+                            # dynamic params
+                            for p in cmd.params:
+                                if p.key in request['cmdparams']:
+                                    value = request['cmdparams'][p.key]
+                                    # chieck if we need a conversion
+                                    if p.conversion is not None and p.conversion != '':
+                                        if dev['client_id'] in self.client_conversion_map:
+                                            if p.conversion in self.client_conversion_map[dev['client_id']]:
+                                                exec(self.client_conversion_map[dev['client_id']][p.conversion])
+                                                value = locals()[p.conversion](value)
+                                    msg.add_data({p.key : value})
+                                else:
+                                    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(p.key)
+                            if not failed:
+                                # send out the msg
+                                self.log.debug(u"sending xplmessage: {0}".format(msg))
+                                self.myxpl.send(msg)
+                                ### Wait for answer
+                                stat_received = 0
+                                if xplstat != None:
+                                    # get xpl message from queue
+                                    self.log.debug(u"Command : wait for answer...")
+                                    sub = MQSyncSub( self.zmq, 'xplgw-command', ['device-stats'] )
+                                    stat = sub.wait_for_event()
+                                    if stat is not None:
+                                        reply = json.loads(stat['content'])
+                                        reply_msg = MQMessage()
+                                        reply_msg.set_action('cmd.send.result')
+                                        reply_msg.add_data('stat', reply)
+                                        reply_msg.add_data('status', True)
+                                        reply_msg.add_data('reason', None)
+                                        self.log.debug(u"mq reply".format(reply_msg.get()))
+                                        self.reply(reply_msg.get())
         if failed:
             self.log.error(failed)
             reply_msg = MQMessage()
@@ -215,32 +215,14 @@ class XplManager(XplPlugin, MQAsyncSub):
             ### Load stats
             # key1, key2 = device_type_id, schema
             self.stats = []
-            for sen in self._db.get_all_sensor():
-                self.log.debug(sen)
-                statparam = self._db.get_xpl_stat_param_by_sensor(sen.id)
-                if statparam is None:
-                    self.log.error( \
-                            'Corresponding xpl-stat param can not be found for sensor {0}' \
-                            .format(sen))
-                    continue
-                stat = self._db.get_xpl_stat(statparam.xplstat_id)
-                if stat is None:
-                    self.log.error( \
-                            'Corresponding xpl-stat can not be found for xplstatparam {0}' \
-                            .format(statparam))
-                    continue
-                dev = self._db.get_device(stat.device_id)
-                if dev is None:
-                    self.log.error(\
-                            'Corresponding device can not be found for xpl-stat {0}' \
-                            .format(stat))
-                    continue
+            created_stats = []
+            for stat in self._db.get_all_xpl_stat():
                 # xpl-trig
-                self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
-                                  "xpl-trig", self.log, self._db, self.pub, self.client_conversion_map))
+                self.stats.append(self._Stat(self.myxpl, stat, "xpl-trig", \
+                                self.log, self.pub, self.client_conversion_map))
                 # xpl-stat
-                self.stats.append(self._Stat(self.myxpl, dev, stat, sen, \
-                                  "xpl-stat", self.log, self._db, self.pub, self.client_conversion_map))
+                self.stats.append(self._Stat(self.myxpl, stat, "xpl-stat", \
+                                self.log, self.pub, self.client_conversion_map))
         except:
             self.log.error(u"%s" % traceback.format_exc())
         self._db.close_session()
@@ -251,22 +233,17 @@ class XplManager(XplPlugin, MQAsyncSub):
         Each instance create a Listener and the associated callbacks
         """
 
-        def __init__(self, xpl, dev, stat, sensor, xpl_type, log_stats, dbh, pub, conversions):
+        def __init__(self, xpl, stat, xpl_type, log, pub, conversions):
             """ Initialize a stat instance
             @param xpl : A xpl manager instance
-            @param dev : A Device reference
             @param stat : A XplStat reference
-            @param sensor: A Sensor reference
             @param xpl-type: what xpl-type to listen for
             """
             ### Rest data
-            self._db = dbh
-            self._log_stats = log_stats
-            self._dev = dev
+            self._log_stats = log
             self._stat = stat
-            self._sen = sensor
             self._pub = pub
-	    self._conv = conversions
+            self._conv = conversions
 
             ### build the filter
             params = {'schema': stat.schema, 'xpltype': xpl_type}
@@ -287,8 +264,7 @@ class XplManager(XplPlugin, MQAsyncSub):
             """ Callback for the xpl message
             @param message : the Xpl message received
             """
-            self._log_stats.debug("Stat received for device {0}." \
-                    .format(self._dev['name']))
+            db = DbHelper()
             current_date = calendar.timegm(time.gmtime())
             stored_value = None
             try:
@@ -297,50 +273,53 @@ class XplManager(XplPlugin, MQAsyncSub):
                     # self._log_stats.debug("Checking param {0}".format(param))
                     if param.sensor_id is not None and param.static is False:
                         if param.key in message.data:
-                            value = message.data[param.key]
-                            # self._log_stats.debug( \
-                            #        "Key found {0} with value {1}." \
-                            #        .format(param.key, value))
-                            store = True
-                            if param.ignore_values:
-                                if value in eval(param.ignore_values):
-                                    self._log_stats.debug( \
-                                            "Value {0} is in the ignore list {0}, so not storing." \
-                                            .format(value, param.ignore_values))
-                                    store = False
-                            if store:
-                                # check if we need a conversion
-                                if self._sen.conversion is not None and self._sen.conversion != '':
-                                    if self._dev['client_id'] in self._conv:
-                                        if self._sen.conversion in self._conv[self._dev['client_id']]:
-                                            exec(self._conv[self._dev['client_id']][self._sen.conversion])
-                                            value = locals()[self._sen.conversion](value)
-                                self._log_stats.info( \
-                                        "Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
-                                        .format(self._dev['name'], self._dev['id'], self._sen.name, self._sen.id, param.key, value))
-                                # do the store
-                                stored_value = value
-                                my_db = DbHelper()
-                                with my_db.session_scope():
-                                    my_db.add_sensor_history(\
+                            with db.session_scope():
+                                value = message.data[param.key]
+                                # self._log_stats.debug( \
+                                #        "Key found {0} with value {1}." \
+                                #        .format(param.key, value))
+                                store = True
+                                if param.ignore_values:
+                                    if value in eval(param.ignore_values):
+                                        self._log_stats.debug( \
+                                                "Value {0} is in the ignore list {0}, so not storing." \
+                                                .format(value, param.ignore_values))
+                                        store = False
+                                if store:
+                                    # get the sensor and dev
+                                    sen = db.get_sensor(param.sensor_id)
+                                    dev = db.get_device(sen.device_id)
+                                    # check if we need a conversion
+                                    if sen.conversion is not None and sen.conversion != '':
+                                        if dev['client_id'] in self._conv:
+                                            if sen.conversion in self._conv[dev['client_id']]:
+                                                self._log_stats.debug( \
+                                                    "Calling conversion {0}".format(sen.conversion))
+                                                exec(self._conv[dev['client_id']][sen.conversion])
+                                                value = locals()[sen.conversion](value)
+                                    self._log_stats.info( \
+                                            "Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
+                                            .format(dev['name'], dev['id'], sen.name, sen.id, param.key, value))
+                                    # do the store
+                                    stored_value = value
+                                    db.add_sensor_history(\
                                             param.sensor_id, \
                                             value, \
                                             current_date)
-                                del(my_db)
-                            else:
-                                self._log_stats.debug("Don't need to store this value")
+                                else:
+                                    self._log_stats.debug("Don't need to store this value")
+                                # publish the result
+                                self._pub.send_event('device-stats', \
+                                          {"timestamp" : current_date, \
+                                          "device_id" : dev['id'], \
+                                          "sensor_id" : sen.id, \
+                                          "stored_value" : stored_value})
                         #else:
                         #    self._log_stats.debug("Key not found in message data")
                     #else:
                     #    self._log_stats.debug("No sensor attached")
             except:
                 self._log_stats.error(traceback.format_exc())
-            # publish the result
-            self._pub.send_event('device-stats', \
-                          {"timestamp" : current_date, \
-                          "device_id" : self._dev['id'], \
-                          "sensor_id" : self._sen.id, \
-                          "stored_value" : stored_value})
 
 if __name__ == '__main__':
     EVTN = XplManager()
