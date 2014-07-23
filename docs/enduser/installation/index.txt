@@ -27,6 +27,10 @@ If you don't already have Python 2.6/2.7 or above (you have it if you are runnin
     $ apt-get install python2.6
     $ ln -sf /usr/bin/python2.6 /usr/bin/python
 
+On some very small debian setup you need to install sudo if not rest would never start.
+
+    $ apt-get install sudo
+
 Even if you have python2.6 or higher installed, check that the development package is also installed, or do (**replace 2.X with your version**): ::
 
     $ apt-get install python2.X-dev gcc
