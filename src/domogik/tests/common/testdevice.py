@@ -136,8 +136,8 @@ if __name__ == "__main__":
     params["name"] = "TestDevice"
     params["reference"] = "reference"
     params["description"] = "description"
-    for idx, val in enumerate(params['no-xpl']):
-        params['no-xpl'][idx]['value'] = 1
+    for idx, val in enumerate(params['global']):
+        params['global'][idx]['value'] = 1
     for idx, val in enumerate(params['xpl']):
         params['xpl'][idx]['value'] = '/'
 

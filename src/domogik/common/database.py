@@ -509,7 +509,7 @@ class DbHelper():
         self.__session.flush()
 
         ### Table code_device_params
-        for p in params['no-xpl']:
+        for p in params['global']:
             self.add_device_param(device.id, p["key"], p["value"], p["type"])
 
         ### Table core_sensor

@@ -357,9 +357,9 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         reference = TextField("Reference", description=gettext("A reference for this device"))
         pass
     # add the global params
-    for item in params["no-xpl"]:
+    for item in params["global"]:
         # build the field
-        name = "No-xpl Parameter {0}".format(item["key"])
+        name = "Global Parameter {0}".format(item["key"])
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
                 default = True
@@ -382,7 +382,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         else:
             # time, email, ipv4, ipv6, url
             field = TextField(name, [Required()], description=item["description"])
-        setattr(F, "noxpl|{0}".format(item["key"]), field)
+        setattr(F, "glob|{0}".format(item["key"]), field)
     # add the global params
     for item in params["xpl"]:
         # build the field
@@ -475,12 +475,12 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             if item in ["name", "reference", "description"]:
                 # handle the global things
                 params[item] = request.form.get(item)
-            elif item.startswith('xpl') or item.startswith('noxpl'):
+            elif item.startswith('xpl') or item.startswith('glob'):
                 # handle the global params
                 if item.startswith('xpl'):
                     key = 'xpl'
                 else:
-                    key = 'no-xpl'
+                    key = 'global'
                 par = item.split('|')[1]
                 i = 0
                 while i < len(params[key]):

@@ -430,14 +430,14 @@ class DBConnector(XplPlugin, MQRep):
         result['description'] = ""
         # append the global xpl and on-xpl params
         result['xpl'] = []
-        result['no-xpl'] = []
+        result['global'] = []
         for param in pjson['device_types'][dev_type_id]['parameters']:
             if param['xpl']:
                 del param['xpl']
                 result['xpl'].append(param)
             else:
                 del param['xpl']
-                result['no-xpl'].append(param)
+                result['global'].append(param)
         # find the xplCommands
         result['xpl_commands'] = {}
         for cmdn in pjson['device_types'][dev_type_id]['commands']:
