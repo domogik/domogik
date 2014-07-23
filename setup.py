@@ -53,7 +53,7 @@ if platform.dist()[0] == 'debian':
     magic = 'Magic-file-extensions >= 0.2'
 else
     mysql = 'pymysql'
-    magic = 'python-magic'
+    magic = 'python-magic >= 0.4.3'
 
 setup(
     name = 'Domogik',
