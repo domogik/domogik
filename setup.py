@@ -41,11 +41,19 @@ import os
 from setuptools import setup, find_packages
 import platform
 import sys
+import platform
 
 if sys.version_info[0] == 3:
     netifaces = 'netifaces-py3'
 else:
     netifaces = 'netifaces'
+
+if platform.dist()[0] == 'debian':
+    mysql = 'mysql-python'
+    magic = 'Magic-file-extensions >= 0.2'
+else
+    mysql = 'pymysql'
+    magic = 'python-magic'
 
 setup(
     name = 'Domogik',
@@ -60,7 +68,7 @@ setup(
 	      'simplejson >= 1.9.2',
 	      'pyOpenSSL >= 0.10',
 	      'psutil >= 0.1.3',
-	      'mysql-python',
+	       mysql,
           'psycopg2',
 	      'pip >= 1.0',
 	      'pyserial >= 2.5',
@@ -72,7 +80,7 @@ setup(
           'Flask-Babel',
 	      'tornado >= 2.3',
           'requests >= 0.12.1',
-          'Magic-file-extensions >= 0.2',
+          magic,
 	      'pyzmq >= 2.2.0'],
     zip_safe = False,
     license = 'GPL v3',
