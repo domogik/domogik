@@ -51,7 +51,7 @@ else:
 if platform.dist()[0] == 'debian':
     mysql = 'mysql-python'
     magic = 'Magic-file-extensions >= 0.2'
-else
+else:
     mysql = 'pymysql'
     magic = 'python-magic >= 0.4.3'
 
