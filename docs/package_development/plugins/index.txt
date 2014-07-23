@@ -91,6 +91,32 @@ After creating a start script (used only by the developpers), you will now creat
     * :doc:`Make the new devices available in the user interface <python/detected_devices>`
     * ...
 
+Icon
+====
+
+Your plugin should have an icon.
+
+* :doc:`Add an icon <graphical/icon_file>`
+
+Udev rules
+==========
+
+If needed, you can add some sample udev rules files for your plugin.
+
+* :doc:`Add some udev rules files <udev_rules/index>`
+
+Documentation
+=============
+
+The documentation is a part important of a plugin! If it is not enough clear, the user may have some difficulties to use the plugin.
+
+  * :doc:`Overview of the documentation process <doc/index>`
+  * :doc:`Doc tree <doc/tree>`
+  * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
+  * :doc:`What should contain the documentation ? <doc/content>`
+  * :doc:`The developpers part <doc/dev>`
+  * :doc:`Make your documentation published on ReadTheDocs.org <doc/readthedoc>`
+
 Tests
 =====
 
@@ -101,25 +127,28 @@ Preparing some automated tests is something really important for a plugin. It wi
   * :doc:`Travis CI (continuous integration) <tests/travis_templates>`
   * :doc:`The testrunner tool <tests/testrunner>`
 
-Documentation
-=============
-
-The documentation is a part important of a plugin! If it is not enough clear, the user may have some difficulties to use the plugin.
-
-  * :doc:`Doc tree <doc/tree>`
-  * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
-  * :doc:`What should contain the documentation ? <doc/content>`
-  * :doc:`The developpers part <doc/dev>`
-
 Your plugin is ready ? Switch to the master branch
 ==================================================
 
 Now, your plugin may be functionnal, documented and the tests are automated. It is time to release a version!
 
-* TODO : merge in the master  branch
-* TODO : set a tag/release
-* TODO : submit the plugin
+..todo ::
+    * merge in the master  branch
+    * set a tag/release
+    * create a branch per version for readthedoc ????
+    * submit the plugin
 
+
+How to manage a new version of the plugin ?
+===========================================
+
+..todo ::
+    * switch to develop
+    * create a branch per version for readthedoc ????
+    * update info.json version number
+    * update docs/conf.py version number
+    * do the dev/doc/tests
+    * switch to master when version is ready (see previous chapter)
 
 
 
@@ -132,17 +161,5 @@ Some other points
 
     * ...
 
-* :doc:`Udev files <udev_rules/index>`
-
-
-* Graphical resources
-
-  * :doc:`Icon <graphical/icon_file>`
-
 * Data files
 
-* Tests
-* Nightly builds
-* Errors
-
-  * Errors handled by baseplugin/plugin ................ TODO
