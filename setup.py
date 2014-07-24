@@ -48,7 +48,11 @@ if sys.version_info[0] == 3:
 else:
     netifaces = 'netifaces'
 
-if platform.dist()[0] == 'debian':
+dist = platform.dist()[0]
+if os.environ.has_key('TRAVIS') and os.environ['TRAVIS']:
+    dist = 'ubuntu'
+
+if  dist == 'debian':
     mysql = 'mysql-python'
     magic = 'Magic-file-extensions >= 0.2'
 else:
