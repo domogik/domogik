@@ -200,7 +200,8 @@ class DbHelper():
     def get_url_connection_string(self):
         """Get url connection string to the database reading the configuration file"""
         if self.__db_config['type'] == "mysql":
-            url = "mysql+pymysql://"
+            #pnb990 why add '+pymysql' ?
+            url = "mysql://"
         else:
             url = "%s://" % self.__db_config['type']
         if self.__db_config['port'] != '':
