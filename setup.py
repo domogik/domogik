@@ -48,20 +48,15 @@ if sys.version_info[0] == 3:
 else:
     netifaces = 'netifaces'
 
-dist,version,other = platform.dist()
-if dist == 'debian' and version == 'wheezy/sid':
-    # fake Debian => ubuntu
-    dist = 'ubuntu'
 
-if  dist == 'debian':
+# platform.dist() doesn't works with ubuntu/debian
+if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
     mysql = 'mysql-python'
     magic = 'Magic-file-extensions >= 0.2'
 else:
     mysql = 'pymysql'
     magic = 'python-magic >= 0.4.3'
 
-print platform.dist() 
-print platform.dist()[0]
 print mysql
 print magic
 
