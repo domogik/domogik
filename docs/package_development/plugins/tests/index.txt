@@ -479,10 +479,168 @@ Here are the actions that can be done in the main part:
             rc = 1   # tests are ok so the shell return code is != 0
         xpl_plugin.force_leave(return_code = rc)
 
+
+How to use the serial mock
+--------------------------
+
+A serial mock can be used to simulate some serial devices and so test the plugin without any hardware!
+
 .. todo ::
     Explain how to use the serial mock
 
+Test file
+*********
 
+First, in the test file, define the *test_folder* variable.
+
+Before ::
+
+    if __name__ == "__main__":
+
+        ### global variables
+
+
+After ::
+
+    if __name__ == "__main__":
+    
+        test_folder = os.path.dirname(os.path.realpath(__file__))
+    
+        ### global variables
+
+
+Then, in the test file, add the following configuration elements in the *main part*: ::
+
+        # specific configuration for test mdode (handled by the manager for plugin startup)
+        cfg['test_mode'] = True
+        cfg['test_option'] = "{0}/tests_hchp_data.json".format(test_folder)
+
+These are configuration options which will be handled by the plugin itself. The first one will activate the mock and the second one will give the json file which describe the fake device comportement.
+
+Of course, the plugin will need to be adapted to handle these options and the serial mock!
+
+Plugin binary part
+******************
+
+Add the following parameter when you instantiate your plugin library class:
+
+* self.options.test_option
+
+Example for the *teleinfo* plugin during the development phasis.
+
+Before ::
+
+    teleinfo_list[device] = Teleinfo(self.log, self.send_xpl, self.get_stop(), device, interval)
+
+After ::
+
+    teleinfo_list[device] = Teleinfo(self.log, self.send_xpl, self.get_stop(), device, interval, self.options.test_option)
+
+
+Plugin library part
+*******************
+
+Import both serial and serial mock libraries: ::
+
+    import serial as serial
+    import domogik.tests.common.testserial as testserial
+
+Handle this parameter in your library class:
+
+* 
+
+Example for the *teleinfo* plugin during the development phases.
+
+Before ::
+
+    class Teleinfo:
+    
+        def __init__(self, log, callback, stop, device, interval):
+            ...
+            self._device = device
+            ...
+
+
+After ::
+
+   class Teleinfo:
+   
+       def __init__(self, log, callback, stop, device, interval, fake_device):
+            ...
+            self._device = device
+            self._fake_device = fake_device
+            ...
+
+Then, when you create the serial device, if this is a fake one, use the serial mock library.
+
+Before ::
+
+            self._ser = serial.Serial(self._device, 1200, bytesize=7,
+                                      parity = 'E',stopbits=1)
+
+After ::
+
+            if self._fake_device != None:
+                self._ser = testserial.Serial(self._fake_device, baudrate=1200, bytesize=7,
+                                          parity = 'E',stopbits=1)
+            else:
+                self._ser = serial.Serial(self._device, baudrate=1200, bytesize=7,
+                                          parity = 'E',stopbits=1)
+
+Create a json serial mock file
+******************************
+
+Now you will have to create the json file. This json file is made of 3 parts: ::
+
+    {
+        "history" : [ ], 
+        "responses" : {},
+        "loop" : []
+    }
+
+..note ::
+    Currently, the **responses** part is not yet implemented
+
+The **history** part will contain some data comming from the fake real device. All history elements are played only one time, in the order they are defined in the json file. Then, when the history if finished, the **loop** part will be processed forever.
+
+Here is an example for the **history** part: ::
+
+    {
+        "history" : [   
+                        ...
+                        { "description" : "Send a start frame flag",
+                          "action" : "data-hex",
+                          "data" : "02"
+                        },
+                        { "description" : "Send a HP frame",
+                          "action" : "data",
+                          "data" : "\nADCO 030928084432 B\r"
+                        },
+                        ...
+                        { "description" : "wait",
+                          "action" : "wait",
+                          "delay" : 5
+                        },
+                        ...
+                    ],
+        "responses" : {},
+        "loop" : [...]
+    }
+
+As you can see in the example, each history step is made of 3 parts:
+
+* description : a small description of the step. It will be used for display, but it is mainly used for the developper information.
+* action : the type of the action. 
+
+  * action = "data" : send a string on the fake serial device
+  * action = "data-hex" : send some hexadecimal data on the fake serial device. Hexadecimal data is written in a human readable mode : 0F44DC...
+  * action == wait" : send nothing for a while on the fake serial device. The wait time is defined in seconds
+
+* data (for action = data, data-hex) : the data to send
+* delay (for action = wait) : the wait time in seconds
+
+
+The **loop** part is to be defined in the same way as the history part. The only difference is that when the last step of the loop part is reached, then following step will be the first step of the loop part... Just a loop :)
 
 
 
