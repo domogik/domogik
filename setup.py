@@ -55,6 +55,11 @@ else:
     mysql = 'pymysql'
     magic = 'python-magic >= 0.4.3'
 
+print platform.dist() 
+print platform.dist()[0]
+print mysql
+print magic
+
 setup(
     name = 'Domogik',
     version = '0.4.0',
