@@ -303,6 +303,8 @@ def needupdate():
 #        if not notest:
 #            test_config()
 #    except:
+#        import traceback
+#        traceback.format_exc()
 #        fail(sys.exc_info())
 
 def update_default(user):
@@ -427,7 +429,9 @@ def install():
         print("\n\n")
     except:
         import traceback
-        traceback.format_exc()
+        print "========= TRACEBACK ============="
+        print traceback.format_exc()
+        print "================================="
         fail(sys.exc_info())
 
 def add_arguments_for_config_file(parser, fle):
