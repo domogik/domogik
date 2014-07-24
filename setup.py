@@ -48,8 +48,9 @@ if sys.version_info[0] == 3:
 else:
     netifaces = 'netifaces'
 
-dist = platform.dist()[0]
-if os.environ.has_key('TRAVIS') and os.environ['TRAVIS']:
+dist,version,other = platform.dist()
+if dist == 'debian' and version == 'wheezy/sid':
+    # fake Debian => ubuntu
     dist = 'ubuntu'
 
 if  dist == 'debian':
