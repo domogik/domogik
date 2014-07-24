@@ -485,8 +485,6 @@ How to use the serial mock
 
 A serial mock can be used to simulate some serial devices and so test the plugin without any hardware!
 
-.. todo ::
-    Explain how to use the serial mock
 
 Test file
 *********
@@ -598,7 +596,7 @@ Now you will have to create the json file. This json file is made of 3 parts: ::
         "loop" : []
     }
 
-..note ::
+.. note ::
     Currently, the **responses** part is not yet implemented
 
 The **history** part will contain some data comming from the fake real device. All history elements are played only one time, in the order they are defined in the json file. Then, when the history if finished, the **loop** part will be processed forever.
