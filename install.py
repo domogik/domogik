@@ -426,6 +426,8 @@ def install():
             os.system('python test_config.py')
         print("\n\n")
     except:
+        import traceback
+        traceback.format_exc()
         fail(sys.exc_info())
 
 def add_arguments_for_config_file(parser, fle):
