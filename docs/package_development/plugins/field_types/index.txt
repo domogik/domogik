@@ -25,6 +25,15 @@ optional parameters:
    * mask_str : regexp to validatethe string
    * multiline : boolean
 
+Password
+--------
+Wil result in a password input field
+
+optional parameters:
+   * max_length : integer
+   * min_length : integer
+   * mask_str : regexp to validatethe string
+
 Choice
 ------
 Will result in a dropdownbox

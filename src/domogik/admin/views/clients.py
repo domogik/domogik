@@ -9,7 +9,7 @@ except ImportError:
     pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField, \
-            DateField, DateTimeField, FloatField
+            DateField, DateTimeField, FloatField, PasswordField
 from wtforms.validators import Required
 from flask_login import login_required
 try:
@@ -248,6 +248,8 @@ def client_config(client_id):
             for choice in item["choices"]:
                 choices.append((choice, choice))
             field = SelectField(item["name"], arguments, description=item["description"], choices=choices, default=default)
+        elif item["type"] == "password":
+            field = PasswordField(name, [Required()], description=item["description"])
         else:
             # time, email, ipv4, ipv6, url
             field = TextField(item["name"], arguments, description=item["description"], default=default)
@@ -379,6 +381,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             for key in item["choices"]:
                 choices.append((key, item["choices"][key]))
             field = SelectField(name, [Required()], description=item["description"], choices=choices)
+        elif item["type"] == "password":
+            field = PasswordField(name, [Required()], description=item["description"])
         else:
             # time, email, ipv4, ipv6, url
             field = TextField(name, [Required()], description=item["description"])
@@ -406,6 +410,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             for key in item["choices"]:
                 choices.append((key, item["choices"][key]))
             field = SelectField(name, [Required()], description=item["description"], choices=choices)
+        elif item["type"] == "password":
+            field = PasswordField(name, [Required()], description=item["description"])
         else:
             # time, email, ipv4, ipv6, url
             field = TextField(name, [Required()], description=item["description"])
@@ -433,6 +439,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 for key in item["choices"]:
                     choices.append((key, item["choices"][key]))
                 field = SelectField(name, [Required()], description=item["description"], choices=choices)
+            elif item["type"] == "password":
+                field = PasswordField(name, [Required()], description=item["description"])
             else:
                 # time, email, ipv4, ipv6, url
                 field = TextField(name, [Required()], description=item["description"])
@@ -460,6 +468,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 for key in item["choices"]:
                     choices.append((key, item["choices"][key]))
                 field = SelectField(name, [Required()], description=item["description"], choices=choices)
+            elif item["type"] == "password":
+                field = PasswordField(name, [Required()], description=item["description"])
             else:
                 # time, email, ipv4, ipv6, url
                 field = TextField(name, [Required()], description=item["description"])
