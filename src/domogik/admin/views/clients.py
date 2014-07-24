@@ -249,7 +249,7 @@ def client_config(client_id):
                 choices.append((choice, choice))
             field = SelectField(item["name"], arguments, description=item["description"], choices=choices, default=default)
         elif item["type"] == "password":
-            field = PasswordField(name, [Required()], description=item["description"])
+            field = PasswordField(item["name"], [Required()], description=item["description"])
         else:
             # time, email, ipv4, ipv6, url
             field = TextField(item["name"], arguments, description=item["description"], default=default)
