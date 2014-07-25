@@ -84,6 +84,10 @@ class Serial():
         # loop index
         self.loop_idx = 0
 
+        # first, wait for 30 seconds
+        # this allows to be sure that the plugin is fully ready before using the fake serial device
+        time.sleep(30)
+
     def flush(self):
         pass
 
