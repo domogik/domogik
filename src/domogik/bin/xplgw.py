@@ -264,6 +264,7 @@ class XplManager(XplPlugin, MQAsyncSub):
             """ Callback for the xpl message
             @param message : the Xpl message received
             """
+            self._log_stats.debug( "_callback started for: {0}".format(message) )
             db = DbHelper()
             current_date = calendar.timegm(time.gmtime())
             stored_value = None
