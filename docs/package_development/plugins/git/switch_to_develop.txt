@@ -34,6 +34,8 @@ First, if this is not already done, commit the changes on the *master* branch (R
 Then, create the new branch and push it: ::
 
     $ git branch develop
+
+    $ git checkout develop
     
     $ git push --set-upstream origin develop
     ...

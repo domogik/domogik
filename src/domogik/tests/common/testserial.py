@@ -59,10 +59,11 @@ class Serial():
     """ serial mock
     """
 
-    def __init__(self, device, baudrate = None, parity = None, stopbits = None, timeout = None):
+    def __init__(self, device, baudrate = None, bytesize = None, parity = None, stopbits = None, timeout = None):
         """ Construtor
             @param device : the json file with the fake data
             @param baudrate : useless, just for compatibility
+            @param bytesize : useless, just for compatibility
             @param parity : useless, just for compatibility
             @param stopbits : useless, just for compatibility
             @param timeout : useless, just for compatibility
@@ -96,6 +97,9 @@ class Serial():
         # TODO : respond with the appropriate answers depending on what has been write to the fake serial device
         pass
 
+    def readline(self, length = 1):
+        return self.read(length)
+
     def read(self, length = 1):
         """ Mock the read feature
             @param length : length of the data to read. For compatibility only
@@ -110,10 +114,16 @@ class Serial():
                 description = self.data['history'][self.history_idx]['description']
                 print(u"Action = {0} / Description = {1}".format(action, description))
                 if action == 'data':
+                    print(self.data['history'][self.history_idx]['data'])
+                    value = self.data['history'][self.history_idx]['data']
+                    self.history_idx += 1
+                    return value
+                elif action == 'data-hex':
+                    print(self.data['history'][self.history_idx]['data'])
                     value = binascii.unhexlify(self.data['history'][self.history_idx]['data'])
                     self.history_idx += 1
                     return value
-                if action == 'wait':
+                elif action == 'wait':
                     delay = self.data['history'][self.history_idx]['delay']
                     print(u" => wait for {0}s".format(delay))
                     self.history_idx += 1
@@ -143,9 +153,11 @@ class Serial():
 
 if __name__ == "__main__":
 
-    my_mock = Serial("/media/stock/domotique/git/domogik-plugin-rfxcom/tests/352_data.json")
+    #my_mock = Serial("/media/stock/domotique/git/domogik-plugin-rfxcom/tests/352_data.json")
+    my_mock = Serial("/media/stock/domotique/git/domogik-plugin-teleinfo/tests/tests_hphc_data.json")
     while True:
-        my_mock.read()
+        #my_mock.read()
+        my_mock.readline()
 
 
 # TODO :
