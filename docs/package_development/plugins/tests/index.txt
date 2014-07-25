@@ -637,6 +637,9 @@ As you can see in the example, each history step is made of 3 parts:
 * data (for action = data, data-hex) : the data to send
 * delay (for action = wait) : the wait time in seconds
 
+.. note ::
+
+    The fake serial device will not send data in the first 30 seconds. It allows the plugin to be fully started (MQ ready) so the xpl checks will not missed any xpl message sent before the MQ is ready and send an *active* status for the plugin (for example).
 
 The **loop** part is to be defined in the same way as the history part. The only difference is that when the last step of the loop part is reached, then following step will be the first step of the loop part... Just a loop :)
 
