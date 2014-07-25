@@ -347,7 +347,8 @@ class DBConnector(XplPlugin, MQRep):
 
     def _mdp_reply_devices_create_result(self, data):
         status = True
-        reason = ""
+        reason = False
+        result = False
         # get the filled package json
         params = data.get_data()['data']
         # get the json
@@ -371,13 +372,21 @@ class DBConnector(XplPlugin, MQRep):
 
         if status:
             # call the add device function
-            if not self._db.add_full_device(params, pjson):
+            res = self._db.add_full_device(params, pjson)
+            if not res:
                 status = False
                 reason = "DB failed"
+            else:
+                status = True
+                reason = False
+                result = res
 
         msg = MQMessage()
         msg.set_action('device.create.result')
-        msg.add_data('reason', reason)
+        if reason:
+            msg.add_data('reason', reason)
+        if result:
+            msg.add_data('result', result)
         msg.add_data('status', status)
         self.log.debug(msg.get())
         self.reply(msg.get())
