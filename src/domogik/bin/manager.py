@@ -942,7 +942,7 @@ class Plugin(GenericComponent, MQAsyncSub):
 
         ### check if the plugin must be started on manager startup
         startup = self._config.query(self.name, 'auto_startup')
-        if startup == '1':
+        if startup == '1' or startup == 'Y':
             startup = True
         if startup == True:
             self.log.info(u"Plugin {0} configured to be started on manager startup. Starting...".format(name))
@@ -1232,7 +1232,7 @@ class Clients():
             return
         old_status = self._clients[client_id]['status']
         # in all cases, set the 'last seen' time for the clients which are not dead
-        if new_status == STATUS_DEAD:
+        if new_status != STATUS_DEAD:
             self._clients[client_id]['last_seen'] = time.time()
         if old_status == new_status:
             self.log.debug(u"The status was already {0} : nothing to do".format(old_status))

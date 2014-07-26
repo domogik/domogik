@@ -66,7 +66,8 @@ class deviceAPI(MethodView):
         if res is not None:
             data = res.get_data()
             if data["status"]:
-                return 201, ""
+                urlHandler.reload_stats()        
+                return 201, data["result"]
             else:
                 return 500, data["reason"]
         else:

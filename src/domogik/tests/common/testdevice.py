@@ -90,6 +90,10 @@ class TestDevice():
         #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:
             raise RuntimeError("Error when creating the device : {0}".format(response.text))
+        else:
+            dev = json.loads(response.text)
+            print(u"The new device is: {0}".format(dev))
+            return dev
 
     def del_device(self, id):
         """ Call DELETE /device/... to delete a device

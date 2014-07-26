@@ -3,10 +3,12 @@ Testing a plugin
 ================
 
 Testing a plugin is really important! This allow to:
+
 * check if the plugin works as designed
 * check if the last update didn't break anything: this is called *non regression tests*
 
 Some libraries have been created in the Domogik project to help you to create the test scripts. These libraries can:
+
 * create some devices
 * configure, start, stop and do some basic checks on the plugin
 * help you to test xPL dialogs
@@ -71,8 +73,129 @@ A test file
 ===========
 
 A test file is made of 2 parts:
+
 * a class which inherits from *PluginTestCase*. This class will contain all the test cases related to the plugin.
 * the main part which will do some actions and launch the test cases.
+
+
+Here is a sample file from the **teleinfo** plugin. This sample file has only one dummy test defined. This is the minimal file you must prepare before creating the tests. This test file will test only global features : 
+
+* deletion and creation of devices
+* plugin configuration
+* plugin startup
+* xpl hbeat
+* plugin stop successfully
+
+
+::
+
+
+
+    #!/usr/bin/python
+    # -*- coding: utf-8 -*-
+    
+    from domogik.xpl.common.plugin import XplPlugin
+    from domogik.tests.common.plugintestcase import PluginTestCase
+    from domogik.tests.common.testplugin import TestPlugin
+    from domogik.tests.common.testdevice import TestDevice
+    from domogik.tests.common.testsensor import TestSensor
+    from domogik.common.utils import get_sanitized_hostname
+    from datetime import datetime
+    import unittest
+    import sys
+    import os
+    import traceback
+    
+    class TeleinfoTestCase(PluginTestCase):
+    
+        def test_0100_dummy(self):
+            self.assertTrue(True)
+    
+    if __name__ == "__main__":
+        ### global variables
+        device = "/dev/teleinfo"
+        interval = 60
+    
+        # set up the xpl features
+        xpl_plugin = XplPlugin(name = 'test',
+                               daemonize = False,
+                               parser = None,
+                               nohub = True,
+                               test  = True)
+    
+        # set up the plugin name
+        name = "teleinfo"
+    
+        # set up the configuration of the plugin
+        # configuration is done in test_0010_configure_the_plugin with the cfg content
+        # notice that the old configuration is deleted before
+        cfg = { 'configured' : True }
+    
+        ### start tests
+        # load the test devices class
+        td = TestDevice()
+    
+        # delete existing devices for this plugin on this host
+        client_id = "{0}-{1}.{2}".format("plugin", name, get_sanitized_hostname())
+        try:
+            td.del_devices_by_client(client_id)
+        except:
+            print(u"Error while deleting all the test device for the client id '{0}' : {1}".format(client_id, traceback.format_exc()))
+            sys.exit(1)
+    
+        # create a test device
+        try:
+            #device_id = td.create_device(client_id, "test_device_teleinfo", "teleinfo.electric_meter")
+            
+            params = td.get_params(client_id, "teleinfo.electric_meter")
+        
+            # fill in the params
+            params["device_type"] = "teleinfo.electric_meter"
+            params["name"] = "test_device_teleinfo"
+            params["reference"] = "reference"
+            params["description"] = "description"
+            # global params
+            for the_param in params['global']:
+                if the_param['key'] == "interval":
+                    the_param['value'] = interval
+                if the_param['key'] == "device":
+                    the_param['value'] = device
+            print params['global']
+            # xpl params
+            pass # there are no xpl params for this plugin
+            # create
+            td.create_device(params)
+    
+        except:
+            print(u"Error while creating the test devices : {0}".format(traceback.format_exc()))
+            sys.exit(1)
+    
+        ### prepare and run the test suite
+        suite = unittest.TestSuite()
+        # check domogik is running, configure the plugin
+        suite.addTest(TeleinfoTestCase("test_0001_domogik_is_running", xpl_plugin, name, cfg))
+        suite.addTest(TeleinfoTestCase("test_0010_configure_the_plugin", xpl_plugin, name, cfg))
+    
+        # start the plugin
+        suite.addTest(TeleinfoTestCase("test_0050_start_the_plugin", xpl_plugin, name, cfg))
+    
+    
+        # do the specific plugin tests
+        suite.addTest(TeleinfoTestCase("test_0100_dummy", xpl_plugin, name, cfg))
+    
+        # do some tests comon to all the plugins
+        suite.addTest(TeleinfoTestCase("test_9900_hbeat", xpl_plugin, name, cfg))
+        suite.addTest(TeleinfoTestCase("test_9990_stop_the_plugin", xpl_plugin, name, cfg))
+    
+        # quit
+        res = unittest.TextTestRunner().run(suite)
+        if res.wasSuccessful() == True:
+            rc = 0   # tests are ok so the shell return code is 0
+        else:
+            rc = 1   # tests are ok so the shell return code is != 0
+        xpl_plugin.force_leave(return_code = rc)
+
+
 
 A test file : the class which inherits from PluginTestCase
 ==========================================================
@@ -97,6 +220,8 @@ Here is an example of a dummy test which is always good: ::
 
 Usefull functions
 -----------------
+
+The following  functions can be used for your tests.
 
 Wait for a xPL message
 **********************
@@ -261,6 +386,11 @@ Here are the actions that can be done in the main part:
                                nohub = True,
                                test  = True)
 
+* set up the plugin name: ::
+
+        # set up the plugin name
+        name = "diskfree"
+
 * define the configuration of the plugin. If no configuration is required for the plugin, at least you must set up the *configured* key to *True*. Example: ::
 
         # set up the configuration of the plugin
@@ -284,15 +414,35 @@ Here are the actions that can be done in the main part:
             print(u"Error while deleting all the test device for the client id '{0}' : {1}".format(client_id, traceback.format_exc()))
             sys.exit(1)
  
-* if needed, create some devices. If you do this, you must set *alter_configuration_or_setup* to True in the json. Notice that the device parameters should come from the global variables defined before. Example: ::
+* if needed, create some devices. If you do this, you must set *alter_configuration_or_setup* to True in the json. Notice that the device parameters should come from the global variables defined before. Example (here 2 global parameters are defined but no xpl parameters are defined): ::
 
         # create a test device
         try:
-            device_id = td.create_device(client_id, "test_device_diskfree", "diskfree.disk_usage")
-            td.configure_global_parameters({"device" : path, "interval" : interval})
+            #device_id = td.create_device(client_id, "test_device_teleinfo", "teleinfo.electric_meter")
+        
+            params = td.get_params(client_id, "teleinfo.electric_meter")
+       
+            # fill in the params
+            params["device_type"] = "teleinfo.electric_meter"
+            params["name"] = "test_device_teleinfo"
+            params["reference"] = "reference"
+            params["description"] = "description"
+            # global params
+            for the_param in params['global']:
+                if the_param['key'] == "interval":
+                    the_param['value'] = interval
+                if the_param['key'] == "device":
+                    the_param['value'] = device
+            print params['global']
+            # xpl params
+            pass # there are no xpl params for this plugin
+            # create
+            td.create_device(params)
+    
         except:
             print(u"Error while creating the test devices : {0}".format(traceback.format_exc()))
             sys.exit(1)
+
 
 * then, call the common tests related to the plugin. These tests are common to all plugins and are defined in the class *PluginTestCase*. The first one will just check if Domogik is running (if not, the plugin will not be able to start). The second one will configure the plugin and the last one will start the plugin. Example: ::
 
@@ -329,10 +479,169 @@ Here are the actions that can be done in the main part:
             rc = 1   # tests are ok so the shell return code is != 0
         xpl_plugin.force_leave(return_code = rc)
 
-.. todo ::
-    Explain how to use the serial mock
+
+How to use the serial mock
+--------------------------
+
+A serial mock can be used to simulate some serial devices and so test the plugin without any hardware!
 
 
+Test file
+*********
+
+First, in the test file, define the *test_folder* variable.
+
+Before ::
+
+    if __name__ == "__main__":
+
+        ### global variables
+
+
+After ::
+
+    if __name__ == "__main__":
+    
+        test_folder = os.path.dirname(os.path.realpath(__file__))
+    
+        ### global variables
+
+
+Then, in the test file, add the following configuration elements in the *main part*: ::
+
+        # specific configuration for test mdode (handled by the manager for plugin startup)
+        cfg['test_mode'] = True
+        cfg['test_option'] = "{0}/tests_hchp_data.json".format(test_folder)
+
+These are configuration options which will be handled by the plugin itself. The first one will activate the mock and the second one will give the json file which describe the fake device comportement.
+
+Of course, the plugin will need to be adapted to handle these options and the serial mock!
+
+Plugin binary part
+******************
+
+Add the following parameter when you instantiate your plugin library class:
+
+* self.options.test_option
+
+Example for the *teleinfo* plugin during the development phasis.
+
+Before ::
+
+    teleinfo_list[device] = Teleinfo(self.log, self.send_xpl, self.get_stop(), device, interval)
+
+After ::
+
+    teleinfo_list[device] = Teleinfo(self.log, self.send_xpl, self.get_stop(), device, interval, self.options.test_option)
+
+
+Plugin library part
+*******************
+
+Import both serial and serial mock libraries: ::
+
+    import serial as serial
+    import domogik.tests.common.testserial as testserial
+
+Handle this parameter in your library class:
+
+* 
+
+Example for the *teleinfo* plugin during the development phases.
+
+Before ::
+
+    class Teleinfo:
+    
+        def __init__(self, log, callback, stop, device, interval):
+            ...
+            self._device = device
+            ...
+
+
+After ::
+
+   class Teleinfo:
+   
+       def __init__(self, log, callback, stop, device, interval, fake_device):
+            ...
+            self._device = device
+            self._fake_device = fake_device
+            ...
+
+Then, when you create the serial device, if this is a fake one, use the serial mock library.
+
+Before ::
+
+            self._ser = serial.Serial(self._device, 1200, bytesize=7,
+                                      parity = 'E',stopbits=1)
+
+After ::
+
+            if self._fake_device != None:
+                self._ser = testserial.Serial(self._fake_device, baudrate=1200, bytesize=7,
+                                          parity = 'E',stopbits=1)
+            else:
+                self._ser = serial.Serial(self._device, baudrate=1200, bytesize=7,
+                                          parity = 'E',stopbits=1)
+
+Create a json serial mock file
+******************************
+
+Now you will have to create the json file. This json file is made of 3 parts: ::
+
+    {
+        "history" : [ ], 
+        "responses" : {},
+        "loop" : []
+    }
+
+.. note ::
+    Currently, the **responses** part is not yet implemented
+
+The **history** part will contain some data comming from the fake real device. All history elements are played only one time, in the order they are defined in the json file. Then, when the history if finished, the **loop** part will be processed forever.
+
+Here is an example for the **history** part: ::
+
+    {
+        "history" : [   
+                        ...
+                        { "description" : "Send a start frame flag",
+                          "action" : "data-hex",
+                          "data" : "02"
+                        },
+                        { "description" : "Send a HP frame",
+                          "action" : "data",
+                          "data" : "\nADCO 030928084432 B\r"
+                        },
+                        ...
+                        { "description" : "wait",
+                          "action" : "wait",
+                          "delay" : 5
+                        },
+                        ...
+                    ],
+        "responses" : {},
+        "loop" : [...]
+    }
+
+As you can see in the example, each history step is made of 3 parts:
+
+* description : a small description of the step. It will be used for display, but it is mainly used for the developper information.
+* action : the type of the action. 
+
+  * action = "data" : send a string on the fake serial device
+  * action = "data-hex" : send some hexadecimal data on the fake serial device. Hexadecimal data is written in a human readable mode : 0F44DC...
+  * action == wait" : send nothing for a while on the fake serial device. The wait time is defined in seconds
+
+* data (for action = data, data-hex) : the data to send
+* delay (for action = wait) : the wait time in seconds
+
+.. note ::
+
+    The fake serial device will not send data in the first 30 seconds. It allows the plugin to be fully started (MQ ready) so the xpl checks will not missed any xpl message sent before the MQ is ready and send an *active* status for the plugin (for example).
+
+The **loop** part is to be defined in the same way as the history part. The only difference is that when the last step of the loop part is reached, then following step will be the first step of the loop part... Just a loop :)
 
 
 
