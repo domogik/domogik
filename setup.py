@@ -41,13 +41,13 @@ import os
 from setuptools import setup, find_packages
 import platform
 import sys
-import platform
 
 if sys.version_info[0] == 3:
     netifaces = 'netifaces-py3'
 else:
     netifaces = 'netifaces'
 
+print platform.linux_distribution()
 
 #platform.dist() doesn't works with ubuntu/debian, 
 #so I not found pettiest test :(
