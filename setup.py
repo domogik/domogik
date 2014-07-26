@@ -47,10 +47,11 @@ if sys.version_info[0] == 3:
 else:
     netifaces = 'netifaces'
 
-print platform.linux_distribution()
 
-#platform.dist() doesn't works with ubuntu/debian, 
-#so I not found pettiest test :(
+
+#platform.dist() and platform.linux_distribution() 
+#doesn't works with ubuntu/debian, both say debian.
+#So I not found pettiest test :(
 if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
     mysql = 'mysql-python'
     magic = 'Magic-file-extensions >= 0.2'
