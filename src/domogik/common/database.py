@@ -200,8 +200,16 @@ class DbHelper():
     def get_url_connection_string(self):
         """Get url connection string to the database reading the configuration file"""
         if self.__db_config['type'] == "mysql":
-            #pnb990 why add '+pymysql' ?
-            url = "mysql://"
+            #platform.dist() doesn't works with ubuntu/debian, 
+            #so I not found pettiest test :(
+            if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') != 0:
+                #why add '+pymysql', 
+                #because on ubuntu sqlalchemy load wrong module
+                url = "mysql+pymysql://"
+            else:
+                #but on debian pymysql is named python-mysqldb.
+                #and it load automatically good one.
+                url = "mysql://"
         else:
             url = "%s://" % self.__db_config['type']
         if self.__db_config['port'] != '':

@@ -49,7 +49,8 @@ else:
     netifaces = 'netifaces'
 
 
-# platform.dist() doesn't works with ubuntu/debian
+#platform.dist() doesn't works with ubuntu/debian, 
+#so I not found pettiest test :(
 if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
     mysql = 'mysql-python'
     magic = 'Magic-file-extensions >= 0.2'
