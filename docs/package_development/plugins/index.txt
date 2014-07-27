@@ -88,7 +88,7 @@ After creating a start script (used only by the developpers), you will now creat
   * :doc:`Library part <python/lib_part>`
   * How to ...
 
-    * :doc:`Make the new devices available in the user interface <python/detected_devices>`
+    * :doc:`Make the detected devices available in the user interface <python/detected_devices>`
     * ...
 
 Icon
@@ -124,8 +124,8 @@ Preparing some automated tests is something really important for a plugin. It wi
 
 * :doc:`Tests <tests/index>`
 
-  * :doc:`Travis CI (continuous integration) <tests/travis_templates>`
   * :doc:`The testrunner tool <tests/testrunner>`
+  * :doc:`Travis CI (continuous integration) <tests/travis_templates>`
 
 Your plugin is ready ? Switch to the master branch
 ==================================================
