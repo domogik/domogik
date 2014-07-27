@@ -58,9 +58,9 @@ if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
 else:
     mysql = 'pymysql'
     magic = 'python-magic >= 0.4.3'
-# tODO : temporary fix
-mysql = 'pymysql'
-magic = 'python-magic >= 0.4.3'
+# TODO : temporary fix
+#mysql = 'pymysql'
+#magic = 'python-magic >= 0.4.3'
 
 print("MySQL version which will be used : {0}".format(mysql))
 print("Magic version which will be used : {0}".format(magic))
