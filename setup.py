@@ -47,6 +47,21 @@ if sys.version_info[0] == 3:
 else:
     netifaces = 'netifaces'
 
+
+
+#platform.dist() and platform.linux_distribution() 
+#doesn't works with ubuntu/debian, both say debian.
+#So I not found pettiest test :(
+if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
+    mysql = 'mysql-python'
+    magic = 'Magic-file-extensions >= 0.2'
+else:
+    mysql = 'pymysql'
+    magic = 'python-magic >= 0.4.3'
+
+print mysql
+print magic
+
 setup(
     name = 'Domogik',
     version = '0.4.0',
@@ -60,7 +75,7 @@ setup(
 	      'simplejson >= 1.9.2',
 	      'pyOpenSSL >= 0.10',
 	      'psutil >= 0.1.3',
-	      'pymysql',
+	       mysql,
           'psycopg2',
 	      'pip >= 1.0',
 	      'pyserial >= 2.5',
@@ -72,7 +87,7 @@ setup(
           'Flask-Babel',
 	      'tornado >= 2.3',
           'requests >= 0.12.1',
-          'python-magic >= 0.4.3',
+          magic,
 	      'pyzmq >= 2.2.0'],
     zip_safe = False,
     license = 'GPL v3',
