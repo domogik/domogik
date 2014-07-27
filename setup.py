@@ -58,9 +58,12 @@ if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
 else:
     mysql = 'pymysql'
     magic = 'python-magic >= 0.4.3'
+# tODO : temporary fix
+mysql = 'pymysql'
+magic = 'python-magic >= 0.4.3'
 
-print mysql
-print magic
+print("MySQL version which will be used : {0}".format(mysql))
+print("Magic version which will be used : {0}".format(magic))
 
 setup(
     name = 'Domogik',
@@ -112,6 +115,7 @@ setup(
             dmg_insert_data = domogik.tools.packages.insert_data:main
             dmg_review = domogik.tools.packages.review.review:main
             dmg_package = domogik.bin.package:main
+            dmg_testrunner = domogik.tests.bin.testrunner:main
 	    """
         ]
     },
