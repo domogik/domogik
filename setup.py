@@ -53,7 +53,6 @@ magic = 'python-magic >= 0.4.3'
 
 import pip
 for mod in pip.get_installed_distributions():
-    print mod.key
     if ( mod.key == 'mysql-python' ):
         mysql = 'mysql-python'
     if ( mod.key == 'magic-file-extensions' ):

@@ -218,7 +218,6 @@ class DbHelper():
         else:
             url = "%s%s:%s@%s/%s" % (url, self.__db_config['user'], self.__db_config['password'],
                                      self.__db_config['host'], self.__db_config['name'])
-        print "****************"+url
         return url
     
     def get_db_user(self):
