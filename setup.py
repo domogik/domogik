@@ -48,16 +48,15 @@ else:
     netifaces = 'netifaces'
 
 
+mysql = 'pymysql'
+magic = 'python-magic >= 0.4.3'
 
-#platform.dist() and platform.linux_distribution() 
-#doesn't works with ubuntu/debian, both say debian.
-#So I not found pettiest test :(
-if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
-    mysql = 'mysql-python'
-    magic = 'Magic-file-extensions >= 0.2'
-else:
-    mysql = 'pymysql'
-    magic = 'python-magic >= 0.4.3'
+import pip
+for mod in pip.get_installed_distributions():
+    if ( mod.key == 'mysql-python' ):
+        mysql = 'mysql-python'
+    if ( mod.key == 'Magic-file-extensions' ):
+        magic = 'Magic-file-extensions'
 
 print mysql
 print magic

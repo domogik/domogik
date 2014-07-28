@@ -63,6 +63,14 @@ from contextlib import contextmanager
 
 DEFAULT_RECYCLE_POOL = 3600
 
+import pip
+
+mysql_suffix='+mysql'
+
+for mod in pip.get_installed_distributions():
+    if ( mod.key == 'mysql-python' ):
+        mysql_suffix = ''
+
 
 def _make_crypted_password(clear_text_password):
     """Make a crypted password (using sha256)
@@ -200,18 +208,7 @@ class DbHelper():
     def get_url_connection_string(self):
         """Get url connection string to the database reading the configuration file"""
         if self.__db_config['type'] == "mysql":
-            #platform.dist() and platform.linux_distribution() 
-            #doesn't works with ubuntu/debian, both say debian.
-            #So I not found pettiest test :(
-            import os
-            if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') != 0:
-                #why add '+pymysql', 
-                #because on ubuntu sqlalchemy load wrong module
-                url = "mysql+pymysql://"
-            else:
-                #but on debian pymysql is named python-mysqldb.
-                #and it load automatically good one.
-                url = "mysql://"
+            url = "mysql"+mysql_suffix+"://"
         else:
             url = "%s://" % self.__db_config['type']
         if self.__db_config['port'] != '':
