@@ -428,6 +428,8 @@ class DbHelper():
                             'conversion' : a_sensor.conversion, 
                             'last_value' : a_sensor.last_value, 
                             'last_received' : a_sensor.last_received,
+                            'value_min' : a_sensor.value_min,
+                            'value_max' : a_sensor.value_max,
                             'reference' : a_sensor.reference
                           }
             json_device['sensors'][a_sensor.reference] = json_sensor
@@ -892,6 +894,18 @@ class DbHelper():
                     self.__session.add(h)
                 sensor.last_received = date
                 sensor.last_value = ucode(value)
+                try:
+                    val = float(value)
+                except ValueError:
+                    pass
+                except TypeError:
+                    pass
+                else:
+                    # update min/max
+                    if sensor.value_min > val:
+                        sensor.value_min = val
+                    if sensor.value_max < val:
+                        sensor.value_max = val
                 self.__session.add(sensor)
                 try:
                     self.__session.commit()
