@@ -63,13 +63,14 @@ from contextlib import contextmanager
 
 DEFAULT_RECYCLE_POOL = 3600
 
+#For packages provided by pip sqlalchemy load wrong python modules.
+#So it is not already installed on system, we need to select good one 
+#by this connector suffix.
 import pip
-
-mysql_suffix='+mysql'
-
+mysql_suffix='+pymysql'
 for mod in pip.get_installed_distributions():
     if ( mod.key == 'mysql-python' ):
-        mysql_suffix = ''
+        mysql_suffix = '' # it is debian package, don't use suffix
 
 
 def _make_crypted_password(clear_text_password):

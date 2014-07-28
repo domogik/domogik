@@ -47,7 +47,7 @@ if sys.version_info[0] == 3:
 else:
     netifaces = 'netifaces'
 
-
+pyzmq_found = False
 mysql = 'pymysql'
 magic = 'python-magic >= 0.4.3'
 
@@ -58,9 +58,25 @@ for mod in pip.get_installed_distributions():
         mysql = 'mysql-python'
     if ( mod.key == 'magic-file-extensions' ):
         magic = 'magic-file-extensions'
+    if ( mod.key == 'pyzmq' ):
+        pyzmq_found = True
 
-print mysql
-print magic
+#platform.dist() and platform.linux_distribution() 
+#doesn't works with ubuntu/debian, both say debian.
+#So I not found pettiest test :(
+if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
+    #it is a debian
+    if not pyzmq_found :
+        print "******************************************"
+        print "* On DEBIAN use python-zmq package       *"
+        print "* provided by debian                     *"
+        print "* Pip version don't compile on debian    *"
+        print "******************************************"
+
+print "******************************************"
+print "use: "+mysql
+print "use: "+magic
+print "******************************************"
 
 setup(
     name = 'Domogik',
