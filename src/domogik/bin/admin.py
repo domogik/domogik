@@ -215,7 +215,7 @@ class Admin(Plugin):
 def main():
     ''' Called by the easyinstall mapping script
     '''
-    Admin('lo', '40405')
+    Admin('lo', '40406')
 
 if __name__ == '__main__':
     main()
