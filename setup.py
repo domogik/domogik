@@ -48,6 +48,7 @@ else:
     netifaces = 'netifaces'
 
 
+pyzmq = 'pyzmq >= 2.2.0'
 mysql = 'pymysql'
 magic = 'python-magic >= 0.4.3'
 
@@ -58,6 +59,12 @@ for mod in pip.get_installed_distributions():
         mysql = 'mysql-python'
     if ( mod.key == 'magic-file-extensions' ):
         magic = 'magic-file-extensions'
+
+#platform.dist() and platform.linux_distribution() 
+#doesn't works with ubuntu/debian, both say debian.
+#So I not found pettiest test :(
+if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
+    pyzmq = 'pyzmq == 2.2.0'
 
 print mysql
 print magic
@@ -88,7 +95,7 @@ setup(
 	      'tornado >= 2.3',
           'requests >= 0.12.1',
           magic,
-	      'pyzmq >= 2.2.0'],
+	      pyzmq],
     zip_safe = False,
     license = 'GPL v3',
     #include_package_data = True,
