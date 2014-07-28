@@ -363,11 +363,11 @@ def install():
             #doesn't works with ubuntu/debian, both say debian.
             #So I not found pettiest test :(
             if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
-                dist_packages_install_script = 'debian_packages_install.sh'
+                dist_packages_install_script = './debian_packages_install.sh'
             if dist_packages_install_script == '' :
                 raise OSError("This argument is not implemented on this distribution.")
-            if os.system(dist_packages_install_script):
-                raise OSError("Cannot install packages correctly")
+            if os.system(dist_packages_install_script) != 0:
+                raise OSError("Cannot install packages correctly script '%s'" % dist_packages_install_script)
 
         # RUN setup.py
         if not args.setup:
