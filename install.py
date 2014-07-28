@@ -359,8 +359,7 @@ def install():
         if not args.setup:
             info("Run setup.py")
             if os.system('python setup.py develop') !=  0:
-                 print "setup.py doesn't finish correctly"
-                 raise 
+                 raise OSError("setup.py doesn't finish correctly")
 
         # ask for the domogik user
         if args.user == None or args.user == '':
