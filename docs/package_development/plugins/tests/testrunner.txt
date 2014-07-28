@@ -14,8 +14,8 @@ You just need to give the tool the path to the test files and it will use the *t
 
 Here are all the available options: ::
 
-    $ ./testrunner.py -h
-    usage: testrunner.py [-h] [-a] [-c CRITICITY] directory
+    $ dmg_testrunner -h
+    usage: dmg_testrunner [-h] [-a] [-c CRITICITY] directory
     
     Launch all the tests that don't need hardware.
     
@@ -39,8 +39,7 @@ Example
 
 In this example, there is only one test file to lauch, which is named *tests*. ::
 
-    $ ./testrunner.py -a -c low /var/lib/domogik/domo
-    gik_packages/plugin_diskfree/tests/
+    $ dmg_testrunner -a -c low /var/lib/domogik/domogik_packages/plugin_diskfree/tests/
     Domogik release : 0.4.0
     Running test with the folowing parameters:
     - allow to alter the configuration or setup.
