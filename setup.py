@@ -61,18 +61,6 @@ for mod in pip.get_installed_distributions():
     if ( mod.key == 'pyzmq' ):
         pyzmq_found = True
 
-#platform.dist() and platform.linux_distribution() 
-#doesn't works with ubuntu/debian, both say debian.
-#So I not found pettiest test :(
-if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
-    #it is a debian
-    if not pyzmq_found :
-        print "******************************************"
-        print "* On DEBIAN use python-zmq package       *"
-        print "* provided by debian                     *"
-        print "* Pip version don't compile on debian    *"
-        print "******************************************"
-
 print "******************************************"
 print "use: "+mysql
 print "use: "+magic
