@@ -60,6 +60,9 @@ class DbInstall():
         self._url = self._db.get_url_connection_string()
         self._engine = create_engine(self._url)
 
+    def db_info(self):
+        return (self._db.get_db_type(),self._db.get_db_name(),self._db.get_db_user(),self._db.get_db_password(),self._url)
+
     def install_or_upgrade_db(self):
         from domogik.common import sql_schema
         from domogik.common import database

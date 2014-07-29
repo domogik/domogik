@@ -315,6 +315,8 @@ def install():
     parser = argparse.ArgumentParser(description='Domogik installation.')
     parser.add_argument('--dist-packages', dest='dist_packages', action="store_true",
                    default=False, help='Try to use distribution packages instead of pip packages')
+    parser.add_argument('--create-database', dest='create_database', action="store_true",
+                   default=False, help='create and allow domogik to access to it, if it is not already created')
     parser.add_argument('--no-setup', dest='setup', action="store_true",
                    default=False, help='Don\'t install the python packages')
     parser.add_argument('--no-test', dest='test', action="store_true",
@@ -404,6 +406,7 @@ def install():
                 info("Update the config file : /etc/domogik/xplhub.cfg")
                 write_xplhub_configfile(False)
 
+
         # upgrade db
         if not args.db:
             try:
@@ -432,6 +435,10 @@ def install():
                 print("Trace: {0}".format(traceback.format_exc()))
 
             dbi = DbInstall()
+            if args.create_database:
+                print "================="
+                print dbi.db_info()
+                print "================="
             dbi.install_or_upgrade_db()
 
         # change permissions to some files created as root during the installation to the domogik user
