@@ -63,6 +63,15 @@ from contextlib import contextmanager
 
 DEFAULT_RECYCLE_POOL = 3600
 
+#For packages provided by pip sqlalchemy load wrong python modules.
+#So it is not already installed on system, we need to select good one 
+#by this connector suffix.
+import pip
+mysql_suffix='+pymysql'
+for mod in pip.get_installed_distributions():
+    if ( mod.key == 'mysql-python' ):
+        mysql_suffix = '' # it is debian package, don't use suffix
+
 
 def _make_crypted_password(clear_text_password):
     """Make a crypted password (using sha256)
@@ -200,18 +209,7 @@ class DbHelper():
     def get_url_connection_string(self):
         """Get url connection string to the database reading the configuration file"""
         if self.__db_config['type'] == "mysql":
-            #platform.dist() and platform.linux_distribution() 
-            #doesn't works with ubuntu/debian, both say debian.
-            #So I not found pettiest test :(
-            import os
-            if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') != 0:
-                #why add '+pymysql', 
-                #because on ubuntu sqlalchemy load wrong module
-                url = "mysql+pymysql://"
-            else:
-                #but on debian pymysql is named python-mysqldb.
-                #and it load automatically good one.
-                url = "mysql://"
+            url = "mysql"+mysql_suffix+"://"
         else:
             url = "%s://" % self.__db_config['type']
         if self.__db_config['port'] != '':
@@ -828,7 +826,7 @@ class DbHelper():
         for val in oldvals:
             # add the value
             self.add_sensor_history(nsid, val[1], val[2])
-  	    # increment num
+           # increment num
             num += 1
         # delete the statas
         meta = MetaData(bind=DbHelper.__engine)
@@ -1171,8 +1169,8 @@ class DbHelper():
         # the user doesn't exists
         if user_acc == None:
             return None
-	if user_acc.password == _make_crypted_password(a_password):
-	    return user_acc
+        if user_acc.password == _make_crypted_password(a_password):
+            return user_acc
         else:
             return None
 
