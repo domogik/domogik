@@ -313,6 +313,8 @@ def update_default(user):
 
 def install():
     parser = argparse.ArgumentParser(description='Domogik installation.')
+    parser.add_argument('--dist-packages', dest='dist_packages', action="store_true",
+                   default=False, help='Try to use distribution packages instead of pip packages')
     parser.add_argument('--no-setup', dest='setup', action="store_true",
                    default=False, help='Don\'t install the python packages')
     parser.add_argument('--no-test', dest='test', action="store_true",
@@ -355,10 +357,23 @@ def install():
         assert os.getuid() == 0, "This script must be started as root"
         ok("Correctly started with root privileges.")
 
+        if args.dist_packages:
+            dist_packages_install_script = ''
+            #platform.dist() and platform.linux_distribution() 
+            #doesn't works with ubuntu/debian, both say debian.
+            #So I not found pettiest test :(
+            if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
+                dist_packages_install_script = './debian_packages_install.sh'
+            if dist_packages_install_script == '' :
+                raise OSError("This argument is not implemented on this distribution.")
+            if os.system(dist_packages_install_script) != 0:
+                raise OSError("Cannot install packages correctly script '%s'" % dist_packages_install_script)
+
         # RUN setup.py
         if not args.setup:
             info("Run setup.py")
-            os.system('python setup.py develop')
+            if os.system('python setup.py develop') !=  0:
+                raise OSError("setup.py doesn't finish correctly")
 
         # ask for the domogik user
         if args.user == None or args.user == '':
