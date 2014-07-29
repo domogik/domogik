@@ -75,3 +75,4 @@ from domogik.admin.views.orphans import *
 from domogik.admin.views.account import *
 from domogik.admin.views.person import *
 from domogik.admin.views.rest import *
+from domogik.admin.views.scenario import *
