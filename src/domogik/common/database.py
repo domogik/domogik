@@ -426,6 +426,8 @@ class DbHelper():
                             'conversion' : a_sensor.conversion, 
                             'last_value' : a_sensor.last_value, 
                             'last_received' : a_sensor.last_received,
+                            'value_min' : a_sensor.value_min,
+                            'value_max' : a_sensor.value_max,
                             'reference' : a_sensor.reference
                           }
             json_device['sensors'][a_sensor.reference] = json_sensor
@@ -824,7 +826,7 @@ class DbHelper():
         for val in oldvals:
             # add the value
             self.add_sensor_history(nsid, val[1], val[2])
-  	    # increment num
+           # increment num
             num += 1
         # delete the statas
         meta = MetaData(bind=DbHelper.__engine)
@@ -890,6 +892,18 @@ class DbHelper():
                     self.__session.add(h)
                 sensor.last_received = date
                 sensor.last_value = ucode(value)
+                try:
+                    val = float(value)
+                except ValueError:
+                    pass
+                except TypeError:
+                    pass
+                else:
+                    # update min/max
+                    if sensor.value_min > val:
+                        sensor.value_min = val
+                    if sensor.value_max < val:
+                        sensor.value_max = val
                 self.__session.add(sensor)
                 try:
                     self.__session.commit()
@@ -1155,8 +1169,8 @@ class DbHelper():
         # the user doesn't exists
         if user_acc == None:
             return None
-	if user_acc.password == _make_crypted_password(a_password):
-	    return user_acc
+        if user_acc.password == _make_crypted_password(a_password):
+            return user_acc
         else:
             return None
 

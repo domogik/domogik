@@ -601,6 +601,8 @@ class Plugin(BasePlugin, MQRep):
         reason = ""
         msg.add_data('status', status)
         msg.add_data('reason', reason)
+        msg.add_data('name', self._name)
+        msg.add_data('host', self.get_sanitized_hostname())
         self.reply(msg.get())
 
         ### Change the plugin status

@@ -31,7 +31,7 @@ Even if you have python2.7 or higher installed, check that the development packa
 
 Install setuptools: ::
 
-    $ sudo apt-get install python-setuptools
+    $ sudo apt-get install python-setuptools pip
 
 .. note::
     Even if setuptools is installed automatically thanks to the *setup.py* script, we need to install it before launching *install.py* : it is needed to use the *pkg_resources* module which is needed during the installation for activating the *domogik* module.
@@ -95,7 +95,7 @@ Download Domogik
 ----------------
 
 .. warning::
-    You must put Domogik sources in a folder which can be read by all the system users:
+    You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be carefull if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
     
     * don't download Domogik sources in */root* or */*
 

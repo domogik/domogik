@@ -391,6 +391,8 @@ class Sensor(Base):
     conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(32), nullable=True)
     last_received = Column(Integer, nullable=True)
+    value_min = Column(Float, nullable=True)
+    value_max = Column(Float, nullable=True)
     history_store = Column(Boolean, nullable=False)
     history_max = Column(Integer, nullable=True)
     history_expire = Column(Integer, nullable=True)
@@ -410,14 +412,17 @@ class Sensor(Base):
         self.history_expire = h_expire
         self.history_round = h_round
         self.history_duplicate = h_duplicate
+        self.value_min = None
+        self.value_max = None
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s)>"\
+        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s min=%s max=%s)>"\
                % (self.id, self.device_id, self.reference, self.incremental, \
                    self.name, self.data_type, self.conversion, \
                    self.history_store, self.history_max, self.history_expire, \
-                   self.history_round, self.history_duplicate)
+                   self.history_round, self.history_duplicate, \
+                   self.value_min, self.value_max)
 
     @staticmethod
     def get_tablename():

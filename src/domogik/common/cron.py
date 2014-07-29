@@ -35,6 +35,7 @@ True
 
 import datetime
 import calendar
+import ephem
 
 __all__ = ["CronExpression", "DEFAULT_EPOCH", "SUBSTITUTIONS"]
 __license__ = "Public Domain"
@@ -62,6 +63,7 @@ SUBSTITUTIONS = {
 
 SPECIALS = [
     '@fullmoon', '@newmoon', '@firstquarter', '@lastquarter',
+    '@equinox', '@solstice',
     '@dawn', '@dusk'    
 ]
 
@@ -78,6 +80,8 @@ class CronExpression(object):
         for key in SPECIALS:
             if line.startswith(key):
                 self._special = True
+                # build the city object
+                self._city = ephem.city('Brussels')
         # store the original input
         self.orig_line = line
 
@@ -106,6 +110,7 @@ class CronExpression(object):
             self.string_tab = [minutes, hours, dom.upper(), months, dow.upper()]
             self.compute_numtab()
         else:
+            self.string_tab = line.split(' ')[0]
             self.comment = None
    
         # handle epoch
@@ -164,8 +169,37 @@ class CronExpression(object):
             return self._check_trigger_normal(date_tuple, utc_offset)
 
     def _check_trigger_special(self, date_tuple, utc_offset=0):
-        print "TODOOOOOOO"
-        return True
+        """
+        Returns boolean indicating if the trigger is active at the given time.
+        The date tuple should be in the local time.
+        """
+        cpm = False;
+
+        if self.string_tab == '@fullmoon':
+            cpm = ephem.next_full_moon(date_tuple)
+        elif self.string_tab == '@newmoon':
+            cpm = ephem.next_new_moon(date_tuple)
+        elif self.string_tab == '@firstquarter':
+            cpm = ephem.next_first_quarter_moon(date_tuple)
+        elif self.string_tab == '@lastquarter':
+            cpm = ephem.next_last_quarter_moon(date_tuple)
+        elif self.string_tab == '@equinox':
+            cpm = ephem.next_equinox(date_tuple)
+        elif self.string_tab == '@solstice':
+            cpm = ephem.next_solistice(date_tuple)
+        elif self.string_tab in ['@dawn', '@dusk']:
+            bobs = ephem.Sun()
+            if self.string_tab == '@dawn':
+                cpm = self._city.next_rising(bobs)
+            else:
+                cpm = self._city.next_setting(bobs)
+
+        if cpm:
+            """ Do compare """
+            print cpm
+            return True
+        else:
+            return False
 
     def _check_trigger_normal(self, date_tuple, utc_offset=0):
         """
@@ -329,14 +363,25 @@ if __name__ == "__main__":
     job = CronExpression("@fullmoon")
     print job
     print job.check_trigger_now()
+    print ""
+    job = CronExpression("@dawn")
+    print job
+    print job.check_trigger_now()
+    print ""
+    job = CronExpression("@equinox")
+    print job
+    print job.check_trigger_now()
+    print ""
     #print job.check_trigger((2010, 11, 17, 0, 0))
     job = CronExpression("0 0 * * 1-5/2 find /var/log -delete")
     print job
     print job.check_trigger_now()
     print job.check_trigger((2010, 11, 17, 0, 0))
     print job.check_trigger((2012, 12, 21, 0 , 0))
+    print ""
     job = CronExpression("@midnight Feed 'it'", (2010, 5, 1, 7, 0, -6))
     print job
     print job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6)
     print job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6)
     print job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6)
+    print ""

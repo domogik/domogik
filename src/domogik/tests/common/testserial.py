@@ -84,9 +84,8 @@ class Serial():
         # loop index
         self.loop_idx = 0
 
-        # first, wait for 30 seconds
-        # this allows to be sure that the plugin is fully ready before using the fake serial device
-        time.sleep(30)
+        # set a flag for the first read 
+        self.first_read = True
 
     def flush(self):
         pass
@@ -108,6 +107,12 @@ class Serial():
         """ Mock the read feature
             @param length : length of the data to read. For compatibility only
         """        
+        if self.first_read:
+            # first, wait for 30 seconds
+            # this allows to be sure that the plugin is fully ready before using the fake serial device
+            time.sleep(30)
+            self.first_read = False
+
         while True:
             # check if we are waiting for some response 
             #TODO

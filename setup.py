@@ -73,22 +73,22 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools',
-	      'sqlalchemy',
-	      'alembic',
-	      'simplejson >= 1.9.2',
-	      'pyOpenSSL >= 0.10',
-	      'psutil >= 0.1.3',
-	       mysql,
+          'sqlalchemy',
+          'alembic',
+          'simplejson >= 1.9.2',
+          'pyOpenSSL >= 0.10',
+          'psutil >= 0.1.3',
+           mysql,
           'psycopg2',
-	      'pip >= 1.0',
-	      'pyserial >= 2.5',
+          'pip >= 1.0',
+          'pyserial >= 2.5',
           'netifaces',
-	      'Twisted >= 12.0.0',
-	      'Flask >= 0.8',
-	      'Flask-WTF >= 0.6',
+          'Twisted >= 12.0.0',
+          'Flask >= 0.8',
+          'Flask-WTF >= 0.6',
           'Flask-Login',
           'Flask-Babel',
-	      'tornado >= 2.3',
+          'tornado >= 2.3',
           'requests >= 0.12.1',
           magic,
           'pyzmq >= 2.2.0'],
@@ -102,7 +102,7 @@ setup(
     scripts=[],
     entry_points = {
         'console_scripts': [
-	    """
+        """
             dmg_manager = domogik.bin.manager:main
             dmg_send = domogik.bin.send:main
             dmg_dump = domogik.bin.dump_xpl:main
@@ -115,7 +115,7 @@ setup(
             dmg_insert_data = domogik.tools.packages.insert_data:main
             dmg_review = domogik.tools.packages.review.review:main
             dmg_package = domogik.bin.package:main
-	    """
+        """
         ]
     },
     classifiers=[
@@ -128,3 +128,4 @@ setup(
         "Natural Language :: English"
     ]
 )
+

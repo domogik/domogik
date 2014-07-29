@@ -45,6 +45,8 @@ def format_babel_datetime(value, format='medium'):
         format="EEEE, d. MMMM y 'at' HH:mm"
     elif format == 'medium':
         format="EE dd.MM.y HH:mm"
+    elif format == 'basic':
+        format="dd.MM.y HH:mm"
     return format_datetime(value, format)
 
 def sort_by_id(value):

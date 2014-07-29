@@ -11,6 +11,7 @@
                         <th scope="col">{% trans %}Type{% endtrans %}</th>
                         <th scope="col">{% trans %}Status{% endtrans %}</th>
                         <th scope="col">{% trans %}Configured{% endtrans %}</th>
+                        <th scope="col">{% trans %}Last seen{% endtrans %}</th>
                         <th scope="col">{% trans %}Actions{% endtrans %}</th>
                     </tr>
             </thead>
@@ -24,6 +25,7 @@
                         <td>{{ data.type }}</td>
                         <td>{{ data.status }}</td>
                         <td>{{ data.configured }}</td>
+                        <td>{{ data.last_seen|datetime('basic') }}</td>
                         <td>
         				    {% if data.configured %}
         					<a class="btn btn-primary" href="/client/{{ name }}">
@@ -86,6 +88,9 @@
 					$('tr#d' + content.pid + ' div.status div.status_' + content.status).addClass('current_status');
 					$('tr#' + content.pid + " td:nth-child(3)").html(content.status);
 					$('tr#' + content.pid + " td:nth-child(4)").html(content.configured);
+                    var d = new Date(content.last_seen*1000)
+                    var p = d.getDate() + '.' + d.getMonth() + '.' + d.getFullYear() + ' ' + d.getHours() + ':' + d.getMinutes()
+					$('tr#' + content.pid + " td:nth-child(5)").html(p);
 				}
 			}
 		}
