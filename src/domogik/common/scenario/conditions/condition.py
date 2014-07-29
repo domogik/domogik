@@ -37,7 +37,7 @@ if __name__ == "__main__":
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
 
-    from domogik.xpl.lib.scenario.tests.textinpage import TextInPageTest
+    from domogik.common.scenario.tests.textinpage import TextInPageTest
     c = None
 
     def mytrigger(test):
