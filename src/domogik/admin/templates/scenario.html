@@ -3,8 +3,21 @@
 {% block content %}
   <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
   <pre id="codeDiv" style="height: 500px; width: 600px; position: absolute; left: 650px; top: 100px; border: 1px red"></pre>
-
-<xml id="toolbox" style="display: none"><category name="Logique"><block type="controls_if"></block><block type="logic_compare"></block><block type="logic_operation"></block><block type="logic_negate"></block><block type="logic_boolean"></block><block type="logic_null"></block><block type="logic_ternary"></block></category><category name="Boucles"><block type="controls_repeat_ext"><value name="TIMES"><block type="math_number"><field name="NUM">10</field></block></value></block><block type="controls_whileUntil"></block><block type="controls_for"><value name="FROM"><block type="math_number"><field name="NUM">1</field></block></value><value name="TO"><block type="math_number"><field name="NUM">10</field></block></value><value name="BY"><block type="math_number"><field name="NUM">1</field></block></value></block><block type="controls_forEach"></block><block type="controls_flow_statements"></block></category><category name="Math"><block type="math_number"></block><block type="math_arithmetic"></block><block type="math_single"></block><block type="math_trig"></block><block type="math_constant"></block><block type="math_number_property"></block><block type="math_change"><value name="DELTA"><block type="math_number"><field name="NUM">1</field></block></value></block><block type="math_round"></block><block type="math_on_list"></block><block type="math_modulo"></block><block type="math_constrain"><value name="LOW"><block type="math_number"><field name="NUM">1</field></block></value><value name="HIGH"><block type="math_number"><field name="NUM">100</field></block></value></block><block type="math_random_int"><value name="FROM"><block type="math_number"><field name="NUM">1</field></block></value><value name="TO"><block type="math_number"><field name="NUM">100</field></block></value></block><block type="math_random_float"></block></category><category name="Texte"><block type="text"></block><block type="text_join"></block><block type="text_append"><value name="TEXT"><block type="text"></block></value></block><block type="text_length"></block><block type="text_isEmpty"></block><block type="text_indexOf"><value name="VALUE"><block type="variables_get"><field name="VAR">texte</field></block></value></block><block type="text_charAt"><value name="VALUE"><block type="variables_get"><field name="VAR">texte</field></block></value></block><block type="text_getSubstring"><value name="STRING"><block type="variables_get"><field name="VAR">texte</field></block></value></block><block type="text_changeCase"></block><block type="text_trim"></block><block type="text_print"></block><block type="text_prompt_ext"><value name="TEXT"><block type="text"></block></value></block></category><category name="Listes"><block type="lists_create_empty"></block><block type="lists_create_with"></block><block type="lists_repeat"><value name="NUM"><block type="math_number"><field name="NUM">5</field></block></value></block><block type="lists_length"></block><block type="lists_isEmpty"></block><block type="lists_indexOf"><value name="VALUE"><block type="variables_get"><field name="VAR">liste</field></block></value></block><block type="lists_getIndex"><value name="VALUE"><block type="variables_get"><field name="VAR">liste</field></block></value></block><block type="lists_setIndex"><value name="LIST"><block type="variables_get"><field name="VAR">liste</field></block></value></block><block type="lists_getSublist"><value name="LIST"><block type="variables_get"><field name="VAR">liste</field></block></value></block></category><category name="Couleur"><block type="colour_picker"></block><block type="colour_random"></block><block type="colour_rgb"></block><block type="colour_blend"></block></category><category name="Variables" custom="VARIABLE"></category><category name="Fonctions" custom="PROCEDURE"></category></xml>
+  <xml id="toolbox" style="display: none">
+      <category name="Logic">
+        <block type="logic_operation"></block>
+    <block type="logic_negate"></block>
+      </category>
+      <category name="Tests">
+    <block type="dom_test_cron"></block>
+    <block type="dom_test_sensor"></block>
+      </category>
+      <category name="Actions">
+    <block type="dom_action_log"></block>
+    <block type="dom_action_command"></block>
+      </category>
+  </xml>
+<!--<xml id="toolbox" style="display: none"><category name="Logique"><block type="controls_if"></block><block type="logic_compare"></block><block type="logic_operation"></block><block type="logic_negate"></block><block type="logic_boolean"></block><block type="logic_null"></block><block type="logic_ternary"></block></category><category name="Boucles"><block type="controls_repeat_ext"><value name="TIMES"><block type="math_number"><field name="NUM">10</field></block></value></block><block type="controls_whileUntil"></block><block type="controls_for"><value name="FROM"><block type="math_number"><field name="NUM">1</field></block></value><value name="TO"><block type="math_number"><field name="NUM">10</field></block></value><value name="BY"><block type="math_number"><field name="NUM">1</field></block></value></block><block type="controls_forEach"></block><block type="controls_flow_statements"></block></category><category name="Math"><block type="math_number"></block><block type="math_arithmetic"></block><block type="math_single"></block><block type="math_trig"></block><block type="math_constant"></block><block type="math_number_property"></block><block type="math_change"><value name="DELTA"><block type="math_number"><field name="NUM">1</field></block></value></block><block type="math_round"></block><block type="math_on_list"></block><block type="math_modulo"></block><block type="math_constrain"><value name="LOW"><block type="math_number"><field name="NUM">1</field></block></value><value name="HIGH"><block type="math_number"><field name="NUM">100</field></block></value></block><block type="math_random_int"><value name="FROM"><block type="math_number"><field name="NUM">1</field></block></value><value name="TO"><block type="math_number"><field name="NUM">100</field></block></value></block><block type="math_random_float"></block></category><category name="Texte"><block type="text"></block><block type="text_join"></block><block type="text_append"><value name="TEXT"><block type="text"></block></value></block><block type="text_length"></block><block type="text_isEmpty"></block><block type="text_indexOf"><value name="VALUE"><block type="variables_get"><field name="VAR">texte</field></block></value></block><block type="text_charAt"><value name="VALUE"><block type="variables_get"><field name="VAR">texte</field></block></value></block><block type="text_getSubstring"><value name="STRING"><block type="variables_get"><field name="VAR">texte</field></block></value></block><block type="text_changeCase"></block><block type="text_trim"></block><block type="text_print"></block><block type="text_prompt_ext"><value name="TEXT"><block type="text"></block></value></block></category><category name="Listes"><block type="lists_create_empty"></block><block type="lists_create_with"></block><block type="lists_repeat"><value name="NUM"><block type="math_number"><field name="NUM">5</field></block></value></block><block type="lists_length"></block><block type="lists_isEmpty"></block><block type="lists_indexOf"><value name="VALUE"><block type="variables_get"><field name="VAR">liste</field></block></value></block><block type="lists_getIndex"><value name="VALUE"><block type="variables_get"><field name="VAR">liste</field></block></value></block><block type="lists_setIndex"><value name="LIST"><block type="variables_get"><field name="VAR">liste</field></block></value></block><block type="lists_getSublist"><value name="LIST"><block type="variables_get"><field name="VAR">liste</field></block></value></block></category><category name="Couleur"><block type="colour_picker"></block><block type="colour_random"></block><block type="colour_rgb"></block><block type="colour_blend"></block></category><category name="Variables" custom="VARIABLE"></category><category name="Fonctions" custom="PROCEDURE"></category></xml>-->
 
   <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
@@ -18,14 +31,115 @@
   <script type="text/javascript" src="/static/js/blockly_generators/domogik/procedures.js"></script>
   <script type="text/javascript" src="/static/js/blockly_generators/domogik/text.js"></script>
   <script type="text/javascript" src="/static/js/blockly_generators/domogik/variables.js"></script>
-  <script>
-    Blockly.inject(document.getElementById('blocklyDiv'),
-        {path: '/static/libraries/blockly/', toolbox: document.getElementById('toolbox')});
+  <script type="text/javascript">
+    Blockly.Blocks['dom_condition'] = {
+      init: function() {
+        this.setHelpUrl(Blockly.Msg.CONTROLS_IF_HELPURL);
+        this.setColour(210);
+        this.appendValueInput('IF')
+            .setCheck('Boolean')
+            .appendField('When');
+        this.appendStatementInput('DO')
+            .appendField('Do');
+        this.setPreviousStatement(false);
+        this.setNextStatement(true);
+        this.setDeletable(false);
+        this.contextMenu = false;
+        this.setInputsInline(false);
+      }
+    };
+    Blockly.Domogik['dom_condition'] = function(block) {
+      var argument = Blockly.Domogik.valueToCode(block, 'IF', Blockly.Domogik.ORDER_NONE);
+      var action = Blockly.Domogik.statementToCode(block, 'DO');
+      this.setInputsInline(false);
+      return code = '{\n\r"condition" : {'+ argument + '}, \n\r"actions" : {\n\r' + action + '}\n\r}';
+    };
+    Blockly.Blocks['dom_action_log'] = {
+      init: function() {
+        this.setHelpUrl('');
+        this.setColour(160);
+        this.appendDummyInput()
+        .appendField('Log Message')
+            .appendField(new Blockly.FieldTextInput("<message to log>"), "message");
+        this.setPreviousStatement(true, "null");
+        this.setNextStatement(true, "null");
+        this.setTooltip('');
+        this.setInputsInline(false);
+      }
+    };
+    Blockly.Domogik['dom_action_log'] = function(block) {
+      return code = '"action_log": { "message": "' + block.getFieldValue('message') + '"} \n\r';
+    };
+    Blockly.Blocks['dom_action_command'] = {
+      init: function() {
+        this.setHelpUrl('');
+        this.setColour(160);
+        this.appendDummyInput()
+        .appendField('Command')
+            .appendField(new Blockly.FieldTextInput("<cmd id>"), "cmdid")
+        .appendField('Command')
+            .appendField(new Blockly.FieldTextInput("<params>"), "cmdparams");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setTooltip('');
+        this.setInputsInline(false);
+      }
+    };
+    //Blockly.Domogik['dom_action_command'] = function(block) {
+    //  return code = '"action_command": { "cmdid": "' + block.getFieldValue('cmdid') + '", "cmdparams": "' + block.getFieldValue('cmdparams') + '"} \n\r';
+    //};
+    Blockly.Blocks['dom_test_cron'] = {
+      init: function() {
+        this.setHelpUrl('');
+        this.setColour(160);
+        this.appendDummyInput()
+        .appendField('Time')
+            .appendField(new Blockly.FieldTextInput("<cron like timestamp>"), "cron");
+        this.setOutput(true, null);
+        this.setTooltip('');
+        this.setInputsInline(false);
+      }
+    };
+    Blockly.Domogik['dom_test_cron'] = function(block) {
+      var code = '"test_cron": { "cron": "' + block.getFieldValue('cron') + '"}'; 
+      return [code, Blockly.Domogik.ORDER_ATOMIC];
+    };
+    Blockly.Blocks['dom_test_sensor'] = {
+      init: function() {
+        this.setHelpUrl('');
+        this.setColour(160);
+        this.appendDummyInput()
+        .appendField('Sensor')
+            .appendField(new Blockly.FieldTextInput("<sensor>"), "sensorid")
+        .appendField('Value')
+            .appendField(new Blockly.FieldTextInput("<value>"), "value");
+        this.setOutput(true, null);
+        this.setTooltip('');
+        this.setInputsInline(false);
+      }
+    };
+    Blockly.Domogik['dom_test_sensor'] = function(block) {
+      var code = '"test_sensor": { "sensorid": "' + block.getFieldValue('sensorid') + '", "value": "' + block.getFieldValue('value') + '"} \n\r'; 
+      return [code, Blockly.Domogik.ORDER_ATOMIC];
+    };
+    Blockly.inject(
+        document.getElementById('blocklyDiv'),
+            {
+            path: '../../',
+            toolbox: document.getElementById('toolbox')
+        }
+    );
+    // Create the root block.
+    rootBlock = new Blockly.Block.obtain(Blockly.mainWorkspace, 'dom_condition');
+    rootBlock.initSvg();
+    rootBlock.render();
+    rootBlock.setMovable(false);
+    rootBlock.setDeletable(false);
 
     function onchange() {
       document.getElementById('codeDiv').innerHTML = Blockly.Domogik.workspaceToCode();
     }
-    Blockly.addChangeListener(onchange);
 
+    Blockly.addChangeListener(onchange);
   </script>
 {% endblock %}
