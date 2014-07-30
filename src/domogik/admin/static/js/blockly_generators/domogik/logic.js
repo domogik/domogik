@@ -35,7 +35,7 @@ Blockly.Domogik['controls_if'] = function(block) {
       Blockly.Domogik.ORDER_NONE) || 'False';
   var branch = Blockly.Domogik.statementToCode(block, 'DO' + n) || 'null';
     var code = '{ "id":' + block.id 
-    + ', "type":' + "controls_if"
+    + ', "type": "controls_if"'
     + ', "if0": ' + argument + ', "do0": ' + branch;
 
   for (n = 1; n <= block.elseifCount_; n++) {
@@ -58,8 +58,8 @@ Blockly.Domogik['logic_compare'] = function(block) {
   var argument0 = Blockly.Domogik.valueToCode(block, 'A', order) || '0';
   var argument1 = Blockly.Domogik.valueToCode(block, 'B', order) || '0';
   var code = '{ "id":' + block.id 
-    + ', "type":' + "logic_compare"
-    + ', "op":' + operator
+    + ', "type": "logic_compare"'
+    + ', "op": "' + operator + '"'
     + ', "a":' + argument0
     + ', "b":' + argument1 + ' }';
   return [code, order];
@@ -74,11 +74,11 @@ Blockly.Domogik['logic_operation'] = function(block) {
   var argument1 = Blockly.Domogik.valueToCode(block, 'B', order);
   if (!argument0 && !argument1) {
     // If there are no arguments, then the return value is false.
-    argument0 = 'False';
-    argument1 = 'False';
+    argument0 = 'false';
+    argument1 = 'false';
   } else {
     // Single missing arguments have no effect on the return value.
-    var defaultArgument = (operator == 'AND') ? 'True' : 'False';
+    var defaultArgument = (operator == 'AND') ? 'true' : 'false';
     if (!argument0) {
       argument0 = defaultArgument;
     }
@@ -87,8 +87,8 @@ Blockly.Domogik['logic_operation'] = function(block) {
     }
   }
   var code = '{ "id":' + block.id 
-    + ', "type":' + "logic_operation"
-    + ', "op":' + operator
+    + ', "type": "logic_operation"'
+    + ', "op": "' + operator + '"'
     + ', "a":' + argument0
     + ', "b":' + argument1 + ' }';
   return [code, order];
@@ -97,18 +97,18 @@ Blockly.Domogik['logic_operation'] = function(block) {
 Blockly.Domogik['logic_negate'] = function(block) {
   // Negation.
   var argument0 = Blockly.Domogik.valueToCode(block, 'BOOL',
-      Blockly.Domogik.ORDER_LOGICAL_NOT) || 'True';
+      Blockly.Domogik.ORDER_LOGICAL_NOT) || 'true';
   var code = '{ "id":' + block.id 
-    + ', "type":' + "logic_negate" 
+    + ', "type": "logic_negate"' 
     + ', "bool": ' +  argument0 + ' }';
   return [code, Blockly.Domogik.ORDER_LOGICAL_NOT];
 };
 
 Blockly.Domogik['logic_boolean'] = function(block) {
   // Boolean values true and false.
-  var value = (block.getFieldValue('BOOL') == 'TRUE') ? 'True' : 'False';
+  var value = (block.getFieldValue('BOOL') == 'TRUE') ? 'true' : 'false';
   var code = '{ "id":' + block.id 
-    + ', "type":' + "logic_boolean" 
+    + ', "type": "logic_boolean"' 
     + ', "bool": ' +  value + ' }';
   return [code, Blockly.Domogik.ORDER_ATOMIC];
 };
@@ -116,20 +116,20 @@ Blockly.Domogik['logic_boolean'] = function(block) {
 Blockly.Domogik['logic_null'] = function(block) {
   // Null data type.
   var code = '{ "id":' + block.id 
-    + ', "type":' + "logic_null" + ' }';
+    + ', "type": "logic_null" }';
   return [code, Blockly.Domogik.ORDER_ATOMIC];
 };
 
 Blockly.Domogik['logic_ternary'] = function(block) {
   // Ternary operator.
   var value_if = Blockly.Domogik.valueToCode(block, 'IF',
-      Blockly.Domogik.ORDER_CONDITIONAL) || 'False';
+      Blockly.Domogik.ORDER_CONDITIONAL) || 'false';
   var value_then = Blockly.Domogik.valueToCode(block, 'THEN',
-      Blockly.Domogik.ORDER_CONDITIONAL) || 'None';
+      Blockly.Domogik.ORDER_CONDITIONAL) || 'null';
   var value_else = Blockly.Domogik.valueToCode(block, 'ELSE',
-      Blockly.Domogik.ORDER_CONDITIONAL) || 'None';
+      Blockly.Domogik.ORDER_CONDITIONAL) || 'null';
   var code = '{ "id":' + block.id 
-    + ', "type":' + "logic_ternary"
+    + ', "type": "logic_ternary"'
     + ', "if": ' + value_if
     + ', "then": ' + value_then
     + ', "else": ' + value_else
