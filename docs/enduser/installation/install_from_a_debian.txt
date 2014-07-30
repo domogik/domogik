@@ -18,23 +18,7 @@ Install Python and setuptools
     $ sudo apt-get install python python-setuptools pip
 
 .. note::
-    We assume you use mysql database.
-
-
-    $ mysql -u root -p
-    Enter password: 
-
-Create a database called "domogik": ::
-
-    mysql> CREATE DATABASE domogik;
-    Query OK, 1 row affected (0.00 sec)
-
-Create the user "domogik" to use the new database: ::
-
-    mysql> GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'domopass';
-    Query OK, 0 rows affected (0.00 sec)
-
-    mysql>exit
+    We assume want you use mysql database.
 
 Download Domogik
 ----------------
@@ -61,7 +45,11 @@ Install Domogik
 Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
 
     $ cd /opt/domogik/
-    $ sudo ./install.py
+    $ sudo ./install.py --dist-packages --create-database
+
+.. note:: 
+    --dist-packages option will automaticaly install debian package dependency with apt-get tool.
+    --create-database option will automaticaly try to create domogik database and give all privilege to domogik in on it.
 
 .. note::
    Domogik uses a configuration file which is created and configured by the *install.py* script. This file is */etc/domogik/domogik.cfg*. For more informations, please read :doc:`the page related to the configuration file <domogik_cfg_file>`.
@@ -78,7 +66,7 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 Make Domogik start with your computer
 -------------------------------------
 
-For Debian or Ubuntu systems: ::
+For Debian systems: ::
 
     $ sudo update-rc.d domogik defaults
 
