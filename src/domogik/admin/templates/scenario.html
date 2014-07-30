@@ -52,7 +52,7 @@
       var argument = Blockly.Domogik.valueToCode(block, 'IF', Blockly.Domogik.ORDER_NONE);
       var action = Blockly.Domogik.statementToCode(block, 'DO');
       this.setInputsInline(false);
-      return code = '{\n\r"condition" : {'+ argument + '}, \n\r"actions" : {\n\r' + action + '}\n\r}';
+      return code = '{"id": ' + block.id + ',"type": "dom_condition","condition" : {'+ argument + '},"actions" : {' + action + '}}';
     };
     Blockly.Blocks['dom_action_log'] = {
       init: function() {
@@ -68,7 +68,7 @@
       }
     };
     Blockly.Domogik['dom_action_log'] = function(block) {
-      return code = '"action_log": { "message": "' + block.getFieldValue('message') + '"} \n\r';
+      return code = '"action_log": { "id": ' + block.id + ',"type": "dom_action_log","message": "' + block.getFieldValue('message') + '"} \n\r';
     };
     Blockly.Blocks['dom_action_command'] = {
       init: function() {
@@ -85,9 +85,9 @@
         this.setInputsInline(false);
       }
     };
-    //Blockly.Domogik['dom_action_command'] = function(block) {
-    //  return code = '"action_command": { "cmdid": "' + block.getFieldValue('cmdid') + '", "cmdparams": "' + block.getFieldValue('cmdparams') + '"} \n\r';
-    //};
+    Blockly.Domogik['dom_action_command'] = function(block) {
+      return code = '"action_command": { "id": ' + block.id + ',"type": "dom_action_command","cmdid": "' + block.getFieldValue('cmdid') + '", "cmdparams": "' + block.getFieldValue('cmdparams') + '"} \n\r';
+    };
     Blockly.Blocks['dom_test_cron'] = {
       init: function() {
         this.setHelpUrl('');
