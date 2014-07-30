@@ -61,7 +61,31 @@ class DbInstall():
         self._engine = create_engine(self._url)
 
     def db_info(self):
-        return (self._db.get_db_type(),self._db.get_db_name(),self._db.get_db_user(),self._db.get_db_password(),self._url)
+        if not self._db.is_db_type_mysql():
+            raise OSError("Create data base of %s is not implemented. Sorry! "%self._db.get_db_type())
+        
+        info("Try to create database %s for user %s"%(self._db.get_db_name(),self._db.get_db_user()))
+        info("Please entrer %s root password"%(self._db.get_db_type()))
+
+        mysql_script = ""
+        mysql_script+= "create database %s;"%(self._db.get_db_name())
+        mysql_script+= "grant usage on *.* to %s@localhost "
+        mysql_script+= "identified by '%s';"%(self._db.get_db_user(),
+                                              self._db.get_db_password()
+                                              )
+        mysql_script+= "grant all privileges on %s.*"%(self._db.get_db_name())
+        mysql_script+= "to %s@localhost;"%%(self._db.get_db_user())
+        mysql_script+= "quit;"%%(self._db.get_db_user())
+
+        sh_script = "mysql -p -u root << TXT\n"+mysql_script+"\nTXT\n"
+
+        info("mysql_script:\n"+mysql_script)
+        info("sh_script:\n"+sh_script)
+
+        res = os.system(sh_script)
+        if ( res != 0 )
+            fail("cannot create database, may be already exist ?")
+
 
     def install_or_upgrade_db(self):
         from domogik.common import sql_schema

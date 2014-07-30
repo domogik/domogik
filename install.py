@@ -436,9 +436,7 @@ def install():
 
             dbi = DbInstall()
             if args.create_database:
-                print "================="
-                print dbi.db_info()
-                print "================="
+                dbi.create_db()
             dbi.install_or_upgrade_db()
 
         # change permissions to some files created as root during the installation to the domogik user

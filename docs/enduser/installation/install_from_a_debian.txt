@@ -1,0 +1,114 @@
+========================================
+Standard installation on debian (Jessie)
+========================================
+
+Installation
+============
+
+.. note::
+    * These examples assume you are using Debian or another apt-based distribution (Ubuntu, etc).  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
+    * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to deactivate it before installation.
+    * In this example, we use a *mysql* database. If you want to use a *postgresql* database, please refer to :doc:`the specific installations steps for postgresql <postgresql>`.
+
+Dependencies
+------------
+
+Install Python and setuptools
+
+    $ sudo apt-get install python python-setuptools pip
+
+.. note::
+    We assume you use mysql database.
+
+
+    $ mysql -u root -p
+    Enter password: 
+
+Create a database called "domogik": ::
+
+    mysql> CREATE DATABASE domogik;
+    Query OK, 1 row affected (0.00 sec)
+
+Create the user "domogik" to use the new database: ::
+
+    mysql> GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'domopass';
+    Query OK, 0 rows affected (0.00 sec)
+
+    mysql>exit
+
+Download Domogik
+----------------
+
+.. warning::
+    You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be carefull if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
+    
+    * don't download Domogik sources in */root* or */*
+
+.. note::
+   Please keep in mind that the folder which will be used to get the sources will be the one used by Domogik installation. So please put it in a proper folder (the following command lines will use **/opt/**).
+
+Use git to get the sources (be sure that your user is able to create some directories where you will clone the sources): ::
+
+    $ sudo apt-get install git
+    $ cd /opt/
+    $ git clone https://github.com/domogik/domogik.git
+    $ cd domogik
+    $ git checkout master
+
+Install Domogik 
+---------------
+
+Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
+
+    $ cd /opt/domogik/
+    $ sudo ./install.py
+
+.. note::
+   Domogik uses a configuration file which is created and configured by the *install.py* script. This file is */etc/domogik/domogik.cfg*. For more informations, please read :doc:`the page related to the configuration file <domogik_cfg_file>`.
+.. note:: 
+
+    During installation, a new user will be created if necessary.
+    
+    If you want to use the C xPL hub instead of the python xPL hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hub.
+
+.. todo::
+    Describe all the steps
+
+
+Make Domogik start with your computer
+-------------------------------------
+
+For Debian or Ubuntu systems: ::
+
+    $ sudo update-rc.d domogik defaults
+
+Start domogik
+-------------
+
+::
+
+    $ sudo /etc/init.d/domogik start
+    * Starting 0MQ broker ... Done.
+    * Starting 0MQ forwarder ... Done.
+    * Starting xPL (python version)... Done.
+    * Starting Manager (with -d -r -x -s)... Done.
+    * Starting the admin interface ... Done.
+
+It will start : 
+
+* The 0MQ broker and forwarder
+* The xpl hub
+* The Domogik manager on this host
+* The database manager and the REST interface module (which will take in account the parameters you defined in your configuration file : host, IP...)
+* The administration web interface
+
+Next step : domoweb, the web user interface
+-------------------------------------------
+
+Domoweb is not yet available for Domogik 0.4
+
+It doesn't work?
+----------------
+
+* :doc:`See errors and solutions </enduser/errors/index>`
+
