@@ -102,6 +102,8 @@ Download Domogik
 .. note::
    Please keep in mind that the folder which will be used to get the sources will be the one used by Domogik installation. So please put it in a proper folder (the following command lines will use **/opt/**).
 
+   The folder path must also not contains any spaces in its name!
+
 Use git to get the sources (be sure that your user is able to create some directories where you will clone the sources): ::
 
     $ sudo apt-get install git
