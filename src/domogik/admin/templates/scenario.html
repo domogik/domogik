@@ -9,8 +9,9 @@
         <block type="logic_negate"></block>
     </category>
     <category name="Tests">
-        <block type="dom_test_cron"></block>
-        <block type="dom_test_sensor"></block>
+        <block type="cron.CronTest"></block>
+        <block type="sensor.TextInPageTest"></block>
+        <block type="textinpage.TextInPageTest"></block>
     </category>
     <category name="Actions">
         <block type="dom_action_log"></block>
@@ -22,11 +23,13 @@
   <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
-  <script type="text/javascript" src="/static/js/blockly_generators/domogik.js"></script>
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
+  <script type="text/javascript" src="/static/js/blockly_generators/domogik.js"></script>
+  <script type="text/javascript" src="/static/js/blockly_generators/domogik/logic.js"></script>
+  <!--<script type="text/javascript" src="/scenario/blocks/actions"></script>--!>
+  <script type="text/javascript" src="/scenario/blocks/tests"></script>
   <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/colour.js"></script>-->
   <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/lists.js"></script>-->
-  <script type="text/javascript" src="/static/js/blockly_generators/domogik/logic.js"></script>
   <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/loops.js"></script>-->
   <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/math.js"></script>-->
   <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/procedures.js"></script>-->
@@ -54,74 +57,6 @@
       var action = Blockly.Domogik.statementToCode(block, 'DO') || 'null';
       this.setInputsInline(false);
       return code = '{"id": ' + block.id + ',"type": "dom_condition","condition" : '+ argument + ',"actions" : ' + action + '}';
-    };
-    Blockly.Blocks['dom_action_log'] = {
-      init: function() {
-        this.setHelpUrl('');
-        this.setColour(160);
-        this.appendDummyInput()
-        .appendField('Log Message')
-            .appendField(new Blockly.FieldTextInput("<message to log>"), "message");
-        this.setPreviousStatement(true, "null");
-        this.setNextStatement(true, "null");
-        this.setTooltip('');
-        this.setInputsInline(false);
-      }
-    };
-    Blockly.Domogik['dom_action_log'] = function(block) {
-      return code = '"action_log": { "id": ' + block.id + ',"type": "dom_action_log","message": "' + block.getFieldValue('message') + '"} \n\r';
-    };
-    Blockly.Blocks['dom_action_command'] = {
-      init: function() {
-        this.setHelpUrl('');
-        this.setColour(160);
-        this.appendDummyInput()
-        .appendField('Command')
-            .appendField(new Blockly.FieldTextInput("<cmd id>"), "cmdid")
-        .appendField('Command')
-            .appendField(new Blockly.FieldTextInput("<params>"), "cmdparams");
-        this.setPreviousStatement(true, null);
-        this.setNextStatement(true, null);
-        this.setTooltip('');
-        this.setInputsInline(false);
-      }
-    };
-    Blockly.Domogik['dom_action_command'] = function(block) {
-      return code = '"action_command": { "id": ' + block.id + ',"type": "dom_action_command","cmdid": "' + block.getFieldValue('cmdid') + '", "cmdparams": "' + block.getFieldValue('cmdparams') + '"} \n\r';
-    };
-    Blockly.Blocks['dom_test_cron'] = {
-      init: function() {
-        this.setHelpUrl('');
-        this.setColour(160);
-        this.appendDummyInput()
-        .appendField('Time')
-            .appendField(new Blockly.FieldTextInput("<cron like timestamp>"), "cron");
-        this.setOutput(true, null);
-        this.setTooltip('');
-        this.setInputsInline(false);
-      }
-    };
-    Blockly.Domogik['dom_test_cron'] = function(block) {
-      var code = '"test_cron": { "cron": "' + block.getFieldValue('cron') + '"}'; 
-      return [code, Blockly.Domogik.ORDER_ATOMIC];
-    };
-    Blockly.Blocks['dom_test_sensor'] = {
-      init: function() {
-        this.setHelpUrl('');
-        this.setColour(160);
-        this.appendDummyInput()
-        .appendField('Sensor')
-            .appendField(new Blockly.FieldTextInput("<sensor>"), "sensorid")
-        .appendField('Value')
-            .appendField(new Blockly.FieldTextInput("<value>"), "value");
-        this.setOutput(true, null);
-        this.setTooltip('');
-        this.setInputsInline(false);
-      }
-    };
-    Blockly.Domogik['dom_test_sensor'] = function(block) {
-      var code = '"test_sensor": { "sensorid": "' + block.getFieldValue('sensorid') + '", "value": "' + block.getFieldValue('value') + '"} \n\r'; 
-      return [code, Blockly.Domogik.ORDER_ATOMIC];
     };
     Blockly.inject(
         document.getElementById('blocklyDiv'),
