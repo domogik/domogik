@@ -195,11 +195,12 @@ class PackageInstaller():
         # check the hash of the file
         # hash format is sha256 
         zip_hash = hashlib.sha256(open(path, 'rb').read()).hexdigest()
-        if zip_hash == hash:
-             self.log.info("The package has the correct hash : {0}".format(hash))
-        else:
-             self.log.error("The package hash '{0}' is different from the expected hash '{1}'. The package will not be installed!".format(zip_hash, hash))
-             return
+        if hash != None:
+            if zip_hash == hash:
+                self.log.info("The package has the correct hash : {0}".format(hash))
+            else:
+                self.log.error("The package hash '{0}' is different from the expected hash '{1}'. The package will not be installed!".format(zip_hash, hash))
+                return
 
         # check the zip file contains what we need
         with zipfile.ZipFile(path, 'r') as myzip:
