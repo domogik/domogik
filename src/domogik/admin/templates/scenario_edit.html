@@ -1,0 +1,82 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+  <div id="blocklyDiv" style="height: 280px; width: 800px;"></div>
+  <pre id="codeDiv" style="height: 500px; width: 800px; position: absolute; top: 380px; border: 1px red"></pre>
+  <xml id="toolbox" style="display: none">
+    <category name="Logic">
+        <block type="logic_operation"></block>
+        <block type="logic_negate"></block>
+    </category>
+    <category name="Tests">
+        {% for t in tests %}
+            <block type="{{ t }}"></block>
+        {% endfor %}
+    </category>
+    <category name="Actions">
+        {% for a in actions %}
+            <block type="{{ a }}"></block>
+        {% endfor %}
+    </category>
+  </xml>
+  <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
+  <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
+  <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
+  <script type="text/javascript" src="/static/js/blockly_json.js"></script>
+  <script type="text/javascript" src="/static/js/blockly_generators/domogik.js"></script>
+  <script type="text/javascript" src="/static/js/blockly_generators/domogik/logic.js"></script>
+  <script type="text/javascript" src="/scenario/blocks/actions"></script>
+  <script type="text/javascript" src="/scenario/blocks/tests"></script>
+  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/colour.js"></script>-->
+  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/lists.js"></script>-->
+  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/loops.js"></script>-->
+  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/math.js"></script>-->
+  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/procedures.js"></script>-->
+  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/text.js"></script>-->
+  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/variables.js"></script>-->
+  <script type="text/javascript">
+    Blockly.Blocks['dom_condition'] = {
+      init: function() {
+        this.setColour(210);
+        this.appendValueInput('IF')
+            .setCheck('Boolean')
+            .appendField('When');
+        this.appendStatementInput('DO')
+            .appendField('Do');
+        this.setPreviousStatement(false);
+        this.setNextStatement(true);
+        this.setDeletable(false);
+        this.contextMenu = false;
+        this.setInputsInline(false);
+      }
+    };
+    Blockly.Domogik['dom_condition'] = function(block) {
+      var argument = Blockly.Domogik.valueToCode(block, 'IF', Blockly.Domogik.ORDER_NONE) || 'null';
+      var action = Blockly.Domogik.statementToCode(block, 'DO') || 'null';
+      this.setInputsInline(false);
+      return code = '{"id": ' + block.id + ',"type": "dom_condition","condition" : '+ argument + ',"actions" : ' + action + '}';
+    };
+    Blockly.inject(
+        document.getElementById('blocklyDiv'),
+        {
+            path: '../../',
+            toolbox: document.getElementById('toolbox')
+        }
+    );
+    // Create the root block.
+/*    rootBlock = new Blockly.Block.obtain(Blockly.mainWorkspace, 'dom_condition');
+    rootBlock.initSvg();
+    rootBlock.render();
+    rootBlock.setMovable(false);
+    rootBlock.setDeletable(false);*/
+
+    function onchange() {
+      document.getElementById('codeDiv').innerHTML = Blockly.Domogik.workspaceToCode();
+    }
+    Blockly.addChangeListener(onchange);
+
+    var json = JSON.parse('{"id": 1,"type": "dom_condition","condition" : { "id":4, "type": "logic_operation", "op": "AND", "a":true, "b":{ "id":7, "type": "logic_negate", "bool": true } },"actions" : null}');
+    Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
+  </script>
+ 
+{% endblock %}

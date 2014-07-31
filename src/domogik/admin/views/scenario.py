@@ -24,6 +24,13 @@ import json
 @app.route('/scenario')
 @login_required
 def scenario():
+    return render_template('scenario.html',
+        scenarios = [],
+        mactive = "scenario")
+
+@app.route('/scenario/edit/<id>')
+@login_required
+def scenario_edit(id):
     # Fetch all known actions
     actions = []
     cli = MQSyncReq(app.zmq_context)
@@ -46,11 +53,15 @@ def scenario():
         if 'result' in res:
             res = json.loads(res['result'])
             tests = res.keys()
+    # TODO laod the json for this scenario
+    # if not exists send None == new
+    jso = None
 
-    return render_template('scenario.html',
+    return render_template('scenario_edit.html',
         mactive = "scenario",
         actions = actions,
-        tests = tests)
+        tests = tests,
+        json = jso)
 
 @app.route('/scenario/blocks/tests')
 def scenario_blocks_tests():
