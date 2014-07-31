@@ -6,7 +6,7 @@ Installation
 ============
 
 .. note::
-    * These examples assume you are using Debian or another apt-based distribution (Ubuntu, etc).  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
+    * These examples assume you are using Debian.  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
     * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to deactivate it before installation.
     * In this example, we use a *mysql* database. If you want to use a *postgresql* database, please refer to :doc:`the specific installations steps for postgresql <postgresql>`.
 
@@ -15,7 +15,7 @@ Dependencies
 
 Install Python and setuptools
 
-    $ sudo apt-get install python python-setuptools pip
+    $ sudo apt-get install python python-setuptools python-pip
 
 .. note::
     We assume want you use mysql database.
@@ -35,9 +35,9 @@ Use git to get the sources (be sure that your user is able to create some direct
 
     $ sudo apt-get install git
     $ cd /opt/
-    $ git clone https://github.com/domogik/domogik.git
+    $ sudo git clone https://github.com/domogik/domogik.git
     $ cd domogik
-    $ git checkout master
+    $ sudo git checkout master
 
 Install Domogik 
 ---------------
@@ -58,6 +58,9 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
     During installation, a new user will be created if necessary.
     
     If you want to use the C xPL hub instead of the python xPL hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hub.
+
+.. note::
+    adduser don't create 
 
 .. todo::
     Describe all the steps

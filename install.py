@@ -153,11 +153,13 @@ def ask_user_name():
 def create_user(d_user):
     info("Create domogik user")
     if d_user not in [x[0] for x in pwd.getpwall()]:
-        print("Creating the {0} user".format(d_user))
-        debug('/usr/sbin/useradd --system {0}'.format(d_user))
-        os.system('/usr/sbin/useradd --system {0}'.format(d_user))
-        debug('/usr/sbin/usermod -a -G dialout {0}'.format(d_user))
-        os.system('/usr/sbin/usermod -a -G dialout {0}'.format(d_user))
+        print("Creating the {0} user and add it to dialout".format(d_user))
+        cmd_line = 'adduser --system {0} '.format(d_user)
+        debug(cmd_line)
+        os.system(cmd_line)
+        cmd_line = 'adduser {0} dialout'.format(d_user)
+        debug(cmd_line)
+        os.system(cmd_line)
     if d_user not in [x[0] for x in pwd.getpwall()]:
         fail("Failed to create domogik user")
     else:
