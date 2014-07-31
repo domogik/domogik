@@ -37,7 +37,6 @@
   <script type="text/javascript">
     Blockly.Blocks['dom_condition'] = {
       init: function() {
-        this.setHelpUrl(Blockly.Msg.CONTROLS_IF_HELPURL);
         this.setColour(210);
         this.appendValueInput('IF')
             .setCheck('Boolean')
@@ -59,7 +58,7 @@
     };
     Blockly.inject(
         document.getElementById('blocklyDiv'),
-            {
+        {
             path: '../../',
             toolbox: document.getElementById('toolbox')
         }
@@ -74,8 +73,8 @@
     function onchange() {
       document.getElementById('codeDiv').innerHTML = Blockly.Domogik.workspaceToCode();
     }
-
     Blockly.addChangeListener(onchange);
+
     var json = JSON.parse('{"id": 1,"type": "dom_condition","condition" : { "id":4, "type": "logic_operation", "op": "AND", "a":true, "b":{ "id":7, "type": "logic_negate", "bool": true } },"actions" : null}');
     Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
   </script>

@@ -74,31 +74,28 @@ def scenario_blocks_tests():
         if 'result' in res:
             res = json.loads(res['result'])
             for test, params in res.iteritems():
-                print ""
                 p = []
                 jso = ""
                 for par, parv in params['parameters'].iteritems():
                     par = parv['expected'].keys()[0]
                     parv = parv['expected'][par]
-                    print par
-                    print parv
                     papp = "this.appendDummyInput().appendField('{0}')".format(parv['description'])
                     if parv['type'] == 'string':
                         jso = '{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
-                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}', '{2}'));".format(papp, parv['default'],par)
+                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
                     elif parv['type'] == 'integer':
                         jso = '{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}', '{2}'));".format(papp, parv['default'],par)
+                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
                     p.append(papp)
                 add = """Blockly.Blocks['{0}'] = {{
                             init: function() {{
-                                this.setHelpUrl('');
                                 this.setColour(160);
                                 this.appendDummyInput().appendField("{0}");
                                 {1}
-                                this.setOutput(true, null);
+                                this.setOutput(true);
                                 this.setInputsInline(true);
                                 this.setTooltip('{2}'); 
+                                this.contextMenu = false;
                             }}
                         }};
                         Blockly.Domogik['{0}'] = function(block) {{
@@ -114,7 +111,6 @@ def scenario_blocks_actions():
     """
         Blockly.Blocks['dom_action_log'] = {
           init: function() {
-            this.setHelpUrl('');
             this.setColour(160);
             this.appendDummyInput()
             .appendField('Log Message')
@@ -123,6 +119,7 @@ def scenario_blocks_actions():
             this.setNextStatement(true, "null");
             this.setTooltip('');
             this.setInputsInline(false);
+            this.contextMenu = false;
           }
         };
         Blockly.Domogik['dom_action_log'] = function(block) {
@@ -141,17 +138,36 @@ def scenario_blocks_actions():
             for act, params in res.iteritems():
                 print act
                 print params
+                p = []
+                jso = ""
+                for par, parv in params['parameters'].iteritems():
+                    print par
+                    print parv
+                    papp = "this.appendDummyInput().appendField('{0}')".format(parv['description'])
+                    if parv['type'] == 'string':
+                        jso = '{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
+                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
+                    elif parv['type'] == 'integer':
+                        jso = '{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
+                    else:
+                        papp = "{0};".format(papp)
+                    p.append(papp)
                 add = """Blockly.Blocks['{0}'] = {{
                         init: function() {{
                             this.setHelpUrl('');
                             this.setColour(160);
-
+                            this.appendDummyInput().appendField("{0}");
+                            {1}
                             this.setPreviousStatement(true, "null");
                             this.setNextStatement(true, "null");
                             this.setTooltip('{2}');
                             this.setInputsInline(false);
                         }}
                     }};
-                    """.format(act, None, params['description'])
+                    Blockly.Domogik['{0}'] = function(block) {{
+                      return code = '{{"id": ' + block.id + ',"type": "{0}"{3}}}';
+                    }};
+                    """.format(act, '\n'.join(p), params['description'], jso)
                 js = '{0}\n\r{1}'.format(js, add)
     return Response(js, content_type='text/javascript; charset=utf-8')
