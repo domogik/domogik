@@ -75,7 +75,11 @@
     }
     Blockly.addChangeListener(onchange);
 
+    {% if json %}
+    var json = JSON.parse({{json}});
+    {% else %}
     var json = JSON.parse('{"id": 1,"type": "dom_condition","condition" : { "id":4, "type": "logic_operation", "op": "AND", "a":true, "b":{ "id":7, "type": "logic_negate", "bool": true } },"actions" : null}');
+    {% endif %}
     Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
   </script>
  
