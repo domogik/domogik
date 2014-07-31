@@ -24,7 +24,33 @@ import json
 @app.route('/scenario')
 @login_required
 def scenario():
-    return render_template('scenario.html')
+    # Fetch all known actions
+    actions = []
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('action.list')
+    res = cli.request('scenario', msg.get(), timeout=10)
+    if res is not None:
+        res = res.get_data()
+        if 'result' in res:
+            res = json.loads(res['result'])
+            actions = res.keys()
+    # Fetch all known tests
+    tests = []
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('test.list')
+    res = cli.request('scenario', msg.get(), timeout=10)
+    if res is not None:
+        res = res.get_data()
+        if 'result' in res:
+            res = json.loads(res['result'])
+            tests = res.keys()
+
+    return render_template('scenario.html',
+        mactive = "scenario",
+        actions = actions,
+        tests = tests)
 
 @app.route('/scenario/blocks/tests')
 def scenario_blocks_tests():
@@ -85,5 +111,47 @@ def scenario_blocks_tests():
 
 @app.route('/scenario/blocks/actions')
 def scenario_blocks_actions():
-    js = 'actions'
+    """
+        Blockly.Blocks['dom_action_log'] = {
+          init: function() {
+            this.setHelpUrl('');
+            this.setColour(160);
+            this.appendDummyInput()
+            .appendField('Log Message')
+                .appendField(new Blockly.FieldTextInput("<message to log>"), "message");
+            this.setPreviousStatement(true, "null");
+            this.setNextStatement(true, "null");
+            this.setTooltip('');
+            this.setInputsInline(false);
+          }
+        };
+        Blockly.Domogik['dom_action_log'] = function(block) {
+          return code = '"action_log": { "message": "' + block.getFieldValue('message') + '"} \n\r';
+        };
+    """
+    js = ""
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('action.list')
+    res = cli.request('scenario', msg.get(), timeout=10)
+    if res is not None:
+        res = res.get_data()
+        if 'result' in res:
+            res = json.loads(res['result'])
+            for act, params in res.iteritems():
+                print act
+                print params
+                add = """Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            this.setHelpUrl('');
+                            this.setColour(160);
+
+                            this.setPreviousStatement(true, "null");
+                            this.setNextStatement(true, "null");
+                            this.setTooltip('{2}');
+                            this.setInputsInline(false);
+                        }}
+                    }};
+                    """.format(act, None, params['description'])
+                js = '{0}\n\r{1}'.format(js, add)
     return Response(js, content_type='text/javascript; charset=utf-8')
