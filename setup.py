@@ -91,7 +91,8 @@ setup(
           'tornado >= 2.3',
           'requests >= 0.12.1',
           magic,
-          'pyzmq >= 2.2.0'],
+          'pyzmq >= 2.2.0',
+          'ephem'],
     zip_safe = False,
     license = 'GPL v3',
     #include_package_data = True,
@@ -115,6 +116,7 @@ setup(
             dmg_insert_data = domogik.tools.packages.insert_data:main
             dmg_review = domogik.tools.packages.review.review:main
             dmg_package = domogik.bin.package:main
+            dmg_testrunner = domogik.tests.bin.testrunner:main
         """
         ]
     },

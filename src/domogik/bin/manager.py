@@ -1066,7 +1066,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         cmd = "{0} && ".format(STARTED_BY_MANAGER)
         if env_pythonpath:
             cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
-        cmd += "{0} {1}".format(PYTHON, py_file)
+        cmd += "{0} {1}".format(PYTHON, py_file.strip())
  
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
