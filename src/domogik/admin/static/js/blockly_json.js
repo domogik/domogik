@@ -1,33 +1,73 @@
-/**
- * @license
- * Visual Blocks Editor
- *
- * Copyright 2012 Google Inc.
- * https://blockly.googlecode.com/
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/**
- * @fileoverview XML reader and writer.
- * @author fraser@google.com (Neil Fraser)
- */
 'use strict';
 
 goog.provide('Blockly.JSON');
 
 /**
- * Decode an XML DOM and create blocks on the workspace.
+ * Encode a block tree as JSON.
+ * @param {!Object} workspace The SVG workspace.
+ * @return {!Element} JSON object.
+ */
+Blockly.JSON.workspaceToJson = function(workspace) {
+  var blocks = workspace.getTopBlocks(true);
+  if (blocks[0]) {
+    var json = Blockly.JSON.blockToJson(blocks[0]);
+  }
+  return JSON.stringify(json);
+};
+
+/**
+ * Encode a block subtree as JSON.
+ * @param {!Blockly.Block} block The root block to encode.
+ * @return {!Element} Tree of JSON object.
+ * @private
+ */
+Blockly.JSON.blockToJson = function(block) {
+  var element = {};
+  element['type'] = block.type;
+  element['id'] = block.id;
+  for (var x = 0, input; input = block.inputList[x]; x++) {
+    for (var y = 0, field; field = input.fieldRow[y]; y++) {
+      if (field.name && field.EDITABLE) {
+        element[field.name] = field.getValue();
+      }
+    }
+  }
+  var hasValues = false;
+  for (var i = 0, input; input = block.inputList[i]; i++) {
+    var empty = true;
+    if (input.type == Blockly.DUMMY_INPUT) {
+      continue;
+    } else {
+      var childBlock = input.connection.targetBlock();
+      if (childBlock) {
+        element[input.name] = Blockly.JSON.blockToJson(childBlock);
+      }
+    }
+  }
+  if (hasValues) {
+    element['inline'] = block.inputsInline;
+  }
+  if (block.isCollapsed()) {
+    element['collapsed'] = true;
+  }
+  if (block.disabled) {
+    element['disabled'] = true;
+  }
+  if (!block.isDeletable()) {
+    element['deletable'] = false;
+  }
+  if (!block.isMovable()) {
+    element['movable'] = false;
+  }
+  if (!block.isEditable()) {
+    element['editable'] = false;
+  }
+
+  return element;
+};
+
+/**
+ * Decode an JSON Object and create blocks on the workspace.
  * @param {!Blockly.Workspace} workspace The SVG workspace.
  * @param {!Element} JSON.
  */
@@ -36,7 +76,7 @@ Blockly.JSON.jsonToWorkspace = function(workspace, json) {
 };
 
 /**
- * Decode an XML block tag and create a block (and possibly sub blocks) on the
+ * Decode an JSON block tag and create a block (and possibly sub blocks) on the
  * workspace.
  * @param {!Blockly.Workspace} workspace The workspace.
  * @param {!Element} JSON block element.
@@ -54,7 +94,6 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
   var id = jsonBlock['id'];
   if (opt_reuseBlock && id) {
     block = Blockly.Block.getById(id, workspace);
-    // TODO: The following is for debugging.  It should never actually happen.
     if (!block) {
       throw 'Couldn\'t get Block with id: ' + id;
     }
@@ -68,9 +107,6 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
     block.parent_ = parentBlock;
   } else {
     block = Blockly.Block.obtain(workspace, prototypeName);
-//    if (id) {
-//      block.id = parseInt(id, 10);
-//    }
   }
   if (!block.svg_) {
     block.initSvg();
@@ -99,58 +135,23 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
 
   var blockChild = null;
 
-  for(var keyx in jsonBlock) {
-    if (['id', 'type'].indexOf(keyx) == -1 && typeof(jsonBlock[keyx]) === 'object' ) {
-      var jsonChild = jsonBlock[keyx];
-      console.debug(keyx, typeof(jsonBlock[keyx]));
-      var input;
-
-      // Find the first 'real' grandchild node (that isn't whitespace).
-      var firstRealGrandchild = null;
-      for(var keyy in jsonChild) {
-        if (['id', 'type'].indexOf(keyy) == -1 && typeof(jsonChild[keyy]) === 'object' ) {
-          firstRealGrandchild = jsonChild[keyy];
-        }
-      }
-      /*
-      var name = jsonChild['name'];
-      
-      switch (jsonNameChild.nodeName.toLowerCase()) {
-        case 'mutation':
-          // Custom data for an advanced block.
-          if (block.domToMutation) {
-            block.domToMutation(xmlChild);
-          }
-          break;
-        case 'comment':
-          block.setCommentText(xmlChild.textContent);
-          var visible = xmlChild.getAttribute('pinned');
-          if (visible) {
-            // Give the renderer a millisecond to render and position the block
-            // before positioning the comment bubble.
-            setTimeout(function() {
-              block.comment.setVisible(visible == 'true');
-            }, 1);
-          }
-          var bubbleW = parseInt(xmlChild.getAttribute('w'), 10);
-          var bubbleH = parseInt(xmlChild.getAttribute('h'), 10);
-          if (!isNaN(bubbleW) && !isNaN(bubbleH)) {
-            block.comment.setBubbleSize(bubbleW, bubbleH);
-          }
-          break;
-        case 'field':
-          block.setFieldValue(xmlChild.textContent, name);
-          break;
-        case 'value':
-        case 'statement':
-          input = block.getInput(name);
-          if (!input) {
-            throw 'Input ' + name + ' does not exist in block ' + prototypeName;
-          }
-          if (firstRealGrandchild &&
-              firstRealGrandchild.nodeName.toLowerCase() == 'block') {
-            blockChild = Blockly.JSON.domToBlock(workspace, firstRealGrandchild,
-                opt_reuseBlock);
+  for(var key in jsonBlock) {
+    if (['id', 'type'].indexOf(key) == -1) {
+      var jsonChild = jsonBlock[key];
+      if (jsonChild) { // not null
+        var input;
+        switch (typeof(jsonChild)) {
+          case 'string':
+          case 'boolean':
+              block.setFieldValue(jsonChild, key);
+            break;
+          case 'object':
+            input = block.getInput(key);
+            if (!input) {
+              throw 'Input ' + key + ' does not exist in block ' + prototypeName;
+            }
+            blockChild = Blockly.JSON.jsonToBlock(workspace, jsonChild,
+                  opt_reuseBlock);
             if (blockChild.outputConnection) {
               input.connection.connect(blockChild.outputConnection);
             } else if (blockChild.previousConnection) {
@@ -158,28 +159,11 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
             } else {
               throw 'Child block does not have output or previous statement.';
             }
-          }
-          break;
-        case 'next':
-          if (firstRealGrandchild &&
-              firstRealGrandchild.nodeName.toLowerCase() == 'block') {
-            if (!block.nextConnection) {
-              throw 'Next statement does not exist.';
-            } else if (block.nextConnection.targetConnection) {
-              // This could happen if there is more than one XML 'next' tag.
-              throw 'Next statement is already connected.';
-            }
-            blockChild = Blockly.JSON.domToBlock(workspace, firstRealGrandchild,
-                opt_reuseBlock);
-            if (!blockChild.previousConnection) {
-              throw 'Next block does not have previous statement.';
-            }
-            block.nextConnection.connect(blockChild.previousConnection);
-          }
-          break;
-        default:
-          // Unknown tag; ignore.  Same principle as HTML parsers.
-      }*/
+            break;
+          default:
+            // Unknown tag; ignore.  Same principle as HTML parsers.
+        }
+      }
     }
   }
 
@@ -201,3 +185,4 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
 // Export symbols that would otherwise be renamed by Closure compiler.
 Blockly['JSON'] = Blockly.JSON;
 Blockly.JSON['jsonToWorkspace'] = Blockly.JSON.jsonToWorkspace;
+Blockly.JSON['workspaceToJson'] = Blockly.JSON.workspaceToJson;

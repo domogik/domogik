@@ -5,8 +5,10 @@
   <pre id="codeDiv" style="height: 500px; width: 800px; position: absolute; top: 380px; border: 1px red"></pre>
   <xml id="toolbox" style="display: none">
     <category name="Logic">
+        <block type="dom_condition"></block>
         <block type="logic_operation"></block>
         <block type="logic_negate"></block>
+        <block type="logic_boolean"></block>
     </category>
     <category name="Tests">
         {% for t in tests %}
@@ -23,17 +25,8 @@
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
-  <script type="text/javascript" src="/static/js/blockly_generators/domogik.js"></script>
-  <script type="text/javascript" src="/static/js/blockly_generators/domogik/logic.js"></script>
   <script type="text/javascript" src="/scenario/blocks/actions"></script>
   <script type="text/javascript" src="/scenario/blocks/tests"></script>
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/colour.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/lists.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/loops.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/math.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/procedures.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/text.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/variables.js"></script>-->
   <script type="text/javascript">
     Blockly.Blocks['dom_condition'] = {
       init: function() {
@@ -50,12 +43,6 @@
         this.setInputsInline(false);
       }
     };
-    Blockly.Domogik['dom_condition'] = function(block) {
-      var argument = Blockly.Domogik.valueToCode(block, 'IF', Blockly.Domogik.ORDER_NONE) || 'null';
-      var action = Blockly.Domogik.statementToCode(block, 'DO') || 'null';
-      this.setInputsInline(false);
-      return code = '{"id": ' + block.id + ',"type": "dom_condition","condition" : '+ argument + ',"actions" : ' + action + '}';
-    };
     Blockly.inject(
         document.getElementById('blocklyDiv'),
         {
@@ -71,11 +58,11 @@
     rootBlock.setDeletable(false);*/
 
     function onchange() {
-      document.getElementById('codeDiv').innerHTML = Blockly.Domogik.workspaceToCode();
+      document.getElementById('codeDiv').innerHTML = Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace());
     }
     Blockly.addChangeListener(onchange);
 
-    var json = JSON.parse('{"id": 1,"type": "dom_condition","condition" : { "id":4, "type": "logic_operation", "op": "AND", "a":true, "b":{ "id":7, "type": "logic_negate", "bool": true } },"actions" : null}');
+    var json = JSON.parse('{"type":"dom_condition","id":"5","IF":{"type":"logic_negate","id":"10","BOOL":{"type":"logic_operation","id":"15","OP":"AND","A":{"type":"logic_boolean","id":"27","BOOL":"FALSE"},"B":{"type":"logic_boolean","id":"20","BOOL":"TRUE"}}},"deletable":false}');
     Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
   </script>
  

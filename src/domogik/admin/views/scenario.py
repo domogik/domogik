@@ -109,10 +109,6 @@ def scenario_blocks_tests():
                                 this.contextMenu = false;
                             }}
                         }};
-                        Blockly.Domogik['{0}'] = function(block) {{
-                          var code = '{{"id": ' + block.id + ',"type": "{0}"{3}}}';
-                          return [code, Blockly.Domogik.ORDER_NONE];
-                        }};
                         """.format(test, '\n'.join(p), params['description'], jso)
                 js = '{0}\n\r{1}'.format(js, add)
     return Response(js, content_type='text/javascript; charset=utf-8')
@@ -132,9 +128,6 @@ def scenario_blocks_actions():
             this.setInputsInline(false);
             this.contextMenu = false;
           }
-        };
-        Blockly.Domogik['dom_action_log'] = function(block) {
-          return code = '"action_log": { "message": "' + block.getFieldValue('message') + '"} \n\r';
         };
     """
     js = ""
@@ -175,9 +168,6 @@ def scenario_blocks_actions():
                             this.setTooltip('{2}');
                             this.setInputsInline(false);
                         }}
-                    }};
-                    Blockly.Domogik['{0}'] = function(block) {{
-                      return code = '{{"id": ' + block.id + ',"type": "{0}"{3}}}';
                     }};
                     """.format(act, '\n'.join(p), params['description'], jso)
                 js = '{0}\n\r{1}'.format(js, add)
