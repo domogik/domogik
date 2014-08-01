@@ -64,7 +64,6 @@ print "******************************************"
 print "use: "+mysql
 print "use: "+magic
 print "******************************************"
-#'ephem'
 
 setup(
     name = 'Domogik',
@@ -92,8 +91,8 @@ setup(
           'tornado >= 2.3',
           'requests >= 0.12.1',
           magic,
-          'pyzmq >= 2.2.0'
-          ],
+          'pyzmq >= 2.2.0',
+          'ephem'],
     zip_safe = False,
     license = 'GPL v3',
     #include_package_data = True,
