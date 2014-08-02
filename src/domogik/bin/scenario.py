@@ -37,16 +37,16 @@ Implements
 import traceback
 
 from domogik.common.scenario.manager import ScenarioManager
-from domogik.xpl.common.plugin import XplPlugin
+from domogik.xpl.common.plugin import Plugin
 from domogik.mq.reqrep.worker import MQRep
 from domogik.mq.message import MQMessage
 
-class ScenarioFrontend(XplPlugin):
+class ScenarioFrontend(Plugin):
     """ This class provides an interface to MQ system to allow Scenarii management.
     """
 
     def __init__(self):
-        XplPlugin.__init__(self, name = 'scenario')
+        Plugin.__init__(self, name = 'scenario')
         self._backend = ScenarioManager(self.log)
         self.add_stop_cb(self.end)
         self.add_stop_cb(self.shutdown)
