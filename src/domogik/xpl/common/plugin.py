@@ -62,7 +62,7 @@ class XplPlugin(Plugin):
         @param nohub : if set the hub discovery will be disabled
         '''
 
-        Plugin.__init__(self, name, stop_cb, is_manager, parser, daemonize, test)
+        Plugin.__init__(self, name, stop_cb = stop_cb, is_manager = is_manager, parser = parser, daemonize = daemonize, log_prefix = "xplplugin_", test = test)
 
         ### start xpl dedicated part
 
