@@ -153,11 +153,13 @@ def ask_user_name():
 def create_user(d_user):
     info("Create domogik user")
     if d_user not in [x[0] for x in pwd.getpwall()]:
-        print("Creating the {0} user".format(d_user))
-        debug('/usr/sbin/useradd --system {0}'.format(d_user))
-        os.system('/usr/sbin/useradd --system {0}'.format(d_user))
-        debug('/usr/sbin/usermod -a -G dialout {0}'.format(d_user))
-        os.system('/usr/sbin/usermod -a -G dialout {0}'.format(d_user))
+        print("Creating the {0} user and add it to dialout".format(d_user))
+        cmd_line = 'adduser --system {0} --shell /bin/sh '.format(d_user)
+        debug(cmd_line)
+        os.system(cmd_line)
+        cmd_line = 'adduser {0} dialout'.format(d_user)
+        debug(cmd_line)
+        os.system(cmd_line)
     if d_user not in [x[0] for x in pwd.getpwall()]:
         fail("Failed to create domogik user")
     else:
@@ -315,6 +317,8 @@ def install():
     parser = argparse.ArgumentParser(description='Domogik installation.')
     parser.add_argument('--dist-packages', dest='dist_packages', action="store_true",
                    default=False, help='Try to use distribution packages instead of pip packages')
+    parser.add_argument('--create-database', dest='create_database', action="store_true",
+                   default=False, help='create and allow domogik to access to it, if it is not already created')
     parser.add_argument('--no-setup', dest='setup', action="store_true",
                    default=False, help='Don\'t install the python packages')
     parser.add_argument('--no-test', dest='test', action="store_true",
@@ -404,6 +408,7 @@ def install():
                 info("Update the config file : /etc/domogik/xplhub.cfg")
                 write_xplhub_configfile(False)
 
+
         # upgrade db
         if not args.db:
             try:
@@ -432,6 +437,8 @@ def install():
                 print("Trace: {0}".format(traceback.format_exc()))
 
             dbi = DbInstall()
+            if args.create_database:
+                dbi.create_db()
             dbi.install_or_upgrade_db()
 
         # change permissions to some files created as root during the installation to the domogik user

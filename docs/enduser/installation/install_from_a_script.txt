@@ -14,7 +14,7 @@ Usage
 To know all the options available to install Domogik, you can just launch *install.py* with the -*h *option: ::
 
     $ sudo ./install.py -h
-    usage: install.py [-h] [--no-setup] [--no-test] [--no-config]
+    usage: install.py [-h] [--dist-packages] [--no-setup] [--no-test] [--no-config]
                       [--no-create-user] [--no-db-upgrade] [--user USER]
                       [--command-line]
                       [--domogik_libraries_path DOMOGIK_LIBRARIES_PATH]
@@ -51,6 +51,8 @@ To know all the options available to install Domogik, you can just launch *insta
     
     optional arguments:
       -h, --help            show this help message and exit
+      --dist-packages       Try to use distribution packages instead of pip
+                            packages
       --no-setup            Don't install the python packages
       --no-test             Don't run a config test   
       --no-config           Don't run a config writer 
