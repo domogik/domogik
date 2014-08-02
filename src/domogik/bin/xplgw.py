@@ -56,7 +56,7 @@ class XplManager(XplPlugin, MQAsyncSub):
     def __init__(self):
         """ Initiate DbHelper, Logs and config
         """
-        XplPlugin.__init__(self, 'xplgw')
+        XplPlugin.__init__(self, 'xplgw', log_prefix = "")
         MQAsyncSub.__init__(self, self.zmq, 'xplgw', ['client.conversion', 'client.list'])
 
         self.log.info(u"XPL manager initialisation...")

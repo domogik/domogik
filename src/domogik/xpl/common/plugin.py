@@ -56,13 +56,13 @@ class XplPlugin(Plugin):
 
 
     def __init__(self, name, stop_cb = None, is_manager = False, parser = None,
-                 daemonize = True, test = False, nohub = False):
+                 daemonize = True, log_prefix = "xplplugin_", test = False, nohub = False):
         '''
         Create XplPlugin instance, which defines system handlers
         @param nohub : if set the hub discovery will be disabled
         '''
 
-        Plugin.__init__(self, name, stop_cb = stop_cb, is_manager = is_manager, parser = parser, daemonize = daemonize, log_prefix = "xplplugin_", test = test)
+        Plugin.__init__(self, name, stop_cb = stop_cb, is_manager = is_manager, parser = parser, daemonize = daemonize, log_prefix = log_prefix, test = test)
 
         ### start xpl dedicated part
 
