@@ -28,40 +28,63 @@ def scenario():
         scenarios = [],
         mactive = "scenario")
 
-@app.route('/scenario/edit/<id>')
+@app.route('/scenario/edit/<id>', methods=['GET', 'POST'])
 @login_required
 def scenario_edit(id):
-    # Fetch all known actions
-    actions = []
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('action.list')
-    res = cli.request('scenario', msg.get(), timeout=10)
-    if res is not None:
-        res = res.get_data()
-        if 'result' in res:
-            res = json.loads(res['result'])
-            actions = res.keys()
-    # Fetch all known tests
-    tests = []
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('test.list')
-    res = cli.request('scenario', msg.get(), timeout=10)
-    if res is not None:
-        res = res.get_data()
-        if 'result' in res:
-            res = json.loads(res['result'])
-            tests = res.keys()
-    # TODO laod the json for this scenario
-    # if not exists send None == new
-    jso = None
+    default_json = '{"type":"dom_condition","id":"1","deletable":false}'
+    # laod the json
+    if id == 0:
+        name = "ikke"
+        jso = default_json
+    else:
+        # TODO laod from DB
+        jso = default_json
+        name = "new"
+    # create a form
+    class F(Form):
+        sid = HiddenField("id", default=id)
+        sname = TextField("name", default=name)
+        sjson = HiddenField("json")
+        submit = SubmitField("Send")
+        pass
+    form = F()
 
-    return render_template('scenario_edit.html',
-        mactive = "scenario",
-        actions = actions,
-        tests = tests,
-        json = jso)
+    if request.method == 'POST' and form.validate():
+        print request.form
+        flash(gettext("Changes saved"), "success")
+        return redirect("/scenario")
+        pass
+    else:
+        # Fetch all known actions
+        actions = []
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('action.list')
+        res = cli.request('scenario', msg.get(), timeout=10)
+        if res is not None:
+            res = res.get_data()
+            if 'result' in res:
+                res = json.loads(res['result'])
+                actions = res.keys()
+        # Fetch all known tests
+        tests = []
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('test.list')
+        res = cli.request('scenario', msg.get(), timeout=10)
+        if res is not None:
+            res = res.get_data()
+            if 'result' in res:
+                res = json.loads(res['result'])
+                tests = res.keys()
+        # ouput
+        return render_template('scenario_edit.html',
+            mactive = "scenario",
+            form = form,
+            name = name,
+            actions = actions,
+            tests = tests,
+            jso = jso)
 
 @app.route('/scenario/blocks/tests')
 def scenario_blocks_tests():
@@ -109,10 +132,6 @@ def scenario_blocks_tests():
                                 this.contextMenu = false;
                             }}
                         }};
-                        Blockly.Domogik['{0}'] = function(block) {{
-                          var code = '{{"id": ' + block.id + ',"type": "{0}"{3}}}';
-                          return [code, Blockly.Domogik.ORDER_NONE];
-                        }};
                         """.format(test, '\n'.join(p), params['description'], jso)
                 js = '{0}\n\r{1}'.format(js, add)
     return Response(js, content_type='text/javascript; charset=utf-8')
@@ -133,9 +152,6 @@ def scenario_blocks_actions():
             this.contextMenu = false;
           }
         };
-        Blockly.Domogik['dom_action_log'] = function(block) {
-          return code = '"action_log": { "message": "' + block.getFieldValue('message') + '"} \n\r';
-        };
     """
     js = ""
     cli = MQSyncReq(app.zmq_context)
@@ -147,13 +163,9 @@ def scenario_blocks_actions():
         if 'result' in res:
             res = json.loads(res['result'])
             for act, params in res.iteritems():
-                print act
-                print params
                 p = []
                 jso = ""
                 for par, parv in params['parameters'].iteritems():
-                    print par
-                    print parv
                     papp = "this.appendDummyInput().appendField('{0}')".format(parv['description'])
                     if parv['type'] == 'string':
                         jso = '{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
@@ -175,9 +187,6 @@ def scenario_blocks_actions():
                             this.setTooltip('{2}');
                             this.setInputsInline(false);
                         }}
-                    }};
-                    Blockly.Domogik['{0}'] = function(block) {{
-                      return code = '{{"id": ' + block.id + ',"type": "{0}"{3}}}';
                     }};
                     """.format(act, '\n'.join(p), params['description'], jso)
                 js = '{0}\n\r{1}'.format(js, add)

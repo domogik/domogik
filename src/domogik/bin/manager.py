@@ -133,7 +133,7 @@ class Manager(XplPlugin):
         # TODO : add -E option for externals ?
 
         ### Call the XplPlugin init  
-        XplPlugin.__init__(self, name = 'manager', parser=parser, nohub=True)
+        XplPlugin.__init__(self, name = 'manager', parser=parser, log_prefix = "", nohub=True)
 
         ### Logger
         self.log.info(u"Manager startup")

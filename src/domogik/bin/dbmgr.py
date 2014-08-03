@@ -41,7 +41,7 @@ import traceback
 
 from domogik.common.jsondata import domogik_encoder
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
-from domogik.xpl.common.plugin import XplPlugin
+from domogik.xpl.common.plugin import Plugin
 from domogik.common.database import DbHelper
 from domogik.mq.reqrep.worker import MQRep
 from domogik.mq.reqrep.client import MQSyncReq
@@ -55,7 +55,7 @@ import traceback
 DATABASE_CONNECTION_NUM_TRY = 50
 DATABASE_CONNECTION_WAIT = 30
 
-class DBConnector(XplPlugin, MQRep):
+class DBConnector(Plugin, MQRep):
     '''
     Manage the connection between database and the plugins
     Should be the *only* object along with the StatsManager to access to the database on the core side
@@ -65,8 +65,8 @@ class DBConnector(XplPlugin, MQRep):
         '''
         Initialize database and xPL connection
         '''
-        XplPlugin.__init__(self, 'dbmgr')
-        # Already done in XplPlugin
+        Plugin.__init__(self, 'dbmgr')
+        # Already done in Plugin
         #MQRep.__init__(self, zmq.Context(), 'dbmgr')
         self.log.debug(u"Init database_manager instance")
 
@@ -111,8 +111,8 @@ class DBConnector(XplPlugin, MQRep):
         """
         try:
             with self._db.session_scope():
-                # XplPlugin handles MQ Req/rep also
-                XplPlugin.on_mdp_request(self, msg)
+                # Plugin handles MQ Req/rep also
+                Plugin.on_mdp_request(self, msg)
 
                 # configuration
                 if msg.get_action() == "config.get":

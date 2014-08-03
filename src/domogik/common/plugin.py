@@ -94,7 +94,7 @@ class Plugin(BasePlugin, MQRep):
 
 
     def __init__(self, name, stop_cb = None, is_manager = False, parser = None,
-                 daemonize = True, test = False):
+                 daemonize = True, log_prefix = "", test = False):
         '''
         Create XplPlugin instance, which defines system handlers
         @param name : The name of the current plugin
@@ -106,8 +106,9 @@ class Plugin(BasePlugin, MQRep):
         Your options/params will then be available on self.options and self.args
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
+        @param log_prefix : If set, use this prefix when creating the log file in Logger()
         '''
-        BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
+        BasePlugin.__init__(self, name, stop_cb, parser, daemonize, log_prefix)
         Watcher(self)
         self.log.info(u"----------------------------------")
         self.log.info(u"Starting plugin '%s' (new manager instance)" % name)

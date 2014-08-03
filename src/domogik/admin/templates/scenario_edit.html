@@ -1,12 +1,14 @@
 {% extends "base/base.html" %}
+{% import "base/wtf.html" as wtf %}
 
 {% block content %}
-  <div id="blocklyDiv" style="height: 280px; width: 800px;"></div>
-  <pre id="codeDiv" style="height: 500px; width: 800px; position: absolute; top: 380px; border: 1px red"></pre>
+  <div id="blocklyDiv" style="position: absolute; top: 200px; left: 200px; height: 300px; width: 900px;"></div>
   <xml id="toolbox" style="display: none">
     <category name="Logic">
+        <block type="dom_condition"></block>
         <block type="logic_operation"></block>
         <block type="logic_negate"></block>
+        <block type="logic_boolean"></block>
     </category>
     <category name="Tests">
         {% for t in tests %}
@@ -19,21 +21,13 @@
         {% endfor %}
     </category>
   </xml>
+  {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}  
   <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
-  <script type="text/javascript" src="/static/js/blockly_generators/domogik.js"></script>
-  <script type="text/javascript" src="/static/js/blockly_generators/domogik/logic.js"></script>
   <script type="text/javascript" src="/scenario/blocks/actions"></script>
   <script type="text/javascript" src="/scenario/blocks/tests"></script>
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/colour.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/lists.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/loops.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/math.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/procedures.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/text.js"></script>-->
-  <!--<script type="text/javascript" src="/static/js/blockly_generators/domogik/variables.js"></script>-->
   <script type="text/javascript">
     Blockly.Blocks['dom_condition'] = {
       init: function() {
@@ -50,12 +44,6 @@
         this.setInputsInline(false);
       }
     };
-    Blockly.Domogik['dom_condition'] = function(block) {
-      var argument = Blockly.Domogik.valueToCode(block, 'IF', Blockly.Domogik.ORDER_NONE) || 'null';
-      var action = Blockly.Domogik.statementToCode(block, 'DO') || 'null';
-      this.setInputsInline(false);
-      return code = '{"id": ' + block.id + ',"type": "dom_condition","condition" : '+ argument + ',"actions" : ' + action + '}';
-    };
     Blockly.inject(
         document.getElementById('blocklyDiv'),
         {
@@ -63,23 +51,15 @@
             toolbox: document.getElementById('toolbox')
         }
     );
-    // Create the root block.
-/*    rootBlock = new Blockly.Block.obtain(Blockly.mainWorkspace, 'dom_condition');
-    rootBlock.initSvg();
-    rootBlock.render();
-    rootBlock.setMovable(false);
-    rootBlock.setDeletable(false);*/
-
     function onchange() {
-      document.getElementById('codeDiv').innerHTML = Blockly.Domogik.workspaceToCode();
+      $('#sjson').val( Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace()) );
     }
     Blockly.addChangeListener(onchange);
-
-    {% if json %}
-    var json = JSON.parse({{json}});
-    {% else %}
-    var json = JSON.parse('{"id": 1,"type": "dom_condition","condition" : { "id":4, "type": "logic_operation", "op": "AND", "a":true, "b":{ "id":7, "type": "logic_negate", "bool": true } },"actions" : null}');
-    {% endif %}
+    //var json = JSON.parse('{"type":"dom_condition","id":"1","IF":{"type":"logic_operation","id":"10","OP":"AND","A":{"type":"cron.CronTest","id":"18","cron":"None"},"B":{"type":"textinpage.TextInPageTest","id":"22","urlpath":"None","text":"None"}},"DO":{"type":"log.LogAction","id":"28","message":"test"},"deletable":false}');
+    //var json = JSON.parse('{"type":"dom_condition","id":"1","deletable":false}');
+    {% autoescape false %}
+    var json = JSON.parse('{{ jso }}');
+    {% endautoescape %}
     Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
   </script>
  

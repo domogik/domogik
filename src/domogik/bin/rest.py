@@ -27,7 +27,7 @@ Plugin purpose
 Implements
 ==========
 
-class Rest(XplPlugin):
+class Rest(Plugin):
 @author: 	Friz <fritz.smh@gmail.com>
 		Maikel Punie <maikel.punie@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
@@ -35,7 +35,7 @@ class Rest(XplPlugin):
 @organization: Domogik
 """
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.xpl.common.plugin import XplPlugin
+from domogik.common.plugin import Plugin
 from domogik.common import logger
 from domogik.rest.url import urlHandler
 from domogik.mq.reqrep.client import MQSyncReq
@@ -64,7 +64,7 @@ TMP_DIR = tempfile.gettempdir()
 DEFAULT_REPO_DIR = TMP_DIR
 
 ################################################################################
-class Rest(XplPlugin):
+class Rest(Plugin):
     """ REST Server 
         - create a HTTP server 
         - process REST requests
@@ -78,7 +78,7 @@ class Rest(XplPlugin):
             @param server_port :  port of HTTP server
         """
 
-        XplPlugin.__init__(self, name = 'rest')
+        Plugin.__init__(self, name = 'rest')
         # logging initialization
         self.log.info(u"Rest Server initialisation...")
         self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
