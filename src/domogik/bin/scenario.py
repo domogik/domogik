@@ -83,11 +83,17 @@ class ScenarioFrontend(Plugin):
                     }
                 }
         try:
-            if msg.get_data() == {}:
-                payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()
+            if msg.get_action().split('.')[0] not in mapping.keys():
+                self._mdp_reply(msg.get_action(), "error", {"details": "{0} not in {1}".format(msg.get_action().split('.')[0], mapping.keys())})
             else:
-                payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
-            self._mdp_reply(msg.get_action(), payload)
+                if msg.get_action().split('.')[1] not in mapping[msg.get_action().split('.')[0]].keys():
+                    self._mdp_reply(msg.get_action(), "error", {"details": "{0} not in {1}".format(msg.get_action().split('.')[1], mapping[msg.get_action().split('.')[0]].keys())})
+                else:
+                    if msg.get_data() == {}:
+                        payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()
+                    else:
+                        payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
+                    self._mdp_reply(msg.get_action(), payload)
         except:
             self.log.error(u"Exception occured during message processing.")
             trace = str(traceback.format_exc())
