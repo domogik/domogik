@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, g
 try:
     from flask_wtf import Form, RecaptchaField
 except ImportError:
@@ -38,6 +38,7 @@ app.jinja_env.globals['bootstrap_is_hidden_field'] =\
 app.config['SECRET_KEY'] = 'devkey'
 app.config['RECAPTCHA_PUBLIC_KEY'] = \
 '6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
+app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Paris'
 
 # jinja 2 filters
 def format_babel_datetime(value, format='medium'):
