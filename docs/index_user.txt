@@ -61,6 +61,10 @@ The following tutorials are not mandatory to use Domogik. You can pick just what
 * :doc:`Install Domogik in a python virtualenv </enduser/installation/virtualenv>`
 * :doc:`Configure SSL </enduser/installation/ssl>`
 
+Open an issue/ticket
+--------------------
+
+When using Domogik or a plugin, if you find an issue, :doc:`please report it on the issue tracker </enduser/errors/create_a_ticket>`.
 
 Quick start guide
 -----------------
