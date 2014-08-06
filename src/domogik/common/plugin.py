@@ -163,6 +163,9 @@ class Plugin(BasePlugin, MQRep):
         self.resources_directory = "{0}/{1}".format(self.config['libraries_path'], RESOURCES_DIR)
         self.products_directory = "{0}/{1}_{2}/{3}".format(self.packages_directory, "plugin", self._name, PRODUCTS_DIR)
 
+        # plugin config
+        self._plugin_config = None
+
         # Get pid and write it in a file
         self._pid_dir_path = self.config['pid_dir_path']
         self._get_pid()
@@ -208,8 +211,8 @@ class Plugin(BasePlugin, MQRep):
             Check in database (over queryconfig) if the key 'configured' is set to True for the plugin
             if not, stop the plugin and log this
         """
-        self._config = Query(self.zmq, self.log)
-        configured = self._config.query(self._name, 'configured')
+        self._plugin_config = Query(self.zmq, self.log)
+        configured = self._plugin_config.query(self._name, 'configured')
         if configured == '1':
             configured = True
         if configured != True:
@@ -242,7 +245,9 @@ class Plugin(BasePlugin, MQRep):
     def get_config(self, key):
         """ Try to get the config over the MQ. If value is None, get the default value
         """
-        value = self._config.query(self._name, key)
+        if self._plugin_config == None:
+            self._plugin_config = Query(self.zmq, self.log)
+        value = self._plugin_config.query(self._name, key)
         if value == None or value == 'None':
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
             value = self.get_config_default_value(key)
