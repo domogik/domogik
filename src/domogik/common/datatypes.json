@@ -576,5 +576,20 @@
             "temp_ok": "UPS temperature returns ok"
         },
         "childs": []
+    },
+    "DT_CoordD": {
+        "format": "DD.dddddd,DD.dddddd",
+        "parent": "DT_String",
+        "childs": []
+    },
+    "DT_CoordDM": {
+        "format": "(N|S) DD MM.mmm,(E|W) DD MM.mmm",
+        "parent": "DT_String",
+        "childs": []
+    },
+    "DT_CoordDMS": {
+        "format": "(N|S) DD MM SS.s,(E|W) DD MM SS.s",
+        "parent": "DT_String",
+        "childs": []
     }
 }
