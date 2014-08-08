@@ -717,7 +717,7 @@ class Plugin(BasePlugin, MQRep):
        After that, try to create a file inside it.
        If something goes wrong, generate an explicit exception.
        """
-       path = "{0}/{1}/{2}_{3}/data/" % (self.librairies_directory, PACKAGES_DIR, "plugin", self._name)
+       path = "{0}/{1}/{2}_{3}/data/" % (self.libraries_directory, PACKAGES_DIR, "plugin", self._name)
        if os.path.exists(path):
            if not os.access(path, os.W_OK & os.X_OK):
                raise OSError("Can't write in directory %s" % path)
