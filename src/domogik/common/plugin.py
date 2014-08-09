@@ -111,7 +111,7 @@ class Plugin(BasePlugin, MQRep):
         BasePlugin.__init__(self, name, stop_cb, parser, daemonize, log_prefix)
         Watcher(self)
         self.log.info(u"----------------------------------")
-        self.log.info(u"Starting plugin '%s' (new manager instance)" % name)
+        self.log.info(u"Starting plugin '{0}' (new manager instance)".format(name))
         self.log.info(u"Python version is {0}".format(sys.version_info))
         if self.options.test_option:
             self.log.info(u"The plugin is starting in TEST mode. Test option is {0}".format(self.options.test_option))
@@ -171,7 +171,7 @@ class Plugin(BasePlugin, MQRep):
         self._get_pid()
 
         if len(self.get_sanitized_hostname()) > 16:
-            self.log.error(u"You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
+            self.log.error(u"You must use 16 char max hostnames ! {0} is {1} long".format(self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
             self.force_leave()
             return
 
@@ -717,16 +717,16 @@ class Plugin(BasePlugin, MQRep):
        After that, try to create a file inside it.
        If something goes wrong, generate an explicit exception.
        """
-       path = "{0}/{1}/{2}_{3}/data/" % (self.libraries_directory, PACKAGES_DIR, "plugin", self._name)
+       path = "{0}/{1}/{2}_{3}/data/".format(self.libraries_directory, PACKAGES_DIR, "plugin", self._name)
        if os.path.exists(path):
            if not os.access(path, os.W_OK & os.X_OK):
-               raise OSError("Can't write in directory %s" % path)
+               raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
                os.mkdir(path, '0770')
-               self.log.info(u"Create directory %s." % path)
+               self.log.info(u"Create directory {0}.".format(path))
            except:
-               raise OSError("Can't create directory %s." % path)
+               raise OSError("Can't create directory {0}.".format(path))
        try:
            tmp_prefix = "write_test";
            count = 0
@@ -738,7 +738,7 @@ class Plugin(BasePlugin, MQRep):
            f.close()
            os.remove(filename)
        except :
-           raise IOError("Can't create a file in directory %s." % path)
+           raise IOError("Can't create a file in directory {0}.".format(path))
        return path
 
     def register_helper(self, action, help_string, callback):
@@ -762,7 +762,7 @@ class Plugin(BasePlugin, MQRep):
         pid = os.getpid()
         pid_file = os.path.join(self._pid_dir_path,
                                 self._name + ".pid")
-        self.log.debug(u"Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
+        self.log.debug(u"Write pid file for pid '{0}' in file '{1}'".format(str(pid), pid_file))
         fil = open(pid_file, "w")
         fil.write(str(pid))
         fil.close()
@@ -807,41 +807,41 @@ class Plugin(BasePlugin, MQRep):
         if hasattr(self, "_timers"):
             for t in self._timers:
                 if hasattr(self, "log"):
-                    self.log.debug(u"Try to stop timer %s"  % t)
+                    self.log.debug(u"Try to stop timer {0}".format(t))
                 t.stop()
                 if hasattr(self, "log"):
-                    self.log.debug(u"Timer stopped %s" % t)
+                    self.log.debug(u"Timer stopped {0}".format(t))
 
         if hasattr(self, "_stop_cb"):
             for cb in self._stop_cb:
                 if hasattr(self, "log"):
-                    self.log.debug(u"Calling stop additionnal method : %s " % cb.__name__)
+                    self.log.debug(u"Calling stop additionnal method : {0} ".format(cb.__name__))
                 cb()
     
         if hasattr(self, "_threads"):
             for t in self._threads:
                 if hasattr(self, "log"):
-                    self.log.debug(u"Try to stop thread %s" % t)
+                    self.log.debug(u"Try to stop thread {0}".format(t))
                 try:
                     t.join()
                 except RuntimeError:
                     pass
                 if hasattr(self, "log"):
-                    self.log.debug(u"Thread stopped %s" % t)
+                    self.log.debug(u"Thread stopped {0}".format(t))
                 #t._Thread__stop()
 
         #Finally, we try to delete all remaining threads
         for t in threading.enumerate():
             if t != threading.current_thread() and t.__class__ != threading._MainThread:
                 if hasattr(self, "log"):
-                    self.log.info(u"The thread %s was not registered, killing it" % t.name)
+                    self.log.info(u"The thread {0} was not registered, killing it".format(t.name))
                 t.join()
                 if hasattr(self, "log"):
-                    self.log.info(u"Thread %s stopped." % t.name)
+                    self.log.info(u"Thread {0} stopped.".format(t.name))
 
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
-                self.log.warn(u"There are more than 1 thread remaining : %s" % threading.enumerate())
+                self.log.warn(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
 
 
 class Watcher:
