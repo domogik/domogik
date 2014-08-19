@@ -4,6 +4,7 @@ pkg_list="\
          alembic \
          mysql-server \
          gettext \
+         gcc\
          \
          python \
          python-setuptools \
