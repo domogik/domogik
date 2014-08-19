@@ -126,7 +126,9 @@
             "DT_Byte",
             "DT_kByte",
             "DT_MByte",
-            "DT_GByte"
+            "DT_GByte",
+            "DT_pH",
+            "DT_Chlorine"
         ]
     },
     "DT_Scaling": {
@@ -392,6 +394,20 @@
         "min": null,
         "max": null,
         "unit": "Gb",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_pH": {
+        "min": null,
+        "max": null,
+        "unit": "pH",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Chlorine": {
+        "min": null,
+        "max": null,
+        "unit": "mg/l",
         "parent": "DT_Number",
         "childs": []
     },
