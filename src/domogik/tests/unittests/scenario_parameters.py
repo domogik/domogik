@@ -40,8 +40,8 @@ from unittest import TestCase
 import logging
 import datetime
 
-from domogik.common.scenario.parameters.cron import CronParameter
-from domogik.common.scenario.parameters.operator import ComparisonOperatorParameter
+from domogik.scenario.parameters.cron import CronParameter
+from domogik.scenario.parameters.operator import ComparisonOperatorParameter
 from domogik.common.cron import CronExpression
 
 

@@ -25,7 +25,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
-from domogik.common.scenario.actions.abstract import AbstractAction
+from domogik.scenario.actions.abstract import AbstractAction
 
 
 class LogAction(AbstractAction):

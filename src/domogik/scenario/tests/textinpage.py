@@ -25,7 +25,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
-from domogik.common.scenario.tests.abstract import AbstractTest
+from domogik.scenario.tests.abstract import AbstractTest
 from time import sleep
 
 class TextInPageTest(AbstractTest):
@@ -34,26 +34,25 @@ class TextInPageTest(AbstractTest):
 
     def __init__(self, log = None, trigger = None):
         AbstractTest.__init__(self, log, trigger)
-        self.set_description("Check if the value for a sensor is set to a specifick txt value")
-        self.add_parameter("sensor", "sensor_id.SensorIdParameter")
-        self.add_parameter("value", "text.TextParameter")
+        self.set_description("Check if a web page contains some word")
+        self.add_parameter("url", "url_value.UrlParameter")
+        self.add_parameter("text", "text.TextParameter")
 
     def evaluate(self):
         """ Evaluate if the text appears in the content of the page referenced by url
         """
-        params = self.get_raw_parameters()
-        sen = p["sensor"]
-        val = p["value"]
-        if sen.evaluate() == None or val.evaluate() == None:
+        p = self.get_raw_parameters()
+        u = p["url"]
+        t = p["text"]
+        if u.evaluate() == None or t.evaluate() == None:
             return None
         else:
-            # check
-            self._log.debug("Evaluate %s in %s : %s" % (t, u, res))
+            res = t.evaluate() in u.evaluate().decode('utf-8')
             return res
 
 
-TEST = None
 if __name__ == "__main__":
+    TEST = None
     import logging
 
     def mytrigger(test):

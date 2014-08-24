@@ -38,12 +38,12 @@ import importlib
 import inspect
 import uuid
 import json
-import domogik.common.scenario.tests as s_t
-import domogik.common.scenario.parameters as s_p
-import domogik.common.scenario.conditions as s_c
-import domogik.common.scenario.actions as s_a
+import domogik.scenario.tests as s_t
+import domogik.scenario.parameters as s_p
+import domogik.scenario.conditions as s_c
+import domogik.scenario.actions as s_a
 from domogik.common.database import DbHelper
-from domogik.common.scenario.conditions.condition import Condition
+from domogik.scenario.conditions.condition import Condition
 from exceptions import KeyError
 
 
@@ -177,7 +177,7 @@ class ScenarioManager:
                 # so we have to load the module/class etc ... only once
                 if inst not in self._test_cache:
                     mod, clas = inst.split('.')
-                    module_name = "domogik.common.scenario.tests.{0}".format(mod)
+                    module_name = "domogik.scenario.tests.{0}".format(mod)
                     cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
                     self._test_cache[inst] = cobj
                     self.log.debug(u"Add class {0} to test cache".format(inst))
@@ -190,7 +190,7 @@ class ScenarioManager:
                 # so we have to load the module/class etc ... only once
                 if inst not in self._action_cache:
                     mod, clas = inst.split('.')
-                    module_name = "domogik.common.scenario.actions.{0}".format(mod)
+                    module_name = "domogik.scenario.actions.{0}".format(mod)
                     cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
                     self._action_cache[inst] = cobj
                     self.log.debug(u"Add class {0} to action cache".format(inst))
@@ -310,11 +310,11 @@ class ScenarioManager:
                 scen = self._db.add_scenario(name, json_input)
                 # store the tests
                 for uuid in c.get_mapping():
-                    cls = str(self._tests_mapping[uuid].__class__).replace('domogik.common.scenario.tests.', '')
+                    cls = str(self._tests_mapping[uuid].__class__).replace('domogik.scenario.tests.', '')
                     self._db.add_scenario_uuid(scen.id, uuid, cls, 1)
                 # store the actions
                 for uuid in self._conditions_actions[name]:
-                    cls = str(self._actions_mapping[uuid].__class__).replace('domogik.common.scenario.actions.', '')
+                    cls = str(self._actions_mapping[uuid].__class__).replace('domogik.scenario.actions.', '')
                     self._db.add_scenario_uuid(scen.id, uuid, cls, 0)
         # return
         return {'name': name}
@@ -429,7 +429,7 @@ class ScenarioManager:
             classes = [m for m in inspect.getmembers(imported_mod) if inspect.isclass(m[1])]
             # Filter in order to keep only the classes that belong to domogik package and are not abstract
             res.extend([(module[1] + "." + c[0], c[1]) for c in filter(
-                lambda x: x[1].__module__.startswith("domogik.common.scenario.") and not x[0].startswith("Abstract"), classes)])
+                lambda x: x[1].__module__.startswith("domogik.scenario.") and not x[0].startswith("Abstract"), classes)])
         return res
 
 

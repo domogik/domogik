@@ -31,7 +31,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 # in evaluate check cronExpression.check_trigger_now()
 # in destroy clean up the cron expression
 
-from domogik.common.scenario.parameters.abstract import AbstractParameter
+from domogik.scenario.parameters.abstract import AbstractParameter
 from domogik.common.cron import CronExpression
 
 class CronParameter(AbstractParameter):

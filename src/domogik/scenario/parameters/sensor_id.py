@@ -25,9 +25,9 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
-from domogik.common.scenario.parameters.abstract import AbstractParameter
+from domogik.scenario.parameters.abstract import AbstractParameter
 
-class TextParameter(AbstractParameter):
+class SensorIdParameter(AbstractParameter):
     """ This parameter  simply provides a text entry
     This is the simplest exemple for to see how you can extend Parameter
     """
@@ -35,15 +35,14 @@ class TextParameter(AbstractParameter):
     def __init__(self, log = None, trigger = None):
         AbstractParameter.__init__(self, log, trigger)
         self.set_type("string")
-        self.add_expected_entry("text", "string", "Some text")
-
+        self.add_expected_entry("sensor_id", "integer", "The sensor id to check")
 
     def evaluate(self):
         """ Return string, or none if no string entered yet
         """
         p = self.get_parameters()
-        if "text" in p:
-            return p["text"]
+        if "sensor_id" in p:
+            return p["sensor_id"]
         else:
             return None
 
@@ -53,10 +52,10 @@ if __name__ == "__main__":
     import logging
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
-    t = TextParameter(logging, None)
+    t = SensorIdParameter(logging, None)
     print("Expected entries : {0}".format(t.get_expected_entries()))
     print("Evaluate should be None : {0}".format(t.evaluate()))
-    print("==> Setting some value for entry 'text'")
-    data = { "text" : "This is a nice text" }
+    print("==> Setting some value for entry 'sensor_id'")
+    data = { "sensor_id" : "1" }
     t.fill(data)
-    print("Evaluate should now return some string : {0}".format(t.evaluate()))
+    print("Evaluate should now return the sensor id : {0}".format(t.evaluate()))

@@ -25,7 +25,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
-from domogik.common.scenario.conditions.abstract import AbstractCondition
+from domogik.scenario.conditions.abstract import AbstractCondition
 
 class Condition(AbstractCondition):
     """ We have nothing to extend right now
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
 
-    from domogik.common.scenario.tests.textinpage import TextInPageTest
+    from domogik.scenario.tests.textinpage import TextInPageTest
     c = None
 
     def mytrigger(test):

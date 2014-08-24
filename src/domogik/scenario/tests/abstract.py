@@ -146,7 +146,7 @@ class AbstractTest:
             raise AttributeError("A parameter instance already exists with this name")
         modonly = classname.split('.')[0]
         classonly = classname.split('.')[1]
-        module_name = "domogik.common.scenario.parameters.%s" % modonly
+        module_name = "domogik.scenario.parameters.%s" % modonly
         #This may raise ImportError
         cname = getattr(__import__(module_name, fromlist = [modonly]), classonly)
         p = cname(log=self._log, trigger=self.cb_trigger)

@@ -19,59 +19,79 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-@author: Maikel Punie <maikel.punie@gmail.com>
+@author: Maxence Dunnewind <maxence@dunnewind.net>
 @copyright: (C) 2007-2009 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
-from domogik.common.scenario.tests.abstract import AbstractTest
+from domogik.scenario.tests.abstract import AbstractTest
 from time import sleep
 
-class CronTest(AbstractTest):
+class TextInPageTest(AbstractTest):
     """ Simple test to check if a word is contained in an url
     """
 
     def __init__(self, log = None, trigger = None):
         AbstractTest.__init__(self, log, trigger)
-        self.set_description("Trigger on a certain timed event")
-        self.add_parameter("cron", "cron.CronParameter")
+        self.set_description("Check if the value for a sensor is set to a specifick txt value")
+        self.add_parameter("sensor", "sensor_id.SensorIdParameter")
+        self.add_parameter("value", "text.TextParameter")
 
     def evaluate(self):
         """ Evaluate if the text appears in the content of the page referenced by url
         """
         params = self.get_raw_parameters()
-        crn = params["cron"]
-        if crn.evaluate() == None:
+        sen = p["sensor"]
+        val = p["value"]
+        if sen.evaluate() == None or val.evaluate() == None:
             return None
         else:
-            res = crn.evaluate()
-            self._log.debug("Evaluate {0} : {1}".format(crn, res))
+            # check
+            self._log.debug("Evaluate %s in %s : %s" % (t, u, res))
             return res
 
 
+TEST = None
 if __name__ == "__main__":
     import logging
-    TEST = None
 
     def mytrigger(test):
-        print("Trigger called by test {0}, refreshing state".format(test))
+        print "Trigger called by test %s, refreshing state" % test
         st = TEST.evaluate()
         print "state is %s" % st
 
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
-    TEST = CronTest(logging, trigger = mytrigger)
-    print(TEST)
-    print("getting parameters")
+    TEST = TextInPageTest(logging, trigger = mytrigger)
+    print "getting parameters"
     p = TEST.get_parameters()
-    print(p)
-    print("====")
-    print("Trying to evaluate : {0}".format(TEST.evaluate()))
-    print("====")
-    print("set data for parameters cron")
-    data = { "cron": { "cron" : "*/2 * * * *"} }
+    print p
+    print "Trying to evaluate : %s" % TEST.evaluate()
+    print "set data for parameters"
+    data = { "url": { "urlpath" : "http://people.dunnewind.net/maxence/domogik/test.txt",
+                    "interval": "5"
+    },
+    "text": {
+        "text" : "this text does not exists"
+    }
+    }
     TEST.fill_parameters(data)
+    print "I sleep 5s"
     sleep(5)
-    print("Trying to evaluate : {0}".format(TEST.evaluate()))
+    print "Trying to evaluate : %s" % TEST.evaluate()
+    print "updating with good text"
+    data = { "url": { "urlpath" : "http://people.dunnewind.net/maxence/domogik/test.txt",
+                    "interval": "5"
+    },
+    "text": {
+        "text" : "randomtext"
+    }
+    }
+    print "===="
+    TEST.fill_parameters(data)
+    print "===="
+    print "I sleep 5s"
+    sleep(5)
+    print "Trying to evaluate : %s" % TEST.evaluate()
     TEST.destroy()
