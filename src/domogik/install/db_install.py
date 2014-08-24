@@ -86,7 +86,7 @@ class DbInstall():
             ok("Done!");
 
 
-    def install_or_upgrade_db(self):
+    def install_or_upgrade_db(self, skip_backup=False):
         from domogik.common import sql_schema
         from domogik.common import database
         from sqlalchemy import create_engine, MetaData, Table
@@ -105,8 +105,9 @@ class DbInstall():
             command.stamp(self.alembic_cfg, "head")
             ok("Setting db version to head")
         else:
-            ok("Creating backup")
-            self.backup_existing_database()
+            if not skip_backup:
+                ok("Creating backup")
+                self.backup_existing_database()
             ok("Upgrading")
             command.upgrade(self.alembic_cfg, "head")
         return 
