@@ -272,7 +272,7 @@ class PackageJson():
                 raise PackageException("Sensor part is NOT a dictionary!")
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
-                expected = ['name', 'data_type', 'conversion', 'history', 'incremental']
+                expected = ['name', 'data_type', 'conversion', 'history', 'incremental', 'timeout']
                 hexpected = ['store', 'max', 'expire', 'round_value', 'duplicate']
                 self._validate_keys(expected, "sensor {0}".format(senid), list(sens.keys()))
                 self._validate_keys(hexpected, "sensor {0} history".format(senid), list(sens['history'].keys()))

@@ -545,7 +545,8 @@ class DbHelper():
                             h_expire = sensor_in_client_data['history']['expire'], \
                             h_round = sensor_in_client_data['history']['round_value'], \
                             h_duplicate = sensor_in_client_data['history']['duplicate'], \
-                            formula = None \
+                            formula = None, \
+                            timeout = sensor_in_client_data['timeout'], \
                             )
             self.__session.add(sensor)
             self.__session.flush()
@@ -1461,7 +1462,7 @@ class DbHelper():
 
     def update_sensor(self, sid, history_round=None, \
             history_store=None, history_max=None, \
-            history_expire=None):
+            history_expire=None, timeout=None):
         sensor = self.__session.query(Sensor).filter_by(id=sid).first()
         if sensor is None:
             self.__raise_dbhelper_exception("Sensor with id %s couldn't be found" % sid)
@@ -1473,6 +1474,8 @@ class DbHelper():
             sensor.history_store = history_store
         if history_expire is not None:
             sensor.history_expire = history_expire
+        if timeout is not None:
+            sensor.timeout = timeout
         self.__session.add(sensor)
         try:
             self.__session.commit()
