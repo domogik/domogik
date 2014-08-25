@@ -330,6 +330,8 @@ def install():
                    default=True, help='Don\'t create a user')
     parser.add_argument('--no-db-upgrade', dest='db', action="store_true",
                    default=False, help='Don\'t do a db upgrade')
+    parser.add_argument('--no-db-backup', dest='skip_database_backup', action="store_true",
+                   default=False, help='Don\'t do a db backup')
     parser.add_argument("--user",
                    help="Set the domogik user")
 
@@ -439,7 +441,7 @@ def install():
             dbi = DbInstall()
             if args.create_database:
                 dbi.create_db()
-            dbi.install_or_upgrade_db()
+            dbi.install_or_upgrade_db(args.skip_database_backup)
 
         # change permissions to some files created as root during the installation to the domogik user
         os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
