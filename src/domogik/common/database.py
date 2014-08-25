@@ -424,6 +424,7 @@ class DbHelper():
                             'formula' : a_sensor.formula,
                             'data_type' : a_sensor.data_type,
                             'conversion' : a_sensor.conversion, 
+                            'timeout' : a_sensor.timeout, 
                             'last_value' : a_sensor.last_value, 
                             'last_received' : a_sensor.last_received,
                             'value_min' : a_sensor.value_min,
