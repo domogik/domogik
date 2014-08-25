@@ -24,8 +24,19 @@ import json
 @app.route('/scenario')
 @login_required
 def scenario():
+    scenarios = []
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('scenario.list')
+    res = cli.request('scenario', msg.get(), timeout=10)
+    if res is not None:
+        res = res.get_data()
+        if 'result' in res:
+            res = res['result']
+            for scen in res:
+                scenarios.append(scen)
     return render_template('scenario.html',
-        scenarios = [],
+        scenarios = scenarios,
         mactive = "scenario")
 
 @app.route('/scenario/edit/<id>', methods=['GET', 'POST'])
@@ -33,13 +44,15 @@ def scenario():
 def scenario_edit(id):
     default_json = '{"type":"dom_condition","id":"1","deletable":false}'
     # laod the json
-    if id == 0:
-        name = "ikke"
+    if int(id) == 0:
+        name = "New scenario"
         jso = default_json
     else:
-        # TODO laod from DB
-        jso = default_json
-        name = "new"
+        with app.db.session_scope():
+            scen = app.db.get_scenario(id)
+            jso = scen.json
+            name = scen.name
+            jso.replace('\n', '').replace('\r', '')
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
@@ -50,7 +63,6 @@ def scenario_edit(id):
     form = F()
 
     if request.method == 'POST' and form.validate():
-        print request.form
         flash(gettext("Changes saved"), "success")
         return redirect("/scenario")
         pass
@@ -64,7 +76,7 @@ def scenario_edit(id):
         if res is not None:
             res = res.get_data()
             if 'result' in res:
-                res = json.loads(res['result'])
+                res = res['result']
                 actions = res.keys()
         # Fetch all known tests
         tests = []
@@ -75,7 +87,7 @@ def scenario_edit(id):
         if res is not None:
             res = res.get_data()
             if 'result' in res:
-                res = json.loads(res['result'])
+                res = res['result']
                 tests = res.keys()
         # ouput
         return render_template('scenario_edit.html',
@@ -106,7 +118,7 @@ def scenario_blocks_tests():
     if res is not None:
         res = res.get_data()
         if 'result' in res:
-            res = json.loads(res['result'])
+            res = res['result']
             for test, params in res.iteritems():
                 p = []
                 jso = ""
@@ -161,7 +173,7 @@ def scenario_blocks_actions():
     if res is not None:
         res = res.get_data()
         if 'result' in res:
-            res = json.loads(res['result'])
+            res = res['result']
             for act, params in res.iteritems():
                 p = []
                 jso = ""

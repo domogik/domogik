@@ -107,6 +107,7 @@ class ScenarioManager:
         self._actions_mapping = {}
         # Keep list of conditions as name : instance
         self._conditions = {}
+        self._conditions_ids = {}
         # Keep list of actions uuid linked to a condition  as name : [uuid1, uuid2, ... ]
         self._conditions_actions = {}
         # an instance of the logger
@@ -133,7 +134,7 @@ class ScenarioManager:
                     else:
                         self.__ask_instance(uid.key, self._actions_mapping, uid.uuid)
                 # now all uuids are created go and install the condition
-                self.create_scenario(scenario.name, scenario.json, store=False)
+                self.create_scenario(scenario.name, scenario.json, store=False, cid=scenario.id)
         for (name, cond) in self._conditions.items():
             cond.parse_condition()
 
@@ -257,12 +258,11 @@ class ScenarioManager:
             # delete from the db
             with self._db.session_scope():
                 scen = self._db.get_scenario_by_name(name)
-                print scen
                 if scen:
                     self._db.del_scenario(scen.id)
             self.log.info(u"Scenario {0} deleted".format(name))
 
-    def create_scenario(self, name, json_input, store=True):
+    def create_scenario(self, name, json_input, store=True, cid=0):
         """ Create a Scenario from the provided json.
         @param name : A name for the condition instance
         @param json_input : JSON representation of the condition
@@ -294,6 +294,7 @@ class ScenarioManager:
         # create the condition itself
         c = Condition(self.log, name, json.dumps(payload['condition']), mapping=self._tests_mapping, on_true=self.trigger_actions)
         self._conditions[name] = c
+        self._conditions_ids[name] = cid
         self._conditions_actions[name] = []
         self.log.debug(u"Create condition {0} with payload {1}".format(name, payload['condition']))
         # build a list of actions
@@ -360,7 +361,7 @@ class ScenarioManager:
             inst = cls()
             res[name] = {"parameters": inst.get_expected_entries(),
                          "description": inst.get_description()}
-        return json.dumps(res)
+        return res
 
     def list_tests(self):
         """ Return the list of tests
@@ -380,17 +381,18 @@ class ScenarioManager:
             res[name] = {"parameters": inst.get_parameters(),
                          "description": inst.get_description()}
             inst.destroy()
-        return json.dumps(res)
+        return res
 
     def list_conditions(self):
         """ Return the list of conditions as JSON
         """
-
-        classes = self.__return_list_of_classes(s_c)
         res = []
-        for c in classes:
-            res.append(c[0])
-        return json.dumps(res)
+        for name in self._conditions:
+            c = {}
+            c['name'] = name
+            c['id'] = self._conditions_ids[name]
+            res.append(c)
+        return res
 
     def list_parameters(self):
         """ Return the list of parameters as JSON
