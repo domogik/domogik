@@ -378,8 +378,16 @@ class ScenarioManager:
         tests = self.__return_list_of_classes(s_t)
         for name, cls in tests:
             inst = cls()
-            res[name] = {"parameters": inst.get_parameters(),
-                         "description": inst.get_description()}
+            res[name] = []
+            for p, i in inst.get_parameters().iteritems():
+                for param, info in i['expected'].iteritems():
+                    res[name].append({
+                            "name": param,
+                            "description": info['description'],
+                            "type": info['type'],
+                            "values": info['values'],
+                            "filters": info['filters'],
+                        })
             inst.destroy()
         return res
 

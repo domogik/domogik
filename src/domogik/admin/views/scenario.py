@@ -122,16 +122,15 @@ def scenario_blocks_tests():
             for test, params in res.iteritems():
                 p = []
                 jso = ""
-                for par, parv in params['parameters'].iteritems():
-                    par = parv['expected'].keys()[0]
-                    parv = parv['expected'][par]
+                for parv in params:
+                    par = parv['name']
                     papp = "this.appendDummyInput().appendField('{0}')".format(parv['description'])
                     if parv['type'] == 'string':
                         jso = '{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
-                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
+                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
                     elif parv['type'] == 'integer':
                         jso = '{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
+                        papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
                     p.append(papp)
                 add = """Blockly.Blocks['{0}'] = {{
                             init: function() {{
@@ -144,7 +143,7 @@ def scenario_blocks_tests():
                                 this.contextMenu = false;
                             }}
                         }};
-                        """.format(test, '\n'.join(p), params['description'], jso)
+                        """.format(test, '\n'.join(p), parv['description'], jso)
                 js = '{0}\n\r{1}'.format(js, add)
     return Response(js, content_type='text/javascript; charset=utf-8')
 
