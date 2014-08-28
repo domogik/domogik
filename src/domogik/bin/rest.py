@@ -38,8 +38,8 @@ from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.plugin import Plugin
 from domogik.common import logger
 from domogik.rest.url import urlHandler
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 from domogik.common.configloader import Loader
 from domogik.common.utils import get_ip_for_interfaces
 import locale

@@ -2,8 +2,8 @@
 
 import zmq
 from zmq.eventloop.ioloop import IOLoop
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 
 cli = MQSyncReq(zmq.Context())
 msg = MQMessage()

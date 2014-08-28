@@ -36,8 +36,8 @@ Usage
 
 import zmq
 from zmq.eventloop.ioloop import IOLoop
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 from domogik.tests.common.helpers import get_rest_url
 from domogik.common.utils import get_sanitized_hostname
 from domogik.tests.common.testsensor import TestSensor

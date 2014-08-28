@@ -5,8 +5,8 @@ import zmq
 import json
 from time import sleep
 
-from domogik.mq.message import MQMessage
-from domogik.mq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
 
 z = zmq.Context()
 m = MQMessage('test.list', {})

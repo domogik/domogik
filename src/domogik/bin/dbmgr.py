@@ -43,9 +43,9 @@ from domogik.common.jsondata import domogik_encoder
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.xpl.common.plugin import Plugin
 from domogik.common.database import DbHelper
-from domogik.mq.reqrep.worker import MQRep
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.worker import MQRep
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
 import time
 import zmq

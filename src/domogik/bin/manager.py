@@ -78,11 +78,11 @@ from domogik.common.queryconfig import Query
 from domogik.common.baseplugin import FIFO_DIR
 
 import zmq
-from domogik.mq.pubsub.subscriber import MQAsyncSub
+from domogikmq.pubsub.subscriber import MQAsyncSub
 from zmq.eventloop.ioloop import IOLoop
-#from domogik.mq.reqrep.worker import MQRep   # moved in XplPlugin
-from domogik.mq.message import MQMessage
-from domogik.mq.pubsub.publisher import MQPub
+#from domogikmq.reqrep.worker import MQRep   # moved in XplPlugin
+from domogikmq.message import MQMessage
+from domogikmq.pubsub.publisher import MQPub
 
 from domogik.xpl.common.xplconnector import XplTimer
 from domogik.common.packagejson import PackageJson, PackageException

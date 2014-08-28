@@ -5,8 +5,8 @@ from flask import request
 import zmq
 import copy
 import json
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 
 @urlHandler.route('/device/old/', methods=['GET'])
 @json_response

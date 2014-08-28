@@ -46,10 +46,10 @@ from domogik.common.utils import ucode
 from domogik.common.queryconfig import Query
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
-from domogik.mq.pubsub.publisher import MQPub
-from domogik.mq.reqrep.worker import MQRep
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.pubsub.publisher import MQPub
+from domogikmq.reqrep.worker import MQRep
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
 from domogik.common.packagejson import PackageJson, PackageException
 import zmq

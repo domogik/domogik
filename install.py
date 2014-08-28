@@ -172,7 +172,6 @@ def is_domogik_advanced(advanced_mode, sect, key):
                 'log_dir_path', 'pid_dir_path', 'broadcast'],
         'database': ['db_prefix', 'pool_recycle'],
         'rest': ['rest_server_port', 'rest_use_ssl', 'rest_ssl_certificate'],
-        'mq': ['req_rep_port', 'pub_port', 'sub_port'],
     }
     if advanced_mode:
         return True
@@ -350,7 +349,7 @@ def install():
     try:
         # CHECK python version
         if sys.version_info < (2, 6):
-            print "Python version is to low, at least python 2.6 is needed"
+            fail("Python version is to low, at least python 2.6 is needed")
             exit(0)
 
         # CHECK sources not in / or /root
@@ -362,6 +361,14 @@ def install():
         info("Check this script is started as root")
         assert os.getuid() == 0, "This script must be started as root"
         ok("Correctly started with root privileges.")
+    
+        # CHECK mq installed
+        info("Check that domogik-mq is installed")
+        try:
+            import domogikmq
+        except ImportError:
+            fail("Please install Domogik MQ first! (https://github.com/domogik/domogik-mq)")
+            exit(0)
 
         if args.dist_packages:
             dist_packages_install_script = ''

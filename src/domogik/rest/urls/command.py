@@ -8,9 +8,9 @@ import json
 from subprocess import Popen, PIPE
 from flask import Response, request
 from domogik.common.utils import call_package_conversion
-from domogik.mq.pubsub.subscriber import MQSyncSub
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.pubsub.subscriber import MQSyncSub
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 
 @urlHandler.route('/cmd/id/<int:cid>', methods=['GET'])
 @json_response

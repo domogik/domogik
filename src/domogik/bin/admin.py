@@ -41,9 +41,9 @@ from domogik.common.plugin import Plugin
 from domogik.common import logger
 from domogik.common.configloader import Loader
 from domogik.common.utils import get_ip_for_interfaces
-from domogik.mq.pubsub.subscriber import MQAsyncSub
-from domogik.mq.message import MQMessage
-from domogik.mq.reqrep.client import MQSyncReq
+from domogikmq.pubsub.subscriber import MQAsyncSub
+from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
 from domogik.admin.application import app as admin_app
 import locale
 import traceback

@@ -37,10 +37,8 @@ import zmq
 from zmq.eventloop.ioloop import IOLoop
 from domogik.common.configloader import Loader
 from domogik.common.utils import get_ip_for_interfaces, is_already_launched
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
-
-
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 
 ### Common features
 

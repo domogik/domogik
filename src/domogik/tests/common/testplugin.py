@@ -35,10 +35,9 @@ Usage
 
 import zmq
 from zmq.eventloop.ioloop import IOLoop
-from domogik.mq.reqrep.client import MQSyncReq
-#from domogik.mq.pubsub.subscriber import MQSyncSub
-from domogik.mq.pubsub.subscriber import MQAsyncSub
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.pubsub.subscriber import MQAsyncSub
+from domogikmq.message import MQMessage
 from domogik.common.plugin import STATUS_ALIVE, STATUS_STOPPED
 import json
 

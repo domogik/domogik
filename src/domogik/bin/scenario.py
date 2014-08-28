@@ -38,8 +38,8 @@ import traceback
 
 from domogik.scenario.manager import ScenarioManager
 from domogik.xpl.common.plugin import Plugin
-from domogik.mq.reqrep.worker import MQRep
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.worker import MQRep
+from domogikmq.message import MQMessage
 
 class ScenarioFrontend(Plugin):
     """ This class provides an interface to MQ system to allow Scenarii management.

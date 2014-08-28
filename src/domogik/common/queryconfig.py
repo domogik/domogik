@@ -41,8 +41,8 @@ from threading import Event
 from domogik.common.utils import get_sanitized_hostname 
 
 import zmq
-from domogik.mq.message import MQMessage
-from domogik.mq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
 
 QUERY_CONFIG_WAIT = 5
 

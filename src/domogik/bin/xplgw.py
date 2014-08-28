@@ -36,11 +36,11 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.database import DbHelper
 from domogik.xpl.common.xplmessage import XplMessage
-from domogik.mq.pubsub.publisher import MQPub
-from domogik.mq.pubsub.subscriber import MQSyncSub
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
-from domogik.mq.pubsub.subscriber import MQAsyncSub
+from domogikmq.pubsub.publisher import MQPub
+from domogikmq.pubsub.subscriber import MQSyncSub
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
+from domogikmq.pubsub.subscriber import MQAsyncSub
 import time
 import traceback
 import calendar
