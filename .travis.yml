@@ -13,6 +13,7 @@ install:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-dependencies.sh
 before_script:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-setup-database.sh
+  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik-mq.sh
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik.sh
   - sudo $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-start-domogik.sh
 script:
