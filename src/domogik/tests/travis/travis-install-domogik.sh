@@ -10,9 +10,10 @@ sudo chown $LOGNAME:root /var/lock/domogik/config.lock
 echo "==== Installing domogik-mq"
 wget https://github.com/domogik/domogik-mq/archive/master.zip
 unzip master.zip
-cd domogik-mq
+cd domogik-mq-master
 pip install .
 sudo python install.py --no-setup --no-test --user domogik --command-line
+cd ..
 
 echo "==== RUNNING SETUP.py"
 #sudo python setup.py install
