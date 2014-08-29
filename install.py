@@ -329,6 +329,8 @@ def install():
                    default=True, help='Don\'t create a user')
     parser.add_argument('--no-db-upgrade', dest='db', action="store_true",
                    default=False, help='Don\'t do a db upgrade')
+    parser.add_argument('--no-mq-check', dest='mq', action="store_true",
+                   default=False, help='Don\'t check the mq package')
     parser.add_argument('--no-db-backup', dest='skip_database_backup', action="store_true",
                    default=False, help='Don\'t do a db backup')
     parser.add_argument("--user",
@@ -363,12 +365,13 @@ def install():
         ok("Correctly started with root privileges.")
     
         # CHECK mq installed
-        info("Check that domogik-mq is installed")
-        try:
-            import domogikmq
-        except ImportError:
-            fail("Please install Domogik MQ first! (https://github.com/domogik/domogik-mq)")
-            exit(0)
+        if not args.mq:
+            info("Check that domogik-mq is installed")
+            try:
+                import domogikmq
+            except ImportError:
+                fail("Please install Domogik MQ first! (https://github.com/domogik/domogik-mq)")
+                exit(0)
 
         if args.dist_packages:
             dist_packages_install_script = ''
