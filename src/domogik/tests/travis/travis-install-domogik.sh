@@ -7,6 +7,13 @@ sudo chown $LOGNAME:root /var/lock/domogik
 sudo touch /var/lock/domogik/config.lock
 sudo chown $LOGNAME:root /var/lock/domogik/config.lock
 
+echo "==== Installing domogik-mq"
+wget https://github.com/domogik/domogik-mq/archive/master.zip
+unzip master.zip
+cd domogik-mq
+pip install .
+sudo python install.py --no-setup --no-test --user domogik --command-line
+
 echo "==== RUNNING SETUP.py"
 #sudo python setup.py install
 pip install .
@@ -25,4 +32,5 @@ sudo chown $LOGNAME:root /var/lock/domogik
 sudo chown $LOGNAME:root /var/lock/domogik/config.lock
 #sudo chown $LOGNAME:root /var/log/domogik/*
 ls -l /var/lock/domogik/
+
 
