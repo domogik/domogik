@@ -16,7 +16,7 @@ echo "==== RUNNING SETUP.py"
 pip install .
 
 echo "==== RUNNING INSTALL.py"
-sudo python install.py --no-setup --no-test --user domogik --command-line --daemon --no-check
+sudo python install.py --no-setup --no-test --user domogik --command-line --daemon
 
 echo "==== SOME CLEANUP stuff"
 cd ..
