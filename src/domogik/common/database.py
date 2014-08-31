@@ -54,7 +54,7 @@ from domogik.common.sql_schema import (
         Device, DeviceStats, DeviceParam,
         PluginConfig, Person,
         UserAccount,
-        Scenario, ScenarioUUID,
+        Scenario,
         Command, CommandParam,
         Sensor, SensorHistory,
         XplCommand, XplStat, XplStatParam, XplCommandParam
@@ -1776,56 +1776,6 @@ class DbHelper():
             except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return scenario
-        else:
-            self.__raise_dbhelper_exception("Couldn't delete scenario with id %s : it doesn't exist" % s_id)
-
-###################
-# ScenarioUUID
-###################
-    def list_scenario_uuid(self):
-        return self.__session.query(ScenarioUUID).all()
-
-    def get_scenario_uuid(self, u_id):
-        return self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
-
-    def add_scenario_uuid(self, s_id, uuid, key, is_test):
-        self.__session.expire_all()
-        scenariouuid = ScenarioUUID(s_id=s_id, uuid=uuid, key=key, is_test=is_test)
-        self.__session.add(scenariouuid)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return scenariouuid
-
-    def update_scenario_uuid(self, u_id, uuid=None, key=None, is_test=None):
-        self.__session.expire_all()
-        scenariouuid = self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
-        if scenariouuid is None:
-            self.__raise_dbhelper_exception("ScenarioUUID with id %s couldn't be found" % u_id)
-        if uuid is not None:
-            scenariouuid.uuid = ucode(uuid)
-        if key is not None:
-            scenariouuid.key = ucode(key)
-        if is_test is not None:
-            scenariouuid.is_test = is_test
-        self.__session.add(scenariouuid)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return scenariouuid
-
-    def del_scenario_uuid(self, u_id):
-        self.__session.expire_all()
-        scenariouuid = self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
-        if scenariouuid is not None:
-            self.__session.delete(scenariouuid)
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            return scenariouuid
         else:
             self.__raise_dbhelper_exception("Couldn't delete scenario with id %s : it doesn't exist" % s_id)
 

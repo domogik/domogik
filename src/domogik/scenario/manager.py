@@ -43,7 +43,7 @@ import domogik.scenario.parameters as s_p
 import domogik.scenario.conditions as s_c
 import domogik.scenario.actions as s_a
 from domogik.common.database import DbHelper
-from domogik.scenario.conditions.condition import Condition
+from domogik.scenario.scenario import ScenarioInstance
 from exceptions import KeyError
 
 
@@ -102,21 +102,10 @@ class ScenarioManager:
         """ Create ScenarioManager instance
             @param log : Logger instance
         """
-        # Keep uuid <-> instance mapping for tests and actions
-        self._tests_mapping = {}
-        self._actions_mapping = {}
         # Keep list of conditions as name : instance
-        self._conditions = {}
-        self._conditions_ids = {}
-        # Keep list of actions uuid linked to a condition  as name : [uuid1, uuid2, ... ]
-        self._conditions_actions = {}
+        self._instances = {}
         # an instance of the logger
         self.log = log
-        # As we lazy-load all the tests/actions in __instanciate
-        # we need to keep the module in a list so that we don't need to reload them
-        # every time.
-        self._test_cache = {}
-        self._action_cache = {}
         # load all scenarios from the DB
         self._db = DbHelper()
         self.load_scenarios()
@@ -127,96 +116,13 @@ class ScenarioManager:
         """
         with self._db.session_scope():
             for scenario in self._db.list_scenario():
-                # add all uuids to the mappings
-                for uid in scenario.uuids:
-                    if uid.is_test:
-                        self.__ask_instance(uid.key, self._tests_mapping, uid.uuid)
-                    else:
-                        self.__ask_instance(uid.key, self._actions_mapping, uid.uuid)
-                # now all uuids are created go and install the condition
-                self.create_scenario(scenario.name, scenario.json, store=False, cid=scenario.id)
-        for (name, cond) in self._conditions.items():
-            cond.parse_condition()
-
-    def __ask_instance(self, obj, mapping, set_uuid=None):
-        """ Generate an uuid corresponding to the object passed as parameter
-        @param obj : a string as "objectmodule.objectClass" to instanciate
-        @param mapping : in what map to store the new uuid
-        @param uuid : if the uuid is provided, don't generate it
-        @return an uuid referencing a new instance of the object
-        """
-        if set_uuid is None:
-            _uuid = self.get_uuid()
-        else:
-            _uuid = set_uuid
-        mapping[_uuid] = obj
-        return _uuid
-
-    def ask_test_instance(self, obj):
-        """ Generate an uuid corresponding to the object passed as parameter
-        @param obj : a string as "objectmodule.objectClass" to instanciate
-        @return an uuid referencing a new instance of the object
-        """
-        return self.__ask_instance(obj, self._tests_mapping)
-
-    def ask_action_instance(self, obj):
-        """ Generate an uuid corresponding to the object passed as parameter
-        @param obj : a string as "objectmodule.objectClass" to instanciate
-        @return an uuid referencing a new instance of the object
-        """
-        return self.__ask_instance(obj, self._actions_mapping)
-
-    def __instanciate(self):
-        """ This method will read the list of uuids, and create coresponding
-        instances if they don't exist yet.
-        If they don't exist yet the type of the instans is str or unicode
-        """
-        for _uuid in self._tests_mapping:
-            inst = self._tests_mapping[_uuid]
-            if type(inst) in [str, unicode]:
-                # _test_cache keeps a list of classname/class object
-                # so we have to load the module/class etc ... only once
-                if inst not in self._test_cache:
-                    mod, clas = inst.split('.')
-                    module_name = "domogik.scenario.tests.{0}".format(mod)
-                    cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
-                    self._test_cache[inst] = cobj
-                    self.log.debug(u"Add class {0} to test cache".format(inst))
-                self.log.debug(u"Create test instance {0} with uuid {1}".format(inst, _uuid))
-                self._tests_mapping[_uuid] = self._test_cache[inst](self.log, trigger=self.generic_trigger)
-        for _uuid in self._actions_mapping:
-            inst = self._actions_mapping[_uuid]
-            if type(inst) in [str, unicode]:
-                # _action_cache keeps a list of classname/class object
-                # so we have to load the module/class etc ... only once
-                if inst not in self._action_cache:
-                    mod, clas = inst.split('.')
-                    module_name = "domogik.scenario.actions.{0}".format(mod)
-                    cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
-                    self._action_cache[inst] = cobj
-                    self.log.debug(u"Add class {0} to action cache".format(inst))
-                self.log.debug(u"Create action instance {0} with uuid {1}".format(inst, _uuid))
-                self._actions_mapping[_uuid] = self._action_cache[inst](self.log)
+                self.create_scenario(scenario.name, scenario.json, scenario.id)
 
     def shutdown(self):
         """ Callback to shut down all parameters
         """
         for cond in self._conditions.keys():
             self.delete_scenario(cond, db_delete=False)
-
-    def generic_trigger(self, test_i):
-        """ Generic trigger to refresh a condition state when some value change
-        @todo allow custom triggers
-        @param test_i the test instance
-        """
-        if test_i.get_condition():
-            cond = test_i.get_condition()
-            if cond.get_parsed_condition is None:
-                return
-            st = cond.eval_condition()
-            test_i._log.info("state of condition '%s' is %s" % (cond.get_parsed_condition(), st))
-        else:  # We have no condition, just evaluate test
-            test_i.evaluate()
 
     def get_parsed_condition(self, name):
         """ Call cond.get_parsed_condition on the cond with name 'name'
@@ -229,40 +135,15 @@ class ScenarioManager:
             parsed = self._conditions[name].get_parsed_condition()
             return {'name': name, 'data': parsed}
 
-    def get_uuid(self):
-        """ Return some random uuid
-        Needs to verify that the uuid is not already used
-        Does this in the mappings (for actions and tests)
-        """
-        _uuid = str(uuid.uuid4())
-        while _uuid in self._tests_mapping.keys() \
-                or uuid in self._actions_mapping.keys():
-            _uuid = str(uuid.uuid4())
-        return _uuid
-
     def delete_scenario(self, name, db_delete=True):
         if name not in self._conditions:
             self.log.info(u"Scenario {0} doesn't exist".format(name))
             return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(name)}
         else:
-            # the condition and the tests
-            cond = self._conditions[name]
-            for tuuid in cond.destroy():
-                del self._tests_mapping[tuuid]
-            cond = None
-            del self._conditions[name]
-            # the actions
-            for action in self._conditions_actions[name]:
-                self._actions_mapping[action].destroy()
-            del self._conditions_actions[name]
-            # delete from the db
-            with self._db.session_scope():
-                scen = self._db.get_scenario_by_name(name)
-                if scen:
-                    self._db.del_scenario(scen.id)
+            # TODO
             self.log.info(u"Scenario {0} deleted".format(name))
 
-    def create_scenario(self, name, json_input, store=True, cid=0):
+    def create_scenario(self, name, json_input, cid=0):
         """ Create a Scenario from the provided json.
         @param name : A name for the condition instance
         @param json_input : JSON representation of the condition
@@ -272,10 +153,6 @@ class ScenarioManager:
             - actions => the json that will be used for creating the actions instances
         @Return {'name': name} or raise exception
         """
-        if name in self._conditions.keys():
-            self.log.error(u"A scenario with name '{0}' already exists.".format(name))
-            return {'status': 'NOK', 'msg': 'a scenario with this name already exists'}
-
         try:
             payload = json.loads(json_input)  # quick test to check if json is valid
         except Exception as e:
@@ -283,40 +160,17 @@ class ScenarioManager:
             self.log.debug(e)
             return {'status': 'NOK', 'msg': 'invallid json'}
 
-        if 'condition' not in payload.keys() \
-                or 'actions' not in payload.keys():
+        if 'IF' not in payload.keys() \
+                or 'DO' not in payload.keys():
             msg = u"the json for the scenario does not contain condition or actions for scenario {0}".format(name)
             self.log.error(msg)
             return {'status': 'NOK', 'msg': msg}
 
-        # instantiate all objects
-        self.__instanciate()
         # create the condition itself
-        c = Condition(self.log, name, json.dumps(payload['condition']), mapping=self._tests_mapping, on_true=self.trigger_actions)
-        self._conditions[name] = c
-        self._conditions_ids[name] = cid
-        self._conditions_actions[name] = []
-        self.log.debug(u"Create condition {0} with payload {1}".format(name, payload['condition']))
-        # build a list of actions
-        for action in payload['actions'].keys():
-            # action is now a tuple
-            #   (uid, params)
-            self._conditions_actions[name].append(action) 
-            self._actions_mapping[action].do_init(payload['actions'][action]) 
- 
-        # store the scenario in the db
-        if store:
-            with self._db.session_scope():
-                # store the scenario
-                scen = self._db.add_scenario(name, json_input)
-                # store the tests
-                for uuid in c.get_mapping():
-                    cls = str(self._tests_mapping[uuid].__class__).replace('domogik.scenario.tests.', '')
-                    self._db.add_scenario_uuid(scen.id, uuid, cls, 1)
-                # store the actions
-                for uuid in self._conditions_actions[name]:
-                    cls = str(self._actions_mapping[uuid].__class__).replace('domogik.scenario.actions.', '')
-                    self._db.add_scenario_uuid(scen.id, uuid, cls, 0)
+        scen = ScenarioInstance(self.log, cid, name, payload)
+        self._instances[name] = scen
+        self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
+        
         # return
         return {'name': name}
 
@@ -382,7 +236,7 @@ class ScenarioManager:
             for p, i in inst.get_parameters().iteritems():
                 for param, info in i['expected'].iteritems():
                     res[name].append({
-                            "name": param,
+                            "name": "{0}.{1}".format(p, param),
                             "description": info['description'],
                             "type": info['type'],
                             "values": info['values'],
@@ -395,36 +249,12 @@ class ScenarioManager:
         """ Return the list of conditions as JSON
         """
         res = []
-        for name in self._conditions:
-            c = {}
-            c['name'] = name
-            c['id'] = self._conditions_ids[name]
-            res.append(c)
+        #for name in self._conditions:
+        #   c = {}
+        #    c['name'] = name
+        #    c['id'] = self._conditions_ids[name]
+        #    res.append(c)
         return res
-
-    def list_parameters(self):
-        """ Return the list of parameters as JSON
-        @return a hash of hash for parameters, like :
-        { "module1.Parameter1" : {
-                "token1": {
-                    "type" : "type of token",
-                    "description": "Description of token",
-                    "default" : "default value or empty",
-                    "values" : [ "list","of","value","that","user","can","choose"],
-                    "filters" : [ "list","of","filters","or",""]
-                },
-                "token2" : { ... }
-            }
-            "module2.Parameter1" : { ... }
-        }
-        """
-        res = {}
-        params = self.__return_list_of_classes(s_p)
-        for name, cls in params:
-            inst = cls()
-            res[name] = inst.get_expected_entries()
-            inst.destroy()
-        return json.dumps(res)
 
     def __return_list_of_classes(self, package):
         """ Return the list of module/classes in a package

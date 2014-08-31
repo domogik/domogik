@@ -234,11 +234,11 @@ class AbstractParameter:
         @raise ValueError if a list_of_values has been defined for an entry and the submitted value is not in this list
         """
         for entry in params:
-            if entry not in self._expected:
-                raise AttributeError("Entry " + entry + "is not in list")
-            if entry in self.get_list_of_values() and params[entry] not in self.get_list_of_values()[entry]:
-                raise ValueError("The submitted value for entry " + entry + " is not in list of authorized values")
-        self._params = params
+            for name, val in entry.iteritems():
+                if name in self._expected:
+                    if name in self.get_list_of_values() and val not in self.get_list_of_values()[name]:
+                        raise ValueError("The submitted value for entry " + entry + " is not in list of authorized values")
+                    self._params[name] = val
         self.call_trigger(1)
 
     def evaluate(self):

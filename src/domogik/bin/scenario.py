@@ -62,7 +62,6 @@ class ScenarioFrontend(Plugin):
         mapping = {'test':
                     {
                         'list': self._backend.list_tests,
-                        'new': self._backend.ask_test_instance,
                     },
                     'scenario':
                     {
@@ -72,14 +71,9 @@ class ScenarioFrontend(Plugin):
                         'get': self._backend.get_parsed_condition,
                         'evaluate': self._backend.eval_condition
                     },
-                    'parameter':
-                    {
-                        'list': self._backend.list_parameters,
-                    },
                     'action':
                     {
                         'list': self._backend.list_actions,
-                        'new': self._backend.ask_action_instance
                     }
                 }
         try:

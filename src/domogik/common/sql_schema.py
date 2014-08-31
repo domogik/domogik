@@ -583,7 +583,6 @@ class Scenario(Base):
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     name = Column(Unicode(32), nullable=False, autoincrement=False)
     json = Column(UnicodeText(), nullable=False)
-    uuids = relationship("ScenarioUUID", backref=__tablename__, cascade="all", passive_deletes=True)
 
     def __init__(self, name, json):
         self.name = ucode(name)
@@ -591,37 +590,10 @@ class Scenario(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Scenario(id=%s name='%s' json='%s' uuids=%s)>"\
-               % (self.id, self.name, self.json, self.uuids)
+        return "<Scenario(id=%s name='%s' json='%s')>"\
+               % (self.id, self.name, self.json)
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
         return Scenario.__tablename__
-
-class ScenarioUUID(Base):
-    __tablename__ = '%s_scenario_uuid' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
-    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    scenario_id = Column(Integer, ForeignKey('%s.id' % Scenario.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False)
-    uuid = Column(Unicode(128), nullable=False, autoincrement=False)
-    key = Column(UnicodeText(), nullable=False)
-    is_test = Column(Boolean, nullable=False, default=False)
-    UniqueConstraint('uuid', name='uuid')
-
-    def __init__(self, s_id, uuid, key, is_test):
-        self.scenario_id = s_id
-        self.uuid = ucode(uuid)
-        self.key = ucode(key)
-        self.is_test = is_test
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<ScenarioUUID(id=%s scenario_id=%s name='%s' json='%s' is_test=%s)>"\
-               % (self.id, self.scenario_id, self.uuid, self.key, self.is_test)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return ScenarioUUID.__tablename__
-

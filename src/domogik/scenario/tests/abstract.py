@@ -128,11 +128,18 @@ class AbstractTest:
         @raise ValueError when parameter has not been correctly filled with provided values. 
         Note that this exception has to be raised by the Parameter
         """
-        for name in data:
-            if name not in self._parameters:
-                raise IndexError("Name " + name + "is not in known parameters for this test")
-            else:
-                self._parameters[name].fill(data[name])
+        params = {}
+        for name, val in data.iteritems():
+            param = name.split('.')
+            if len(param) == 2:
+                paramn = param[0]
+                param = param[1]
+                if paramn in self._parameters:
+                    if paramn not in params:
+                        params[paramn] = []
+                    params[paramn].append({param: val})
+        for test, param in params.iteritems():
+            self._parameters[test].fill(param)            
 
     def add_parameter(self, name, classname):
         """ Helper to add a parameter's instance to your Test instance

@@ -32,8 +32,8 @@ class TextInPageTest(AbstractTest):
     """ Simple test to check if a word is contained in an url
     """
 
-    def __init__(self, log = None, trigger = None):
-        AbstractTest.__init__(self, log, trigger)
+    def __init__(self, log = None, trigger = None, cond = None):
+        AbstractTest.__init__(self, log, trigger, cond)
         self.set_description("Check if the value for a sensor is set to a specifick txt value")
         self.add_parameter("sensor", "sensor_id.SensorIdParameter")
         self.add_parameter("value", "text.TextParameter")
