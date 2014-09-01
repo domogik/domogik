@@ -583,15 +583,17 @@ class Scenario(Base):
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     name = Column(Unicode(32), nullable=False, autoincrement=False)
     json = Column(UnicodeText(), nullable=False)
+    disabled = Column(Boolean, nullable=True)
 
-    def __init__(self, name, json):
+    def __init__(self, name, json, disabled=False):
         self.name = ucode(name)
         self.json = ucode(json)
+        self.disabled = disabled
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Scenario(id=%s name='%s' json='%s')>"\
-               % (self.id, self.name, self.json)
+        return "<Scenario(id=%s name='%s' json='%s' disabled=%s)>"\
+               % (self.id, self.name, self.json, self.disabled)
 
     @staticmethod
     def get_tablename():
