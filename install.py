@@ -150,11 +150,12 @@ def ask_user_name():
     debug("Username will be {0}".format(d_user))
     return d_user
 
-def create_user(d_user):
+def create_user(d_user, d_shell = "/bin/sh"):
     info("Create domogik user")
     if d_user not in [x[0] for x in pwd.getpwall()]:
         print("Creating the {0} user and add it to dialout".format(d_user))
-        cmd_line = 'adduser --system {0} --shell /bin/sh '.format(d_user)
+        #cmd_line = 'adduser --system {0} --shell /bin/sh '.format(d_user)
+        cmd_line = 'adduser --system {0} --shell {1} '.format(d_user, d_shell)
         debug(cmd_line)
         os.system(cmd_line)
         cmd_line = 'adduser {0} dialout'.format(d_user)
@@ -335,6 +336,8 @@ def install():
                    default=False, help='Don\'t do a db backup')
     parser.add_argument("--user",
                    help="Set the domogik user")
+    parser.add_argument("--user-shell", dest="user_shell",
+                   help="Set the domogik user shell")
 
     # generate dynamically all arguments for the various config files
     # notice that we MUST NOT have the same sections in the different files!
@@ -400,7 +403,10 @@ def install():
 
         # create user
         if args.user_creation:
-            create_user(user)
+            if args.user_shell:
+                create_user(user, args.user_shell)
+            else:
+                create_user(user)
 
         # Copy files
         copy_files(user)
