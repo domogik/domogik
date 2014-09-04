@@ -18,6 +18,9 @@ echo "==== /var/lock/domogik/ ===="
 ls -l /var/lock/domogik/
 ls -ld /var/lock/domogik/
 echo "\n\n\n"
+echo "==== /etc/passwd ===="
+cat /etc/passwd
+echo "\n\n\n"
 # TODO END
 
 /etc/init.d/domogik-mq start
