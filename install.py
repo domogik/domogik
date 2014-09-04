@@ -403,6 +403,7 @@ def install():
 
         # create user
         if args.user_creation:
+            print("XXXXXXXXX {0}".format(args.user_shell))
             if args.user_shell:
                 create_user(user, args.user_shell)
             else:
