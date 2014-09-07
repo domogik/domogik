@@ -10,7 +10,6 @@ mysql:
   username: travis
   encoding: utf8
 install:
-  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-change-shell.sh
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-dependencies.sh
 before_script:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-setup-database.sh
