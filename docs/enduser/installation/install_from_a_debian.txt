@@ -13,7 +13,7 @@ Installation
 Dependencies
 ------------
 
-Install Python and setuptools
+Install Python and setuptools ::
 
     $ sudo apt-get install python python-setuptools python-pip
 
@@ -48,8 +48,8 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
     $ sudo ./install.py --dist-packages --create-database
 
 .. note:: 
-    --dist-packages option will automaticaly install debian package dependency with apt-get tool.
-    --create-database option will automaticaly try to create domogik database and give all privilege to domogik in on it.
+    \--dist-packages option will automaticaly install debian package dependency with apt-get tool.
+    \--create-database option will automaticaly try to create domogik database and give all privilege to domogik in on it.
 
 .. note::
    Domogik uses a configuration file which is created and configured by the *install.py* script. This file is */etc/domogik/domogik.cfg*. For more informations, please read :doc:`the page related to the configuration file <domogik_cfg_file>`.
@@ -57,14 +57,6 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 
     During installation, a new user will be created if necessary.
     
-    If you want to use the C xPL hub instead of the python xPL hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hub.
-
-.. note::
-    adduser don't create 
-
-.. todo::
-    Describe all the steps
-
 
 Make Domogik start with your computer
 -------------------------------------
@@ -93,10 +85,10 @@ It will start :
 * The database manager and the REST interface module (which will take in account the parameters you defined in your configuration file : host, IP...)
 * The administration web interface
 
-Next step : domoweb, the web user interface
+Next step : Domoweb, the web user interface
 -------------------------------------------
 
-Domoweb is not yet available for Domogik 0.4
+Check in the Domoweb documentation.
 
 It doesn't work?
 ----------------

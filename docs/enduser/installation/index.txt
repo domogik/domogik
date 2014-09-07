@@ -162,7 +162,7 @@ It will start :
 Next step : domoweb, the web user interface
 -------------------------------------------
 
-Domoweb is not yet available for Domogik 0.4
+Check in the Domoweb documentation.
 
 It doesn't work?
 ----------------
