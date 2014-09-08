@@ -15,7 +15,7 @@ Domogik components can be installed with no user interaction : the *install.py* 
 Domogik-mq usage
 ================
 
-To know all the options available to install Domogik-mq, you can just launch *install.py* with the -*h *option: ::
+To know all the options available to install Domogik-mq, you can just launch *install.py* with the **-h** option: ::
 
 
     usage: install.py [-h] [--no-setup] [--no-test] [--no-config]
@@ -58,7 +58,7 @@ To know all the options available to install Domogik-mq, you can just launch *in
 Domogik usage
 =============
 
-To know all the options available to install Domogik, you can just launch *install.py* with the -*h *option: ::
+To know all the options available to install Domogik, you can just launch *install.py* with the **-h** option: ::
 
     $ sudo ./install.py -h
     usage: install.py [-h] [--dist-packages] [--create-database] [--no-setup]
@@ -116,17 +116,17 @@ To know all the options available to install Domogik, you can just launch *insta
     
     ...
 
-All configuration options which start by *domogik*, *database*, *rest*, *admin* or *hub* are related to parameters from the Domogik configuration file */etc/domogik/domogik.cfg*.
+All configuration options which start by *domogik*, *database*, *rest*, *admin* or *hub* are related to parameters from the Domogik configuration file **/etc/domogik/domogik.cfg**.
 
 The other options are specific:
 
-* **--no-setup**:  the *setup.py* script which install python dependencies and Domogik python package won't be run. This can be usefull for :doc:`setting a Domogik in a virtualenv <virtualenv>`.
-* **--no-test**: the *test_config.py* script won't be executed after the installation.
-* **--no-config**: there won't be any update of the configuration files.
-* **--no-create-user**: the user won't be created during installation.
-* **--user <login>**: set the login which will be used by Domogik (default is *domogik*)
-* **--user-shell <user shell>**: set the shell which will be used by the user (default is /bin/sh)
-* **--command-line**: the configuration files will be update from the command line. If not set, the user will be prompted for the main parameters value.
+* **\--no-setup**:  the *setup.py* script which install python dependencies and Domogik python package won't be run. This can be usefull for :doc:`setting a Domogik in a virtualenv <virtualenv>`.
+* **\--no-test**: the *test_config.py* script won't be executed after the installation.
+* **\--no-config**: there won't be any update of the configuration files.
+* **\--no-create-user**: the user won't be created during installation.
+* **\--user <login>**: set the login which will be used by Domogik (default is *domogik*)
+* **\--user-shell <user shell>**: set the shell which will be used by the user (default is /bin/sh)
+* **\--command-line**: the configuration files will be update from the command line. If not set, the user will be prompted for the main parameters value.
 
 How to use it
 =============
