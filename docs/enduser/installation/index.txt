@@ -164,9 +164,11 @@ Start domogik
 
 ::
 
-    $ sudo /etc/init.d/domogik start
+    $ sudo /etc/init.d/domogik-mq start
     * Starting 0MQ broker ... Done.
     * Starting 0MQ forwarder ... Done.
+
+    $ sudo /etc/init.d/domogik start
     * Starting xPL (python version)... Done.
     * Starting Manager (with -d -r -x -s)... Done.
     * Starting the admin interface ... Done.
