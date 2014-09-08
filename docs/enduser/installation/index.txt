@@ -147,6 +147,7 @@ Install Domogik-mq
     Focus on some options :
 
     * *Install MQ as master (lib+daemon) or client (lib only) ? [M/s]*
+
       On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.4), on the main server, choose the default option and on the other servers, choose the client option.
 
 Install Domogik 
