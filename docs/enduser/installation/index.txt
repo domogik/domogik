@@ -34,22 +34,13 @@ Install the needed dependencies :
 * various needed libraries : mako, libffi
 
 .. note::
-    Even if setuptools is installed automatically thanks to the *setup.py* script, we need to install it before launching *install.py* : it is needed to use the *pkg_resources* module which is needed during the installation for activating the *domogik* module.
-
-    Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
+    * Even if setuptools is installed automatically thanks to the *setup.py* script, we need to install it before launching *install.py* : it is needed to use the *pkg_resources* module which is needed during the installation for activating the *domogik* module.
+    * Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
 
 ::
 
-    $ sudo apt-get install python2.7-dev gcc g++
-    $ sudo apt-get install python-setuptools pip
-    $ sudo apt-get install libssl-dev 
-    $ sudo apt-get install libzmq-dev
-    $ sudo apt-get install libpq-dev python-psycopg2
-    $ sudo apt-get install python-mako
-    $ sudo apt-get install libffi-dev
+    $ sudo apt-get install python2.7-dev gcc g++ python-setuptools pip libssl-dev libzmq-dev libpq-dev python-psycopg2 python-mako libffi-dev
 
-
-.. note::
 
 Mysql server
 ------------
