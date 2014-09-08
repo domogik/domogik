@@ -120,13 +120,13 @@ All configuration options which start by *domogik*, *database*, *rest*, *admin* 
 
 The other options are specific:
 
-* **\--no-setup**:  the *setup.py* script which install python dependencies and Domogik python package won't be run. This can be usefull for :doc:`setting a Domogik in a virtualenv <virtualenv>`.
-* **\--no-test**: the *test_config.py* script won't be executed after the installation.
-* **\--no-config**: there won't be any update of the configuration files.
-* **\--no-create-user**: the user won't be created during installation.
-* **\--user <login>**: set the login which will be used by Domogik (default is *domogik*)
-* **\--user-shell <user shell>**: set the shell which will be used by the user (default is /bin/sh)
-* **\--command-line**: the configuration files will be update from the command line. If not set, the user will be prompted for the main parameters value.
+* ``--no-setup``:  the *setup.py* script which install python dependencies and Domogik python package won't be run. This can be usefull for :doc:`setting a Domogik in a virtualenv <virtualenv>`.
+* ``--no-test``: the *test_config.py* script won't be executed after the installation.
+* ``--no-config``: there won't be any update of the configuration files.
+* ``--no-create-user``: the user won't be created during installation.
+* ``--user <login>``: set the login which will be used by Domogik (default is *domogik*)
+* ``--user-shell <user shell>``: set the shell which will be used by the user (default is /bin/sh)
+* ``--command-line``: the configuration files will be update from the command line. If not set, the user will be prompted for the main parameters value.
 
 How to use it
 =============
