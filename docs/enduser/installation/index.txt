@@ -74,18 +74,17 @@ Create the user "domogik" to use the new database: ::
 
     mysql>exit
 
-Download Domogik
-----------------
+Download Domogik components
+---------------------------
 
 .. warning::
-    You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be carefull if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
-    
-    * don't download Domogik sources in */root* or */*
+    * You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be carefull if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
+    * Don't download Domogik sources directly in */root* or */*
+    * The folder path must also not contains any spaces in its name!
 
 .. note::
-   Please keep in mind that the folder which will be used to get the sources will be the one used by Domogik installation. So please put it in a proper folder (the following command lines will use **/opt/**).
+   The following commands assume that you are using the **/opt/** folder as the root folder for Domogik. And so Domogik will be installed in the */opt/domogik/* folder.
 
-   The folder path must also not contains any spaces in its name!
 
 Two components are needed to install domogik : 
 

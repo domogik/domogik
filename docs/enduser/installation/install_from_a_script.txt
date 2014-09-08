@@ -2,14 +2,61 @@
 Install Domogik from a script
 =============================
 
+.. todo::
+
+    Add the domogik-mq install script
+
 Purpose
 =======
 
-Domogik can be installed with no user interaction : the *install.py* script has options for each configuration parameters. This is usefull for packagers or people who want to automatically deploy some Domogik systems.
+Domogik components can be installed with no user interaction : the *install.py* scripts has options for each configuration parameters. This is usefull for packagers or people who want to automatically deploy some Domogik systems.
 
 
-Usage
-=====
+Domogik-mq usage
+================
+
+To know all the options available to install Domogik-mq, you can just launch *install.py* with the -*h *option: ::
+
+
+    usage: install.py [-h] [--no-setup] [--no-test] [--no-config]
+                      [--no-create-user] [--daemon] [--user USER]
+                      [--user-shell USER_SHELL] [--command-line]
+                      [--mq_log_dir_path MQ_LOG_DIR_PATH]
+                      [--mq_pid_dir_path MQ_PID_DIR_PATH]
+                      [--mq_log_level MQ_LOG_LEVEL] [--mq_ip MQ_IP]
+                      [--mq_req_rep_port MQ_REQ_REP_PORT]
+                      [--mq_pub_port MQ_PUB_PORT] [--mq_sub_port MQ_SUB_PORT]
+    
+    Domogik MQ installation.
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      --no-setup            Don't install the python packages
+      --no-test             Don't run a config test
+      --no-config           Don't run a config writer
+      --no-create-user      Don't create a user
+      --daemon              Install the daemon
+      --user USER           Set the domogik user
+      --user-shell USER_SHELL
+                            Set the domogik user shell
+      --command-line        Configure the configuration files from the command
+                            line only
+      --mq_log_dir_path MQ_LOG_DIR_PATH
+                            Update section mq, key log_dir_path value
+      --mq_pid_dir_path MQ_PID_DIR_PATH
+                            Update section mq, key pid_dir_path value
+      --mq_log_level MQ_LOG_LEVEL
+                            Update section mq, key log_level value
+      --mq_ip MQ_IP         Update section mq, key ip value
+      --mq_req_rep_port MQ_REQ_REP_PORT
+                            Update section mq, key req_rep_port value
+      --mq_pub_port MQ_PUB_PORT
+                            Update section mq, key pub_port value
+      --mq_sub_port MQ_SUB_PORT
+                            Update section mq, key sub_port value
+
+Domogik usage
+=============
 
 To know all the options available to install Domogik, you can just launch *install.py* with the -*h *option: ::
 
@@ -35,9 +82,7 @@ To know all the options available to install Domogik, you can just launch *insta
                       [--rest_use_ssl REST_USE_SSL]
                       [--rest_ssl_certificate REST_SSL_CERTIFICATE]
                       [--rest_ssl_key REST_SSL_KEY]
-                      [--rest_clean_json REST_CLEAN_JSON] [--mq_ip MQ_IP]
-                      [--mq_req_rep_port MQ_REQ_REP_PORT]
-                      [--mq_pub_port MQ_PUB_PORT] [--mq_sub_port MQ_SUB_PORT]
+                      [--rest_clean_json REST_CLEAN_JSON]
                       [--admin_interfaces ADMIN_INTERFACES]
                       [--admin_port ADMIN_PORT] [--admin_use_ssl ADMIN_USE_SSL]
                       [--admin_ssl_certificate ADMIN_SSL_CERTIFICATE]
@@ -71,7 +116,7 @@ To know all the options available to install Domogik, you can just launch *insta
     
     ...
 
-All configuration options which start by *domogik*, *database*, *rest*, *mq*, *admin* or *hub* are related to parameters from the Domogik configuration file */etc/domogik/domogik.cfg*.
+All configuration options which start by *domogik*, *database*, *rest*, *admin* or *hub* are related to parameters from the Domogik configuration file */etc/domogik/domogik.cfg*.
 
 The other options are specific:
 
@@ -83,8 +128,8 @@ The other options are specific:
 * **--user-shell <user shell>**: set the shell which will be used by the user (default is /bin/sh)
 * **--command-line**: the configuration files will be update from the command line. If not set, the user will be prompted for the main parameters value.
 
-Usages examples
-===============
+How to use it
+=============
 
 I am a core developper, can these options help me ?
 ---------------------------------------------------
@@ -95,16 +140,25 @@ Of course! Here is an example of one developper script named *do_install.sh*. Th
 
     # stop domogik
     /etc/init.d/domogik stop
+    /etc/init.d/domogik-mq stop
     
     # create database
-    mysql -uroot -pxxxxx << EOF
+    mysql -uroot -plapinous << EOF
       DROP database dmgtest10;
       CREATE DATABASE dmgtest10;
       GRANT ALL PRIVILEGES ON dmgtest10.* to domogik@localhost IDENTIFIED BY 'domopass';
     EOF
     
+    # install domogik-mq
+    cd ../domogik-mq/
+    python install.py \
+    --daemon \
+    --user fritz \
+    --command-line \
+    --mq_ip 192.168.1.10 
     
     # install domogik
+    cd ../domogik/
     python install.py \
     --user fritz \
     --command-line \
@@ -113,16 +167,16 @@ Of course! Here is an example of one developper script named *do_install.sh*. Th
     --database_name dmgtest10 \
     --rest_interfaces eth0 \
     --rest_clean_json True \
-    --mq_ip 192.168.1.10 \
     --hub_interfaces eth0 \
     --hub_log_level info \
     --hub_log_bandwidth True \
     --hub_log_invalid_data True
     
-    # start xml and mq
+    # start components
+    /etc/init.d/domogik-mq start 
     /etc/init.d/domogik start 
 
-As you can see, the developper only set the options he needed to change.
+As you can see, the developper only set the options he needs to change.
 
 
 Automated tests

@@ -75,15 +75,6 @@ ssl_key =
 clean_json = False
 
 ###
-# Messaging section
-###
-[mq]
-ip = 127.0.0.1
-req_rep_port = 40410
-pub_port = 40411
-sub_port = 40412
-
-###
 # Admin interface
 ###
 [admin]
