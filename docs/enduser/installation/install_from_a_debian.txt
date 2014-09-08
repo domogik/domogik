@@ -2,6 +2,10 @@
 Standard installation on debian (Jessie)
 ========================================
 
+.. todo::
+
+    Review for domogik-mq component addition
+
 Installation
 ============
 

@@ -104,13 +104,50 @@ Download Domogik
 
    The folder path must also not contains any spaces in its name!
 
+Two components are needed to install domogik : 
+
+* domogik-mq : the message queue component used by all components which want/need to use the MQ (Domogik, Domoweb, ...)
+* domogik
+
 Use git to get the sources (be sure that your user is able to create some directories where you will clone the sources): ::
 
     $ sudo apt-get install git
+
+Download Domogik-mq : ::
+
+    $ cd /opt/
+    $ git clone https://github.com/domogik/domogik-mq.git
+    $ cd domogik-mq
+    $ git checkout master
+
+Download Domogik : ::
+
     $ cd /opt/
     $ git clone https://github.com/domogik/domogik.git
     $ cd domogik
     $ git checkout master
+
+Install Domogik-mq
+------------------
+
+::
+
+    $ cd /opt/domogik-mq
+    $ sudo ./install.py
+
+
+.. todo::
+
+    Explain:
+
+    * key ip
+        
+.. note::
+
+    Focus on some options :
+
+    * *Install MQ as master (lib+daemon) or client (lib only) ? [M/s]*
+      On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.4), on the main server, choose the default option and on the other servers, choose the client option.
 
 Install Domogik 
 ---------------
@@ -121,7 +158,9 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
     $ sudo ./install.py
 
 .. note::
+
    Domogik uses a configuration file which is created and configured by the *install.py* script. This file is */etc/domogik/domogik.cfg*. For more informations, please read :doc:`the page related to the configuration file <domogik_cfg_file>`.
+
 .. note:: 
 
     During installation, a new user will be created if necessary.
