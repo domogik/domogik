@@ -72,21 +72,27 @@ class XplManager(XplPlugin, MQAsyncSub):
 
     def on_mdp_request(self, msg):
     # XplPlugin handles MQ Req/rep also
-        XplPlugin.on_mdp_request(self, msg)
+        try:
+            XplPlugin.on_mdp_request(self, msg)
 
-        if msg.get_action() == "reload":
-            self.load()
-            msg = MQMessage()
-            msg.set_action( 'reload.result' )
-            self.reply(msg.get())
-        elif msg.get_action() == "cmd.send":
-            self._send_xpl_command(msg)
+            if msg.get_action() == "reload":
+                self.load()
+                msg = MQMessage()
+                msg.set_action( 'reload.result' )
+                self.reply(msg.get())
+            elif msg.get_action() == "cmd.send":
+                self._send_xpl_command(msg)
+        except:
+            self.log.error(traceback.format_exc())
 
     def on_message(self, msgid, content):
-        if msgid == 'client.conversion':
-            self._parse_conversions(content)
-        elif msgid == 'client.list':
-            self._parse_xpl_target(content)
+        try:
+            if msgid == 'client.conversion':
+                self._parse_conversions(content)
+            elif msgid == 'client.list':
+                self._parse_xpl_target(content)
+        except:
+            self.log.error(traceback.format_exc())
 
     def _load_client_to_xpl_target(self):
         cli = MQSyncReq(self.zmq)
@@ -324,3 +330,4 @@ class XplManager(XplPlugin, MQAsyncSub):
 
 if __name__ == '__main__':
     EVTN = XplManager()
+        
