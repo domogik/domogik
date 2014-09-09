@@ -40,7 +40,6 @@ import uuid
 import json
 import domogik.scenario.tests as s_t
 import domogik.scenario.parameters as s_p
-import domogik.scenario.conditions as s_c
 import domogik.scenario.actions as s_a
 from domogik.common.database import DbHelper
 from domogik.scenario.scenario import ScenarioInstance
@@ -168,7 +167,7 @@ class ScenarioManager:
 
         # create the condition itself
         scen = ScenarioInstance(self.log, cid, name, payload)
-        self._instances[name] = scen
+        self._instances[cid] = {'name': name, 'json': payload, 'instance': scen } 
         self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
         
         # return
@@ -248,13 +247,7 @@ class ScenarioManager:
     def list_conditions(self):
         """ Return the list of conditions as JSON
         """
-        res = []
-        #for name in self._conditions:
-        #   c = {}
-        #    c['name'] = name
-        #    c['id'] = self._conditions_ids[name]
-        #    res.append(c)
-        return res
+        return self._instances
 
     def __return_list_of_classes(self, package):
         """ Return the list of module/classes in a package
