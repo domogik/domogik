@@ -77,6 +77,7 @@ Part of the json sample
                 "conversion": "from_level_to_DT_Switch",                # if needed define proper conversion fuction in file <plugindirectory>/conversion/<fooplugin>.py
                                                                         # conversion have utility when hard device send a particular scale or data type who are not directly compatible with Domogik Types
                 "incremental" : false,                                  # does the sensor is about incremental values
+                "timeout" : 120,                                        # value in seconds to indicate when a value is too old and so the device may be offline/broken/...
                 "history": {                                            # how is managed the sensor history.
                     "store": true,                                       
                     "duplicate": false,
@@ -90,6 +91,7 @@ Part of the json sample
                 "data_type": "DT_Scaling",
                 "conversion": "from_level_to_DT_Scaling",
                 "incremental" : false,
+                "timeout" : 0,
                 "history": {
                     "store": true,
                     "duplicate": false,
