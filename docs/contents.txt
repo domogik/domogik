@@ -61,25 +61,6 @@ Table Of Content
 	/package_development/plugins/python/detected_devices
 	/package_development/plugins/python/lib_part
 	/package_development/plugins/python/init_files
-	/package_development/plugins/old/index
-	/package_development/plugins/old/test_the_package
-	/package_development/plugins/old/data_files
-	/package_development/plugins/old/plugin_bin_part
-	/package_development/plugins/old/test_cases
-	/package_development/plugins/old/developing_an_external_member
-	/package_development/plugins/old/documentation
-	/package_development/plugins/old/packages_lifecycle
-	/package_development/plugins/old/howto
-	/package_development/plugins/old/developing
-	/package_development/plugins/old/url2xpl_files
-	/package_development/plugins/old/rules_for_version_numbers
-	/package_development/plugins/old/review
-	/package_development/plugins/old/specifications
-	/package_development/plugins/old/stats_files
-	/package_development/plugins/old/plugin_library_part
-	/package_development/plugins/old/developing_a_plugin
-	/package_development/plugins/old/generate_the_package
-	/package_development/plugins/old/icon
 	/package_development/plugins/releases/release_numbers_rules
 	/package_development/plugins/udev_rules/index
 	/package_development/plugins/field_types/index

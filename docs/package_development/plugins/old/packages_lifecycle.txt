@@ -1,5 +1,0 @@
-==================
-Package life cycle
-==================
-
-.. image:: packages_lifecycle_sozi.svg
