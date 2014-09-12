@@ -47,16 +47,19 @@ def scenario_edit(id):
     if int(id) == 0:
         name = "New scenario"
         jso = default_json
+        dis = 0
     else:
         with app.db.session_scope():
             scen = app.db.get_scenario(id)
             jso = scen.json
+            dis = scen.disabled
             name = scen.name
             jso.replace('\n', '').replace('\r', '')
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
         sname = TextField("name", default=name)
+        sdis = BooleanField("disabled", default=dis)
         sjson = HiddenField("json")
         submit = SubmitField("Send")
         pass

@@ -6,7 +6,7 @@ Technical Documentation
 =======================
 
 General informations
--------------------
+--------------------
 
 General informations:
 

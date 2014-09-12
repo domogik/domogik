@@ -1,6 +1,6 @@
-=======================================
+========================================
 info.json for plugins - commands section
-=======================================
+========================================
 
 Purpose
 =======
@@ -26,15 +26,16 @@ For each command, we define a name and the required parameters for this command.
                  "return_confirmation": true,
                  "parameters": [
                  {
-                     "key": "level",
-                     "data_type": "DT_Switch",
-                     "conversion": "from_DT_Switch_to_level"
+                    "key": "level",
+                    "data_type": "DT_Switch",
+                    "conversion": "from_DT_Switch_to_level"
                  }
                  ],
                  "xpl_command": "set_level_bin"
             },
             ...
         }
+
 
 Description
 ===========

@@ -39,7 +39,7 @@ You will get a reply like this: ::
 
 
 client.conversion.get
-==================
+=====================
 
 Request : XplGW
 Reply : manager

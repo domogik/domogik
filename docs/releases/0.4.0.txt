@@ -47,7 +47,7 @@ The REST core component has been removed and rewritten. Now it allows only to re
 It is now based on flask for url routing and is RESTFULLY : it uses HTTP methods (GET, POST, PUT, DELETE) and HTTP status codes.
 
 New XplGW core component
-----------------------
+------------------------
 
 The new xPLGW core component is the only gateway to the xpl network, this is the component that translates the mq messages to xPL commands and the received xPL message to message queue published events.
 

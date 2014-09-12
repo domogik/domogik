@@ -66,12 +66,11 @@ Starting to create the json file without being clear on these elements is useles
 * :doc:`Sensors part <json/sensors>` 
 * :doc:`Xpl stats part <json/xpl_stats>`
 * :doc:`Commands part <json/commands>` 
-* :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
-* :doc:`Json version part <json/version>` ....................................TODO
+* :doc:`Xpl commands part <json/xpl_commands>`
 
 * Resources : 
 
-  * :doc:`Data types <data_types/index>`
+  * :doc:`Data types <../../technical/data_types/index>`
   * :doc:`Field types <field_types/index>`
   * :doc:`Conversion files <conversion/index>`
 
