@@ -5,6 +5,7 @@
     <h1>{% trans %}Clients list{% endtrans %}</h1>
 
     {% if clients|length > 0 %}
+        <h2>{% trans %}Packages{% endtrans %}</h2>
         <table class="table table-striped" style="border-collapse:collapse;">
             <thead>
                 <tr>
@@ -58,7 +59,6 @@
                         <th scope="col">{% trans %}ID{% endtrans %}</th>
                         <th scope="col">{% trans %}Type{% endtrans %}</th>
                         <th scope="col">{% trans %}Status{% endtrans %}</th>
-                        <th scope="col">{% trans %}Configured{% endtrans %}</th>
                     </tr>
             </thead>
             <tbody>
@@ -68,10 +68,9 @@
                         <td>{{ name }}</td>
                         <td>{{ data.type }}</td>
                         <td>{{ data.status }}</td>
-                        <td>{{ data.configured }}</td>
                     </tr>
                     <tr id="d{{data.pid}}">
-                        <td colspan="4" class="hiddenRow">
+                        <td colspan="3" class="hiddenRow">
                             {% include 'client_overview.html' %}
                         </td>
                     </tr>
