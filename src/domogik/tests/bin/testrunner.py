@@ -91,12 +91,12 @@ class TestRunner():
         # check tests folder
 	self.log.info("- path {0}".format(self.options.directory))
         if not self.check_dir():
-            return False
+            return 
 
         # check and load the json file
         self.log.info("- json file {0}".format(self.json_file))
 	if not self.load_json():
-	    return False
+	    return
 
         # run the test cases
         self._run_testcases()
