@@ -18,7 +18,7 @@ WARNING = '\033[93m'
 FAIL = '\033[91m'
 ENDC = '\033[0m'
 
-logging.basicConfig(filename='install.log', level=logging.DEBUG)
+### define display functions
 
 def info(msg):
     logging.info(msg)
@@ -38,6 +38,19 @@ def fail(msg):
 
 def debug(msg):
     logging.debug(msg)
+
+### test if script is launch as root
+
+# CHECK run as root
+info("Check this script is started as root")
+assert os.getuid() == 0, "This script must be started as root"
+ok("Correctly started with root privileges.")
+
+logging.basicConfig(filename='install.log', level=logging.DEBUG)
+
+
+
+### other functions
 
 def get_c_hub():
     hub = {
