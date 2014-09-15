@@ -189,7 +189,7 @@ class Admin(Plugin):
         """ Stop HTTP Server
         """
         self.log.info('Stopping http server')
-        selg.http_server.stop()
+        self.http_server.stop()
  
         self.log.info('Will shutdown in 10 seconds ...' )
         io_loop = tornado.ioloop.IOLoop.instance()
