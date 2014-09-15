@@ -374,11 +374,6 @@ def install():
         print os.getcwd()
         assert os.getcwd().startswith("/root/") == False, "Domogik sources must not be located in the /root/ folder"
 
-        # CHECK run as root
-        info("Check this script is started as root")
-        assert os.getuid() == 0, "This script must be started as root"
-        ok("Correctly started with root privileges.")
-    
         # CHECK mq installed
         if not args.mq:
             info("Check that domogik-mq is installed")
