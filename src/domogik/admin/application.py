@@ -33,6 +33,7 @@ babel.init_app(app)
 
 app.jinja_env.globals['bootstrap_is_hidden_field'] =\
     is_hidden_field_filter
+app.jinja_env.add_extension('jinja2.ext.do')
 
 # in a real app, these should be configured through Flask-Appconfig
 app.config['SECRET_KEY'] = 'devkey'
