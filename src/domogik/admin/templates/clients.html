@@ -26,7 +26,7 @@
                         <td>{{ name }}</td>
                         <td>{{ data.type }}</td>
                         <td>{{ data.status }}</td>
-                        <td>{{ data.configured }}</td>
+                        <td>{% if data.configured %}<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>{% else %} <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> {% endif %}</td>
                         <td>{{ data.last_seen|datetime('basic') }}</td>
                         <td>
         				    {% if data.configured %}
