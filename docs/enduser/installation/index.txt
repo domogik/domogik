@@ -40,7 +40,7 @@ Install the needed dependencies :
 
 ::
 
-    $ sudo apt-get install python2.7-dev gcc g++ python-setuptools pip libssl-dev libzmq-dev libpq-dev python-psycopg2 python-mako libffi-dev git
+    $ sudo apt-get install python2.7-dev gcc g++ python-setuptools python-pip libssl-dev libzmq-dev libpq-dev python-psycopg2 python-mako libffi-dev git
 
 
 Mysql server

@@ -2,7 +2,16 @@
 
 {% block content %}
 <div class="container">
-  <h1>Welcome to Domogik Admin</h1>
+  <h1>{% trans %}Welcome to Domogik Admin{% endtrans %}</h1>
+  <p>{% trans %}If this is your first time on Domogik, you should read the online documentation : {% endtrans %}
+    <a href="http://docs.domogik.org/">http://docs.domogik.org/</a>.</p>
+  <p>{% trans %}To sum up, you have to :{% endtrans %}</p>
+  <ul>
+    <li>{% trans %}Install some plugins.{% endtrans %}</li>
+    <li>{% trans %}Create devices for these plugins.{% endtrans %}</li>
+    <li>{% trans %}Go to Domoweb and set some widgets with your created devices.{% endtrans %}</li>
+    <li>{% trans %}Enjoy !{% endtrans %}</li>
+  </ul>
 
 </div>
 {% endblock %}

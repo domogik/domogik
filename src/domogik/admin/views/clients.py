@@ -256,7 +256,7 @@ def client_config(client_id):
         # add the field
         setattr(F, item["key"], field)
     # add the submit button
-    field = submit = SubmitField("Save config")
+    field = submit = SubmitField("Save configuration")
     setattr(F, "submit", field)
 
     form = F()
@@ -361,7 +361,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     # add the global params
     for item in params["global"]:
         # build the field
-        name = "Global Parameter {0}".format(item["key"])
+        name = "Parameter - {0}".format(item["key"])
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
                 default = True
@@ -387,10 +387,10 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             # time, email, ipv4, ipv6, url
             field = TextField(name, [Required()], description=item["description"])
         setattr(F, "glob|{0}".format(item["key"]), field)
-    # add the global params
+    # add the xpl params
     for item in params["xpl"]:
         # build the field
-        name = "Global XPL Parameter '{0}".format(item["key"])
+        name = "xPL Parameter - '{0}".format(item["key"])
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
                 default = True

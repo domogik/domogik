@@ -3,28 +3,30 @@
 {% block content %}
 <div class="container">
     <h1>{% trans %}Clients list{% endtrans %}</h1>
+
     {% if clients|length > 0 %}
-      <table class="table table-striped" style="border-collapse:collapse;">
+        <h2>{% trans %}Packages{% endtrans %}</h2>
+        <table class="table table-striped" style="border-collapse:collapse;">
             <thead>
-                    <tr>
-                        <th scope="col">{% trans %}ID{% endtrans %}</th>
-                        <th scope="col">{% trans %}Type{% endtrans %}</th>
-                        <th scope="col">{% trans %}Status{% endtrans %}</th>
-                        <th scope="col">{% trans %}Configured{% endtrans %}</th>
-                        <th scope="col">{% trans %}Last seen{% endtrans %}</th>
-                        <th scope="col">{% trans %}Actions{% endtrans %}</th>
-                    </tr>
+                <tr>
+                    <th scope="col">{% trans %}ID{% endtrans %}</th>
+                    <th scope="col">{% trans %}Type{% endtrans %}</th>
+                    <th scope="col">{% trans %}Status{% endtrans %}</th>
+                    <th scope="col">{% trans %}Configured{% endtrans %}</th>
+                    <th scope="col">{% trans %}Last seen{% endtrans %}</th>
+                    <th scope="col">{% trans %}Actions{% endtrans %}</th>
+                </tr>
             </thead>
             <tbody>
-	    {% set count = 0 %}
+            {% set exists = [] %}
             {% for name, data in clients.iteritems() %}
                 {% if data.type != 'core' %}
-                    {% set count = count + 1 %}
+                    {% do exists.append(1) %}
                     <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle" id="{{data.pid}}">
                         <td>{{ name }}</td>
                         <td>{{ data.type }}</td>
                         <td>{{ data.status }}</td>
-                        <td>{{ data.configured }}</td>
+                        <td>{% if data.configured %}<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>{% else %} <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> {% endif %}</td>
                         <td>{{ data.last_seen|datetime('basic') }}</td>
                         <td>
         				    {% if data.configured %}
@@ -37,15 +39,15 @@
                         </td>
                     </tr>
                     <tr id="d{{data.pid}}">
-                        <td colspan="5" class="hiddenRow">
+                        <td colspan="6" class="hiddenRow">
                             {% include 'client_overview.html' %}
                         </td>
                     </tr>
                 {% endif %}
             {% endfor %}
-            {% if count == 0 %}
+            {% if not exists %}
                 <tr>
-                    <td colspan="5" class="alert alert-warning">{% trans %}At least one plugin should be installed to see a client{% endtrans %}</td>
+                    <td colspan="6" class="alert alert-warning">{% trans %}At least one package should be installed to see a client{% endtrans %}</td>
                 </tr>
             {% endif %}
             </tbody>
@@ -57,7 +59,6 @@
                         <th scope="col">{% trans %}ID{% endtrans %}</th>
                         <th scope="col">{% trans %}Type{% endtrans %}</th>
                         <th scope="col">{% trans %}Status{% endtrans %}</th>
-                        <th scope="col">{% trans %}Configured{% endtrans %}</th>
                     </tr>
             </thead>
             <tbody>
@@ -67,10 +68,9 @@
                         <td>{{ name }}</td>
                         <td>{{ data.type }}</td>
                         <td>{{ data.status }}</td>
-                        <td>{{ data.configured }}</td>
                     </tr>
                     <tr id="d{{data.pid}}">
-                        <td colspan="4" class="hiddenRow">
+                        <td colspan="3" class="hiddenRow">
                             {% include 'client_overview.html' %}
                         </td>
                     </tr>
@@ -96,7 +96,7 @@
 		}
        </script>
     {% else %}
-    <div class="alert alert-warning">{% trans %}No clients found: Is manager running?{% endtrans %}</div>
+        <div class="alert alert-warning">{% trans %}No clients found: Is Domogik manager running?{% endtrans %}</div>
     {% endif %}
 </div>
 {% endblock %}
