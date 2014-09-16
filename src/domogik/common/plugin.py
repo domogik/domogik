@@ -109,9 +109,7 @@ class Plugin(BasePlugin, MQRep):
         @param log_prefix : If set, use this prefix when creating the log file in Logger()
         '''
         BasePlugin.__init__(self, name, stop_cb, parser, daemonize, log_prefix)
-        #Watcher(self)
-        signal.signal(signal.SIGTERM, self.force_leave)
-        signal.signal(signal.SIGINT, self.force_leave)
+        Watcher(self)
         self.log.info(u"----------------------------------")
         self.log.info(u"Starting plugin '{0}' (new manager instance)".format(name))
         self.log.info(u"Python version is {0}".format(sys.version_info))
@@ -844,7 +842,7 @@ class Plugin(BasePlugin, MQRep):
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
                 self.log.warn(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
-        sys.exit(0)
+
 
 class Watcher:
     """this class solves two problems with multithreaded
