@@ -104,7 +104,8 @@ def client_sensor_edit(client_id, sensor_id):
                      history_round=request.form['history_round'], \
                      history_store=store, \
                      history_max=request.form['history_max'], \
-                     history_expire=request.form['history_expire'])
+                     history_expire=request.form['history_expire'],
+                     timeout=request.form['timeout'])
 
             flash(gettext("Changes saved"), "success")
             return redirect("/client/{0}/dmg_devices/known".format(client_id))

@@ -398,7 +398,7 @@ class Sensor(Base):
     history_expire = Column(Integer, nullable=True)
     history_round = Column(Float, nullable=True)
     history_duplicate = Column(Boolean, nullable=False)
-    timeout = Column(Integer, nullable=False)
+    timeout = Column(Integer, nullable=True, default=0)
 
     def __init__(self, device_id, name, reference, incremental, formula, data_type, conversion, h_store, h_max, h_expire, h_round, h_duplicate, timeout):
         self.device_id = device_id
