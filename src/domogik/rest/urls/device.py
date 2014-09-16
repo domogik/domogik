@@ -36,6 +36,89 @@ class deviceAPI(MethodView):
     decorators = [json_response, timeit]
 
     def get(self, did):
+        """
+        @api {get} /device/<id> Retrieve a/all domogik Device
+        @apiName getDevice
+        @apiGroup Device
+
+        @apiParam {Number} [id] If provided only the device that matches the id will be returned
+
+        @apiSuccess {json} result The json representation of the device
+
+        @apiSuccessExample Success-Response:
+            HTTTP/1.1 200 OK
+            {
+                "xpl_stats": {
+                    "get_temp": {
+                        "json_id": "get_temp",
+                        "schema": "sensor.basic",
+                        "id": 4,
+                        "parameters": {
+                            "dynamic": [
+                                {
+                                    "ignore_values": "",
+                                    "sensor_name": "temp",
+                                    "key": "current"
+                                }
+                            ],
+                            "static": [
+                                {
+                                    "type": "integer",
+                                    "value": "2",
+                                    "key": "device"
+                                },
+                                {
+                                    "type": null,
+                                    "value": "temp",
+                                    "key": "type"
+                                },
+                                {
+                                    "type": null,
+                                    "value": "c",
+                                    "key": "units"
+                                }
+                            ]
+                        },
+                        "name": "get_temp"
+                    },
+                    ...
+                },
+                "commands": {
+                    ...
+                },
+                "description": "Test Temp",
+                "reference": "VMB1TS",
+                "xpl_commands": {
+                    ...
+                },
+                "client_id": "plugin-velbus.igor",
+                "device_type_id": "velbus.temp",
+                "sensors": {
+                    "temp": {
+                        "value_min": 21.875,
+                        "data_type": "DT_Temp",
+                        "incremental": false,
+                        "id": 4,
+                        "reference": "temp",
+                        "conversion": "",
+                        "name": "temp_sensor",
+                        "last_received": 1410857216,
+                        "timeout": 0,
+                        "formula": null,
+                        "last_value": "29.1875",
+                        "value_max": 37.4375
+                    }
+                },
+                "parameters": {
+                    ...
+                },
+                "id": 3,
+                "name": "Temp elentrik"
+            }
+
+        @apiErrorExample Error-Response:
+            HTTTP/1.1 404 Not Found
+        """
         if did != None:
             b = urlHandler.db.get_device(did)
         else:
@@ -46,6 +129,89 @@ class deviceAPI(MethodView):
             return 200, b
 
     def delete(self, did):
+        """
+        @api {del} /device/id Delete a device
+        @apiName delDevice
+        @apiGroup Device
+
+        @apiParam {Number} id The id of the device to be deleted
+
+        @apiSuccess {json} result The json representation of the deleted device
+
+        @apiSuccessExample Success-Response:
+            HTTTP/1.1 200 OK
+            {
+                "xpl_stats": {
+                    "get_temp": {
+                        "json_id": "get_temp",
+                        "schema": "sensor.basic",
+                        "id": 4,
+                        "parameters": {
+                            "dynamic": [
+                                {
+                                    "ignore_values": "",
+                                    "sensor_name": "temp",
+                                    "key": "current"
+                                }
+                            ],
+                            "static": [
+                                {
+                                    "type": "integer",
+                                    "value": "2",
+                                    "key": "device"
+                                },
+                                {
+                                    "type": null,
+                                    "value": "temp",
+                                    "key": "type"
+                                },
+                                {
+                                    "type": null,
+                                    "value": "c",
+                                    "key": "units"
+                                }
+                            ]
+                        },
+                        "name": "get_temp"
+                    },
+                    ...
+                },
+                "commands": {
+                    ...
+                },
+                "description": "Test Temp",
+                "reference": "VMB1TS",
+                "xpl_commands": {
+                    ...
+                },
+                "client_id": "plugin-velbus.igor",
+                "device_type_id": "velbus.temp",
+                "sensors": {
+                    "temp": {
+                        "value_min": 21.875,
+                        "data_type": "DT_Temp",
+                        "incremental": false,
+                        "id": 4,
+                        "reference": "temp",
+                        "conversion": "",
+                        "name": "temp_sensor",
+                        "last_received": 1410857216,
+                        "timeout": 0,
+                        "formula": null,
+                        "last_value": "29.1875",
+                        "value_max": 37.4375
+                    }
+                },
+                "parameters": {
+                    ...
+                },
+                "id": 3,
+                "name": "Temp elentrik"
+            }
+
+        @apiErrorExample Error-Response:
+            HTTTP/1.1 404 Not Found
+        """
         b = urlHandler.db.del_device(did)
         urlHandler.reload_stats()        
         return 200, b
