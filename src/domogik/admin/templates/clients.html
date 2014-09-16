@@ -81,18 +81,22 @@
       <script type="text/javascript">
 		ws.onmessage = function(e) {
 			data = JSON.parse(e.data);
-			if (data.msgid == "client.list" ) {
+			if (data.msgid == "client.list" || data.msgid == "client.detail" ) {
 				for (plugin in data.content) {
-                    content = data.content[plugin]
+                    content = data.content[plugin];
 					$('tr#d' + content.pid + ' div.status div').removeClass('current_status');
 					$('tr#d' + content.pid + ' div.status div.status_' + content.status).addClass('current_status');
 					$('tr#' + content.pid + " td:nth-child(3)").html(content.status);
-					$('tr#' + content.pid + " td:nth-child(4)").html(content.configured);
+                    if ( content.configured ) {
+                        $('tr#' + content.pid + " td:nth-child(4)").html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>');
+                    } else {
+                        $('tr#' + content.pid + " td:nth-child(4)").html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>');
+                    }
                     var d = new Date(content.last_seen*1000)
                     var p = d.getDate() + '.' + d.getMonth() + '.' + d.getFullYear() + ' ' + d.getHours() + ':' + d.getMinutes()
 					$('tr#' + content.pid + " td:nth-child(5)").html(p);
 				}
-			}
+            }
 		}
        </script>
     {% else %}
