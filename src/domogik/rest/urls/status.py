@@ -10,6 +10,34 @@ from flask import Response
 @json_response
 @timeit
 def api_root():
+    """
+    @api {get} / Get the status of the REST server
+    @apiName getStatus
+    @apiGroup Status
+
+    @apiSuccess {json} result A json result with the status
+
+    @apiSuccessExample Success-Response:
+        HTTTP/1.1 200 OK
+        {
+            "info": {
+                "REST_API_version": "0.7",
+                "SSL": false,
+                "Host": "igor",
+                "Domogik_release": "0.4.0",
+                "Domogik_version": "0.4.0",
+                "REST_API_release": "0.7",
+                "Sources_release": "0.4.0",
+                "Sources_version": "0.4.0"
+            },
+            "mq": {
+                "sub_port": "40412",
+                "ip": "127.0.0.1",
+                "req_rep_port": "40410",
+                "pub_port": "40411"
+            }
+        }
+    """
     # domogik global version
     global_version = sys.modules["domogik"].__version__
     # domogik src version
