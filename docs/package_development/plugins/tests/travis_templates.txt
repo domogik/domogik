@@ -51,6 +51,7 @@ For Domogik plugins, you must use this template to create your **.travis.yml** f
       - ~/domogik/src/domogik/tests/travis/travis-install-dependencies.sh
     before_script:
       - ~/domogik/src/domogik/tests/travis/travis-setup-database.sh
+      - ~/domogik/src/domogik/tests/travis/travis-install-domogik-mq.sh
       - ~/domogik/src/domogik/tests/travis/travis-install-domogik.sh
       - ~/domogik/src/domogik/tests/travis/travis-install-plugin.sh
       - sudo ~/domogik/src/domogik/tests/travis/travis-start-domogik.sh
