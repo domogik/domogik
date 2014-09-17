@@ -139,8 +139,9 @@ else
     echo "It seems to be development files"
 fi
 
-echo "Notice : database was not suppressed : you must do it manually"
-echo "         the folder /var/lib/domogik/domogik_packages was not suppressed"
+echo "Notice : "
+echo " * database was not suppressed : you must do it manually"
+echo " * the folder /var/lib/domogik/domogik_packages was not suppressed"
 
 echo "Uninstall complete!"
 
