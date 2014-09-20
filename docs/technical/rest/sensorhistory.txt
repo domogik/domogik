@@ -29,7 +29,7 @@ Example: ::
         }
     ]
 
-/sensorhistory/id<sensor id>/last/<number of item to get>
+/sensorhistory/id/<sensor id>/last/<number of item to get>
 ---------------------------------------------------------
 
 Get the N last values of a sensor.
