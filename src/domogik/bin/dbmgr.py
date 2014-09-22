@@ -373,7 +373,7 @@ class DBConnector(Plugin, MQRep):
             res = self._db.add_full_device(params, pjson)
             if not res:
                 status = False
-                reason = "DB failed"
+                reason = "An error occured while adding the device in database. Please check the file dbmgr.log for more informations"
             else:
                 status = True
                 reason = False
