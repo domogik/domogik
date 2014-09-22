@@ -130,11 +130,9 @@ class DBConnector(Plugin, MQRep):
                 # device create
                 elif msg.get_action() == "device.create":
                     self._mdp_reply_devices_create_result(msg)
-        except exception as e:
-            msg = "Exception in on_mdp_request: {0}".format(e)
+        except:
+            msg = "Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
-            self.log.error(traceback.format_exc())
-            print msg
 
     def _mdp_reply_config_get(self, data):
         """ Reply to config.get MQ req
