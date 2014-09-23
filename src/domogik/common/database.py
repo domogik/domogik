@@ -851,6 +851,7 @@ class DbHelper():
 # Sensor history
 ####
     def add_sensor_history(self, sid, value, date):
+        try:
             self.__session.expire_all()
             sensor = self.__session.query(Sensor).filter_by(id=sid).first()
             if sensor is not None:
