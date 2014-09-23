@@ -851,108 +851,110 @@ class DbHelper():
 # Sensor history
 ####
     def add_sensor_history(self, sid, value, date):
-        self.__session.expire_all()
-        sensor = self.__session.query(Sensor).filter_by(id=sid).first()
-        if sensor is not None:
-            orig_value = value
-            # check the sensorTypes
-            # sensor.type is absolute => do nothing
-            if sensor.incremental:
-                # get the last orig_value and substract value and orig_value and set the enw value
-                last = self.__session.query(SensorHistory) \
-                    .filter(SensorHistory.sensor_id == sid) \
-                    .order_by(SensorHistory.date.desc()) \
-                    .first()
-                if last is not None:
-                    if last.original_value_num is not None:
-                        value = float(value) - last.original_value_num
-                else:
-                    # set the begin value to 0
-                    value = 0
-            #if semsor.formula is not None:
-                # do the calculation
-            # only store stats if the value is different
-            if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
-                # handle history_round
-                # reduce device stats
-                if sensor.history_round > 0:
+            self.__session.expire_all()
+            sensor = self.__session.query(Sensor).filter_by(id=sid).first()
+            if sensor is not None:
+                orig_value = value
+                # check the sensorTypes
+                # sensor.type is absolute => do nothing
+                if sensor.incremental:
+                    # get the last orig_value and substract value and orig_value and set the enw value
                     last = self.__session.query(SensorHistory) \
                         .filter(SensorHistory.sensor_id == sid) \
                         .order_by(SensorHistory.date.desc()) \
-                        .limit(2) \
-                        .all()
-                    last.reverse()
-                    if last and len(last) == 2:
-                        delta = abs(float(last[0].value_num) - float(last[1].value_num))
-                        if delta < sensor.history_round:
-                            delta0 = abs(float(value) - float(last[0].value_num))
-                            delta1 = abs(float(value) - float(last[1].value_num))
-                            if delta0 < sensor.history_round \
-                                    and delta1 < sensor.history_round:
-                                self.__session.query(SensorHistory) \
-                                    .filter(SensorHistory.id == last[1].id) \
-                                    .delete()
-                # insert new recored in core_sensor_history
-                # store the history value if requested
-                if sensor.history_store:
-                    h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
-                    self.__session.add(h)
-                sensor.last_received = date
-                sensor.last_value = ucode(value)
-                try:
-                    val = float(value)
-                except ValueError:
-                    pass
-                except TypeError:
-                    pass
-                else:
-                    # update min/max
-                    if sensor.value_min > val:
-                        sensor.value_min = val
-                    if sensor.value_max < val:
-                        sensor.value_max = val
-                self.__session.add(sensor)
-                try:
-                    self.__session.commit()
-                except Exception as sql_exception:
-                    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            # handle the max value
-            if sensor.history_max > 0:
-                count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor.id).count()
-                if count > sensor.history_max:
-                    # delete from sensor_history where id not in (select id from sensor_history order by date desc limit x)
-                    tokeep1 = self.__session.query(SensorHistory.id) \
-                            .filter(SensorHistory.sensor_id==sensor.id) \
+                        .first()
+                    if last is not None:
+                        if last.original_value_num is not None:
+                            value = float(value) - last.original_value_num
+                    else:
+                        # set the begin value to 0
+                        value = 0
+                #if semsor.formula is not None:
+                    # do the calculation
+                # only store stats if the value is different
+                if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
+                    # handle history_round
+                    # reduce device stats
+                    if sensor.history_round > 0:
+                        last = self.__session.query(SensorHistory) \
+                            .filter(SensorHistory.sensor_id == sid) \
                             .order_by(SensorHistory.date.desc()) \
-                            .limit(sensor.history_max) \
-                            .subquery()
-                    # ugly fix because mysql is not supporting limit in a subquery
-                    tokeep2 = self.__session.query(tokeep1).subquery()
+                            .limit(2) \
+                            .all()
+                        last.reverse()
+                        if last and len(last) == 2:
+                            delta = abs(float(last[0].value_num) - float(last[1].value_num))
+                            if delta < sensor.history_round:
+                                delta0 = abs(float(value) - float(last[0].value_num))
+                                delta1 = abs(float(value) - float(last[1].value_num))
+                                if delta0 < sensor.history_round \
+                                        and delta1 < sensor.history_round:
+                                    self.__session.query(SensorHistory) \
+                                        .filter(SensorHistory.id == last[1].id) \
+                                        .delete()
+                    # insert new recored in core_sensor_history
+                    # store the history value if requested
+                    if sensor.history_store:
+                        h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
+                        self.__session.add(h)
+                    sensor.last_received = date
+                    sensor.last_value = ucode(value)
+                    try:
+                        val = float(value)
+                    except ValueError:
+                        pass
+                    except TypeError:
+                        pass
+                    else:
+                        # update min/max
+                        if sensor.value_min > val:
+                            sensor.value_min = val
+                        if sensor.value_max < val:
+                            sensor.value_max = val
+                    self.__session.add(sensor)
+                    try:
+                        self.__session.commit()
+                    except Exception as sql_exception:
+                        self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                # handle the max value
+                if sensor.history_max > 0:
+                    count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor.id).count()
+                    if count > sensor.history_max:
+                        # delete from sensor_history where id not in (select id from sensor_history order by date desc limit x)
+                        tokeep1 = self.__session.query(SensorHistory.id) \
+                                .filter(SensorHistory.sensor_id==sensor.id) \
+                                .order_by(SensorHistory.date.desc()) \
+                                .limit(sensor.history_max) \
+                                .subquery()
+                        # ugly fix because mysql is not supporting limit in a subquery
+                        tokeep2 = self.__session.query(tokeep1).subquery()
+                        self.__session.query(SensorHistory) \
+                            .filter( \
+                                        SensorHistory.sensor_id==sensor.id, \
+                                        ~SensorHistory.id.in_(tokeep2) \
+                                    ) \
+                            .delete(synchronize_session=False)
+                        try:
+                            self.__session.commit()
+                        except Exception as sql_exception:
+                            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                # handle the expire value (days)
+                if sensor.history_expire > 0:
+                    stamp = datetime.datetime.now() - datetime.timedelta(days=sensor.history_expire)
                     self.__session.query(SensorHistory) \
                         .filter( \
-                                    SensorHistory.sensor_id==sensor.id, \
-                                    ~SensorHistory.id.in_(tokeep2) \
+                                    SensorHistory.date<=stamp, \
+                                    SensorHistory.sensor_id==sensor.id \
                                 ) \
                         .delete(synchronize_session=False)
                     try:
                         self.__session.commit()
                     except Exception as sql_exception:
                         self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            # handle the expire value (days)
-            if sensor.history_expire > 0:
-                stamp = datetime.datetime.now() - datetime.timedelta(days=sensor.history_expire)
-                self.__session.query(SensorHistory) \
-                    .filter( \
-                                SensorHistory.date<=stamp, \
-                                SensorHistory.sensor_id==sensor.id \
-                            ) \
-                    .delete(synchronize_session=False)
-                try:
-                    self.__session.commit()
-                except Exception as sql_exception:
-                    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        else:
-            self.__raise_dbhelper_exception("Can not add history to not existing sensor: %s" % sid, True)             
+            else:
+                self.__raise_dbhelper_exception("Can not add history to not existing sensor: %s" % sid, True)             
+        except:
+            self.__raise_dbhelper_exception("Error when adding data to sensor history. Sensor id = {0}  | Value = {1}  | Date = {2}. Error is {3}".format(sid, value, date, traceback.format_exc()))
 
     def list_sensor_history(self, sid, num=None):
         if num is None:

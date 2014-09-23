@@ -309,10 +309,13 @@ class XplManager(XplPlugin, MQAsyncSub):
                                             .format(dev['name'], dev['id'], sen.name, sen.id, param.key, value))
                                     # do the store
                                     stored_value = value
-                                    db.add_sensor_history(\
-                                            param.sensor_id, \
-                                            value, \
-                                            current_date)
+                                    try:
+                                        db.add_sensor_history(\
+                                                param.sensor_id, \
+                                                value, \
+                                                current_date)
+                                    except:
+                                        self._log_stats.error("Error when adding sensor history : {0}".format(traceback.format_exc()))
                                 else:
                                     self._log_stats.debug("Don't need to store this value")
                                 # publish the result
