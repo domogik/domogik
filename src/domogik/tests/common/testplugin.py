@@ -105,6 +105,7 @@ class TestPlugin(MQAsyncSub):
     def wait_for_event(self, event, timeout = 30):
         """ Wait for a plugin to be in a state
             @param event : the event (STATUS_ALIVE, STATUS_STOPPED, ...)
+            @param timeout : timeout for the MQ
             This is done by subscribing on the MQ plugin.status publisher
             If no status has been catched before the timeout, raise an error
         """
