@@ -40,6 +40,7 @@ from domogik.common.utils import get_sanitized_hostname
 import requests
 import json
 import sys
+import time
 
 
 class TestSensor():
@@ -97,6 +98,8 @@ class TestSensor():
             Returns a tuple : (timestamp, value)
         """
         print(u"Get the last value for sensor id={0} / name={1}".format(self.sensor_id, self.sensor_reference))
+        print(u"(but before, wait for 1s to be sure the value has been inserted in database...)")
+        time.sleep(1)
         response = requests.get("{0}/sensor/{1}".format(self.rest_url, self.sensor_id), \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
