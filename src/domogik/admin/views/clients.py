@@ -520,6 +520,11 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         if res is not None:
             data = res.get_data()
             if data["status"]:
+                # reload stats
+                req = MQSyncReq(app.zmq_context)
+                msg = MQMessage()
+                msg.set_action( 'reload' )
+                resp = req.request('xplgw', msg.get(), 100)
                 flash(gettext("Device cerated succesfully"), 'success')
             else:
                 flash(gettext("Device creation failed"), 'warning')
