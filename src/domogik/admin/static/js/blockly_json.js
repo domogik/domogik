@@ -63,6 +63,11 @@ Blockly.JSON.blockToJson = function(block) {
     element['editable'] = false;
   }
 
+  var nextBlock = block.getNextBlock();
+  if (nextBlock) {
+    element['NEXT']= Blockly.JSON.blockToJson(nextBlock);
+  }
+
   return element;
 };
 
