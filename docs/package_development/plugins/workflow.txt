@@ -36,7 +36,7 @@ Example for a new plugin
 
 On the left, there is the *master* branch. On the right, the *develop* branch.
 
-.. image:: plugin.png
+.. image:: git/plugin.png
 
 Step 1 - prepare the information files on the master branch
 ===========================================================
