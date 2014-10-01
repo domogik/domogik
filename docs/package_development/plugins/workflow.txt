@@ -9,7 +9,7 @@ Plugins development workflow
 Overview
 ========
 
-All the released versions of the plugins can be available on the packages repository : xxxxxxxxxxxxxx.org
+All the released versions of the plugins can be available on the packages repository : http://xxxxxxxxxxxxxx.org
 The developper of a plugin just need to submit its plugin (more details in step 5).
 
 We want to avoid alpha/beta/candidates versions for a plugin : 
@@ -26,6 +26,7 @@ For any Domogik package on git, you should follow the branching model described 
 This branching model is inspired from the one here : http://nvie.com/posts/a-successful-git-branching-model/
 
 Basically :
+
 * the *master* branch contains the last stable release
 * the *develop* branch contains the release which is currently developped. It you have to do any upgrade or fix, you should do them in this branch.
 * when a stable release is ready (in the *develop* branch), you create a *tag* (and *version*) on the GitHub repository and then merge it into the master branch.
