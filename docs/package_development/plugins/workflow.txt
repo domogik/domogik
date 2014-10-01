@@ -164,31 +164,31 @@ If this was not ok, fix this, do a commit, check that the plugin is still starti
 
 Check all the existing tags for your plugin: ::
 
-    git pull --tags
-    git tags -l
+    $ git pull --tags
+    $ git tags -l
 
 Check that there is not already a tag created for the version you want to release. If so well... you are bad somewhere!
 
 Now, set a tag for your release. For example: ::
 
-    git tag -a "1.0"
+    $ git tag -a "1.0"
 
 Push the tag on the remote repository: ::
 
-    git push -tags
+    $ git push -tags
 
 And finally, merge the tag in the *master* branch. For example for our 1.0 release: ::
 
-    git checkout master
-    git merge 1.0
+    $ git checkout master
+    $ git merge 1.0
 
 Push the merge: ::
 
-    git push
+    $ git push
 
 And get back to the *develop* branch: ::
 
-    git checkout develop
+    $ git checkout develop
 
 You now have finished the actions on your local repository!
 
