@@ -134,12 +134,14 @@ The checklist
 
 Here are all the prerequisites for a plugin to be stable:
 
-* The development of the features included in the plugin version is complete
-* The plugin is stable (it has been tested a complete week without any restart)
-* The documentation is finished and published on ReadTheDoc
-* The tests are written, set with Travis CI and the tests results are OK
-* A few people have tested and approved the plugin
-* There is no license issue with the code
+.. note::
+
+    * The development of the features included in the plugin version is complete
+    * The plugin is stable (it has been tested a complete week without any restart)
+    * The documentation is finished and published on ReadTheDoc
+    * The tests are written, set with Travis CI and the tests results are OK
+    * A few people have tested and approved the plugin
+    * There is no license issue with the code
 
 If one of these points is not OK, the plugin will not be validated on the package repository by the core team.
 
