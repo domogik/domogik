@@ -56,20 +56,6 @@ if [ ${UID} != 0 ];then
 fi
 
 function start {
-    MQ_RUNNING=$(/etc/init.d/domogik-mq status | grep -c "is running")
-    if [ $MQ_RUNNING -ne 2 ]; then
-        echo 'domogik-mq running not running, try to start domogik-mq...'
-        /etc/init.d/domogik-mq start
-        sleep 2;
-        MQ_RUNNING=$(/etc/init.d/domogik-mq status | grep -c "is running")
-        if [ $MQ_RUNNING -ne 2 ]; then
-            echo 'Fail to start domogik-mq, exit.'
-            exit
-    else echo 'domogik-mq running, start domogik...'
-    fi
-    else
-        echo 'domogik-mq running, start domogik...'
-    fi
     if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
         start_xpl
     else
