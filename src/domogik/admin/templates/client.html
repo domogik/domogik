@@ -10,8 +10,8 @@
 	    <li>{% trans %}Email{% endtrans %} : {{ data.data.identity.author_email }}</li>
 	</ul>
 	<div>
-		<button id="start" type="button" class="btn btn-primary btn-success" {% if data.status == "alive" %}disabled="disabbled"{% endif %}>Start</button>
-		<button id="stop" type="button" class="btn btn-primary btn-danger" {% if data.status != "alive" %}disabled="disabbled"{% endif %}>Stop</button>
+		<button id="start" type="button" class="btn btn-primary btn-success" {% if data.status == "alive" %}disabled="disabled"{% endif %}>Start</button>
+		<button id="stop" type="button" class="btn btn-primary btn-danger" {% if data.status != "alive" %}disabled="disabled"{% endif %}>Stop</button>
 	</div>
 	{% if data.data.udev_rules|length > 0 %}
 	<h2>{% trans %}Udev{% endtrans %}</h2>
@@ -35,28 +35,44 @@
 			ws.send('{"dst": "plugin-{{ data.name }}.{{ data.host }}", "action": "plugin.stop.do", "data": {"name": "{{ data.name }}", "host": "{{ data.host }}"}}');
 			setTimeout(function () {$("#stop").addClass('btn-danger');}, 2000);;
 		});
-                ws.onmessage = function(e) {
-                        data = JSON.parse(e.data);
-                        if (data.msgid == "client.list" ) {
-                                for (plugin in data.content) {
-					if ( plugin == '{{data.package_id}}.{{data.host}}' ) { 
-						content = data.content[plugin]
-						$('div.status div').removeClass('current_status');
-						$('div.status div.status_' + content.status).addClass('current_status');
-						if ( content.status == "alive" || content.status == "starting" ) {
-							$('#start').attr('disabled','disabled'); 	
-							$('#stop').removeAttr('disabled');
-						} else if ( content.status == "stopped" || content.status == "unknown" || content.status == "dead") {
-							$('#stop').attr('disabled','disabled'); 	
-							$('#start').removeAttr('disabled');
-						} else {
-							$('#stop').attr('disabled','disabled'); 	
-							$('#start').attr('disabled','disabled');
-						}
-					}
-                                }
+        ws.onmessage = function(e) {
+            data = JSON.parse(e.data);
+            if (data.msgid == "client.list" ) {
+                for (plugin in data.content) {
+                    if ( plugin == '{{data.package_id}}.{{data.host}}' ) { 
+                        content = data.content[plugin]
+                        $('div.status div').removeClass('current_status');
+                        $('div.status div.status_' + content.status).addClass('current_status');
+                        if ( content.status == "alive" || content.status == "starting" ) {
+                            $('#start').attr('disabled','disabled'); 	
+                            $('#stop').removeAttr('disabled');
+                        } else if ( content.status == "stopped" || content.status == "unknown" || content.status == "dead") {
+                            $('#stop').attr('disabled','disabled'); 	
+                            $('#start').removeAttr('disabled');
+                        } else {
+                            $('#stop').attr('disabled','disabled'); 	
+                            $('#start').attr('disabled','disabled');
                         }
+                    }
                 }
+            }
+            if (data.msgid == "plugin.status") {
+                if ( data.content['host'] == '{{data.host}}' && '{{data.package_id}}' == data.content['type'] + '-'+ data.content['name'] ) {
+                    $('div.status div').removeClass('current_status');
+                    $('div.status div.status_' + data.content['status']).addClass('current_status');
+                    if ( data.content['status'] == "alive" || data.content['status'] == "starting" ) {
+                        $('#start').attr('disabled','disabled'); 	
+                        $('#stop').removeAttr('disabled');
+                    } else if ( data.content['status'] == "stopped" || data.content['status'] == "unknown" || data.content['status'] == "dead") {
+                        $('#stop').attr('disabled','disabled'); 	
+                        $('#start').removeAttr('disabled');
+                    } else {
+                        $('#stop').attr('disabled','disabled'); 	
+                        $('#start').attr('disabled','disabled');
+                    }
+                }
+            }
+        }
 	});
 	
 </script>
