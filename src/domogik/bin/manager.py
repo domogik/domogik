@@ -554,16 +554,23 @@ class Manager(XplPlugin):
         else:
             name = data.get_data()['name']
             msg.add_data('name', name)
+            host = data.get_data()['host']
+            msg.add_data('host', host)
 
             # try to start the plugin
-            pid = self._plugins[name].start()
-            if pid != 0:
-                status = True
-                reason = ""
-            else:
+            try:
+                pid = self._plugins[name].start()
+                if pid != 0:
+                    status = True
+                    reason = ""
+                else:
+                    status = False
+                    reason = "Plugin '{0}' startup failed".format(name)
+            except KeyError:
+                # plugin doesn't exist 
                 status = False
-                reason = "Plugin '{0}' startup failed".format(name)
-
+                reason = "Plugin '{0}' does not exist on this host".format(name)
+                
         msg.add_data('status', status)
         msg.add_data('reason', reason)
         self.reply(msg.get())
