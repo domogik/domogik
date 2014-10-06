@@ -1,4 +1,7 @@
 #!/usr/bin/python
+"""
+@apiIgnore TODO : This method is not yet documented
+"""
 
 import zmq
 from zmq.eventloop.ioloop import IOLoop
@@ -9,5 +12,5 @@ cli = MQSyncReq(zmq.Context())
 msg = MQMessage()
 msg.set_action('helper.help.get')
 msg.add_data('command', 'scan')
-print cli.request('velbus', msg.get(), timeout=10).get()
+print(cli.request('velbus', msg.get(), timeout=10).get())
 
