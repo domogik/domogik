@@ -2,7 +2,7 @@
 """
 @api {REQ} config.get Get a value for all configuration items of a client
 @apiVersion 0.4.0
-@apiName config.get (all)
+@apiName config.get for all elements
 @apiGroup Clients configuration
 @apiDescription This request is used to ask Domogik's dbmgr the value of a configuration item
 * Source client : Domogik admin, any other interface which can manage the clients
