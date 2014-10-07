@@ -24,7 +24,7 @@
         Test()
     
 @apiSuccessExample {json} Success-Response:
-{...}
+[]
 """
 
 import zmq
