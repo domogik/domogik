@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-                                                                           
+"""
+@apiIgnore TODO : This method is not yet documented
+"""
 
 import zmq
 from domogikmq.pubsub.subscriber import MQAsyncSub

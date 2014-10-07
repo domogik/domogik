@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-                                                                           
+"""
+@apiIgnore TODO : is this dialog still needed ? Not sure!!!!
+"""
 
 import zmq
 from domogikmq.pubsub.subscriber import MQAsyncSub
