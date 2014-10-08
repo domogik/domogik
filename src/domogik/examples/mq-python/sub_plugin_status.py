@@ -4,7 +4,7 @@
 @api {SUB} plugin.status Subscribe to the updates of the plugins status
 @apiVersion 0.4.0
 @apiName plugin.status
-@apiGroup Client
+@apiGroup Plugin
 @apiDescription Subscribe to the updates of the plugins status (alive, stopped, ...)
 * Source client : Domogik admin, any other interface which can need to get the plugins status informations
 * Target client : n/a (any publisher)

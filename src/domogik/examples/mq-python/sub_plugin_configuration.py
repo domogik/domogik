@@ -4,7 +4,7 @@
 @api {SUB} plugin.configuration Subscribe to the updates of the plugins configuration
 @apiVersion 0.4.0
 @apiName plugin.configuration
-@apiGroup Client
+@apiGroup Plugin
 @apiDescription Subscribe to the updates of the plugins configuration
 * Source client : Domogik admin, any other interface which can need to get the plugins configuration informations
 * Target client : n/a (any publisher)
