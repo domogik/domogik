@@ -57,6 +57,28 @@ Just launch the **dmg_package** tool with the **--install** option and the url o
 
 When you will uninstall such a package, a backup of the folder will be done and saved in the domogik packages folders as the installation acts as a zip file installation.
 
+Upgrade a package
+=================
+
+If a package is already installed, you can't use again the install option to upgrade it. You need to use the **--upgrade** option in the same way you used previously the **--install** option.
+
+The backup option will basically do a classic installation of the package from a zip of an url (but not from a folder!) and also do a backup of the previous installed version.
+
+.. note::
+
+    There is currently no way to automatically find updates for a package. You need to manually specify the new package for the upgrade.
+
+Example: ::
+
+    $ dmg_package -u https://github.com/fritz-smh/domogik-plugin-teleinfo/archive/1.0.zip
+    Start downloading https://github.com/fritz-smh/domogik-plugin-teleinfo/archive/1.0.zip
+    Download finished
+    Install a package from a zip file : /tmp/tmpRRbqSR
+    This is a package upgrade. A backup of the installed version will be done first
+    Creating a backup of '/var/lib/domogik/domogik_packages/plugin_teleinfo' as '/var/lib/domogik/domogik_packages/backup_plugin_teleinfo_20141008230215.zip'
+    Extract the zip file /tmp/tmpRRbqSR as /var/lib/domogik/domogik_packages/plugin_teleinfo
+    Package installed!
+
 List the installed packages
 ===========================
 
