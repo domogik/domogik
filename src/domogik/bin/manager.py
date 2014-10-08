@@ -1189,7 +1189,7 @@ class Clients():
                    "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
                    "last_seen" : time.time(),
-                   "status" : STATUS_UNKNOWN,
+                   "status" : STATUS_STOPPED,
                    "configured" : configured}
         client_with_details = { "host" : host,
                    "type" : type,
@@ -1198,7 +1198,7 @@ class Clients():
                    "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
                    "last_seen" : time.time(),
-                   "status" : STATUS_UNKNOWN,
+                   "status" : STATUS_STOPPED,
                    "configured" : configured,
                    "data" : data}
         self._clients[client_id] = client
