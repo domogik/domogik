@@ -42,7 +42,7 @@ import traceback
 from domogik.common.jsondata import domogik_encoder
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.xpl.common.plugin import Plugin
-from domogik.common.database import DbHelper
+from domogik.common.database import DbHelper, DbHelperException
 from domogikmq.reqrep.worker import MQRep
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -130,6 +130,9 @@ class DBConnector(Plugin, MQRep):
                 # device create
                 elif msg.get_action() == "device.create":
                     self._mdp_reply_devices_create_result(msg)
+                # device delete
+                elif msg.get_action() == "device.delete":
+                    self._mdp_reply_devices_delete_result(msg)
         except:
             msg = "Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
@@ -343,6 +346,38 @@ class DBConnector(Plugin, MQRep):
             self.log.warn(msg)
             return "None"
 
+    def _mdp_reply_devices_delete_result(self, data):
+        status = True
+        reason = False
+
+        try:
+            did = data.get_data()['did']
+            if did:
+                res = self._db.del_device(did)
+                if not res:
+                    status = False
+                else:
+                    status = True 
+            else:
+                status = False
+                reason = "Device delete failed"
+            # delete done
+            self.reload_stats()
+        except DbHelperException as d:
+            status = False
+            reason = "Error while deleting device: {0}".format(d.value)
+        except:
+            status = False
+            reason = "Error while deleting device: {0}".format(traceback.format_exc())
+        # send the result
+        msg = MQMessage()
+        msg.set_action('device.delete.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
     def _mdp_reply_devices_create_result(self, data):
         status = True
         reason = False
@@ -539,6 +574,14 @@ class DBConnector(Plugin, MQRep):
                               "host" : host,
                               "event" : "updated"})
 
+    def reload_stats(self):
+        self.log.debug(u"=============== reload stats")                                                                                                                              
+        req = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action( 'reload' )
+        resp = req.request('xplgw', msg.get(), 100)
+        self.log.debug(u"Reply from xplgw: {0}".format(resp))
+        self.log.debug(u"=============== reload stats END")
 
 if __name__ == "__main__":
     DBC = DBConnector()

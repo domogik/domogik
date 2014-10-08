@@ -171,31 +171,23 @@ def client_devices_edit(client_id, did):
                 active = 'devices'
                 )
 
-app.route('/client/<client_id>/dmg_devices/delete/<did>')
-@login_required
-def client_devices_delete(client_id, did):
-    with app.db.session_scope():
-        app.db.del_device(did)
-    flash(gettext("Device deleted"), 'success')
-    # reload stats
-    req = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action( 'reload' )
-    resp = req.request('xplgw', msg.get(), 100)
-    return redirect("/client/{0}/dmg_devices/known".format(client_id))
-
-
-
 @app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required
 def client_devices_delete(client_id, did):
-    with app.db.session_scope():
-        app.db.del_device(did)
-    # reload stats
-    req = MQSyncReq(app.zmq_context)
+    cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
-    msg.set_action( 'reload' )
-    resp = req.request('xplgw', msg.get(), 100)
+    msg.set_action('device.delete')
+    msg.set_data({'did': did})
+    res = cli.request('dbmgr', msg.get(), timeout=10)
+    if res is not None:
+        data = res.get_data()
+        if data["status"]:
+            flash(gettext("Device deleted succesfully"), 'success')
+        else:
+            flash(gettext("Device deleted failed"), 'warning')
+            flash(data["reason"], 'danger')
+    else:
+        flash(gettext("DbMgr did not respond on the device.delete, check the logs"), 'danger')
     return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])

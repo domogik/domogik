@@ -188,81 +188,24 @@ class deviceAPI(MethodView):
 
         @apiSuccessExample Success-Response:
             HTTTP/1.1 200 OK
-            {
-                "xpl_stats": {
-                    "get_temp": {
-                        "json_id": "get_temp",
-                        "schema": "sensor.basic",
-                        "id": 4,
-                        "parameters": {
-                            "dynamic": [
-                                {
-                                    "ignore_values": "",
-                                    "sensor_name": "temp",
-                                    "key": "current"
-                                }
-                            ],
-                            "static": [
-                                {
-                                    "type": "integer",
-                                    "value": "2",
-                                    "key": "device"
-                                },
-                                {
-                                    "type": null,
-                                    "value": "temp",
-                                    "key": "type"
-                                },
-                                {
-                                    "type": null,
-                                    "value": "c",
-                                    "key": "units"
-                                }
-                            ]
-                        },
-                        "name": "get_temp"
-                    },
-                    ...
-                },
-                "commands": {
-                    ...
-                },
-                "description": "Test Temp",
-                "reference": "VMB1TS",
-                "xpl_commands": {
-                    ...
-                },
-                "client_id": "plugin-velbus.igor",
-                "device_type_id": "velbus.temp",
-                "sensors": {
-                    "temp": {
-                        "value_min": 21.875,
-                        "data_type": "DT_Temp",
-                        "incremental": false,
-                        "id": 4,
-                        "reference": "temp",
-                        "conversion": "",
-                        "name": "temp_sensor",
-                        "last_received": 1410857216,
-                        "timeout": 0,
-                        "formula": null,
-                        "last_value": "29.1875",
-                        "value_max": 37.4375
-                    }
-                },
-                "parameters": {
-                    ...
-                },
-                "id": 3,
-                "name": "Temp elentrik"
-            }
 
         @apiErrorExample Error-Response:
-            HTTTP/1.1 404 Not Found
+            HTTTP/1.1 500 INTERNAL SERVER ERROR
         """
-        b = urlHandler.db.del_device(did)
-        urlHandler.reload_stats()        
-        return 200, None
+        cli = MQSyncReq(urlHandler.zmq_context)
+        msg = MQMessage()
+        msg.set_action('device.delete')
+        msg.set_data({'did': did})
+        res = cli.request('dbmgr', msg.get(), timeout=10)
+        if res is not None:
+            data = res.get_data()
+            if data["status"]:
+                return 201, None
+            else:
+                return 500, data["reason"]
+        else:
+            return 500, "DbMgr did not respond on the device.create, check the logs"
+        return 201, None
 
     def post(self):
         """
@@ -363,7 +306,7 @@ class deviceAPI(MethodView):
                 return 500, data["reason"]
         else:
             return 500, "DbMgr did not respond on the device.create, check the logs"
-        return 201, null
+        return 201, None
 
     def put(self, did):
         """
