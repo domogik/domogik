@@ -13,8 +13,9 @@
     {%- block styles %}
     <!-- Bootstrap -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="/static/css/bootstrap-notify.css" rel="stylesheet" media="screen">
     <link href="/static/css/datepicker.css" rel="stylesheet" media="screen">
+    <link href="/static/css/datepicker.css" rel="stylesheet" media="screen">
+    <link href="/static/libraries/pnotify/pnotify.min.css" rel="stylesheet" media="screen">
     <!-- Domogik -->
     <link href="/static/css/default.css" rel="stylesheet" media="screen">
        <script type="text/javascript">
@@ -30,7 +31,6 @@
   </head>
   <body{% block body_attribs %}{% endblock body_attribs %}>
     <div id="now"></div>
-    <div class="notifications bottom-right"></div>
     {% block body -%}
     {% block navbar %}
         {% if not nonav %}
@@ -41,19 +41,23 @@
     {%- endblock content %}
     {% block scripts %}
     <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/bootstrap-notify.js"></script>
     <script src="/static/js/bootstrap-datepicker.js"></script>
     <script src="/static/js/bootstrap-tooltip.js"></script>
     <script src="/static/js/bootstrap-confirmation.js"></script>
+    <script src="/static/libraries/pnotify/pnotify.min.js"></script>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <script type="text/javascript">
            {% for category, message in messages: %}
-            $('.notifications').notify({
-                message: { text: '{{ message }}' },
-                type: '{{ category }}',
-                fadeOut: { enabled: false, delay: 3000 }
-            }).show();
+            PNotify.prototype.options.delay = 3000;
+            new PNotify({
+                text: '{{ message }}',
+                type: '{{ categoiry }}',
+                buttons: {
+                    close: false,
+                    sticker: false
+                }
+            });
             {% endfor %}
             </script>
     {% endif %}
