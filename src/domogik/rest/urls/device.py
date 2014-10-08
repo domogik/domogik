@@ -19,6 +19,54 @@ def device_list_old():
 @json_response
 @timeit
 def device_params(client_id, dev_type_id):
+    """
+    @api {get} /device/params/<clientId>/<device_type> Retrieve the needed parameter for creating a device
+    @apiName getDeviceParams
+    @apiGroup Device
+
+    @apiParam {String} clientId The clientId to request the parameter from
+    @apiParam {String} device_type The device type to request the parameters for
+
+    @apiSuccess {json} result The json representing the device type
+    
+    @apiSampleRequest /device/params/plugin-velbus.igor/velbus.relay
+
+    @apiSuccessExample Success-Response:
+        HTTTP/1.1 200 OK
+        {
+            "xpl_stats": {
+                "get_level_bin": []
+            },
+            "name": "",
+            "reference": "",
+            "xpl": [
+                {
+                    "max_value": 4,
+                    "min_value": 1,
+                    "type": "integer",
+                    "description": "The channel number",
+                    "key": "channel"
+                },
+                {
+                    "max_value": 255,
+                    "min_value": 0,
+                    "type": "integer",
+                    "description": "The decimal address",
+                    "key": "device"
+                }
+            ],
+            "xpl_commands": {
+                "set_level_bin": []
+            },
+            "global": [],
+            "client_id": "plugin-velbus.igor",
+            "device_type": "velbus.relay",
+            "description": ""
+        }
+
+    @apiErrorExample Error-Response:
+        HTTTP/1.1 404 Not Found
+    """
     cli = MQSyncReq(urlHandler.zmq_context)
     msg = MQMessage()
     msg.set_action('device.params')
@@ -136,7 +184,7 @@ class deviceAPI(MethodView):
 
         @apiParam {Number} id The id of the device to be deleted
 
-        @apiSuccess {json} result The json representation of the deleted device
+        @apiSuccess {String} none No data is returned
 
         @apiSuccessExample Success-Response:
             HTTTP/1.1 200 OK
@@ -217,13 +265,90 @@ class deviceAPI(MethodView):
         return 200, None
 
     def post(self):
-        """ Create a new device
-            Get all the clients details
-            Finally, call the database function to create the device and give it the device types list and clients details : they will be used to fill the database as the json structure is recreated in the database
         """
-        print "=========="
-        print request.form
-        type(json.loads(request.form.get('params')))
+        @api {post} /device Create a device
+        @apiName postDevice
+        @apiGroup Device
+
+        @apiParamTitle (data) Post parameters
+        @apiParam (data) {Json} params The populated device params json string
+
+        @apiSuccess {json} result The json representation of the created device
+
+        @apiSuccessExample Success-Response:
+            HTTTP/1.1 201 Created
+            {
+                "xpl_stats": {
+                    "get_temp": {
+                        "json_id": "get_temp",
+                        "schema": "sensor.basic",
+                        "id": 4,
+                        "parameters": {
+                            "dynamic": [
+                                {
+                                    "ignore_values": "",
+                                    "sensor_name": "temp",
+                                    "key": "current"
+                                }
+                            ],
+                            "static": [
+                                {
+                                    "type": "integer",
+                                    "value": "2",
+                                    "key": "device"
+                                },
+                                {
+                                    "type": null,
+                                    "value": "temp",
+                                    "key": "type"
+                                },
+                                {
+                                    "type": null,
+                                    "value": "c",
+                                    "key": "units"
+                                }
+                            ]
+                        },
+                        "name": "get_temp"
+                    },
+                    ...
+                },
+                "commands": {
+                    ...
+                },
+                "description": "Test Temp",
+                "reference": "VMB1TS",
+                "xpl_commands": {
+                    ...
+                },
+                "client_id": "plugin-velbus.igor",
+                "device_type_id": "velbus.temp",
+                "sensors": {
+                    "temp": {
+                        "value_min": 21.875,
+                        "data_type": "DT_Temp",
+                        "incremental": false,
+                        "id": 4,
+                        "reference": "temp",
+                        "conversion": "",
+                        "name": "temp_sensor",
+                        "last_received": 1410857216,
+                        "timeout": 0,
+                        "formula": null,
+                        "last_value": "29.1875",
+                        "value_max": 37.4375
+                    }
+                },
+                "parameters": {
+                    ...
+                },
+                "id": 3,
+                "name": "Temp elentrik"
+            }
+
+        @apiErrorExample Error-Response:
+            HTTTP/1.1 500 Internal Server Error
+        """
         cli = MQSyncReq(urlHandler.zmq_context)
         msg = MQMessage()
         msg.set_action('device.create')
@@ -241,6 +366,95 @@ class deviceAPI(MethodView):
         return 201, null
 
     def put(self, did):
+        """
+        @api {put} /device/<id> Update a specifick device
+        @apiName putDevice
+        @apiGroup Device
+
+        @apiParamTitle (url) Url parameters
+        @apiParam (url) {Number} id The deviceId to update
+        @apiParamTitle (data) Post parameters
+        @apiParam (data) {String} name The new name for the device
+        @apiParam (data) {String} description The new description for the device
+        @apiParam (data) {String} reference The new reference for the device
+
+        @apiSuccess {json} result The json representation of the updated device
+
+        @apiSuccessExample Success-Response:
+            HTTTP/1.1 200 OK
+            {
+                "xpl_stats": {
+                    "get_temp": {
+                        "json_id": "get_temp",
+                        "schema": "sensor.basic",
+                        "id": 4,
+                        "parameters": {
+                            "dynamic": [
+                                {
+                                    "ignore_values": "",
+                                    "sensor_name": "temp",
+                                    "key": "current"
+                                }
+                            ],
+                            "static": [
+                                {
+                                    "type": "integer",
+                                    "value": "2",
+                                    "key": "device"
+                                },
+                                {
+                                    "type": null,
+                                    "value": "temp",
+                                    "key": "type"
+                                },
+                                {
+                                    "type": null,
+                                    "value": "c",
+                                    "key": "units"
+                                }
+                            ]
+                        },
+                        "name": "get_temp"
+                    },
+                    ...
+                },
+                "commands": {
+                    ...
+                },
+                "description": "Test Temp",
+                "reference": "VMB1TS",
+                "xpl_commands": {
+                    ...
+                },
+                "client_id": "plugin-velbus.igor",
+                "device_type_id": "velbus.temp",
+                "sensors": {
+                    "temp": {
+                        "value_min": 21.875,
+                        "data_type": "DT_Temp",
+                        "incremental": false,
+                        "id": 4,
+                        "reference": "temp",
+                        "conversion": "",
+                        "name": "temp_sensor",
+                        "last_received": 1410857216,
+                        "timeout": 0,
+                        "formula": null,
+                        "last_value": "29.1875",
+                        "value_max": 37.4375
+                    }
+                },
+                "parameters": {
+                    ...
+                },
+                "id": 3,
+                "name": "Temp elentrik"
+            }
+
+        @apiErrorExample Error-Response:
+            HTTTP/1.1 404 Not Found
+        """
+
         b = urlHandler.db.update_device(
             did,
             request.form.get('name'),
