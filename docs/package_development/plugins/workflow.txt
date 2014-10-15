@@ -177,7 +177,7 @@ Now, set a tag for your release. For example: ::
 
 Push the tag on the remote repository: ::
 
-    $ git push -tags
+    $ git push --tags
 
 And finally, merge the tag in the *master* branch. For example for our 1.0 release: ::
 
