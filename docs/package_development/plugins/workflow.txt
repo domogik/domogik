@@ -114,10 +114,19 @@ A development version (which can be named as alpha/beta/candidate) will never be
 * the plugin to be identified as an existing plugin still under development
 * display the plugin build status in the packages repository dashboard
 
-.. todo::
+Got the the packages repository and:
 
-    Currently, the package repository does not handle yet this kind of packages. An enhancement is in progress. See https://github.com/fritz-smh/dmgweb_packages/issues/1
-    The doc for this step will be finished after this ticket is completed
+* login with your GitHub account
+* Click on **Submit a pacckage**
+* Fill the form:
+
+  * Package url : the url to the zip of the *develop* branch. Example : https://github.com/fritz-smh/domogik-plugin-teleinfo/archive/develop.zip
+  * Candidate for the category : **Development** (at this point, do not use any other choice!!!!)
+  * Build status : the url to the picture of the Travis CI build status. Example : https://api.travis-ci.org/fritz-smh/domogik-plugin-teleinfo.svg?branch=develop
+  * Documentation : the url to the generated documentation. Example : http://domogik-plugin-teleinfo.readthedocs.org/en/develop/
+
+* Click on **Validate**
+* Click again on **Validate**
 
 How to give some development releases to people who want to test ?
 ------------------------------------------------------------------
