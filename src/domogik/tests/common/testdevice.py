@@ -109,8 +109,8 @@ class TestDevice():
         response = requests.delete(url, \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
-        if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
+        if response.status_code != 201:
+            raise RuntimeError("Error when deleting the device")
 
     def del_devices_by_client(self, client_id):
         """ Call GET /device to get all devices
