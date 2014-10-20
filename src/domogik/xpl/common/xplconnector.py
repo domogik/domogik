@@ -83,6 +83,7 @@ from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from domogik.xpl.common.xplmessage import XplMessage, FragmentedXplMessage
 from domogik.common.dmg_exceptions import XplMessageError
 import time
+import uuid
 
 READ_NETWORK_TIMEOUT = 2
 
@@ -414,7 +415,8 @@ class Listener:
         @param filter : dictionnary { key : value }. If value is a list, then the 
         listener will check if the key equals any of these values
         """
-        manager.p.log.debug("New listener, filter : %s" % filter)
+        self.uuid = str(uuid.uuid1())
+        manager.p.log.debug("New listener {0}, filter : {1}".format(self.uuid, filter))
         self._callback = cb
         self._filter = filter
         self._manager = manager
@@ -461,6 +463,7 @@ class Listener:
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
+            self._manager.p.log.debug("Message match for listener {0}".format(self.uuid))
             try:
                 if self._cb_params != {} and self._callback.func_code.co_argcount > 1:  
                     thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb-%s" % suffixe)
