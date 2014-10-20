@@ -123,13 +123,13 @@ class Serial():
                 description = self.data['history'][self.history_idx]['description']
                 print(u"Action = {0} / Description = {1}".format(action, description))
                 if action == 'data':
-                    print(self.data['history'][self.history_idx]['data'])
                     value = self.data['history'][self.history_idx]['data']
+                    print(value)
                     self.history_idx += 1
                     return value
                 elif action == 'data-hex':
-                    print(self.data['history'][self.history_idx]['data'])
                     value = binascii.unhexlify(self.data['history'][self.history_idx]['data'])
+                    print(value)
                     self.history_idx += 1
                     return value
                 elif action == 'wait':
@@ -137,6 +137,9 @@ class Serial():
                     print(u" => wait for {0}s".format(delay))
                     self.history_idx += 1
                     time.sleep(delay)
+                else:
+                    print(u"Unkwown action : {0}".format(action))
+                    self.history_idx += 1
             # and if the history is finished, handle the loop
             else:
                 if self.data['loop'] == []:
@@ -149,14 +152,22 @@ class Serial():
                     description = self.data['loop'][self.loop_idx]['description']
                     print(u"Action = {0} / Description = {1}".format(action, description))
                     if action == 'data':
+                        value = self.data['loop'][self.loop_idx]['data']
+                        print(value)
+                        self.loop_idx += 1
+                        return value
+                    elif action == 'data-hex':
                         value = binascii.unhexlify(self.data['loop'][self.loop_idx]['data'])
                         self.loop_idx += 1
                         return value
-                    if action == 'wait':
+                    elif action == 'wait':
                         delay = self.data['loop'][self.loop_idx]['delay']
                         print(u" => wait for {0}s".format(delay))
                         self.loop_idx += 1
                         time.sleep(delay)
+                    else:
+                        print(u"Unkwown action : {0}".format(action))
+                        self.loop_idx += 1
                
 
 
