@@ -46,6 +46,7 @@ import imp
 import unittest
 import sys
 from subprocess import Popen, PIPE
+import time
 
 LOW = "low"
 MEDIUM = "medium"
@@ -174,6 +175,9 @@ class TestRunner():
             pid = subp.pid
             subp.communicate()
             self.results[test] = { 'return_code' : subp.returncode }
+            # do a pause to be sure the previous test (and so plugin instance) has been killed
+            self.log.debug("Do a 60s pause... (yeah, this is a lot but Travis CI is not so quick!!!)")
+            time.sleep(60)
 
     def get_result(self):
         """ Return 0 if all is ok
