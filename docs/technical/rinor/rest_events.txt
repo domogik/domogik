@@ -16,7 +16,7 @@ First, you create a new event request for one or more device id. This request wi
 
 After the event creation you can make a request for the event as often as you want. On REST side, data is put in a queue, so no data will be lost between 2 requests.
 
-When you don't need the reauest anymore, please free it with the appropriate request.
+When you don't need the request anymore, please free it with the appropriate request.
 
 When there is no data in queue, REST will keep connection open until it can give you the data or until timeout occurs (cf **q-evt-timeout** configuration key).
 
