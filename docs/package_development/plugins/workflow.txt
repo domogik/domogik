@@ -114,7 +114,7 @@ A development version (which can be named as alpha/beta/candidate) will never be
 * the plugin to be identified as an existing plugin still under development
 * display the plugin build status in the packages repository dashboard
 
-Got the the packages repository and:
+Go to the the packages repository and:
 
 * login with your GitHub account
 * Click on **Submit a pacckage**
@@ -131,9 +131,8 @@ Got the the packages repository and:
 How to give some development releases to people who want to test ?
 ------------------------------------------------------------------
 
-.. todo::
-
-    The doc for this step will be finished after the previous ticket is completed
+The best way to test a plugin during the development phasis is to clone the repository.
+But you can also use the .zip file of the *develop* branch.
 
 Step 5 - Releasing a stable version
 ===================================
@@ -214,19 +213,37 @@ Get the build status picture url for the release of your plugin and keep it some
 Configure ReadTheDoc to build the new version
 ---------------------------------------------
 
-.. todo::
-    TODO
-    And get the doc url :)
+Connect to your *ReadTheDoc* account and go in your project homepage, for example: https://readthedocs.org/projects/domogik-plugin-teleinfo/
+
+Go in the **Admin** section, then in the **Versions** section and:
+
+* Set **1.0** as the default version (assuming 1.0) is the last version of your package). If you can't select it, first check the 1.0 version to activate it and click on **Submit**. You will now be able to select this version.
+* Uncheck the **stable** version
+* Uncheck the **master** version
+* Uncheck the **latest** version
+* Check the **develop** version
+* Check all the released versions (1.0, ...)
+
+Now, check that the documentation has been generated and get its url. It should be something like http://domogik-plugin-teleinfo.readthedocs.org/en/1.0/
 
 Create a release on GitHub
 --------------------------
 
-.. todo::
-    TODO
-    And get the zip url :)
+This part is mandatory : when a tag have been created, you can see the corresponding release in the **Release** section of a GitHub repository. Creating a release will only help you to give more informations. This is not needed but this can be nice looking on your Github repositories ;)
+
 
 Finally : submit the package!
 -----------------------------
 
-.. todo::
-    * submitting
+Now, the final step! You can submit your package as a stable release!
+
+Go on http://repo-root.domogik.org/ and lg in with your GitHub account.
+
+Click on **Submit a package** and fill the form:
+
+* Package url : the url to the zip of the *released* branch. Example : https://github.com/fritz-smh/domogik-plugin-teleinfo/archive/1.0.zip
+* Candidate for the category : **Stable**. If you think your package may need to be tested by some people before setting it as stable, you should select **Testing** : we will be able to move it from *Testing* to *Stable* later.
+* Build status : the url to the picture of the Travis CI build status. Example : https://api.travis-ci.org/fritz-smh/domogik-plugin-teleinfo.svg?branch=1.0
+* Documentation : the url to the generated documentation. Example : http://domogik-plugin-teleinfo.readthedocs.org/en/1.0/
+
+
