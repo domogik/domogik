@@ -727,18 +727,22 @@ class Plugin(BasePlugin, MQRep):
                self.log.info(u"Create directory {0}.".format(path))
            except:
                raise OSError("Can't create directory {0}.".format(path))
-       try:
-           tmp_prefix = "write_test";
-           count = 0
-           filename = os.path.join(path, tmp_prefix)
-           while(os.path.exists(filename)):
-               filename = "{}.{}".format(os.path.join(path, tmp_prefix),count)
-               count = count + 1
-           f = open(filename,"w")
-           f.close()
-           os.remove(filename)
-       except :
-           raise IOError("Can't create a file in directory {0}.".format(path))
+       # Commented because :
+       # a write test is done for each call of this function. For a plugin with a html server (geoloc for example), it
+       # can be an issue as this makes a lot of write for 'nothing' on the disk.
+       # We keep the code for now (0.4) for maybe a later use (and improved)
+       #try:
+       #    tmp_prefix = "write_test";
+       #    count = 0
+       #    filename = os.path.join(path, tmp_prefix)
+       #    while(os.path.exists(filename)):
+       #        filename = "{}.{}".format(os.path.join(path, tmp_prefix),count)
+       #        count = count + 1
+       #    f = open(filename,"w")
+       #    f.close()
+       #    os.remove(filename)
+       #except :
+       #    raise IOError("Can't create a file in directory {0}.".format(path))
        return path
 
     def register_helper(self, action, help_string, callback):
