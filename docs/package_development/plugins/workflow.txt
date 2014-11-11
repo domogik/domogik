@@ -150,6 +150,7 @@ Here are all the prerequisites for a plugin to be stable:
     * The tests are written, set with Travis CI and the tests results are OK
     * A few people have tested and approved the plugin
     * There is no license issue with the code
+    * All self.log.* calls use the u"foo" syntax to avoid charset issues
 
 If one of these points is not OK, the plugin will not be validated on the package repository by the core team.
 
