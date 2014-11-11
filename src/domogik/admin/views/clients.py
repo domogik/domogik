@@ -517,7 +517,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 msg = MQMessage()
                 msg.set_action( 'reload' )
                 resp = req.request('xplgw', msg.get(), 100)
-                flash(gettext("Device cerated succesfully"), 'success')
+                flash(gettext("Device created succesfully"), 'success')
             else:
                 flash(gettext("Device creation failed"), 'warning')
                 flash(data["reason"], 'danger')
