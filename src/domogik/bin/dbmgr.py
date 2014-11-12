@@ -579,13 +579,16 @@ class DBConnector(Plugin, MQRep):
                               "event" : "updated"})
 
     def reload_stats(self):
-        self.log.debug(u"=============== reload stats")                                                                                                                              
-        req = MQSyncReq(self.zmq)
-        msg = MQMessage()
-        msg.set_action( 'reload' )
-        resp = req.request('xplgw', msg.get(), 100)
-        self.log.debug(u"Reply from xplgw: {0}".format(resp))
-        self.log.debug(u"=============== reload stats END")
+        try:
+            self.log.debug(u"=============== reload stats")                                                                                                                              
+            req = MQSyncReq(self.zmq)
+            msg = MQMessage()
+            msg.set_action( 'reload' )
+            resp = req.request('xplgw', msg.get(), 100)
+            self.log.debug(u"Reply from xplgw: {0}".format(resp))
+            self.log.debug(u"=============== reload stats END")
+        except:
+            self.log.error(u"Error while reloading stats : {0}".format(traceback.format_exc()))
 
 if __name__ == "__main__":
     DBC = DBConnector()
