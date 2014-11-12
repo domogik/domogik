@@ -178,8 +178,8 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 else:
                                     failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(p.key)
                             if not failed:
-                                # send out the msg
-                                self.log.debug(u"sending xplmessage: {0}".format(msg))
+                                # send out the msg
+                                self.log.debug(u"Sending xplmessage: {0}".format(msg))
                                 self.myxpl.send(msg)
                                 ### Wait for answer
                                 stat_received = 0
