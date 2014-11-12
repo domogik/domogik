@@ -87,6 +87,9 @@ class Serial():
         # set a flag for the first read 
         self.first_read = True
 
+        # set the next_response (used by write function) to None
+        self.next_responses = None
+
     def flush(self):
         pass
 
@@ -95,10 +98,24 @@ class Serial():
 
     def write(self, data):
         """ Mock for input data on the serial device
+            respond with the appropriate answers depending on what has been write to the fake serial device
         """
  
-        # TODO : respond with the appropriate answers depending on what has been write to the fake serial device
-        pass
+        for mock in self.data['responses']:
+            found = False
+            if mock['action'] == "data":
+                if data == mock['written']:
+                    found = True
+                    responses = mock['responses']
+                    data_for_log = data
+            elif mock['action'] == "data-hex":
+                if binascii.hexlify(data).lower() == mock['written'].lower():
+                    found = True
+                    responses = mock['responses']
+                    data_for_log = binascii.hexlify(data)
+        if found:
+            print(u"Found mock responses for data written : {0}. Response is {1}".format(data_for_log, responses))
+            self.next_responses = responses
 
     def readline(self, length = 1):
         return self.read(length)
@@ -114,11 +131,26 @@ class Serial():
             self.first_read = False
 
         while True:
-            # check if we are waiting for some response 
-            #TODO
+
+            # handle a response to a write action
+            if self.next_responses != None:
+                response = self.next_responses[0]
+                if response['type'] == "data-hex":
+                    print(u"Action = reply to a write action / Delay = {0} / Data = {1}".format(response['delay'], response['data']))
+                    data = binascii.unhexlify(response['data'])
+                elif response['type'] == "data":
+                    print(u"Action = reply to a write action / Delay = {0} / Data = {1}".format(response['delay'], binascii.hexlify(response['data'])))
+                    data = response['data']
+
+                time.sleep(int(response['delay']))
+                # remove first item from the responses list
+                self.next_responses.pop(0)
+                if self.next_responses == []:
+                    self.next_responses = None
+                return data
 
             # handle the history part
-            if self.history_idx < len(self.data['history']):
+            elif self.history_idx < len(self.data['history']):
                 action = self.data['history'][self.history_idx]['action']
                 description = self.data['history'][self.history_idx]['description']
                 print(u"Action = {0} / Description = {1}".format(action, description))
