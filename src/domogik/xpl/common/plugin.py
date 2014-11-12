@@ -81,6 +81,8 @@ class XplPlugin(Plugin):
         # hbeat not yet called (will be called by the ready() function by a developper plugin)
         self.enable_hbeat_called = False
 
+        # define the source (in can be used in some plugins)
+        self.source = "domogik-{0}.{1}".format(self.get_plugin_name(), self.get_sanitized_hostname())
         self.log.info(u"End of the xPL init")
 
 
