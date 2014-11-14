@@ -107,9 +107,11 @@ class AbstractTest:
              - expected: list of expected keys
         Those values are mostly informational and allow the UI to create different forms
         """
+        self.log.debug("Get parameters for the test")
         result = {}
 
         for name in self._parameters:
+            self.log.debug("Parameter : {0}".format(name))
             p = self._parameters[name]
             result[name] = {
                 "type": p.get_type(),
@@ -118,6 +120,7 @@ class AbstractTest:
                 "default": p.get_default_value(),
                 "expected": p.get_expected_entries()
             }
+            self.log.debug("Parameter results : {0}".format(result))
         return result
 
     def fill_parameters(self, data):
