@@ -254,9 +254,11 @@ class ScenarioManager:
         @param package : a reference to the package that need to be explored
         @return a list of tuple ('modulename.Classname', <instance of class>)
         """
+        self.log.debug("Get list of classes for package : {0}".format(package))
         res = []
         mods = pkgutil.iter_modules(package.__path__)
         for module in mods:
+            self.log.debug("- {0}".format(module))
             imported_mod = importlib.import_module('.' + module[1], package.__name__)
             #get the list of classes in the module
             classes = [m for m in inspect.getmembers(imported_mod) if inspect.isclass(m[1])]
