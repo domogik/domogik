@@ -36,11 +36,14 @@ class SensorIdParameter(AbstractParameter):
         AbstractParameter.__init__(self, log, trigger)
         self.set_type("string")
         self.add_expected_entry("sensor_id", "integer", "The sensor id to check")
+        self.log = log
 
     def evaluate(self):
         """ Return string, or none if no string entered yet
         """
+        self.log.debug("SensorIdParameter : evaluate") 
         p = self.get_parameters()
+        self.log.debug("SensorIdParameter : evaluate : params = {0}".format(p)) 
         if "sensor_id" in p:
             return p["sensor_id"]
         else:
