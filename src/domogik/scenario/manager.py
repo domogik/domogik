@@ -208,9 +208,11 @@ class ScenarioManager:
         }
         """
 
+        self.log.debug("ScenarioManager : list actions")
         res = {}
         actions = self.__return_list_of_classes(s_a)
         for name, cls in actions:
+            self.log.debug("- {0}".format(name))
             inst = cls()
             res[name] = {"parameters": inst.get_expected_entries(),
                          "description": inst.get_description()}
@@ -227,10 +229,12 @@ class ScenarioManager:
         }
         """
 
+        self.log.debug("ScenarioManager : list tests")
         res = {}
         tests = self.__return_list_of_classes(s_t)
         for name, cls in tests:
-            inst = cls()
+            self.log.debug("- {0}".format(name))
+            inst = cls(log = self.log)
             res[name] = []
             for p, i in inst.get_parameters().iteritems():
                 for param, info in i['expected'].iteritems():
