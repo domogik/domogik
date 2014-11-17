@@ -24,15 +24,18 @@ print "==== List of conditions ===="
 print c.request('scenario', m3.get())
 print "==== List actions ===="
 print c.request('scenario', m4.get())
-print "==== Get one test"
-tests_data = json.loads(tests._data['payload'])
+print "==== Get one test ===="
+print tests._data['result']
+print type(tests._data['result'])
+#tests_data = json.loads(tests._data['result'])
+tests_data = tests._data['result']
 test_k = tests_data.keys()[0]
 test_v = tests_data[tests_data.keys()[0]]
 
 print "Test name : %s" % test_k
-#print "Test value : %s" % test_v
+print "Test value : %s" % test_v
 
-print "Create an instance of %s" % test_k
+print "==== Create an instance of %s ====" % test_k
 m4 = MQMessage('test.new', {'obj': test_k})
 uid = c.request('scenario', m4.get())
 print "Create an instance of %s" % test_k
@@ -40,14 +43,17 @@ m5 = MQMessage('action.new', {'obj': 'log.LogAction'})
 uid5 = c.request('scenario', m5.get())
 m6 = MQMessage('action.new', {'obj': 'log.LogAction'})
 uid6 = c.request('scenario', m5.get())
-print "Got UUID for test: %s" % uid._data['payload']
-print "Got UUID for action: %s" % uid5._data['payload']
-print "Got UUID for action: %s" % uid6._data['payload']
+
+print "Got UUID for test: %s" % uid._data['result']
+print "Got UUID for action: %s" % uid5._data['result']
+print "Got UUID for action: %s" % uid6._data['result']
 
 
-print "Needed parameters : "
-for k in test_v["parameters"]:
-    v = test_v["parameters"][k]
+print "==== Set needed parameters ===="
+for a_value in test_v:
+    print a_value
+    k = a_value["name"]
+    v = a_value["values"]
     print "    - %s" % k
     print "      > type : %s" % v["type"]
     print "      > expected tokens :"
