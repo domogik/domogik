@@ -55,6 +55,8 @@ from domogik.common.packagejson import PackageJson, PackageException
 import zmq
 import traceback
 import json
+# to get force_leave() callers : 
+import inspect
 
 # clients (plugins, etc) status
 STATUS_UNKNOWN = "unknown"
@@ -782,6 +784,10 @@ class Plugin(BasePlugin, MQRep):
 
             In the XplPLugin class, this function will be completed to also activate the xpl hbeat
         """
+        if hasattr(self, "log"):
+            self.log.debug(u"force_leave called")
+            self.log.debug(u"the stack is : {0}".format(inspect.stack()))
+
         if return_code != None:
             self.set_return_code(return_code)
             self.log.info("Return code set to {0} when calling force_leave()".format(return_code))
@@ -794,8 +800,6 @@ class Plugin(BasePlugin, MQRep):
         #    IOLoop.instance().start()
         #except:
         #    pass
-        if hasattr(self, "log"):
-            self.log.debug(u"force_leave called")
         # send stopped status over the MQ
         if status:
             self._set_status(status)
