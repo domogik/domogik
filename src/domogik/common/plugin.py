@@ -786,7 +786,10 @@ class Plugin(BasePlugin, MQRep):
         """
         if hasattr(self, "log"):
             self.log.debug(u"force_leave called")
-            self.log.debug(u"the stack is : {0}".format(inspect.stack()))
+            #self.log.debug(u"the stack is : {0}".format(inspect.stack()))
+            self.log.debug(u"the stack is :")
+            for elt in inspect.stack():
+                self.log.debug(u"    {0}".format(elt))
 
         if return_code != None:
             self.set_return_code(return_code)
