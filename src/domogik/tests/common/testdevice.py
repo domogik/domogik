@@ -35,7 +35,7 @@ Usage
 
 
 
-from domogik.tests.common.helpers import get_rest_url
+from domogik.common.utils import get_rest_url
 from domogik.common.utils import get_sanitized_hostname
 import requests
 import json

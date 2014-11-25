@@ -40,6 +40,7 @@ import os
 import sys
 import re
 from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
+from domogik.common.configloader import Loader, CONFIG_FILE
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
@@ -166,4 +167,20 @@ def is_already_launched(log, id, manager=True):
             log.info("No existing process.")
     return is_launched, pid_list
 
+
+def get_rest_url():
+    """ Build and return the rest url
+    """
+    cfg = Loader('rest')
+    config = cfg.load()
+    conf = dict(config[1])
+    ### get REST ip and port
+    port = conf['port']
+    interfaces = conf['interfaces']
+    intf = interfaces.split(',')
+    print intf
+    # get the first ip of the first interface declared
+    ip = get_ip_for_interfaces(intf)[0]
+
+    return "http://{0}:{1}/map".format(ip, port)
 
