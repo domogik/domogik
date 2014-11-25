@@ -40,9 +40,21 @@ import json
 import traceback
 
 
-# for compatibility
-PARITY_NONE = None
-STOPBITS_ONE = None
+### for compatibility
+# taken from /usr/lib/python2.7/dist-packages/serial/serialutil.py
+
+# create control bytes
+XON  = to_bytes([17])
+XOFF = to_bytes([19])
+
+CR = to_bytes([13])
+LF = to_bytes([10])
+
+PARITY_NONE, PARITY_EVEN, PARITY_ODD, PARITY_MARK, PARITY_SPACE = 'N', 'E', 'O', 'M', 'S'
+STOPBITS_ONE, STOPBITS_ONE_POINT_FIVE, STOPBITS_TWO = (1, 1.5, 2)
+FIVEBITS, SIXBITS, SEVENBITS, EIGHTBITS = (5, 6, 7, 8)
+
+### end compatibility
 
 
 
@@ -59,25 +71,26 @@ class Serial():
     """ serial mock
     """
 
-    def __init__(self, device, baudrate = None, bytesize = None, parity = None, stopbits = None, timeout = None):
+    def __init__(self, port, baudrate = None, bytesize = None, parity = None, stopbits = None, timeout = None, xonxoff = None, rtscts = None, writeTimeout = None, dsrdtr = None, interCharTimeout = None):
         """ Construtor
-            @param device : the json file with the fake data
+            @param port : the json file with the fake data
             @param baudrate : useless, just for compatibility
             @param bytesize : useless, just for compatibility
             @param parity : useless, just for compatibility
             @param stopbits : useless, just for compatibility
             @param timeout : useless, just for compatibility
+            @param ... : useless, just for compatibility
         """
         # there is nothing to do, excepting logging!
-        print(u"Fake serial device created. The fake data in the file '{0}' will be used".format(device))
+        print(u"Fake serial device created. The fake data in the file '{0}' will be used".format(port))
 
         # load the json file
         try:
-            json_fp = open(device)
+            json_fp = open(port)
             self.data = json.load(json_fp)
             json_fp.close()
         except:
-            raise SerialException(u"Error while opening fake serial device from file {0} : {1}".format(device, traceback.format_exc()))
+            raise SerialException(u"Error while opening fake serial device from file {0} : {1}".format(port, traceback.format_exc()))
         
         # read index
         self.history_idx = 0
@@ -101,17 +114,17 @@ class Serial():
             respond with the appropriate answers depending on what has been write to the fake serial device
         """
  
+        found = False
         for mock in self.data['responses']:
-            found = False
-            if mock['action'] == "data":
-                if data == mock['written']:
+            if mock['type'] == "data":
+                if data == mock['when']:
                     found = True
-                    responses = mock['responses']
+                    responses = mock['do']
                     data_for_log = data
-            elif mock['action'] == "data-hex":
-                if binascii.hexlify(data).lower() == mock['written'].lower():
+            elif mock['type'] == "data-hex":
+                if binascii.hexlify(data).lower() == mock['when'].lower():
                     found = True
-                    responses = mock['responses']
+                    responses = mock['do']
                     data_for_log = binascii.hexlify(data)
         if found:
             print(u"Found mock responses for data written : {0}. Response is {1}".format(data_for_log, responses))
@@ -127,6 +140,7 @@ class Serial():
         if self.first_read:
             # first, wait for 30 seconds
             # this allows to be sure that the plugin is fully ready before using the fake serial device
+            print("Before the first read, we wait for 30 seconds...")
             time.sleep(30)
             self.first_read = False
 
@@ -161,7 +175,6 @@ class Serial():
                     return value
                 elif action == 'data-hex':
                     value = binascii.unhexlify(self.data['history'][self.history_idx]['data'])
-                    print(value)
                     self.history_idx += 1
                     return value
                 elif action == 'wait':
@@ -212,5 +225,3 @@ if __name__ == "__main__":
         my_mock.readline()
 
 
-# TODO :
-# add a dictionnary to respond
