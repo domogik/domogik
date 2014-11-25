@@ -14,7 +14,7 @@
     {% if device_types|length > 0 %}
     <h3>{% trans %}Create by device type{% endtrans %}</h3>
         {% for dev in device_types %}
-        <a href="/client/{{ clientid }}/dmg_devices/new/type/{{ dev }}"><button type="button" class="btn btn-default btn-sm">{{ dev }}</button></a>
+        <a href="/client/{{ clientid }}/dmg_devices/new/type/{{ dev }}"><button type="button" class="btn btn-default btn-sm">{{ device_types[dev]['name'] }}</button></a>
         {% endfor %}
     {% else %}
     <div class="alert alert-warning">{% trans %}No device types found{% endtrans %}</div>
