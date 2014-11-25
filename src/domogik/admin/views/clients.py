@@ -20,6 +20,7 @@ except ImportError:
 
 from domogik.common.sql_schema import Device, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form
+from collections import OrderedDict
 
 @app.route('/clients')
 @login_required
@@ -304,17 +305,17 @@ def client_devices_new(client_id):
         data = detaila[client_id]['data']
     else:
         data = {}
-    if type(data["device_types"]) is not dict:
-        dtypes = {}
-    else:
-        dtypes = list(data["device_types"].keys())
+    device_types_keys = sorted(data["device_types"])
+    device_types_list = OrderedDict()
+    for key in device_types_keys:
+        device_types_list[key] = data["device_types"][key]
     products = {}
     if "products" in data:
         for prod in data["products"]:
             products[prod["name"]] = prod["type"]
  
     return render_template('client_device_new.html',
-            device_types = dtypes,
+            device_types = device_types_list,
             products = products,
             clientid = client_id,
             mactive="clients",
