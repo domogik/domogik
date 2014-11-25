@@ -182,5 +182,5 @@ def get_rest_url():
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
 
-    return "http://{0}:{1}/map".format(ip, port)
+    return "http://{0}:{1}".format(ip, port)
 

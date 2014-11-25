@@ -8,7 +8,7 @@ import requests
 
 @app.route('/rest')
 def rest():
-    r = requests.get(get_rest_url())
+    r = requests.get("{0}/map".format(get_rest_url()))
 
     return render_template('rest.html',
         mactive="rest",
