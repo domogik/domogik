@@ -162,69 +162,77 @@
                   {% endif %}
 
                   {% if data.xpl_stats|length > 0 %}
-                    <span class="label label-default">{% trans %}Xplstats{% endtrans %}</span>
-                                        <table class="table table-bordered">
-                                            {% for name in data.xpl_stats %}
-                                                <tr>
-                                                    <th>{% trans %}Name{% endtrans %}</th>
-                                                    <td>{{ name }}</td>
-                                                    <th>{% trans %}Schema{% endtrans %}</th>
-                                                    <td>{{ data.xpl_stats[name].schema }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>{% trans %}Type{% endtrans %}</th>
-                                                    <th>{% trans %}Key{% endtrans %}</th>
-                                                    <th colspan="2">{% trans %}Value{% endtrans %} {% trans %}or{% endtrans %} {% trans %}Sensor{% endtrans %}</th>
-                                                </tr>
-                                                {% for param in data.xpl_stats[name].parameters.static %}
-                                                <tr>
-                                                                            <td>Static</td>
-                                                    <td>{{ param.key }}</td>
-                                                    <td colspan="2">{{ param.value }}</td>
-                                                </tr>
-                                                {% endfor %}
-                                                {% for param in data.xpl_stats[name].parameters.dynamic %}
-                                                <tr>
-                                                                            <td>Dynamic</td>
-                                                    <td>{{ param.key }}</td>
-                                                    <td colspan="2">{{ param.sensor_name }}</td>
-                                                </tr>
-                                                {% endfor %}
-                                            {% endfor %}
-                                        </table>
-                {% endif %}
-                {% if data.xpl_commands|length > 0 %}
-                    <span class="label label-default">{% trans %}Xpl commands{% endtrans %}</span>
-                                        <table class="table table-bordered">
-                                        {% for name in data.xpl_commands %}
-                                                <tr>
-                                                    <th>{% trans %}Name{% endtrans %}</th>
-                                                    <td>{{ name }}</td>
-                                                    <th>{% trans %}Schema{% endtrans %}</th>
-                                                    <td>{{ data.xpl_commands[name].schema }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="2">{% trans %}Type{% endtrans %}</th>
-                                                    <th colspan="2">{% trans %}Value{% endtrans %}</th>
-                                                </tr>
-                                                {% for param in data.xpl_commands[name].parameters %}
-                                                <tr>
-                                                    <td colspan="2">{{ param.key }}</td>
-                                                    <td colspan="2">{{ param.value }}</td>
-                                                </tr>
-                                                {% endfor %}
-                                        {% endfor %}
-                                        </table>
-                {% endif %}
-                                </div> 
- 
-                            </td>
-                    </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h3 class="panel-title">{% trans %}xPL stats : details about xPL parameters for the sensors{% endtrans %}</h3>
+                      </div>
+                      <div class="panel-body">
+                        {% for name in data.xpl_stats %}
+                          <h4>{{ name }} <small>xPL schema : {{ data.xpl_stats[name].schema }}</small></h4>
+                          <table class="table table-bordered">
+                            <tbody>
+                              <tr>
+                                <th>{% trans %}Type{% endtrans %}</th>
+                                <th>{% trans %}Key{% endtrans %}</th>
+                                <th>{% trans %}Value or sensor{% endtrans %}</th>
+                              </tr>
+                              {% for param in data.xpl_stats[name].parameters.static %}
+                                <tr>
+                                  <td>{% trans %}Static{% endtrans %}</td>
+                                  <td>{{ param.key }}</td>
+                                  <td>{{ param.value }} <em>({% trans %}value{% endtrans %})</em></td>
+                                </tr>
+                              {% endfor %}
+                              {% for param in data.xpl_stats[name].parameters.dynamic %}
+                                <tr>
+                                  <td>{% trans %}Dynamic{% endtrans %}</td>
+                                  <td>{{ param.key }}</td>
+                                  <td>{{ param.sensor_name }} <em>({% trans %}sensor{% endtrans %})</em></td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {% if data.xpl_commands|length > 0 %}
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h3 class="panel-title">{% trans %}xPL Commands : details about xPL parameters for the commands{% endtrans %}</h3>
+                      </div>
+                      <div class="panel-body">
+                        {% for name in data.xpl_commands %}
+                          <h4>{{ name }} <small>xPL schema : {{ data.xpl_commands[name].schema }}</small></h4>
+                          <table class="table table-bordered">
+                            <tbody>
+                              <tr>
+                                <th>{% trans %}Key{% endtrans %}</th>
+                                <th>{% trans %}Value or sensor{% endtrans %}</th>
+                              </tr>
+                              {% for param in data.xpl_commands[name].parameters %}
+                                <tr>
+                                  <td>{{ param.key }}</td>
+                                  <td>{{ param.value }}</td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        {% endfor %}
+
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </td>
+
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     {% else %}
-    <div class="alert alert-warning">{% trans %}No devices found{% endtrans %}</div>
+      <div class="alert alert-warning">{% trans %}No devices found{% endtrans %}</div>
     {% endif %}
-</div>
+  </div>
 {% endblock %}
