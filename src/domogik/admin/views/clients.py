@@ -21,6 +21,7 @@ except ImportError:
 from domogik.common.sql_schema import Device, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form
 from collections import OrderedDict
+from domogik.common.utils import get_rest_url
 
 @app.route('/clients')
 @login_required
@@ -80,7 +81,8 @@ def client_devices_known(client_id):
             devices = devices,
             clientid = client_id,
             mactive="clients",
-            active = 'devices'
+            active = 'devices',
+            rest_url = get_rest_url()
             )
 
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
