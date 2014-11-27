@@ -43,6 +43,13 @@ import traceback
 ### for compatibility
 # taken from /usr/lib/python2.7/dist-packages/serial/serialutil.py
 
+def to_bytes(seq):
+    """convert a sequence to a bytes type"""
+    b = bytearray()
+    for item in seq:
+        b.append(item)  # this one handles int and str
+    return bytes(b)
+
 # create control bytes
 XON  = to_bytes([17])
 XOFF = to_bytes([19])
