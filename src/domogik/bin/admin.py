@@ -70,22 +70,28 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
         AdminWebSocket.clients.remove(self)
 
     def on_message(self, msg, content=None):
-        if not content:
-            # this is a websocket message
-            jsons = json.loads(msg)
-            if 'action' in jsons and 'data' in jsons:
-                cli = MQSyncReq(zmq.Context())
-                msg = MQMessage()
-                msg.set_action(str(jsons['action']))
-                msg.set_data(jsons['data'])
-                if 'dst' in jsons:
-                    print cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
-                else:
-                    print cli.request('manager', msg.get(), timeout=10).get()
-        else:
-            # this is a mq message
-            for cli in AdminWebSocket.clients:
-                cli.write_message({"msgid": msg, "content": content})
+        try:
+            if not content:
+                # this is a websocket message
+                jsons = json.loads(msg)
+                if 'action' in jsons and 'data' in jsons:
+                    cli = MQSyncReq(zmq.Context())
+                    msg = MQMessage()
+                    msg.set_action(str(jsons['action']))
+                    msg.set_data(jsons['data'])
+                    if 'dst' in jsons:
+                        print(cli.request(str(jsons['dst']), msg.get(), timeout=10).get())
+                    else:
+                        print(cli.request('manager', msg.get(), timeout=10).get())
+            else:
+                # this is a mq message
+                for cli in AdminWebSocket.clients:
+                    print("Client : {0}".format(AdminWebSocket.clients))
+                    #print({"msgid": msg, "content": content})
+                    print({"msgid": msg})
+                    cli.write_message({"msgid": msg, "content": content})
+        except:
+            print("Error : {0}".format(traceback.format_exc()))
 
 class Admin(Plugin):
     """ Admin Server 

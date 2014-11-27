@@ -1,5 +1,22 @@
 <div class="container">
-    <h1>{% trans %}Client{% endtrans %} {{ clientid }}</h1>
+    <h1 id="client_name">
+      {% trans %}Client{% endtrans %} {{ clientid }}
+      {% if client_detail %}
+        {% if client_detail.type == "plugin" %}
+          <div class="btn-group pull-right">
+            <button type="button" class="btn btn-info dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
+              <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+              <li><a id="start" href="#">Start</a></li>
+              <li><a id="stop" href="#">Stop</a></li>
+            </ul>
+          </div>
+        {% else %}
+          <small><span class="label label-info status status-label status-{{client_detail.status}}">{{client_detail.status}}</span> </small>
+        {% endif %}
+      {% endif %}
+    </h1>
     <ul class="nav nav-tabs">
         <li {% if active == "home" %} class="active" {% endif %}><a href="/client/{{ clientid }}">{% trans %}Status{% endtrans %}</a></li>
         <li {% if active == "config" %} class="active" {% endif %}><a href="/client/{{ clientid }}/config">{% trans %}Configuration{% endtrans %}</a></li>
@@ -13,3 +30,38 @@
         </li>
     </ul>
 </div>
+
+    <script type="text/javascript">
+    $( document ).ready(function() {
+        ws.onmessage = function(e) {
+            data = JSON.parse(e.data);
+            {% if client_detail %}
+            if (data.msgid == "plugin.status") {
+                if ( data.content['host'] == '{{client_detail.host}}' && '{{client_detail.package_id}}' == data.content['type'] + '-'+ data.content['name'] ) {
+                console.log(data.content['event']);
+                    $('#client_name .status').text(data.content['event']);
+                    // for plugins, update the button classes
+                    $('#client_name button').removeClass().addClass('btn btn-info dropdown-toggle status-'+data.content['event']);
+                    // for clients which are not plugins, update the label classes
+                    $('#client_name .status-label').removeClass().addClass('label label-info status status-label status-'+data.content['event']);
+                    // TODO : deactivate link start/stop depending on the status
+                }
+            }
+            {% endif %}
+        };
+
+        {% if client_detail %}
+        $("#start").click(function() {
+            console.log("start request");
+            ws.send('{"action": "plugin.start.do", "data": {"name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
+            console.log("ws send done");
+        });
+        $("#stop").click(function() {
+            console.log("stop request");
+            ws.send('{"dst": "plugin-{{ client_detail.name }}.{{ client_detail.host }}", "action": "plugin.stop.do", "data": {"name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
+            console.log("ws send done ()");
+        });
+        {% endif %}
+    });
+    
+    </script>

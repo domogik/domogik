@@ -3,7 +3,7 @@
                                 <h2>{% trans %}Status{% endtrans %}</h2>
                                 <div class="status">
                                     {% for status in ['unknown', 'not-configured', 'starting', 'alive', 'stop-request', 'stopped', 'dead', 'invalid'] %}
-                                        <div class='status_{{status}} {% if data.status == status %}current_status{% endif %}'>
+                                        <div class='status_{{status}} {% if client_detail.status == status %}current_status{% endif %}'>
                                             {% trans %}{{ status }}{% endtrans %}
                                         </div>
                                     {% endfor %}
@@ -11,8 +11,8 @@
 
                                 <h2>{% trans %}Informations{% endtrans %}</h2>
                                 <ul>
-                                    <li>{% trans %}Package{% endtrans %} : {{ data.package_id }}</li>
-                                    <li>{% trans %}Host{% endtrans %} : {{ data.host }}</li>
-                                    <li>{% trans %}Process id{% endtrans %} : {{ data.pid }}</li>
+                                    <li>{% trans %}Package{% endtrans %} : {{ client_detail.package_id }}</li>
+                                    <li>{% trans %}Host{% endtrans %} : {{ client_detail.host }}</li>
+                                    <li>{% trans %}Process id{% endtrans %} : {{ client_detail.pid }}</li>
                                 </ul>
                             </div>

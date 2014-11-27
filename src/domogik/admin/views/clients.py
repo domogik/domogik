@@ -23,6 +23,20 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 
+
+
+def get_client_detail(client_id):
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('client.detail.get')
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is not None:
+        detaila = res.get_data()
+        detail = detaila[client_id]
+    else:
+        detail = {}
+    return detail
+
 @app.route('/clients')
 @login_required
 def clients():
@@ -38,26 +52,28 @@ def clients():
     return render_template('clients.html',
         mactive="clients",
         overview_state="collapse",
-        clients=client_list
+        clients=client_list,
         )
 
 @app.route('/client/<client_id>')
 @login_required
 def client_detail(client_id):
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('client.detail.get')
-    res = cli.request('manager', msg.get(), timeout=10)
-    if res is not None:
-        detaila = res.get_data()
-        detail = detaila[client_id]
-    else:
-        detail = {}
+    # TODO : delete below lines
+    #cli = MQSyncReq(app.zmq_context)
+    #msg = MQMessage()
+    #msg.set_action('client.detail.get')
+    #res = cli.request('manager', msg.get(), timeout=10)
+    #if res is not None:
+    #    detaila = res.get_data()
+    #    detail = detaila[client_id]
+    #else:
+    #    detail = {}
+    detail = get_client_detail(client_id)
 
     return render_template('client.html',
             loop = {'index': 1},
             clientid = client_id,
-            data = detail,
+            client_detail = detail,
             mactive="clients",
             active = 'home'
             )
@@ -65,6 +81,8 @@ def client_detail(client_id):
 @app.route('/client/<client_id>/dmg_devices/known')
 @login_required
 def client_devices_known(client_id):
+    detail = get_client_detail(client_id)
+
     if app.datatypes == {}:
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
@@ -74,15 +92,28 @@ def client_devices_known(client_id):
             app.datatypes = res.get_data()['datatypes']
         else:
             app.datatypes = {}
+
+    # todo : grab from MQ ?
     with app.db.session_scope():
         devices = app.db.list_devices_by_plugin(client_id)
+
+    # sort clients per device type
+    devices_by_device_type_id = {}
+    for dev in devices:
+        if devices_by_device_type_id.has_key(dev['device_type_id']):
+            devices_by_device_type_id[dev['device_type_id']].append(dev)
+        else:
+            devices_by_device_type_id[dev['device_type_id']] = [dev]
+
     return render_template('client_devices.html',
             datatypes = app.datatypes,
             devices = devices,
+            devices_by_device_type_id = devices_by_device_type_id,
             clientid = client_id,
             mactive="clients",
             active = 'devices',
-            rest_url = get_rest_url()
+            rest_url = get_rest_url(),
+            client_detail = detail
             )
 
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
@@ -196,15 +227,19 @@ def client_devices_delete(client_id, did):
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
 def client_config(client_id):
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('client.detail.get')
-    res = cli.request('manager', msg.get(), timeout=10)
-    if res is not None:
-        detaila = res.get_data()
-        config = detaila[client_id]['data']['configuration']
-    else:
-        config = {}
+    # TODO : delete below lines
+    #cli = MQSyncReq(app.zmq_context)
+    #msg = MQMessage()
+    #msg.set_action('client.detail.get')
+    #res = cli.request('manager', msg.get(), timeout=10)
+    #if res is not None:
+    #    detaila = res.get_data()
+    #    config = detaila[client_id]['data']['configuration']
+    #else:
+    #    config = {}
+    
+    detail = get_client_detail(client_id)
+    config = detail['data']['configuration']
     known_items = []
 
     # dynamically generate the wtfform
@@ -292,21 +327,27 @@ def client_config(client_id):
             form = form,
             clientid = client_id,
             mactive="clients",
-            active = 'config'
+            active = 'config',
+            client_detail = detail
             )
 
 @app.route('/client/<client_id>/dmg_devices/new')
 @login_required
 def client_devices_new(client_id):
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('client.detail.get')
-    res = cli.request('manager', msg.get(), timeout=10)
-    if res is not None:
-        detaila = res.get_data()
-        data = detaila[client_id]['data']
-    else:
-        data = {}
+    # TODO : delete below lines
+    #cli = MQSyncReq(app.zmq_context)
+    #msg = MQMessage()
+    #msg.set_action('client.detail.get')
+    #res = cli.request('manager', msg.get(), timeout=10)
+    #if res is not None:
+    #    detaila = res.get_data()
+    #    data = detaila[client_id]['data']
+    #else:
+    #    data = {}
+
+    detail = get_client_detail(client_id)
+    data = detail['data']
+
     device_types_keys = sorted(data["device_types"])
     device_types_list = OrderedDict()
     for key in device_types_keys:
@@ -321,7 +362,8 @@ def client_devices_new(client_id):
             products = products,
             clientid = client_id,
             mactive="clients",
-            active = 'devices'
+            active = 'devices',
+            client_detail = detail,
             )
 
 @app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>', methods=['GET', 'POST'])

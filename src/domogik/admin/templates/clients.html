@@ -5,46 +5,42 @@
     <h1>{% trans %}Clients list{% endtrans %}</h1>
 
     {% if clients|length > 0 %}
-        <h2>{% trans %}Packages{% endtrans %}</h2>
-        <table class="table table-striped" style="border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <th scope="col">{% trans %}ID{% endtrans %}</th>
-                    <th scope="col">{% trans %}Type{% endtrans %}</th>
-                    <th scope="col">{% trans %}Status{% endtrans %}</th>
-                    <th scope="col">{% trans %}Configured{% endtrans %}</th>
-                    <th scope="col">{% trans %}Last seen{% endtrans %}</th>
-                    <th scope="col">{% trans %}Actions{% endtrans %}</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% set exists = [] %}
-            {% for name, data in clients.iteritems() %}
-                {% if data.type != 'core' %}
-                    {% do exists.append(1) %}
-                    <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle" id="{{data.pid}}">
-                        <td>{{ name }}</td>
-                        <td>{{ data.type }}</td>
-                        <td>{{ data.status }}</td>
-                        <td>{% if data.configured %}<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>{% else %} <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> {% endif %}</td>
-                        <td>{{ data.last_seen|datetime('basic') }}</td>
-                        <td>
-        				    {% if data.configured %}
-        					<a class="btn btn-primary" href="/client/{{ name }}">
-        				    {% else %}
-        					<a class="btn btn-primary" href="/client/{{ name }}/config">
-        				    {% endif %}
-        				    {% trans %}Details{% endtrans %}
-                            </a>
-                        </td>
-                    </tr>
-                    <tr id="d{{data.pid}}">
-                        <td colspan="6" class="hiddenRow">
-                            {% include 'client_overview.html' %}
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
+      <h2>{% trans %}Packages{% endtrans %}</h2>
+      {% set exists = [] %}
+
+      <ul class="list-group">
+        <li class="list-group-item"><strong>{% trans %}Packages {% endtrans %}</strong></li>
+        <ul class="list-group">
+
+<!-- TODO
+- dans le .py trier par type/host
+- ici: afficher par type/host
+-->
+          {% for name, client_detail in clients.iteritems() %}
+            {% if client_detail.type != 'xxxcore' %}
+              {% do exists.append(1) %}
+                <a class="list-group-item" href="/client/{{ name }}">
+                  <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> 
+                  {{ client_detail.type }} {{ client_detail.name }} {{ client_detail.host }}
+                  <span class="label label-info status status-label status-{{client_detail.status}} pull-right">{{client_detail.status}}</span>
+                </a>
+            {% endif %}
+          {% endfor %}
+          {% if not exists %}
+            <div class="alert alert-warning">
+              {% trans %}At least one package should be installed to see the packages list{% endtrans %}
+            </span>
+          {% endif %}
+        </ul>
+      </ul>
+
+    {% else %}
+        <div class="alert alert-warning">{% trans %}No clients found (even core components!): is Domogik manager running?{% endtrans %}</div>
+    {% endif %}
+
+
+
+    {% if clients|length > 0 %}
             {% if not exists %}
                 <tr>
                     <td colspan="6" class="alert alert-warning">{% trans %}At least one package should be installed to see a client{% endtrans %}</td>
@@ -62,14 +58,14 @@
                     </tr>
             </thead>
             <tbody>
-            {% for name, data in clients.iteritems() %}
-                {% if data.type == 'core' %}
-                    <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle" id="{{data.pid}}">
+            {% for name, client_detail in clients.iteritems() %}
+                {% if client_detail.type == 'core' %}
+                    <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle" id="{{client_detail.pid}}">
                         <td>{{ name }}</td>
-                        <td>{{ data.type }}</td>
-                        <td>{{ data.status }}</td>
+                        <td>{{ client_detail.type }}</td>
+                        <td>{{ client_detail.status }}</td>
                     </tr>
-                    <tr id="d{{data.pid}}">
+                    <tr id="d{{client_detail.pid}}">
                         <td colspan="3" class="hiddenRow">
                             {% include 'client_overview.html' %}
                         </td>

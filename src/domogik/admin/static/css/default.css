@@ -109,6 +109,30 @@ body {
 }
 
 
+/*** clients status ***/
+
+.status-unknown, .status-stop-request, .status-stopped {
+    background-color: #bb0000;
+    border-color: #bb0000;
+}
+
+.status-unknown, .status-dead, .status-not-configured {
+    background-color: #555555;
+    border-color: #555555;
+}
+
+.status-starting {
+    background-color: #008800;
+    border-color: #008800;
+}
+
+.status-alive {
+    background-color: #00ff00;
+    border-color: #00ff00;
+}
+
+
+
 /*** delete below ****/
 .dmg_client {
     border: 1px solid black;
