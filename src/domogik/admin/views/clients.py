@@ -49,10 +49,24 @@ def clients():
     else:
         client_list = {}
 
+    client_list_per_host_per_type = OrderedDict()
+    for client in client_list:
+        cli_type = client_list[client]['type']
+        cli_host = client_list[client]['host']
+
+        if not client_list_per_host_per_type.has_key(cli_host):
+            client_list_per_host_per_type[cli_host] = {}
+
+        if not client_list_per_host_per_type[cli_host].has_key(cli_type):
+            client_list_per_host_per_type[cli_host][cli_type] = {}
+
+        client_list_per_host_per_type[cli_host][cli_type][client] = client_list[client]
+
     return render_template('clients.html',
         mactive="clients",
         overview_state="collapse",
         clients=client_list,
+        client_list_per_host_per_type=client_list_per_host_per_type
         )
 
 @app.route('/client/<client_id>')

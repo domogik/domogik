@@ -5,98 +5,30 @@
     <h1>{% trans %}Clients list{% endtrans %}</h1>
 
     {% if clients|length > 0 %}
-      <h2>{% trans %}Packages{% endtrans %}</h2>
-      {% set exists = [] %}
-
-      <ul class="list-group">
-        <li class="list-group-item"><strong>{% trans %}Packages {% endtrans %}</strong></li>
-        <ul class="list-group">
-
-<!-- TODO
-- dans le .py trier par type/host
-- ici: afficher par type/host
--->
-          {% for name, client_detail in clients.iteritems() %}
-            {% if client_detail.type != 'xxxcore' %}
-              {% do exists.append(1) %}
-                <a class="list-group-item" href="/client/{{ name }}">
+      {% for host in client_list_per_host_per_type %}
+        <h2>Server : {{ host }}</h2>
+  
+          {% for type in client_list_per_host_per_type[host] %}
+            <div class="list-group">
+              <h3 class="list-group-item">{{ type }}</h3>
+              {% for client in client_list_per_host_per_type[host][type] %}
+                {% if type == "plugin" %}
+                  <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
+                {% else %}
+                  <a class="list-group-item" href="#">
+                {% endif %}
                   <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> 
-                  {{ client_detail.type }} {{ client_detail.name }} {{ client_detail.host }}
-                  <span class="label label-info status status-label status-{{client_detail.status}} pull-right">{{client_detail.status}}</span>
+                  {{ client_list_per_host_per_type[host][type][client].type }} {{ client_list_per_host_per_type[host][type][client].name }} {{ client_list_per_host_per_type[host][type][client].host }}
+                  <span class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
                 </a>
-            {% endif %}
+              {% endfor %}
+            </div>
           {% endfor %}
-          {% if not exists %}
-            <div class="alert alert-warning">
-              {% trans %}At least one package should be installed to see the packages list{% endtrans %}
-            </span>
-          {% endif %}
-        </ul>
-      </ul>
+      {% endfor %}
 
     {% else %}
         <div class="alert alert-warning">{% trans %}No clients found (even core components!): is Domogik manager running?{% endtrans %}</div>
     {% endif %}
 
-
-
-    {% if clients|length > 0 %}
-            {% if not exists %}
-                <tr>
-                    <td colspan="6" class="alert alert-warning">{% trans %}At least one package should be installed to see a client{% endtrans %}</td>
-                </tr>
-            {% endif %}
-            </tbody>
-      </table>
-      <h2>{% trans %}Core components{% endtrans %}</h2>
-      <table class="table table-striped" style="border-collapse:collapse;">
-            <thead>
-                    <tr>
-                        <th scope="col">{% trans %}ID{% endtrans %}</th>
-                        <th scope="col">{% trans %}Type{% endtrans %}</th>
-                        <th scope="col">{% trans %}Status{% endtrans %}</th>
-                    </tr>
-            </thead>
-            <tbody>
-            {% for name, client_detail in clients.iteritems() %}
-                {% if client_detail.type == 'core' %}
-                    <tr data-toggle="collapse" data-target=".client_{{ loop.index }}" class="accordion-toggle" id="{{client_detail.pid}}">
-                        <td>{{ name }}</td>
-                        <td>{{ client_detail.type }}</td>
-                        <td>{{ client_detail.status }}</td>
-                    </tr>
-                    <tr id="d{{client_detail.pid}}">
-                        <td colspan="3" class="hiddenRow">
-                            {% include 'client_overview.html' %}
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            </tbody>
-      </table>
-      <script type="text/javascript">
-		ws.onmessage = function(e) {
-			data = JSON.parse(e.data);
-			if (data.msgid == "client.list" || data.msgid == "client.detail" ) {
-				for (plugin in data.content) {
-                    content = data.content[plugin];
-					$('tr#d' + content.pid + ' div.status div').removeClass('current_status');
-					$('tr#d' + content.pid + ' div.status div.status_' + content.status).addClass('current_status');
-					$('tr#' + content.pid + " td:nth-child(3)").html(content.status);
-                    if ( content.configured ) {
-                        $('tr#' + content.pid + " td:nth-child(4)").html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>');
-                    } else {
-                        $('tr#' + content.pid + " td:nth-child(4)").html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>');
-                    }
-                    var d = new Date(content.last_seen*1000)
-                    var p = d.getDate() + '.' + d.getMonth() + '.' + d.getFullYear() + ' ' + d.getHours() + ':' + d.getMinutes()
-					$('tr#' + content.pid + " td:nth-child(5)").html(p);
-				}
-            }
-		}
-       </script>
-    {% else %}
-        <div class="alert alert-warning">{% trans %}No clients found: Is Domogik manager running?{% endtrans %}</div>
-    {% endif %}
 </div>
 {% endblock %}
