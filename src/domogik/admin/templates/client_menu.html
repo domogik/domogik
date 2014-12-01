@@ -1,34 +1,76 @@
 <div class="container">
-    <h1 id="client_name">
-      {% trans %}Client{% endtrans %} {{ clientid }}
-      {% if client_detail %}
-        {% if client_detail.type == "plugin" %}
-          <div class="btn-group pull-right">
-            <button type="button" class="btn btn-info dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
-              <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-              <li><a id="start" href="#">Start</a></li>
-              <li><a id="stop" href="#">Stop</a></li>
-            </ul>
-          </div>
-        {% else %}
-          <small><span class="label label-info status status-label status-{{client_detail.status}}">{{client_detail.status}}</span> </small>
-        {% endif %}
+  <h1 id="client_name">
+    {% trans %}Client{% endtrans %} {{ clientid }}
+    {% if client_detail %}
+<!--
+TODO : remove
+      {% if client_detail.type == "plugin" %}
+        <div class="btn-group pull-right">
+          <button type="button" class="btn btn-info dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
+            <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a id="start" href="#">Start</a></li>
+            <li><a id="stop" href="#">Stop</a></li>
+          </ul>
+        </div>
+      {% else %}
+        <small><span class="label label-info status status-label status-{{client_detail.status}}">{{client_detail.status}}</span> </small>
       {% endif %}
-    </h1>
-    <ul class="nav nav-tabs">
-        <li {% if active == "home" %} class="active" {% endif %}><a href="/client/{{ clientid }}">{% trans %}Status{% endtrans %}</a></li>
-        <li {% if active == "config" %} class="active" {% endif %}><a href="/client/{{ clientid }}/config">{% trans %}Configuration{% endtrans %}</a></li>
-        <li {% if active == "devices" %} class="active" {% endif %} class="dropdown">
-        <a href="/client/{{ clientid }}/dmg_devices" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Domogik devices{% endtrans %} <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-                <li><a href="/client/{{ clientid }}/dmg_devices/known"><span class='glyphicon glyphicon-list' aria-hidden='true'></span> {% trans %}Known{% endtrans %}</a></li>
-                <li><a href="/client/{{ clientid }}/dmg_devices/new"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}New{% endtrans %}</a></li>
-                <li><a href="/client/{{ clientid }}/dmg_devices/detected"><span class='glyphicon glyphicon-search' aria-hidden='true'></span> {% trans %}Detected{% endtrans %}</a></li>
-            </ul>
-        </li>
-    </ul>
+-->
+    {% endif %}
+  </h1>
+
+    <nav id="client-navbar" class="navbar navbar-default" role="navigation">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#client-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">{{ client_detail.name }}</a>
+
+          {% if client_detail.type == "plugin" %}
+            <div id="client-status" class="btn-group navbar-brand pull-right">
+              <button type="button" class="btn btn-info btn-xs dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
+                <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a id="start" href="#">Start</a></li>
+                <li><a id="stop" href="#">Stop</a></li>
+              </ul>
+            </div>
+          {% else %}
+            <!-- TODO : improve layout -->
+            <span id="client-status" class="label label-info status status-label status-{{client_detail.status}} pull-right">{{client_detail.status}}</span>
+          {% endif %}
+
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="client-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li {% if active == "home" %} class="active" {% endif %} >
+              <a href="/client/{{ clientid }}">{% trans %}Informations{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+
+            <li {% if active == "config" %} class="active" {% endif %} >
+              <a href="/client/{{ clientid }}/config">{% trans %}Configuration{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+
+            <li {% if active == "devices" %} class="active" {% endif %} >
+              <a href="/client/{{ clientid }}/dmg_devices/known">{% trans %}Domogik devices{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
 </div>
 
     <script type="text/javascript">
@@ -62,6 +104,76 @@
             console.log("ws send done ()");
         });
         {% endif %}
+
+
+        {% if active == "home" %}
+            // Define the home client page tour!
+            var client_tour = {
+              id: "client_tour",
+              steps: [
+                {
+                  title: "{% trans %}Welcome to the client pages{% endtrans %}",
+                  content: "{% trans %}Thanks to this menu, you will be able to see informations about the client, to configure it and create some devices.{% endtrans %}",
+                  target: document.querySelector("#client-navbar"),
+                  placement: "bottom"
+                },
+                {
+                  title: "{% trans %}Check the client status{% endtrans %}",
+                  content: "{% trans %}This control shows you the current client status.{% endtrans %}",
+                  target: document.querySelector("#client-status"),
+                  placement: "bottom"
+                }
+              ],
+              onEnd: function() {
+                  $.cookie("admin_client_tour", "done");
+              }
+            };
+
+            // Start the tour on demand
+            $('#start_client_tour').click(function() {
+                hopscotch.startTour(client_tour);
+            });
+
+            // Start the tour on first launch
+            do_client_tour = $.cookie("admin_client_tour")
+            if (do_client_tour != "done") {
+                hopscotch.startTour(client_tour);
+            }
+
+        {% elif active == "devices" %}
+            // Define the client devices tour!
+            var devices_tour = {
+              id: "devices_tour",
+              steps: [
+                {
+                  title: "{% trans %}Create Domogik devices{% endtrans %}",
+                  content: "{% trans %}Click on this button to start creating a new Domogik device. When it will be created, it will appear in a list below.{% endtrans %}",
+                  target: document.querySelector("#create-device"),
+                  placement: "bottom"
+                },
+                {
+                  title: "{% trans %}Let the client show you the new devices{% endtrans %}",
+                  content: "{% trans %}Some clients are able to detect new devices. When your client is running, you can click here to get the detected devices list.{% endtrans %}",
+                  target: document.querySelector("#detected-devices"),
+                  placement: "bottom"
+                }
+              ],
+              onEnd: function() {
+                  $.cookie("admin_devices_tour", "done");
+              }
+            };
+
+            // Start the tour on demand
+            $('#start_devices_tour').click(function() {
+                hopscotch.startTour(devices_tour);
+            });
+
+            do_devices_tour = $.cookie("admin_devices_tour")
+            if (do_devices_tour != "done") {
+                hopscotch.startTour(devices_tour);
+            }
+        {% endif %}
+
     });
     
     </script>

@@ -4,7 +4,7 @@
 {%- block html %}
   <head>
     {%- block head %}
-    <title>{% block title %}{% endblock title %}</title>
+    <title>Domogik</title>
 
     {%- block metas %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +16,9 @@
     <link href="/static/css/datepicker.css" rel="stylesheet" media="screen">
     <link href="/static/css/datepicker.css" rel="stylesheet" media="screen">
     <link href="/static/libraries/pnotify/pnotify.min.css" rel="stylesheet" media="screen">
+    <!-- hopscotch (product tour) -->
+    <link href="/static/libraries/hopscotch/css/hopscotch.min.css" rel="stylesheet" media="screen">
+    <script src="/static/libraries/hopscotch/js/hopscotch.min.js"></script>
     <!-- Domogik -->
     <link href="/static/css/default.css" rel="stylesheet" media="screen">
 
@@ -27,6 +30,7 @@
 	}
        </script>
    <script src="/static/js/jquery.min.js"></script>
+   <script src="/static/js/jquery.cookie.js"></script>
     {%- endblock styles %}
     {%- endblock head %}
   </head>

@@ -4,34 +4,61 @@
 {% include "client_menu.html" %}
 
   <div class="container">
-    <h2>{% trans %}Known Devices{% endtrans %}</h2>
+
+    <div class="row-fluid margin-bottom">
+      <a id="create-device" class="btn btn-info" href="/client/{{ clientid }}/dmg_devices/new"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Create a new Domogik device{% endtrans %}</a> 
+      <button id="detected-devices" type="button" class="btn btn-default" data-toggle="modal" data-target="#detected_modal">
+        <span class='glyphicon glyphicon-search' aria-hidden='true'></span> {% trans %}Detected devices{% endtrans %}
+      </button>
+      <button class="btn btn-default" id="start_devices_tour">{% trans %}Start the discover tour!{% endtrans %}</button>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="detected_modal" tabindex="-1" role="dialog" aria-labelledby="detectedModal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans %}Close{% endtrans %}</span></button>
+            <h4 class="modal-title" id="myModalLabel">{% trans %}Detected devices{% endtrans %}</h4>
+          </div>
+          <div class="modal-body">
+            <p>{% trans %}Some plugins can detect devices that are not yet created on Domogik as Domogik devices. If you continue, you will see the list of these detected devices.{% endtrans %}</p>
+            <p>{% trans %}This feature works only when the plugin is started! Keep also in mind that each time the plugin is stopped, the list is reseted. You should wait a few minutes after the plugin startup before looking for detected devices.{% endtrans %}</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+            <a class="btn btn-primary" href="/client/{{ clientid }}/dmg_devices/detected">{% trans %}OK, show me the detected devices{% endtrans %}</a> 
+          </div>
+        </div>
+      </div>
+    </div>
+
 
 
     {% if devices|length > 0 %}
       <div class="container-fluid">
         <div class="row">
-          <!-- display all devices links sorted by device type -->
-          <div class="col-md-4 sidebar sidebar-left sidebar-animate">
-            <ul class="list-group">
+        
+          <!-- Devices list -->
+          <div class="col-md-4">
+            <h2>{% trans %}Known Devices{% endtrans %}</h2>
+            <ul class="list-group" id="myTabs">
               {% for device_type_id in devices_by_device_type_id %}
                 <li class="list-group-item"><strong>{{ device_type_id }}</strong><span class="badge">{{ devices_by_device_type_id[device_type_id]|length }}</span></li>
-                <ul class="list-group">
-                  {% for data in devices_by_device_type_id[device_type_id] %}
-                    <li class="list-group-item">
-                      <a class="" data-dismiss="sidebar-left" data-toggle="collapse" data-target=".detail-{{ data.id }}" href="#">
-                        <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> {{ data.name }}
-                      </a>
-                    </li>
-                  {% endfor %}
-                </ul>
+                {% for data in devices_by_device_type_id[device_type_id] %}
+                  <a class="list-group-item" href="#detail-{{ data.id }}"><span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> {{ data.name }}</a>
+                {% endfor %}
               {% endfor %}
             </ul>
           </div>
-    
-          <!-- display all devices details -->
+        
+          <!-- Devices details -->
           <div class="col-md-8">
-            {% for data in devices %}
-                    <div class="collapse detail-{{ data.id }}">
+            <div class="tab-content">
+              {% for device_type_id in devices_by_device_type_id %}
+                {% for data in devices_by_device_type_id[device_type_id] %}
+                  <div class="tab-pane" id="detail-{{ data.id }}">
+                    <div class="tab-pane detail-device" id="detail-{{ data.id }}">
                       <h3>{{ data.name }} <small>{{ data.device_type_id }}</small></h2>
                       <div class="panel panel-default">
                         <div class="panel-heading">
@@ -234,12 +261,27 @@
                         </div>
                       {% endif %}
                     </div>
-            {% endfor %}
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            </div>
           </div>
+        
         </div>
+        <script type="text/javascript">
+        // Enable the Tabs
+        
+        $('#myTabs a').click(function (e) {
+            e.preventDefault()
+            $(this).tab('show')
+          });
+        </script>
       </div>
     {% else %}
       <div class="alert alert-warning">{% trans %}No devices found{% endtrans %}</div>
     {% endif %}
+
   </div>
+
+
 {% endblock %}

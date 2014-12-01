@@ -22,6 +22,7 @@ from domogik.common.sql_schema import Device, Sensor
 from wtforms.ext.sqlalchemy.orm import model_form
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
+from operator import itemgetter
 
 
 
@@ -169,6 +170,8 @@ def client_sensor_edit(client_id, sensor_id):
 @app.route('/client/<client_id>/dmg_devices/detected')
 @login_required
 def client_devices_detected(client_id):
+    detail = get_client_detail(client_id)
+
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('device.new.get')
@@ -182,7 +185,8 @@ def client_devices_detected(client_id):
             devices = devices,
             clientid = client_id,
             mactive="clients",
-            active = 'devices'
+            active = 'devices',
+            client_detail = detail
             )
 
 @app.route('/client/<client_id>/dmg_devices/edit/<did>', methods=['GET', 'POST'])
@@ -367,13 +371,24 @@ def client_devices_new(client_id):
     for key in device_types_keys:
         device_types_list[key] = data["device_types"][key]
     products = {}
+    products_per_type = OrderedDict()
     if "products" in data:
-        for prod in data["products"]:
+        products_list = data["products"]
+        products_list = sorted(products_list, key=itemgetter("name"))
+        for prod in products_list:
+            product_label = data['device_types'][prod["type"]]['name']
             products[prod["name"]] = prod["type"]
+            #if not products_per_type.has_key(prod["type"]):
+            if not products_per_type.has_key(product_label):
+                products_per_type[product_label] = OrderedDict()
+            products_per_type[product_label][prod['name']] = prod["type"]
+    # TODO : include products icons
+        
  
     return render_template('client_device_new.html',
             device_types = device_types_list,
             products = products,
+            products_per_type = products_per_type,
             clientid = client_id,
             mactive="clients",
             active = 'devices',
@@ -388,9 +403,12 @@ def client_devices_new_type(client_id, device_type_id):
 @app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
 @login_required
 def client_devices_new_prod(client_id, device_type_id, product):
-    return client_devices_new_wiz(client_id, device_type_id, product)
+    return client_devices_new_wiz(client_id, 
+                                  device_type_id, 
+                                  product)
 
 def client_devices_new_wiz(client_id, device_type_id, product):
+    detail = get_client_detail(client_id)
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('device.params')
@@ -590,5 +608,6 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             dtype = device_type_id,
             clientid = client_id,
             mactive="clients",
-            active = 'devices'
+            active = 'devices',
+            client_detail = detail
             )
