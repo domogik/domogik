@@ -73,16 +73,6 @@ def clients():
 @app.route('/client/<client_id>')
 @login_required
 def client_detail(client_id):
-    # TODO : delete below lines
-    #cli = MQSyncReq(app.zmq_context)
-    #msg = MQMessage()
-    #msg.set_action('client.detail.get')
-    #res = cli.request('manager', msg.get(), timeout=10)
-    #if res is not None:
-    #    detaila = res.get_data()
-    #    detail = detaila[client_id]
-    #else:
-    #    detail = {}
     detail = get_client_detail(client_id)
 
     return render_template('client.html',
@@ -192,6 +182,7 @@ def client_devices_detected(client_id):
 @app.route('/client/<client_id>/dmg_devices/edit/<did>', methods=['GET', 'POST'])
 @login_required
 def client_devices_edit(client_id, did):
+    detail = get_client_detail(client_id)
     with app.db.session_scope():
         device = app.db.get_device_sql(did)
         MyForm = model_form(Device, \
@@ -220,7 +211,8 @@ def client_devices_edit(client_id, did):
                 form = form,
                 clientid = client_id,
                 mactive="clients",
-                active = 'devices'
+                active = 'devices',
+                client_detail = detail,
                 )
 
 @app.route('/client/<client_id>/dmg_devices/delete/<did>')
@@ -245,17 +237,6 @@ def client_devices_delete(client_id, did):
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
 def client_config(client_id):
-    # TODO : delete below lines
-    #cli = MQSyncReq(app.zmq_context)
-    #msg = MQMessage()
-    #msg.set_action('client.detail.get')
-    #res = cli.request('manager', msg.get(), timeout=10)
-    #if res is not None:
-    #    detaila = res.get_data()
-    #    config = detaila[client_id]['data']['configuration']
-    #else:
-    #    config = {}
-    
     detail = get_client_detail(client_id)
     config = detail['data']['configuration']
     known_items = []
@@ -352,17 +333,6 @@ def client_config(client_id):
 @app.route('/client/<client_id>/dmg_devices/new')
 @login_required
 def client_devices_new(client_id):
-    # TODO : delete below lines
-    #cli = MQSyncReq(app.zmq_context)
-    #msg = MQMessage()
-    #msg.set_action('client.detail.get')
-    #res = cli.request('manager', msg.get(), timeout=10)
-    #if res is not None:
-    #    detaila = res.get_data()
-    #    data = detaila[client_id]['data']
-    #else:
-    #    data = {}
-
     detail = get_client_detail(client_id)
     data = detail['data']
 

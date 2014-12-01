@@ -184,3 +184,15 @@ def get_rest_url():
 
     return "http://{0}:{1}".format(ip, port)
 
+
+def get_rest_doc_path():
+    """ return the REST API generated doc path
+    """
+    cfg = Loader('domogik')
+    config = cfg.load()
+    conf = dict(config[1])
+    ### get libraries path
+    path = conf['libraries_path']
+
+    return "{0}/rest_doc_generated_during_install/".format(path)
+
