@@ -275,57 +275,15 @@ class ScenarioManager:
 if __name__ == "__main__":
     import logging
     s = ScenarioManager(logging)
-    print "==== list of conditions ===="
-    print s.list_conditions()
-    print "==== list of parameters ===="
-    print s.list_parameters()
+    print "==== list of actions ===="
+    print s.list_actions()
+    print "==== list of tests ===="
+    print s.list_tests()
 
     print "\n==== Create condition ====\n"
-    print "  * get list of tests as json:"
-    t = s.list_tests()
-    print t
-    tests = json.loads(t)
-    print "  * Create a test instance of %s (%s)" % (tests.keys()[0], tests.values()[0]["description"])
-    uid = s.ask_test_instance(tests.keys()[0])
-    print "  * asked for an instance of %s, got uuid %s" % (tests.keys()[0], uid)
-    print "  * listing parameters needed by the test :"
-    test_data = tests["textinpage.TextInPageTest"]
-    for k in test_data["parameters"]:
-        v = test_data["parameters"][k]
-        print "    - %s" % k
-        print "      > type : %s" % v["type"]
-        print "      > expected tokens :"
-        for tok in v["expected"]:
-            vtok = v["expected"][tok]
-            print "        * %s :" % tok
-            print "          - default : %s" % vtok["default"]
-            print "          - values : %s" % vtok["values"]
-            print "          - type : %s" % vtok["type"]
-            print "          - description : %s" % vtok["description"]
-            print "          - filters : %s" % vtok["filters"]
-    print "  * Generating JSON with values :"
-    print "    - url.urlpath = http://www.google.fr"
-    print "    - url.interval = 5"
-    print "    - text.text = sometext"
-    src = """{ "NOT" : { "%s" : {
-            "url": {
-                "urlpath": "http://www.google.fr",
-                "interval" : "5"
-            },
-            "text": {
-                "text": "sometext"
-            }
-        }
-    }}""" % uid
-    print "  * JSON is : %s" % json.dumps(src)
-    p = json.loads(json.dumps(src))
-    print p
-    print "  * Create condition 'foo' with previous payload"
-    c = s.create_condition("foo", json.dumps(src))
+    jsons = """
+            {"type":"dom_condition","id":"1","IF":{"type":"textinpage.TextInPageTest","id":"5","url.urlpath":"http://cereal.sinners.be/test","url.interval":"10","text.text":"foo"},"deletable":false, "DO":{} }
+                    """
+    c = s.create_scenario("name", jsons)
     print "    - condition created : %s" % c
-    print "    - parse condition"
-    c.parse_condition()
-    print "    - generated condition is : %s" % c.get_parsed_condition()
-    print "    - evaluate the condition, result is %s" % c.eval_condition()
-    s.shutdown()
-    print "  - call force_leave to stop."
+    print "    - list of instances : %s" % s.list_conditions()

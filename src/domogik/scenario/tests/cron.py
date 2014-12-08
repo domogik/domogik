@@ -46,7 +46,7 @@ class CronTest(AbstractTest):
             return None
         else:
             res = crn.evaluate()
-            self._log.debug("Evaluate {0} : {1}".format(crn, res))
+            self.log.debug("Evaluate {0} : {1}".format(crn, res))
             return res
 
 

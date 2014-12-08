@@ -179,7 +179,7 @@ if __name__ == "__main__":
     jsons = """
         {"type":"dom_condition","id":"1","IF":{"type":"textinpage.TextInPageTest","id":"5","url.urlpath":"http://cereal.sinners.be/test","url.interval":"10","text.text":"foo"},"deletable":false}
         """
-    s = ScenarioInstance(logging, 10, "name", json.loads(jsons), "", "")
+    s = ScenarioInstance(logging, 10, "name", json.loads(jsons))
     print s._parsed_condition
     print s._mapping
 
