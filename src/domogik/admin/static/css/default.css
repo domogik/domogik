@@ -124,13 +124,13 @@ body {
 }
 
 .status-starting {
-    background-color: #008800;
-    border-color: #008800;
+    background-color: #cccc00;
+    border-color: #cccc00;
 }
 
 .status-alive {
-    background-color: #00ff00;
-    border-color: #00ff00;
+    background-color: #00cc00;
+    border-color: #00cc00;
 }
 
 
