@@ -204,7 +204,7 @@ class deviceAPI(MethodView):
             else:
                 return 500, data["reason"]
         else:
-            return 500, "DbMgr did not respond on the device.create, check the logs"
+            return 500, "DbMgr did not respond on the device.delete, check the logs"
         return 201, None
 
     def post(self):
