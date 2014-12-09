@@ -91,7 +91,7 @@ from domogik.common.packagejson import PackageJson, PackageException
 
 PYTHON = sys.executable
 WAIT_AFTER_STOP_REQUEST = 15
-CHECK_FOR_NEW_PACKAGES_INTERVAL = 60
+CHECK_FOR_NEW_PACKAGES_INTERVAL = 30
 
 
 class Manager(XplPlugin):
