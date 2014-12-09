@@ -251,7 +251,10 @@ class ScenarioManager:
     def list_conditions(self):
         """ Return the list of conditions as JSON
         """
-        return self._instances
+        ret = []
+        for cid, inst in self._instances.iteritems():
+            ret.append({'cid': cid, 'name': inst['name'], 'json': inst['json']})
+        return ret
 
     def __return_list_of_classes(self, package):
         """ Return the list of module/classes in a package
