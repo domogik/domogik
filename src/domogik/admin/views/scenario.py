@@ -59,13 +59,21 @@ def scenario_edit(id):
     class F(Form):
         sid = HiddenField("id", default=id)
         sname = TextField("name", default=name)
-        sdis = BooleanField("disabled", default=dis)
+        #sdis = BooleanField("disabled", default=dis)
         sjson = HiddenField("json")
         submit = SubmitField("Send")
         pass
     form = F()
 
     if request.method == 'POST' and form.validate():
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('scenario.new')
+        msg.add_data('name', form.sname.data)
+        msg.add_data('json_input', form.sjson.data)
+        msg.add_data('cid', form.sid.data)
+        print "++++++++++++++++="
+        res = cli.request('scenario', msg.get(), timeout=10)
         flash(gettext("Changes saved"), "success")
         return redirect("/scenario")
         pass

@@ -258,7 +258,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                     params[param.key] = param.value
 
             ### start the listener
-            self._log_stats.info("creating listener for %s" % (params))
+            self._log_stats.info(u"creating listener for %s" % (params))
             self._listener = Listener(self._callback, xpl, params)
 
         def get_listener(self):
@@ -270,7 +270,7 @@ class XplManager(XplPlugin, MQAsyncSub):
             """ Callback for the xpl message
             @param message : the Xpl message received
             """
-            self._log_stats.debug( "_callback started for: {0}".format(message) )
+            self._log_stats.debug(u"_callback started for: {0}".format(message) )
             db = DbHelper()
             current_date = calendar.timegm(time.gmtime())
             stored_value = None
@@ -289,7 +289,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 if param.ignore_values:
                                     if value in eval(param.ignore_values):
                                         self._log_stats.debug( \
-                                                "Value {0} is in the ignore list {0}, so not storing." \
+                                                u"Value {0} is in the ignore list {0}, so not storing." \
                                                 .format(value, param.ignore_values))
                                         store = False
                                 if store:
@@ -301,11 +301,11 @@ class XplManager(XplPlugin, MQAsyncSub):
                                         if dev['client_id'] in self._conv:
                                             if sen.conversion in self._conv[dev['client_id']]:
                                                 self._log_stats.debug( \
-                                                    "Calling conversion {0}".format(sen.conversion))
+                                                    u"Calling conversion {0}".format(sen.conversion))
                                                 exec(self._conv[dev['client_id']][sen.conversion])
                                                 value = locals()[sen.conversion](value)
                                     self._log_stats.info( \
-                                            "Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
+                                            u"Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
                                             .format(dev['name'], dev['id'], sen.name, sen.id, param.key, value))
                                     # do the store
                                     stored_value = value
@@ -315,9 +315,9 @@ class XplManager(XplPlugin, MQAsyncSub):
                                                 value, \
                                                 current_date)
                                     except:
-                                        self._log_stats.error("Error when adding sensor history : {0}".format(traceback.format_exc()))
+                                        self._log_stats.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
                                 else:
-                                    self._log_stats.debug("Don't need to store this value")
+                                    self._log_stats.debug(u"Don't need to store this value")
                                 # publish the result
                                 self._pub.send_event('device-stats', \
                                           {"timestamp" : current_date, \
