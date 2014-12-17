@@ -143,10 +143,10 @@ class TestPlugin(MQAsyncSub):
                 return 
 
             print(u"Message received : msgid={0}, content={1}".format(msgid, content))
-            self.plugin_status = content['event']
             if content['name'] == self.name and \
                content['type'] == self.type and \
                content['host'] == self.host:
+                self.plugin_status = content['event']
                 # plugin started
                 if content['event'] == STATUS_ALIVE:
                     print(u"Plugin is started")
