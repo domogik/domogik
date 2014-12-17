@@ -57,6 +57,7 @@ import traceback
 import json
 # to get force_leave() callers : 
 import inspect
+import time
 
 # clients (plugins, etc) status
 STATUS_UNKNOWN = "unknown"
@@ -611,6 +612,7 @@ class Plugin(BasePlugin, MQRep):
         msg.add_data('reason', reason)
         msg.add_data('name', self._name)
         msg.add_data('host', self.get_sanitized_hostname())
+        self.log.info("Send reply for the stop request : {0}".format(msg))
         self.reply(msg.get())
 
         ### Change the plugin status
