@@ -9,3 +9,5 @@ sleep 10
 sleep 10
 cat /var/log/domogik/manager.log
 
+# for some plugins tests, the conversion functions may need to be imported, so we need the following line
+export PYTHONPATH=/var/lib/domogik
