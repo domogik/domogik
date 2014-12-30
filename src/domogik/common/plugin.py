@@ -901,11 +901,12 @@ class Watcher:
             os.wait()
         except KeyboardInterrupt:
             print('KeyBoardInterrupt')
-            self._plugin.log.info("Keyoard Interrupt detected, leave now.")
+            self._plugin.log.warning("Keyoard Interrupt detected, leave now.")
             self._plugin.force_leave()
             self.kill()
         except OSError:
             print(u"OSError")
+            self._plugin.log.error("OSError : {0}.".format(traceback.format_exc()))
         return_code = self._plugin.get_return_code()
         self._plugin.clean_return_code_file()
         sys.exit(return_code)
