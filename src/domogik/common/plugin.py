@@ -778,6 +778,9 @@ class Plugin(BasePlugin, MQRep):
     def __del__(self):
         if hasattr(self, "log"):
             self.log.debug(u"__del__ Single plugin")
+            self.log.debug(u"the stack is :")
+            for elt in inspect.stack():
+                self.log.debug(u"    {0}".format(elt))
             # we guess that if no "log" is defined, the plugin has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
