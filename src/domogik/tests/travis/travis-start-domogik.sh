@@ -3,8 +3,9 @@
 
 source /home/travis/virtualenv/python2.7/bin/activate
 
-/etc/init.d/domogik-mq start
-sleep 10
+# AS of 7/01/2015 this should not be needed anymore
+#/etc/init.d/domogik-mq start
+#sleep 10
 /etc/init.d/domogik start
 sleep 10
 cat /var/log/domogik/manager.log
