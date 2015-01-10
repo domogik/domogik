@@ -12,7 +12,7 @@ Installation
 Dependencies
 ------------
 
-Check your Python version with: ::
+Check your Python version with the below command: ::
 
     python -V
 
@@ -52,9 +52,6 @@ For all other distributions, please install them manually.
 Mysql server
 ------------
 
-.. warning::
-    If you plan to use **postgresql**, please check the :doc:`postgresql installation steps <postgresql>`.
-
 .. note::
     * If you have already a Mysql server installed, you will only have to create the Domogik database.
     * Please note that Domogik does not automatically install the mysql server.
@@ -79,7 +76,8 @@ Download Domogik components
 ---------------------------
 
 .. note::
-    The following commands assume that you are using the **/opt/** folder as the root folder for Domogik. And so Domogik will be installed in the */opt/domogik/* folder.
+    The following commands assume that you are using the **/opt/dmg/** folder as the root folder for Domogik. And so Domogik will be installed in the */opt/dmg/domogik/* folder.
+    If you choose another folder, please keep in mind the below points:
 
     * You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be carefull if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
     * Don't download Domogik sources directly in */root* or */*
@@ -94,16 +92,22 @@ Two components are needed to install domogik :
 
 Git is used to get the sources (be sure that your user is able to create some directories where you will clone the sources).
 
+
+Create the folder */opt/dmg/* : ::
+
+    $ sudo mkdir -p /opt/dmg
+    $ sudo chown domogik /opt/dmg  # assuming the user domogik already exists!
+
 Download Domogik-mq : ::
 
-    $ cd /opt/
+    $ cd /opt/dmg/
     $ git clone https://github.com/domogik/domogik-mq.git
     $ cd domogik-mq
     $ git checkout master
 
 Download Domogik : ::
 
-    $ cd /opt/
+    $ cd /opt/dmg/
     $ git clone https://github.com/domogik/domogik.git
     $ cd domogik
     $ git checkout master
@@ -113,7 +117,7 @@ Install Domogik-mq
 
 ::
 
-    $ cd /opt/domogik-mq
+    $ cd /opt/dmg/domogik-mq
     $ sudo ./install.py
 
 
@@ -136,18 +140,14 @@ Install Domogik
 
 Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
 
-    $ cd /opt/domogik/
+    $ cd /opt/dmg/domogik/
     $ sudo ./install.py --dist-packages
 
 .. note::
 
-   Domogik uses a configuration file which is created and configured by the *install.py* script. This file is */etc/domogik/domogik.cfg*. For more informations, please read :doc:`the page related to the configuration file <domogik_cfg_file>`.
-
-.. note:: 
-
-    During installation, a new user will be created if necessary.
-    
-    If you want to use the C xPL hub instead of the python xPL hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hub.
+    * Domogik uses a configuration file which is created and configured by the *install.py* script. This file is */etc/domogik/domogik.cfg*. For more informations, please read :doc:`the page related to the configuration file <domogik_cfg_file>`.
+    * During the installation, a new user will be created if necessary.
+    * If you want to use the C xPL hub instead of the python xPL hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hub.
 
 .. todo::
     Describe all the steps
@@ -165,11 +165,9 @@ Start domogik
 
 ::
 
-    $ sudo /etc/init.d/domogik-mq start
+    $ sudo /etc/init.d/domogik start
     * Starting 0MQ broker ... Done.
     * Starting 0MQ forwarder ... Done.
-
-    $ sudo /etc/init.d/domogik start
     * Starting xPL (python version)... Done.
     * Starting Manager (with -d -r -x -s)... Done.
     * Starting the admin interface ... Done.
