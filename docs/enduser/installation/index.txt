@@ -6,7 +6,6 @@ Installation
 ============
 
 .. note::
-    * These examples assume you are using Debian or another apt-based distribution (Ubuntu, etc).  Adjust accordingly (eg, use yum instead if using RedHat-based distribution).
     * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to deactivate it before installation.
     * In this example, we use a *mysql* database. If you want to use a *postgresql* database, please refer to :doc:`the specific installations steps for postgresql <postgresql>`.
 
@@ -17,31 +16,38 @@ Check your Python version with: ::
 
     python -V
 
-.. warning::
+.. note::
     Right now Domogik **requires Python 2.7**. Python 3 is not (yet) fully supported.
 
-If you don't already have Python 2.7 or above (you have it if you are running a recent Linux system), then you can run for example: ::
+If you don't already have Python 2.7 or above (you have it if you are running a recent Linux system), please install the following package : 
 
-    $ sudo apt-get install python2.7
-    $ sudo ln -sf /usr/bin/python2.7 /usr/bin/python
+* python2.7
+
+.. note::
+    Example on a Debian based distribution: ::
+
+        $ sudo apt-get install python2.7
+        $ sudo ln -sf /usr/bin/python2.7 /usr/bin/python
 
 Install the needed dependencies : 
 
-* the development package and setuptools
-* SSL libraries
-* Zero MQ libraries
-* postgresql libraries
-* various needed libraries : mako, libffi
-* git
+* the development packages, pip and setuptools : **python2.7-dev, python-pip, python-setuptools**
+* SSL libraries : **libssl-dev**
+* Zero MQ librariy : **libzmq-dev**
+* postgresql libraries : **libpq-dev, python-psycopg2**
+* various needed libraries : **python-mako, libffi-dev**
+* git : **git**
+* MySQL server : **mysql-server**
 
 .. note::
     * Even if setuptools is installed automatically thanks to the *setup.py* script, we need to install it before launching *install.py* : it is needed to use the *pkg_resources* module which is needed during the installation for activating the *domogik* module.
     * Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
 
-::
+The **install.py** script will install these dependencies of the following distributions:
 
-    $ sudo apt-get install python2.7-dev gcc g++ python-setuptools python-pip libssl-dev libzmq-dev libpq-dev python-psycopg2 python-mako libffi-dev git
+* Debian based distributions
 
+For all other distributions, please install them manually.
 
 Mysql server
 ------------
@@ -51,9 +57,10 @@ Mysql server
 
 .. note::
     * If you have already a Mysql server installed, you will only have to create the Domogik database.
+    * Please note that Domogik does not automatically install the mysql server.
     * It is highly recommended to use the **innodb engine** (which can be enabled in /etc/mysql/my.cnf)
 
-Install packages for mysql server: ::
+Install the packages for mysql server: ::
 
     $ sudo apt-get install mysql-server
 
@@ -62,28 +69,22 @@ Log on the mysql database as root user: ::
     $ mysql -u root -p
     Enter password: 
 
-Create a database called "domogik": ::
+Create a database called *domogik* and add grants on it to the user *domogik*: ::
 
-    mysql> CREATE DATABASE domogik;
-    Query OK, 1 row affected (0.00 sec)
+    CREATE DATABASE domogik;
+    GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'domopass';
 
-Create the user "domogik" to use the new database: ::
-
-    mysql> GRANT ALL PRIVILEGES ON domogik.* to domogik@localhost IDENTIFIED BY 'domopass';
-    Query OK, 0 rows affected (0.00 sec)
-
-    mysql>exit
 
 Download Domogik components
 ---------------------------
 
-.. warning::
+.. note::
+    The following commands assume that you are using the **/opt/** folder as the root folder for Domogik. And so Domogik will be installed in the */opt/domogik/* folder.
+
     * You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be carefull if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
     * Don't download Domogik sources directly in */root* or */*
     * The folder path must also not contains any spaces in its name!
 
-.. note::
-   The following commands assume that you are using the **/opt/** folder as the root folder for Domogik. And so Domogik will be installed in the */opt/domogik/* folder.
 
 
 Two components are needed to install domogik : 
@@ -136,7 +137,7 @@ Install Domogik
 Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
 
     $ cd /opt/domogik/
-    $ sudo ./install.py
+    $ sudo ./install.py --dist-packages
 
 .. note::
 
