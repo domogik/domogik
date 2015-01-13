@@ -269,7 +269,9 @@ class XplManager(XplPlugin, MQAsyncSub):
                                             break
                                         else:
                                             self._log.debug(u"we found a matching xplmessage, but the length of the one in the db is not the same as the one on the xplnetwork: db={0} xpl={1}".format(len(xplstat.params), matching))
-                            if found:
+                            if not found:
+                                self._log.debug(u"Did not find a matching xplstat")
+                            else:
                                 self._log.debug(u"Found a matching sensor, so starting the storage procedure")
                                 current_date = calendar.timegm(time.gmtime())
                                 stored_value = None
