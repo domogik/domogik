@@ -242,6 +242,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                     item = self._queue.get()
                     self._log.debug(u"Getting item from the sensorQueue, current length = {0}".format(self._queue.qsize()))
                     self._log.debug(item)
+                    self._log.debug(item["msg"])
                     # if clientid is none, we don't know this sender so ignore
                     if item["clientId"] is not None:
                         with self._db.session_scope():
