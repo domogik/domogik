@@ -241,8 +241,6 @@ class XplManager(XplPlugin, MQAsyncSub):
                 try:
                     item = self._queue.get()
                     self._log.debug(u"Getting item from the sensorQueue, current length = {0}".format(self._queue.qsize()))
-                    self._log.debug(item)
-                    self._log.debug(item["msg"])
                     # if clientid is none, we don't know this sender so ignore
                     # TODO check temp disabled until external members are working
                     #if item["clientId"] is not None:
@@ -251,6 +249,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                             found = 0 
                             for xplstat in self._db.get_all_xpl_stat():
                                 matching = 0
+                                statics = 0
                                 value = False
                                 storeparam = False
                                 if xplstat.schema == item["msg"].schema:
@@ -259,21 +258,17 @@ class XplManager(XplPlugin, MQAsyncSub):
                                     for param in xplstat.params:
                                         if param.key in item["msg"].data:
                                             if param.static:
+                                                statics = statics + 1
                                                 if item["msg"].data[param.key] == param.value:
                                                     matching = matching + 1
                                             else:
-                                                matching = matching + 1
                                                 storeparam = param
                                                 value = item["msg"].data[param.key]
                                     if storeparam:
-                                        if matching == len(xplstat.params): 
+                                        if matching == statics: 
                                             found = 1
                                             break
-                                        else:
-                                            self._log.debug(u"we found a matching xplmessage, but the length of the one in the db is not the same as the one on the xplnetwork: db={0} xpl={1}".format(len(xplstat.params), matching))
-                            if not found:
-                                self._log.debug(u"Did not find a matching xplstat")
-                            else:
+                            if found:
                                 self._log.debug(u"Found a matching sensor, so starting the storage procedure")
                                 current_date = calendar.timegm(time.gmtime())
                                 stored_value = None
