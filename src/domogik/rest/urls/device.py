@@ -300,7 +300,6 @@ class deviceAPI(MethodView):
         if res is not None:
             data = res.get_data()
             if data["status"]:
-                urlHandler.reload_stats()        
                 return 201, data["result"]
             else:
                 return 500, data["reason"]
@@ -404,7 +403,6 @@ class deviceAPI(MethodView):
             request.form.get('description'),
             request.form.get('reference'),
         )
-        urlHandler.reload_stats()        
         return 200, urlHandler.db.get_device(did)
 
 register_api(deviceAPI, 'device', '/device/', pk='did', pk_type='int')

@@ -362,7 +362,6 @@ class DBConnector(Plugin, MQRep):
                 status = False
                 reason = "Device delete failed"
             # delete done
-            self.reload_stats()
         except DbHelperException as d:
             status = False
             reason = "Error while deleting device: {0}".format(d.value)
@@ -577,18 +576,6 @@ class DBConnector(Plugin, MQRep):
                               "name" : name,
                               "host" : host,
                               "event" : "updated"})
-
-    def reload_stats(self):
-        try:
-            self.log.debug(u"=============== reload stats")                                                                                                                              
-            req = MQSyncReq(self.zmq)
-            msg = MQMessage()
-            msg.set_action( 'reload' )
-            resp = req.request('xplgw', msg.get(), 100)
-            self.log.debug(u"Reply from xplgw: {0}".format(resp))
-            self.log.debug(u"=============== reload stats END")
-        except:
-            self.log.error(u"Error while reloading stats : {0}".format(traceback.format_exc()))
 
 if __name__ == "__main__":
     DBC = DBConnector()

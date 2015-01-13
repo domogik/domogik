@@ -28,7 +28,7 @@ Implements
 class XplManager(XplPlugin):
 
 @author: Maikel Punie <maikel.punie@gmail.com>
-@copyright: (C) 2007-2013 Domogik project
+@copyright: (C) 2007-2015 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -46,7 +46,6 @@ import traceback
 import calendar
 import zmq
 import json
-import sys
 import Queue
 import threading
 
@@ -58,8 +57,10 @@ class XplManager(XplPlugin, MQAsyncSub):
     def __init__(self):
         """ Initiate DbHelper, Logs and config
         """
-        XplPlugin.__init__(self, 'xplgw', log_prefix = "")
-        MQAsyncSub.__init__(self, self.zmq, 'xplgw', ['client.conversion', 'client.list'])
+        XplPlugin.__init__(self, 'xplgw', log_prefix="")
+        MQAsyncSub.__init__(\
+            self, self.zmq, 'xplgw', \
+            ['client.conversion', 'client.list'])
 
         self.log.info(u"XPL manager initialisation...")
         self._db = DbHelper()
@@ -76,35 +77,39 @@ class XplManager(XplPlugin, MQAsyncSub):
         # create a general listener
         self._create_xpl_trigger()
         # start handling the xplmessages
-        self._sThread = self._SensorThread(self.log, self._sensor_queue, self.client_conversion_map, self.pub)
-        self._sThread.start()
+        self._s_thread = self._SensorThread(\
+            self.log, self._sensor_queue, \
+            self.client_conversion_map, self.pub)
+        self._s_thread.start()
         # start the sensorthread
         self.ready()
 
     def on_mdp_request(self, msg):
-    # XplPlugin handles MQ Req/rep also
+        """ Method called when an mq request comes in
+        XplPlugin also needs this info, so we need to do a passthrough
+        """
         try:
             XplPlugin.on_mdp_request(self, msg)
-
-            if msg.get_action() == "reload":
-                msg = MQMessage()
-                msg.set_action( 'reload.result' )
-                self.reply(msg.get())
-            elif msg.get_action() == "cmd.send":
+            if msg.get_action() == "cmd.send":
                 self._send_xpl_command(msg)
-        except:
+        except Exception as exp:
             self.log.error(traceback.format_exc())
 
     def on_message(self, msgid, content):
+        """ Method called on a subscribed message
+        """
         try:
             if msgid == 'client.conversion':
                 self._parse_conversions(content)
             elif msgid == 'client.list':
                 self._parse_xpl_target(content)
-        except:
+        except Exception as exp:
             self.log.error(traceback.format_exc())
 
     def _load_client_to_xpl_target(self):
+        """ Request the client conversion info
+        This is an mq req to manager
+        """
         cli = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action('client.list.get')
@@ -112,15 +117,22 @@ class XplManager(XplPlugin, MQAsyncSub):
         if response:
             self._parse_xpl_target(response.get_data())
         else:
-            self.log.error(u"Updating client list was not successfull, no response from manager")
+            self.log.error(\
+                u"Updating client list failed, no response from manager")
 
     def _parse_xpl_target(self, data):
+        """ Translate the mq data info a dict
+        for the xpl targets
+        """
         tmp = {}
         for cli in data:
             tmp[cli] = data[cli]['xpl_source']
         self.client_xpl_map = tmp
-    
+
     def _load_conversions(self):
+        """ Request the client conversion info
+        This is an mq req to manager
+        """
         cli = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action('client.conversion.get')
@@ -128,9 +140,12 @@ class XplManager(XplPlugin, MQAsyncSub):
         if response:
             self._parse_conversions(response.get_data())
         else:
-            self.log.error(u"Updating client conversion list was not successfull, no response from manager")
+            self.log.error(\
+                u"Updating conversion list failed, no response from manager")
 
     def _parse_conversions(self, data):
+        """ Translate the mq data into a dict
+        """
         tmp = {}
         for cli in data:
             tmp[cli] = data[cli]
@@ -170,33 +185,32 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 msg.set_target(self.client_xpl_map[dev['client_id']])
                             msg.set_source(self.myxpl.get_source())
                             msg.set_type("xpl-cmnd")
-                            msg.set_schema( xplcmd.schema)
+                            msg.set_schema(xplcmd.schema)
                             # static paramsw
-                            for p in xplcmd.params:
-                                msg.add_data({p.key : p.value})
+                            for par in xplcmd.params:
+                                msg.add_data({par.key : par.value})
                             # dynamic params
-                            for p in cmd.params:
-                                if p.key in request['cmdparams']:
-                                    value = request['cmdparams'][p.key]
+                            for par in cmd.params:
+                                if par.key in request['cmdparams']:
+                                    value = request['cmdparams'][par.key]
                                     # chieck if we need a conversion
-                                    if p.conversion is not None and p.conversion != '':
+                                    if par.conversion is not None and par.conversion != '':
                                         if dev['client_id'] in self.client_conversion_map:
-                                            if p.conversion in self.client_conversion_map[dev['client_id']]:
-                                                exec(self.client_conversion_map[dev['client_id']][p.conversion])
-                                                value = locals()[p.conversion](value)
-                                    msg.add_data({p.key : value})
+                                            if par.conversion in self.client_conversion_map[dev['client_id']]:
+                                                exec(self.client_conversion_map[dev['client_id']][par.conversion])
+                                                value = locals()[par.conversion](value)
+                                    msg.add_data({par.key : value})
                                 else:
-                                    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(p.key)
+                                    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par.key)
                             if not failed:
                                 # send out the msg
                                 self.log.debug(u"Sending xplmessage: {0}".format(msg))
                                 self.myxpl.send(msg)
                                 ### Wait for answer
-                                stat_received = 0
                                 if xplstat != None:
                                     # get xpl message from queue
                                     self.log.debug(u"Command : wait for answer...")
-                                    sub = MQSyncSub( self.zmq, 'xplgw-command', ['device-stats'] )
+                                    sub = MQSyncSub(self.zmq, 'xplgw-command', ['device-stats'])
                                     stat = sub.wait_for_event()
                                     if stat is not None:
                                         reply = json.loads(stat['content'])
@@ -217,10 +231,16 @@ class XplManager(XplPlugin, MQAsyncSub):
             self.reply(reply_msg.get())
 
     def _create_xpl_trigger(self):
+        """ Create a listener to catch
+        all xpl-stats and xpl-trig messages
+        """
         Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-stat'})
         Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-trig'})
 
     def _xpl_callback(self, pkt):
+        """ The callback for the xpl messages
+        push them into the needed queues
+        """
         item = {}
         item["msg"] = pkt
         item["clientId"] = next((cli for cli, xpl in self.client_xpl_map.items() if xpl == pkt.source), None)
@@ -228,6 +248,10 @@ class XplManager(XplPlugin, MQAsyncSub):
         self.log.debug(u"Adding new message to the sensorQueue, current length = {0}".format(self._sensor_queue.qsize()))
 
     class _SensorThread(threading.Thread):
+        """ SensorThread class
+        Class that will handle the sensor storage in a seperated thread
+        This will get messages from the SensorQueue
+        """
         def __init__(self, log, queue, conv, pub):
             threading.Thread.__init__(self)
             self._db = DbHelper()
@@ -246,12 +270,12 @@ class XplManager(XplPlugin, MQAsyncSub):
                     #if item["clientId"] is not None:
                     if True:
                         with self._db.session_scope():
-                            found = 0 
+                            found = False
                             for xplstat in self._db.get_all_xpl_stat():
                                 matching = 0
                                 statics = 0
-                                value = False
-                                storeparam = False
+                                value = None
+                                storeparam = None
                                 if xplstat.schema == item["msg"].schema:
                                     # we found a possible xplstat
                                     # try to match all params and try to find a sensorid and a vlaue to store
@@ -265,15 +289,15 @@ class XplManager(XplPlugin, MQAsyncSub):
                                                 storeparam = param
                                                 value = item["msg"].data[param.key]
                                     if storeparam:
-                                        if matching == statics: 
-                                            found = 1
+                                        if matching == statics:
+                                            found = True
                                             break
                             if found:
                                 self._log.debug(u"Found a matching sensor, so starting the storage procedure")
                                 current_date = calendar.timegm(time.gmtime())
                                 stored_value = None
                                 store = True
-                                if param.ignore_values:
+                                if storeparam.ignore_values:
                                     if value in eval(storeparam.ignore_values):
                                         self._log.debug( \
                                                 u"Value {0} is in the ignore list {0}, so not storing." \
@@ -292,8 +316,8 @@ class XplManager(XplPlugin, MQAsyncSub):
                                                 exec(self._conv[dev['client_id']][sen.conversion])
                                                 value = locals()[sen.conversion](value)
                                     self._log.info( \
-                                            u"Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
-                                            .format(dev['name'], dev['id'], sen.name, sen.id, param.key, value))
+                                            u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}): key '{4}' with value '{5}' after conversion." \
+                                            .format(dev['name'], dev['id'], sen.name, sen.id, storeparam.key, value))
                                     # do the store
                                     stored_value = value
                                     try:
@@ -301,7 +325,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                                                 storeparam.sensor_id, \
                                                 value, \
                                                 current_date)
-                                    except:
+                                    except Exception as exp:
                                         self._log.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
                                 else:
                                     self._log.debug(u"Don't need to store this value")
@@ -315,9 +339,8 @@ class XplManager(XplPlugin, MQAsyncSub):
                 except Queue.Empty:
                     # nothing in the queue, sleep for 1 second
                     time.sleep(1)
-                except:
-                    self._log_stats.error(traceback.format_exc())
+                except Exception as exp:
+                    self._log.error(traceback.format_exc())
 
 if __name__ == '__main__':
-    EVTN = XplManager()
-        
+    EVTN = XplManager() 

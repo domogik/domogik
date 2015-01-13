@@ -36,10 +36,5 @@ def orphans():
 def orphans_delete(did):
     with app.db.session_scope():
         app.db.del_device(did)
-    # reload stats
-    req = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action( 'reload' )
-    resp = req.request('xplgw', msg.get(), 100)
     flash(gettext("Device deleted"), "success")
     return redirect("/orphans")
