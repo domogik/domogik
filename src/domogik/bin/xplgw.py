@@ -87,7 +87,6 @@ class XplManager(XplPlugin, MQAsyncSub):
             XplPlugin.on_mdp_request(self, msg)
 
             if msg.get_action() == "reload":
-                self._load_db_info()
                 msg = MQMessage()
                 msg.set_action( 'reload.result' )
                 self.reply(msg.get())
@@ -242,6 +241,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                 try:
                     item = self._queue.get()
                     self._log.debug(u"Getting item from the sensorQueue, current length = {0}".format(self._queue.qsize()))
+                    self._log.debug(item)
                     # if clientid is none, we don't know this sender so ignore
                     if item["clientId"] is not None:
                         with self._db.session_scope():
@@ -266,6 +266,8 @@ class XplManager(XplPlugin, MQAsyncSub):
                                         if matching == len(xplstat.params): 
                                             found = 1
                                             break
+                                        else:
+                                            self._log.debug(u"we found a matching xplmessage, but the length of the one in the db is not the same as the one on the xplnetwork: db={0} xpl={1}".format(len(xplstat.params), matching))
                             if found:
                                 self._log.debug(u"Found a matching sensor, so starting the storage procedure")
                                 current_date = calendar.timegm(time.gmtime())
