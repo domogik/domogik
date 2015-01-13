@@ -246,7 +246,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                     # if clientid is none, we don't know this sender so ignore
                     # TODO check temp disabled until external members are working
                     #if item["clientId"] is not None:
-                    if True
+                    if True:
                         with self._db.session_scope():
                             found = 0 
                             for xplstat in self._db.get_all_xpl_stat():
