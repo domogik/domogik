@@ -47,6 +47,8 @@ import calendar
 import zmq
 import json
 import sys
+import Queue
+import threading
 
 ################################################################################
 class XplManager(XplPlugin, MQAsyncSub):
@@ -62,12 +64,21 @@ class XplManager(XplPlugin, MQAsyncSub):
         self.log.info(u"XPL manager initialisation...")
         self._db = DbHelper()
         self.pub = MQPub(zmq.Context(), 'xplgw')
-        self.stats = None
+        # some initial data sets
         self.client_xpl_map = {}
         self.client_conversion_map = {}
+        self._db_sensors = {}
+        self._db_xplstats = {}
+        self._xpl_queue = Queue.Queue()
+        # load some initial data from manager and db
         self._load_client_to_xpl_target()
         self._load_conversions()
-        self.load()
+        self._load_db_info()
+        # create a general listener
+        self._create_xpl_trigger()
+        # start handling the xplmessages
+        # TODO
+        # start the sensorthread
         self.ready()
 
     def on_mdp_request(self, msg):
@@ -76,7 +87,7 @@ class XplManager(XplPlugin, MQAsyncSub):
             XplPlugin.on_mdp_request(self, msg)
 
             if msg.get_action() == "reload":
-                self.load()
+                self._load_db_info()
                 msg = MQMessage()
                 msg.set_action( 'reload.result' )
                 self.reply(msg.get())
@@ -206,33 +217,28 @@ class XplManager(XplPlugin, MQAsyncSub):
             self.log.debug(u"mq reply".format(reply_msg.get()))
             self.reply(reply_msg.get())
 
-    def load(self):
-        """ (re)load all xml files to (re)create _Stats objects
-        """
+    def _load_db_info(self):
         self.log.info(u"Rest Stat Manager loading.... ")
-        self._db.open_session()
-        try:
-            # not the first load : clean
-            if self.stats != None:
-                self.log.info(u"reloading")
-                for stat in self.stats:
-                    self.myxpl.del_listener(stat.get_listener())
-
-            ### Load stats
-            # key1, key2 = device_type_id, schema
-            self.stats = []
-            created_stats = []
-            for stat in self._db.get_all_xpl_stat():
-                # xpl-trig
-                self.stats.append(self._Stat(self.myxpl, stat, "xpl-trig", \
-                                self.log, self.pub, self.client_conversion_map))
-                # xpl-stat
-                self.stats.append(self._Stat(self.myxpl, stat, "xpl-stat", \
-                                self.log, self.pub, self.client_conversion_map))
-        except:
-            self.log.error(u"%s" % traceback.format_exc())
-        self._db.close_session()
+        with self._db.session_scope():
+            self._db_sensors = self._db.get_all_sensor()
+            self._db_xplstats = self._db.get_all_xpl_stat()
         self.log.info(u"Loading finished")
+
+    def _create_xpl_trigger(self):
+        Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-stat'})
+        Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-trig'})
+
+    def _xpl_callback(self, msg):
+        # TODO extend the data we put in here
+        self._xpl_queue.put(msg)
+        self.log.debug(u"Adding new message to the xplQueue, current length = {0}".format(self._xpl_queue.qsize()))
+
+    class _SensorThread(threading.Thread):
+        def __init__(self, log, queue, sCache, xCache):
+            self._log = log
+            self._queue = queue
+            self._sCache = sCache
+            self._xCache = xCache
 
     class _Stat:
         """ This class define a statistic parser and logger instance
