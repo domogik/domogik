@@ -244,7 +244,9 @@ class XplManager(XplPlugin, MQAsyncSub):
                     self._log.debug(item)
                     self._log.debug(item["msg"])
                     # if clientid is none, we don't know this sender so ignore
-                    if item["clientId"] is not None:
+                    # TODO check temp disabled until external members are working
+                    #if item["clientId"] is not None:
+                    if True
                         with self._db.session_scope():
                             found = 0 
                             for xplstat in self._db.get_all_xpl_stat():
