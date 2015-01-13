@@ -69,15 +69,15 @@ class XplManager(XplPlugin, MQAsyncSub):
         self.client_conversion_map = {}
         self._db_sensors = {}
         self._db_xplstats = {}
-        self._xpl_queue = Queue.Queue()
+        self._sensor_queue = Queue.Queue()
         # load some initial data from manager and db
         self._load_client_to_xpl_target()
         self._load_conversions()
-        self._load_db_info()
         # create a general listener
         self._create_xpl_trigger()
         # start handling the xplmessages
-        # TODO
+        self._sThread = self._SensorThread(self.log, self._sensor_queue, self.client_conversion_map, self.pub)
+        self._sThread.start()
         # start the sensorthread
         self.ready()
 
@@ -172,7 +172,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                             msg.set_source(self.myxpl.get_source())
                             msg.set_type("xpl-cmnd")
                             msg.set_schema( xplcmd.schema)
-                            # static params
+                            # static paramsw
                             for p in xplcmd.params:
                                 msg.add_data({p.key : p.value})
                             # dynamic params
@@ -217,125 +217,104 @@ class XplManager(XplPlugin, MQAsyncSub):
             self.log.debug(u"mq reply".format(reply_msg.get()))
             self.reply(reply_msg.get())
 
-    def _load_db_info(self):
-        self.log.info(u"Rest Stat Manager loading.... ")
-        with self._db.session_scope():
-            self._db_sensors = self._db.get_all_sensor()
-            self._db_xplstats = self._db.get_all_xpl_stat()
-        self.log.info(u"Loading finished")
-
     def _create_xpl_trigger(self):
         Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-stat'})
         Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-trig'})
 
-    def _xpl_callback(self, msg):
-        # TODO extend the data we put in here
-        self._xpl_queue.put(msg)
-        self.log.debug(u"Adding new message to the xplQueue, current length = {0}".format(self._xpl_queue.qsize()))
+    def _xpl_callback(self, pkt):
+        item = {}
+        item["msg"] = pkt
+        item["clientId"] = next((cli for cli, xpl in self.client_xpl_map.items() if xpl == pkt.source), None)
+        self._sensor_queue.put(item)
+        self.log.debug(u"Adding new message to the sensorQueue, current length = {0}".format(self._sensor_queue.qsize()))
 
     class _SensorThread(threading.Thread):
-        def __init__(self, log, queue, sCache, xCache):
+        def __init__(self, log, queue, conv, pub):
+            threading.Thread.__init__(self)
+            self._db = DbHelper()
             self._log = log
             self._queue = queue
-            self._sCache = sCache
-            self._xCache = xCache
-
-    class _Stat:
-        """ This class define a statistic parser and logger instance
-        Each instance create a Listener and the associated callbacks
-        """
-
-        def __init__(self, xpl, stat, xpl_type, log, pub, conversions):
-            """ Initialize a stat instance
-            @param xpl : A xpl manager instance
-            @param stat : A XplStat reference
-            @param xpl-type: what xpl-type to listen for
-            """
-            ### Rest data
-            self._log_stats = log
-            self._stat = stat
+            self._conv = conv
             self._pub = pub
-            self._conv = conversions
 
-            ### build the filter
-            params = {'schema': stat.schema, 'xpltype': xpl_type}
-            for param in stat.params:
-                if param.static:
-                    params[param.key] = param.value
-
-            ### start the listener
-            self._log_stats.info(u"creating listener for %s" % (params))
-            self._listener = Listener(self._callback, xpl, params)
-
-        def get_listener(self):
-            """ getter for lsitener object
-            """
-            return self._listener
-
-        def _callback(self, message):
-            """ Callback for the xpl message
-            @param message : the Xpl message received
-            """
-            self._log_stats.debug(u"_callback started for: {0}".format(message) )
-            db = DbHelper()
-            current_date = calendar.timegm(time.gmtime())
-            stored_value = None
-            try:
-                # find what parameter to store
-                for param in self._stat.params:
-                    # self._log_stats.debug("Checking param {0}".format(param))
-                    if param.sensor_id is not None and param.static is False:
-                        if param.key in message.data:
-                            with db.session_scope():
-                                value = message.data[param.key]
-                                # self._log_stats.debug( \
-                                #        "Key found {0} with value {1}." \
-                                #        .format(param.key, value))
+        def run(self):
+            while True:
+                try:
+                    item = self._queue.get()
+                    self._log.debug(u"Getting item from the sensorQueue, current length = {0}".format(self._queue.qsize()))
+                    # if clientid is none, we don't know this sender so ignore
+                    if item["clientId"] is not None:
+                        with self._db.session_scope():
+                            found = 0 
+                            for xplstat in self._db.get_all_xpl_stat():
+                                matching = 0
+                                value = False
+                                storeparam = False
+                                if xplstat.schema == item["msg"].schema:
+                                    # we found a possible xplstat
+                                    # try to match all params and try to find a sensorid and a vlaue to store
+                                    for param in xplstat.params:
+                                        if param.key in item["msg"].data:
+                                            if param.static:
+                                                if item["msg"].data[param.key] == param.value:
+                                                    matching = matching + 1
+                                            else:
+                                                matching = matching + 1
+                                                storeparam = param
+                                                value = item["msg"].data[param.key]
+                                    if storeparam:
+                                        if matching == len(xplstat.params): 
+                                            found = 1
+                                            break
+                            if found:
+                                self._log.debug(u"Found a matching sensor, so starting the storage procedure")
+                                current_date = calendar.timegm(time.gmtime())
+                                stored_value = None
                                 store = True
                                 if param.ignore_values:
-                                    if value in eval(param.ignore_values):
-                                        self._log_stats.debug( \
+                                    if value in eval(storeparam.ignore_values):
+                                        self._log.debug( \
                                                 u"Value {0} is in the ignore list {0}, so not storing." \
-                                                .format(value, param.ignore_values))
+                                                .format(value, storeparam.ignore_values))
                                         store = False
                                 if store:
                                     # get the sensor and dev
-                                    sen = db.get_sensor(param.sensor_id)
-                                    dev = db.get_device(sen.device_id)
+                                    sen = self._db.get_sensor(storeparam.sensor_id)
+                                    dev = self._db.get_device(sen.device_id)
                                     # check if we need a conversion
                                     if sen.conversion is not None and sen.conversion != '':
                                         if dev['client_id'] in self._conv:
                                             if sen.conversion in self._conv[dev['client_id']]:
-                                                self._log_stats.debug( \
+                                                self._log.debug( \
                                                     u"Calling conversion {0}".format(sen.conversion))
                                                 exec(self._conv[dev['client_id']][sen.conversion])
                                                 value = locals()[sen.conversion](value)
-                                    self._log_stats.info( \
+                                    self._log.info( \
                                             u"Storing stat for device '{0}' ({1}) and sensor'{2}' ({3}): key '{4}' with value '{5}' after conversion." \
                                             .format(dev['name'], dev['id'], sen.name, sen.id, param.key, value))
                                     # do the store
                                     stored_value = value
                                     try:
-                                        db.add_sensor_history(\
-                                                param.sensor_id, \
+                                        self._db.add_sensor_history(\
+                                                storeparam.sensor_id, \
                                                 value, \
                                                 current_date)
                                     except:
-                                        self._log_stats.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
+                                        self._log.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
                                 else:
-                                    self._log_stats.debug(u"Don't need to store this value")
+                                    self._log.debug(u"Don't need to store this value")
                                 # publish the result
                                 self._pub.send_event('device-stats', \
                                           {"timestamp" : current_date, \
                                           "device_id" : dev['id'], \
                                           "sensor_id" : sen.id, \
                                           "stored_value" : stored_value})
-                        #else:
-                        #    self._log_stats.debug("Key not found in message data")
-                    #else:
-                    #    self._log_stats.debug("No sensor attached")
-            except:
-                self._log_stats.error(traceback.format_exc())
+
+                except Queue.Empty:
+                    # nothing in the queue, sleep for 1 second
+                    time.sleep(1)
+                except:
+                    self._log_stats.error(traceback.format_exc())
 
 if __name__ == '__main__':
     EVTN = XplManager()
