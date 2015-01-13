@@ -260,6 +260,36 @@ class XplManager(XplPlugin, MQAsyncSub):
             self._conv = conv
             self._pub = pub
 
+        def _find_storeparam(self, item):
+            found = False
+            value = None
+            storeparam = None
+            for xplstat in self._db.get_all_xpl_stat():
+                matching = 0
+                statics = 0
+                value = None
+                storeparam = None
+                if xplstat.schema == item["msg"].schema:
+                    # we found a possible xplstat
+                    # try to match all params and try to find a sensorid and a vlaue to store
+                    for param in xplstat.params:
+                        if param.key in item["msg"].data:
+                            if param.static:
+                                statics = statics + 1
+                                if item["msg"].data[param.key] == param.value:
+                                    matching = matching + 1
+                            else:
+                                storeparam = param
+                                value = item["msg"].data[param.key]
+                    if storeparam:
+                        if matching == statics:
+                            found = True
+                            break
+            if found:
+                return (found, value, storeparam.__dict__)
+            else:
+                return False
+
         def run(self):
             while True:
                 try:
@@ -270,59 +300,35 @@ class XplManager(XplPlugin, MQAsyncSub):
                     #if item["clientId"] is not None:
                     if True:
                         with self._db.session_scope():
-                            found = False
-                            for xplstat in self._db.get_all_xpl_stat():
-                                matching = 0
-                                statics = 0
-                                value = None
-                                storeparam = None
-                                if xplstat.schema == item["msg"].schema:
-                                    # we found a possible xplstat
-                                    # try to match all params and try to find a sensorid and a vlaue to store
-                                    for param in xplstat.params:
-                                        if param.key in item["msg"].data:
-                                            if param.static:
-                                                statics = statics + 1
-                                                if item["msg"].data[param.key] == param.value:
-                                                    matching = matching + 1
-                                            else:
-                                                storeparam = param
-                                                value = item["msg"].data[param.key]
-                                    if storeparam:
-                                        if matching == statics:
-                                            found = True
-                                            break
-                            if found:
+                            fdata = self._find_storeparam(item)
+                            if fdata:
                                 self._log.debug(u"Found a matching sensor, so starting the storage procedure")
+                                value = fdata[1]
+                                storeparam = fdata[2]
                                 current_date = calendar.timegm(time.gmtime())
-                                stored_value = None
                                 store = True
-                                if storeparam.ignore_values:
-                                    if value in eval(storeparam.ignore_values):
-                                        self._log.debug( \
-                                                u"Value {0} is in the ignore list {0}, so not storing." \
-                                                .format(value, storeparam.ignore_values))
+                                if storeparam["ignore_values"]:
+                                    if value in eval(storeparam["ignore_values"]):
+                                        self._log.debug(u"Value {0} is in the ignore list {0}, so not storing.".format(value, storeparam["ignore_values"]))
                                         store = False
                                 if store:
                                     # get the sensor and dev
-                                    sen = self._db.get_sensor(storeparam.sensor_id)
+                                    sen = self._db.get_sensor(storeparam["sensor_id"])
                                     dev = self._db.get_device(sen.device_id)
                                     # check if we need a conversion
                                     if sen.conversion is not None and sen.conversion != '':
-                                        if dev['client_id'] in self._conv:
-                                            if sen.conversion in self._conv[dev['client_id']]:
-                                                self._log.debug( \
-                                                    u"Calling conversion {0}".format(sen.conversion))
-                                                exec(self._conv[dev['client_id']][sen.conversion])
-                                                value = locals()[sen.conversion](value)
+                                        if dev['client_id'] in self._conv and sen.conversion in self._conv[dev['client_id']]:
+                                            self._log.debug( \
+                                                u"Calling conversion {0}".format(sen.conversion))
+                                            exec(self._conv[dev['client_id']][sen.conversion])
+                                            value = locals()[sen.conversion](value)
                                     self._log.info( \
                                             u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}): key '{4}' with value '{5}' after conversion." \
-                                            .format(dev['name'], dev['id'], sen.name, sen.id, storeparam.key, value))
+                                            .format(dev['name'], dev['id'], sen.name, sen.id, storeparam["key"], value))
                                     # do the store
-                                    stored_value = value
                                     try:
                                         self._db.add_sensor_history(\
-                                                storeparam.sensor_id, \
+                                                storeparam["sensor_id"], \
                                                 value, \
                                                 current_date)
                                     except Exception as exp:
@@ -334,7 +340,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                                           {"timestamp" : current_date, \
                                           "device_id" : dev['id'], \
                                           "sensor_id" : sen.id, \
-                                          "stored_value" : stored_value})
+                                          "stored_value" : value})
 
                 except Queue.Empty:
                     # nothing in the queue, sleep for 1 second
