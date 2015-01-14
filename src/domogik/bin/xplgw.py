@@ -48,6 +48,7 @@ import zmq
 import json
 import Queue
 import threading
+from uuid import uuid4
 
 ################################################################################
 class XplManager(XplPlugin, MQAsyncSub):
@@ -70,7 +71,15 @@ class XplManager(XplPlugin, MQAsyncSub):
         self.client_conversion_map = {}
         self._db_sensors = {}
         self._db_xplstats = {}
+        # queue to store the message that needs to be ahndled for sensor checking
         self._sensor_queue = Queue.Queue()
+        # all command handling params
+        # _lock => to be sure to be thread safe
+        # _dict => uuid to xplstat translationg
+        # _pkt => received messages to check
+        self._cmd_lock = threading.Lock()
+        self._cmd_dict = {}
+        self._cmd_pkt = {}
         # load some initial data from manager and db
         self._load_client_to_xpl_target()
         self._load_conversions()
@@ -90,6 +99,8 @@ class XplManager(XplPlugin, MQAsyncSub):
         """
         try:
             XplPlugin.on_mdp_request(self, msg)
+            if msg.get_action() == "test":
+                pass
             if msg.get_action() == "cmd.send":
                 self._send_xpl_command(msg)
         except Exception as exp:
@@ -206,25 +217,28 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 # send out the msg
                                 self.log.debug(u"Sending xplmessage: {0}".format(msg))
                                 self.myxpl.send(msg)
-                                ### Wait for answer
+                                # generate an uuid for the matching answer published messages
                                 if xplstat != None:
-                                    # get xpl message from queue
-                                    self.log.debug(u"Command : wait for answer...")
-                                    sub = MQSyncSub(self.zmq, 'xplgw-command', ['device-stats'])
-                                    stat = sub.wait_for_event()
-                                    if stat is not None:
-                                        reply = json.loads(stat['content'])
-                                        reply_msg = MQMessage()
-                                        reply_msg.set_action('cmd.send.result')
-                                        reply_msg.add_data('stat', reply)
-                                        reply_msg.add_data('status', True)
-                                        reply_msg.add_data('reason', None)
-                                        self.log.debug(u"mq reply".format(reply_msg.get()))
-                                        self.reply(reply_msg.get())
+                                    resp_uuid = uuid4()
+                                    self._cmd_lock.acquire()
+                                    self._cmd_dict[str(resp_uuid)] = xplstat
+                                    self._cmd_lock.release()
+                                else:
+                                    resp_uuid = None
+                                # send the response
+                                reply_msg = MQMessage()
+                                reply_msg.set_action('cmd.send.result')
+                                reply_msg.add_data('uuid', str(resp_uuid))
+                                reply_msg.add_data('status', True)
+                                reply_msg.add_data('reason', None)
+                                self.log.debug(u"mq reply".format(reply_msg.get()))
+                                self.reply(reply_msg.get())
+                                    
         if failed:
             self.log.error(failed)
             reply_msg = MQMessage()
             reply_msg.set_action('cmd.send.result')
+            reply_msg.add_data('uuid', None)
             reply_msg.add_data('status', False)
             reply_msg.add_data('reason', failed)
             self.log.debug(u"mq reply".format(reply_msg.get()))
@@ -246,6 +260,17 @@ class XplManager(XplPlugin, MQAsyncSub):
         item["clientId"] = next((cli for cli, xpl in self.client_xpl_map.items() if xpl == pkt.source), None)
         self._sensor_queue.put(item)
         self.log.debug(u"Adding new message to the sensorQueue, current length = {0}".format(self._sensor_queue.qsize()))
+        self._cmd_lock.acquire()
+        # only do this when we have outstanding commands
+        if len(self._cmd_dict) > 0:
+            self._cmd_dict[time.time()] = pkt
+            self.log.debug(u"Adding new message to the cmdQueue, current length = {0}".format(len(self._cmd_dict)))
+        self._cmd_lock.release()
+
+    class _CommandThread(threading.Thread):
+        """ commandthread class
+        Class responsible for handling one xpl command
+        """
 
     class _SensorThread(threading.Thread):
         """ SensorThread class
