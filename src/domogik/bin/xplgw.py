@@ -50,6 +50,9 @@ import Queue
 import threading
 from uuid import uuid4
 
+# how long we keep a message in the cmd queue
+CMDTIMEOUT = 5
+
 ################################################################################
 class XplManager(XplPlugin, MQAsyncSub):
     """ Statistics manager
@@ -77,8 +80,9 @@ class XplManager(XplPlugin, MQAsyncSub):
         # _lock => to be sure to be thread safe
         # _dict => uuid to xplstat translationg
         # _pkt => received messages to check
-        self._cmd_lock = threading.Lock()
+        self._cmd_lock_d = threading.Lock()
         self._cmd_dict = {}
+        self._cmd_lock_p = threading.Lock()
         self._cmd_pkt = {}
         # load some initial data from manager and db
         self._load_client_to_xpl_target()
@@ -90,6 +94,11 @@ class XplManager(XplPlugin, MQAsyncSub):
             self.log, self._sensor_queue, \
             self.client_conversion_map, self.pub)
         self._s_thread.start()
+        # start handling the command reponses in a thread
+        self._c_thread = self._CommandThread(\
+            self.log, self._db, self._cmd_lock_d, \
+            self._cmd_lock_p, self._cmd_dict, self._cmd_pkt)
+        self._c_thread.start()
         # start the sensorthread
         self.ready()
 
@@ -217,12 +226,13 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 # send out the msg
                                 self.log.debug(u"Sending xplmessage: {0}".format(msg))
                                 self.myxpl.send(msg)
+                                xplstat = self._db.detach(xplstat)
                                 # generate an uuid for the matching answer published messages
                                 if xplstat != None:
                                     resp_uuid = uuid4()
-                                    self._cmd_lock.acquire()
+                                    self._cmd_lock_d.acquire()
                                     self._cmd_dict[str(resp_uuid)] = xplstat
-                                    self._cmd_lock.release()
+                                    self._cmd_lock_d.release()
                                 else:
                                     resp_uuid = None
                                 # send the response
@@ -260,17 +270,44 @@ class XplManager(XplPlugin, MQAsyncSub):
         item["clientId"] = next((cli for cli, xpl in self.client_xpl_map.items() if xpl == pkt.source), None)
         self._sensor_queue.put(item)
         self.log.debug(u"Adding new message to the sensorQueue, current length = {0}".format(self._sensor_queue.qsize()))
-        self._cmd_lock.acquire()
+        self._cmd_lock_p.acquire()
         # only do this when we have outstanding commands
         if len(self._cmd_dict) > 0:
-            self._cmd_dict[time.time()] = pkt
+            self._cmd_pkt[int(time.time())] = pkt
             self.log.debug(u"Adding new message to the cmdQueue, current length = {0}".format(len(self._cmd_dict)))
-        self._cmd_lock.release()
+        self._cmd_lock_p.release()
 
     class _CommandThread(threading.Thread):
         """ commandthread class
         Class responsible for handling one xpl command
         """
+        def __init__(self, log, db, lock_d, lock_p, dic, pkt):
+            threading.Thread.__init__(self)
+            self._db = DbHelper()
+            self._log = log
+            self._lock_d = lock_d
+            self._lock_p = lock_p
+            self._dict = dic
+            self._pkt = pkt
+
+        def run(self):
+            while True:
+                # remove old pkts
+                self._lock_p.acquire()
+                for pkt in self._pkt.keys():
+                    if int(pkt) < int(time.time()) - CMDTIMEOUT:
+                        del(self._pkt[pkt])
+                self._lock_p.release()
+                # now try to match if we have enough data
+                if len(self._dict) > 0 and len(self._pkt) > 0:
+                    # TODO handle
+                    for uuid, search in self._dict.items():
+                        for times, pkt in self._pkt.items():
+                            print search.schema
+                            print pkt.schema
+                else:
+                    # nothing todo, sleep a second
+                    time.sleep(1)
 
     class _SensorThread(threading.Thread):
         """ SensorThread class

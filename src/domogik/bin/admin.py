@@ -51,6 +51,8 @@ import zmq
 import signal
 import time
 import json
+import datetime
+import random
 zmq.eventloop.ioloop.install()
 from tornado.wsgi import WSGIContainer
 from tornado.ioloop import IOLoop, PeriodicCallback 
@@ -62,12 +64,39 @@ from tornado.websocket import WebSocketHandler
 class AdminWebSocket(WebSocketHandler, MQAsyncSub):
     clients = set()
 
+    def __init__(self, application, request, **kwargs):
+        WebSocketHandler.__init__(self, application, request, **kwargs)
+        self.io_loop = IOLoop.instance()
+
     def open(self):
         MQAsyncSub.__init__(self, zmq.Context(), 'admin', [])
+        # Ping to make sure the agent is alive.
+        self.io_loop.add_timeout(datetime.timedelta(seconds=random.randint(5,30)), self.send_ping)
         AdminWebSocket.clients.add(self)
+        print "WSSSS: add new client"
+
+    def on_connection_timeout(self):
+        print "-- Client timed out aftter 1 minute"
+        self.on_close()
+
+    def send_ping(self):
+        try:
+            print "-- Sending ping"
+            self.ping("a")
+            self.ping_timeout = self.io_loop.add_timeout(datetime.timedelta(minutes=1), self.on_connection_timeout)
+        except Exception as ex:
+            print "-- Failed to send ping! %s" % ex
+
+    def on_pong(self, data):
+        print "-- Client send pong"
+        if hasattr(self, "ping_timeout"):
+            self.io_loop.remove_timeout(self.ping_timeout)
+            # Wait 5 seconds before pinging again.
+            self.io_loop.add_timeout(datetime.timedelta(seconds=5), self.send_ping)
 
     def on_close(self):
         AdminWebSocket.clients.remove(self)
+        print "WSSSS: remove client"
 
     def on_message(self, msg, content=None):
         try:
@@ -168,7 +197,7 @@ class Admin(Plugin):
         
 	tapp = Application([
 		(r"/ws", AdminWebSocket),
-                (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
+        (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
 	])
 
 	# create the server
