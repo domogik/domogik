@@ -13,11 +13,21 @@
           <h2>{% trans %}Package details{% endtrans %}</h2>
         </div>
         <div class="panel-body">
-          <h3>{% trans %}Author{% endtrans %}</h3>
-          <ul>
-            <li>{% trans %}Name{% endtrans %} : {{ client_detail.data.identity.author }}</li>
-            <li>{% trans %}Email{% endtrans %} : {{ client_detail.data.identity.author_email }}</li>
-          </ul>
+          <blockquote>
+            <p>{{ client_detail.data.identity.description }}</p>
+          </blockquote>
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <th>{% trans %}Version{% endtrans %}</th>
+                <td>{{ client_detail.data.identity.version }}</td>
+              </tr>
+              <tr>
+                <th>{% trans %}Author{% endtrans %}</th>
+                <td>{{ client_detail.data.identity.author }} : {{ client_detail.data.identity.author_email }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -39,8 +49,43 @@
     </div>
   </div>
 
-  <div class="row">
-    {% if client_detail.data.udev_rules|length > 0 %}
+  {% if client_detail.data.identity.dependencies|length > 0 %}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h2>{% trans %}Dependencies{% endtrans %}</h2>
+          </div>
+          <div class="panel-body">
+            <p class="well">
+              {% trans %}This package needs some dependencies to work properly. Please check they are present on your system.{% endtrans %}
+            </p>
+
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>{% trans %}Type{% endtrans %}</th>
+                  <th>{% trans %}Detail{% endtrans %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for dep in client_detail.data.identity.dependencies %}
+                  <tr>
+                    <td>{{ dep.type }}</td>
+                    <td>{{ dep.id }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+
+  {% if client_detail.data.udev_rules|length > 0 %}
+    <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -58,9 +103,8 @@
           </div>
         </div>
       </div>
-    {% endif %}
-
-  </div>
+    </div>
+  {% endif %}
 
 </div>
 {% endblock %}

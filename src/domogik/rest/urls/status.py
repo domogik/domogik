@@ -63,7 +63,16 @@ def api_root():
     info["Domogik_release"] = global_version
     info["Sources_release"] = src_version
 
-    data = {"info" : info}
+    # mq part
+    mqconfig = Loader('mq', 'domogik-mq.cfg')
+    config = dict(mqconfig.load()[1])
+    mq = {}
+    mq["sub_port"] = config["sub_port"]
+    mq["ip"] = config["ip"]
+    mq["req_rep_port"] = config["req_rep_port"]
+    mq["pub_port"] = config["pub_port"]
+
+    data = {"info" : info, "mq": mq}
     return 200, data
 
 @urlHandler.route('/map')
