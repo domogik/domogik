@@ -9,8 +9,6 @@ mysql:
   database: domogik
   username: travis
   encoding: utf8
-virtualenv:
-  system_site_packages: true
 install:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-dependencies.sh
 before_script:
