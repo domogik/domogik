@@ -10,4 +10,4 @@ sudo apt-get install libssl-dev
 sudo apt-get install libmysqlclient-dev mysql-client
 pip install psycopg2
 pip install docutils
-pip install python-daemon
+pip install python-daemon==2.0.2
