@@ -53,10 +53,10 @@ class PluginJsonValidator():
             try:
                 pkg = PackageJson(path=self.options.path)
                 pkg.validate()
-                print "JSON OK"
+                print("JSON OK")
             except PackageException as e:
-                print "JSON NOT OK"
-                print e.value
+                print("JSON NOT OK")
+                print(e.value)
         else:
             parser.print_help()
 
