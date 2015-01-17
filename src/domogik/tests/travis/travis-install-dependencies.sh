@@ -12,7 +12,6 @@ sudo pip install psycopg2
 #sudo apt-get install python-versiontools
 #sudo pip install python-version-info
 sudo pip install docutils
-sudo pip uninstall python-daemon
 #rm /usr/lib/python2.7/dist-packages/easy_install.pyc
 sudo pip install python-daemon==2.0.2 ## see http://stackoverflow.com/questions/27972349/installing-latest-python-daemon-2-0-3-breaks-subsequent-pip-installs
 
