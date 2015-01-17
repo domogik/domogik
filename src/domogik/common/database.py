@@ -507,8 +507,6 @@ class DbHelper():
 
     def add_full_device(self, params, client_data):
         try:
-            print params
-            print json
             created_xpl_stats = {}
             created_xpl_cmd = {}
             created_sensors = {}
