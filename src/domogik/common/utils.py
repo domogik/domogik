@@ -166,7 +166,6 @@ def is_already_launched(log, type, id, manager=True):
     if manager:
         #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
         cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v mprof | grep -v update".format(id, STARTED_BY_MANAGER, my_pid)
-        print "is manager"
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
     # the grep python is needed to avoid a client to not start because someone is editing the client with vi :)
