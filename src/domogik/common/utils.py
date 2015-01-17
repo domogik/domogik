@@ -137,7 +137,7 @@ def is_already_launched(log, id, manager=True):
     if manager:
         #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
         cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v update".format(id, STARTED_BY_MANAGER, my_pid)
-        print "is manager"
+        print("is manager")
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
     # the grep python is needed to avoid a plugin to not start because someone is editing the plugin with vi :)
@@ -178,7 +178,7 @@ def get_rest_url():
     port = conf['port']
     interfaces = conf['interfaces']
     intf = interfaces.split(',')
-    print intf
+    print(intf)
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
 
