@@ -10,7 +10,6 @@ import getpass
 print("USER={0}".format(getpass.getuser()))
 # end debug
 import platform
-import ConfigParser
 import argparse
 import shutil
 import errno

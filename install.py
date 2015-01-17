@@ -460,7 +460,8 @@ def install():
             user_entry = pwd.getpwnam(user)
         except KeyError:
             raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
-        os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
+        if os.path.isfile("/var/log/domogik/db_api.log"): 
+            os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
         os.chown("/var/lock/domogik/config.lock", user_entry.pw_uid, -1)
 
         if not args.test:
