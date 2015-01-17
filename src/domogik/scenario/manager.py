@@ -278,12 +278,12 @@ class ScenarioManager:
 if __name__ == "__main__":
     import logging
     s = ScenarioManager(logging)
-    print "==== list of actions ===="
-    print s.list_actions()
-    print "==== list of tests ===="
-    print s.list_tests()
+    print("==== list of actions ====")
+    print(s.list_actions())
+    print("==== list of tests ====")
+    print(s.list_tests())
 
-    print "\n==== Create condition ====\n"
+    print("\n==== Create condition ====\n")
     jsons = """
             {"type":"dom_condition","id":"1","IF":{"type":"textinpage.TextInPageTest","id":"5","url.urlpath":"http://cereal.sinners.be/test","url.interval":"10","text.text":"foo"},"deletable":false, "DO":{} }
                     """

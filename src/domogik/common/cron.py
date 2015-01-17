@@ -196,7 +196,7 @@ class CronExpression(object):
 
         if cpm:
             """ Do compare """
-            print cpm
+            print(cpm)
             return True
         else:
             return False
@@ -361,27 +361,27 @@ class CronExpression(object):
 
 if __name__ == "__main__":
     job = CronExpression("@fullmoon")
-    print job
-    print job.check_trigger_now()
-    print ""
+    print(job)
+    print(job.check_trigger_now())
+    print("")
     job = CronExpression("@dawn")
-    print job
-    print job.check_trigger_now()
-    print ""
+    print(job)
+    print(job.check_trigger_now())
+    print("")
     job = CronExpression("@equinox")
-    print job
-    print job.check_trigger_now()
-    print ""
-    #print job.check_trigger((2010, 11, 17, 0, 0))
+    print(job)
+    print(job.check_trigger_now())
+    print("")
+    #print(job.check_trigger((2010, 11, 17, 0, 0)))
     job = CronExpression("0 0 * * 1-5/2 find /var/log -delete")
-    print job
-    print job.check_trigger_now()
-    print job.check_trigger((2010, 11, 17, 0, 0))
-    print job.check_trigger((2012, 12, 21, 0 , 0))
-    print ""
+    print(job)
+    print(job.check_trigger_now())
+    print(job.check_trigger((2010, 11, 17, 0, 0)))
+    print(job.check_trigger((2012, 12, 21, 0 , 0)))
+    print("")
     job = CronExpression("@midnight Feed 'it'", (2010, 5, 1, 7, 0, -6))
-    print job
-    print job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6)
-    print job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6)
-    print job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6)
-    print ""
+    print(job)
+    print(job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6))
+    print(job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6))
+    print(job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6))
+    print("")

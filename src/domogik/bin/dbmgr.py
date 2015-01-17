@@ -209,7 +209,6 @@ class DBConnector(Plugin, MQRep):
         """ Reply to config.set MQ req
             @param data : MQ req message
         """
-        print "#################"
         msg = MQMessage()
         msg.set_action('config.result')
         status = True
