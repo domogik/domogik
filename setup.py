@@ -60,10 +60,10 @@ for mod in pip.get_installed_distributions():
     if ( mod.key == 'pyzmq' ):
         pyzmq_found = True
 
-print "******************************************"
-print "use: "+mysql
-print "use: "+magic
-print "******************************************"
+print("******************************************")
+print("use: {0}".format(mysql))
+print("use: {0}".format(magic))
+print("******************************************")
 
 setup(
     name = 'Domogik',
