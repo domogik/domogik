@@ -87,12 +87,15 @@ def ucode(my_string):
 
     """
     if my_string is not None:
-        if isinstance(my_string, unicode):
-            return my_string
-        elif not isinstance(my_string, str):
-            return str(my_string).decode("utf-8")
+        if sys.version < '3':
+            if isinstance(my_string, unicode):
+                return my_string
+            elif not isinstance(my_string, str):
+                return str(my_string).decode("utf-8")
+            else:
+                return my_string.decode("utf-8")
         else:
-            return my_string.decode("utf-8")
+            return my_string
     else:
         return None
 
