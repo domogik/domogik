@@ -140,7 +140,7 @@ class DbHelper():
         config = cfg.load()
         self.__db_config = dict(config[1])
 
-        if self.__db_config.has_key("recycle_pool"):
+        if "recycle_pool" in self.__db_config:
             #self.log.info(u"User value for recycle pool : {0}".format(self.__db_config['recycle_pool']))
             pool_recycle = int(self.__db_config['recycle_pool'])
         else:
