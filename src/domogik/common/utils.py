@@ -87,9 +87,9 @@ def ucode(my_string):
 
     """
     if my_string is not None:
-        if type(my_string) == unicode:
+        if isinstance(my_string, unicode):
             return my_string
-        elif not type(my_string) == str:
+        elif not isinstance(my_string, str):
             return str(my_string).decode("utf-8")
         else:
             return my_string.decode("utf-8")
