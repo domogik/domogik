@@ -82,7 +82,7 @@ def _make_crypted_password(clear_text_password):
 
     """
     password = hashlib.sha256()
-    password.update(clear_text_password)
+    password.update(clear_text_password.encode('utf-8'))
     return password.hexdigest()
 
 def _datetime_string_from_tstamp(ts):
