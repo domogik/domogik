@@ -166,29 +166,29 @@ class Admin(Plugin):
         admin_app.db = DbHelper()
         admin_app.datatypes = self.datatypes
         
-    tapp = Application([
-        (r"/ws", AdminWebSocket),
-                (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
-    ])
+        tapp = Application([
+            (r"/ws", AdminWebSocket),
+            (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
+        ])
 
-    # create the server
+        # create the server
         # for ssl, extra parameter to HTTPServier init
         if self.use_ssl is True:
             ssl_options = {
                  "certfile": self.cert_file,
                  "keyfile": self.key_file,
             }
-        self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
+            self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
             self.http_server = HTTPServer(tapp)
-    # listen on the interfaces
-    if self.interfaces != "":
-        intf = self.interfaces.split(',')
-        for ip in get_ip_for_interfaces(intf):
-            self.http_server.listen(int(self.port), address=ip)
-        else:
-            self.http_server.bind(int(self.port))
-            self.http_server.start(1)
+        # listen on the interfaces
+        if self.interfaces != "":
+            intf = self.interfaces.split(',')
+            for ip in get_ip_for_interfaces(intf):
+                self.http_server.listen(int(self.port), address=ip)
+            else:
+                self.http_server.bind(int(self.port))
+                self.http_server.start(1)
         return
 
     def stop_http(self):
