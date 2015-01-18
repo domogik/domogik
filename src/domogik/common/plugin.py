@@ -639,7 +639,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self.log.info(u"Check if there are pictures for the defined products")
         ok = True
         ok_product = None
-        if self.json_data.has_key('products'):
+        if 'products' in self.json_data:
             for product in self.json_data['products']:
                 ok_product = False
                 for ext in PRODUCTS_PICTURES_EXTENSIONS:

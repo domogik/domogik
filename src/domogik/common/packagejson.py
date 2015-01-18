@@ -91,6 +91,12 @@ class PackageJson():
                 if pkg_type in ["plugin", "brain", "interface"]:
                     json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
                     icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
+                # TODO : reactivate later
+                #elif pkg_type == "external":
+                #    if 'package_path' in conf:
+                #        json_directory = "%s/domogik_packages/externals/" % (conf['package_path'])
+                #    else:
+                #        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
                 else:
                     raise PackageException("Type '{0}' doesn't exists".format(pkg_type))
                 #json_file = "{0}/{1}.json".format(json_directory, name)
