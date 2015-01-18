@@ -122,8 +122,8 @@ class Rest(Plugin):
                 self.interfaces = server_interfaces
                 self.port = server_port
                 self.use_ssl = False
-		        self.key_file = ""
-		        self.cert_file = ""
+                self.key_file = ""
+                self.cert_file = ""
                 self.clean_json = False
             self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
     
