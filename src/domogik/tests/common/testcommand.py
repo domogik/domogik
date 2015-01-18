@@ -221,8 +221,5 @@ class TestCommand():
 
 
 if __name__ == "__main__":
-
     ts = Testcommand(1, "set_on-off")
-    print ts.get_last_command()
- 
-
+    print(ts.get_last_command())
