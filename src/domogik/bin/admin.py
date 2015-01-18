@@ -111,7 +111,7 @@ class Admin(Plugin):
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
 
-    try:
+        try:
             try:
                 cfg_rest = Loader('admin')
                 config_rest = cfg_rest.load()
@@ -126,13 +126,13 @@ class Admin(Plugin):
                 # default parameters
                 self.interfaces = server_interfaces
                 self.port = server_port
-		self.use_ssl = False
-		self.key_file = ""
-		self.cert_file = ""
-                self.clean_json = False
+		        self.use_ssl = False
+		        self.key_file = ""
+		        self.cert_file = ""
+            self.clean_json = False
             self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
 	    
-	    # get all datatypes
+	        # get all datatypes
             cli = MQSyncReq(self.zmq)
             msg = MQMessage()
             msg.set_action('datatype.get')
@@ -142,17 +142,17 @@ class Admin(Plugin):
             else:
                 self.datatypes = {}
 
- 	    # Launch server, stats
+ 	        # Launch server, stats
             self.log.info(u"Admin Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
-	    self.start_http()
+	        self.start_http()
             # calls the tornado.ioloop.instance().start()
             
             ### Component is ready
             self.ready(0)
             IOLoop.instance().start()
-        except :
+        except:
             self.log.error(u"%s" % self.get_exception())
 
     def start_http(self):
