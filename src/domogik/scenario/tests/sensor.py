@@ -61,9 +61,9 @@ if __name__ == "__main__":
     import logging
 
     def mytrigger(test):
-        print "Trigger called by test %s, refreshing state" % test
+        print("Trigger called by test {0}, refreshing state".format(test))
         st = TEST.evaluate()
-        print "state is %s" % st
+        print("state is {0}".format(st))
 
     ### create logger
     FORMAT = "%(asctime)-15s %(message)s"
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     st.evaluate()
 
     ######### TODO : finish the below part 
-    print "updating with good text"
+    print("updating with good text")
     data = { "url": { "urlpath" : "http://people.dunnewind.net/maxence/domogik/test.txt",
                     "interval": "5"
     },
@@ -114,10 +114,8 @@ if __name__ == "__main__":
         "text" : "randomtext"
     }
     }
-    print "===="
     TEST.fill_parameters(data)
-    print "===="
-    print "I sleep 5s"
+    print("I sleep 5s")
     sleep(5)
-    print "Trying to evaluate : %s" % TEST.evaluate()
+    print("Trying to evaluate : {0}".format(TEST.evaluate()))
     TEST.destroy()

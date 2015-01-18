@@ -72,7 +72,6 @@ def scenario_edit(id):
         msg.add_data('name', form.sname.data)
         msg.add_data('json_input', form.sjson.data)
         msg.add_data('cid', form.sid.data)
-        print "++++++++++++++++="
         res = cli.request('scenario', msg.get(), timeout=10)
         flash(gettext("Changes saved"), "success")
         return redirect("/scenario")

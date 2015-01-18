@@ -93,7 +93,7 @@ class TestCommand():
         device = json.loads(response.text)
    #     print device
         if not device['commands'].has_key(self.command_name):
-            print "There is no command named '{0}' for the device id {1}".format(self.command_name, self.device_id)
+            print("There is no command named '{0}' for the device id {1}".format(self.command_name, self.device_id))
             raise RuntimeError("There is no command named '{0}' for the device id {1}".format(self.command_name, self.device_id))
         self._device = device
         command_id = device['commands'][self.command_name]['id']

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#i!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -288,5 +288,5 @@ if __name__ == "__main__":
             {"type":"dom_condition","id":"1","IF":{"type":"textinpage.TextInPageTest","id":"5","url.urlpath":"http://cereal.sinners.be/test","url.interval":"10","text.text":"foo"},"deletable":false, "DO":{} }
                     """
     c = s.create_scenario("name", jsons)
-    print "    - condition created : %s" % c
-    print "    - list of instances : %s" % s.list_conditions()
+    print("    - condition created : {0}".format(c))
+    print("    - list of instances : {0}".format(s.list_conditions()))

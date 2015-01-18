@@ -121,6 +121,6 @@ class TestSensor():
 if __name__ == "__main__":
 
     ts = TestSensor(1, "get_percent_used")
-    print ts.get_last_value()
+    print(ts.get_last_value())
  
 
