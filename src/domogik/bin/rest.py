@@ -121,7 +121,7 @@ class Rest(Plugin):
                 # default parameters
                 self.interfaces = server_interfaces
                 self.port = server_port
-		self.use_ssl = False
+        self.use_ssl = False
 		self.key_file = ""
 		self.cert_file = ""
                 self.clean_json = False

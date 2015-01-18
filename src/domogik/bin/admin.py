@@ -111,7 +111,7 @@ class Admin(Plugin):
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
 
-	try:
+    try:
             try:
                 cfg_rest = Loader('admin')
                 config_rest = cfg_rest.load()

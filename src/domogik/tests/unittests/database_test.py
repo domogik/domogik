@@ -460,29 +460,29 @@ class DeviceStatsTestCase(GenericTestCase):
         # Add device stats
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
         device2 = db.add_device(d_name='device2', d_address='A2', d_type_id=dty1.id, d_usage_id=du1.id)
-        ds1 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 0, device1.id)
+        ds1 = db.add_device_stat(make_ts(2010, 4, 9, 12, 0), 'val1', 0, device1.id)
         print(ds1)
         assert ds1.skey == 'val1' and ds1.value == '0'
-        assert ds1.timestamp == make_ts(2010, 04, 9, 12, 0)
-        ds2 = db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val_char', 'plop', device1.id)
+        assert ds1.timestamp == make_ts(2010, 4, 9, 12, 0)
+        ds2 = db.add_device_stat(make_ts(2010, 4, 9, 12, 0), 'val_char', 'plop', device1.id)
         assert ds2.skey == 'val_char' and ds2.value == 'plop'
 
         # Add for device1
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 2, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 3, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val1', 4, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val2', 5, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 6, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val2', 7, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 8, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val2', 9, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 0), 'val2', 1, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 1), 'val1', 2, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 1), 'val2', 3, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 2), 'val1', 4, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 2), 'val2', 5, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 3), 'val1', 6, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 3), 'val2', 7, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 4), 'val1', 8, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 4), 'val2', 9, device1.id)
 
         # Add for device2
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val1', 100, device2.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 200, device2.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 300, device2.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val2', 400, device2.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 0), 'val1', 100, device2.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 0), 'val2', 200, device2.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 1), 'val1', 300, device2.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 1), 'val2', 400, device2.id)
 
         assert db.get_last_stat_of_device( device1.id, 'val1').value == '8'
         assert db.get_last_stat_of_device( device1.id, 'val2').value == '9'
@@ -491,16 +491,16 @@ class DeviceStatsTestCase(GenericTestCase):
         assert len(stats_l) == 3
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
 
-        stats_l = db.list_stats_of_device_between_by_key( device1.id, 'val1', make_ts(2010, 04, 9, 12, 2),
-                                                         make_ts(2010, 04, 9, 12, 4))
+        stats_l = db.list_stats_of_device_between_by_key( device1.id, 'val1', make_ts(2010, 4, 9, 12, 2),
+                                                         make_ts(2010, 4, 9, 12, 4))
         assert len(stats_l) == 3
         assert stats_l[0].value == '4' and stats_l[1].value == '6' and stats_l[2].value == '8'
         stats_l = db.list_stats_of_device_between_by_key(device1.id, 'val1',
-                                                         make_ts(2010, 04, 9, 12, 3))
+                                                         make_ts(2010, 4, 9, 12, 3))
         assert len(stats_l) == 2
         assert stats_l[0].value == '6' and stats_l[1].value == '8'
         stats_l = db.list_stats_of_device_between_by_key(device1.id, 'val1', 
-                                                         end_date_ts=make_ts(2010, 04, 9, 12, 2))
+                                                         end_date_ts=make_ts(2010, 4, 9, 12, 2))
         assert len(stats_l) == 3
         assert stats_l[0].get_date_as_timestamp() == 1270810800.0
 
@@ -526,14 +526,14 @@ class DeviceStatsTestCase(GenericTestCase):
         dty1 = db.add_device_type(dty_id='x10.switch', dty_name='Switch', dty_description='desc1', dt_id=dt1.id)
         du1 = db.add_device_usage('lighting', 'Lighting')
         device1 = db.add_device(d_name='device1', d_address = "A1", d_type_id = dty1.id, d_usage_id = du1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 0), 'val2', 1000, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 1), 'val1', 1, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 2), 'val1', 2, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 3), 'val1', 3, device1.id)
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 4), 'val1', 4, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 0), 'val2', 1000, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 1), 'val1', 1, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 2), 'val1', 2, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 3), 'val1', 3, device1.id)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 4), 'val1', 4, device1.id)
         assert len(db.list_device_stats(device1.id)) == 5
         assert len(db.list_device_stats(device1.id,'val1' )) == 4
-        db.add_device_stat(make_ts(2010, 04, 9, 12, 5), 'val1', 5, device1.id, 2)
+        db.add_device_stat(make_ts(2010, 4, 9, 12, 5), 'val1', 5, device1.id, 2)
         stat_list = db.list_device_stats( device1.id,'val1')
         assert len(stat_list) == 2
         for stat in stat_list:

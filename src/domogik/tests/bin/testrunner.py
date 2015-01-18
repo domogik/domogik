@@ -65,7 +65,7 @@ class TestRunner():
         self.log = l.get_logger()
 
         parser = ArgumentParser(description="Launch all the tests that don't need hardware.")
-	parser.add_argument("directory",
+        parser.add_argument("directory",
                           help="What directory to run")
         parser.add_argument("-a", 
                           "--allow-alter", 
@@ -77,7 +77,7 @@ class TestRunner():
                           dest="criticity", 
                           help="Set the minimum level of criticity to use to filter the tests to execute. low/medium/high. Default is low.")
         self.options = parser.parse_args()
-	self.testcases = {}
+        self.testcases = {}
         self.results = {}
 
         # options
@@ -86,7 +86,7 @@ class TestRunner():
 	if self.options.allow_alter:
 	    self.log.info("- allow to alter the configuration or setup.")
 	if self.options.criticity not in (LOW, MEDIUM, HIGH):
-            self.options.criticity = LOW
+        self.options.criticity = LOW
 	self.log.info("- criticity : {0}".format(self.options.criticity))
 
         # check tests folder

@@ -56,18 +56,18 @@ if __name__ == "__main__":
     import logging
 
     def mytrigger(test):
-        print "Trigger called by test %s, refreshing state" % test
+        print("Trigger called by test {0}, refreshing state".format(test))
         st = TEST.evaluate()
-        print "state is %s" % st
+        print("state is {0}".format(st))
 
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
     TEST = TextInPageTest(logging, trigger = mytrigger)
-    print "getting parameters"
+    print("getting parameters")
     p = TEST.get_parameters()
-    print p
-    print "Trying to evaluate : %s" % TEST.evaluate()
-    print "set data for parameters"
+    print(p)
+    print("Trying to evaluate : {0}".format(TEST.evaluate()))
+    print("set data for parameters")
     data = { "url": { "urlpath" : "http://people.dunnewind.net/maxence/domogik/test.txt",
                     "interval": "5"
     },
@@ -76,10 +76,10 @@ if __name__ == "__main__":
     }
     }
     TEST.fill_parameters(data)
-    print "I sleep 5s"
+    print("I sleep 5s")
     sleep(5)
-    print "Trying to evaluate : %s" % TEST.evaluate()
-    print "updating with good text"
+    print("Trying to evaluate : {0}".format(TEST.evaluate()))
+    print("updating with good text")
     data = { "url": { "urlpath" : "http://people.dunnewind.net/maxence/domogik/test.txt",
                     "interval": "5"
     },
@@ -87,10 +87,10 @@ if __name__ == "__main__":
         "text" : "randomtext"
     }
     }
-    print "===="
+    print("====")
     TEST.fill_parameters(data)
-    print "===="
-    print "I sleep 5s"
+    print("====")
+    print("I sleep 5s")
     sleep(5)
-    print "Trying to evaluate : %s" % TEST.evaluate()
+    print ("Trying to evaluate : {0}".format(TEST.evaluate()))
     TEST.destroy()

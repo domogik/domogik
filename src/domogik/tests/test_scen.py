@@ -15,10 +15,10 @@ m3 = MQMessage('scenario.list', {})
 m4 = MQMessage('action.list', {})
 c = MQSyncReq(z)
 
-print("==== List of tests ===="
+print("==== List of tests ====")
 tests = c.request('scenario', m.get())
-print(tests
-print("==== List of parameters ===="
+print(tests)
+print("==== List of parameters ====")
 print(c.request('scenario', m2.get())
 print("==== List of conditions ====")
 print(c.request('scenario', m3.get()))

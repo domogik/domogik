@@ -148,7 +148,7 @@ class TestCommand():
                 data[param['key']] = None
                 statResult[param['key']] = None
             if edata :
-                print "Xpl_Stat data required for ack : {0}".format(edata)
+                print("Xpl_Stat data required for ack : {0}".format(edata))
                 for d in edata :
                     data[d] = edata[d]
                     statResult[d] = edata[d]

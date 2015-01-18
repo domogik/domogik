@@ -98,7 +98,7 @@ def delete_configuration(type, name, host):
     msg.add_data('name', name)
     result = cli.request('dbmgr', msg.get(), timeout=10)
     if result:
-	data = result.get_data()
+        data = result.get_data()
 	if 'status' in data:
 	    if not data['status']:
                 print(result.get())
