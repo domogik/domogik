@@ -30,8 +30,8 @@ Implements
 class Admin(Plugin)
 class AdminWebSocket(WebSocketHandler, MQAsyncSub)
 
-@author: 	Friz <fritz.smh@gmail.com>
-		Maikel Punie <maikel.punie@gmail.com>
+@author:    Friz <fritz.smh@gmail.com>
+        Maikel Punie <maikel.punie@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
@@ -131,8 +131,8 @@ class Admin(Plugin):
                 self.cert_file = ""
             self.clean_json = False
             self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
-	    
-	        # get all datatypes
+        
+            # get all datatypes
             cli = MQSyncReq(self.zmq)
             msg = MQMessage()
             msg.set_action('datatype.get')
@@ -142,11 +142,11 @@ class Admin(Plugin):
             else:
                 self.datatypes = {}
 
- 	        # Launch server, stats
+            # Launch server, stats
             self.log.info(u"Admin Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
-	        self.start_http()
+            self.start_http()
             # calls the tornado.ioloop.instance().start()
             
             ### Component is ready
@@ -166,26 +166,26 @@ class Admin(Plugin):
         admin_app.db = DbHelper()
         admin_app.datatypes = self.datatypes
         
-	tapp = Application([
-		(r"/ws", AdminWebSocket),
+    tapp = Application([
+        (r"/ws", AdminWebSocket),
                 (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
-	])
+    ])
 
-	# create the server
+    # create the server
         # for ssl, extra parameter to HTTPServier init
         if self.use_ssl is True:
             ssl_options = {
                  "certfile": self.cert_file,
                  "keyfile": self.key_file,
             }
-	    self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
+        self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
             self.http_server = HTTPServer(tapp)
-	# listen on the interfaces
-	if self.interfaces != "":
-	    intf = self.interfaces.split(',')
-	    for ip in get_ip_for_interfaces(intf):
-	        self.http_server.listen(int(self.port), address=ip)
+    # listen on the interfaces
+    if self.interfaces != "":
+        intf = self.interfaces.split(',')
+        for ip in get_ip_for_interfaces(intf):
+            self.http_server.listen(int(self.port), address=ip)
         else:
             self.http_server.bind(int(self.port))
             self.http_server.start(1)
