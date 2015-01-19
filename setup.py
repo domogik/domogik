@@ -82,7 +82,7 @@ setup(
           'psycopg2',
           'pip >= 1.0',
           'pyserial >= 2.5',
-          'netifaces',
+          'netifaces >= 0.10',
           'Twisted >= 12.0.0',
           'Flask >= 0.8',
           'Flask-WTF >= 0.6',
