@@ -162,7 +162,7 @@ First, you need to check you have no more upgrades in progress. You can check wi
 
 Then, check that you have pushed all upgrades on the remote repository by doing a last push with the **git push** command. If some commits were not pushed, well... it means that only you have tested the last plugin upgrades and so the checklist is not fully ok ;). Get back later on the step 5 after some people have tested your last upgrades!
 
-Check the *info.json* file is OK : the version set in the identity part of the json file must be set to the version number you want to release. Example for a version 1.0: ::
+**Check the info.json file is OK** : the version set in the identity part of the json file must be set to the version number you want to release. Example for a version 1.0: ::
 
     "identity": {
         ...
@@ -171,18 +171,20 @@ Check the *info.json* file is OK : the version set in the identity part of the j
         "version": "1.0"
     },
 
+**Check the docs/changelog.txt file is OK** : the updates since the last release are described.
+
 If this was not ok, fix this, do a commit, check that the plugin is still starting (if not, you made a mistake in the json file) and push the commit (and not, at this point you don't need other people to test again).
 
 Check all the existing tags for your plugin: ::
 
     $ git pull --tags
-    $ git tags -l
+    $ git tag -l
 
 Check that there is not already a tag created for the version you want to release. If so well... you are bad somewhere!
 
 Now, set a tag for your release. For example: ::
 
-    $ git tag -a "1.0"
+    $ git tag -a "1.0" -m "release 1.0"
 
 Push the tag on the remote repository: ::
 
