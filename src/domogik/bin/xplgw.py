@@ -97,7 +97,7 @@ class XplManager(XplPlugin, MQAsyncSub):
         # start handling the command reponses in a thread
         self._c_thread = self._CommandThread(\
             self.log, self._db, self._cmd_lock_d, \
-            self._cmd_lock_p, self._cmd_dict, self._cmd_pkt)
+            self._cmd_lock_p, self._cmd_dict, self._cmd_pkt, self.pub)
         self._c_thread.start()
         # start the sensorthread
         self.ready()
@@ -273,7 +273,7 @@ class XplManager(XplPlugin, MQAsyncSub):
         self._cmd_lock_p.acquire()
         # only do this when we have outstanding commands
         if len(self._cmd_dict) > 0:
-            self._cmd_pkt[int(time.time())] = pkt
+            self._cmd_pkt[time.time()] = pkt
             self.log.debug(u"Adding new message to the cmdQueue, current length = {0}".format(len(self._cmd_dict)))
         self._cmd_lock_p.release()
 
@@ -281,7 +281,7 @@ class XplManager(XplPlugin, MQAsyncSub):
         """ commandthread class
         Class responsible for handling one xpl command
         """
-        def __init__(self, log, db, lock_d, lock_p, dic, pkt):
+        def __init__(self, log, db, lock_d, lock_p, dic, pkt, pub):
             threading.Thread.__init__(self)
             self._db = DbHelper()
             self._log = log
@@ -289,22 +289,46 @@ class XplManager(XplPlugin, MQAsyncSub):
             self._lock_p = lock_p
             self._dict = dic
             self._pkt = pkt
+            self._pub = pub
 
         def run(self):
             while True:
                 # remove old pkts
                 self._lock_p.acquire()
                 for pkt in self._pkt.keys():
-                    if int(pkt) < int(time.time()) - CMDTIMEOUT:
+                    if pkt < time.time() - CMDTIMEOUT:
                         del(self._pkt[pkt])
                 self._lock_p.release()
                 # now try to match if we have enough data
                 if len(self._dict) > 0 and len(self._pkt) > 0:
-                    # TODO handle
+                    todel_pkt = []
+                    todel_dict = []
                     for uuid, search in self._dict.items():
-                        for times, pkt in self._pkt.items():
-                            print search.schema
-                            print pkt.schema
+                        for tim, pkt in self._pkt.items():
+                            if search.schema == pkt.schema:
+                                found = True
+                                for par in search.params:
+                                    if par.key not in pkt.data and par.value != pkt.data[par.key]:
+                                        found = False
+                                if found:
+                                    self._log.info(u"Found response message to command with uuid: {0}".format(uuid))
+                                    # publish the result
+                                    self._pub.send_event('command.result', \
+                                              {"uuid" : uuid})
+                                    todel_pkt.append(tim)
+                                    todel_dict.append(uuid)
+                    # now go and delete the unneeded data
+                    self._lock_p.acquire()
+                    for tim in todel_pkt:
+                        del(self._pkt[tim])
+                    self._log.debug(u"Deleting message from the cmdQueue, current length = {0}".format(len(self._pkt)))
+                    self._lock_p.release()
+                    self._lock_d.acquire()
+                    for tim in todel_dict:
+                        del(self._dict[tim])
+                    self._lock_d.release()
+                    todel_pkt = []
+                    todel_dict = []
                 else:
                     # nothing todo, sleep a second
                     time.sleep(1)
