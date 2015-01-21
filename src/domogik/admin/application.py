@@ -27,7 +27,7 @@ login_manager = LoginManager()
 babel = Babel()
 
 app = Flask(__name__)
-app.debug = True
+#app.debug = True
 login_manager.init_app(app)
 babel.init_app(app)
 

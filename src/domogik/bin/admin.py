@@ -51,6 +51,8 @@ import zmq
 import signal
 import time
 import json
+import datetime
+import random
 zmq.eventloop.ioloop.install()
 from tornado.wsgi import WSGIContainer
 from tornado.ioloop import IOLoop, PeriodicCallback 
@@ -62,9 +64,31 @@ from tornado.websocket import WebSocketHandler
 class AdminWebSocket(WebSocketHandler, MQAsyncSub):
     clients = set()
 
+    def __init__(self, application, request, **kwargs):
+        WebSocketHandler.__init__(self, application, request, **kwargs)
+        self.io_loop = IOLoop.instance()
+
     def open(self):
         MQAsyncSub.__init__(self, zmq.Context(), 'admin', [])
+        # Ping to make sure the agent is alive.
+        self.io_loop.add_timeout(datetime.timedelta(seconds=random.randint(5,30)), self.send_ping)
         AdminWebSocket.clients.add(self)
+
+    def on_connection_timeout(self):
+        self.on_close()
+
+    def send_ping(self):
+        try:
+            self.ping("a")
+            self.ping_timeout = self.io_loop.add_timeout(datetime.timedelta(minutes=1), self.on_connection_timeout)
+        except Exception as ex:
+            print("-- Failed to send ping! {0}".format(ex))
+
+    def on_pong(self, data):
+        if hasattr(self, "ping_timeout"):
+            self.io_loop.remove_timeout(self.ping_timeout)
+            # Wait 5 seconds before pinging again.
+            self.io_loop.add_timeout(datetime.timedelta(seconds=5), self.send_ping)
 
     def on_close(self):
         AdminWebSocket.clients.remove(self)
@@ -80,15 +104,12 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
                     msg.set_action(str(jsons['action']))
                     msg.set_data(jsons['data'])
                     if 'dst' in jsons:
-                        print(cli.request(str(jsons['dst']), msg.get(), timeout=10).get())
+                        cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
                     else:
-                        print(cli.request('manager', msg.get(), timeout=10).get())
+                        cli.request('manager', msg.get(), timeout=10).get()
             else:
                 # this is a mq message
                 for cli in AdminWebSocket.clients:
-                    print("Client : {0}".format(AdminWebSocket.clients))
-                    #print({"msgid": msg, "content": content})
-                    print({"msgid": msg})
                     cli.write_message({"msgid": msg, "content": content})
         except:
             print("Error : {0}".format(traceback.format_exc()))

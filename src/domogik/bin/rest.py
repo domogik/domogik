@@ -184,8 +184,6 @@ class Rest(Plugin):
         urlHandler.use_ssl = self.use_ssl
         urlHandler.hostname = self.get_sanitized_hostname()
         urlHandler.clean_json = self.clean_json
-        # reload statsmanager helper
-        urlHandler.reload_stats = self.reload_stats
         urlHandler.zmq_context = self.zmq
         # handler for getting the paths
         urlHandler.resources_directory = self.get_resources_directory()
@@ -229,15 +227,6 @@ class Rest(Plugin):
                 logging.info('Shutdown')
         stop_loop()
         return
-
-    def reload_stats(self):
-        self.log.debug(u"=============== reload stats")
-        req = MQSyncReq(self.zmq)
-        msg = MQMessage()
-        msg.set_action( 'reload' )
-        resp = req.request('xplgw', msg.get(), 100)
-        self.log.debug(u"Reply from xplgw: {0}".format(resp))
-        self.log.debug(u"=============== reload stats END")
 
     def get_exception(self):
         """ Get exception and display it on stdout

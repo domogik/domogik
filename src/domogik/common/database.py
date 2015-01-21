@@ -46,7 +46,7 @@ import sqlalchemy
 from sqlalchemy import Table, MetaData, and_, or_, not_, desc
 from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker, defer
-
+from sqlalchemy.orm.session import make_transient
 from domogik.common.utils import ucode
 from domogik.common import logger
 #from domogik.common.packagejson import PackageJson
@@ -189,6 +189,12 @@ class DbHelper():
     def close_session(self):
         self.__session.close()
         self.__session = None
+
+    def detach(self, obj):
+        for par in obj.params:
+            make_transient(par)
+        make_transient(obj)
+        return obj
 
     def get_engine(self):
         """Return the existing engine or None if not set
