@@ -88,7 +88,7 @@ class PluginTestCase(TemplateTestCase):
         self.assertTrue(tp.request_startup())
         self.assertTrue(tp.wait_for_event(STATUS_ALIVE))
         # just wait 1 second to get clearer logs
-        time.sleep(10)
+        time.sleep(5)
 
     # this function is the same for all plugins
     def test_9900_hbeat(self):

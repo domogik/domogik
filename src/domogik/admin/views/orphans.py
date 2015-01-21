@@ -1,7 +1,7 @@
 from domogik.admin.application import app
 from flask import render_template, request, flash, redirect
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 from flask_login import login_required
 from flask.ext.babel import gettext, ngettext
 
@@ -27,7 +27,7 @@ def orphans():
             orphan_devs.append(dev)
 
     return render_template('orphans.html',
-        mactve="orphans",
+        mactive="orphans",
         devices=orphan_devs
         )
 
@@ -36,10 +36,5 @@ def orphans():
 def orphans_delete(did):
     with app.db.session_scope():
         app.db.del_device(did)
-    # reload stats
-    req = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action( 'reload' )
-    resp = req.request('xplgw', msg.get(), 100)
     flash(gettext("Device deleted"), "success")
     return redirect("/orphans")

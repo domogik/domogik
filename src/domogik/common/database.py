@@ -39,13 +39,14 @@ Implements
 """
 
 import datetime, hashlib, time
+import traceback
 
 import json
 import sqlalchemy
 from sqlalchemy import Table, MetaData, and_, or_, not_, desc
 from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker, defer
-
+from sqlalchemy.orm.session import make_transient
 from domogik.common.utils import ucode
 from domogik.common import logger
 #from domogik.common.packagejson import PackageJson
@@ -54,7 +55,7 @@ from domogik.common.sql_schema import (
         Device, DeviceParam,
         PluginConfig, Person,
         UserAccount,
-        Scenario, ScenarioUUID,
+        Scenario,
         Command, CommandParam,
         Sensor, SensorHistory,
         XplCommand, XplStat, XplStatParam, XplCommandParam
@@ -62,6 +63,15 @@ from domogik.common.sql_schema import (
 from contextlib import contextmanager
 
 DEFAULT_RECYCLE_POOL = 3600
+
+#For packages provided by pip sqlalchemy load wrong python modules.
+#So it is not already installed on system, we need to select good one 
+#by this connector suffix.
+import pip
+mysql_suffix='+pymysql'
+for mod in pip.get_installed_distributions():
+    if ( mod.key == 'mysql-python' ):
+        mysql_suffix = '' # it is debian package, don't use suffix
 
 
 def _make_crypted_password(clear_text_password):
@@ -180,6 +190,12 @@ class DbHelper():
         self.__session.close()
         self.__session = None
 
+    def detach(self, obj):
+        for par in obj.params:
+            make_transient(par)
+        make_transient(obj)
+        return obj
+
     def get_engine(self):
         """Return the existing engine or None if not set
         @return self.__engine
@@ -200,7 +216,7 @@ class DbHelper():
     def get_url_connection_string(self):
         """Get url connection string to the database reading the configuration file"""
         if self.__db_config['type'] == "mysql":
-            url = "mysql+pymysql://"
+            url = "mysql"+mysql_suffix+"://"
         else:
             url = "%s://" % self.__db_config['type']
         if self.__db_config['port'] != '':
@@ -415,8 +431,11 @@ class DbHelper():
                             'formula' : a_sensor.formula,
                             'data_type' : a_sensor.data_type,
                             'conversion' : a_sensor.conversion, 
+                            'timeout' : a_sensor.timeout, 
                             'last_value' : a_sensor.last_value, 
                             'last_received' : a_sensor.last_received,
+                            'value_min' : a_sensor.value_min,
+                            'value_max' : a_sensor.value_max,
                             'reference' : a_sensor.reference
                           }
             json_device['sensors'][a_sensor.reference] = json_sensor
@@ -488,10 +507,168 @@ class DbHelper():
                                                    'value' :  a_xplcmd_param.value
                                                 })
             json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
+
+        # global parameters
         return json_device
 
+    def add_full_device(self, params, client_data):
+        try:
+            print params
+            print json
+            created_xpl_stats = {}
+            created_xpl_cmd = {}
+            created_sensors = {}
+            self.__session.expire_all()
+    
+            ### Add the device itself
+            self.log.debug(u"Device creation : inserting data in core_device...")
+            device = Device(name=params['name'], device_type_id=params['device_type'], \
+                    client_id=params['client_id'], client_version=client_data['identity']['version'], \
+                    description=params['description'], reference=params['reference'])
+            self.__session.add(device)
+            self.__session.flush()
+    
+            ### Table code_device_params
+            for p in params['global']:
+                self.add_device_param(device.id, p["key"], p["value"], p["type"])
+    
+            ### Table core_sensor
+            # first, get the sensors associated to the device_type
+            self.log.debug(u"Device creation : start to process the sensors")
+            device_type_sensors = client_data['device_types'][params['device_type']]['sensors']
+            self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
+    
+            # then, for each sensor, create it in databse for the device
+            stats_list = []
+            for a_sensor in device_type_sensors:
+                self.log.debug(u"Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
+                sensor_in_client_data = client_data['sensors'][a_sensor]
+                sensor = Sensor(name = sensor_in_client_data['name'], \
+                                device_id  = device.id, \
+                                reference = a_sensor, \
+                                incremental = sensor_in_client_data['incremental'], \
+                                data_type = sensor_in_client_data['data_type'], \
+                                conversion = sensor_in_client_data['conversion'], \
+                                h_store = sensor_in_client_data['history']['store'], \
+                                h_max = sensor_in_client_data['history']['max'], \
+                                h_expire = sensor_in_client_data['history']['expire'], \
+                                h_round = sensor_in_client_data['history']['round_value'], \
+                                h_duplicate = sensor_in_client_data['history']['duplicate'], \
+                                formula = None, \
+                                timeout = sensor_in_client_data['timeout'], \
+                                )
+                self.__session.add(sensor)
+                self.__session.flush()
+                created_sensors[a_sensor] = sensor.id
+                for a_stat in client_data['xpl_stats']:
+                    stat = client_data['xpl_stats'][a_stat]
+                    for param in stat['parameters']['dynamic']:
+                        if param['sensor'] == a_sensor:
+                            stats_list.append(a_stat)
+            
+    
+            ### Table core_xplstat
+            stats_list = list(set(stats_list))
+            self.log.debug(u"Device creation : xplstats to be created '{0}'...".format(stats_list))
+            for a_xplstat in stats_list:
+                self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
+                xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
+                xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors, a_xplstat, xplstat_in_client_data, params)
+                created_xpl_stats[a_xplstat] = xplstat.id
+                    
+            del stats_list
+    
+            ### Table core_command
+            # first, get the commands associated to the device_type
+            self.log.debug(u"Device creation : start to process the commands")
+            device_type_commands = client_data['device_types'][params['device_type']]['commands']
+            self.log.debug(u"Device creation : list of commands available for the device : {0}".format(device_type_commands))
+    
+            for a_command in device_type_commands:
+                self.log.debug(u"Device creation : inserting data in core_command for '{0}'...".format(a_command))
+                command_in_client_data = client_data['commands'][a_command]
+                command = Command(name = command_in_client_data['name'], \
+                                  device_id = device.id, \
+                                  reference = a_command, \
+                                  return_confirmation = command_in_client_data['return_confirmation'])
+                self.__session.add(command)
+                self.__session.flush()
+    
+                self.log.debug(u"Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
+                for command_param in client_data['commands'][a_command]['parameters']:
+                    pa = CommandParam(command.id, \
+                                      command_param['key'], \
+                                      command_param['data_type'], \
+                                      command_param['conversion'])
+                    self.__session.add(pa)
+                    self.__session.flush()
+    
+                ### Table core_xplcommand
+                if 'xpl_command' in command_in_client_data:
+                    self.log.debug(u"Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
+                    x_command = client_data['xpl_commands'][command_in_client_data['xpl_command']]
+                    if x_command['xplstat_name'] in created_xpl_stats.keys():
+                        xplstatid = created_xpl_stats[x_command['xplstat_name']]
+                    else:
+                        xplstat_in_client_data = client_data['xpl_stats'][x_command['xplstat_name']]
+                        xplstat = self.add_device_and_commands_xplstat(device.id, None, x_command['xplstat_name'], xplstat_in_client_data, params)
+                        xplstatid = xplstat.id
+                    xplcommand = XplCommand(cmd_id=command.id, \
+                                            name=x_command['name'], \
+                                            schema=x_command['schema'], \
+                                            device_id=device.id, stat_id=xplstatid, \
+                                            json_id=command_in_client_data['xpl_command'])
+                    self.__session.add(xplcommand)
+                    self.__session.flush()
+                    ### Table core_xplcommand_param
+                    for p in x_command['parameters']['static']:
+                        par = XplCommandParam(cmd_id=xplcommand.id, \
+                                             key=p['key'], value=p['value'])
+                        self.__session.add(par)
+                    for p in x_command['parameters']['device']:
+                        for p2 in params["xpl_commands"][command_in_client_data['xpl_command']]:
+                            if p["key"] == p2["key"]:
+                                if "value" in p2:
+                                    par = XplCommandParam(cmd_id=xplcommand.id, \
+                                                         key=p['key'], value=p2["value"])
+                                    self.__session.add(par)
+            ### Add the global params
+            for cmd in self.get_xpl_command_by_device_id(device.id):
+                for p in client_data['device_types'][params['device_type']]['parameters']:
+                    if p['xpl']:
+                        for p2 in params['xpl']:
+                            if p2['key'] == p['key']:
+                                par = XplCommandParam(cmd_id=cmd.id, \
+                                                     key=p['key'], value=p2["value"])
+                                self.__session.add(par)
+            for stat in self.get_xpl_stat_by_device_id(device.id):
+                for p in client_data['device_types'][params['device_type']]['parameters']:
+                    if p['xpl']:
+                        for p2 in params['xpl']:
+                            if p2['key'] == p['key']:
+                                print("P={0}   / P2={0}".format(p, p2))
+                                par = XplStatParam(xplstat_id = stat.id , \
+                                          sensor_id = None, \
+                                          key = p['key'], \
+                                          value = p2["value"], \
+                                          static = True, \
+                                          ignore_values = None, \
+                                          type = p2["type"])
+                                self.__session.add(par)
+    
+            ### Finally, commit all !
+            try:
+                self.__session.commit()
+            except Exception as sql_exception:
+                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, False)
+    
+            ### Return the created device as json
+            d = self.get_device(device.id)
+            return d
+        except:
+            self.log.error("Error when adding a device. Params = {0}      | Client_data = {1}    | Error : {2}".format(params, client_data, traceback.format_exc()))
 
-    def add_device_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data):
+    def add_device_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data, params):
         self.log.debug(u"Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
         xplstat = XplStat(name = xplstat_in_client_data['name'], \
               schema = xplstat_in_client_data['schema'], \
@@ -530,125 +707,20 @@ class DbHelper():
                 self.__session.add(parameter)
                 self.__session.flush()
 
-        return xplstat 
-
-
-    def add_device_and_commands(self, name, device_type, client_id, description, reference, client_data):
-        """ Create a device : fill the following tables with data from the related client json file
-            - core_device
-            - ...
-        """
-        created_xpl_stats = {}
-	created_sensors = {}
-        self.__session.expire_all()
-
-        ### Add the device itself
-        self.log.debug(u"Device creation : inserting data in core_device...")
-        device = Device(name=name, device_type_id=device_type, \
-                client_id=client_id, client_version=client_data['identity']['version'], \
-                description=description, reference=reference)
-        self.__session.add(device)
-        self.__session.flush()
-
-        ### Table core_sensor
-        # first, get the sensors associated to the device_type
-        self.log.debug(u"Device creation : start to process the sensors")
-        device_type_sensors = client_data['device_types'][device_type]['sensors']
-        self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
-
-        # then, for each sensor, create it in databse for the device
-        stats_list = []
-        for a_sensor in device_type_sensors:
-            self.log.debug(u"Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
-            sensor_in_client_data = client_data['sensors'][a_sensor]
-            sensor = Sensor(name = sensor_in_client_data['name'], \
-                            device_id  = device.id, \
-                            reference = a_sensor, \
-                            incremental = sensor_in_client_data['incremental'], \
-                            data_type = sensor_in_client_data['data_type'], \
-                            conversion = sensor_in_client_data['conversion'], \
-                            h_store = sensor_in_client_data['history']['store'], \
-                            h_max = sensor_in_client_data['history']['max'], \
-                            h_expire = sensor_in_client_data['history']['expire'], \
-                            h_round = sensor_in_client_data['history']['round_value'], \
-                            h_duplicate = sensor_in_client_data['history']['duplicate'], \
-                            formula = None \
-                            )
-            self.__session.add(sensor)
-            self.__session.flush()
-            created_sensors[a_sensor] = sensor.id
-            for a_stat in client_data['xpl_stats']:
-                stat = client_data['xpl_stats'][a_stat]
-                for param in stat['parameters']['dynamic']:
-                    if param['sensor'] == a_sensor:
-                        stats_list.append(a_stat)
-
-        ### Table core_xplstat
-        for a_xplstat in stats_list:
-	    self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
-	    xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
-	    for param in xplstat_in_client_data['parameters']['dynamic']:
-		xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors, a_xplstat, xplstat_in_client_data)
-		created_xpl_stats[a_xplstat] = xplstat.id
-	del stats_list
-
-        ### Table core_command
-        # first, get the commands associated to the device_type
-        self.log.debug(u"Device creation : start to process the commands")
-        device_type_commands = client_data['device_types'][device_type]['commands']
-        self.log.debug(u"Device creation : list of commands available for the device : {0}".format(device_type_commands))
-
-        for a_command in device_type_commands:
-            self.log.debug(u"Device creation : inserting data in core_command for '{0}'...".format(a_command))
-            command_in_client_data = client_data['commands'][a_command]
-            command = Command(name = command_in_client_data['name'], \
-                              device_id = device.id, \
-                              reference = a_command, \
-                              return_confirmation = command_in_client_data['return_confirmation'])
-            self.__session.add(command)
-            self.__session.flush()
-
-            self.log.debug(u"Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
-            for command_param in client_data['commands'][a_command]['parameters']:
-                pa = CommandParam(command.id, \
-                                  command_param['key'], \
-                                  command_param['data_type'], \
-                                  command_param['conversion'])
-                self.__session.add(pa)
-                self.__session.flush()
-
-            ### Table core_xplcommand
-            if 'xpl_command' in command_in_client_data:
-                self.log.debug(u"Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
-                x_command = client_data['xpl_commands'][command_in_client_data['xpl_command']]
-                if x_command['xplstat_name'] in created_xpl_stats.keys():
-                    xplstatid = created_xpl_stats[x_command['xplstat_name']]
-                else:
-                    xplstat_in_client_data = client_data['xpl_stats'][x_command['xplstat_name']]
-                    xplstat = self.add_device_and_commands_xplstat(device.id, None, x_command['xplstat_name'], xplstat_in_client_data)
-                    xplstatid = xplstat.id
-                xplcommand = XplCommand(cmd_id=command.id, \
-                                        name=x_command['name'], \
-                                        schema=x_command['schema'], \
-                                        device_id=device.id, stat_id=xplstatid, \
-                                        json_id=command_in_client_data['xpl_command'])
-                self.__session.add(xplcommand)
-                self.__session.flush()
-                ### Table core_xplcommand_param
-                for p in x_command['parameters']['static']:
-                    par = XplCommandParam(cmd_id=xplcommand.id, \
-                                         key=p['key'], value=p['value'])
+        # device parameters
+        for a_parameter in xplstat_in_client_data['parameters']['device']: 
+            self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
+            for p2 in params['xpl_stats'][xplstat_in_client_data['name']]:
+                if p2['key'] == a_parameter['key']:
+                    par = XplStatParam(xplstat_id = xplstat.id , \
+                                      sensor_id = None, \
+                                      key = p2['key'], \
+                                      value = p2["value"], \
+                                      static = True, \
+                                      ignore_values = None, \
+                                      type = p2["type"])
                     self.__session.add(par)
-
-        ### Finally, commit all !
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, False)
-
-        ### Return the created device as json
-        d = self.get_device(device.id)
-        return d
+        return xplstat 
 
     def add_device(self, d_name, d_type_id, d_client_id, d_description=None, d_reference=None):
         """Add a device item
@@ -735,99 +807,154 @@ class DbHelper():
         return device
 
 ####
+# stats upgrade
+####
+    def upgrade_list_old(self):
+        return self.__session.query(Device.id, Device.name, DeviceStats.skey).\
+                    filter(Device.id==DeviceStats.device_id).\
+                    filter(Device.address!=None).\
+                    order_by(Device.id).\
+                    distinct()
+
+    def upgrade_list_new(self):
+        return self.__session.query(Device.id, Device.name, Sensor.name, Sensor.id).\
+                     filter(Device.id==Sensor.device_id).\
+                     filter(Device.address==None).\
+                     order_by(Device.id).\
+                     distinct()
+
+    def upgrade_do(self, oid, okey, nid, nsid):
+        self.__session.expire_all()
+        oldvals = self.__session.query(DeviceStats.id, DeviceStats.value, DeviceStats.timestamp).\
+                     filter(DeviceStats.skey==okey).\
+                     filter(DeviceStats.device_id ==oid)
+        num = 0
+        for val in oldvals:
+            # add the value
+            self.add_sensor_history(nsid, val[1], val[2])
+           # increment num
+            num += 1
+        # delete the statas
+        meta = MetaData(bind=DbHelper.__engine)
+        t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
+        self.__session.execute(
+            t_stats.delete().where(and_(t_stats.c.device_id == oid, t_stats.c.skey == okey))
+        )
+        try:
+            self.__session.commit()
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        return num
+            
+####
 # Sensor history
 ####
     def add_sensor_history(self, sid, value, date):
-        self.__session.expire_all()
-        sensor = self.__session.query(Sensor).filter_by(id=sid).first()
-        if sensor is not None:
-            orig_value = value
-            # check the sensorTypes
-            # sensor.type is absolute => do nothing
-            if sensor.incremental:
-                # get the last orig_value and substract value and orig_value and set the enw value
-                last = self.__session.query(SensorHistory) \
-                    .filter(SensorHistory.sensor_id == sid) \
-                    .order_by(SensorHistory.date.desc()) \
-                    .first()
-                if last is not None:
-                    if last.original_value_num is not None:
-                        value = float(value) - last.original_value_num
-                else:
-                    # set the begin value to 0
-                    value = 0
-            #if semsor.formula is not None:
-                # do the calculation
-            # only store stats if the value is different
-            if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
-                # handle history_round
-                # reduce device stats
-                if sensor.history_round > 0:
+        try:
+            self.__session.expire_all()
+            sensor = self.__session.query(Sensor).filter_by(id=sid).first()
+            if sensor is not None:
+                orig_value = value
+                # check the sensorTypes
+                # sensor.type is absolute => do nothing
+                if sensor.incremental:
+                    # get the last orig_value and substract value and orig_value and set the enw value
                     last = self.__session.query(SensorHistory) \
                         .filter(SensorHistory.sensor_id == sid) \
                         .order_by(SensorHistory.date.desc()) \
-                        .limit(2) \
-                        .all()
-                    last.reverse()
-                    if last and len(last) == 2:
-                        delta = abs(float(last[0].value_num) - float(last[1].value_num))
-                        if delta < sensor.history_round:
-                            delta0 = abs(float(value) - float(last[0].value_num))
-                            delta1 = abs(float(value) - float(last[1].value_num))
-                            if delta0 < sensor.history_round \
-                                    and delta1 < sensor.history_round:
-                                self.__session.query(SensorHistory) \
-                                    .filter(SensorHistory.id == last[1].id) \
-                                    .delete()
-                # insert new recored in core_sensor_history
-                # store the history value if requested
-                if sensor.history_store:
-                    h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
-                    self.__session.add(h)
-                sensor.last_received = date
-                sensor.last_value = ucode(value)
-                self.__session.add(sensor)
-                try:
-                    self.__session.commit()
-                except Exception as sql_exception:
-                    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            # handle the max value
-            if sensor.history_max > 0:
-                count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor.id).count()
-                if count > sensor.history_max:
-                    # delete from sensor_history where id not in (select id from sensor_history order by date desc limit x)
-                    tokeep1 = self.__session.query(SensorHistory.id) \
-                            .filter(SensorHistory.sensor_id==sensor.id) \
+                        .first()
+                    if last is not None:
+                        if last.original_value_num is not None:
+                            value = float(value) - last.original_value_num
+                    else:
+                        # set the begin value to 0
+                        value = 0
+                #if semsor.formula is not None:
+                    # do the calculation
+                # only store stats if the value is different
+                if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
+                    # handle history_round
+                    # reduce device stats
+                    if sensor.history_round > 0:
+                        last = self.__session.query(SensorHistory) \
+                            .filter(SensorHistory.sensor_id == sid) \
                             .order_by(SensorHistory.date.desc()) \
-                            .limit(sensor.history_max) \
-                            .subquery()
-                    # ugly fix because mysql is not supporting limit in a subquery
-                    tokeep2 = self.__session.query(tokeep1).subquery()
+                            .limit(2) \
+                            .all()
+                        last.reverse()
+                        if last and len(last) == 2:
+                            delta = abs(float(last[0].value_num) - float(last[1].value_num))
+                            if delta < sensor.history_round:
+                                delta0 = abs(float(value) - float(last[0].value_num))
+                                delta1 = abs(float(value) - float(last[1].value_num))
+                                if delta0 < sensor.history_round \
+                                        and delta1 < sensor.history_round:
+                                    self.__session.query(SensorHistory) \
+                                        .filter(SensorHistory.id == last[1].id) \
+                                        .delete()
+                    # insert new recored in core_sensor_history
+                    # store the history value if requested
+                    if sensor.history_store:
+                        h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
+                        self.__session.add(h)
+                    sensor.last_received = date
+                    sensor.last_value = ucode(value)
+                    try:
+                        val = float(value)
+                    except ValueError:
+                        pass
+                    except TypeError:
+                        pass
+                    else:
+                        # update min/max
+                        if sensor.value_min > val:
+                            sensor.value_min = val
+                        if sensor.value_max < val:
+                            sensor.value_max = val
+                    self.__session.add(sensor)
+                    try:
+                        self.__session.commit()
+                    except Exception as sql_exception:
+                        self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                # handle the max value
+                if sensor.history_max > 0:
+                    count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor.id).count()
+                    if count > sensor.history_max:
+                        # delete from sensor_history where id not in (select id from sensor_history order by date desc limit x)
+                        tokeep1 = self.__session.query(SensorHistory.id) \
+                                .filter(SensorHistory.sensor_id==sensor.id) \
+                                .order_by(SensorHistory.date.desc()) \
+                                .limit(sensor.history_max) \
+                                .subquery()
+                        # ugly fix because mysql is not supporting limit in a subquery
+                        tokeep2 = self.__session.query(tokeep1).subquery()
+                        self.__session.query(SensorHistory) \
+                            .filter( \
+                                        SensorHistory.sensor_id==sensor.id, \
+                                        ~SensorHistory.id.in_(tokeep2) \
+                                    ) \
+                            .delete(synchronize_session=False)
+                        try:
+                            self.__session.commit()
+                        except Exception as sql_exception:
+                            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                # handle the expire value (days)
+                if sensor.history_expire > 0:
+                    stamp = datetime.datetime.now() - datetime.timedelta(days=sensor.history_expire)
                     self.__session.query(SensorHistory) \
                         .filter( \
-                                    SensorHistory.sensor_id==sensor.id, \
-                                    ~SensorHistory.id.in_(tokeep2) \
+                                    SensorHistory.date<=stamp, \
+                                    SensorHistory.sensor_id==sensor.id \
                                 ) \
                         .delete(synchronize_session=False)
                     try:
                         self.__session.commit()
                     except Exception as sql_exception:
                         self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            # handle the expire value (days)
-            if sensor.history_expire > 0:
-                stamp = datetime.datetime.now() - datetime.timedelta(days=sensor.history_expire)
-                self.__session.query(SensorHistory) \
-                    .filter( \
-                                SensorHistory.date<=stamp, \
-                                SensorHistory.sensor_id==sensor.id \
-                            ) \
-                    .delete(synchronize_session=False)
-                try:
-                    self.__session.commit()
-                except Exception as sql_exception:
-                    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        else:
-            self.__raise_dbhelper_exception("Can not add history to not existing sensor: %s" % sid, True)             
+            else:
+                self.__raise_dbhelper_exception("Can not add history to not existing sensor: %s" % sid, True)             
+        except:
+            self.__raise_dbhelper_exception("Error when adding data to sensor history. Sensor id = {0}  | Value = {1}  | Date = {2}. Error is {3}".format(sid, value, date, traceback.format_exc()))
 
     def list_sensor_history(self, sid, num=None):
         if num is None:
@@ -1051,8 +1178,8 @@ class DbHelper():
         # the user doesn't exists
         if user_acc == None:
             return None
-	if user_acc.password == _make_crypted_password(a_password):
-	    return user_acc
+        if user_acc.password == _make_crypted_password(a_password):
+            return user_acc
         else:
             return None
 
@@ -1343,7 +1470,7 @@ class DbHelper():
 
     def update_sensor(self, sid, history_round=None, \
             history_store=None, history_max=None, \
-            history_expire=None):
+            history_expire=None, timeout=None):
         sensor = self.__session.query(Sensor).filter_by(id=sid).first()
         if sensor is None:
             self.__raise_dbhelper_exception("Sensor with id %s couldn't be found" % sid)
@@ -1355,6 +1482,8 @@ class DbHelper():
             sensor.history_store = history_store
         if history_expire is not None:
             sensor.history_expire = history_expire
+        if timeout is not None:
+            sensor.timeout = timeout
         self.__session.add(sensor)
         try:
             self.__session.commit()
@@ -1618,9 +1747,9 @@ class DbHelper():
     def get_scenario_by_name(self, s_name):
         return self.__session.query(Scenario).filter(Scenario.name==s_name).first()
 
-    def add_scenario(self, name, json):
+    def add_scenario(self, name, json, disabled):
         self.__session.expire_all()
-        scenario = Scenario(name=name, json=json)
+        scenario = Scenario(name=name, json=json, disabled=disabled)
         self.__session.add(scenario)
         try:
             self.__session.commit()
@@ -1628,7 +1757,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return scenario
 
-    def update_scenario(self, s_id, name=None, json=None):
+    def update_scenario(self, s_id, name=None, json=None, disabled=None):
         self.__session.expire_all()
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is None:
@@ -1637,6 +1766,8 @@ class DbHelper():
             scenario.name = ucode(name)
         if json is not None:
             scenario.json = ucode(json)
+        if disabled is not None:
+            scenario.disabled = disabled
         self.__session.add(scenario)
         try:
             self.__session.commit()
@@ -1654,56 +1785,6 @@ class DbHelper():
             except Exception as sql_exception:
                 self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
             return scenario
-        else:
-            self.__raise_dbhelper_exception("Couldn't delete scenario with id %s : it doesn't exist" % s_id)
-
-###################
-# ScenarioUUID
-###################
-    def list_scenario_uuid(self):
-        return self.__session.query(ScenarioUUID).all()
-
-    def get_scenario_uuid(self, u_id):
-        return self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
-
-    def add_scenario_uuid(self, s_id, uuid, key, is_test):
-        self.__session.expire_all()
-        scenariouuid = ScenarioUUID(s_id=s_id, uuid=uuid, key=key, is_test=is_test)
-        self.__session.add(scenariouuid)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return scenariouuid
-
-    def update_scenario_uuid(self, u_id, uuid=None, key=None, is_test=None):
-        self.__session.expire_all()
-        scenariouuid = self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
-        if scenariouuid is None:
-            self.__raise_dbhelper_exception("ScenarioUUID with id %s couldn't be found" % u_id)
-        if uuid is not None:
-            scenariouuid.uuid = ucode(uuid)
-        if key is not None:
-            scenariouuid.key = ucode(key)
-        if is_test is not None:
-            scenariouuid.is_test = is_test
-        self.__session.add(scenariouuid)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return scenariouuid
-
-    def del_scenario_uuid(self, u_id):
-        self.__session.expire_all()
-        scenariouuid = self.__session.query(ScenarioUUID).filter_by(id=u_id).first()
-        if scenariouuid is not None:
-            self.__session.delete(scenariouuid)
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-            return scenariouuid
         else:
             self.__raise_dbhelper_exception("Couldn't delete scenario with id %s : it doesn't exist" % s_id)
 

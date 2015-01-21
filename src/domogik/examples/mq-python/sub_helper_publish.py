@@ -1,10 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-                                                                           
+"""
+@apiIgnore TODO : This method is not yet documented
+"""
 
 import zmq
-from domogik.mq.pubsub.subscriber import MQAsyncSub
+from domogikmq.pubsub.subscriber import MQAsyncSub
 from zmq.eventloop.ioloop import IOLoop
-from domogik.mq.message import MQMessage
+from domogikmq.message import MQMessage
 
 class Test(MQAsyncSub):
 

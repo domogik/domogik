@@ -11,7 +11,44 @@ import json
 @json_response
 @timeit
 def api_datatype():
-    """ return the datatypes json file
+    """
+    @api {get} /datatype Retrieve all datatypes
+    @apiName getDataTypes
+    @apiGroup DataType
+
+    @apiSuccess {json} result The json representation of the datatypes
+
+    @apiSuccessExample Success-Response:
+        HTTTP/1.1 200 OK
+        {
+            "DT_HVACVent": {
+                "childs": [],
+                "values": {
+                    "0": "Auto",
+                    "1": "Heat",
+                    "2": "Cool",
+                    "3": "Fan only",
+                    "4": "Dry"
+                }
+            },
+            "DT_DateTime": {
+                "childs": [
+                    "DT_Date",
+                    "DT_Time"
+                ],
+                "format": "YYYY-MM-DDThh:mm:ss.s"
+            },
+            "DT_String": {
+                "childs": [
+                    "DT_Phone",
+                    "DT_Hexa",
+                    "DT_ColorRGBHexa"
+                ],
+                "maxLengh": null,
+                "format": null
+            },
+            ...
+        }
     """
     cfg = Loader('domogik')
     config = cfg.load()

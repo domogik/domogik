@@ -68,10 +68,6 @@ For each message you need to set:
   * *device* : the static parameters. Their value is defined on a per device basis (input is requested) in the user interface. The values can be different for the *xpl_commands* and xpl_stats* parts (if both exists).
   * *dynamic* : all the dynamic parts of the xPL message. It is all the keys which are not related to the device address : values for the sensors. They are stored in the sensor history table.
 
-15:01 < cereal_> dynamic (for commands) => the key will be filled in on command sending (usually the return from a 
-                 widget)
-
-
 ..todo :: 
 
     explain ignore_values

@@ -9,8 +9,7 @@ TODO : "helpers" for special pages
 Purpose
 =======
 
-First, as already said in :doc:`the chapter about creating the plugin repository on GitHub <../create_repository/index>`, t
-here are some rules about a plugin name : don't forget to respect them.
+First, as already said in :doc:`the chapter about creating the plugin repository on GitHub <../create_repository/index>`, there are some rules about a plugin name : don't forget to respect them.
 
 The binary part of a plugin will in all cases be a single file. Assuming your plugin name is *myplugin*, the file name will be **bin/myplugin.py**.
 
@@ -32,7 +31,8 @@ Depending on your plugin, more actions may be done:
 XplPlugin and its usefull functions
 ===================================
 
-TODO : overview
+..todo ::
+    overview
 
 Helper function
 ---------------
@@ -43,16 +43,16 @@ Helper function
 Hidden but usefull features
 ---------------------------
 
-TODO : check plugin not laucnhed, status, ...
+..todo ::
+    check plugin not laucnhed, status, ...
 
 On demande features
 -------------------
 
-TODO : ready, config, library, packages, resources, data getter functions
-
-TODO : logging, force_leave (and return code),
-
-TODO : MQ usage
+..todo ::
+    * ready, config, library, packages, resources, data getter functions
+    * logging, force_leave (and return code),
+    * MQ usage
 
 Template of the binary part
 ===========================
@@ -184,8 +184,8 @@ Focus on the configuration
 The plugin global configuration
 -------------------------------
 
-If you except the mandatory *auto_startup* key, a plugin can have no configuration elements and another one can have multimple configuration elements. A plugin without configuration elements can be started without any configuration from the user (but maybe the user will need to create some devices : we will see this later). But for plugins with some configuration elements, the plugin developper may want to check that the plugin has been configured before the plugin can start!
-This can be done by calling the function ``self.check_configured()``* and check its return value: ::
+If you except the mandatory *auto_startup* key, a plugin can have no configuration elements and another one can have multimple configuration elements. A plugin without configuration elements can be started without any configuration from the user (but maybe the user will need to create some devices, we will see this later). But for plugins with some configuration elements, the plugin developper may want to check that the plugin has been configured before the plugin can start!
+This can be done by calling the function *``self.check_configured()``* and check its return value: ::
 
     # check if the plugin is configured. If not, this will stop the plugin and log an error
     if not self.check_configured():

@@ -78,11 +78,11 @@ from domogik.common.queryconfig import Query
 from domogik.common.baseplugin import FIFO_DIR
 
 import zmq
-from domogik.mq.pubsub.subscriber import MQAsyncSub
+from domogikmq.pubsub.subscriber import MQAsyncSub
 from zmq.eventloop.ioloop import IOLoop
-#from domogik.mq.reqrep.worker import MQRep   # moved in XplPlugin
-from domogik.mq.message import MQMessage
-from domogik.mq.pubsub.publisher import MQPub
+#from domogikmq.reqrep.worker import MQRep   # moved in XplPlugin
+from domogikmq.message import MQMessage
+from domogikmq.pubsub.publisher import MQPub
 
 from domogik.xpl.common.xplconnector import XplTimer
 from domogik.common.packagejson import PackageJson, PackageException
@@ -91,7 +91,7 @@ from domogik.common.packagejson import PackageJson, PackageException
 
 PYTHON = sys.executable
 WAIT_AFTER_STOP_REQUEST = 15
-CHECK_FOR_NEW_PACKAGES_INTERVAL = 60
+CHECK_FOR_NEW_PACKAGES_INTERVAL = 30
 
 
 class Manager(XplPlugin):
@@ -133,7 +133,7 @@ class Manager(XplPlugin):
         # TODO : add -E option for externals ?
 
         ### Call the XplPlugin init  
-        XplPlugin.__init__(self, name = 'manager', parser=parser, nohub=True)
+        XplPlugin.__init__(self, name = 'manager', parser=parser, log_prefix = "", nohub=True)
 
         ### Logger
         self.log.info(u"Manager startup")
@@ -554,16 +554,23 @@ class Manager(XplPlugin):
         else:
             name = data.get_data()['name']
             msg.add_data('name', name)
+            host = data.get_data()['host']
+            msg.add_data('host', host)
 
             # try to start the plugin
-            pid = self._plugins[name].start()
-            if pid != 0:
-                status = True
-                reason = ""
-            else:
+            try:
+                pid = self._plugins[name].start()
+                if pid != 0:
+                    status = True
+                    reason = ""
+                else:
+                    status = False
+                    reason = "Plugin '{0}' startup failed".format(name)
+            except KeyError:
+                # plugin doesn't exist 
                 status = False
-                reason = "Plugin '{0}' startup failed".format(name)
-
+                reason = "Plugin '{0}' does not exist on this host".format(name)
+                
         msg.add_data('status', status)
         msg.add_data('reason', reason)
         self.reply(msg.get())
@@ -942,7 +949,7 @@ class Plugin(GenericComponent, MQAsyncSub):
 
         ### check if the plugin must be started on manager startup
         startup = self._config.query(self.name, 'auto_startup')
-        if startup == '1':
+        if startup == '1' or startup == 'Y':
             startup = True
         if startup == True:
             self.log.info(u"Plugin {0} configured to be started on manager startup. Starting...".format(name))
@@ -1066,7 +1073,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         cmd = "{0} && ".format(STARTED_BY_MANAGER)
         if env_pythonpath:
             cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
-        cmd += "{0} {1}".format(PYTHON, py_file)
+        cmd += "{0} {1}".format(PYTHON, py_file.strip())
  
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
@@ -1182,7 +1189,7 @@ class Clients():
                    "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
                    "last_seen" : time.time(),
-                   "status" : STATUS_UNKNOWN,
+                   "status" : STATUS_STOPPED,
                    "configured" : configured}
         client_with_details = { "host" : host,
                    "type" : type,
@@ -1191,7 +1198,7 @@ class Clients():
                    "package_id" : "{0}-{1}".format(type, name),
                    "pid" : 0,
                    "last_seen" : time.time(),
-                   "status" : STATUS_UNKNOWN,
+                   "status" : STATUS_STOPPED,
                    "configured" : configured,
                    "data" : data}
         self._clients[client_id] = client
@@ -1228,9 +1235,11 @@ class Clients():
         if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED):
             self.log.error(u"Invalid status : {0}".format(new_status))
             return
+        if client_id not in self._clients:
+            return
         old_status = self._clients[client_id]['status']
         # in all cases, set the 'last seen' time for the clients which are not dead
-        if new_status == STATUS_DEAD:
+        if new_status != STATUS_DEAD:
             self._clients[client_id]['last_seen'] = time.time()
         if old_status == new_status:
             self.log.debug(u"The status was already {0} : nothing to do".format(old_status))

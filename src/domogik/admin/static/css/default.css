@@ -8,6 +8,11 @@ body {
     font-size: 13px;
 }
 
+.margin-bottom {
+    margin-bottom: 1em;
+}
+
+
 /** login **/
 
 .login{
@@ -98,14 +103,34 @@ body {
     padding: 0 !important;
 }
 
-/* client list */
-.status div {
-    display: inline-block;
-    margin-right: 2em;
+
+
+/*** clients status ***/
+
+/*
+.status {
+    vertical-align: middle;
+}
+*/
+
+.status-unknown, .status-stop-request, .status-stopped {
+    background-color: #bb0000;
+    border-color: #bb0000;
 }
 
-.current_status {
-    background-color: #cccccc;
+.status-unknown, .status-dead, .status-not-configured {
+    background-color: #555555;
+    border-color: #555555;
+}
+
+.status-starting {
+    background-color: #cccc00;
+    border-color: #cccc00;
+}
+
+.status-alive {
+    background-color: #00cc00;
+    border-color: #00cc00;
 }
 
 

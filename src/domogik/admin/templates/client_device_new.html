@@ -4,20 +4,26 @@
 {% include "client_menu.html" %}
 <div class="container">
     <h2>{% trans %}Create a new device{% endtrans %}</h2>
-    {% if products|length > 0 %}
-    <h3>{% trans %}Create by product{% endtrans %}</h3>
-        {% for name, type in products.items() %}
-        <a href="/client/{{ clientid }}/dmg_devices/new/type/{{ type }}/prod/{{ name }}"><button type="button" class="btn btn-default btn-sm">{{ name }}</button></a>
-        {% endfor %}
-    {% endif %}
 
     {% if device_types|length > 0 %}
     <h3>{% trans %}Create by device type{% endtrans %}</h3>
         {% for dev in device_types %}
-        <a href="/client/{{ clientid }}/dmg_devices/new/type/{{ dev }}"><button type="button" class="btn btn-default btn-sm">{{ dev }}</button></a>
+        <a class="btn btn-default" href="/client/{{ clientid }}/dmg_devices/new/type/{{ dev }}">{{ device_types[dev]['name'] }}</a>
         {% endfor %}
     {% else %}
     <div class="alert alert-warning">{% trans %}No device types found{% endtrans %}</div>
     {% endif %}
+
+
+    {% if products_per_type|length > 0 %}
+      {% for type in products_per_type %}
+        <h3>{{ type }}</h3>
+        {% for product in products_per_type[type] %}
+          <a class="btn btn-default" href="/client/{{ clientid }}/dmg_devices/new/type/{{ products_per_type[type][product] }}/prod/{{ product }}">{{ product }}</a>
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+
+
 </div>
 {% endblock %}

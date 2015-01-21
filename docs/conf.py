@@ -41,7 +41,7 @@ master_doc = 'contents'
 
 # General information about the project.
 project = u'Domogik'
-copyright = u'2012, Domogik'
+copyright = u'2014, Domogik'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

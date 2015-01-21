@@ -40,6 +40,7 @@ import os
 import sys
 import re
 from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
+from domogik.common.configloader import Loader, CONFIG_FILE
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
@@ -135,7 +136,7 @@ def is_already_launched(log, id, manager=True):
     # the final 'grep -v sudo' is here to exclude the lines launched by sudo from the search : using sudo make 2 results be in the grep result : one with sudo and the other one with the command (but this second one is filtered thanks to its pid)
     if manager:
         #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
-        cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner ".format(id, STARTED_BY_MANAGER, my_pid)
+        cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v update".format(id, STARTED_BY_MANAGER, my_pid)
         print "is manager"
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
@@ -166,4 +167,32 @@ def is_already_launched(log, id, manager=True):
             log.info("No existing process.")
     return is_launched, pid_list
 
+
+def get_rest_url():
+    """ Build and return the rest url
+    """
+    cfg = Loader('rest')
+    config = cfg.load()
+    conf = dict(config[1])
+    ### get REST ip and port
+    port = conf['port']
+    interfaces = conf['interfaces']
+    intf = interfaces.split(',')
+    print intf
+    # get the first ip of the first interface declared
+    ip = get_ip_for_interfaces(intf)[0]
+
+    return "http://{0}:{1}".format(ip, port)
+
+
+def get_rest_doc_path():
+    """ return the REST API generated doc path
+    """
+    cfg = Loader('domogik')
+    config = cfg.load()
+    conf = dict(config[1])
+    ### get libraries path
+    path = conf['libraries_path']
+
+    return "{0}/rest_doc_generated_during_install/".format(path)
 

@@ -1,7 +1,15 @@
-from flask import Flask, render_template
-from flask_wtf import Form, RecaptchaField
+from flask import Flask, render_template, g
+try:
+    from flask_wtf import Form, RecaptchaField
+except ImportError:
+    from flaskext.wtf import Form, RecaptchaField
+    pass
 from flask_login import LoginManager
-from flask.ext.babel import Babel, get_locale, format_datetime
+try:
+	from flask.ext.babel import Babel, get_locale, format_datetime
+except ImportError:
+	from flask_babel import Babel, get_locale, format_datetime
+	pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField
 from wtforms.validators import Required
@@ -19,17 +27,19 @@ login_manager = LoginManager()
 babel = Babel()
 
 app = Flask(__name__)
-app.debug = True
+#app.debug = True
 login_manager.init_app(app)
 babel.init_app(app)
 
 app.jinja_env.globals['bootstrap_is_hidden_field'] =\
     is_hidden_field_filter
+app.jinja_env.add_extension('jinja2.ext.do')
 
 # in a real app, these should be configured through Flask-Appconfig
 app.config['SECRET_KEY'] = 'devkey'
 app.config['RECAPTCHA_PUBLIC_KEY'] = \
 '6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
+app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Paris'
 
 # jinja 2 filters
 def format_babel_datetime(value, format='medium'):
@@ -37,6 +47,8 @@ def format_babel_datetime(value, format='medium'):
         format="EEEE, d. MMMM y 'at' HH:mm"
     elif format == 'medium':
         format="EE dd.MM.y HH:mm"
+    elif format == 'basic':
+        format="dd.MM.y HH:mm"
     return format_datetime(value, format)
 
 def sort_by_id(value):
@@ -64,3 +76,5 @@ from domogik.admin.views.clients import *
 from domogik.admin.views.orphans import *
 from domogik.admin.views.account import *
 from domogik.admin.views.person import *
+from domogik.admin.views.rest import *
+from domogik.admin.views.scenario import *

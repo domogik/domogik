@@ -45,6 +45,7 @@ PIDDIR="/var/run/domogik"
 PIDFILE="$PIDDIR/manager.pid"
 LOCKDIR="/var/lock/domogik"
 LOGDIR="/var/log/domogik"
+MASTERMQ=`grep 'is_master = [True|False]' /etc/domogik/domogik-mq.cfg | cut -d" " -f 3`
 
 [ -f /etc/conf.d/domogik ] && . /etc/conf.d/domogik
 [ -f /etc/default/domogik ] && . /etc/default/domogik
@@ -71,23 +72,6 @@ function start_admin {
     /bin/su - ${DOMOGIK_USER} -c "$(which ${ADMIN}) >/dev/null"
     if [ $? -gt 0 ]; then
         echo " An error occured during admin startup."
-        exit 1
-    fi
-    echo " Done."
-}
-
-function start_mq {
-    echo -n " * Starting 0MQ broker ..."
-    /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_BROKER}) >/dev/null"
-    if [ $? -gt 0 ]; then
-        echo " An error occured during 0MQ broker startup."
-        exit 1
-    fi
-    echo " Done."
-    echo -n " * Starting 0MQ forwarder ..."
-    /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_FORWARDER}) >/dev/null"
-    if [ $? -gt 0 ]; then
-        echo " An error occured during 0MQ forwarder startup."
         exit 1
     fi
     echo " Done."
@@ -145,6 +129,46 @@ function start_daemon {
     sleep ${STARTTIME}
     echo " Done."
 }
+function start_mq {
+    if [ $MASTERMQ = "True" ]; then
+        echo -n " * Starting 0MQ broker ..."
+        /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_BROKER}) >/dev/null"
+        if [ $? -gt 0 ]; then
+            echo " An error occured during 0MQ broker startup."
+            exit 1
+        fi
+        echo " Done."
+        echo -n " * Starting 0MQ forwarder ..."
+        #original command# /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_FORWARDER}) >/dev/null"
+        nohup /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_FORWARDER}) >/dev/null " &
+        if [ $? -gt 0 ]; then
+            echo " An error occured during 0MQ forwarder startup."
+            exit 1
+        fi
+        echo " Done."
+    fi
+}
+
+function status_mq {
+    if [ $MASTERMQ = "True" ]; then
+        set +e
+        RUNNING=$(/usr/bin/pgrep -c ${MQ_BROKER})
+        set -e
+        if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+            echo " * ${MQ_BROKER} is running"
+        else
+            echo " * ${MQ_BROKER} is not running"
+        fi
+        set +e
+        RUNNING=$(/usr/bin/pgrep -c ${MQ_FORWARDER})
+        set -e
+        if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+            echo " * ${MQ_FORWARDER} is running"
+        else
+            echo " * ${MQ_FORWARDER} is not running"
+        fi
+    fi
+}
 
 function status {
     [ ! -f ${PIDFILE} ] && \
@@ -187,26 +211,6 @@ function status_admin {
     fi
 } 
 
-function status_mq {
-    set +e
-    RUNNING=$(/usr/bin/pgrep -c ${MQ_BROKER})
-    set -e
-    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
-        echo " * ${MQ_BROKER} is running"
-    else
-        echo " * ${MQ_BROKER} is not running"
-    fi
-    set +e
-    RUNNING=$(/usr/bin/pgrep -c ${MQ_FORWARDER})
-    set -e
-    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
-        echo " * ${MQ_FORWARDER} is running"
-    else
-        echo " * ${MQ_FORWARDER} is not running"
-    fi
-
-}
-
 function status_xpl {
     if [ "${DOMOGIK_XPL_HUB}" == "c" ] || [ "${DOMOGIK_XPL_HUB}" == "C" ] ; then
         set +e
@@ -237,14 +241,33 @@ function status_xpl {
 function stop {
     stop_admin
     stop_plugins
+    stop_manager
     if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
         stop_xpl
     else
         echo "Domogik xPL hub disabled : no need to stop Domogik xPL hub"
     fi
-    stop_manager
     stop_mq
     kill_all
+}
+
+function stop_mq {
+    if [ $MASTERMQ = "True" ]; then
+        echo -n " * Stopping 0MQ broker..."
+        for pid in `ps ax | grep "${MQ_BROKER}" | grep -v grep | awk '{print $1}'`; do
+            kill -15 $pid 2>/dev/null 1>&2
+            sleep ${DIETIME}
+            kill -9 $pid 2>/dev/null 1>&2
+        done
+        echo " Done."
+        echo -n " * Stopping 0MQ forwarder..."
+        for pid in `ps ax | grep "${MQ_FORWARDER}" | grep -v grep | awk '{print $1}'`; do
+            kill -15 $pid 2>/dev/null 1>&2
+            sleep ${DIETIME}
+            kill -9 $pid 2>/dev/null 1>&2
+        done
+        echo " Done."
+    fi
 }
 
 function stop_admin {
@@ -255,24 +278,6 @@ function stop_admin {
         kill -9 $pid 2>/dev/null 1>&2
     done
     echo " Done."
-}
-
-function stop_mq {
-    echo -n " * Stopping 0MQ broker..."
-    for pid in `ps ax | grep "${MQ_BROKER}" | grep -v grep | awk '{print $1}'`; do
-        kill -15 $pid 2>/dev/null 1>&2
-        sleep ${DIETIME}
-        kill -9 $pid 2>/dev/null 1>&2
-    done
-    echo " Done."
-    echo -n " * Stopping 0MQ forwarder..."
-    for pid in `ps ax | grep "${MQ_FORWARDER}" | grep -v grep | awk '{print $1}'`; do
-        kill -15 $pid 2>/dev/null 1>&2
-        sleep ${DIETIME}
-        kill -9 $pid 2>/dev/null 1>&2
-    done
-    echo " Done."
-
 }
 
 function stop_xpl {
@@ -378,11 +383,11 @@ case "$1" in
             sleep ${STARTTIME}
         else
             case "$2" in
+                mq)
+                    start_mq
+                ;;
                 admin)
                     start_admin
-                ;;
-		mq)
-                    start_mq
                 ;;
                 xpl)
                     start_xpl
@@ -393,7 +398,7 @@ case "$1" in
                     start_manager
                     ;;
                 *)
-                    echo "usage: $0 start [manager|xpl|mq|admin]"
+                    echo "usage: $0 start [manager|xpl|admin|mq]"
                 ;;
             esac
         fi
@@ -403,11 +408,11 @@ case "$1" in
             stop
         else
             case "$2" in
+                mq)
+                    stop_mq
+                ;;
                 admin)
                     stop_admin
-                ;;
-		mq)
-                    stop_mq
                 ;;
                 xpl)
                     stop_xpl
@@ -419,7 +424,7 @@ case "$1" in
                     stop_manager
                 ;;
                 *)
-                    echo "usage: $0 stop [manager|xpl|mq|admin]"
+                    echo "usage: $0 stop [manager|xpl|admin|mq]"
                 ;;
             esac
         fi
@@ -434,15 +439,15 @@ case "$1" in
             sleep ${STARTTIME}
         else
             case "$2" in
+                mq)
+                    stop_mq
+                    sleep ${DIETIME}
+                    start_mq
+                ;;
                 admin)
                     stop_admin
                     sleep ${DIETIME}
                     start_admin
-                ;;
-		mq)
-                    stop_mq
-                    sleep ${DIETIME}
-		    start_mq
                 ;;
                 xpl)
                     stop_xpl
@@ -459,7 +464,7 @@ case "$1" in
                     start_manager
                     ;;
                 *)
-                    echo "usage: $0 restart [manager|xpl|mq|admin]"
+                    echo "usage: $0 restart [manager|xpl|admin|mq]"
                 ;;
             esac
         fi
@@ -469,6 +474,9 @@ case "$1" in
             status
         else
             case "$2" in
+                mq)
+                    status_mq
+                ;;
                 admin)
                     status_admin
                 ;;
@@ -478,17 +486,14 @@ case "$1" in
                 xpl)
                     status_xpl
                 ;;
-                mq)
-		    status_mq
-                ;;
                 *)
-                    echo "usage: $0 status [manager|xpl|mq]"
+                    echo "usage: $0 status [manager|xpl|admin|mq]"
                 ;;
             esac
         fi
         ;;
     *)
-    echo "usage: $0 {start|stop|restart|status} [(mq|xpl|manager|plugins|admin)]"
+    echo "usage: $0 {start|stop|restart|status} [(xpl|manager|plugins|admin)]"
     echo "More help : $0 command help"
 esac
 exit 0

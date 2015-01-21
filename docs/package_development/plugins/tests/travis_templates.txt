@@ -5,7 +5,7 @@ Travis CI templates
 What is Travis CI ?
 ===================
 
-`Travis CI <https://travis-ci.org/>` is a continuous integration tool.
+Travis CI (https://travis-ci.org/) is a continuous integration tool.
 
 How to add a github repository to Travis CI
 ===========================================
@@ -13,13 +13,15 @@ How to add a github repository to Travis CI
 Enable the repository
 ---------------------
 
-.. todo ::
-    Explain with screenshots
+* Go on the Travis CI website : https://travis-ci.org/
+* Click on the link **Sign in with GitHub** to login thanks to your GitHub account
+* Click on your login, then on **Accounts**
+* You will see the list of all your repositories. Set your plugin to **ON**.
 
 Add a .travis.yml file to your repository root
 --------------------------------------------------
 
-Travis CI uses a file named **.travis.yml** to execute the tests.  This file contains several part and you will find all the needed informations on Travis CI official website.
+Travis CI uses a file named **.travis.yml** to execute the tests.  This file contains several part and you will find all the needed informations on the Travis CI official website.
 
 For Domogik plugins, you must use this template to create your **.travis.yml** file. ::
 
@@ -28,7 +30,7 @@ For Domogik plugins, you must use this template to create your **.travis.yml** f
     # based on the template version 1
     # the templates are availables in the documentation on http://docs.domogik.org/domogik/dev/en/package_development/plugins/tests/travis_templates.html
     #
-    # Template version : 0.1
+    # Template version : 1
     
     language: python
     python:
@@ -49,13 +51,14 @@ For Domogik plugins, you must use this template to create your **.travis.yml** f
       - ~/domogik/src/domogik/tests/travis/travis-install-dependencies.sh
     before_script:
       - ~/domogik/src/domogik/tests/travis/travis-setup-database.sh
+      - ~/domogik/src/domogik/tests/travis/travis-install-domogik-mq.sh
       - ~/domogik/src/domogik/tests/travis/travis-install-domogik.sh
       - ~/domogik/src/domogik/tests/travis/travis-install-plugin.sh
       - sudo ~/domogik/src/domogik/tests/travis/travis-start-domogik.sh
     script:
       - echo $TRAVIS_BUILD_DIR
       - cd $TRAVIS_BUILD_DIR
-      - python ~/domogik/src/domogik/tests/bin/testrunner.py -a /var/lib/domogik/domogik_packages/plugin_$DMG_PLUGIN/tests/
+      - dmg_testrunner -a /var/lib/domogik/domogik_packages/plugin_$DMG_PLUGIN/tests/
     after_script:
       - ~/domogik/src/domogik/tests/travis/travis-after.sh
     notifications:
@@ -66,3 +69,9 @@ For Domogik plugins, you must use this template to create your **.travis.yml** f
 * Currently, only *python 2.7* is tested as Domogik isn't entirely compliant with *python 3.x*.
 * *DMG_BRANCH* should be let to *master* as the *master* branch of Domogik repository is the last stable version of Domogik.
 * *DMG_PLUGIN* myst be set to the plugin name.
+
+Once this file will be pushed, you will be able to see the test status at *https://travis-ci.org/<mylogin>/domogik-plugin-<plugin name>*. Example : For example : https://travis-ci.org/fritz-smh/domogik-plugin-diskfree
+
+You can get the plugin status icon at *https://travis-ci.org/<mylogin>/domogik-plugin-<plugin name>?branch=<branch name>*. For example : https://travis-ci.org/fritz-smh/domogik-plugin-teleinfo.svg?branch=develop
+
+

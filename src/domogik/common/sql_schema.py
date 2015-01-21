@@ -337,13 +337,16 @@ class Sensor(Base):
     conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(32), nullable=True)
     last_received = Column(Integer, nullable=True)
+    value_min = Column(Float, nullable=True)
+    value_max = Column(Float, nullable=True)
     history_store = Column(Boolean, nullable=False)
     history_max = Column(Integer, nullable=True)
     history_expire = Column(Integer, nullable=True)
     history_round = Column(Float, nullable=True)
     history_duplicate = Column(Boolean, nullable=False)
+    timeout = Column(Integer, nullable=True, default=0)
 
-    def __init__(self, device_id, name, reference, incremental, formula, data_type, conversion, h_store, h_max, h_expire, h_round, h_duplicate):
+    def __init__(self, device_id, name, reference, incremental, formula, data_type, conversion, h_store, h_max, h_expire, h_round, h_duplicate, timeout):
         self.device_id = device_id
         self.name = ucode(name)
         self.reference = ucode(reference)
@@ -356,14 +359,18 @@ class Sensor(Base):
         self.history_expire = h_expire
         self.history_round = h_round
         self.history_duplicate = h_duplicate
+        self.timeout = timeout
+        self.value_min = None
+        self.value_max = None
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s)>"\
+        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s min=%s max=%s timeout=%s)>"\
                % (self.id, self.device_id, self.reference, self.incremental, \
                    self.name, self.data_type, self.conversion, \
                    self.history_store, self.history_max, self.history_expire, \
-                   self.history_round, self.history_duplicate)
+                   self.history_round, self.history_duplicate, \
+                   self.value_min, self.value_max, self.timeout)
 
     @staticmethod
     def get_tablename():
@@ -522,45 +529,19 @@ class Scenario(Base):
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     name = Column(Unicode(32), nullable=False, autoincrement=False)
     json = Column(UnicodeText(), nullable=False)
-    uuids = relationship("ScenarioUUID", backref=__tablename__, cascade="all", passive_deletes=True)
+    disabled = Column(Boolean, nullable=True)
 
-    def __init__(self, name, json):
+    def __init__(self, name, json, disabled=False):
         self.name = ucode(name)
         self.json = ucode(json)
+        self.disabled = disabled
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Scenario(id=%s name='%s' json='%s' uuids=%s)>"\
-               % (self.id, self.name, self.json, self.uuids)
+        return "<Scenario(id=%s name='%s' json='%s' disabled=%s)>"\
+               % (self.id, self.name, self.json, self.disabled)
 
     @staticmethod
     def get_tablename():
         """Return the table name associated to the class"""
         return Scenario.__tablename__
-
-class ScenarioUUID(Base):
-    __tablename__ = '%s_scenario_uuid' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
-    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    scenario_id = Column(Integer, ForeignKey('%s.id' % Scenario.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False)
-    uuid = Column(Unicode(128), nullable=False, autoincrement=False)
-    key = Column(UnicodeText(), nullable=False)
-    is_test = Column(Boolean, nullable=False, default=False)
-    UniqueConstraint('uuid', name='uuid')
-
-    def __init__(self, s_id, uuid, key, is_test):
-        self.scenario_id = s_id
-        self.uuid = ucode(uuid)
-        self.key = ucode(key)
-        self.is_test = is_test
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<ScenarioUUID(id=%s scenario_id=%s name='%s' json='%s' is_test=%s)>"\
-               % (self.id, self.scenario_id, self.uuid, self.key, self.is_test)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return ScenarioUUID.__tablename__
-

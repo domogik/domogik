@@ -92,9 +92,13 @@ class PackageInstaller():
                           dest="install", 
                           help="Install a package from a path, a zip file or an url to a zip file or to a github repository and branch")
         parser.add_argument("-u", 
-                          "--uninstall", 
+                          "--upgrade", 
+                          dest="upgrade", 
+                          help="Upgrade a package (zip and url only).")
+        parser.add_argument("-r", 
+                          "--remove", 
                           dest="uninstall", 
-                          help="Uninstall a package. Example : plugin_rfxcom")
+                          help="Remove (uninstall) a package. Example : plugin_rfxcom")
         parser.add_argument("-H", 
                           "--hash", 
                           dest="hash", 
@@ -118,13 +122,20 @@ class PackageInstaller():
         elif self.options.uninstall:
             self.uninstall(self.options.uninstall)
 
+        # upgrade a package
+        elif self.options.upgrade:
+            if self.options.hash:
+                self.install(self.options.upgrade, hash = self.options.hash, upgrade = True)
+            else:
+                self.install(self.options.upgrade, hash = None, upgrade = True)
+
         # no choice : display the list of installed packages
         else:
             self.list_packages()
 
 
-    def install(self, package, hash = None):
-        """ Install a package
+    def install(self, package, hash = None, upgrade = False):
+        """ Install or upgrade a package
             Check what is the package
             if package is a folder : 
                 check if it contains a info.json file and if it is ok/compliant. If so, create a symlink to it
@@ -135,17 +146,20 @@ class PackageInstaller():
         """
         # check if the package is a folder
         if os.path.isdir(package):
-            self.install_folder(package)
+            if upgrade:
+                self.log.error("You can't upgrade a package installed from a folder as the installed package is a symbolic lynk. If the folder contains a git repository clone, just do a 'git pull' in this folder to upgrade the package!")
+            else: 
+                self.install_folder(package)
 
         # check if this is an url
         elif URL_REGEXP.search(package):
             downloaded_file, mime = self.download_from_url(package)
             if downloaded_file != None and mime == MIME_ZIP:
-                self.install_zip_file(downloaded_file, hash)
+                self.install_zip_file(downloaded_file, hash, upgrade)
 
         # check if the package is a zip file
         elif zipfile.is_zipfile(package):
-            self.install_zip_file(package, hash)
+            self.install_zip_file(package, hash, upgrade)
 
         # the package format is not handled
         else:
@@ -187,19 +201,23 @@ class PackageInstaller():
         self.log.info("Package installed!")
         
 
-    def install_zip_file(self, path, hash):
+    def install_zip_file(self, path, hash, upgrade):
         """ Install the zip file
         """
-        self.log.info("Install a package from a zip file : {0}".format(path))
+        if upgrade:
+            self.log.info("Install a package from a zip file : {0}".format(path))
+        else:
+            self.log.info("Upgrade a package from a zip file : {0}".format(path))
 
         # check the hash of the file
         # hash format is sha256 
         zip_hash = hashlib.sha256(open(path, 'rb').read()).hexdigest()
-        if zip_hash == hash:
-             self.log.info("The package has the correct hash : {0}".format(hash))
-        else:
-             self.log.error("The package hash '{0}' is different from the expected hash '{1}'. The package will not be installed!".format(zip_hash, hash))
-             return
+        if hash != None:
+            if zip_hash == hash:
+                self.log.info("The package has the correct hash : {0}".format(hash))
+            else:
+                self.log.error("The package hash '{0}' is different from the expected hash '{1}'. The package will not be installed!".format(zip_hash, hash))
+                return
 
         # check the zip file contains what we need
         with zipfile.ZipFile(path, 'r') as myzip:
@@ -235,22 +253,31 @@ class PackageInstaller():
      
             # if so, get the name of the package
             package_name = self.get_package_installation_name()
+            pkg_folder = os.path.join(self.pkg_path, package_name)
     
             # check it is not already installed
             # notice that this can't be done before as before we don't know the package name yet ;)
-            if self.is_already_installed(package_name):
-                return
+            if upgrade:
+                self.log.info("This is a package upgrade. A backup of the installed version will be done first")
+                # create a backup in case the user have drunk !
+                self.backup(pkg_folder, os.path.join(self.pkg_path, "backup_{0}_{1}.zip".format(package_name, time.strftime("%Y%m%d%H%M%S")))) 
+            else:
+                if self.is_already_installed(package_name):
+                     return
     
             # and finally, extract the zip
-            package_full = os.path.join(self.pkg_path, package_name)
-            self.log.info("Extract the zip file {0} as {1}".format(path, package_full))
+            #package_full = os.path.join(self.pkg_path, package_name)
+            self.log.info("Extract the zip file {0} as {1}".format(path, pkg_folder))
             try:
-                os.mkdir(package_full)
+                os.mkdir(pkg_folder)
+            except OSError, e:
+                if e.errno != 17:
+                    raise
             except:
-                self.log.error("Error while creating the folder '{0}' : {1}".format(package_full, traceback.format_exc()))
+                self.log.error("Error while creating the folder '{0}' : {1}".format(pkg_folder, traceback.format_exc()))
                 return
             try:
-                #myzip.extractall(package_full, root_dir)
+                #myzip.extractall(pkg_folder, root_dir)
 
 
                 for member in myzip.namelist():
@@ -262,8 +289,11 @@ class PackageInstaller():
                         if dirname == "":
                             continue
                         try:
-                            new_folder = os.path.join(package_full, dirname)
+                            new_folder = os.path.join(pkg_folder, dirname)
                             os.mkdir(new_folder)
+                        except OSError, e:
+                            if e.errno != 17:
+                                raise
                         except:
                             self.log.error("Error while creating the folder '{0}' : {1}".format(new_folder, traceback.format_exc()))
                             return
@@ -271,13 +301,13 @@ class PackageInstaller():
                      
                     # copy file (taken from zipfile's extract)
                     source = myzip.open(member)
-                    target = file(os.path.join(package_full, dirname, filename), "wb")
+                    target = file(os.path.join(pkg_folder, dirname, filename), "wb")
                     with source, target:
                         shutil.copyfileobj(source, target)
 
 
             except:
-                self.log.error("Error while extracting the package in the folder '{0}' : {1}".format(package_full, traceback.format_exc()))
+                self.log.error("Error while extracting the package in the folder '{0}' : {1}".format(pkg_folder, traceback.format_exc()))
                 return
 
 
@@ -366,7 +396,7 @@ class PackageInstaller():
 
         # check if the package is a folder
         elif os.path.isdir(pkg_folder):
-            # create a backup in case the user had drunk !
+            # create a backup in case the user have drunk !
             self.backup(pkg_folder, os.path.join(self.pkg_path, "backup_{0}_{1}.zip".format(package, time.strftime("%Y%m%d%H%M%S")))) 
             # uninstall
             try:

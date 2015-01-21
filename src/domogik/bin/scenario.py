@@ -36,17 +36,17 @@ Implements
 
 import traceback
 
-from domogik.common.scenario.manager import ScenarioManager
-from domogik.xpl.common.plugin import XplPlugin
-from domogik.mq.reqrep.worker import MQRep
-from domogik.mq.message import MQMessage
+from domogik.scenario.manager import ScenarioManager
+from domogik.xpl.common.plugin import Plugin
+from domogikmq.reqrep.worker import MQRep
+from domogikmq.message import MQMessage
 
-class ScenarioFrontend(XplPlugin):
+class ScenarioFrontend(Plugin):
     """ This class provides an interface to MQ system to allow Scenarii management.
     """
 
     def __init__(self):
-        XplPlugin.__init__(self, name = 'scenario')
+        Plugin.__init__(self, name = 'scenario')
         self._backend = ScenarioManager(self.log)
         self.add_stop_cb(self.end)
         self.add_stop_cb(self.shutdown)
@@ -62,7 +62,6 @@ class ScenarioFrontend(XplPlugin):
         mapping = {'test':
                     {
                         'list': self._backend.list_tests,
-                        'new': self._backend.ask_test_instance,
                     },
                     'scenario':
                     {
@@ -72,22 +71,23 @@ class ScenarioFrontend(XplPlugin):
                         'get': self._backend.get_parsed_condition,
                         'evaluate': self._backend.eval_condition
                     },
-                    'parameter':
-                    {
-                        'list': self._backend.list_parameters,
-                    },
                     'action':
                     {
                         'list': self._backend.list_actions,
-                        'new': self._backend.ask_action_instance
                     }
                 }
         try:
-            if msg.get_data() == {}:
-                payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()
+            if msg.get_action().split('.')[0] not in mapping.keys():
+                self._mdp_reply(msg.get_action(), {"status" : "error", "details": "{0} not in {1}".format(msg.get_action().split('.')[0], mapping.keys())})
             else:
-                payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
-            self._mdp_reply(msg.get_action(), payload)
+                if msg.get_action().split('.')[1] not in mapping[msg.get_action().split('.')[0]].keys():
+                    self._mdp_reply(msg.get_action(), {"status" : "error", "details": "{0} not in {1}".format(msg.get_action().split('.')[1], mapping[msg.get_action().split('.')[0]].keys())})
+                else:
+                    if msg.get_data() == {}:
+                        payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()
+                    else:
+                        payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
+                    self._mdp_reply(msg.get_action(), payload)
         except:
             self.log.error(u"Exception occured during message processing.")
             trace = str(traceback.format_exc())

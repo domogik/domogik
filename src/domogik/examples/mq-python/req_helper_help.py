@@ -1,13 +1,16 @@
 #!/usr/bin/python
+"""
+@apiIgnore TODO : This method is not yet documented
+"""
 
 import zmq
 from zmq.eventloop.ioloop import IOLoop
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 
 cli = MQSyncReq(zmq.Context())
 msg = MQMessage()
 msg.set_action('helper.help.get')
 msg.add_data('command', 'scan')
-print cli.request('velbus', msg.get(), timeout=10).get()
+print(cli.request('velbus', msg.get(), timeout=10).get())
 

@@ -46,6 +46,7 @@ import imp
 import unittest
 import sys
 from subprocess import Popen, PIPE
+import time
 
 LOW = "low"
 MEDIUM = "medium"
@@ -91,12 +92,12 @@ class TestRunner():
         # check tests folder
 	self.log.info("- path {0}".format(self.options.directory))
         if not self.check_dir():
-            return False
+            return 
 
         # check and load the json file
         self.log.info("- json file {0}".format(self.json_file))
 	if not self.load_json():
-	    return False
+	    return
 
         # run the test cases
         self._run_testcases()
@@ -132,7 +133,7 @@ class TestRunner():
 	# cehck if we have a json file
 	self.json_file = "{0}/tests.json".format(self.path)
         if not os.path.isfile(self.json_file):
-	    self.log.error("Path {0} has no tests.json file".format(self.path))
+	    self.log.error("{0} is not a valid 'tests.json' file".format(self.json_file))
 	    return False
 
 	return True
@@ -174,6 +175,9 @@ class TestRunner():
             pid = subp.pid
             subp.communicate()
             self.results[test] = { 'return_code' : subp.returncode }
+            # do a pause to be sure the previous test (and so plugin instance) has been killed
+            self.log.debug("Do a 60s pause... (yeah, this is a lot but Travis CI is not so quick!!!)")
+            time.sleep(60)
 
     def get_result(self):
         """ Return 0 if all is ok

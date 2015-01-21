@@ -27,7 +27,7 @@ Plugin purpose
 Implements
 ==========
 
-class Rest(XplPlugin):
+class Rest(Plugin):
 @author: 	Friz <fritz.smh@gmail.com>
 		Maikel Punie <maikel.punie@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
@@ -35,11 +35,11 @@ class Rest(XplPlugin):
 @organization: Domogik
 """
 from domogik.common.database import DbHelper, DbHelperException
-from domogik.xpl.common.plugin import XplPlugin
+from domogik.common.plugin import Plugin
 from domogik.common import logger
 from domogik.rest.url import urlHandler
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 from domogik.common.configloader import Loader
 from domogik.common.utils import get_ip_for_interfaces
 import locale
@@ -64,7 +64,7 @@ TMP_DIR = tempfile.gettempdir()
 DEFAULT_REPO_DIR = TMP_DIR
 
 ################################################################################
-class Rest(XplPlugin):
+class Rest(Plugin):
     """ REST Server 
         - create a HTTP server 
         - process REST requests
@@ -78,7 +78,7 @@ class Rest(XplPlugin):
             @param server_port :  port of HTTP server
         """
 
-        XplPlugin.__init__(self, name = 'rest')
+        Plugin.__init__(self, name = 'rest')
         # logging initialization
         self.log.info(u"Rest Server initialisation...")
         self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
@@ -184,8 +184,6 @@ class Rest(XplPlugin):
         urlHandler.use_ssl = self.use_ssl
         urlHandler.hostname = self.get_sanitized_hostname()
         urlHandler.clean_json = self.clean_json
-        # reload statsmanager helper
-        urlHandler.reload_stats = self.reload_stats
         urlHandler.zmq_context = self.zmq
         # handler for getting the paths
         urlHandler.resources_directory = self.get_resources_directory()
@@ -229,15 +227,6 @@ class Rest(XplPlugin):
                 logging.info('Shutdown')
         stop_loop()
         return
-
-    def reload_stats(self):
-        self.log.debug(u"=============== reload stats")
-        req = MQSyncReq(self.zmq)
-        msg = MQMessage()
-        msg.set_action( 'reload' )
-        resp = req.request('xplgw', msg.get(), 100)
-        self.log.debug(u"Reply from xplgw: {0}".format(resp))
-        self.log.debug(u"=============== reload stats END")
 
     def get_exception(self):
         """ Get exception and display it on stdout

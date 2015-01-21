@@ -6,7 +6,7 @@ Technical Documentation
 =======================
 
 General informations
--------------------
+--------------------
 
 General informations:
 
@@ -28,9 +28,7 @@ Message queue (zeroMQ)
 * :doc:`Overview </technical/mq/overview>`
 * :doc:`Request Reply </technical/mq/reqrep>`
 * :doc:`Publish Subscribe </technical/mq/pubsub>`
-* :doc:`Used messages </technical/mq/used>`
-* :doc:`Detail on Request Reply used messages </technical/mq/reqrep_detailed>`
-* :doc:`Detail on Publish Subscribe used messages</technical/mq/pubsub_detailed>`
+* `MQ API documentation <http://apidoc.domogik.org/mq/>`_
 
 Core component : manager
 ------------------------
@@ -55,28 +53,9 @@ Core component : admin
 Core component : REST
 ---------------------
 
-.. todo::
-    Review
-
 * :doc:`Overview </technical/rest/index>`
-* :doc:`/ </technical/rest/status>`: Status ouput for rest
-* :doc:`/map </technical/rest/map>`: A dynamicly generated list of all possible REST urls
-* :doc:`/datatype </technical/rest/datatype>`: The output of all known datatypes by domogik
-* Devices
-    * :doc:`/device </technical/rest/device>`: manage devices (list, create, update, delete)
-    * Devices parameters management
-        * :doc:`/device/params </technical/rest/device_params>`: list the parameters associated to a device type
-        * :doc:`/device/addglobal </technical/rest/device_addglobal>`: add global parameters to a device
-    * Sensors of the devices
-        * :doc:`/sensor </technical/rest/sensor>`: manage sensors (list, update)
-        * :doc:`/sensorhistory </technical/rest/sensorhistory>`: list sensorhistory values
-    * Command sending
-        * :doc:`/cmd </technical/rest/cmd>`: execute an already created command
-* Accounts and persons
-    * :doc:`/account </technical/rest/account>`: manage accounts (list, create, update, delete, authenticate)
-    * :doc:`/person </technical/rest/person>`: manage persons (list, create, update, delete)
-* Old Domogik 0.2/0.3 devices migration
-    * :doc:`/device/old </technical/rest/device_old>`: list the old devices (created with Domogik <= 0.3)
+* `REST API documentation <http://apidoc.domogik.org/rest/>`_
+* :doc:`More details about the way to send commands with /cmd  </technical/rest/cmd>`
 
 Packages
 --------

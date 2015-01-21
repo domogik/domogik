@@ -1,0 +1,62 @@
+========================================
+info.json for plugins - commands section
+========================================
+
+Purpose
+=======
+
+The commands section will quickly describe each command with:
+
+* a name
+* an xpl command to generate. Sess :doc:`xpl commands <xpl_commands>` for info about these.
+* a list of parameters
+
+
+Example 1
+=========
+
+This example is the *velbus* plugin. See the :doc:`device types documentation <device_types>` for more informations.
+
+For each command, we define a name and the required parameters for this command.
+
+::
+        "commands": {
+            "set_level_bin": {
+                 "name": "Switch On or Off",
+                 "return_confirmation": true,
+                 "parameters": [
+                 {
+                    "key": "level",
+                    "data_type": "DT_Switch",
+                    "conversion": "from_DT_Switch_to_level"
+                 }
+                 ],
+                 "xpl_command": "set_level_bin"
+            },
+            ...
+        }
+
+
+Description
+===========
+
+Each item has several properties: 
+
+* **name** : it is a string used to display this command on the UI
+* **return_confirmation** : true or false depending if the plugin responds to the command
+* **xpl_command** : what xpl command to generate
+* **parameters** : a list of parameters that need to be filled in during command generation
+    * **key** : the xpl-message key of the parameter
+    * **data_type** : what datatype this parameter will be
+    * **conversion** : the optional conversion function to run. See :doc:`conversion function documentation <../conversion/index.txt>'
+
+What happens if a command is received by the xpl gateway
+========================================================
+
+1. Check that all parameters are provided in the mq message
+2. Load the needed parameters from the xpl_command
+3. Combine all parameters to generate the xpl message
+4. Load the xpl_stat thats linked to the defined xpl command
+5. Create an xpl listener for the xpl_stat/xpl_trigeer messages
+6. Send out the xpl_command
+7. Wait until the xpl_stat is received

@@ -14,5 +14,8 @@ From the root of Domogik sources or the Domogik package, just do: ::
 
     $ sudo ./src/domogik/install/uninstall.sh
 
+Then, you can also uninstall the Domogik-mq package. From the root of Domogik-mq source or Domogik-mq package: ::
+
+    $ sudo ./src/domogikmq/install/uninstall.sh
  
 

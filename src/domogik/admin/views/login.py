@@ -1,7 +1,7 @@
 from domogik.admin.application import app, login_manager, babel
 from flask import render_template, request, flash, redirect
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 from flask_login import login_required, login_user, logout_user, current_user
 from wtforms import form, fields, validators
 from flask.ext.babel import gettext, ngettext, get_locale

@@ -46,15 +46,18 @@ from domogik.common.utils import ucode
 from domogik.common.queryconfig import Query
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
-from domogik.mq.pubsub.publisher import MQPub
-from domogik.mq.reqrep.worker import MQRep
-from domogik.mq.reqrep.client import MQSyncReq
-from domogik.mq.message import MQMessage
+from domogikmq.pubsub.publisher import MQPub
+from domogikmq.reqrep.worker import MQRep
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 from zmq.eventloop.ioloop import IOLoop
 from domogik.common.packagejson import PackageJson, PackageException
 import zmq
 import traceback
 import json
+# to get force_leave() callers : 
+import inspect
+import time
 
 # clients (plugins, etc) status
 STATUS_UNKNOWN = "unknown"
@@ -94,7 +97,7 @@ class Plugin(BasePlugin, MQRep):
 
 
     def __init__(self, name, stop_cb = None, is_manager = False, parser = None,
-                 daemonize = True, test = False):
+                 daemonize = True, log_prefix = "", test = False):
         '''
         Create XplPlugin instance, which defines system handlers
         @param name : The name of the current plugin
@@ -106,11 +109,12 @@ class Plugin(BasePlugin, MQRep):
         Your options/params will then be available on self.options and self.args
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
+        @param log_prefix : If set, use this prefix when creating the log file in Logger()
         '''
-        BasePlugin.__init__(self, name, stop_cb, parser, daemonize)
+        BasePlugin.__init__(self, name, stop_cb, parser, daemonize, log_prefix)
         Watcher(self)
         self.log.info(u"----------------------------------")
-        self.log.info(u"Starting plugin '%s' (new manager instance)" % name)
+        self.log.info(u"Starting plugin '{0}' (new manager instance)".format(name))
         self.log.info(u"Python version is {0}".format(sys.version_info))
         if self.options.test_option:
             self.log.info(u"The plugin is starting in TEST mode. Test option is {0}".format(self.options.test_option))
@@ -162,12 +166,15 @@ class Plugin(BasePlugin, MQRep):
         self.resources_directory = "{0}/{1}".format(self.config['libraries_path'], RESOURCES_DIR)
         self.products_directory = "{0}/{1}_{2}/{3}".format(self.packages_directory, "plugin", self._name, PRODUCTS_DIR)
 
+        # plugin config
+        self._plugin_config = None
+
         # Get pid and write it in a file
         self._pid_dir_path = self.config['pid_dir_path']
         self._get_pid()
 
         if len(self.get_sanitized_hostname()) > 16:
-            self.log.error(u"You must use 16 char max hostnames ! %s is %s long" % (self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
+            self.log.error(u"You must use 16 char max hostnames ! {0} is {1} long".format(self.get_sanitized_hostname(), len(self.get_sanitized_hostname())))
             self.force_leave()
             return
 
@@ -207,8 +214,8 @@ class Plugin(BasePlugin, MQRep):
             Check in database (over queryconfig) if the key 'configured' is set to True for the plugin
             if not, stop the plugin and log this
         """
-        self._config = Query(self.zmq, self.log)
-        configured = self._config.query(self._name, 'configured')
+        self._plugin_config = Query(self.zmq, self.log)
+        configured = self._plugin_config.query(self._name, 'configured')
         if configured == '1':
             configured = True
         if configured != True:
@@ -241,7 +248,9 @@ class Plugin(BasePlugin, MQRep):
     def get_config(self, key):
         """ Try to get the config over the MQ. If value is None, get the default value
         """
-        value = self._config.query(self._name, key)
+        if self._plugin_config == None:
+            self._plugin_config = Query(self.zmq, self.log)
+        value = self._plugin_config.query(self._name, key)
         if value == None or value == 'None':
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
             value = self.get_config_default_value(key)
@@ -601,6 +610,9 @@ class Plugin(BasePlugin, MQRep):
         reason = ""
         msg.add_data('status', status)
         msg.add_data('reason', reason)
+        msg.add_data('name', self._name)
+        msg.add_data('host', self.get_sanitized_hostname())
+        self.log.info("Send reply for the stop request : {0}".format(msg))
         self.reply(msg.get())
 
         ### Change the plugin status
@@ -709,28 +721,32 @@ class Plugin(BasePlugin, MQRep):
        After that, try to create a file inside it.
        If something goes wrong, generate an explicit exception.
        """
-       path = "{0}/{1}/{2}_{3}/data/" % (self.librairies_directory, PACKAGES_DIR, "plugin", self._name)
+       path = "{0}/{1}/{2}_{3}/data/".format(self.libraries_directory, PACKAGES_DIR, "plugin", self._name)
        if os.path.exists(path):
            if not os.access(path, os.W_OK & os.X_OK):
-               raise OSError("Can't write in directory %s" % path)
+               raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
                os.mkdir(path, '0770')
-               self.log.info(u"Create directory %s." % path)
+               self.log.info(u"Create directory {0}.".format(path))
            except:
-               raise OSError("Can't create directory %s." % path)
-       try:
-           tmp_prefix = "write_test";
-           count = 0
-           filename = os.path.join(path, tmp_prefix)
-           while(os.path.exists(filename)):
-               filename = "{}.{}".format(os.path.join(path, tmp_prefix),count)
-               count = count + 1
-           f = open(filename,"w")
-           f.close()
-           os.remove(filename)
-       except :
-           raise IOError("Can't create a file in directory %s." % path)
+               raise OSError("Can't create directory {0}.".format(path))
+       # Commented because :
+       # a write test is done for each call of this function. For a plugin with a html server (geoloc for example), it
+       # can be an issue as this makes a lot of write for 'nothing' on the disk.
+       # We keep the code for now (0.4) for maybe a later use (and improved)
+       #try:
+       #    tmp_prefix = "write_test";
+       #    count = 0
+       #    filename = os.path.join(path, tmp_prefix)
+       #    while(os.path.exists(filename)):
+       #        filename = "{}.{}".format(os.path.join(path, tmp_prefix),count)
+       #        count = count + 1
+       #    f = open(filename,"w")
+       #    f.close()
+       #    os.remove(filename)
+       #except :
+       #    raise IOError("Can't create a file in directory {0}.".format(path))
        return path
 
     def register_helper(self, action, help_string, callback):
@@ -754,7 +770,7 @@ class Plugin(BasePlugin, MQRep):
         pid = os.getpid()
         pid_file = os.path.join(self._pid_dir_path,
                                 self._name + ".pid")
-        self.log.debug(u"Write pid file for pid '%s' in file '%s'" % (str(pid), pid_file))
+        self.log.debug(u"Write pid file for pid '{0}' in file '{1}'".format(str(pid), pid_file))
         fil = open(pid_file, "w")
         fil.write(str(pid))
         fil.close()
@@ -762,6 +778,9 @@ class Plugin(BasePlugin, MQRep):
     def __del__(self):
         if hasattr(self, "log"):
             self.log.debug(u"__del__ Single plugin")
+            self.log.debug(u"the stack is :")
+            for elt in inspect.stack():
+                self.log.debug(u"    {0}".format(elt))
             # we guess that if no "log" is defined, the plugin has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
@@ -770,6 +789,13 @@ class Plugin(BasePlugin, MQRep):
 
             In the XplPLugin class, this function will be completed to also activate the xpl hbeat
         """
+        if hasattr(self, "log"):
+            self.log.debug(u"force_leave called")
+            #self.log.debug(u"the stack is : {0}".format(inspect.stack()))
+            self.log.debug(u"the stack is :")
+            for elt in inspect.stack():
+                self.log.debug(u"    {0}".format(elt))
+
         if return_code != None:
             self.set_return_code(return_code)
             self.log.info("Return code set to {0} when calling force_leave()".format(return_code))
@@ -782,8 +808,6 @@ class Plugin(BasePlugin, MQRep):
         #    IOLoop.instance().start()
         #except:
         #    pass
-        if hasattr(self, "log"):
-            self.log.debug(u"force_leave called")
         # send stopped status over the MQ
         if status:
             self._set_status(status)
@@ -799,41 +823,41 @@ class Plugin(BasePlugin, MQRep):
         if hasattr(self, "_timers"):
             for t in self._timers:
                 if hasattr(self, "log"):
-                    self.log.debug(u"Try to stop timer %s"  % t)
+                    self.log.debug(u"Try to stop timer {0}".format(t))
                 t.stop()
                 if hasattr(self, "log"):
-                    self.log.debug(u"Timer stopped %s" % t)
+                    self.log.debug(u"Timer stopped {0}".format(t))
 
         if hasattr(self, "_stop_cb"):
             for cb in self._stop_cb:
                 if hasattr(self, "log"):
-                    self.log.debug(u"Calling stop additionnal method : %s " % cb.__name__)
+                    self.log.debug(u"Calling stop additionnal method : {0} ".format(cb.__name__))
                 cb()
     
         if hasattr(self, "_threads"):
             for t in self._threads:
                 if hasattr(self, "log"):
-                    self.log.debug(u"Try to stop thread %s" % t)
+                    self.log.debug(u"Try to stop thread {0}".format(t))
                 try:
                     t.join()
                 except RuntimeError:
                     pass
                 if hasattr(self, "log"):
-                    self.log.debug(u"Thread stopped %s" % t)
+                    self.log.debug(u"Thread stopped {0}".format(t))
                 #t._Thread__stop()
 
         #Finally, we try to delete all remaining threads
         for t in threading.enumerate():
             if t != threading.current_thread() and t.__class__ != threading._MainThread:
                 if hasattr(self, "log"):
-                    self.log.info(u"The thread %s was not registered, killing it" % t.name)
+                    self.log.info(u"The thread {0} was not registered, killing it".format(t.name))
                 t.join()
                 if hasattr(self, "log"):
-                    self.log.info(u"Thread %s stopped." % t.name)
+                    self.log.info(u"Thread {0} stopped.".format(t.name))
 
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
-                self.log.warn(u"There are more than 1 thread remaining : %s" % threading.enumerate())
+                self.log.warn(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
 
 
 class Watcher:
@@ -880,11 +904,12 @@ class Watcher:
             os.wait()
         except KeyboardInterrupt:
             print('KeyBoardInterrupt')
-            self._plugin.log.info("Keyoard Interrupt detected, leave now.")
+            self._plugin.log.warning("Keyoard Interrupt detected, leave now.")
             self._plugin.force_leave()
             self.kill()
         except OSError:
             print(u"OSError")
+            self._plugin.log.error("OSError : {0}.".format(traceback.format_exc()))
         return_code = self._plugin.get_return_code()
         self._plugin.clean_return_code_file()
         sys.exit(return_code)

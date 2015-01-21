@@ -18,7 +18,7 @@ WARNING = '\033[93m'
 FAIL = '\033[91m'
 ENDC = '\033[0m'
 
-logging.basicConfig(filename='install.log', level=logging.DEBUG)
+### define display functions
 
 def info(msg):
     logging.info(msg)
@@ -38,6 +38,19 @@ def fail(msg):
 
 def debug(msg):
     logging.debug(msg)
+
+### test if script is launch as root
+
+# CHECK run as root
+info("Check this script is started as root")
+assert os.getuid() == 0, "This script must be started as root"
+ok("Correctly started with root privileges.")
+
+logging.basicConfig(filename='install.log', level=logging.DEBUG)
+
+
+
+### other functions
 
 def get_c_hub():
     hub = {
@@ -150,14 +163,16 @@ def ask_user_name():
     debug("Username will be {0}".format(d_user))
     return d_user
 
-def create_user(d_user):
+def create_user(d_user, d_shell = "/bin/sh"):
     info("Create domogik user")
     if d_user not in [x[0] for x in pwd.getpwall()]:
-        print("Creating the {0} user".format(d_user))
-        debug('/usr/sbin/useradd --system {0}'.format(d_user))
-        os.system('/usr/sbin/useradd --system {0}'.format(d_user))
-        debug('/usr/sbin/usermod -a -G dialout {0}'.format(d_user))
-        os.system('/usr/sbin/usermod -a -G dialout {0}'.format(d_user))
+        print("Creating the {0} user and add it to dialout".format(d_user))
+        cmd_line = 'adduser --system {0} --shell {1} '.format(d_user, d_shell)
+        debug(cmd_line)
+        os.system(cmd_line)
+        cmd_line = 'adduser {0} dialout'.format(d_user)
+        debug(cmd_line)
+        os.system(cmd_line)
     if d_user not in [x[0] for x in pwd.getpwall()]:
         fail("Failed to create domogik user")
     else:
@@ -170,7 +185,6 @@ def is_domogik_advanced(advanced_mode, sect, key):
                 'log_dir_path', 'pid_dir_path', 'broadcast'],
         'database': ['db_prefix', 'pool_recycle'],
         'rest': ['rest_server_port', 'rest_use_ssl', 'rest_ssl_certificate'],
-        'mq': ['req_rep_port', 'pub_port', 'sub_port'],
     }
     if advanced_mode:
         return True
@@ -303,6 +317,8 @@ def needupdate():
 #        if not notest:
 #            test_config()
 #    except:
+#        import traceback
+#        traceback.format_exc()
 #        fail(sys.exc_info())
 
 def update_default(user):
@@ -311,6 +327,10 @@ def update_default(user):
 
 def install():
     parser = argparse.ArgumentParser(description='Domogik installation.')
+    parser.add_argument('--dist-packages', dest='dist_packages', action="store_true",
+                   default=False, help='Try to use distribution packages instead of pip packages')
+    parser.add_argument('--create-database', dest='create_database', action="store_true",
+                   default=False, help='create and allow domogik to access to it, if it is not already created')
     parser.add_argument('--no-setup', dest='setup', action="store_true",
                    default=False, help='Don\'t install the python packages')
     parser.add_argument('--no-test', dest='test', action="store_true",
@@ -322,8 +342,14 @@ def install():
                    default=True, help='Don\'t create a user')
     parser.add_argument('--no-db-upgrade', dest='db', action="store_true",
                    default=False, help='Don\'t do a db upgrade')
+    parser.add_argument('--no-mq-check', dest='mq', action="store_true",
+                   default=False, help='Don\'t check the mq package')
+    parser.add_argument('--no-db-backup', dest='skip_database_backup', action="store_true",
+                   default=False, help='Don\'t do a db backup')
     parser.add_argument("--user",
                    help="Set the domogik user")
+    parser.add_argument("--user-shell", dest="user_shell",
+                   help="Set the domogik user shell")
 
     # generate dynamically all arguments for the various config files
     # notice that we MUST NOT have the same sections in the different files!
@@ -340,7 +366,7 @@ def install():
     try:
         # CHECK python version
         if sys.version_info < (2, 6):
-            print "Python version is to low, at least python 2.6 is needed"
+            fail("Python version is to low, at least python 2.6 is needed")
             exit(0)
 
         # CHECK sources not in / or /root
@@ -348,15 +374,32 @@ def install():
         print os.getcwd()
         assert os.getcwd().startswith("/root/") == False, "Domogik sources must not be located in the /root/ folder"
 
-        # CHECK run as root
-        info("Check this script is started as root")
-        assert os.getuid() == 0, "This script must be started as root"
-        ok("Correctly started with root privileges.")
+        # CHECK mq installed
+        if not args.mq:
+            info("Check that domogik-mq is installed")
+            try:
+                import domogikmq
+            except ImportError:
+                fail("Please install Domogik MQ first! (https://github.com/domogik/domogik-mq)")
+                exit(0)
+
+        if args.dist_packages:
+            dist_packages_install_script = ''
+            #platform.dist() and platform.linux_distribution() 
+            #doesn't works with ubuntu/debian, both say debian.
+            #So I not found pettiest test :(
+            if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
+                dist_packages_install_script = './debian_packages_install.sh'
+            if dist_packages_install_script == '' :
+                raise OSError("This argument is not implemented on this distribution.")
+            if os.system(dist_packages_install_script) != 0:
+                raise OSError("Cannot install packages correctly script '%s'" % dist_packages_install_script)
 
         # RUN setup.py
         if not args.setup:
             info("Run setup.py")
-            os.system('python setup.py develop')
+            if os.system('python setup.py develop') !=  0:
+                raise OSError("setup.py doesn't finish correctly")
 
         # ask for the domogik user
         if args.user == None or args.user == '':
@@ -367,7 +410,10 @@ def install():
 
         # create user
         if args.user_creation:
-            create_user(user)
+            if args.user_shell:
+                create_user(user, args.user_shell)
+            else:
+                create_user(user)
 
         # Copy files
         copy_files(user)
@@ -386,6 +432,7 @@ def install():
                 write_domogik_configfile(False)
                 info("Update the config file : /etc/domogik/xplhub.cfg")
                 write_xplhub_configfile(False)
+
 
         # upgrade db
         if not args.db:
@@ -415,7 +462,9 @@ def install():
                 print("Trace: {0}".format(traceback.format_exc()))
 
             dbi = DbInstall()
-            dbi.install_or_upgrade_db()
+            if args.create_database:
+                dbi.create_db()
+            dbi.install_or_upgrade_db(args.skip_database_backup)
 
         # change permissions to some files created as root during the installation to the domogik user
         os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
@@ -426,6 +475,10 @@ def install():
             os.system('python test_config.py')
         print("\n\n")
     except:
+        import traceback
+        print "========= TRACEBACK ============="
+        print traceback.format_exc()
+        print "================================="
         fail(sys.exc_info())
 
 def add_arguments_for_config_file(parser, fle):

@@ -47,6 +47,24 @@ if sys.version_info[0] == 3:
 else:
     netifaces = 'netifaces'
 
+pyzmq_found = False
+mysql = 'pymysql'
+magic = 'python-magic >= 0.4.3'
+
+import pip
+for mod in pip.get_installed_distributions():
+    if ( mod.key == 'mysql-python' ):
+        mysql = 'mysql-python'
+    if ( mod.key == 'magic-file-extensions' ):
+        magic = 'magic-file-extensions'
+    if ( mod.key == 'pyzmq' ):
+        pyzmq_found = True
+
+print "******************************************"
+print "use: "+mysql
+print "use: "+magic
+print "******************************************"
+
 setup(
     name = 'Domogik',
     version = '0.4.0',
@@ -55,25 +73,26 @@ setup(
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools',
-	      'sqlalchemy',
-	      'alembic',
-	      'simplejson >= 1.9.2',
-	      'pyOpenSSL >= 0.10',
-	      'psutil >= 0.1.3',
-	      'pymysql',
-              'psycopg2',
-	      'pip >= 1.0',
-	      'pyserial >= 2.5',
-              netifaces,
-	      'Twisted >= 12.1.0',
-	      'Flask >= 0.9',
-	      'Flask-WTF >= 0.9.3',
-              'Flask-Login',
-              'Flask-Babel',
-	      'tornado >= 3.1',
-              'requests >= 1.2.3',
-              'python-magic >= 0.4.3',
-	      'pyzmq >= 13.1.0'],
+          'sqlalchemy',
+          'alembic',
+          'simplejson >= 1.9.2',
+          'pyOpenSSL >= 0.10',
+          'psutil >= 0.1.3',
+           mysql,
+          'psycopg2',
+          'pip >= 1.0',
+          'pyserial >= 2.5',
+          'netifaces',
+          'Twisted >= 12.0.0',
+          'Flask >= 0.8',
+          'Flask-WTF >= 0.6',
+          'Flask-Login',
+          'Flask-Babel',
+          'tornado >= 2.3',
+          'requests >= 0.12.1',
+          magic,
+          'pyzmq >= 2.2.0',
+          'ephem'],
     zip_safe = False,
     license = 'GPL v3',
     #include_package_data = True,
@@ -84,20 +103,18 @@ setup(
     scripts=[],
     entry_points = {
         'console_scripts': [
-	    """
+        """
             dmg_manager = domogik.bin.manager:main
             dmg_send = domogik.bin.send:main
             dmg_dump = domogik.bin.dump_xpl:main
-            dmg_mq_dump = domogik.mq.dump:main
             dmg_admin = domogik.bin.admin:main
             dmg_version = domogik.bin.version:main
             dmg_hub = domogik.bin.hub:main
-            dmg_broker = domogik.mq.reqrep.broker:main
-            dmg_forwarder = domogik.mq.pubsub.forwarder:main
             dmg_insert_data = domogik.tools.packages.insert_data:main
             dmg_review = domogik.tools.packages.review.review:main
             dmg_package = domogik.bin.package:main
-	    """
+            dmg_testrunner = domogik.tests.bin.testrunner:main
+        """
         ]
     },
     classifiers=[
@@ -110,3 +127,4 @@ setup(
         "Natural Language :: English"
     ]
 )
+

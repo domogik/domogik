@@ -22,12 +22,14 @@ Branches management
 ===================
 
 * :doc:`What is a branch in git ? <git/what_is_a_branch>`
-* :doc:`The branching model you should/must follow <git/branching_model>`
+* :doc:`The branches management is detailed in the workflow of a plugin development <workflow>`
 
 Prepare the plugin
 ==================
 
-Now, you will have to create a few files for your plugin.
+:doc:`See workflow, step 1 <workflow>`
+
+Now, you will have to create a few files for your plugin on the *master* branch.
 
 * :doc:`Plugin file tree <plugin_file_tree/index>`
 * :doc:`Readme and changelog files <readme_and_changelog/index>`
@@ -36,13 +38,15 @@ Now, you will have to create a few files for your plugin.
 Before coding : branching to 'develop'
 ======================================
 
-* :doc:`Switch to the *develop* branch to start your developments <git/switch_to_develop>`
-* :doc:`If you want, you can create in one shot the main folders and files <plugin_file_tree/create_sample>`
+:doc:`See workflow, step 2 <workflow>`
 
-* TODO : submit the development package zip
+* :doc:`Switch to the *develop* branch before starting your developments : follow the step 2 of the workflow <workflow>`
+* :doc:`If you want, you can create in one shot the main folders and files <plugin_file_tree/create_sample>`
 
 Json file
 =========
+
+:doc:`See workflow, step 3 <workflow>`
 
 The **info.json** file it surely the most important part of a plugin. It will describe the configuration of the plugins, the features, the xPL messages to send and to listen, ...
 You should first read all this chapter, then make sure that you already defined the following part in your specifications :
@@ -65,18 +69,19 @@ Starting to create the json file without being clear on these elements is useles
 * :doc:`Device types part <json/device_types>`
 * :doc:`Sensors part <json/sensors>` 
 * :doc:`Xpl stats part <json/xpl_stats>`
-* :doc:`Commands part <json/commands>` ....................................TODO 
-* :doc:`Xpl commands part <json/xpl_commands>` ....................................TODO
-* :doc:`Json version part <json/version>` ....................................TODO
+* :doc:`Commands part <json/commands>` 
+* :doc:`Xpl commands part <json/xpl_commands>`
 
 * Resources : 
 
-  * :doc:`Data types <data_types/index>`
+  * :doc:`Data types <../../technical/data_types/index>`
   * :doc:`Field types <field_types/index>`
   * :doc:`Conversion files <conversion/index>`
 
 Python part
 ===========
+
+:doc:`See workflow, step 3 <workflow>`
 
 After creating a start script (used only by the developpers), you will now create the python part of your plugin. 
 
@@ -88,41 +93,79 @@ After creating a start script (used only by the developpers), you will now creat
   * :doc:`Library part <python/lib_part>`
   * How to ...
 
-    * log in a file
-    * manage infinite loop without *while True*
-    * create a timer
-    * :doc:`Make the new devices available in the user interface <python/detected_devices>`
+    * :doc:`Make the detected devices available in the user interface <python/detected_devices>`
     * ...
+
+Icon
+====
+
+:doc:`See workflow, step 3 <workflow>`
+
+Your plugin should have an icon.
+
+* :doc:`Add an icon <graphical/icon_file>`
+
+Udev rules
+==========
+
+:doc:`See workflow, step 3 <workflow>`
+
+If needed, you can add some sample udev rules files for your plugin.
+
+* :doc:`Add some udev rules files <udev_rules/index>`
+
+Documentation
+=============
+
+:doc:`See workflow, step 3 <workflow>`
+
+The documentation is a part important of a plugin! If it is not enough clear, the user may have some difficulties to use the plugin.
+
+  * :doc:`Overview of the documentation process <doc/index>`
+  * :doc:`Doc tree <doc/tree>`
+  * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
+  * :doc:`What should contain the documentation ? <doc/content>`
+  * :doc:`The developpers part <doc/dev>`
+  * :doc:`Make your documentation published on ReadTheDocs.org <doc/readthedoc>`
 
 Tests
 =====
+
+:doc:`See workflow, step 3 <workflow>`
 
 Preparing some automated tests is something really important for a plugin. It will help you to test automatically the plugin after each commit and will help you to easily validate some contributions (pull requests).
 
 * :doc:`Tests <tests/index>`
 
-  * :doc:`Travis CI (continuous integration) <tests/travis_templates>`
   * :doc:`The testrunner tool <tests/testrunner>`
+  * :doc:`Travis CI (continuous integration) <tests/travis_templates>`
 
-Documentation
-=============
+Your plugin is ready ? Make some users test it
+==============================================
 
-The documentation is a part important of a plugin! If it is not enough clear, the user may have some difficulties to use the plugin.
+:doc:`See workflow, step 4 <workflow>`
 
-  * :doc:`Doc tree <doc/tree>`
-  * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
-  * :doc:`What should contain the documentation ? <doc/content>`
-  * :doc:`The developpers part <doc/dev>`
+Now, your plugin may be functionnal, documented and the tests are automated. It is time to release a version! But before, you should make some people test your plugin!
 
-Your plugin is ready ? Switch to the master branch
-==================================================
+* :doc:`Release your plugin by following the step 4 of the workflow <workflow>`
 
-Now, your plugin may be functionnal, documented and the tests are automated. It is time to release a version!
 
-* TODO : merge in the master  branch
-* TODO : set a tag/release
-* TODO : submit the plugin
 
+
+Release a version of your plugin
+================================
+
+:doc:`See workflow, step 5 <workflow>`
+
+* :doc:`Release your plugin by following the step 5 of the workflow <workflow>`
+
+..todo ::
+    * switch to develop
+    * create a branch per version for readthedoc ????
+    * update info.json version number
+    * update docs/conf.py version number
+    * do the dev/doc/tests
+    * switch to master when version is ready (see previous chapter)
 
 
 
@@ -135,17 +178,5 @@ Some other points
 
     * ...
 
-* :doc:`Udev files <udev_rules/index>`
-
-
-* Graphical resources
-
-  * :doc:`Icon <graphical/icon_file>`
-
 * Data files
 
-* Tests
-* Nightly builds
-* Errors
-
-  * Errors handled by baseplugin/plugin ................ TODO

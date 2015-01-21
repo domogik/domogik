@@ -38,4 +38,5 @@ Application            Port
 ====================== =====
 Plugin : demodata      40440
 Plugin : proxy         40444
+Plugin : geoloc        40445
 ====================== =====

@@ -1,3 +1,7 @@
+============================================
+info.json for plugins - xpl_commands section
+============================================
+
 15:01 < cereal_> dynamic (for commands) => the key will be filled in on command sending (usually the return from a
                  widget)
 

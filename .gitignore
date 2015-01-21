@@ -22,3 +22,5 @@ dist/
 build/
 _build/*
 install.log
+*.swp
+pipinstall.log

@@ -192,7 +192,7 @@ class PackageJson():
                 raise PackageException("unknown key '{0}' found in {1}".format(item, name))
 
     def _validate_02(self):
-        fieldTypes = ["boolean", "string", "choice", "date", "time", "datetime", "float", "integer", "email", "ipv4", "ipv6", "url"]
+        fieldTypes = ["boolean", "string", "choice", "date", "time", "datetime", "float", "integer", "email", "ipv4", "ipv6", "url", "password"]
         try:
             #check that all main keys are in the file
             expected = ["configuration", "xpl_commands", "xpl_stats", "commands", "sensors", "device_types", "identity", "json_version"]
@@ -272,7 +272,7 @@ class PackageJson():
                 raise PackageException("Sensor part is NOT a dictionary!")
             for senid in self.json["sensors"]:
                 sens = self.json["sensors"][senid]
-                expected = ['name', 'data_type', 'conversion', 'history', 'incremental']
+                expected = ['name', 'data_type', 'conversion', 'history', 'incremental', 'timeout']
                 hexpected = ['store', 'max', 'expire', 'round_value', 'duplicate']
                 self._validate_keys(expected, "sensor {0}".format(senid), list(sens.keys()))
                 self._validate_keys(hexpected, "sensor {0} history".format(senid), list(sens['history'].keys()))
