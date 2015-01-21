@@ -320,12 +320,14 @@ class XplManager(XplPlugin, MQAsyncSub):
                     # now go and delete the unneeded data
                     self._lock_p.acquire()
                     for tim in todel_pkt:
-                        del(self._pkt[tim])
+                        if tim in self._pkt:
+                            del(self._pkt[tim])
                     self._log.debug(u"Deleting message from the cmdQueue, current length = {0}".format(len(self._pkt)))
                     self._lock_p.release()
                     self._lock_d.acquire()
                     for tim in todel_dict:
-                        del(self._dict[tim])
+                        if tim in self._dict:
+                            del(self._dict[tim])
                     self._lock_d.release()
                     todel_pkt = []
                     todel_dict = []
