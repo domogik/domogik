@@ -118,6 +118,4 @@ import domogik.rest.urls.sensorhistory
 from domogik.rest.urls.device import *
 
 # Pure REST API
-from domogik.rest.urls.person import personAPI
-from domogik.rest.urls.account import AccountAPI
 from domogik.rest.urls.sensor import sensorAPI
