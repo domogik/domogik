@@ -2,14 +2,11 @@
 Plugins development workflow
 ============================
 
-.. todo::
-
-    Set the final urls of the packages repository: see xxxxxxxxxxxxx.org
 
 Overview
 ========
 
-All the released versions of the plugins can be available on the packages repository : http://xxxxxxxxxxxxxx.org
+All the released versions of the plugins can be available on the packages repository : http://repo-public.domogik.org
 The developper of a plugin just need to submit its plugin (more details in step 5).
 
 We want to avoid alpha/beta/candidates versions for a plugin : 
@@ -103,8 +100,8 @@ Please don't forget that a stable version means:
 You will find a complete checklist in a later step
 
 
-Step 4 - Releasing a development version
-========================================
+Step 4 - Register a development version
+=======================================
 
 Register the plugin the packages repository
 -------------------------------------------
