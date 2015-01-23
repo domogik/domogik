@@ -1,4 +1,4 @@
-from flask import Flask, render_template, g
+from flask import Flask, g
 try:
     from flask_wtf import Form, RecaptchaField
 except ImportError:
@@ -13,7 +13,6 @@ except ImportError:
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField
 from wtforms.validators import Required
-
 try:
     from wtforms.fields import HiddenField
 except ImportError:
@@ -22,14 +21,17 @@ except ImportError:
 else:
     def is_hidden_field_filter(field):
         return isinstance(field, HiddenField)
+from flask.ext.themes2 import Themes, render_theme_template, get_themes_list, ThemeManager
+import os
 
 login_manager = LoginManager()
 babel = Babel()
 
 app = Flask(__name__)
-#app.debug = True
+app.debug = True
 login_manager.init_app(app)
 babel.init_app(app)
+Themes(app, app_identifier='domogik-admin')
 
 app.jinja_env.globals['bootstrap_is_hidden_field'] =\
     is_hidden_field_filter
@@ -40,6 +42,7 @@ app.config['SECRET_KEY'] = 'devkey'
 app.config['RECAPTCHA_PUBLIC_KEY'] = \
 '6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
 app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Paris'
+app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
 # jinja 2 filters
 def format_babel_datetime(value, format='medium'):
@@ -68,6 +71,14 @@ def write_access_log_after(response):
 @app.before_request
 def write_acces_log_before():
     app.logger.info('http request for {0} received'.format(request.path))
+
+# render a template, later on we can select the theme it here
+def render_template(template, **context):
+    p = ThemeManager(app, app_identifier='domogik-admin')
+    print p.themes['default'].templates_path
+    print template
+    print os.path.join(p.themes['default'].templates_path, template)
+    return render_theme_template('default', template, **context)
 
 # import all files inside the view module
 from domogik.admin.views.index import *
