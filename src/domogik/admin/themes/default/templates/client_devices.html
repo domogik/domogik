@@ -1,0 +1,287 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+{% include theme("client_menu.html") %}
+
+  <div class="container">
+
+    <div class="row-fluid margin-bottom">
+      <a id="create-device" class="btn btn-info" href="/client/{{ clientid }}/dmg_devices/new"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Create a new Domogik device{% endtrans %}</a> 
+      <button id="detected-devices" type="button" class="btn btn-default" data-toggle="modal" data-target="#detected_modal">
+        <span class='glyphicon glyphicon-search' aria-hidden='true'></span> {% trans %}Detected devices{% endtrans %}
+      </button>
+      <button class="btn btn-default" id="start_devices_tour">{% trans %}Start the discover tour!{% endtrans %}</button>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="detected_modal" tabindex="-1" role="dialog" aria-labelledby="detectedModal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans %}Close{% endtrans %}</span></button>
+            <h4 class="modal-title" id="myModalLabel">{% trans %}Detected devices{% endtrans %}</h4>
+          </div>
+          <div class="modal-body">
+            <p>{% trans %}Some plugins can detect devices that are not yet created on Domogik as Domogik devices. If you continue, you will see the list of these detected devices.{% endtrans %}</p>
+            <p>{% trans %}This feature works only when the plugin is started! Keep also in mind that each time the plugin is stopped, the list is reseted. You should wait a few minutes after the plugin startup before looking for detected devices.{% endtrans %}</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+            <a class="btn btn-primary" href="/client/{{ clientid }}/dmg_devices/detected">{% trans %}OK, show me the detected devices{% endtrans %}</a> 
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    {% if devices|length > 0 %}
+      <div class="container-fluid">
+        <div class="row">
+        
+          <!-- Devices list -->
+          <div class="col-md-4">
+            <h2>{% trans %}Known Devices{% endtrans %}</h2>
+            <ul class="list-group" id="myTabs">
+              {% for device_type_id in devices_by_device_type_id %}
+                <li class="list-group-item"><strong>{{ device_type_id }}</strong><span class="badge">{{ devices_by_device_type_id[device_type_id]|length }}</span></li>
+                {% for data in devices_by_device_type_id[device_type_id] %}
+                  <li class="list-group-item"><a href="#detail-{{ data.id }}"><span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> {{ data.name }}</a></li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+        
+          <!-- Devices details -->
+          <div class="col-md-8">
+            <div class="tab-content">
+              {% for device_type_id in devices_by_device_type_id %}
+                {% for data in devices_by_device_type_id[device_type_id] %}
+                  <div class="tab-pane" id="detail-{{ data.id }}">
+                    <div class="tab-pane detail-device" id="detail-{{ data.id }}">
+                      <h3>{{ data.name }} <small>{{ data.device_type_id }}</small></h2>
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <h3 class="panel-title">{% trans %}Informations{% endtrans %}
+                            <a class="btn btn-default" href="/client/{{ clientid }}/dmg_devices/edit/{{ data.id }}"><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span> {% trans %}Edit{% endtrans %}</a> 
+                            <a class="btn btn-default" data-toggle="confirmation" data-placement="bottom" data-href="/client/{{ clientid }}/dmg_devices/delete/{{ data.id }}"><span class='glyphicon glyphicon-trash' aria-hidden='true'></span> {% trans %}Delete the device{% endtrans %}</a>
+                          </h3>
+                        </div>
+                        <div class="panel-body">
+                          <ul>
+                            <!-- <div>{{ data }}</div> -->
+                            <li><strong>id</strong> : {{ data.id }}</li>
+                            <li><strong>{% trans %}Device type id{% endtrans %}</strong> : {{ data.device_type_id }}</li>
+                            <li><strong>{% trans %}Reference{% endtrans %}</strong> : {{ data.reference }}</li>
+                            <li><strong>{% trans %}Description{% endtrans %}</strong> : {{ data.description }}</li>
+                          </ul>
+                        </div>
+                      </div>
+    
+                      {% if data.parameters|length > 0 %}
+                        <div class="panel panel-default">
+                          <div class="panel-heading">
+                            <h3 class="panel-title">{% trans %}Global parameters{% endtrans %}</h3>
+                          </div>
+                          <div class="panel-body">
+                            <table class="table table-bordered">
+                              <thead>
+                                <tr>
+                                  <th>{% trans %}ID{% endtrans %}</th>
+                                  <th>{% trans %}Name{% endtrans %}</th>
+                                  <th>{% trans %}Value{% endtrans %}</th>
+                                  <th>{% trans %}Type{% endtrans %}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for tmp in data.parameters %}
+                                  <tr>
+                                    <td>{{ data.parameters[tmp].id }}</td>
+                                    <td>{{ data.parameters[tmp].key }}</td>
+                                    <td>{{ data.parameters[tmp].value }}</td>
+                                    <td>{{ data.parameters[tmp].type }}</td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      {% endif %}
+    
+                      {% if data.sensors|length > 0 %}
+                        <div class="panel panel-default">
+                          <div class="panel-heading">
+                            <h3 class="panel-title">{% trans %}Sensors{% endtrans %}</h3>
+                          </div>
+                          <div class="panel-body">
+                            {% for name, sen in data.sensors|sortid %}
+                              <div>
+                                <h4>{{ sen.name }} <small>(id = {{ sen.id }})</small>
+                                  <a class="btn btn-default" href="/client/{{ clientid }}/sensors/edit/{{ sen.id }}"><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span> {% trans %}Configure{% endtrans %}</a>
+                                </h4>
+                                <table class="table table-bordered">
+                                  <tbody>
+                                    <tr>
+                                      <th>{% trans %}Data Type{% endtrans %}</th>
+                                      <td>{{ sen.data_type }}</td>
+                                    <tr>
+                                    </tr>
+                                      <th>{% trans %}Last value{% endtrans %}</th>
+                                      <td>{% if sen.last_value %}{{ sen.last_value }}{% if datatypes[sen.data_type].unit %}&nbsp;{{ datatypes[sen.data_type].unit }}{% endif %}{% else %}&nbsp;{% endif %}</td>
+                                    <tr>
+                                    </tr>
+                                      <th>{% trans %}Last received{% endtrans %}</th>
+                                      <td>{% if sen.last_value %}{{ sen.last_received|datetime }}{% endif %}</td>
+                                    <tr>
+                                    </tr>
+                                      <th>{% trans %}Rest URL{% endtrans %}</th>
+                                      {% set sensor_url = rest_url + "/sensorhistory/id/" + sen.id|string + "/last/10" %}
+                                      <td><a href="{{ sensor_url }}">{{ sensor_url }}</a></td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endif %}
+    
+                      {% if data.commands|length > 0 %}
+                        <div class="panel panel-default">
+                          <div class="panel-heading">
+                            <h3 class="panel-title">{% trans %}Commands{% endtrans %}</h3>
+                          </div>
+                          <div class="panel-body">
+                            {% for name, cmd in data.commands|sortid %}
+                              <div>
+                                <h4>{{ cmd.name }} <small>(id = {{ cmd.id }})</small></h4>
+                                {% for param in cmd.parameters %}
+                                  <table class="table table-bordered">
+                                    <tbody>
+                                      <tr>
+                                        <th>{% trans %}Command Key{% endtrans %}</th>
+                                        <td>{{ param.key }}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>{% trans %}Data Type{% endtrans %}</th>
+                                        <td>{{ param.data_type }} : {{ datatypes[param.data_type] }}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>{% trans %}Example REST url{% endtrans %}</th>
+                                        <td>
+                                          {% trans %}Urls{% endtrans %}:
+                                          {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
+                                            {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
+                                            {% set url_0 = url_sample + "0" %}
+                                            {% set url_1 = url_sample + "1" %}
+                                            <ul>
+                                              <li><strong>{{ datatypes[param.data_type]['labels']['0'] }}</strong> : {{ url_0 }}</li>
+                                              <li><strong>{{ datatypes[param.data_type]['labels']['1'] }}</strong> : {{ url_1 }}</li>
+                                            </ul>
+                                            <div>
+                                              <p>Test it :</p>
+                                              <a class="btn btn-primary" href="{{ url_0 }}">{{ datatypes[param.data_type]['labels']['0'] }} (0)</a> 
+                                              <a class="btn btn-primary" href="{{ url_1 }}">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a> 
+                                            </div>
+                                          {% else %}
+                                            {{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;key&gt;
+                                          {% endif %}
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                {% endfor %}
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endif %}
+    
+                      {% if data.xpl_stats|length > 0 %}
+                        <div class="panel panel-default">
+                          <div class="panel-heading">
+                            <h3 class="panel-title">{% trans %}xPL stats : details about xPL parameters for the sensors{% endtrans %}</h3>
+                          </div>
+                          <div class="panel-body">
+                            {% for name in data.xpl_stats %}
+                              <h4>{{ name }} <small>xPL schema : {{ data.xpl_stats[name].schema }}</small></h4>
+                              <table class="table table-bordered">
+                                <tbody>
+                                  <tr>
+                                    <th>{% trans %}Type{% endtrans %}</th>
+                                    <th>{% trans %}Key{% endtrans %}</th>
+                                    <th>{% trans %}Value or sensor{% endtrans %}</th>
+                                  </tr>
+                                  {% for param in data.xpl_stats[name].parameters.static %}
+                                    <tr>
+                                      <td>{% trans %}Static{% endtrans %}</td>
+                                      <td>{{ param.key }}</td>
+                                      <td>{{ param.value }} <em>({% trans %}value{% endtrans %})</em></td>
+                                    </tr>
+                                  {% endfor %}
+                                  {% for param in data.xpl_stats[name].parameters.dynamic %}
+                                    <tr>
+                                      <td>{% trans %}Dynamic{% endtrans %}</td>
+                                      <td>{{ param.key }}</td>
+                                      <td>{{ param.sensor_name }} <em>({% trans %}sensor{% endtrans %})</em></td>
+                                    </tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endif %}
+    
+                      {% if data.xpl_commands|length > 0 %}
+                        <div class="panel panel-default">
+                          <div class="panel-heading">
+                            <h3 class="panel-title">{% trans %}xPL Commands : details about xPL parameters for the commands{% endtrans %}</h3>
+                          </div>
+                          <div class="panel-body">
+                            {% for name in data.xpl_commands %}
+                              <h4>{{ name }} <small>xPL schema : {{ data.xpl_commands[name].schema }}</small></h4>
+                              <table class="table table-bordered">
+                                <tbody>
+                                  <tr>
+                                    <th>{% trans %}Key{% endtrans %}</th>
+                                    <th>{% trans %}Value or sensor{% endtrans %}</th>
+                                  </tr>
+                                  {% for param in data.xpl_commands[name].parameters %}
+                                    <tr>
+                                      <td>{{ param.key }}</td>
+                                      <td>{{ param.value }}</td>
+                                    </tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                            {% endfor %}
+    
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        
+        </div>
+        <script type="text/javascript">
+        // Enable the Tabs
+        
+        $('#myTabs a').click(function (e) {
+            e.preventDefault()
+            $(this).tab('show')
+          });
+        </script>
+      </div>
+    {% else %}
+      <div class="alert alert-warning">{% trans %}No devices found{% endtrans %}</div>
+    {% endif %}
+
+  </div>
+
+
+{% endblock %}

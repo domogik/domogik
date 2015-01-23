@@ -1,0 +1,86 @@
+{%- macro form_field_errors(field) -%}
+    {% if field.errors %}
+    <div>
+        {%- for error in field.errors -%}
+        <span class="text-warning">{{ error }}</span>
+        {%- endfor -%}
+    </div>
+    {% endif %}
+{%- endmacro -%}
+
+{%- macro action_buttons(submit_title) -%}
+<div class="actions">
+	<input type="submit" class="btn btn-default" value="{{submit_title}}">
+	&nbsp;
+	<button type="reset" class="btn btn-default">{% trans %}Reset{% endtrans %}</button>
+</div>
+{%- endmacro -%}
+
+{%- macro form_field(field) -%}
+    {% if field.type == 'HiddenField' %}
+        {{ field() }}
+    {% elif field.type == 'CSRFTokenField' %}
+        {{ field() }}
+    {% elif field.type == 'BooleanField' %}
+      <div class="form-group{% if field.errors %} has-error{% endif %}">
+        <div class="col-sm-offset-2 col-sm-10">
+          <div class="checkbox">
+            <label>
+              {{ field(**kwargs) }}{{ field.label.text }}
+            </label>
+          </div>
+        </div>
+      </div>
+    {% elif field.type == 'SubmitField' %}
+          <div class="col-sm-offset-2">
+            {{ field(class='btn btn-primary', **kwargs) }}
+          </div>
+    {% else %}
+         <div class="form-group{% if field.errors %} has-error{% endif %}">
+          <label class="col-sm-2 control-label" for="{{field.id}}">{{ field.label.text }}</label>
+          <div class="col-sm-10">
+            {{ field(class='form-control', **kwargs) }}
+          {% if field.description %}
+          <div class="help-block">{{ field.description }}</div>
+          {% endif %}
+          {{ form_field_errors(field) }}
+          </div>
+        </div>
+    {% endif %}
+{%- endmacro -%}
+
+{%- macro form_fields(fields, class=None, legend=None) -%}
+    {% for field in fields %}
+        {{ form_field(field) }}
+    {% endfor %}
+{%- endmacro -%}
+
+{# valid form types are "basic", "inline" and "horizontal" #}
+{% macro quick_form(form,
+                    action="",
+                    method="post",
+                    extra_classes=None,
+                    role="form",
+                    form_type="horizontal",
+                    horizontal_columns=('lg', 2, 10),
+                    enctype=None,
+                    add_submit="",
+                    submit_title="Save",
+                    button_map={}) %}
+<form
+  {%- if action %} action="{{action}}"{% endif -%}
+  {%- if method %} method="{{method}}"{% endif %}
+  class="form
+    {%- if extra_classes %} {{extra_classes}}{% endif -%}
+    {%- if form_type == "horizontal" %} form-horizontal
+    {%- elif form_type == "inline" %} form-inline
+    {%- endif -%}
+  "
+  {%- if enctype %} enctype="{{enctype}}"{% endif -%}
+  {%- if role %} role="{{role}}"{% endif -%}
+  >
+  {{ form_fields(form) }}
+  {%- if add_submit %}{{ action_buttons(submit_title=submit_title) }}{% endif -%}
+</form>
+{%- endmacro %}
+
