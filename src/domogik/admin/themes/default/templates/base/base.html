@@ -39,7 +39,7 @@
     {% block body -%}
     {% block navbar %}
         {% if not nonav %}
-        {% include "base/nav.html" %}
+        {% include theme("base/nav.html") %}
         {% endif %}
     {%- endblock navbar %}
     {% block content -%}
