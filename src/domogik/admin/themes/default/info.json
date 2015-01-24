@@ -1,0 +1,9 @@
+{
+    "application": "domogik-admin",
+    "identifier": "default",
+    "name": "Default",
+    "author": "Domogik team",
+    "license": "GPLv3",
+    "description": "The default theme",
+    "version": "1.0.0"
+}

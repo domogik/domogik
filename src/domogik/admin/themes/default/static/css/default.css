@@ -68,7 +68,7 @@ body {
 }
 
 .navbar-dmg .navbar-brand {
-	background: url('../images/dmg-logo.png') 0 50% no-repeat;
+	background: url('/static/images/dmg-logo.png') 0 50% no-repeat;
 	padding-left: 52px;
 }
 

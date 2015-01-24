@@ -12,15 +12,15 @@
 
     {%- block styles %}
     <!-- Bootstrap -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="/static/css/datepicker.css" rel="stylesheet" media="screen">
-    <link href="/static/css/datepicker.css" rel="stylesheet" media="screen">
-    <link href="/static/libraries/pnotify/pnotify.min.css" rel="stylesheet" media="screen">
+    <link href="{{ theme_static('css/bootstrap.min.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ theme_static('css/datepicker.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ theme_static('css/datepicker.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ theme_static('libraries/pnotify/pnotify.min.css') }}" rel="stylesheet" media="screen">
     <!-- hopscotch (product tour) -->
-    <link href="/static/libraries/hopscotch/css/hopscotch.min.css" rel="stylesheet" media="screen">
-    <script src="/static/libraries/hopscotch/js/hopscotch.min.js"></script>
+    <link href="{{ theme_static('libraries/hopscotch/css/hopscotch.min.css') }}" rel="stylesheet" media="screen">
+    <script src="{{ theme_static('libraries/hopscotch/js/hopscotch.min.js') }}"></script>
     <!-- Domogik -->
-    <link href="/static/css/default.css" rel="stylesheet" media="screen">
+    <link href="{{ theme_static('css/default.css') }}" rel="stylesheet" media="screen">
 
        <script type="text/javascript">
 	 if ("WebSocket" in window) {
@@ -29,8 +29,8 @@
 		alert('No WS support');
 	}
        </script>
-   <script src="/static/js/jquery.min.js"></script>
-   <script src="/static/js/jquery.cookie.js"></script>
+   <script src="{{ theme_static('js/jquery.min.js') }}"></script>
+   <script src="{{ theme_static('js/jquery.cookie.js') }}"></script>
     {%- endblock styles %}
     {%- endblock head %}
   </head>
@@ -39,17 +39,17 @@
     {% block body -%}
     {% block navbar %}
         {% if not nonav %}
-        {% include "base/nav.html" %}
+        {% include theme("base/nav.html") %}
         {% endif %}
     {%- endblock navbar %}
     {% block content -%}
     {%- endblock content %}
     {% block scripts %}
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/bootstrap-datepicker.js"></script>
-    <script src="/static/js/bootstrap-tooltip.js"></script>
-    <script src="/static/js/bootstrap-confirmation.js"></script>
-    <script src="/static/libraries/pnotify/pnotify.min.js"></script>
+    <script src="{{ theme_static('js/bootstrap.min.js') }}"></script>
+    <script src="{{ theme_static('js/bootstrap-datepicker.js') }}"></script>
+    <script src="{{ theme_static('js/bootstrap-tooltip.js') }}"></script>
+    <script src="{{ theme_static('js/bootstrap-confirmation.js') }}"></script>
+    <script src="{{ theme_static('libraries/pnotify/pnotify.min.js') }}"></script>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <script type="text/javascript">

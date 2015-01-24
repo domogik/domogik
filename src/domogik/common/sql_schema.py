@@ -227,7 +227,7 @@ class UserAccount(Base):
     person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
     person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
-    skin_used = Column(Unicode(80), nullable=False)
+    skin_used = Column(Unicode(80), nullable=False, default=Unicode('default'))
 
     def __init__(self, login, password, is_admin, skin_used, person_id):
         """Class constructor
@@ -251,8 +251,8 @@ class UserAccount(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>"\
-               % (self.id, self.login, self.is_admin, self.person)
+        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s, skin=%s)>"\
+               % (self.id, self.login, self.is_admin, self.person, self.skin_used)
    # Flask-Login integration
     def is_authenticated(self):
         return True

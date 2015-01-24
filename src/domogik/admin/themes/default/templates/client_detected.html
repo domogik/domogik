@@ -1,7 +1,7 @@
-{% extends "base/base.html" %}
+{% extends theme("base/base.html") %}
 
 {% block content %}
-{% include "client_menu.html" %}
+{% include theme("client_menu.html") %}
 <div class="container">
     <h2>{% trans %}Detected devices{% endtrans %}</h2>
     <table id="detected" class="table table-condensed" style="border-collapse:collapse;">

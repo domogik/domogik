@@ -1,9 +1,9 @@
-{% extends "base/base.html" %}
-{% import "base/wtf.html" as wtf %}
+{% extends theme("base/base.html") %}
+{% import theme("base/wtf.html") as wtf %}
 
 {% block content %}
 <div class="container">
-    <h2>{% trans %}Sensor Edit{% endtrans %}</h2>
+    <h2>{% trans %}Person Edit{% endtrans %}</h2>
     {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}, add_submit=True) }}
     <script type="text/javascript">
         $( document ).ready( function () {

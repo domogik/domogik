@@ -452,15 +452,27 @@ class DBConnector(Plugin, MQRep):
                 if res is None:
                     status = False
                     reason = "Manager is not replying to the mq request" 
+            if status:
                 pjson = res.get_data()
                 if pjson is None:
                     status = False
                     reason = "No data for {0} found by manager".format(msg_data['device_type']) 
+            if status:
                 pjson = pjson[dev_type_id]
                 if pjson is None:
                     status = False
                     reason = "The json for {0} found by manager is empty".format(msg_data['device_type']) 
                 self.log.debug("Device Params result : json received by the manager is : {0}".format(pjson))
+            if not status:
+                # we don't have all info so exit
+                msg = MQMessage()
+                msg.set_action('device.params.result')
+                msg.add_data('result', 'Failed')
+                msg.add_data('reason', reason)
+                self.log.debug(msg.get())
+                self.reply(msg.get())
+                return
+
     
             # we have the json now, build the params
             msg = MQMessage()

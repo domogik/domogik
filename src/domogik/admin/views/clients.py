@@ -1,5 +1,5 @@
-from domogik.admin.application import app
-from flask import render_template, request, flash, redirect
+from domogik.admin.application import app, render_template
+from flask import request, flash, redirect
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 try:
