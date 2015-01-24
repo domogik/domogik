@@ -74,7 +74,7 @@ def write_acces_log_before():
 # render a template, later on we can select the theme it here
 def render_template(template, **context):
     user = flask_login.current_user
-    if user.skin_used == '':
+    if not hasattr(user, 'skin_used') or user.skin_used == '':
         user.skin_used = 'default'
     return render_theme_template(user.skin_used, template, **context)
 
