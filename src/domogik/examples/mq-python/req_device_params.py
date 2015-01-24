@@ -59,6 +59,6 @@ from domogikmq.message import MQMessage
 cli = MQSyncReq(zmq.Context())
 msg = MQMessage()
 msg.set_action('device.params')
-#msg.set_data({'device_type': 'diskfree.disk_usage'})
+msg.set_data({'device_type': 'velbus.dimmer'})
 print(cli.request('dbmgr', msg.get(), timeout=10).get())
 

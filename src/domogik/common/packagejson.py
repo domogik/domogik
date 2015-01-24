@@ -242,7 +242,7 @@ class PackageJson():
                         raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
                 #see that each xplparam inside device_type has the following keys: key, description, type
                 expected = ["key", "type", "description", "xpl"]
-                optional = ["max_value", "min_value", "choices", "mask", "multiline"]
+                optional = ["max_value", "min_value", "choices", "mask", "multiline", "default"]
                 if type(devt["parameters"]) != list:
                     raise PackageException("Parameters list for device_type {0} is NOT a list!".format(devtype))
                 for par in devt["parameters"]:
