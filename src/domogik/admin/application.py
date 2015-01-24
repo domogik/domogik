@@ -4,7 +4,8 @@ try:
 except ImportError:
     from flaskext.wtf import Form, RecaptchaField
     pass
-from flask_login import LoginManager
+import flask_login
+from flask_login import LoginManager, current_user
 try:
 	from flask.ext.babel import Babel, get_locale, format_datetime
 except ImportError:
@@ -72,7 +73,10 @@ def write_acces_log_before():
 
 # render a template, later on we can select the theme it here
 def render_template(template, **context):
-    return render_theme_template('default', template, **context)
+    user = flask_login.current_user
+    if user.skin_used == '':
+        user.skin_used = 'default'
+    return render_theme_template(user.skin_used, template, **context)
 
 # import all files inside the view module
 from domogik.admin.views.index import *

@@ -16,6 +16,7 @@ class LoginForm(form.Form):
 def load_user(userid):
     with app.db.session_scope():
         user = app.db.get_user_account(userid)
+        app.db.detach(user)
         if user.is_admin:
             return user
         else:
