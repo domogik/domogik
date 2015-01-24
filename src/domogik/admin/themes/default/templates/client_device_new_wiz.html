@@ -1,8 +1,8 @@
-{% extends "base/base.html" %}
-{% import "base/wtf.html" as wtf %}
+{% extends theme("base/base.html") %}
+{% import theme("base/wtf.html") as wtf %}
 
 {% block content %}
-{% include "client_menu.html" %}
+{% include theme("client_menu.html") %}
 <div class="container">
     <h2>{% trans %}Create a new device{% endtrans %} : {{ dtype }}</h2>
     {{ wtf.quick_form(form, submit_title="Create", add_submit=True) }}

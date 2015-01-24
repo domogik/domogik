@@ -191,8 +191,9 @@ class DbHelper():
         self.__session = None
 
     def detach(self, obj):
-        for par in obj.params:
-            make_transient(par)
+        if hasattr(obj, 'params'):
+            for par in obj.params:
+                make_transient(par)
         make_transient(obj)
         return obj
 

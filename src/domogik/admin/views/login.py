@@ -1,5 +1,5 @@
-from domogik.admin.application import app, login_manager, babel
-from flask import render_template, request, flash, redirect
+from domogik.admin.application import app, login_manager, babel, render_template
+from flask import request, flash, redirect
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from flask_login import login_required, login_user, logout_user, current_user
@@ -16,6 +16,7 @@ class LoginForm(form.Form):
 def load_user(userid):
     with app.db.session_scope():
         user = app.db.get_user_account(userid)
+        app.db.detach(user)
         if user.is_admin:
             return user
         else:
