@@ -65,10 +65,25 @@ For each message you need to set:
 * *parameters*: all the parameters of the xPL message.
 
   * *static*: all the static keys of the xPL message. Static keys will always be the same, whatever the device is. They will never be displayed in the user interface.
+    
+    * *key*: The xpl key
+    * *value*: The value the xpl key must have
+  
   * *device* : the static parameters. Their value is defined on a per device basis (input is requested) in the user interface. The values can be different for the *xpl_commands* and xpl_stats* parts (if both exists).
+    
+    * *description* :  short description of this field
+    * *type* : the value type for this field. The available values are the same as the ones used in the :doc:`configuration part of the json <configuration>`
+    * *key* : The Xpl key
+    * *default* : Optionaly a default value for this parameter, will be pre filled in in the admin interface during device creation
+
   * *dynamic* : all the dynamic parts of the xPL message. It is all the keys which are not related to the device address : values for the sensors. They are stored in the sensor history table.
 
-..todo :: 
+    * *key* : The Xpl key
+    * *ignore_values* : What values to ignore, see below for more info
+    * *sensor* : The sensor to store this value in
 
-    explain ignore_values
+ignore_values
+-------------
+
+This parameter for a dynamic xpl_stat parameter is used to ignore certain values. If the received value (in the xpl_stat message) is found in this list then the value will not be stored in the sensor_history table, if we don't find it in the list or if the list is empty the value will be stored in the sensorHistory table.
 
