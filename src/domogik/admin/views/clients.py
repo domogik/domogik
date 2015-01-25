@@ -396,7 +396,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     # add the global params
     for item in params["global"]:
         # build the field
-        name = "Parameter - {0}".format(item["key"])
+        name = "Parameter - '{0}'".format(item["key"])
         default = None
         if 'default' in item:
             default = item['default']
@@ -428,7 +428,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     # add the xpl params
     for item in params["xpl"]:
         # build the field
-        name = "xPL Parameter - '{0}".format(item["key"])
+        name = "xPL Parameter - '{0}'".format(item["key"])
         default = None
         if 'default' in item:
             default = item['default']
