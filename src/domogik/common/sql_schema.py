@@ -496,13 +496,14 @@ class XplStatParam(Base):
     xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
+    multiple = Column(Unicode(1), nullable=True)
     static = Column(Boolean, nullable=True)
     sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=True) 
     ignore_values = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
 
-    def __init__(self, xplstat_id, key, value, static, sensor_id, ignore_values, type):
+    def __init__(self, xplstat_id, key, value, static, sensor_id, ignore_values, type, multiple=None):
         self.xplstat_id = xplstat_id
         self.key = ucode(key)
         self.value = ucode(value)
@@ -510,11 +511,12 @@ class XplStatParam(Base):
         self.sensor_id = sensor_id
         self.ignore_values = ucode(ignore_values)
         self.type = ucode(type)
+        self.multiple = ucode(multiple)
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStatParam(stat_id=%s key='%s' value='%s' static=%s sensor_id=%s ignore='%s' type='%s')>"\
-               % (self.xplstat_id, self.key, self.value, self.static, self.sensor_id, self.ignore_values, self.type)
+        return "<XplStatParam(stat_id=%s key='%s' value='%s' multi='%s' static=%s sensor_id=%s ignore='%s' type='%s')>"\
+               % (self.xplstat_id, self.key, self.value, self.multiple, self.static, self.sensor_id, self.ignore_values, self.type)
 
     @staticmethod
     def get_tablename():

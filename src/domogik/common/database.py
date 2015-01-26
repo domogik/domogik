@@ -713,13 +713,19 @@ class DbHelper():
             self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
             for p2 in params['xpl_stats'][xplstat_in_client_data['name']]:
                 if p2['key'] == a_parameter['key']:
+                    print p2
+                    if 'multiple' in p2:
+                        mul = p2['multiple']
+                    else:
+                        mul = None
                     par = XplStatParam(xplstat_id = xplstat.id , \
                                       sensor_id = None, \
                                       key = p2['key'], \
                                       value = p2["value"], \
                                       static = True, \
                                       ignore_values = None, \
-                                      type = p2["type"])
+                                      type = p2["type"], \
+                                      multiple = mul)
                     self.__session.add(par)
         return xplstat 
 
