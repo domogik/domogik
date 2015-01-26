@@ -75,6 +75,7 @@ For each message you need to set:
     * *type* : the value type for this field. The available values are the same as the ones used in the :doc:`configuration part of the json <configuration>`
     * *key* : The Xpl key
     * *default* : Optionaly a default value for this parameter, will be pre filled in in the admin interface during device creation
+    * *multiple* : Optional parameter, if this parameter is set to a one char string, then we can set multiple values for the parameter seperated by the char. Example input: <value1><seperator><value2><seperator><value3>
 
   * *dynamic* : all the dynamic parts of the xPL message. It is all the keys which are not related to the device address : values for the sensors. They are stored in the sensor history table.
 
