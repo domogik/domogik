@@ -496,30 +496,35 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             default = None
             if 'default' in item:
                 default = item['default']
+            desc = item["description"]
+            if 'multiple' in item and len(item['multiple']) == 1:
+                desc = "{0}. Multiple values allowed, seperate with '{1}'".format(desc, item['multiple'])
+                # ugly fix, override field type
+                item['type'] = "string"
             if item["type"] == "boolean":
                 if default == 'Y' or default == 1 or default == True:
                     default = True
                 else:
                     default = False
-                field = BooleanField(name, [Required()], description=item["description"], default=default)
+                field = BooleanField(name, [Required()], description=desc, default=default)
             elif item["type"] == "integer":
-                field = IntegerField(name, [Required()], description=item["description"], default=default)
+                field = IntegerField(name, [Required()], description=desc, default=default)
             elif item["type"] == "date":
-                field = DateField(name, [Required()], description=item["description"], default=default)
+                field = DateField(name, [Required()], description=desc, default=default)
             elif item["type"] == "datetime":
-                field = DateTimeField(name, [Required()], description=item["description"], default=default)
+                field = DateTimeField(name, [Required()], description=desc, default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [Required()], description=item["description"], default=default)
+                field = DateTimeField(name, [Required()], description=desc, default=default)
             elif item["type"] == "choice":
                 choices = []
                 for key in sorted(item["choices"]):
                     choices.append((key, item["choices"][key]))
-                field = SelectField(name, [Required()], description=item["description"], choices=choices, default=default)
+                field = SelectField(name, [Required()], description=desc, choices=choices, default=default)
             elif item["type"] == "password":
-                field = PasswordField(name, [Required()], description=item["description"], default=default)
+                field = PasswordField(name, [Required()], description=desc, default=default)
             else:
                 # time, email, ipv4, ipv6, url
-                field = TextField(name, [Required()], description=item["description"], default=default)
+                field = TextField(name, [Required()], description=desc, default=default)
             setattr(F, "stat|{0}|{1}".format(cmd,item["key"]), field)
     form = F()
 
