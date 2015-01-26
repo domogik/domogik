@@ -129,7 +129,7 @@ def client_sensor_edit(client_id, sensor_id):
         MyForm = model_form(Sensor, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
-                        exclude=['core_device', 'name', 'reference', 'incremental', 'formula', 'data_type', 'conversion', 'last_value', 'last_received', 'history_duplicate','value_min','value_max'])
+                        exclude=['core_device', 'name', 'reference', 'incremental', 'data_type', 'conversion', 'last_value', 'last_received', 'history_duplicate','value_min','value_max'])
         #MyForm.history_duplicate.kwargs['validators'] = []
         MyForm.history_store.kwargs['validators'] = []
         form = MyForm(request.form, sensor)
@@ -144,7 +144,8 @@ def client_sensor_edit(client_id, sensor_id):
                      history_store=store, \
                      history_max=request.form['history_max'], \
                      history_expire=request.form['history_expire'],
-                     timeout=request.form['timeout'])
+                     timeout=request.form['timeout'],
+                     formula=request.form['formula'])
 
             flash(gettext("Changes saved"), "success")
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
