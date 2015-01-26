@@ -324,7 +324,7 @@ class PackageJson():
                     self._validate_keys(expected, "a static parameter for xpl_stat {0}".format(xstatid), stat.keys())
                 # device parameter
                 expected = ["key", "description", "type"]
-                optional = ["default"]
+                optional = ["default", "multiple"]
                 if type(xstat['parameters']['device']) != list:
                     raise PackageException("Device parameters for xpl_stat {0} is not a list".format(xstatid))
                 for stat in xstat['parameters']['device']:
