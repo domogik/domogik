@@ -885,7 +885,7 @@ class DbHelper():
                         value = 0
                 # handle formula if defined
                 if sensor.formula is not None and sensor.formula != '':
-                    form = sensor.formula.replace('XYZ', str(value))
+                    form = sensor.formula.replace('VALUE', str(value))
                     try:
                         newval = eval(form)
                     except Exception as exp:
