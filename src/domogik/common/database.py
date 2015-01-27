@@ -883,8 +883,15 @@ class DbHelper():
                     else:
                         # set the begin value to 0
                         value = 0
-                #if semsor.formula is not None:
-                    # do the calculation
+                # handle formula if defined
+                if sensor.formula is not None and sensor.formula != '':
+                    form = sensor.formula.replace('XYZ', str(value))
+                    try:
+                        newval = eval(form)
+                    except Exception as exp:
+                        newval = value
+                        self.log.error("Failed to apply formula ({0}) to sensor ({1}): {2}".format(sensor.formula, sensor, exp))
+                    value = newval
                 # only store stats if the value is different
                 if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
                     # handle history_round

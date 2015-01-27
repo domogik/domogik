@@ -419,12 +419,12 @@ class Sensor(Base):
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s min=%s max=%s timeout=%s)>"\
+        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s min=%s max=%s timeout=%s formula='%s')>"\
                % (self.id, self.device_id, self.reference, self.incremental, \
                    self.name, self.data_type, self.conversion, \
                    self.history_store, self.history_max, self.history_expire, \
                    self.history_round, self.history_duplicate, \
-                   self.value_min, self.value_max, self.timeout)
+                   self.value_min, self.value_max, self.timeout, self.formula)
 
     @staticmethod
     def get_tablename():
