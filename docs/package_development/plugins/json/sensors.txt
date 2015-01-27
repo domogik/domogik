@@ -150,4 +150,15 @@ In this example this will save use 66% of storage space, so for the example in t
 
 For this sytem to work its verry important that the round_value is set to a logical number for that type of sensor.
 
+Formula Field
+=============
 
+This is a field that is NOT in the json, but its a sensor parameter. This means it can be udpated after sensor creation.
+With the formula field you can apply a formula to a value that will be stored. The formula calculation is one of the last steps in the sensor history storage.
+
+The formula needs an input parameter and thats the value comming from XPL. To use this value in you formula use XYZ string, it will be replaced before the formula is applied.
+
+example: XYZ - 5
+This will store the received XPL value - 5
+
+If the formula is not a valid formula (means it can not be evalled) the exception is logged in the db_api.log and the original value will be stored in the DB
