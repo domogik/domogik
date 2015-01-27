@@ -1,7 +1,7 @@
-{% extends "base/base.html" %}
+{% extends theme("base/base.html") %}
 
 {% block content %}
-{% include "client_menu.html" %}
+{% include theme("client_menu.html") %}
 
 <div class="container">
   <button class="btn btn-default margin-bottom" id="start_client_tour">{% trans %}Start the discover tour!{% endtrans %}</button>
