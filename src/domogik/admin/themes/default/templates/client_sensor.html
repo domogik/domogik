@@ -5,10 +5,5 @@
 <div class="container">
     <h2>{% trans %}Sensor Edit{% endtrans %}</h2>
     {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}, add_submit=True) }}
-    <script type="text/javascript">
-        $( document ).ready( function () {
-		$('#birthdate').datepicker({'format': 'yyyy-mm-dd'})
-	})
-    </script>
 </div>
 {% endblock %}
