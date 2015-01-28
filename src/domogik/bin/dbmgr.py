@@ -511,7 +511,7 @@ class DBConnector(Plugin, MQRep):
                     stats.append(xstatn)
             result['xpl_stats'] = {}
             for xstatn in stats:
-                xtat = pjson['xpl_stats'][xstatn]
+                xstat = pjson['xpl_stats'][xstatn]
                 result['xpl_stats'][xstatn] = []
                 for param in xstat['parameters']['device']:
                     result['xpl_stats'][xstatn].append(param)
