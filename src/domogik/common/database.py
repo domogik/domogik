@@ -411,7 +411,8 @@ class DbHelper():
                         'reference' : device.reference, 
                         'description' : device.description, 
                         'device_type_id' : device.device_type_id, 
-                        'client_id' : device.client_id
+                        'client_id' : device.client_id,
+                        'client_version' : device.client_version
                       }
         # params
         json_device['parameters'] = {}
