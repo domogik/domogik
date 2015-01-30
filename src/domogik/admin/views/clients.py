@@ -155,7 +155,8 @@ def client_sensor_edit(client_id, sensor_id):
                 form = form,
                 clientid = client_id,
                 mactive="clients",
-                active = 'devices'
+                active = 'devices',
+                sensor = sensor
                 )
 
 @app.route('/client/<client_id>/dmg_devices/detected')
@@ -297,7 +298,6 @@ def client_config(client_id):
             data['auto_startup'] = 'Y'
         else:
             data['auto_startup'] = 'N'
-        print data
         # build the message
         msg = MQMessage()
         msg.set_action('config.set')
