@@ -35,7 +35,7 @@ The Network
 
 As domogik has a lot of different components that need to publish or subscribe messages a system is required to forward the messages.
 
-The dmg_forwarder was build for this, the forwarder listens on 2 different ports, on for the publisher clients and one for the subscribed clients. So all clinets (domogik components) that publish a messages will need to connect to the publisher listing port, the forwarder will then broadcast this message to all clients (domogik components) that are connected on the subscriber port.
+The dmg_forwarder was build for this, the forwarder listens on 2 different ports, on for the publisher clients and one for the subscribed clients. So all clients (domogik components) that publish a messages will need to connect to the publisher listing port, the forwarder will then broadcast this message to all clients (domogik components) that are connected on the subscriber port.
 
 The subscribing to certain messages is done on the client side, by using the subscribe socket of zmq.
 
