@@ -507,8 +507,10 @@ class DBConnector(Plugin, MQRep):
             sensors = pjson['device_types'][dev_type_id]['sensors']
             for xstatn in pjson['xpl_stats']:
                 xstat = pjson['xpl_stats'][xstatn]
-                if xstat['parameters']['dynamic'] in sensors:
-                    stats.append(xstatn)
+                for sparam in xstat['parameters']['dynamic']:
+                    if 'sensor' in sparam:
+                        if sparam['sensor'] in sensors:
+                            stats.append(xstatn)
             result['xpl_stats'] = {}
             for xstatn in stats:
                 xstat = pjson['xpl_stats'][xstatn]
