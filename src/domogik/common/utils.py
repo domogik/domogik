@@ -178,7 +178,6 @@ def get_rest_url():
     port = conf['port']
     interfaces = conf['interfaces']
     intf = interfaces.split(',')
-    print intf
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
 

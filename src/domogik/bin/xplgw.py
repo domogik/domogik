@@ -308,8 +308,12 @@ class XplManager(XplPlugin, MQAsyncSub):
                             if search.schema == pkt.schema:
                                 found = True
                                 for par in search.params:
-                                    if par.key not in pkt.data and par.value != pkt.data[par.key]:
-                                        found = False
+                                    if par.key not in pkt.data:
+                                        if par.value != pkt.data[par.key]:
+                                            found = False
+                                        elif par.multiple is not None and len(par.multiple) == 1:
+                                            if pkt.data[par.key] not in par.value.split(par.multiple):
+                                                found = False
                                 if found:
                                     self._log.info(u"Found response message to command with uuid: {0}".format(uuid))
                                     # publish the result
@@ -361,7 +365,9 @@ class XplManager(XplPlugin, MQAsyncSub):
                     for param in xplstat.params:
                         if param.key in item["msg"].data and param.static:
                             statics = statics + 1
-                            if item["msg"].data[param.key] == param.value:
+                            if param.multiple is not None and len(param.multiple) == 1 and item["msg"].data[param.key] in param.value.split(param.multiple):
+                                matching = matching + 1
+                            elif item["msg"].data[param.key] == param.value:
                                 matching = matching + 1
                     # now we have a matching xplstat, go and find all sensors
                     if matching == statics:

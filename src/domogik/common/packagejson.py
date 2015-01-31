@@ -242,7 +242,7 @@ class PackageJson():
                         raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
                 #see that each xplparam inside device_type has the following keys: key, description, type
                 expected = ["key", "type", "description", "xpl"]
-                optional = ["max_value", "min_value", "choices", "mask", "multiline"]
+                optional = ["max_value", "min_value", "choices", "mask", "multiline", "default"]
                 if type(devt["parameters"]) != list:
                     raise PackageException("Parameters list for device_type {0} is NOT a list!".format(devtype))
                 for par in devt["parameters"]:
@@ -295,10 +295,13 @@ class PackageJson():
                     self._validate_keys(expected, "a static parameter for xpl_command {0}".format(xcmdid), stat.keys())
                 # device parameter
                 expected = ["key", "description", "type"]
+                optional = ["default"]
                 if type(xcmd['parameters']['device']) != list:
                     raise PackageException("Device parameters for xpl_command {0} is not a list".format(xcmdid))
                 for stat in xcmd['parameters']['device']:
-                    self._validate_keys(expected, "a device parameter for xpl_command {0}".format(xcmdid), stat.keys())
+                    self._validate_keys(expected, "a device parameter for xpl_command {0}".format(xcmdid), stat.keys(), optional)
+                    if stat['type'] not in fieldTypes:
+                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(stat['type'], fieldTypes))
                 # see that the xpl_stat is defined
                 if xcmd["xplstat_name"] not in self.json["xpl_stats"].keys():
                     raise PackageException("xplstat_name {0} defined in xpl_command {1} is not found".format(xcmd["xplstat_name"], xcmdid))
@@ -321,10 +324,11 @@ class PackageJson():
                     self._validate_keys(expected, "a static parameter for xpl_stat {0}".format(xstatid), stat.keys())
                 # device parameter
                 expected = ["key", "description", "type"]
+                optional = ["default", "multiple"]
                 if type(xstat['parameters']['device']) != list:
                     raise PackageException("Device parameters for xpl_stat {0} is not a list".format(xstatid))
                 for stat in xstat['parameters']['device']:
-                    self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys())
+                    self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys(), optional)
                     if stat['type'] not in fieldTypes:
                         raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(stat['type'], fieldTypes))
                 # dynamic parameter

@@ -129,7 +129,7 @@ def client_sensor_edit(client_id, sensor_id):
         MyForm = model_form(Sensor, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
-                        exclude=['core_device', 'name', 'reference', 'incremental', 'formula', 'data_type', 'conversion', 'last_value', 'last_received', 'history_duplicate','value_min','value_max'])
+                        exclude=['core_device', 'name', 'reference', 'incremental', 'data_type', 'conversion', 'last_value', 'last_received', 'history_duplicate','value_min','value_max'])
         #MyForm.history_duplicate.kwargs['validators'] = []
         MyForm.history_store.kwargs['validators'] = []
         form = MyForm(request.form, sensor)
@@ -144,7 +144,8 @@ def client_sensor_edit(client_id, sensor_id):
                      history_store=store, \
                      history_max=request.form['history_max'], \
                      history_expire=request.form['history_expire'],
-                     timeout=request.form['timeout'])
+                     timeout=request.form['timeout'],
+                     formula=request.form['formula'])
 
             flash(gettext("Changes saved"), "success")
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
@@ -154,7 +155,8 @@ def client_sensor_edit(client_id, sensor_id):
                 form = form,
                 clientid = client_id,
                 mactive="clients",
-                active = 'devices'
+                active = 'devices',
+                sensor = sensor
                 )
 
 @app.route('/client/<client_id>/dmg_devices/detected')
@@ -296,7 +298,6 @@ def client_config(client_id):
             data['auto_startup'] = 'Y'
         else:
             data['auto_startup'] = 'N'
-        print data
         # build the message
         msg = MQMessage()
         msg.set_action('config.set')
@@ -396,118 +397,135 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     # add the global params
     for item in params["global"]:
         # build the field
-        name = "Parameter - {0}".format(item["key"])
+        name = "Parameter - '{0}'".format(item["key"])
+        default = None
+        if 'default' in item:
+            default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
                 default = True
             else:
                 default = False
-            field = BooleanField(name, [Required()], description=item["description"])
+            field = BooleanField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "integer":
-            field = IntegerField(name, [Required()], description=item["description"])
+            field = IntegerField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "date":
-            field = DateField(name, [Required()], description=item["description"])
+            field = DateField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "datetime":
-            field = DateTimeField(name, [Required()], description=item["description"])
+            field = DateTimeField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "float":
-            field = DateTimeField(name, [Required()], description=item["description"])
+            field = DateTimeField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "choice":
             choices = []
             for key in sorted(item["choices"]):
                 choices.append((key, item["choices"][key]))
             field = SelectField(name, [Required()], description=item["description"], choices=choices)
         elif item["type"] == "password":
-            field = PasswordField(name, [Required()], description=item["description"])
+            field = PasswordField(name, [Required()], description=item["description"], default=default)
         else:
             # time, email, ipv4, ipv6, url
-            field = TextField(name, [Required()], description=item["description"])
+            field = TextField(name, [Required()], description=item["description"], default=default)
         setattr(F, "glob|{0}".format(item["key"]), field)
     # add the xpl params
     for item in params["xpl"]:
         # build the field
-        name = "xPL Parameter - '{0}".format(item["key"])
+        name = "xPL Parameter - '{0}'".format(item["key"])
+        default = None
+        if 'default' in item:
+            default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
                 default = True
             else:
                 default = False
-            field = BooleanField(name, [Required()], description=item["description"])
+            field = BooleanField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "integer":
-            field = IntegerField(name, [Required()], description=item["description"])
+            field = IntegerField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "date":
-            field = DateField(name, [Required()], description=item["description"])
+            field = DateField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "datetime":
-            field = DateTimeField(name, [Required()], description=item["description"])
+            field = DateTimeField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "float":
-            field = DateTimeField(name, [Required()], description=item["description"])
+            field = DateTimeField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "choice":
             choices = []
             for key in sorted(item["choices"]):
                 choices.append((key, item["choices"][key]))
-            field = SelectField(name, [Required()], description=item["description"], choices=choices)
+            field = SelectField(name, [Required()], description=item["description"], choices=choices, default=default)
         elif item["type"] == "password":
-            field = PasswordField(name, [Required()], description=item["description"])
+            field = PasswordField(name, [Required()], description=item["description"], default=default)
         else:
             # time, email, ipv4, ipv6, url
-            field = TextField(name, [Required()], description=item["description"])
+            field = TextField(name, [Required()], description=item["description"], default=default)
         setattr(F, "xpl|{0}".format(item["key"]), field)
     for cmd in params["xpl_commands"]:
         for item in params["xpl_commands"][cmd]:
             # build the fiel
             name = "Xpl-Command '{0}' Parameter '{1}'".format(cmd, item["key"])
+            default = None
+            if 'default' in item:
+                default = item['default']
             if item["type"] == "boolean":
                 if default == 'Y' or default == 1 or default == True:
                     default = True
                 else:
                     default = False
-                field = BooleanField(name, [Required()], description=item["description"])
+                field = BooleanField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "integer":
-                field = IntegerField(name, [Required()], description=item["description"])
+                field = IntegerField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "date":
-                field = DateField(name, [Required()], description=item["description"])
+                field = DateField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "datetime":
-                field = DateTimeField(name, [Required()], description=item["description"])
+                field = DateTimeField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [Required()], description=item["description"])
+                field = DateTimeField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "choice":
                 choices = []
                 for key in sorted(item["choices"]):
                     choices.append((key, item["choices"][key]))
-                field = SelectField(name, [Required()], description=item["description"], choices=choices)
+                field = SelectField(name, [Required()], description=item["description"], choices=choices, default=default)
             elif item["type"] == "password":
-                field = PasswordField(name, [Required()], description=item["description"])
+                field = PasswordField(name, [Required()], description=item["description"], default=default)
             else:
                 # time, email, ipv4, ipv6, url
-                field = TextField(name, [Required()], description=item["description"])
+                field = TextField(name, [Required()], description=item["description"], default=default)
             setattr(F, "cmd|{0}|{1}".format(cmd,item["key"]), field)
     for cmd in params["xpl_stats"]:
         for item in params["xpl_stats"][cmd]:
             # build the fiel
             name = "Xpl-Stat '{0}' Parameter '{1}'".format(cmd, item["key"])
+            default = None
+            if 'default' in item:
+                default = item['default']
+            desc = item["description"]
+            if 'multiple' in item and len(item['multiple']) == 1:
+                desc = "{0}. Multiple values allowed, seperate with '{1}'".format(desc, item['multiple'])
+                # ugly fix, override field type
+                item['type'] = "string"
             if item["type"] == "boolean":
                 if default == 'Y' or default == 1 or default == True:
                     default = True
                 else:
                     default = False
-                field = BooleanField(name, [Required()], description=item["description"])
+                field = BooleanField(name, [Required()], description=desc, default=default)
             elif item["type"] == "integer":
-                field = IntegerField(name, [Required()], description=item["description"])
+                field = IntegerField(name, [Required()], description=desc, default=default)
             elif item["type"] == "date":
-                field = DateField(name, [Required()], description=item["description"])
+                field = DateField(name, [Required()], description=desc, default=default)
             elif item["type"] == "datetime":
-                field = DateTimeField(name, [Required()], description=item["description"])
+                field = DateTimeField(name, [Required()], description=desc, default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [Required()], description=item["description"])
+                field = DateTimeField(name, [Required()], description=desc, default=default)
             elif item["type"] == "choice":
                 choices = []
                 for key in sorted(item["choices"]):
                     choices.append((key, item["choices"][key]))
-                field = SelectField(name, [Required()], description=item["description"], choices=choices)
+                field = SelectField(name, [Required()], description=desc, choices=choices, default=default)
             elif item["type"] == "password":
-                field = PasswordField(name, [Required()], description=item["description"])
+                field = PasswordField(name, [Required()], description=desc, default=default)
             else:
                 # time, email, ipv4, ipv6, url
-                field = TextField(name, [Required()], description=item["description"])
+                field = TextField(name, [Required()], description=desc, default=default)
             setattr(F, "stat|{0}|{1}".format(cmd,item["key"]), field)
     form = F()
 
