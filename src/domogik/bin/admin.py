@@ -82,7 +82,7 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
             self.ping("a")
             self.ping_timeout = self.io_loop.add_timeout(datetime.timedelta(minutes=1), self.on_connection_timeout)
         except Exception as ex:
-            print("-- Failed to send ping! {0}".format(ex))
+            pass
 
     def on_pong(self, data):
         if hasattr(self, "ping_timeout"):

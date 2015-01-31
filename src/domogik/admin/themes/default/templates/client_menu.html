@@ -81,11 +81,11 @@ TODO : remove
             if (data.msgid == "plugin.status") {
                 if ( data.content['host'] == '{{client_detail.host}}' && '{{client_detail.package_id}}' == data.content['type'] + '-'+ data.content['name'] ) {
                 console.log(data.content['event']);
-                    $('#client_name .status').text(data.content['event']);
+                    $('#client-status .status').text(data.content['event']);
                     // for plugins, update the button classes
-                    $('#client_name button').removeClass().addClass('btn btn-info dropdown-toggle status-'+data.content['event']);
+                    $('#client-status button').removeClass().addClass('btn btn-info btn-xs dropdown-toggle status-'+data.content['event']);
                     // for clients which are not plugins, update the label classes
-                    $('#client_name .status-label').removeClass().addClass('label label-info status status-label status-'+data.content['event']);
+                    $('#client-status .status-label').removeClass().addClass('label label-info status status-label status-'+data.content['event']);
                     // TODO : deactivate link start/stop depending on the status
                 }
             }
@@ -101,7 +101,7 @@ TODO : remove
         $("#stop").click(function() {
             console.log("stop request");
             ws.send('{"dst": "plugin-{{ client_detail.name }}.{{ client_detail.host }}", "action": "plugin.stop.do", "data": {"name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
-            console.log("ws send done ()");
+            console.log("ws send done");
         });
         {% endif %}
 

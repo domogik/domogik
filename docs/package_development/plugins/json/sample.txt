@@ -27,6 +27,7 @@ Part of the json sample
                         "description": "A short description",
                         "type": "string"                                # key appears in the xpl as : {key1_devicetype : this a string type}
                         "xpl": True                                     # if the params is in the xpl messages : True. For example, an interval will not be in a xpl message
+                        "default": "A default value"                    # optionally a default value for this parameter
                     },
                     {
                         "key": "key2_devicetype",
@@ -35,6 +36,7 @@ Part of the json sample
                         "max_value": 255,                               # depending on the type the are other posibilitys
                         "min_value": 0,
                         "xpl": True                                     # if the params is in the xpl messages : True. For example, an interval will not be in a xpl message
+                        "default": "A default value"                    # optionally a default value for this parameter
                     }
                 ]
             }
@@ -126,12 +128,16 @@ Part of the json sample
 
 
                         {
-                            "key": "device_key1_xpl_cmd_one",           # key appears in the xpl as : {device_key1_xpl_cmd_one : static value}
-                            "value" : "value_device_key1_xpl_cmd_one"
+                            "key": "device_key1_xpl_cmd_one",           # key appears in the xpl as : {device_key1_xpl_cmd_one}
+                            "description": "A description",             # A description that will be displayed in the admin interface
+                            "type": "string"                            # The type of the field (used for the userinterface)
+                            "default": "A default value"                # optionally a default value for this parameter
                         },
                         {
-                            "key": "device_key2_xpl_cmd_one",
-                            "value" : "value_device_key2_xpl_cmd_one"
+                            "key": "device_key2_xpl_cmd_one",           # key appears in the xpl as : {device_key1_xpl_cmd_one}
+                            "description": "A description",             # A description that will be displayed in the admin interface
+                            "type": "string"                            # The type of the field (used for the userinterface)
+                            "default": "A default value"                # optionally a default value for this parameter
                         }
                     ]
                 }
@@ -149,8 +155,10 @@ Part of the json sample
                     ],
                     "device": [
                         {
-                            "key": "device_key1_xpl_cmd_two",
-                            "value" : "value_device_key1_xpl_cmd_two"
+                            "key": "device_key1_xpl_cmd_two",           # key appears in the xpl as : {device_key1_xpl_cmd_one : static value}
+                            "description": "A description",             # A description that will be displayed in the admin interface
+                            "type": "string"                            # The type of the field (used for the userinterface)
+                            "default": "A default value"                # optionally a default value for this parameter
                         }
                     ]
                 }
@@ -167,7 +175,14 @@ Part of the json sample
                             "key": "static_key1_xplstat_one",           # key appears in the xpl as : {static_key1_xplstat_one : static value}
                             "value" : "value_static_key1_xplstat_one"
                         }],
-                    "device": [],                                       # will always be empty
+                    "device": [
+                        {
+                            "key": "device_key1_xpl_cmd_two",           # key appears in the xpl as : {device_key1_xpl_cmd_one}
+                            "description": "A description",             # A description that will be displayed in the admin interface
+                            "type": "string"                            # The type of the field (used for the userinterface)
+                            "default": "A default value"                # optionally a default value for this parameter
+                        }
+                    ],
                     "dynamic": [                                        # key copied to the xPL message. keys which are values for the sensors. They are stored in the sensor history table.
                         {
                              "key": "dynamic_key1_xpl_xplstat_one",     # key appears in the xpl as : {dynamic_key1_xpl_xplstat_one : dynamic value}

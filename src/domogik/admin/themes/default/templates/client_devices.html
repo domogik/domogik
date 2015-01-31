@@ -74,6 +74,8 @@
                             <li><strong>{% trans %}Device type id{% endtrans %}</strong> : {{ data.device_type_id }}</li>
                             <li><strong>{% trans %}Reference{% endtrans %}</strong> : {{ data.reference }}</li>
                             <li><strong>{% trans %}Description{% endtrans %}</strong> : {{ data.description }}</li>
+                            {% set device_url = rest_url + "/device/" + data.id|string %}
+                            <li><strong>{% trans %}Rest url{% endtrans %}</strong> : <a href='{{ device_url }}'>{{ device_url }}</a></li>
                           </ul>
                         </div>
                       </div>

@@ -712,13 +712,19 @@ class DbHelper():
             self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
             for p2 in params['xpl_stats'][a_xplstat]:
                 if p2['key'] == a_parameter['key']:
+                    print p2
+                    if 'multiple' in p2:
+                        mul = p2['multiple']
+                    else:
+                        mul = None
                     par = XplStatParam(xplstat_id = xplstat.id , \
                                       sensor_id = None, \
                                       key = p2['key'], \
                                       value = p2["value"], \
                                       static = True, \
                                       ignore_values = None, \
-                                      type = p2["type"])
+                                      type = p2["type"], \
+                                      multiple = mul)
                     self.__session.add(par)
         return xplstat 
 
@@ -876,8 +882,15 @@ class DbHelper():
                     else:
                         # set the begin value to 0
                         value = 0
-                #if semsor.formula is not None:
-                    # do the calculation
+                # handle formula if defined
+                if sensor.formula is not None and sensor.formula != '':
+                    form = sensor.formula.replace('VALUE', str(value))
+                    try:
+                        newval = eval(form)
+                    except Exception as exp:
+                        newval = value
+                        self.log.error("Failed to apply formula ({0}) to sensor ({1}): {2}".format(sensor.formula, sensor, exp))
+                    value = newval
                 # only store stats if the value is different
                 if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
                     # handle history_round
@@ -1477,7 +1490,7 @@ class DbHelper():
 
     def update_sensor(self, sid, history_round=None, \
             history_store=None, history_max=None, \
-            history_expire=None, timeout=None):
+            history_expire=None, timeout=None, formula=None):
         sensor = self.__session.query(Sensor).filter_by(id=sid).first()
         if sensor is None:
             self.__raise_dbhelper_exception("Sensor with id %s couldn't be found" % sid)
@@ -1491,6 +1504,8 @@ class DbHelper():
             sensor.history_expire = history_expire
         if timeout is not None:
             sensor.timeout = timeout
+        if formula is not None:
+            sensor.formula = formula
         self.__session.add(sensor)
         try:
             self.__session.commit()
