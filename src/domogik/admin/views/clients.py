@@ -234,6 +234,7 @@ def client_devices_delete(client_id, did):
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
 def client_config(client_id):
+    cli = MQSyncReq(app.zmq_context)
     detail = get_client_detail(client_id)
     config = detail['data']['configuration']
     known_items = []
