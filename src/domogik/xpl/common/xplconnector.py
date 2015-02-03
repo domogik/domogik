@@ -101,7 +101,7 @@ class Manager:
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None, nohub = False):
+    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None, nohub = False, source = None):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)
@@ -112,7 +112,8 @@ class Manager:
         if ip == None:
             ip = self.get_sanitized_hostname()
         self.p = plugin
-        source = "domogik-%s.%s" % (self.p.get_plugin_name(), self.p.get_sanitized_hostname())
+        if source == None:
+            source = "domogik-%s.%s" % (self.p.get_plugin_name(), self.p.get_sanitized_hostname())
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
