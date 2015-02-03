@@ -283,11 +283,15 @@ def client_config(client_id):
             field = TextField(item["name"], arguments, description=item["description"], default=default)
         # add the field
         setattr(F, item["key"], field)
-    # add the submit button
-    field = submit = SubmitField("Save configuration")
-    setattr(F, "submit", field)
+    # Add the submit button only if there is some existing configuration to save...
+    # plugins with identity->xpl_clients_only == True for example have no configuration items
+    if config != []:
+        field = submit = SubmitField("Save configuration")
+        setattr(F, "submit", field)
+        form = F()
+    else:
+        form = None
 
-    form = F()
 
     if request.method == 'POST' and form.validate():
         # build the requested config set

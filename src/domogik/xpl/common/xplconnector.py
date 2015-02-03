@@ -86,6 +86,7 @@ import time
 import uuid
 
 READ_NETWORK_TIMEOUT = 2
+STATUS_HBEAT_XPL = 5  # default hbeat interval in minutes
 
 class Manager:
     """
@@ -295,7 +296,7 @@ class Manager:
         mesg.set_source( self._source )
         mesg.set_target( target )
         mesg.set_schema( schema )
-        mesg.add_single_data( "interval", "5" )
+        mesg.add_single_data( "interval", STATUS_HBEAT_XPL )
         mesg.add_single_data( "port", self.port )
         mesg.add_single_data( "remote-ip", self._ip )
         if schema != 'hbeat.end':

@@ -123,19 +123,23 @@ class PackageJson():
             self.json["identity"]["icon_file"] = icon_file
 
             # common configuration items
-            auto_startup = {
-                               "default": False,
-                               "description": "Automatically start the plugin at Domogik startup",
-                               "key": "auto_startup",
-                               "name" : "Start the plugin with Domogik",
-                               "required": True,
-                               "type": "boolean"
-                           }
-            # check that auto_startup key is not already defined in the json
-            for config_elt in self.json["configuration"]:
-                if config_elt["key"] == "auto_startup":
-                    raise PackageException("Configuration parameter 'auto_startup' has not to be defined in the json file. Please remove it")
-            self.json["configuration"].insert(0, auto_startup)
+            # to add only for a plugin with identity>xpl_clients_only not set to True !
+            print("XXXX {0}".format(self.json["identity"].has_key("xpl_clients_only")))
+            print(self.json["identity"])
+            if not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
+                auto_startup = {
+                                   "default": False,
+                                   "description": "Automatically start the plugin at Domogik startup",
+                                   "key": "auto_startup",
+                                   "name" : "Start the plugin with Domogik",
+                                   "required": True,
+                                   "type": "boolean"
+                               }
+                # check that auto_startup key is not already defined in the json
+                for config_elt in self.json["configuration"]:
+                    if config_elt["key"] == "auto_startup":
+                        raise PackageException("Configuration parameter 'auto_startup' has not to be defined in the json file. Please remove it")
+                self.json["configuration"].insert(0, auto_startup)
                   
 
 
@@ -200,7 +204,7 @@ class PackageJson():
 
             # validate identity
             expected = ["author", "author_email", "description", "domogik_min_version", "name", "type", "version"]
-            optional = ["tags", "dependencies", "package_id", "icon_file"]
+            optional = ["tags", "dependencies", "package_id", "icon_file", "xpl_clients_only"]
             if type(self.json["identity"]) != dict:
                 raise PackageException("Identity part is NOT a dictionary!")
             self._validate_keys(expected, "an identity param", self.json["identity"].keys(), optional)

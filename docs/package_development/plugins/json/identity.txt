@@ -25,8 +25,19 @@ Example
         "version": "0.1"
     },
 
+Some optionnal fields can be added in **identity**: ::
+
+    "identity": {
+        ...
+        "xpl_clients_only": true,
+        ...
+    },
+
+
 Description
 ===========
+
+Mandatory :
 
 * **type** : the package type. For a plugin, the value will always be **plugin**
 * **name** : the plugin name. Example : ipx800, diskfree, ... 
@@ -37,6 +48,10 @@ Description
 * **author_email** : an email to contact the package author. If you want you can write the email like this : *john at dummy dot com*.
 * **tags** : a list of tags. You will find some examples below.
 * **dependencies** : a list of dependencies for the package. You will find more informations below.
+
+Optionnal :
+
+* **xpl_clients_only** : *true|false*. Default : *false*. This key is to set to true only for the plugins with **no python** part. These are special plugins that will be used only for adding compatibility to external xPL clients to Domogik. Example : the **generic** plugin.
 
 Tags
 ----
