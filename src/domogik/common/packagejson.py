@@ -124,8 +124,6 @@ class PackageJson():
 
             # common configuration items
             # to add only for a plugin with identity>xpl_clients_only not set to True !
-            print("XXXX {0}".format(self.json["identity"].has_key("xpl_clients_only")))
-            print(self.json["identity"])
             if not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
                 auto_startup = {
                                    "default": False,
