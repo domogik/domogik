@@ -60,6 +60,21 @@
                   {{ client_list_per_host_per_type[host][type][client].name }}
                   <span class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
                 </a>
+                {% if type == "plugin" %}
+                  {# if the client has some xpl client compliants possibilities, parse all the clients to check if it should be added below the client #}
+                  {% for compliant in client_list_per_host_per_type[host][type][client]['compliant_xpl_clients'] %}
+                    {# for the compliant xpl client, check if any client corresponds... and if so, display it #}
+                    {% for a_client in clients %}
+                      {% if a_client.split(".")[0] == compliant %}
+                        <span class="list-group-item xpl_client_compliant" href="#">
+                          <span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span> 
+                            <em>{{ a_client }}</em>
+                          <span class="label label-info status status-label status-{{clients[a_client].status }} pull-right">{{ clients[a_client].status }}</span>
+                        </span>
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+                {% endif %}
               {% endfor %}
             </div>
           {% endfor %}

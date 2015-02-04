@@ -1220,6 +1220,10 @@ class Clients():
             @param conversions : conversions info for the client
         """
         self.log.info(u"Add new client : host={0}, type={1}, name={2}, client_id={3}, data={4}".format(host, type, name, client_id, str(data)))
+        if data != None:
+            compliant_xpl_clients = data["identity"]["compliant_xpl_clients"]
+        else: 
+            compliant_xpl_clients = []
         client = { "host" : host,
                    "type" : type,
                    "name" : name,
@@ -1228,7 +1232,8 @@ class Clients():
                    "pid" : 0,
                    "last_seen" : time.time(),
                    "status" : STATUS_STOPPED,
-                   "configured" : configured}
+                   "configured" : configured,
+                   "compliant_xpl_clients" : compliant_xpl_clients}
         client_with_details = { "host" : host,
                    "type" : type,
                    "name" : name,

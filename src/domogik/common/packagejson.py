@@ -122,6 +122,12 @@ class PackageJson():
                                                            self.json["identity"]["name"])
             self.json["identity"]["icon_file"] = icon_file
 
+            if not self.json["identity"].has_key("xpl_clients_only"):
+                self.json["identity"]["xpl_clients_only"] = False
+
+            if not self.json["identity"].has_key("compliant_xpl_clients"):
+                self.json["identity"]["compliant_xpl_clients"] = []
+
             # common configuration items
             # to add only for a plugin with identity>xpl_clients_only not set to True !
             if not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
@@ -202,7 +208,7 @@ class PackageJson():
 
             # validate identity
             expected = ["author", "author_email", "description", "domogik_min_version", "name", "type", "version"]
-            optional = ["tags", "dependencies", "package_id", "icon_file", "xpl_clients_only"]
+            optional = ["tags", "dependencies", "package_id", "icon_file", "xpl_clients_only", "compliant_xpl_clients"]
             if type(self.json["identity"]) != dict:
                 raise PackageException("Identity part is NOT a dictionary!")
             self._validate_keys(expected, "an identity param", self.json["identity"].keys(), optional)

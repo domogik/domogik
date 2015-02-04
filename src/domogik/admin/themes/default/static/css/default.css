@@ -147,3 +147,8 @@ body {
     margin-right: 1em;
 }
 
+
+/* clients list */
+.xpl_client_compliant {
+    padding-left: 3em;
+}

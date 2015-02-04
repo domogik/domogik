@@ -33,6 +33,14 @@ Some optionnal fields can be added in **identity**: ::
         ...
     },
 
+::
+
+    "identity": {
+        ...
+        "compliant_xpl_clients" : ["rfxcom-lan"],
+        ...
+    },
+
 
 Description
 ===========
@@ -52,6 +60,7 @@ Mandatory :
 Optionnal :
 
 * **xpl_clients_only** : *true|false*. Default : *false*. This key is to set to true only for the plugins with **no python** part. These are special plugins that will be used only for adding compatibility to external xPL clients to Domogik. Example : the **generic** plugin.
+* **compliant_xpl_clients** : an array of *<vendor_id>-<device_id>* identifiers. This array is to used when a plugin with a python part can also handle some external xpl clients. For example, the **rfxcom** plugin can handle both usb and lan models. The usb one needs python to work. The lan one just need the json. All xpl clients detected as corresponding to one of the *<vendor_id>-<device_id>* identifiers will be visually linked to the plugin in the Domogik administration interface.
 
 Tags
 ----
