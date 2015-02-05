@@ -1220,34 +1220,41 @@ class Clients():
             @param conversions : conversions info for the client
         """
         self.log.info(u"Add new client : host={0}, type={1}, name={2}, client_id={3}, data={4}".format(host, type, name, client_id, str(data)))
-        if data != None:
-            compliant_xpl_clients = data["identity"]["compliant_xpl_clients"]
-        else: 
-            compliant_xpl_clients = []
-        client = { "host" : host,
-                   "type" : type,
-                   "name" : name,
-                   "xpl_source" : xpl_source,
-                   "package_id" : "{0}-{1}".format(type, name),
-                   "pid" : 0,
-                   "last_seen" : time.time(),
-                   "status" : STATUS_STOPPED,
-                   "configured" : configured,
-                   "compliant_xpl_clients" : compliant_xpl_clients}
-        client_with_details = { "host" : host,
-                   "type" : type,
-                   "name" : name,
-                   "xpl_source" : xpl_source,
-                   "package_id" : "{0}-{1}".format(type, name),
-                   "pid" : 0,
-                   "last_seen" : time.time(),
-                   "status" : STATUS_STOPPED,
-                   "configured" : configured,
-                   "data" : data}
-        self._clients[client_id] = client
-        self._clients_with_details[client_id] = client_with_details
-        self._conversions[client_id] = conversions
-        self.publish_update()
+        try:
+            if data != None:
+                try:
+                    compliant_xpl_clients = data["identity"]["compliant_xpl_clients"]
+                except KeyError:
+                    # data is empty for core components
+                    compliant_xpl_clients = []
+            else: 
+                compliant_xpl_clients = []
+            client = { "host" : host,
+                       "type" : type,
+                       "name" : name,
+                       "xpl_source" : xpl_source,
+                       "package_id" : "{0}-{1}".format(type, name),
+                       "pid" : 0,
+                       "last_seen" : time.time(),
+                       "status" : STATUS_STOPPED,
+                       "configured" : configured,
+                       "compliant_xpl_clients" : compliant_xpl_clients}
+            client_with_details = { "host" : host,
+                       "type" : type,
+                       "name" : name,
+                       "xpl_source" : xpl_source,
+                       "package_id" : "{0}-{1}".format(type, name),
+                       "pid" : 0,
+                       "last_seen" : time.time(),
+                       "status" : STATUS_STOPPED,
+                       "configured" : configured,
+                       "data" : data}
+            self._clients[client_id] = client
+            self._clients_with_details[client_id] = client_with_details
+            self._conversions[client_id] = conversions
+            self.publish_update()
+        except:
+            self.log.error("Error when adding the client in the clients list. Error : {0}".format(traceback.format_exc()))
 
     def remove(self, client_id):
         """ Remove a client from the list
