@@ -1227,6 +1227,12 @@ class Clients():
                 except KeyError:
                     # data is empty for core components
                     compliant_xpl_clients = []
+
+                try:
+                    xpl_clients_only = data["identity"]["xpl_clients_only"]
+                except KeyError:
+                    # data is empty for core components
+                    xpl_clients_only = []
             else: 
                 compliant_xpl_clients = []
             client = { "host" : host,
@@ -1238,7 +1244,8 @@ class Clients():
                        "last_seen" : time.time(),
                        "status" : STATUS_STOPPED,
                        "configured" : configured,
-                       "compliant_xpl_clients" : compliant_xpl_clients}
+                       "compliant_xpl_clients" : compliant_xpl_clients,
+                       "xpl_clients_only" : xpl_clients_only}
             client_with_details = { "host" : host,
                        "type" : type,
                        "name" : name,

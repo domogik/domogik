@@ -56,10 +56,19 @@
                 {% else %}
                   <a class="list-group-item" href="#">
                 {% endif %}
-                  <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> 
+
+                <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> 
                   {{ client_list_per_host_per_type[host][type][client].name }}
+
+
+                {# for a plugin for only external xpl clients, there is nothing to start so no status ;) #}
+                {% if type == "plugin" and client_list_per_host_per_type[host][type][client]['xpl_clients_only'] == True %}
+                  <span class="label label-info status status-label pull-right">n/a</span>
+                {% else %}
                   <span class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
+                {% endif %}
                 </a>
+
                 {% if type == "plugin" %}
                   {# if the client has some xpl client compliants possibilities, parse all the clients to check if it should be added below the client #}
                   {% for compliant in client_list_per_host_per_type[host][type][client]['compliant_xpl_clients'] %}

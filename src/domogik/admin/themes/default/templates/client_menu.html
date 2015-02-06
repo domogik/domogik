@@ -20,6 +20,7 @@ TODO : remove
 -->
     {% endif %}
   </h1>
+<pre> {{ client_detail['data']['identity']['xpl_clients_only'] }} </pre>
 
     <nav id="client-navbar" class="navbar navbar-default" role="navigation">
       <div class="container-fluid">
@@ -34,6 +35,7 @@ TODO : remove
           <a class="navbar-brand" href="#">{{ client_detail.name }}</a>
 
           {% if client_detail.type == "plugin" %}
+            {% if client_detail['data']['identity']['xpl_clients_only'] == False %}
             <div id="client-status" class="btn-group navbar-brand pull-right">
               <button type="button" class="btn btn-info btn-xs dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
                 <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
@@ -43,9 +45,13 @@ TODO : remove
                 <li><a id="stop" href="#">Stop</a></li>
               </ul>
             </div>
+            {% else %}
+            {% endif %}
           {% else %}
             <!-- TODO : improve layout -->
-            <span id="client-status" class="label label-info status status-label status-{{client_detail.status}} pull-right">{{client_detail.status}}</span>
+            <div class="navbar-brand"> 
+              <span id="client-status" class="label label-info status status-label status-{{client_detail.status}} pull-right">{{client_detail.status}}</span>
+            </div>
           {% endif %}
 
         </div>
