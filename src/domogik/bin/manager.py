@@ -1235,6 +1235,7 @@ class Clients():
                     xpl_clients_only = []
             else: 
                 compliant_xpl_clients = []
+                xpl_clients_only = []
             client = { "host" : host,
                        "type" : type,
                        "name" : name,
