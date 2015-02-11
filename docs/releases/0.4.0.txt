@@ -70,6 +70,14 @@ The plugin format has been changed. The main changes are:
 * a test framework has been designed to allow automatic testing on the plugins.
 * ...
 
+xPL clients not related to Domogik
+**********************************
+
+Domogik can, as in the 0.3 release, handle some external xPL clients. There are 2 kind of external xPL clients:
+
+* the xPL clients related to a plugin. For example the *RFXCOM Lan xPL* hardware is handled by the *rfxcom* plugin : the python part of the plugin (used for the *RFXCOM usb model*) is not used, but all the devices declarations and features can be used for the xPL client. These clients are detected by Domogik and linked in the clients list to the related plugin.
+* the xPL clients with no relationship with a dedicated plugin. For these xPL clients, you can try to use the *generic* plugin which allow to create some Domogik devices for common xPL features (temperature, humidity, ...).
+
 New administration interface
 ----------------------------
 
