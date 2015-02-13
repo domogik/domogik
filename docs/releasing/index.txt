@@ -22,6 +22,17 @@ We basically follow the main lines of this `git branching model <http://nvie.com
 Releasing
 =========
 
+Release domogik-mq if needed
+----------------------------
+
+If the Domogik release need a new version of Domogik-mq to work, create this one :
+
+* create a tag in the **develop** branch
+* merge the tag in the **master** branch
+* go on GitHub and create a release from the tag.
+
+*For the details of the command, you can use the same commands as for Domogik*.
+
 Release a beta
 --------------
 
@@ -42,3 +53,18 @@ When all is ok, put a tag on the develop branch. for example for a beta release:
     git tag -a "0.4.0b1" -m "Release 0.4.0 beta 1"
 
 Go on GitHub and create a release from the tag.
+
+
+Release a final release
+-----------------------
+
+..todo ::
+    complete
+
+Create the release branch :
+
+..todo ::
+    complete
+
+In the newly created release branch, upgrade the install documentation with the final packages (tgz) from the GitHub for all needed components (domogik, domogik-mq)
+

@@ -98,6 +98,27 @@ Create the folder */opt/dmg/* : ::
     $ sudo mkdir -p /opt/dmg
     $ sudo chown domogik /opt/dmg  # assuming the user domogik already exists!
 
+
+Download Domogik 0.4.0 beta1
+****************************
+
+Download Domogik-mq : ::
+
+    $ cd /opt/dmg/
+    $ wget https://github.com/domogik/domogik-mq/archive/1.0.tar.gz -O domogik-mq-1.0.tar.gz
+    $ tar xvzf domogik-mq-1.0.tar.gz
+    $ ln -sf domogik-mq-1.0 domogik-mq
+
+Download Domogik : ::
+
+    $ cd /opt/dmg/
+    $ wget https://github.com/domogik/domogik/archive/0.4.0b1.tar.gz -O domogik-0.4.0b1.tar.gz
+    $ tar xvzf domogik-0.4.0b1.tar.gz
+    $ ln -sf domogik-0.4.0b1 domogik
+
+Download the sources on GitHub
+******************************
+
 Download Domogik-mq : ::
 
     $ cd /opt/dmg/
