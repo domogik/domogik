@@ -327,6 +327,9 @@ class XplManager(XplPlugin, MQAsyncSub):
                         if tim in self._pkt:
                             del(self._pkt[tim])
                     self._log.debug(u"Deleting message from the cmdQueue, current length = {0}".format(len(self._pkt)))
+                    # TODO : remove or comment the 2 following lines
+                    self._log.debug(u"Data to delete : {0}".format(todel_dict))
+                    self._log.debug(u"Content before deletion : {0}".format(self._dict))
                     self._lock_p.release()
                     self._lock_d.acquire()
                     for tim in todel_dict:
