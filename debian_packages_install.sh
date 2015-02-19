@@ -19,6 +19,7 @@ pkg_list="\
          \
          python \
          python-dev \
+         python-pkg-resources \
          python-setuptools \
          python-mysqldb \
          python-argparse \
