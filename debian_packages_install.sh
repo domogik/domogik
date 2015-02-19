@@ -39,13 +39,20 @@ pkg_list="\
          python-daemon \
          python-magic \
          python-zmq \
-         python-flask-login \
-         python-flask-babel \
          python-gluon \
          python-babel \
          "
 
 sudo apt-get update
 sudo apt-get install $pkg_list
+
+pip_list="Flask-Login \
+          Flask-Babel \
+         "
+
+for elt in $pip_list
+  do
+    sudo pip install $elt
+done
 
 
