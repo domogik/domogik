@@ -102,6 +102,7 @@ Git is used to get the sources (be sure that your user is able to create some di
 Create the folder */opt/dmg/* : ::
 
     $ sudo mkdir -p /opt/dmg
+    $ sudo useradd -M domogik
     $ sudo chown domogik /opt/dmg  # assuming the user domogik already exists!
 
 
