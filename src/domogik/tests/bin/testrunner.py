@@ -209,8 +209,11 @@ class TestRunner():
 
 
 def main():
-    testr = TestRunner()
-    cr = testr.get_result()
+    try:
+        testr = TestRunner()
+        cr = testr.get_result()
+    except:
+        cr = 1
     sys.exit(cr)
 
 if __name__ == "__main__":
