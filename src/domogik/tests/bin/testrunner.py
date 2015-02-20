@@ -78,7 +78,7 @@ class TestRunner():
 
         except:
             self.log.error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
-            return False
+            return
 
 
         parser = ArgumentParser(description="Launch all the tests that don't need hardware.")
@@ -109,28 +109,12 @@ class TestRunner():
         # check tests folder
 	self.log.info("- path {0}".format(self.options.directory))
         if not self.check_dir():
-            return False
+            return
 
         # check and load the json file
         self.log.info("- json file {0}".format(self.json_file))
 	if not self.load_json():
-	    return False
-
-        # run the test cases
-        self._run_testcases()
-
-        # Display a summary and manager return code
-        rc = 0
-        self.log.info("")
-        self.log.info("Tests summary :")
-        self.log.info("---------------")
-       
-        for res in self.results:
-            if self.results[res]['return_code'] == 0:
-                self.log.info("Test {0} : OK".format(res))
-            else:
-                self.log.info("Test {0} : ERROR".format(res))
-                rc = 1
+	    return
 
     def check_dir(self):
         self.path = None
@@ -179,7 +163,7 @@ class TestRunner():
             self.log.info("{0} {1} : need hardware={2}, alter config or setup={3}, criticity={4}".format(indicator, test, config['need_hardware'], config['alter_configuration_or_setup'], config['criticity']))
         return True
 
-    def _run_testcases(self):
+    def run_testcases(self):
         for (test, config) in self.testcases.items():
             # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
             self.log.info("")
@@ -195,6 +179,18 @@ class TestRunner():
             # do a pause to be sure the previous test (and so plugin instance) has been killed
             self.log.debug("Do a 60s pause... (yeah, this is a lot but Travis CI is not so quick!!!)")
             time.sleep(60)
+        # Display a summary and manager return code
+        rc = 0
+        self.log.info("")
+        self.log.info("Tests summary :")
+        self.log.info("---------------")
+       
+        for res in self.results:
+            if self.results[res]['return_code'] == 0:
+                self.log.info("Test {0} : OK".format(res))
+            else:
+                self.log.info("Test {0} : ERROR".format(res))
+                rc = 1
 
     def get_result(self):
         """ Return 0 if all is ok
@@ -211,11 +207,10 @@ class TestRunner():
 def main():
     try:
         testr = TestRunner()
-        if testr:
-            cr = testr.get_result()
-        else:
-            cr = 1
-    except:
+        testr.run_testcases()
+        cr = testr.get_result()
+    except Exception as exp:
+        print exp
         cr = 1
     sys.exit(cr)
 
