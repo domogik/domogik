@@ -78,7 +78,7 @@ class TestRunner():
 
         except:
             self.log.error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
-            return
+            return False
 
 
         parser = ArgumentParser(description="Launch all the tests that don't need hardware.")
@@ -109,12 +109,12 @@ class TestRunner():
         # check tests folder
 	self.log.info("- path {0}".format(self.options.directory))
         if not self.check_dir():
-            return 
+            return False
 
         # check and load the json file
         self.log.info("- json file {0}".format(self.json_file))
 	if not self.load_json():
-	    return
+	    return False
 
         # run the test cases
         self._run_testcases()
@@ -211,7 +211,10 @@ class TestRunner():
 def main():
     try:
         testr = TestRunner()
-        cr = testr.get_result()
+        if testr:
+            cr = testr.get_result()
+        else:
+            cr = 1
     except:
         cr = 1
     sys.exit(cr)
