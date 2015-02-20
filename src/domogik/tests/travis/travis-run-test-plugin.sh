@@ -1,6 +1,4 @@
 #!/bin/bash -e
-sudo su
-
 echo "=== Start virtualenv ==="
 source /home/travis/virtualenv/python2.7/bin/activate
 
