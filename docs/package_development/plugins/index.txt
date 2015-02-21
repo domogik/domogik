@@ -27,8 +27,8 @@ Branches management
 Plugin name
 ==========
 
-Choose a name that describes the plugin as good as possible. Not that a plugin can not be more then 8 characters and it should be all lower case. 
-This restriction is linked to xPL and is not a domogik limitation.
+Choose a name that describes the plugin as good as possible. Notice that a plugin can not use more than 8 characters and they should be all lower case. 
+This restriction is linked to xPL and is not a Domogik limitation.
 
 Prepare the plugin
 ==================
