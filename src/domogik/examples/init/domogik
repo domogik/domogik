@@ -78,7 +78,7 @@ function start_admin {
 }
 
 function start_xpl {
-    echo -n " * Starting xPL (${DOMOGIK_XPL_HUB} version)..."
+    echo -n " * Starting xPL (${DOMOGIK_XPL_HUB} version) ..."
     if [ "${DOMOGIK_XPL_HUB}" == "c" ] || [ "${DOMOGIK_XPL_HUB}" == "C" ] ; then
         if [ -z "$(which ${C_XPLHUB})" ];then
             echo "ERROR : ${C_XPLHUB} not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
@@ -119,7 +119,7 @@ function start_manager {
 }
 
 function start_daemon {
-    echo -n " * Starting Manager (with ${MANAGER_PARAMS})..."
+    echo -n " * Starting Manager (with ${MANAGER_PARAMS}) ... "
     /bin/su - ${DOMOGIK_USER} -c "export PATH=/usr/sbin:${PATH} && ${NAME} ${MANAGER_PARAMS}"
     if [ $? -gt 0 ]; then
         echo " "
