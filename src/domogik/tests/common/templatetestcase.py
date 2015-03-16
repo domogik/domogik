@@ -80,6 +80,8 @@ class TemplateTestCase(unittest.TestCase):
         if not self._xpl_received.is_set():
             raise RuntimeError("No xPL message received")
         print(u"xPL message received : {0}".format(self.xpl_data))
+        # remove the listener
+        listener.unregister()
         return True
        
 

@@ -83,8 +83,10 @@ from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from domogik.xpl.common.xplmessage import XplMessage, FragmentedXplMessage
 from domogik.common.dmg_exceptions import XplMessageError
 import time
+import uuid
 
 READ_NETWORK_TIMEOUT = 2
+STATUS_HBEAT_XPL = 5  # default hbeat interval in minutes
 
 class Manager:
     """
@@ -100,7 +102,7 @@ class Manager:
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None, nohub = False):
+    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None, nohub = False, source = None):
         """
         Create a new manager instance
         @param ip : IP to listen to (default real ip address)
@@ -111,7 +113,8 @@ class Manager:
         if ip == None:
             ip = self.get_sanitized_hostname()
         self.p = plugin
-        source = "domogik-%s.%s" % (self.p.get_plugin_name(), self.p.get_sanitized_hostname())
+        if source == None:
+            source = "domogik-%s.%s" % (self.p.get_plugin_name(), self.p.get_sanitized_hostname())
         # Define maximum xPL message size
         self._buff = 1500
         # Define xPL base port
@@ -145,6 +148,7 @@ class Manager:
 
         # hbeat detected
         self._foundhub = threading.Event()
+        self._nohub_mandatory = nohub
         if nohub == True:
             self._foundhub.set()
         else:
@@ -154,7 +158,7 @@ class Manager:
         try:
             self._UDPSock.bind(addr)
         except:
-            # Smthg is already running on this port
+            # Something is already running on this port
             self.p.log.error("Can't bind to the interface %s, port %i" % (ip, port))
             exit(1)
         else:
@@ -166,11 +170,26 @@ class Manager:
                             % (self.p.get_plugin_name(), self._ip, self._port))
             self._h_timer = None
 
-            msg = "HUB discovery > starting"
-            self.p.log.info(msg)
-            print(msg)
+      
+            if self._nohub_mandatory == True:
+                # no xPL hub is requested for the plugin to start by the developper
+                # This means that we don't search for a xPL hub...
+                # but as we are in a xPL plugin, we still send a hbeat each 5 minutes to
+                # be seen by a hub, if there is a hub :)
+                self.p.log.info("Plugin configure to have the xPL hub as optionnal! The hub won't be searched but a hbeat message will be sent each 5 minutes")
+                self._SendHeartbeat()
+                self._h_timer = XplTimer(60 * STATUS_HBEAT_XPL, self._SendHeartbeat, self)
+                self._h_timer.start()
 
-            self._SendHeartbeat()
+            else:
+                # a xPL hub is requested for the plugin to start by the developper
+                # This means that if we don't find a xPL hub, the plugin will not start !
+                self.p.log.info("Plugin configure to have the xPL hub as mandatory!")
+                msg = "HUB discovery > starting"
+                self.p.log.info(msg)
+    
+                self._SendHeartbeat()
+
             #And finally we start network listener in a thread
             self._stop_thread = False
             self._network = threading.Thread(None, self._run_thread_monitor,
@@ -207,7 +226,7 @@ class Manager:
         self._foundhub.set()
         self.update_status(1)
         if self._h_timer != None:
-            self._h_timer._timer._time = 300
+            self._h_timer._timer._time = 60 * STATUS_HBEAT_XPL
         Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
 
     def enable_hbeat(self, lock = False):
@@ -293,7 +312,7 @@ class Manager:
         mesg.set_source( self._source )
         mesg.set_target( target )
         mesg.set_schema( schema )
-        mesg.add_single_data( "interval", "5" )
+        mesg.add_single_data( "interval", STATUS_HBEAT_XPL )
         mesg.add_single_data( "port", self.port )
         mesg.add_single_data( "remote-ip", self._ip )
         if schema != 'hbeat.end':
@@ -414,7 +433,8 @@ class Listener:
         @param filter : dictionnary { key : value }. If value is a list, then the 
         listener will check if the key equals any of these values
         """
-        manager.p.log.debug("New listener, filter : %s" % filter)
+        self.uuid = str(uuid.uuid1())
+        manager.p.log.debug("New listener {0}, filter : {1}".format(self.uuid, filter))
         self._callback = cb
         self._filter = filter
         self._manager = manager
@@ -461,6 +481,7 @@ class Listener:
                 ok = False
         #The message match the filter, we can call  the callback function
         if ok:
+            self._manager.p.log.debug("Message match for listener {0}".format(self.uuid))
             try:
                 if self._cb_params != {} and self._callback.func_code.co_argcount > 1:  
                     thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb-%s" % suffixe)

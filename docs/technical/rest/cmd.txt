@@ -42,7 +42,7 @@ To help you to understand with real examples, or to check you are building your 
 Which values should be used ?
 =============================
 
-You device is related to a :doc:`data type </package_development/plugins/data_types/index>`. Depending on the data type, you will be able to use some values.
+You device is related to a :doc:`data type <../data_types/index>`. Depending on the data type, you will be able to use some values.
 
 
 Example 1 : DT_Switch

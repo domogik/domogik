@@ -55,6 +55,9 @@ from domogik.common.packagejson import PackageJson, PackageException
 import zmq
 import traceback
 import json
+# to get force_leave() callers : 
+import inspect
+import time
 
 # clients (plugins, etc) status
 STATUS_UNKNOWN = "unknown"
@@ -372,7 +375,114 @@ class Plugin(BasePlugin, MQRep):
             return device_list
 
 
-    def device_detected(self, device_type, type, feature, data):
+    def device_detected(self, data):
+        """ The plugin developpers can call this function when a device is detected
+            This function will check if a corresponding device exists and :
+            - if so, do nothing
+            - if not, add the device in a 'new devices' list
+                 - if the device is already in the 'new devices list', does nothing
+                 - if not : add it into the list and send a MQ message : an event for the UI to say a new device is detected
+
+            @param data : data about the device 
+            
+            Data example : 
+            {
+                "device_type" : "...",
+                "reference" : "...",
+                "global" : [
+                    { 
+                        "key" : "....",
+                        "value" : "...."
+                    },
+                    ...
+                ],
+                "xpl" : [
+                    { 
+                        "key" : "....",
+                        "value" : "...."
+                    },
+                    ...
+                ],
+                "xpl_commands" : {
+                    "command_id" : [
+                        { 
+                            "key" : "....",
+                            "value" : "...."
+                        },
+                        ...
+                    ],
+                    "command_id_2" : [...]
+                },
+                "xpl_stats" : {
+                    "sensor_id" : [
+                        { 
+                            "key" : "....",
+                            "value" : "...."
+                        },
+                        ...
+                    ],
+                    "sensor_id_2" : [...]
+                }
+            }
+        """
+        self.log.debug(u"Device detected : data = {0}".format(data))
+        # browse all devices to find if the device exists
+        found = False
+        for a_device in self.devices:
+            # TODO : set the id if the device exists!
+            pass
+
+        if found:
+            self.log.debug(u"The device already exists : id={0}.".format(a_device['id']))
+        else:
+            self.log.debug(u"The device doesn't exists in database")
+            # generate a unique id for the device from its addresses
+            new_device_id = self.generate_detected_device_id(data)
+         
+            # add the device feature in the new devices list : self.new_devices[device_type][type][feature] = data
+            self.log.debug(u"Check if the device has already be marked as new...")
+            found = False
+            for a_device in self.new_devices:
+                if a_device['id'] == new_device_id:
+                    found = True
+
+            #for a_device in self.new_devices:
+            #    if a_device['device_type_id'] == device_type and \
+            #       a_device['type'] == type and \
+            #       a_device['feature'] == feature:
+#
+            #       if data == a_device['data']:
+            #            found = True
+                    
+            if found == False:
+                new_device = {'id' : new_device_id, 'data' : data}
+                self.log.info(u"New device feature detected and added in the new devices list : {0}".format(new_device))
+                self.new_devices.append(new_device)
+
+                # publish new devices update
+                self._pub.send_event('device.new',
+                                     {"type" : "plugin",
+                                      "name" : self._name,
+                                      "host" : self.get_sanitized_hostname(),
+                                      "client_id" : "plugin-{0}.{1}".format(self._name, self.get_sanitized_hostname()),
+                                      "device" : new_device})
+
+                # TODO : later (0.4.0+), publish one "new device" notification with only the new device detected
+
+            else:
+                self.log.debug(u"The device has already been detected since the plugin startup")
+
+    def generate_detected_device_id(self, data):
+        """ Generate an unique id based on the content of data
+        """
+        # TODO : improve to make something more sexy ?
+        the_id = json.dumps(data, sort_keys=True) 
+        chars_to_remove = ['"', '{', '}', ',', ' ', '=', '[', ']', ':']
+        the_id = the_id.translate(None, ''.join(chars_to_remove))
+        return the_id
+
+
+    def OLD_device_detected(self, device_type, type, feature, data):
         """ The plugin developpers can call this function when a device is detected
             This function will check if a corresponding device exists and : 
             - if so, do nothing
@@ -609,6 +719,7 @@ class Plugin(BasePlugin, MQRep):
         msg.add_data('reason', reason)
         msg.add_data('name', self._name)
         msg.add_data('host', self.get_sanitized_hostname())
+        self.log.info("Send reply for the stop request : {0}".format(msg))
         self.reply(msg.get())
 
         ### Change the plugin status
@@ -727,18 +838,22 @@ class Plugin(BasePlugin, MQRep):
                self.log.info(u"Create directory {0}.".format(path))
            except:
                raise OSError("Can't create directory {0}.".format(path))
-       try:
-           tmp_prefix = "write_test";
-           count = 0
-           filename = os.path.join(path, tmp_prefix)
-           while(os.path.exists(filename)):
-               filename = "{}.{}".format(os.path.join(path, tmp_prefix),count)
-               count = count + 1
-           f = open(filename,"w")
-           f.close()
-           os.remove(filename)
-       except :
-           raise IOError("Can't create a file in directory {0}.".format(path))
+       # Commented because :
+       # a write test is done for each call of this function. For a plugin with a html server (geoloc for example), it
+       # can be an issue as this makes a lot of write for 'nothing' on the disk.
+       # We keep the code for now (0.4) for maybe a later use (and improved)
+       #try:
+       #    tmp_prefix = "write_test";
+       #    count = 0
+       #    filename = os.path.join(path, tmp_prefix)
+       #    while(os.path.exists(filename)):
+       #        filename = "{}.{}".format(os.path.join(path, tmp_prefix),count)
+       #        count = count + 1
+       #    f = open(filename,"w")
+       #    f.close()
+       #    os.remove(filename)
+       #except :
+       #    raise IOError("Can't create a file in directory {0}.".format(path))
        return path
 
     def register_helper(self, action, help_string, callback):
@@ -770,6 +885,9 @@ class Plugin(BasePlugin, MQRep):
     def __del__(self):
         if hasattr(self, "log"):
             self.log.debug(u"__del__ Single plugin")
+            self.log.debug(u"the stack is :")
+            for elt in inspect.stack():
+                self.log.debug(u"    {0}".format(elt))
             # we guess that if no "log" is defined, the plugin has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
@@ -778,6 +896,13 @@ class Plugin(BasePlugin, MQRep):
 
             In the XplPLugin class, this function will be completed to also activate the xpl hbeat
         """
+        if hasattr(self, "log"):
+            self.log.debug(u"force_leave called")
+            #self.log.debug(u"the stack is : {0}".format(inspect.stack()))
+            self.log.debug(u"the stack is :")
+            for elt in inspect.stack():
+                self.log.debug(u"    {0}".format(elt))
+
         if return_code != None:
             self.set_return_code(return_code)
             self.log.info("Return code set to {0} when calling force_leave()".format(return_code))
@@ -790,8 +915,6 @@ class Plugin(BasePlugin, MQRep):
         #    IOLoop.instance().start()
         #except:
         #    pass
-        if hasattr(self, "log"):
-            self.log.debug(u"force_leave called")
         # send stopped status over the MQ
         if status:
             self._set_status(status)
@@ -888,11 +1011,12 @@ class Watcher:
             os.wait()
         except KeyboardInterrupt:
             print('KeyBoardInterrupt')
-            self._plugin.log.info("Keyoard Interrupt detected, leave now.")
+            self._plugin.log.warning("Keyoard Interrupt detected, leave now.")
             self._plugin.force_leave()
             self.kill()
         except OSError:
             print(u"OSError")
+            self._plugin.log.error("OSError : {0}.".format(traceback.format_exc()))
         return_code = self._plugin.get_return_code()
         self._plugin.clean_return_code_file()
         sys.exit(return_code)

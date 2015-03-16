@@ -13,7 +13,7 @@ There is a big gap between the releases 0.3 and 0.4.0 for several reasons:
 * The administration interface has moved from Domoweb to Domogik (on port 40406 by default).
 * ...
 
-For more informations, please check the :doc:`0.4.0 release page <releases/0.4.0>`
+For more informations, please check the :doc:`0.4.0 release page <../../releases/0.4.0>`
 
 Before starting to upgrade from 0.3 to 0.4.0, please notice that: 
 

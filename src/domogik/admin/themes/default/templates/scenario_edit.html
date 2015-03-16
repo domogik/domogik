@@ -1,0 +1,64 @@
+{% extends theme("base/base.html") %}
+{% import theme("base/wtf.html") as wtf %}
+
+{% block content %}
+  <div id="blocklyDiv" style="position: absolute; top: 200px; left: 200px; height: 300px; width: 900px;"></div>
+  <xml id="toolbox" style="display: none">
+    <category name="Logic">
+        <block type="logic_operation"></block>
+        <block type="logic_negate"></block>
+    </category>
+    <category name="Tests">
+        {% for t in tests %}
+            <block type="{{ t }}"></block>
+        {% endfor %}
+    </category>
+    <category name="Actions">
+        {% for a in actions %}
+            <block type="{{ a }}"></block>
+        {% endfor %}
+    </category>
+  </xml>
+  {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}  
+  <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
+  <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
+  <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
+  <script type="text/javascript" src="/static/js/blockly_json.js"></script>
+  <script type="text/javascript" src="/scenario/blocks/actions"></script>
+  <script type="text/javascript" src="/scenario/blocks/tests"></script>
+  <script type="text/javascript">
+    Blockly.Blocks['dom_condition'] = {
+      init: function() {
+        this.setColour(210);
+        this.appendValueInput('IF')
+            .setCheck('Boolean')
+            .appendField('When');
+        this.appendStatementInput('DO')
+            .appendField('Do');
+        this.setPreviousStatement(false);
+        this.setNextStatement(true);
+        this.setDeletable(false);
+        this.contextMenu = false;
+        this.setInputsInline(false);
+      }
+    };
+    Blockly.inject(
+        document.getElementById('blocklyDiv'),
+        {
+            path: '../../',
+            toolbox: document.getElementById('toolbox')
+        }
+    );
+    function onchange() {
+      $('#sjson').val( Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace()) );
+    }
+    Blockly.addChangeListener(onchange);
+    //var json = JSON.parse('{"type":"dom_condition","id":"1","IF":{"type":"logic_operation","id":"10","OP":"AND","A":{"type":"cron.CronTest","id":"18","cron":"None"},"B":{"type":"textinpage.TextInPageTest","id":"22","urlpath":"None","text":"None"}},"DO":{"type":"log.LogAction","id":"28","message":"test"},"deletable":false}');
+    //var json = JSON.parse('{"type":"dom_condition","id":"1","deletable":false}');
+    {% autoescape false %}
+    var json = JSON.parse('{{ jso }}');
+    {% endautoescape %}
+    Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
+  </script>
+ 
+{% endblock %}

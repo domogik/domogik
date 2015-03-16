@@ -1,0 +1,69 @@
+{% extends theme("base/base.html") %}
+{% import theme("base/wtf.html") as wtf %}
+
+{% block content %}
+
+  <div class="container">
+    <h2>{% trans %}Edit the sensor properties{% endtrans %}</h2>
+
+    <form method="post" role="form" class="form-horizontal">
+      {{ form.csrf_token }}
+      <div class="form-group ">
+        <label class="control-label col-xs-3">{% trans %}Store the history of the sensor{% endtrans %}</label>
+        <div class="col-xs-9">
+          {{ form.history_store() }} 
+          <span class="help-block">{% trans %}If checked, the history of the sensor will be stored in database. Else, only the last value will be kept.{% endtrans %}</span>
+        </div>
+      </div>
+
+      <div class="form-group ">
+        <label class="control-label col-xs-3">{% trans %}Timeout{% endtrans %}</label>
+        <div class="col-xs-9">
+          {{ form.timeout() }} 
+          <span class="help-block">{% trans %}Define the time (in seconds) after which a sensor will considered as lost if no new value have been received. For some type of sensors, there is no need to set a timeout value.{% endtrans %}</span>
+        </div>
+      </div>
+
+      <div class="form-group ">
+        <label class="control-label col-xs-3">{% trans %}Formula{% endtrans %}</label>
+        <div class="col-xs-9">
+          {{ form.formula() }} 
+          <span class="help-block">{% trans %}If the value raised by the plugin is not correct (for example a temperature sensor that has an +1°C error) or need to be transformed (converting an input voltage into a temperature for example), you may choose to define a formula.{% endtrans %}</span>
+          <span class="help-block">{% trans %}The sensor value is contained in the <strong>VALUE</strong> parameter.{% endtrans %}</span>
+          <span class="help-block">{% trans %}To add 1 degree to a temperature sensor, just do : {% endtrans %}<code>VALUE+1</code></span>
+          <span class="help-block">{% trans %}If the sensor value must be divided by 100, just do : {% endtrans %}<code>VALUE/100</code></span>
+          <span class="help-block">{% trans %}You can also use more complex formula like : {% endtrans %}<code>(VALUE+10)/2</code></span>
+        </div>
+      </div>
+
+      <div class="form-group ">
+        <label class="control-label col-xs-3">{% trans %}Maximum number of values in database{% endtrans %}</label>
+        <div class="col-xs-9">
+          {{ form.history_max() }} 
+          <span class="help-block">{% trans %}Set the maximum number of records that will be stored in the history table, if 0 the max number is infinite..{% endtrans %}</span>
+        </div>
+      </div>
+
+      <div class="form-group ">
+        <label class="control-label col-xs-3">{% trans %}History size in days{% endtrans %}</label>
+        <div class="col-xs-9">
+          {{ form.history_expire() }} 
+          <span class="help-block">{% trans %}Define how long the history needs to be kept, if 0 the stats will bekept forever. Its counted in days, so a value of 10 means keep the history for 10 days.{% endtrans %}</span>
+        </div>
+      </div>
+
+      <div class="form-group ">
+        <label class="control-label col-xs-3">{% trans %}Round value{% endtrans %}</label>
+        <div class="col-xs-9">
+          {{ form.history_round() }} 
+          <span class="help-block">{% trans %}Set a number that will be used for the reduced stats storage. This will be evaluated only if you choose to store the history. More informations about the configuration of this option is available in the online documentation.{% endtrans %}</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-offset-3 col-xs-9">
+        <input type="submit" value="validate" class="btn btn-primary">
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

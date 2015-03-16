@@ -1,5 +1,5 @@
-from domogik.admin.application import app
-from flask import render_template, request, flash, redirect, Response
+from domogik.admin.application import app, render_template
+from flask import request, flash, redirect, Response
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 try:
@@ -47,22 +47,33 @@ def scenario_edit(id):
     if int(id) == 0:
         name = "New scenario"
         jso = default_json
+        dis = 0
     else:
         with app.db.session_scope():
             scen = app.db.get_scenario(id)
             jso = scen.json
+            dis = scen.disabled
             name = scen.name
             jso.replace('\n', '').replace('\r', '')
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
         sname = TextField("name", default=name)
+        #sdis = BooleanField("disabled", default=dis)
         sjson = HiddenField("json")
         submit = SubmitField("Send")
         pass
     form = F()
 
     if request.method == 'POST' and form.validate():
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('scenario.new')
+        msg.add_data('name', form.sname.data)
+        msg.add_data('json_input', form.sjson.data)
+        msg.add_data('cid', form.sid.data)
+        print "++++++++++++++++="
+        res = cli.request('scenario', msg.get(), timeout=10)
         flash(gettext("Changes saved"), "success")
         return redirect("/scenario")
         pass

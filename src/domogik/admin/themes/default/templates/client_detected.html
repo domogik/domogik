@@ -1,0 +1,71 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+{% include theme("client_menu.html") %}
+<div class="container">
+    <h2>{% trans %}Detected devices{% endtrans %}</h2>
+    {% for dev in devices %}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+        <h3>{% trans %}Device type{% endtrans %} : {{ dev.data.device_type }} <small>{% trans %}Reference{% endtrans %} : {{ dev.data.reference }}</small></h3>
+        </div>
+        <div class="panel-body">
+  
+          <h4>{% trans %}Main parameters{% endtrans %}</h4>
+          <ul>
+          {% for a_param in dev.data['global'] %}
+            <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+          {% endfor %}
+          </ul>
+  
+          <h4>{% trans %}xPL parameters{% endtrans %}</h4>
+          <ul>
+          {% for a_param in dev.data['xpl'] %}
+            <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+          {% endfor %}
+          </ul>
+  
+          <h4>{% trans %}xPL command parameters{% endtrans %}</h4>
+          {% for item in dev.data['xpl_commands'] %}
+            <h5>{{ item }}</h5>
+            <ul>
+              {% for a_param in dev.data['xpl_commands'][item] %}
+                <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+              {% endfor %}
+            <ul>
+          {% endfor %}
+  
+          <h4>{% trans %}xPL stat parameters{% endtrans %}</h4>
+          {% for item in dev.data['xpl_stats'] %}
+            <h5>{{ item }}</h5>
+            <ul>
+              {% for a_param in dev.data['xpl_stats'][item] %}
+                <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+              {% endfor %}
+            </ul>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <script type="text/javascript">
+        /*
+        TODO : review to make it work
+               This code is obsolete
+        */
+        /*
+        ws.onmessage = function(e) {
+            data = JSON.parse(e.data);
+            if (data.msgid == "device.new" ) {
+				if (data.content.client_id == "{{ clientid }}") {
+                    for (index = 0; index < data.content['devices'].length; ++index ) {
+                        dev = data.content['devices'][index];
+                        $('#detected > tbody:last').append('<tr><td>' + dev.device_type_id +'</td><td>' + dev.feature + '</td><td>' + JSON.stringify(dev.data) + '</td></tr>');
+                    }
+				}
+            }
+        }
+        */
+    </script>
+</div>
+{% endblock %}

@@ -78,10 +78,10 @@ class ScenarioFrontend(Plugin):
                 }
         try:
             if msg.get_action().split('.')[0] not in mapping.keys():
-                self._mdp_reply(msg.get_action(), "error", {"details": "{0} not in {1}".format(msg.get_action().split('.')[0], mapping.keys())})
+                self._mdp_reply(msg.get_action(), {"status" : "error", "details": "{0} not in {1}".format(msg.get_action().split('.')[0], mapping.keys())})
             else:
                 if msg.get_action().split('.')[1] not in mapping[msg.get_action().split('.')[0]].keys():
-                    self._mdp_reply(msg.get_action(), "error", {"details": "{0} not in {1}".format(msg.get_action().split('.')[1], mapping[msg.get_action().split('.')[0]].keys())})
+                    self._mdp_reply(msg.get_action(), {"status" : "error", "details": "{0} not in {1}".format(msg.get_action().split('.')[1], mapping[msg.get_action().split('.')[0]].keys())})
                 else:
                     if msg.get_data() == {}:
                         payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()

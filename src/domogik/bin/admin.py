@@ -51,6 +51,8 @@ import zmq
 import signal
 import time
 import json
+import datetime
+import random
 zmq.eventloop.ioloop.install()
 from tornado.wsgi import WSGIContainer
 from tornado.ioloop import IOLoop, PeriodicCallback 
@@ -62,30 +64,55 @@ from tornado.websocket import WebSocketHandler
 class AdminWebSocket(WebSocketHandler, MQAsyncSub):
     clients = set()
 
+    def __init__(self, application, request, **kwargs):
+        WebSocketHandler.__init__(self, application, request, **kwargs)
+        self.io_loop = IOLoop.instance()
+
     def open(self):
         MQAsyncSub.__init__(self, zmq.Context(), 'admin', [])
+        # Ping to make sure the agent is alive.
+        self.io_loop.add_timeout(datetime.timedelta(seconds=random.randint(5,30)), self.send_ping)
         AdminWebSocket.clients.add(self)
+
+    def on_connection_timeout(self):
+        self.on_close()
+
+    def send_ping(self):
+        try:
+            self.ping("a")
+            self.ping_timeout = self.io_loop.add_timeout(datetime.timedelta(minutes=1), self.on_connection_timeout)
+        except Exception as ex:
+            pass
+
+    def on_pong(self, data):
+        if hasattr(self, "ping_timeout"):
+            self.io_loop.remove_timeout(self.ping_timeout)
+            # Wait 5 seconds before pinging again.
+            self.io_loop.add_timeout(datetime.timedelta(seconds=5), self.send_ping)
 
     def on_close(self):
         AdminWebSocket.clients.remove(self)
 
     def on_message(self, msg, content=None):
-        if not content:
-            # this is a websocket message
-            jsons = json.loads(msg)
-            if 'action' in jsons and 'data' in jsons:
-                cli = MQSyncReq(zmq.Context())
-                msg = MQMessage()
-                msg.set_action(str(jsons['action']))
-                msg.set_data(jsons['data'])
-                if 'dst' in jsons:
-                    print cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
-                else:
-                    print cli.request('manager', msg.get(), timeout=10).get()
-        else:
-            # this is a mq message
-            for cli in AdminWebSocket.clients:
-                cli.write_message({"msgid": msg, "content": content})
+        try:
+            if not content:
+                # this is a websocket message
+                jsons = json.loads(msg)
+                if 'action' in jsons and 'data' in jsons:
+                    cli = MQSyncReq(zmq.Context())
+                    msg = MQMessage()
+                    msg.set_action(str(jsons['action']))
+                    msg.set_data(jsons['data'])
+                    if 'dst' in jsons:
+                        cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
+                    else:
+                        cli.request('manager', msg.get(), timeout=10).get()
+            else:
+                # this is a mq message
+                for cli in AdminWebSocket.clients:
+                    cli.write_message({"msgid": msg, "content": content})
+        except:
+            print("Error : {0}".format(traceback.format_exc()))
 
 class Admin(Plugin):
     """ Admin Server 
@@ -162,7 +189,7 @@ class Admin(Plugin):
         
 	tapp = Application([
 		(r"/ws", AdminWebSocket),
-                (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
+        (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
 	])
 
 	# create the server
@@ -189,7 +216,7 @@ class Admin(Plugin):
         """ Stop HTTP Server
         """
         self.log.info('Stopping http server')
-        selg.http_server.stop()
+        self.http_server.stop()
  
         self.log.info('Will shutdown in 10 seconds ...' )
         io_loop = tornado.ioloop.IOLoop.instance()

@@ -1,7 +1,25 @@
 language: python
 branches:
-  only:
-    - master
+  except:
+    - domogik
+    - 0.4-candidate
+    - 0.3
+    - 0.2
+    - 0.1
+    - 0.1.0.rc4
+    - 0.1.0.rc3
+    - 0.1.0.rc2
+    - 0.1.0.rc1
+    - 0.1.0.beta2.bts
+    - 0.1.0.beta2
+    - 0.1.0.beta1
+    - 0.1.0.alpha3
+    - 0.1.0.alpha2
+    - 0.1.0.alpha1
+    - ozwave
+    - Scene
+    - scenario
+    - jsl-dawndusk
 python:
   - "2.7"
 mysql:

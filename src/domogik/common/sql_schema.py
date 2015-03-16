@@ -281,7 +281,7 @@ class UserAccount(Base):
     person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
     person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
-    skin_used = Column(Unicode(80), nullable=False)
+    skin_used = Column(Unicode(80), nullable=False, default=Unicode('default'))
 
     def __init__(self, login, password, is_admin, skin_used, person_id):
         """Class constructor
@@ -305,8 +305,8 @@ class UserAccount(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s)>"\
-               % (self.id, self.login, self.is_admin, self.person)
+        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s, skin=%s)>"\
+               % (self.id, self.login, self.is_admin, self.person, self.skin_used)
    # Flask-Login integration
     def is_authenticated(self):
         return True
@@ -398,7 +398,7 @@ class Sensor(Base):
     history_expire = Column(Integer, nullable=True)
     history_round = Column(Float, nullable=True)
     history_duplicate = Column(Boolean, nullable=False)
-    timeout = Column(Integer, nullable=False)
+    timeout = Column(Integer, nullable=True, default=0)
 
     def __init__(self, device_id, name, reference, incremental, formula, data_type, conversion, h_store, h_max, h_expire, h_round, h_duplicate, timeout):
         self.device_id = device_id
@@ -419,12 +419,12 @@ class Sensor(Base):
    
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s min=%s max=%s timeout=%s)>"\
+        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s min=%s max=%s timeout=%s formula='%s')>"\
                % (self.id, self.device_id, self.reference, self.incremental, \
                    self.name, self.data_type, self.conversion, \
                    self.history_store, self.history_max, self.history_expire, \
                    self.history_round, self.history_duplicate, \
-                   self.value_min, self.value_max, self.timeout)
+                   self.value_min, self.value_max, self.timeout, self.formula)
 
     @staticmethod
     def get_tablename():
@@ -496,13 +496,14 @@ class XplStatParam(Base):
     xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
+    multiple = Column(Unicode(1), nullable=True)
     static = Column(Boolean, nullable=True)
     sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=True) 
     ignore_values = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
 
-    def __init__(self, xplstat_id, key, value, static, sensor_id, ignore_values, type):
+    def __init__(self, xplstat_id, key, value, static, sensor_id, ignore_values, type, multiple=None):
         self.xplstat_id = xplstat_id
         self.key = ucode(key)
         self.value = ucode(value)
@@ -510,11 +511,12 @@ class XplStatParam(Base):
         self.sensor_id = sensor_id
         self.ignore_values = ucode(ignore_values)
         self.type = ucode(type)
+        self.multiple = ucode(multiple)
     
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStatParam(stat_id=%s key='%s' value='%s' static=%s sensor_id=%s ignore='%s' type='%s')>"\
-               % (self.xplstat_id, self.key, self.value, self.static, self.sensor_id, self.ignore_values, self.type)
+        return "<XplStatParam(stat_id=%s key='%s' value='%s' multi='%s' static=%s sensor_id=%s ignore='%s' type='%s')>"\
+               % (self.xplstat_id, self.key, self.value, self.multiple, self.static, self.sensor_id, self.ignore_values, self.type)
 
     @staticmethod
     def get_tablename():

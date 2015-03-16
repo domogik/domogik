@@ -52,6 +52,7 @@ import fcntl
 
 
 CONFIG_FILE = "/etc/domogik/domogik.cfg"
+CONFIG_LCOATION = "/etc/domogik/"
 LOCK_FILE = "/var/lock/domogik/config.lock"
 
 class Loader():
@@ -61,13 +62,14 @@ class Loader():
 
     config = None 
 
-    def __init__(self, part_name=None):
+    def __init__(self, part_name=None, cfile="domogik.cfg"):
         '''
         Load the configuration for a part of the Domogik system
         @param part_name name of the part to load config from
         '''
         #if hasattr(self.__class__, "config") == False:
         #    self.__class__.config = None
+        self.cfile = "{0}{1}".format(CONFIG_LCOATION, cfile)
         self.config = None
         self.part_name = part_name
 
@@ -95,7 +97,7 @@ class Loader():
 
         # read config file
         self.config = configparser.ConfigParser()
-        cfg_file = open(CONFIG_FILE)
+        cfg_file = open(self.cfile)
         self.config.readfp(cfg_file)
         cfg_file.close()
 
@@ -104,10 +106,13 @@ class Loader():
         file.close()
 
         # get 'domogik' config part
-        result = self.config.items('domogik')
         domogik_part = {}
-        for k, v in result:
-            domogik_part[k] = v
+        try:
+            result = self.config.items('domogik')
+            for k, v in result:
+                domogik_part[k] = v
+        except configparser.NoSectionError as exp:
+            pass
 
         # no other config part requested
         if self.part_name == None:
@@ -132,5 +137,5 @@ class Loader():
         if self.config == None:
             raise Exception("ConfigLoader : you must use load() before set() function")
         self.config.set(section, key, value)
-        with open(CONFIG_FILE, "wb") as configfile:
+        with open(self.cfile, "wb") as configfile:
             self.config.write(configfile)

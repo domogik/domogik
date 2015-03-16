@@ -48,7 +48,7 @@ class AbstractTest:
         @param trigger : a method to call when a parameter changes
         @param cond : The condition instance test is attached to
         """
-        self._log = log
+        self.log = log
         self._trigger = trigger
         self._parameters = {}
         self._description = None
@@ -86,7 +86,7 @@ class AbstractTest:
         """ Callback called by a parameter when the fill() method is called
         Basically, it only calls the underlying ttrigger if exists
         """
-        #self._log.warning("Trigger %s called by parameter %s" % (self._trigger, param))
+        self.log.warning("Trigger %s called by parameter %s" % (self._trigger, param))
         if self._trigger != None:
             self._trigger(self)
 
@@ -107,9 +107,11 @@ class AbstractTest:
              - expected: list of expected keys
         Those values are mostly informational and allow the UI to create different forms
         """
+        self.log.debug("Get parameters for the test")
         result = {}
 
         for name in self._parameters:
+            self.log.debug("Parameter : {0}".format(name))
             p = self._parameters[name]
             result[name] = {
                 "type": p.get_type(),
@@ -118,6 +120,7 @@ class AbstractTest:
                 "default": p.get_default_value(),
                 "expected": p.get_expected_entries()
             }
+            self.log.debug("Parameter results : {0}".format(result))
         return result
 
     def fill_parameters(self, data):
@@ -156,7 +159,7 @@ class AbstractTest:
         module_name = "domogik.scenario.parameters.%s" % modonly
         #This may raise ImportError
         cname = getattr(__import__(module_name, fromlist = [modonly]), classonly)
-        p = cname(log=self._log, trigger=self.cb_trigger)
+        p = cname(log=self.log, trigger=self.cb_trigger)
         self._parameters[name] = p
 
     def destroy(self):

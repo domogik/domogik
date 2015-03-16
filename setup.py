@@ -88,6 +88,7 @@ setup(
           'Flask-WTF >= 0.6',
           'Flask-Login',
           'Flask-Babel',
+          'Flask-Themes2',
           'tornado >= 2.3',
           'requests >= 0.12.1',
           magic,

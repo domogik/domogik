@@ -1,0 +1,144 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+<div class="container">
+
+
+    <button type="button" id="install_a_plugin" class="btn btn-primary" data-toggle="modal" data-target="#install_instructions">
+      <span class='glyphicon glyphicon-download-alt' aria-hidden='true'></span> {% trans %}Install a plugin{% endtrans %}
+    </button>
+    <button class="btn btn-default" id="start_tour">{% trans %}Start the discover tour!{% endtrans %}</button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="install_instructions" tabindex="-1" role="dialog" aria-labelledby="installInstructions" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans %}Close{% endtrans %}</span></button>
+            <h4 class="modal-title" id="myModalLabel">{% trans %}How to install a plugin{% endtrans %}</h4>
+          </div>
+          <div class="modal-body">
+            <p>{% trans %}In the current release, you can't install plugins directly from this administration interface..{% endtrans %}</p>
+            <p>{% trans %}You will have to install a plugin from a command line, thanks to the command :{% endtrans %}</p>
+            <pre>dmg_install --install http://somewhere.com/aplugin.zip</pre>
+            <p>{% trans %}You will be able to find the plugins in the Domogik packages online repository : {% endtrans%}</p>
+            <a href="http://repo-public.domogik.org/">http://repo-public.domogik.org/</a>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">{% trans %}OK{% endtrans %}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    {% if clients|length > 0 %}
+      {% for host in client_list_per_host_per_type %}
+        <h1>{% trans %}Clients on server{% endtrans %} {{ host }}</h1>
+  
+          {% for type in client_list_per_host_per_type[host] %}
+            <div class="list-group">
+              <h2 class="list-group-item">
+              {% if type == "core" %}
+                {% trans %}Core components{% endtrans %}
+              {% elif type == "plugin" %}
+                {% trans %}Plugins{% endtrans %}
+              {% elif type == "xpl_client" %}
+                {% trans %}xPL clients{% endtrans %}
+              {% else %}
+                {{ type }}
+              {% endif %}
+              <span class="badge">{{ client_list_per_host_per_type[host][type]|length }}</span>
+              </h2>
+              {% for client in client_list_per_host_per_type[host][type] %}
+                {% if type == "plugin" %}
+                  <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
+                {% else %}
+                  <a class="list-group-item" href="#">
+                {% endif %}
+
+                <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> 
+                  {{ client_list_per_host_per_type[host][type][client].name }}
+
+
+                {# for a plugin for only external xpl clients, there is nothing to start so no status ;) #}
+                {% if type == "plugin" and client_list_per_host_per_type[host][type][client]['xpl_clients_only'] == True %}
+                  <span class="label label-info status status-label pull-right">n/a</span>
+                {% else %}
+                  <span class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
+                {% endif %}
+                </a>
+
+                {% if type == "plugin" %}
+                  {# if the client has some xpl client compliants possibilities, parse all the clients to check if it should be added below the client #}
+                  {% for compliant in client_list_per_host_per_type[host][type][client]['compliant_xpl_clients'] %}
+                    {# for the compliant xpl client, check if any client corresponds... and if so, display it #}
+                    {% for a_client in clients %}
+                      {% if a_client.split(".")[0] == compliant %}
+                        <span class="list-group-item xpl_client_compliant" href="#">
+                          <span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span> 
+                            <em>{{ a_client }}</em>
+                          <span class="label label-info status status-label status-{{clients[a_client].status }} pull-right">{{ clients[a_client].status }}</span>
+                        </span>
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endfor %}
+      {% endfor %}
+
+    {% else %}
+        <div class="alert alert-warning">{% trans %}No clients found (even core components!): is Domogik manager running?{% endtrans %}</div>
+    {% endif %}
+
+</div>
+
+
+<script type="text/javascript">
+  $( document ).ready(function() {
+
+    // Define the tour!
+    var tour = {
+      id: "clients_tour",
+      steps: [
+        {
+          title: "{% trans %}Find all the Domogik clients{% endtrans %}",
+          content: "{% trans %}You will find all the clients on all the servers handled by Domogik.{% endtrans %}",
+          target: "h1",
+          placement: "bottom"
+        },
+        {
+          title: "{% trans %}There are different type of clients{% endtrans %}",
+          content: "{% trans %}Domogik has different type of clients.{% endtrans %}<ul><li><strong>{% trans %}Core components{% endtrans %}</strong> : {% trans %}they are the main components of Domogik. You can't do nothing on these components from here. You can just check their status.{% endtrans %}</li><li><strong>{% trans %}Plugins{% endtrans %}</strong> : {% trans %}plugins are packages installed by yourself. You can configure them and create some devices.{% endtrans %}</li></ul>",
+          target: "h2",
+          placement: "bottom"
+        },
+        {
+          title: "{% trans %}You should now install some plugins{% endtrans %}",
+          content: "{% trans %}To be able to continue, you should now install some plugins.{% endtrans %}",
+          target: document.querySelector("#install_a_plugin"),
+          placement: "bottom"
+        }
+      ],
+      onEnd: function() {
+          $.cookie("admin_clients_tour", "done", { expires: 3650 });
+      }
+    };
+
+    // Start the tour on first launch
+    do_tour = $.cookie("admin_clients_tour")
+    if (do_tour != "done") {
+        hopscotch.startTour(tour);
+    }
+
+    // Start the tour on demand
+    $('#start_tour').click(function() {
+        hopscotch.startTour(tour);
+    });
+
+  });
+
+</script>
+{% endblock %}

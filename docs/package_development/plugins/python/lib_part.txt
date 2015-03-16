@@ -79,7 +79,7 @@ Focus on devices
 ================
 
 Stop the plugin if no device has been created ?
----------------------------------------------
+-----------------------------------------------
 
 .. todo::
     It depends on the plugin :). If there is devices detection, it should not stop for example.

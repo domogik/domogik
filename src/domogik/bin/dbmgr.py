@@ -42,7 +42,7 @@ import traceback
 from domogik.common.jsondata import domogik_encoder
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.xpl.common.plugin import Plugin
-from domogik.common.database import DbHelper
+from domogik.common.database import DbHelper, DbHelperException
 from domogikmq.reqrep.worker import MQRep
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -130,11 +130,12 @@ class DBConnector(Plugin, MQRep):
                 # device create
                 elif msg.get_action() == "device.create":
                     self._mdp_reply_devices_create_result(msg)
-        except exception as e:
-            msg = "Exception in on_mdp_request: {0}".format(e)
+                # device delete
+                elif msg.get_action() == "device.delete":
+                    self._mdp_reply_devices_delete_result(msg)
+        except:
+            msg = "Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
-            self.log.error(traceback.format_exc())
-            print msg
 
     def _mdp_reply_config_get(self, data):
         """ Reply to config.get MQ req
@@ -345,6 +346,37 @@ class DBConnector(Plugin, MQRep):
             self.log.warn(msg)
             return "None"
 
+    def _mdp_reply_devices_delete_result(self, data):
+        status = True
+        reason = False
+
+        try:
+            did = data.get_data()['did']
+            if did:
+                res = self._db.del_device(did)
+                if not res:
+                    status = False
+                else:
+                    status = True 
+            else:
+                status = False
+                reason = "Device delete failed"
+            # delete done
+        except DbHelperException as d:
+            status = False
+            reason = "Error while deleting device: {0}".format(d.value)
+        except:
+            status = False
+            reason = "Error while deleting device: {0}".format(traceback.format_exc())
+        # send the result
+        msg = MQMessage()
+        msg.set_action('device.delete.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
     def _mdp_reply_devices_create_result(self, data):
         status = True
         reason = False
@@ -375,7 +407,7 @@ class DBConnector(Plugin, MQRep):
             res = self._db.add_full_device(params, pjson)
             if not res:
                 status = False
-                reason = "DB failed"
+                reason = "An error occured while adding the device in database. Please check the file dbmgr.log for more informations"
             else:
                 status = True
                 reason = False
@@ -400,80 +432,98 @@ class DBConnector(Plugin, MQRep):
         """
         status = True
 
-        # check we have all the needed info
-        msg_data = data.get_data()
-        if 'device_type' not in msg_data:
-            status = False
-            reason = "Device params request : missing 'cevice_type' field : {0}".format(data)
-        else:
-            dev_type_id = msg_data['device_type']
-
-        # check the received info
-        if status:
-            cli = MQSyncReq(self.zmq)
-            msg = MQMessage()
-            msg.set_action('device_types.get')
-            msg.add_data('device_type', dev_type_id)
-            res = cli.request('manager', msg.get(), timeout=10)
-            del cli
-            if res is None:
+        try:
+            # check we have all the needed info
+            msg_data = data.get_data()
+            if 'device_type' not in msg_data:
                 status = False
-                reason = "Manager is not replying to the mq request" 
-            pjson = res.get_data()
-            if pjson is None:
-                status = False
-                reason = "No data for {0} found by manager".format(msg_data['device_type']) 
-            pjson = pjson[dev_type_id]
-            if pjson is None:
-                status = False
-                reason = "The json for {0} found by manager is empty".format(msg_data['device_type']) 
-
-        # we have the json now, build the params
-        msg = MQMessage()
-        msg.set_action('device.params.result')
-        stats = []
-        result = {}
-        result['device_type'] = dev_type_id
-        result['name'] = ""
-        result['reference'] = ""
-        result['description'] = ""
-        # append the global xpl and on-xpl params
-        result['xpl'] = []
-        result['global'] = []
-        for param in pjson['device_types'][dev_type_id]['parameters']:
-            if param['xpl']:
-                del param['xpl']
-                result['xpl'].append(param)
+                reason = "Device params request : missing 'cevice_type' field : {0}".format(data)
             else:
-                del param['xpl']
-                result['global'].append(param)
-        # find the xplCommands
-        result['xpl_commands'] = {}
-        for cmdn in pjson['device_types'][dev_type_id]['commands']:
-            cmd = pjson['commands'][cmdn]
-            if 'xpl_command'in cmd:
-                xcmdn = cmd['xpl_command']
-                xcmd = pjson['xpl_commands'][xcmdn]
-                result['xpl_commands'][xcmdn] = []
-                stats.append( xcmd['xplstat_name'] )
-                for param in xcmd['parameters']['device']:
-                    result['xpl_commands'][xcmdn].append(param)
-        # find the xplStats
-        sensors = pjson['device_types'][dev_type_id]['sensors']
-        for xstatn in pjson['xpl_stats']:
-            xstat = pjson['xpl_stats'][xstatn]
-            if xstat['parameters']['dynamic'] in sensors:
-                stats.append(xstatn)
-        result['xpl_stats'] = {}
-        for xstatn in stats:
-            xtat = pjson['xpl_stats'][xstatn]
-            result['xpl_stats'][xstatn] = []
-            for param in xstat['parameters']['device']:
-                result['xpl_stats'][xstatn].append(param)
-        # return the data
-        msg.add_data('result', result)
-        self.log.debug(msg.get())
-        self.reply(msg.get())
+                dev_type_id = msg_data['device_type']
+    
+            # check the received info
+            if status:
+                cli = MQSyncReq(self.zmq)
+                msg = MQMessage()
+                msg.set_action('device_types.get')
+                msg.add_data('device_type', dev_type_id)
+                res = cli.request('manager', msg.get(), timeout=10)
+                del cli
+                if res is None:
+                    status = False
+                    reason = "Manager is not replying to the mq request" 
+            if status:
+                pjson = res.get_data()
+                if pjson is None:
+                    status = False
+                    reason = "No data for {0} found by manager".format(msg_data['device_type']) 
+            if status:
+                pjson = pjson[dev_type_id]
+                if pjson is None:
+                    status = False
+                    reason = "The json for {0} found by manager is empty".format(msg_data['device_type']) 
+                self.log.debug("Device Params result : json received by the manager is : {0}".format(pjson))
+            if not status:
+                # we don't have all info so exit
+                msg = MQMessage()
+                msg.set_action('device.params.result')
+                msg.add_data('result', 'Failed')
+                msg.add_data('reason', reason)
+                self.log.debug(msg.get())
+                self.reply(msg.get())
+                return
+
+    
+            # we have the json now, build the params
+            msg = MQMessage()
+            msg.set_action('device.params.result')
+            stats = []
+            result = {}
+            result['device_type'] = dev_type_id
+            result['name'] = ""
+            result['reference'] = ""
+            result['description'] = ""
+            # append the global xpl and on-xpl params
+            result['xpl'] = []
+            result['global'] = []
+            for param in pjson['device_types'][dev_type_id]['parameters']:
+                if param['xpl']:
+                    del param['xpl']
+                    result['xpl'].append(param)
+                else:
+                    del param['xpl']
+                    result['global'].append(param)
+            # find the xplCommands
+            result['xpl_commands'] = {}
+            for cmdn in pjson['device_types'][dev_type_id]['commands']:
+                cmd = pjson['commands'][cmdn]
+                if 'xpl_command'in cmd:
+                    xcmdn = cmd['xpl_command']
+                    xcmd = pjson['xpl_commands'][xcmdn]
+                    result['xpl_commands'][xcmdn] = []
+                    stats.append( xcmd['xplstat_name'] )
+                    for param in xcmd['parameters']['device']:
+                        result['xpl_commands'][xcmdn].append(param)
+            # find the xplStats
+            sensors = pjson['device_types'][dev_type_id]['sensors']
+            for xstatn in pjson['xpl_stats']:
+                xstat = pjson['xpl_stats'][xstatn]
+                for sparam in xstat['parameters']['dynamic']:
+                    if 'sensor' in sparam:
+                        if sparam['sensor'] in sensors:
+                            stats.append(xstatn)
+            result['xpl_stats'] = {}
+            for xstatn in stats:
+                xstat = pjson['xpl_stats'][xstatn]
+                result['xpl_stats'][xstatn] = []
+                for param in xstat['parameters']['device']:
+                    result['xpl_stats'][xstatn].append(param)
+            # return the data
+            msg.add_data('result', result)
+            self.log.debug(msg.get())
+            self.reply(msg.get())
+        except:
+            self.log.error("Error when replying to device.params for data={0}. Error: {1}".format(data, traceback.format_exc()))
 
     def _mdp_reply_devices_result(self, data):
         """ Reply to device.get MQ req
@@ -540,7 +590,6 @@ class DBConnector(Plugin, MQRep):
                               "name" : name,
                               "host" : host,
                               "event" : "updated"})
-
 
 if __name__ == "__main__":
     DBC = DBConnector()

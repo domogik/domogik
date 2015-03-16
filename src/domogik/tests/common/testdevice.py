@@ -35,7 +35,7 @@ Usage
 
 
 
-from domogik.tests.common.helpers import get_rest_url
+from domogik.common.utils import get_rest_url
 from domogik.common.utils import get_sanitized_hostname
 import requests
 import json
@@ -65,9 +65,11 @@ class TestDevice():
         """
         url = "{0}/device/params/{1}/{2}".format(self.rest_url, client_id, device_type)
         print(u"Getting device_type params {0}".format(device_type))
+        print(u"Url called is {0}".format(url))
 
         response = requests.get(url)
-        print(u"Response : [{0}]".format(response.status_code))
+        #print(u"Response : [{0}]".format(response.status_code))
+        print(u"Response : [{0}] : {1}".format(response.status_code, response.text))
         if response.status_code != 200:
             raise RuntimeError("Can not get the device_type params : {0}".format(response.text))
 
@@ -80,14 +82,16 @@ class TestDevice():
             @param params : The filled params
             @return : the device id for the device created
         """
+        url = "{0}/device/".format(self.rest_url)
         print(u"Create a test device with {0}".format(params))
+        print(u"Url called is {0}".format(url))
 
-        response = requests.post("{0}/device/".format(self.rest_url), \
+        response = requests.post(url, \
             headers={'content-type':'application/x-www-form-urlencoded'}, \
             data="params={0}".format(json.dumps(params)))
         
-        print(u"Response : [{0}]".format(response.status_code))
-        #print(u"Response : [{0}] {1}".format(response.status_code, response.text))
+        #print(u"Response : [{0}]".format(response.status_code))
+        print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:
             raise RuntimeError("Error when creating the device : {0}".format(response.text))
         else:
@@ -99,21 +103,25 @@ class TestDevice():
         """ Call DELETE /device/... to delete a device
             @param id : device id
         """
+        url = "{0}/device/{1}".format(self.rest_url, id)
         print(u"Delete the device : id = {0}".format(id))
-        response = requests.delete("{0}/device/{1}".format(self.rest_url, id), \
+        print(u"Url called is {0}".format(url))
+        response = requests.delete(url, \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
-        if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
+        if response.status_code != 201:
+            raise RuntimeError("Error when deleting the device")
 
     def del_devices_by_client(self, client_id):
         """ Call GET /device to get all devices
             Then, call del_device for each device of the given client_id
             @param client_id: the client id for which we want to delete all the devices
         """
+        url = "{0}/device/".format(self.rest_url)
         print(u"Delete all the devices for the client id '{0}'".format(client_id))
+        print(u"Url called is {0}".format(url))
         # first, retrieve all the devices
-        response = requests.get("{0}/device/".format(self.rest_url), \
+        response = requests.get(url, \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
         print(u"Response : [{0}]".format(response.status_code))
         if response.status_code != 200:

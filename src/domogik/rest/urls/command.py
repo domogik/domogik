@@ -16,6 +16,29 @@ from domogikmq.message import MQMessage
 @json_response
 @timeit
 def api_ncommand(cid):
+    """
+    @api {get} /cmd/id/<int:cid> Trigger a command
+    @apiName getCommand
+    @apiGroup Command
+
+    @apiParam {Number} id The commandId to generate
+    @apiParam Key A key value pair for each command param
+
+    @apiSuccessExample Success-Response:
+        HTTTP/1.1 204 No Content 
+
+    @apiErrorExample Gateway Timeout
+        HTTTP/1.1 400 No Bad Request
+        {
+            msg: 'XPL gateway does not respond'
+        }
+    
+    @apiErrorExample Other error
+        HTTTP/1.1 400 No Bad Request
+        {
+            msg: 'Bad command Id'
+        }
+    """
     cli = MQSyncReq(urlHandler.zmq_context)
     msg = MQMessage()
     msg.set_action('cmd.send')

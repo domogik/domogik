@@ -10,6 +10,34 @@ from flask import Response
 @json_response
 @timeit
 def api_root():
+    """
+    @api {get} / Get the status of the REST server
+    @apiName getStatus
+    @apiGroup Status
+
+    @apiSuccess {json} result A json result with the status
+
+    @apiSuccessExample Success-Response:
+        HTTTP/1.1 200 OK
+        {
+            "info": {
+                "REST_API_version": "0.7",
+                "SSL": false,
+                "Host": "igor",
+                "Domogik_release": "0.4.0",
+                "Domogik_version": "0.4.0",
+                "REST_API_release": "0.7",
+                "Sources_release": "0.4.0",
+                "Sources_version": "0.4.0"
+            },
+            "mq": {
+                "sub_port": "40412",
+                "ip": "127.0.0.1",
+                "req_rep_port": "40410",
+                "pub_port": "40411"
+            }
+        }
+    """
     # domogik global version
     global_version = sys.modules["domogik"].__version__
     # domogik src version
@@ -35,12 +63,16 @@ def api_root():
     info["Domogik_release"] = global_version
     info["Sources_release"] = src_version
 
-    # Configuration
-    cfg = Loader('mq').load()
-    mqcfg = dict(cfg[1])
+    # mq part
+    mqconfig = Loader('mq', 'domogik-mq.cfg')
+    config = dict(mqconfig.load()[1])
+    mq = {}
+    mq["sub_port"] = config["sub_port"]
+    mq["ip"] = config["ip"]
+    mq["req_rep_port"] = config["req_rep_port"]
+    mq["pub_port"] = config["pub_port"]
 
-    data = {"info" : info, 
-           "mq": mqcfg}
+    data = {"info" : info, "mq": mq}
     return 200, data
 
 @urlHandler.route('/map')

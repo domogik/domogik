@@ -87,17 +87,6 @@ def check_domogik_is_running():
             print("component {0} is running".format(chk))
     return ret
 
-def get_rest_url():
-    """ Return the REST server url (constructed from the configuration file of the host)
-    """
-    cfg = Loader('rest')
-    config = cfg.load()
-    conf = dict(config[1])
-    # we return the url related to the first declared interface in domogik.cfg
-    intf = conf['interfaces'].split(",")[0]
-    ip = get_ip_for_interfaces([intf])[0]
-    return "http://{0}:{1}/".format(ip, conf['port'])
-
 ### Plugin configuration features
 
 def delete_configuration(type, name, host):

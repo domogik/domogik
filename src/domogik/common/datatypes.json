@@ -420,7 +420,10 @@
         "childs": [
             "DT_Phone",
             "DT_Hexa",
-            "DT_ColorRGBHexa"
+            "DT_ColorRGBHexa",
+            "DT_CoordD",
+            "DT_CoordDM",
+            "DT_CoordDMS"
         ]
     },
     "DT_Phone": {
@@ -543,19 +546,6 @@
             "5": "Speed 3",
             "6": "Speed 4",
             "7": "Speed 5"
-        },
-        "childs": []
-    },
-    "DT_ColorCII": {
-        "values": {
-            "W": "White",
-            "O": "Orange",
-            "R": "Red",
-            "Y": "Yellow",
-            "B": "Blue",
-            "G": "Green",
-            "Bk": "Black",
-            "Br": "Brown"
         },
         "childs": []
     },

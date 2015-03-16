@@ -122,20 +122,28 @@ class PackageJson():
                                                            self.json["identity"]["name"])
             self.json["identity"]["icon_file"] = icon_file
 
+            if not self.json["identity"].has_key("xpl_clients_only"):
+                self.json["identity"]["xpl_clients_only"] = False
+
+            if not self.json["identity"].has_key("compliant_xpl_clients"):
+                self.json["identity"]["compliant_xpl_clients"] = []
+
             # common configuration items
-            auto_startup = {
-                               "default": False,
-                               "description": "Automatically start the plugin at Domogik startup",
-                               "key": "auto_startup",
-                               "name" : "Start the plugin with Domogik",
-                               "required": True,
-                               "type": "boolean"
-                           }
-            # check that auto_startup key is not already defined in the json
-            for config_elt in self.json["configuration"]:
-                if config_elt["key"] == "auto_startup":
-                    raise PackageException("Configuration parameter 'auto_startup' has not to be defined in the json file. Please remove it")
-            self.json["configuration"].insert(0, auto_startup)
+            # to add only for a plugin with identity>xpl_clients_only not set to True !
+            if not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
+                auto_startup = {
+                                   "default": False,
+                                   "description": "Automatically start the plugin at Domogik startup",
+                                   "key": "auto_startup",
+                                   "name" : "Start the plugin with Domogik",
+                                   "required": True,
+                                   "type": "boolean"
+                               }
+                # check that auto_startup key is not already defined in the json
+                for config_elt in self.json["configuration"]:
+                    if config_elt["key"] == "auto_startup":
+                        raise PackageException("Configuration parameter 'auto_startup' has not to be defined in the json file. Please remove it")
+                self.json["configuration"].insert(0, auto_startup)
                   
 
 
@@ -200,7 +208,7 @@ class PackageJson():
 
             # validate identity
             expected = ["author", "author_email", "description", "domogik_min_version", "name", "type", "version"]
-            optional = ["tags", "dependencies", "package_id", "icon_file"]
+            optional = ["tags", "dependencies", "package_id", "icon_file", "xpl_clients_only", "compliant_xpl_clients"]
             if type(self.json["identity"]) != dict:
                 raise PackageException("Identity part is NOT a dictionary!")
             self._validate_keys(expected, "an identity param", self.json["identity"].keys(), optional)
@@ -242,7 +250,7 @@ class PackageJson():
                         raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
                 #see that each xplparam inside device_type has the following keys: key, description, type
                 expected = ["key", "type", "description", "xpl"]
-                optional = ["max_value", "min_value", "choices", "mask", "multiline"]
+                optional = ["max_value", "min_value", "choices", "mask", "multiline", "default"]
                 if type(devt["parameters"]) != list:
                     raise PackageException("Parameters list for device_type {0} is NOT a list!".format(devtype))
                 for par in devt["parameters"]:
@@ -295,10 +303,13 @@ class PackageJson():
                     self._validate_keys(expected, "a static parameter for xpl_command {0}".format(xcmdid), stat.keys())
                 # device parameter
                 expected = ["key", "description", "type"]
+                optional = ["default"]
                 if type(xcmd['parameters']['device']) != list:
                     raise PackageException("Device parameters for xpl_command {0} is not a list".format(xcmdid))
                 for stat in xcmd['parameters']['device']:
-                    self._validate_keys(expected, "a device parameter for xpl_command {0}".format(xcmdid), stat.keys())
+                    self._validate_keys(expected, "a device parameter for xpl_command {0}".format(xcmdid), stat.keys(), optional)
+                    if stat['type'] not in fieldTypes:
+                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(stat['type'], fieldTypes))
                 # see that the xpl_stat is defined
                 if xcmd["xplstat_name"] not in self.json["xpl_stats"].keys():
                     raise PackageException("xplstat_name {0} defined in xpl_command {1} is not found".format(xcmd["xplstat_name"], xcmdid))
@@ -321,10 +332,11 @@ class PackageJson():
                     self._validate_keys(expected, "a static parameter for xpl_stat {0}".format(xstatid), stat.keys())
                 # device parameter
                 expected = ["key", "description", "type"]
+                optional = ["default", "multiple"]
                 if type(xstat['parameters']['device']) != list:
                     raise PackageException("Device parameters for xpl_stat {0} is not a list".format(xstatid))
                 for stat in xstat['parameters']['device']:
-                    self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys())
+                    self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys(), optional)
                     if stat['type'] not in fieldTypes:
                         raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(stat['type'], fieldTypes))
                 # dynamic parameter

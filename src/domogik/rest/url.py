@@ -22,7 +22,7 @@ def write_access_log_after(response):
 def write_acces_log_before():
     urlHandler.json_stop_at = []
     urlHandler.db.open_session()
-    urlHandler.logger.info('http request for {0} received'.format(request.path))
+    urlHandler.logger.info('http request {0} for {1} received'.format(request.method, request.path))
 
 # json reponse handler decorator
 # the url handlers funictions can return
@@ -120,6 +120,4 @@ import domogik.rest.urls.sensorhistory
 from domogik.rest.urls.device import *
 
 # Pure REST API
-from domogik.rest.urls.person import personAPI
-from domogik.rest.urls.account import AccountAPI
 from domogik.rest.urls.sensor import sensorAPI
