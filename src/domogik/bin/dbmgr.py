@@ -133,6 +133,9 @@ class DBConnector(Plugin, MQRep):
                 # device delete
                 elif msg.get_action() == "device.delete":
                     self._mdp_reply_devices_delete_result(msg)
+                # sensor history
+                elif msg.get_action() == "sensor_history.get":
+                    self._mdp_reply_sensor_history(msg)
         except:
             msg = "Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
@@ -534,28 +537,45 @@ class DBConnector(Plugin, MQRep):
         status = True
 
         msg_data = data.get_data()
-        if 'type' not in msg_data:
-            status = False
-            reason = "Devices request : missing 'type' field : {0}".format(data)
 
-        if 'name' not in msg_data:
-            status = False
-            reason = "Devices request : missing 'name' field : {0}".format(data)
+        # request for all devices
+        if 'type' not in msg_data and \
+           'name' not in msg_data and \
+           'host' not in msg_data:
 
-        if 'host' not in msg_data:
-            status = False
-            reason = "Devices request : missing 'host' field : {0}".format(data)
-
-        if status == False:
-            self.log.error(reason)
-        else:
             reason = ""
-            type = msg_data['type']
-            #if type == "plugin":
-            #    type = DMG_VENDOR_ID
-            name = msg_data['name']
-            host = msg_data['host']
-            dev_list = self._db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
+            status = True
+            dev_list = self._db.list_devices()
+
+            dev_json = dev_list
+            print(dev_json)
+            msg.add_data('status', status)
+            msg.add_data('reason', reason)
+            msg.add_data('devices', dev_json)
+
+        # request for all devices of one client
+        else:
+            if 'type' not in msg_data:
+                status = False
+                reason = "Devices request : missing 'type' field : {0}".format(data)
+
+            if 'name' not in msg_data:
+                status = False
+                reason = "Devices request : missing 'name' field : {0}".format(data)
+
+            if 'host' not in msg_data:
+                status = False
+                reason = "Devices request : missing 'host' field : {0}".format(data)
+
+            if status == False:
+                self.log.error(reason)
+            else:
+                reason = ""
+                type = msg_data['type']
+                name = msg_data['name']
+                host = msg_data['host']
+                dev_list = self._db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
+
             #dev_json = json.dumps(dev_list, cls=domogik_encoder(), check_circular=False),
             dev_json = dev_list
             print(dev_json)
@@ -565,6 +585,38 @@ class DBConnector(Plugin, MQRep):
             msg.add_data('name', name)
             msg.add_data('host', host)
             msg.add_data('devices', dev_json)
+
+        self.reply(msg.get())
+
+    def _mdp_reply_sensor_history(self, data):
+        """ Reply to sensor_history.get MQ req
+            @param data : MQ req message
+
+            If no other param than the sensor id, return the last value
+        """
+        msg = MQMessage()
+        msg.set_action('sensor_history.result')
+        status = True
+        reason = ""
+
+        msg_data = data.get_data()
+
+        try:
+            sensor_id = msg_data['sensor_id']
+            history = self._db.list_sensor_history(sensor_id, 1)
+            if len(history) == 0:
+                last_value = None
+            else: 
+                last_value = self._db.list_sensor_history(sensor_id, 1)[0].value_str
+        except:
+            self.log.error("ERROR when getting sensor history for id = {0} : {1}".format(sensor_id, traceback.format_exc()))
+            reason = "ERROR : {0}".format(traceback.format_exc())
+            status = False
+
+        msg.add_data('status', status)
+        msg.add_data('reason', reason)
+        msg.add_data('sensor_id', sensor_id)
+        msg.add_data('values', [last_value])
 
         self.reply(msg.get())
 

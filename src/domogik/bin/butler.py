@@ -39,13 +39,19 @@ from argparse import ArgumentParser
 
 from domogik.common.plugin import Plugin
 from domogik.butler.rivescript import RiveScript
-from domogik.butler.common import *
+#DELETE#   from domogik.butler.common import *
 #from domogikmq.reqrep.worker import MQRep
 #from domogikmq.message import MQMessage
 from domogikmq.pubsub.subscriber import MQAsyncSub
 from domogikmq.pubsub.publisher import MQPub
 from zmq.eventloop.ioloop import IOLoop
 import zmq
+import os
+
+
+BRAIN_PKG_TYPE = "brain"
+EMPTY_BRAIN = "../butler/brain_empty.rive"
+RIVESCRIPT_DIR = "rs"
 
 class Butler(Plugin, MQAsyncSub):
     """ Butler component
@@ -91,9 +97,11 @@ class Butler(Plugin, MQAsyncSub):
         # set rivescript variables
 
         # load the minimal brain
-        self.brain.load_directory("../butler/brain_base_{0}".format(self.lang))
+        #self.brain.load_directory("../butler/brain_base_{0}".format(self.lang))
+        self.brain.load_file(EMPTY_BRAIN)
 
         # TODO : load packages for the brain
+        self.load_brain_parts()
 
         # TODO : describe this command
         self.brain.sort_replies()
@@ -130,6 +138,26 @@ class Butler(Plugin, MQAsyncSub):
 
         self.log.info(u"Butler initialized")
         self.ready()
+
+    def load_brain_parts(self):
+        """ Load the parts of the brain from /var/lib/domogik/domogik_packages/brain_*
+        """
+        try:
+            list = []
+            for a_file in os.listdir(self.get_packages_directory()):
+                if a_file[0:len(BRAIN_PKG_TYPE)] == BRAIN_PKG_TYPE:
+                    self.log.info("Brain part found : {0}".format(a_file))
+                    rs_dir = os.path.join(self.get_packages_directory(), a_file, RIVESCRIPT_DIR)
+                    if os.path.isdir(rs_dir):
+                        #self.log.debug("The brain part contains a rivescript folder ({0})".format(RIVESCRIPT_DIR))
+                        lang_dir = os.path.join(rs_dir, self.lang)
+                        if os.path.isdir(lang_dir):
+                            self.log.info("- Language found : {0}".format(self.lang))
+                            self.brain.load_directory(lang_dir)
+        except:
+            msg = "Error accessing packages directory : {0}. You should create it".format(str(traceback.format_exc()))
+            self.log.error(msg)
+
 
     def shutdown(self):
         """ Shutdown the butler
