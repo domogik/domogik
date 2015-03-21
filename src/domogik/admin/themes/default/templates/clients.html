@@ -41,6 +41,8 @@
               <h2 class="list-group-item">
               {% if type == "core" %}
                 {% trans %}Core components{% endtrans %}
+              {% elif type == "brain" %}
+                {% trans %}Brain parts{% endtrans %}
               {% elif type == "plugin" %}
                 {% trans %}Plugins{% endtrans %}
               {% elif type == "xpl_client" %}
@@ -63,6 +65,9 @@
 
                 {# for a plugin for only external xpl clients, there is nothing to start so no status ;) #}
                 {% if type == "plugin" and client_list_per_host_per_type[host][type][client]['xpl_clients_only'] == True %}
+                  <span class="label label-info status status-label pull-right">n/a</span>
+                {# Brain parts are not runnable, so no status #}
+                {% elif type == "brain" %}
                   <span class="label label-info status status-label pull-right">n/a</span>
                 {% else %}
                   <span class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
@@ -111,7 +116,7 @@
         },
         {
           title: "{% trans %}There are different type of clients{% endtrans %}",
-          content: "{% trans %}Domogik has different type of clients.{% endtrans %}<ul><li><strong>{% trans %}Core components{% endtrans %}</strong> : {% trans %}they are the main components of Domogik. You can't do nothing on these components from here. You can just check their status.{% endtrans %}</li><li><strong>{% trans %}Plugins{% endtrans %}</strong> : {% trans %}plugins are packages installed by yourself. You can configure them and create some devices.{% endtrans %}</li></ul>",
+          content: "{% trans %}Domogik has different type of clients.{% endtrans %}<ul><li><strong>{% trans %}Core components{% endtrans %}</strong> : {% trans %}they are the main components of Domogik. You can't do nothing on these components from here. You can just check their status.{% endtrans %}</li><li><strong>{% trans %}Plugins{% endtrans %}</strong> : {% trans %}plugins are packages installed by yourself. You can configure them and create some devices.{% endtrans %}</li><li><strong>{% trans %}Brain parts{% endtrans %}</strong> : {% trans %}brain parts are packages installed by yourself. They are used by the butler which is the core components that helps you to communicate with Domogik.{% endtrans %}</li></ul>",
           target: "h2",
           placement: "bottom"
         },

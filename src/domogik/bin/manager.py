@@ -185,6 +185,9 @@ class Manager(XplPlugin):
         ### Create the plugins list
         self._plugins = {}
 
+        ### Create the brain parts list
+        self._brains = {}
+
         ### Start the dbmgr
         if self.options.start_dbmgr:
             if not self._start_core_component("dbmgr"):
@@ -298,6 +301,23 @@ class Manager(XplPlugin):
                             for device_type in self._packages[pkg_id].get_device_types():
                                 self.log.info(u"Register device type : {0}".format(device_type))
                                 self._device_types[device_type] = self._packages[pkg_id].get_json()
+
+                        ### type = brain
+                        if type == "brain":
+                            if self._brains.has_key(name):
+                                self.log.debug(u"The brain '{0}' is already registered. Reloading its data".format(name))
+                                self._brains[name].reload_data()
+                            else:
+                                self.log.info(u"New brain available : {0}".format(name))
+                                self._brains[name] = Brain(name, 
+                                                           self.get_sanitized_hostname(), 
+                                                           self._clients, 
+                                                           self.get_libraries_directory(),
+                                                           self.get_packages_directory(),
+                                                           self.zmq,
+                                                           self.get_stop(),
+                                                           self.get_sanitized_hostname())
+
     
             # finally, check if some packages has been uninstalled/removed
             pkg_to_unregister = []
@@ -758,7 +778,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         ### set the component type
         self.type = "core"
 
-        ### change the cilent id as 'core-....'
+        ### change the client id as 'core-....'
         self.client_id = "{0}-{1}.{2}".format("core", self.name, self.host)
 
         ### component data (empty)
@@ -854,6 +874,74 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
 
 
+class Brain(GenericComponent):
+    """ This helps to handle brains discovered on the host filesystem
+
+        Notice that this kind of packages is only data!
+        * the brain packages will never "run"
+        * they have no alive/stopped/dead/... status
+    """
+
+    def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
+        """ Init a plugin 
+            @param name : brain name (ipx800, onewire, ...)
+            @param host : hostname
+            @param clients : clients list 
+            @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
+            @param packages_directory : path in which are stored the packages : /var/lib/domogik/packages/
+            @param zmq_context : zmq context
+            @param stop : get_stop()
+            @param local_host : get_sanitized_hostname()
+        """
+        GenericComponent.__init__(self, name = name, host = host, clients = clients)
+        self.log.info(u"New brain : {0}".format(self.name))
+
+        ### change the client id as 'brain-....'
+        self.client_id = "{0}-{1}.{2}".format("brain", self.name, self.host)
+
+        ### check if the plugin is on he local host
+        self.local_plugin = True
+
+        ### set the component type
+        self.type = "brain"
+
+        ### set package path
+        self._packages_directory = packages_directory
+
+        ### get the plugin data (from the json file)
+        status = None
+        self.data = {}
+        self.fill_data()
+
+        #TO DEL ??#
+        self.configured = False
+
+        ### register the plugin as a client
+        self.register_component()
+
+    def reload_data(self):
+        """ Just reload the client data
+        """
+        self.data = {}
+        self.fill_data()
+
+    def fill_data(self):
+        """ Fill the client data by reading the json file
+        """
+        try:
+            self.log.info(u"Brain {0} : read the json file".format(self.name))
+            pkg_json = PackageJson(pkg_type = "brain", name = self.name)
+            #we don't need to validate the json file as it has already be done in the check_avaiable_packages function
+            self.data = pkg_json.get_json()
+            #DEL#self.add_configuration_values_to_data()
+        except PackageException as e:
+            self.log.error(u"Brain {0} : error while trying to read the json file".format(self.name))
+            self.log.error(u"Brain {0} : invalid json file".format(self.name))
+            self.log.error(u"Brain {0} : {1}".format(self.name, e.value))
+            self.set_status(STATUS_INVALID)
+            pass
+
+
 class Plugin(GenericComponent, MQAsyncSub):
     """ This helps to handle plugins discovered on the host filesystem
         The MQAsyncSub helps to set the status 
@@ -861,11 +949,13 @@ class Plugin(GenericComponent, MQAsyncSub):
         Notice that some actions can't be done if the plugin host is not the server host! :
         * check if a plugin has stopped and kill it if needed
         * start the plugin
+ 
+        Notice also that all brain parts are to be hosted on the master Domogik
     """
 
     def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
         """ Init a plugin 
-            @param name : plugin name (ipx800, onewire, ...)
+            @param name : plugin name (core, datatype, ...)
             @param host : hostname
             @param clients : clients list 
             @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
