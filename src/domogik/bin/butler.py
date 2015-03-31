@@ -19,10 +19,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-Plugin purpose
-==============
+Component purpose
+=================
 
-This plugin manages scenarii, it provides MQ interface
+This component is the butler, your domogik assistant
 
 Implements
 ==========
@@ -37,6 +37,7 @@ Implements
 import traceback
 from argparse import ArgumentParser
 
+from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.plugin import Plugin
 from domogik.butler.rivescript import RiveScript
 #DELETE#   from domogik.butler.common import *
@@ -47,21 +48,23 @@ from domogikmq.pubsub.publisher import MQPub
 from zmq.eventloop.ioloop import IOLoop
 import zmq
 import os
+from subprocess import Popen, PIPE
+
 
 
 BRAIN_PKG_TYPE = "brain"
 EMPTY_BRAIN = "../butler/brain_empty.rive"
 RIVESCRIPT_DIR = "rs"
 
+SEX_MALE = "male"
+SEX_FEMALE = "female"
+SEX_ALLOWED = [SEX_MALE, SEX_FEMALE]
+
 class Butler(Plugin, MQAsyncSub):
     """ Butler component
 
         TODO : 
-        * check docs : 
-          * https://github.com/aifr/aifr-docs
-        * include existing french brain from https://github.com/aifr/rivescriptfr
         * /quit /reload commands
-        * interact with domogik : sensors
         * interact with domogik : commands
     """
 
@@ -78,17 +81,28 @@ class Butler(Plugin, MQAsyncSub):
         Plugin.__init__(self, name = 'butler', parser = parser)
 
         ### Configuration elements
-        # TODO : get these elements from the .cfg file
-        # default name 
-        self.butler_name = "nestor"
+        try:
+            cfg = Loader('butler')
+            config = cfg.load()
+            conf = dict(config[1])
+
+            self.lang = conf['lang']
+            self.butler_name = conf['name']
+            self.butler_sex = conf['sex']
+            if self.butler_sex not in SEX_ALLOWED:
+                self.log.error(u"The butler sex configured is not valid : '{0}'. Expecting : {1}".format(self.butler_sex, SEX_ALLOWED))
+                self.force_leave()
+                return
+       
+        except:
+            self.log.error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
+            self.force_leave()
+            return
         # user name (default is 'localuser')
+        # this is not used for now on Domogik side
         self.user_name = "localuser"
-        # lang 
-        self.lang = 'fr_FR'
 
         ### Prepare the brain
-        # TODO
-        # - load packages
         # - validate packages
 
         # Start the brain :)
@@ -97,18 +111,18 @@ class Butler(Plugin, MQAsyncSub):
         # set rivescript variables
 
         # load the minimal brain
-        #self.brain.load_directory("../butler/brain_base_{0}".format(self.lang))
         self.brain.load_file(EMPTY_BRAIN)
 
-        # TODO : load packages for the brain
+        # load packages for the brain
         self.load_brain_parts()
 
-        # TODO : describe this command
+        # sort replies
         self.brain.sort_replies()
 
         # Configure bot variables
         self.brain.set_variable("name", self.butler_name)
         self.brain.set_variable("fullname", self.butler_name)
+        self.brain.set_variable("sex", self.butler_sex)
 
         print("*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
         print("You may type /quit to let {0} have a break".format(self.butler_name))
@@ -159,6 +173,25 @@ class Butler(Plugin, MQAsyncSub):
             self.log.error(msg)
 
 
+    def process(self, query):
+        """ Process the input query by calling rivescript brain
+            @param query : the text query
+        """
+        try:
+            if isinstance(query, str):
+                query = unicode(query)
+
+            #self.log.debug(u"Before calling Rivescript brain for processing : {0} (type={1})".format(query, type(query)))
+            reply = self.brain.reply(self.user_name, query)
+            #self.log.debug(u"Processing finished. The reply is : {0}".format(reply))
+            return reply
+        except:
+            self.log.error(u"Error while processing query '{0}'. Error is : {1}".format(query, traceback.format_exc()))
+            self.log.error(reply)
+            self.log.error(type(reply))
+            return "Error"
+
+
     def shutdown(self):
         """ Shutdown the butler
         """
@@ -174,13 +207,16 @@ class Butler(Plugin, MQAsyncSub):
         """
         if msgid == "interface.input":
             self.log.info("Received message : {0}".format(content))
+            print(type(content['text']))
 
             ### Get response from the brain
             # TODO : do it in a thread and if this last too long, do :
             # 3s : reply "humm..."
             # 10s : reply "I am checking..."
             # 20s : reply "It takes already 20s for processing, I cancel the request" and kill the thread
-            reply = self.brain.reply(self.user_name, content['text'])
+            #reply = self.brain.reply(self.user_name, content['text'])
+            reply = self.process(content['text'])
+            print(u"DEBUG REPLY={0}".format(reply))
 
             ### Prepare response for the MQ
             # All elements that may be added in the request sent over MQ for interface.output
@@ -195,10 +231,10 @@ class Butler(Plugin, MQAsyncSub):
             #               }
             #self.context['text'] = reply
 
-            self.log.info("Send response over MQ : media = irc, location = '{0}', reply_to = '{1}', text = {2}".format(content['location'], content['identity'], reply))
+            self.log.info(u"Send response over MQ : media = '{0}', location = '{1}', reply_to = '{2}', text = {3}".format(content['media'], content['location'], content['identity'], reply))
             # publish over MQ
             self.pub.send_event('interface.output',
-                                {"media" : "irc",
+                                {"media" : content['media'],
                                  "location" : content['location'],
                                  "reply_to" : content['identity'],
                                  "text" : reply})
@@ -219,13 +255,15 @@ class Butler(Plugin, MQAsyncSub):
                 quit()
 
             # then, let Nestor do his work!!!
-            reply = self.brain.reply(self.user_name, msg)
+            #reply = self.brain.reply(self.user_name, msg)
+            reply = self.process(msg)
 
             # let Nestor answer in the chat
             print(u"{0} > {1}".format(self.butler_name, reply))
 
             # let Nestor speak
-            #tts = u"espeak -p 40 -s 140 -v mb/mb-fr1 \"{0}\" | mbrola /usr/share/mbrola/voices/fr1 - -.au | aplay".format(reply)
+            #tts = u"espeak -p 40 -s 140 -v mb/mb-fr1 \"{0}\" | mbrola /usr/share/mbrola/fr1/fr1 - -.au | aplay".format(reply)
+            #tts = u"espeak -p 40 -s 140 -v mb/mb-fr1 \"{0}\" | mbrola /usr/share/mbrola/fr1 - -.au | aplay".format(reply)
             #subp = Popen(tts, shell=True)
             #pid = subp.pid
             #subp.communicate()
