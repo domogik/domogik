@@ -55,6 +55,8 @@
               {% for client in client_list_per_host_per_type[host][type] %}
                 {% if type == "plugin" %}
                   <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
+                {% elif type == "brain" %}
+                  <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
                 {% else %}
                   <a class="list-group-item" href="#">
                 {% endif %}

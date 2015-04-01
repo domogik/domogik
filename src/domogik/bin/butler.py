@@ -55,6 +55,7 @@ from subprocess import Popen, PIPE
 BRAIN_PKG_TYPE = "brain"
 EMPTY_BRAIN = "../butler/brain_empty.rive"
 RIVESCRIPT_DIR = "rs"
+RIVESCRIPT_EXTENSION = ".rive"
 
 SEX_MALE = "male"
 SEX_FEMALE = "female"
@@ -209,8 +210,16 @@ class Butler(Plugin):
                             self.brain_content[client_id][self.lang] = {}
                             for a_rs_file in os.listdir(lang_dir):
                                 a_rs_file_path = os.path.join(lang_dir, a_rs_file)
-                                if os.path.isfile(a_rs_file_path):
-                                    self.brain_content[client_id][self.lang][a_rs_file] = "xxx"
+                                if os.path.isfile(a_rs_file_path) and a_rs_file[-len(RIVESCRIPT_EXTENSION):] == RIVESCRIPT_EXTENSION:
+                                    try:
+                                        import codecs
+                                        file = codecs.open(a_rs_file_path, 'r', 'utf-8')
+                                        file_content = file.read()
+                                        content = u"{0}".format(file_content)
+                                    except:
+                                        content = u"Error while reading file '{0}'. Error is : {1}".format(a_rs_file_path, traceback.format_exc())
+                                        self.log.error(content)
+                                    self.brain_content[client_id][self.lang][a_rs_file] = content
                               
         except:
             msg = "Error accessing packages directory : {0}. You should create it".format(str(traceback.format_exc()))

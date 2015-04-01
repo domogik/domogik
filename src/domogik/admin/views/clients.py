@@ -620,3 +620,36 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             active = 'devices',
             client_detail = detail
             )
+
+
+
+def get_brain_content(client_id):
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('butler.scripts.get')
+    res = cli.request('butler', msg.get(), timeout=10)
+    if res is not None:
+        data = res.get_data()
+        detail = {}
+        detail[client_id] = data[client_id]
+    else:
+        detail = {}
+    return detail
+
+
+@app.route('/client/<client_id>/brain')
+@login_required
+def client_brain(client_id):
+    detail = get_client_detail(client_id)
+    brain = get_brain_content(client_id)
+    #brain = {"brain-core.darkstar": {"fr_FR": {"path": "/var/lib/domogik//domogik_packages/brain_core/rs/fr_FR", "politesses.rive": "xxx", "tests.rive": "xxx"}}, "brain-wolfram.darkstar": {"fr_FR": {"path": "/var/lib/domogik//domogik_packages/brain_wolfram/rs/fr_FR", "wolfram.rive": "xxx", ".wolfram.rive.swp": "xxx"}}, "brain-datatype.darkstar": {"fr_FR": {"python_get_sensor_value.rive": "xxx", "path": "/var/lib/domogik//domogik_packages/brain_datatype/rs/fr_FR", "DT_Humidity.rive": "xxx", "DT_Temp.rive": "xxx"}}}
+
+    return render_template('client_brain.html',
+            loop = {'index': 1},
+            clientid = client_id,
+            client_detail = detail,
+            brain = brain,
+            mactive="clients",
+            active = 'brain'
+            )
+

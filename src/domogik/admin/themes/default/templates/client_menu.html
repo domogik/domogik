@@ -1,24 +1,6 @@
 <div class="container">
   <h1 id="client_name">
     {% trans %}Client{% endtrans %} {{ clientid }}
-    {% if client_detail %}
-<!--
-TODO : remove
-      {% if client_detail.type == "plugin" %}
-        <div class="btn-group pull-right">
-          <button type="button" class="btn btn-info dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
-            <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" role="menu">
-            <li><a id="start" href="#">Start</a></li>
-            <li><a id="stop" href="#">Stop</a></li>
-          </ul>
-        </div>
-      {% else %}
-        <small><span class="label label-info status status-label status-{{client_detail.status}}">{{client_detail.status}}</span> </small>
-      {% endif %}
--->
-    {% endif %}
   </h1>
 
     <nav id="client-navbar" class="navbar navbar-default" role="navigation">
@@ -46,6 +28,11 @@ TODO : remove
             </div>
             {% else %}
             {% endif %}
+          {% elif client_detail.type == "brain" %}
+            <!-- TODO : improve layout -->
+            <div class="navbar-brand"> 
+              <span id="client-status" class="label label-info status status-label pull-right">{% trans %}n/a{% endtrans %}</span>
+            </div>
           {% else %}
             <!-- TODO : improve layout -->
             <div class="navbar-brand"> 
@@ -62,13 +49,23 @@ TODO : remove
               <a href="/client/{{ clientid }}">{% trans %}Informations{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
 
+            {% if client_detail.type == "plugin" %}
             <li {% if active == "config" %} class="active" {% endif %} >
               <a href="/client/{{ clientid }}/config">{% trans %}Configuration{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
+            {% endif %}
 
+            {% if client_detail.type == "plugin" %}
             <li {% if active == "devices" %} class="active" {% endif %} >
               <a href="/client/{{ clientid }}/dmg_devices/known">{% trans %}Domogik devices{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
+            {% endif %}
+
+            {% if client_detail.type == "brain" %}
+            <li {% if active == "brain" %} class="active" {% endif %} >
+              <a href="/client/{{ clientid }}/brain">{% trans %}Brain details{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+            {% endif %}
 
           </ul>
         </div>

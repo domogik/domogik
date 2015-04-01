@@ -1,0 +1,31 @@
+{% extends theme("base/base.html") %}
+{% import theme("base/wtf.html") as wtf %}
+
+{% block content %}
+{% include theme("client_menu.html") %}
+<div class="container">
+    <h2>{% trans %}Brain details{% endtrans %}</h2>
+    <!-- summrary -->
+    <h3>{% trans %}Files{% endtrans %}</h3>
+    <ul>
+    {% for a_lang in brain[clientid] %}
+      {% for a_file in brain[clientid][a_lang] %}
+        <li>
+          <a href="#{{ a_file }}_{{ a_lang }}">{{ a_file }} ({{ a_lang }})</a>
+        </li>
+      {% endfor %}
+    {% endfor %}
+    </ul>
+
+    <!-- content -->
+    {% for a_lang in brain[clientid] %}
+      {% for a_file in brain[clientid][a_lang] %}
+        <h3>{{ a_file }} <small>{{ a_lang }}</small></h3>
+        <div id="#{{ a_file }}_{{ a_lang }}">
+          <pre>{{ brain[clientid][a_lang][a_file] }}</pre>
+        </div>
+      {% endfor %}
+    {% endfor %}
+</div>
+{% endblock %}
+
