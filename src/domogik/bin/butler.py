@@ -29,23 +29,23 @@ Implements
 
 
 @author: Fritz SMH <fritz.smh at gmail.com>
-@copyright: (C) 2007-2014 Domogik project
+@copyright: (C) 2007-2015 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
 import traceback
 from argparse import ArgumentParser
+from threading import Thread
 
 from domogik.common.configloader import Loader, CONFIG_FILE
+from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import Plugin
 from domogik.butler.rivescript import RiveScript
-#DELETE#   from domogik.butler.common import *
-#from domogikmq.reqrep.worker import MQRep
-#from domogikmq.message import MQMessage
+from domogikmq.reqrep.worker import MQRep
+from domogikmq.message import MQMessage
 from domogikmq.pubsub.subscriber import MQAsyncSub
 from domogikmq.pubsub.publisher import MQPub
-from zmq.eventloop.ioloop import IOLoop
 import zmq
 import os
 from subprocess import Popen, PIPE
@@ -60,7 +60,7 @@ SEX_MALE = "male"
 SEX_FEMALE = "female"
 SEX_ALLOWED = [SEX_MALE, SEX_FEMALE]
 
-class Butler(Plugin, MQAsyncSub):
+class Butler(Plugin):
     """ Butler component
 
         TODO : 
@@ -111,6 +111,7 @@ class Butler(Plugin, MQAsyncSub):
         # set rivescript variables
 
         # load the minimal brain
+        self.brain_content = {}   # the brain raw content for display in the admin (transmitted over MQ)
         self.brain.load_file(EMPTY_BRAIN)
 
         # load packages for the brain
@@ -130,19 +131,24 @@ class Butler(Plugin, MQAsyncSub):
         ### MQ
 
         # subscribe the MQ for interfaces inputs
-        MQAsyncSub.__init__(self, self.zmq, self._name, ['interface.input'])
+        #TMP#MQAsyncSub.__init__(self, self.zmq, self._name, ['interface.input'])
 
         # MQ publisher
         self._mq_name = "interface-{0}.{1}".format(self._name, self.get_sanitized_hostname())
         self.zmq = zmq.Context()
         self.pub = MQPub(self.zmq, self._mq_name)
 
-
         ### Interactive mode
         if self.options.interactive:
             self.log.info("Launched in interactive mode : running the chat!")
             # TODO : run as a thread
-            self.run_chat()
+            #self.run_chat()
+            thr_run_chat = Thread(None,
+                                  self.run_chat,
+                                  "run_chat",
+                                  (),
+                                  {})
+            thr_run_chat.start()
         else:
             self.log.info("Not launched in interactive mode")
         
@@ -153,6 +159,34 @@ class Butler(Plugin, MQAsyncSub):
         self.log.info(u"Butler initialized")
         self.ready()
 
+
+    def on_mdp_request(self, msg):
+        """ Handle Requests over MQ 
+            @param msg : MQ req message
+        """
+        try:
+            ### rivescript files detail
+            if msg.get_action() == "butler.scripts.get":
+                self.log.info(u"Scripts request : {0}".format(msg))
+                print(self.brain_content)
+                self._mdp_reply_butler_scripts(msg)
+        except:
+            self.log.error("Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
+    
+
+    def _mdp_reply_butler_scripts(self, message):
+        """ Send the raw content for the brain parts over the MQ
+        """
+
+        # TODO : handle choice of the client in the req message
+
+        msg = MQMessage()
+        msg.set_action('butler.scripts.result')
+        for client_id in self.brain_content:
+            msg.add_data(client_id, self.brain_content[client_id])
+        self.reply(msg.get())
+
+
     def load_brain_parts(self):
         """ Load the parts of the brain from /var/lib/domogik/domogik_packages/brain_*
         """
@@ -161,13 +195,23 @@ class Butler(Plugin, MQAsyncSub):
             for a_file in os.listdir(self.get_packages_directory()):
                 if a_file[0:len(BRAIN_PKG_TYPE)] == BRAIN_PKG_TYPE:
                     self.log.info("Brain part found : {0}".format(a_file))
+                    client_id = "{0}-{1}.{2}".format(BRAIN_PKG_TYPE, a_file.split("_")[1], self.get_sanitized_hostname())
+                    self.brain_content[client_id] = {}
                     rs_dir = os.path.join(self.get_packages_directory(), a_file, RIVESCRIPT_DIR)
                     if os.path.isdir(rs_dir):
                         #self.log.debug("The brain part contains a rivescript folder ({0})".format(RIVESCRIPT_DIR))
                         lang_dir = os.path.join(rs_dir, self.lang)
                         if os.path.isdir(lang_dir):
                             self.log.info("- Language found : {0}".format(self.lang))
+                            # add the brain part to rivescript
                             self.brain.load_directory(lang_dir)
+                            # add the files raw data to brain content (to be sent over MQ to the admin)
+                            self.brain_content[client_id][self.lang] = {}
+                            for a_rs_file in os.listdir(lang_dir):
+                                a_rs_file_path = os.path.join(lang_dir, a_rs_file)
+                                if os.path.isfile(a_rs_file_path):
+                                    self.brain_content[client_id][self.lang][a_rs_file] = "xxx"
+                              
         except:
             msg = "Error accessing packages directory : {0}. You should create it".format(str(traceback.format_exc()))
             self.log.error(msg)
@@ -194,11 +238,6 @@ class Butler(Plugin, MQAsyncSub):
 
     def shutdown(self):
         """ Shutdown the butler
-        """
-        pass
-
-    def on_mdp_request(self, msg):
-        """ MQ messages reception (req/rep)
         """
         pass
 
