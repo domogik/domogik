@@ -680,7 +680,7 @@ def get_brain_content(client_id):
                 # python objects
                 idx += 1
                 reg = re.compile(r"&gt; object", re.IGNORECASE)
-                content = reg.sub("<button class='button' onclick=\"$('#python_object_{0}').toggle();\">python object</button><div class='python' id='python_object_{0}' style='display: none'>&gt; object".format(idx), content)
+                content = reg.sub("<button class='btn btn-info' onclick=\"$('#python_object_{0}').toggle();\"><span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span> python object</button><div class='python' id='python_object_{0}' style='display: none'>&gt; object".format(idx), content)
 
                 reg = re.compile(r"&lt; object", re.IGNORECASE)
                 content = reg.sub("&lt; object</div>", content)
