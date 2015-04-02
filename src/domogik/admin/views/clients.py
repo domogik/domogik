@@ -23,8 +23,42 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
+import re
+
+try:
+    import html.parser
+    html_parser = html.parser.HTMLParser()
+except ImportError:
+    import HTMLParser
+    html_parser = HTMLParser.HTMLParser()
 
 
+### Regexp for brain scripts displaying
+#<button class="button" onclick="$('#target').toggle();">Show/Hide</button>
+#<div id="target" style="display: none">
+#    Hide show.....
+#</div>
+
+#RE_BRAIN_PYTHON_OBJECT_START = re.compile(r"&gt; object", re.IGNORECASE)
+#NEW_BRAIN_PYTHON_OBJECT_START = "<div class='python'>&gt; object"
+#
+#RE_BRAIN_PYTHON_OBJECT_END = re.compile(r"&lt; object", re.IGNORECASE)
+#NEW_BRAIN_PYTHON_OBJECT_END = "&lt; object</div>"
+
+
+
+
+html_escape_table = {
+    "&": "&amp;",
+    '"': "&quot;",
+    "'": "&apos;",
+    ">": "&gt;",
+    "<": "&lt;",
+    }
+
+def html_escape(text):
+    """Produce entities within text."""
+    return "".join(html_escape_table.get(c,c) for c in text)
 
 def get_client_detail(client_id):
     cli = MQSyncReq(app.zmq_context)
@@ -624,6 +658,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
 
 
 def get_brain_content(client_id):
+    # get data over MQ
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('butler.scripts.get')
@@ -634,6 +669,32 @@ def get_brain_content(client_id):
         detail[client_id] = data[client_id]
     else:
         detail = {}
+
+    # do a post processing on content to add html inside
+    for client_id in detail:
+        for lang in detail[client_id]:
+            idx = 0
+            for file in detail[client_id][lang]:
+                content = html_escape(detail[client_id][lang][file])
+
+                # python objects
+                idx += 1
+                reg = re.compile(r"&gt; object", re.IGNORECASE)
+                content = reg.sub("<button class='button' onclick=\"$('#python_object_{0}').toggle();\">python object</button><div class='python' id='python_object_{0}' style='display: none'>&gt; object".format(idx), content)
+
+                reg = re.compile(r"&lt; object", re.IGNORECASE)
+                content = reg.sub("&lt; object</div>", content)
+
+                # trigger
+                reg = re.compile(r"\+(?P<trigger>.*)", re.IGNORECASE)
+                content = reg.sub("<strong>+\g<trigger></strong>", content)
+
+                # comments
+                reg = re.compile(r"//(?P<comment>.*)", re.IGNORECASE)
+                content = reg.sub("<em>//\g<comment></em>", content)
+
+
+                detail[client_id][lang][file] = content
     return detail
 
 
@@ -642,7 +703,6 @@ def get_brain_content(client_id):
 def client_brain(client_id):
     detail = get_client_detail(client_id)
     brain = get_brain_content(client_id)
-    #brain = {"brain-core.darkstar": {"fr_FR": {"path": "/var/lib/domogik//domogik_packages/brain_core/rs/fr_FR", "politesses.rive": "xxx", "tests.rive": "xxx"}}, "brain-wolfram.darkstar": {"fr_FR": {"path": "/var/lib/domogik//domogik_packages/brain_wolfram/rs/fr_FR", "wolfram.rive": "xxx", ".wolfram.rive.swp": "xxx"}}, "brain-datatype.darkstar": {"fr_FR": {"python_get_sensor_value.rive": "xxx", "path": "/var/lib/domogik//domogik_packages/brain_datatype/rs/fr_FR", "DT_Humidity.rive": "xxx", "DT_Temp.rive": "xxx"}}}
 
     return render_template('client_brain.html',
             loop = {'index': 1},

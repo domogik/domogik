@@ -20,10 +20,8 @@
     <!-- content -->
     {% for a_lang in brain[clientid] %}
       {% for a_file in brain[clientid][a_lang] %}
-        <h3>{{ a_file }} <small>{{ a_lang }}</small></h3>
-        <div id="#{{ a_file }}_{{ a_lang }}">
-          <pre>{{ brain[clientid][a_lang][a_file] }}</pre>
-        </div>
+        <h3 id="{{ a_file }}_{{ a_lang }}">{{ a_file }} <small>{{ a_lang }}</small></h3>
+        <pre class="brain_code"><code>{{ brain[clientid][a_lang][a_file]|safe }}</code></pre>
       {% endfor %}
     {% endfor %}
 </div>

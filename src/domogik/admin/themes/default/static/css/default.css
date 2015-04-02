@@ -152,3 +152,12 @@ body {
 .xpl_client_compliant {
     padding-left: 3em;
 }
+
+/* brain specific */
+.brain_code {
+    margin-left: 2em;
+}
+
+.python {
+    color: red;
+}
