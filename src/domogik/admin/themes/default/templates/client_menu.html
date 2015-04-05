@@ -49,7 +49,7 @@
               <a href="/client/{{ clientid }}">{% trans %}Informations{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
 
-            {% if client_detail.type == "plugin" %}
+            {% if client_detail.type == "plugin" or client_detail.type == "brain" %}
             <li {% if active == "config" %} class="active" {% endif %} >
               <a href="/client/{{ clientid }}/config">{% trans %}Configuration{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>

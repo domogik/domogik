@@ -152,9 +152,9 @@ class DBConnector(Plugin, MQRep):
             status = False
             reason = "Config request : missing 'type' field : {0}".format(data)
 
-        if msg_data['type'] != "plugin":
+        if msg_data['type'] not in ["plugin", "brain", "interface"]:
             status = False
-            reason = "Config request not available for type={0}".format(msg_data['type'])
+            reason = "Configuration request not available for type={0}".format(msg_data['type'])
 
         if 'name' not in msg_data:
             status = False
@@ -184,14 +184,14 @@ class DBConnector(Plugin, MQRep):
             msg.add_data('key', key)  # we let this here to display key or * depending on the case
             try:
                 if get_all_keys == True:
-                    config = self._db.list_plugin_config(name, host)
+                    config = self._db.list_plugin_config("{0}-{1}".format(type, name), host)
                     self.log.info(u"Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, config))
                     json_config = {}
                     for elt in config:
                         json_config[elt.key] = self.convert(elt.value)
                     msg.add_data('data', json_config)
                 else:
-                    value = self._fetch_techno_config(name, host, key)
+                    value = self._fetch_techno_config("{0}-{1}".format(type, name), host, key)
                     # temporary fix : should be done in a better way (on db side)
                     value = self.convert(value)
                     self.log.info(u"Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, value))
@@ -221,9 +221,9 @@ class DBConnector(Plugin, MQRep):
             status = False
             reason = "Config set : missing 'type' field : {0}".format(data)
 
-        if msg_data['type'] != "plugin":
+        if msg_data['type'] not in ["plugin", "brain", "interface"]:
             status = False
-            reason = "Config set not available for type={0}".format(msg_data['type'])
+            reason = "You are not able to configure items for type={0}".format(msg_data['type'])
 
         if 'name' not in msg_data:
             status = False
@@ -250,9 +250,9 @@ class DBConnector(Plugin, MQRep):
             msg.add_data('host', host)
             try: 
                 # we add a configured key set to true to tell the UIs and plugins that there are some configuration elements
-                self._db.set_plugin_config(name, host, "configured", True)
+                self._db.set_plugin_config("{0}-{1}".format(type, name), host, "configured", True)
                 for key in msg_data['data']:
-                    self._db.set_plugin_config(name, host, key, data[key])
+                    self._db.set_plugin_config("{0}-{1}".format(type, name), host, key, data[key])
                 self.publish_config_updated(type, name, host)
             except:
                 reason = "Error while setting configuration for '{0} {1} on {2}' : {3}".format(type, name, host, traceback.format_exc())
@@ -279,9 +279,9 @@ class DBConnector(Plugin, MQRep):
             status = False
             reason = "Config request : missing 'type' field : {0}".format(data)
 
-        if msg_data['type'] != "plugin":
+        if msg_data['type'] not in ["plugin", "brain", "interface"]:
             status = False
-            reason = "Config request not available for type={0}".format(msg_data['type'])
+            reason = "Configuration deletion not available for type={0}".format(msg_data['type'])
 
         if 'name' not in msg_data:
             status = False
@@ -302,7 +302,7 @@ class DBConnector(Plugin, MQRep):
             msg.add_data('name', name)
             msg.add_data('host', host)
             try:
-                self._db.del_plugin_config(name, host)
+                self._db.del_plugin_config("{0}-{1}".format(type, name), host)
                 self.log.info(u"Delete config for {0} {1}".format(type, name))
                 self.publish_config_updated(type, name, host)
             except:

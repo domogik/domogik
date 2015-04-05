@@ -722,6 +722,11 @@ class GenericComponent():
         log = logger.Logger('manager')
         self.log = log.get_logger('manager')
 
+        #TODEL ?#### config
+        #TODEL ?## used only in the function add_configuration_values_to_data()
+        #TODEL ?## elsewhere, this function is used : self.get_config("xxxx")
+        #TODEL ?#self._config = Query(self.zmq, self.log)
+
 
     def register_component(self):
         """ register the component as a client
@@ -755,6 +760,28 @@ class GenericComponent():
         self._clients.set_pid(self.client_id, pid)
 
 
+    def add_configuration_values_to_data(self):
+        """
+        """
+        # grab all the config elements for the plugin
+        config = self._config.query(self.type, self.name)
+        if config != None:
+            for key in config:
+                # filter on the 'configured' key
+                if key == 'configured':
+                    self.configured = True
+                    self.set_configured(True)
+                else:
+                    # check if the key exists in the plugin configuration
+                    key_found = False
+                    # search the key in the configuration json part
+                    for idx in range(len(self.data['configuration'])):
+                        if self.data['configuration'][idx]['key'] == key:
+                            key_found = True
+                            # key found : insert value in the json
+                            self.data['configuration'][idx]['value'] = config[key]
+                    if key_found == False:
+                        self.log.warning(u"A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.name, self.host))
 
 
 
@@ -874,7 +901,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
 
 
-class Brain(GenericComponent):
+class Brain(GenericComponent, MQAsyncSub):
     """ This helps to handle brains discovered on the host filesystem
 
         Notice that this kind of packages is only data!
@@ -905,6 +932,14 @@ class Brain(GenericComponent):
         ### set the component type
         self.type = "brain"
 
+        ### zmq context
+        self.zmq = zmq_context
+
+        ### config
+        # used only in the function add_configuration_values_to_data()
+        # elsewhere, this function is used : self.get_config("xxxx")
+        self._config = Query(self.zmq, self.log)
+
         ### set package path
         self._packages_directory = packages_directory
 
@@ -916,8 +951,22 @@ class Brain(GenericComponent):
         #TO DEL ??#
         self.configured = False
 
+        ### subscribe the the MQ for category = plugin and name = self.name
+        MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.configuration'])
+
         ### register the plugin as a client
         self.register_component()
+
+
+    def on_message(self, msgid, content):
+        """ when a message is received from the MQ 
+        """
+        self.log.debug(u"{0}".format(content))
+        if msgid == "plugin.configuration":
+            # TODO : rename plugin.configuration to client.configuration ?
+            #        as this is currently used by type=plugin, brain
+            self.add_configuration_values_to_data()
+            self._clients.publish_update()
 
     def reload_data(self):
         """ Just reload the client data
@@ -933,7 +982,7 @@ class Brain(GenericComponent):
             pkg_json = PackageJson(pkg_type = "brain", name = self.name)
             #we don't need to validate the json file as it has already be done in the check_avaiable_packages function
             self.data = pkg_json.get_json()
-            #DEL#self.add_configuration_values_to_data()
+            self.add_configuration_values_to_data()
         except PackageException as e:
             self.log.error(u"Brain {0} : error while trying to read the json file".format(self.name))
             self.log.error(u"Brain {0} : invalid json file".format(self.name))
@@ -1096,6 +1145,8 @@ class Plugin(GenericComponent, MQAsyncSub):
                                                   {})
                     thr_check_if_stopped.start()
         elif msgid == "plugin.configuration":
+            # TODO : rename plugin.configuration to client.configuration ?
+            #        as this is currently used by type=plugin, brain
             self.add_configuration_values_to_data()
             self._clients.publish_update()
 
@@ -1122,28 +1173,29 @@ class Plugin(GenericComponent, MQAsyncSub):
             self.set_status(STATUS_INVALID)
             pass
 
-    def add_configuration_values_to_data(self):
-        """
-        """
-        # grab all the config elements for the plugin
-        config = self._config.query(self.name)
-        if config != None:
-            for key in config:
-                # filter on the 'configured' key
-                if key == 'configured':
-                    self.configured = True
-                    self.set_configured(True)
-                else:
-                    # check if the key exists in the plugin configuration
-                    key_found = False
-                    # search the key in the configuration json part
-                    for idx in range(len(self.data['configuration'])):
-                        if self.data['configuration'][idx]['key'] == key:
-                            key_found = True
-                            # key found : insert value in the json
-                            self.data['configuration'][idx]['value'] = config[key]
-                    if key_found == False:
-                        self.log.warning(u"A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.name, self.host))
+    # MOVED in the parent class because used also for brain, interface types
+    #def add_configuration_values_to_data(self):
+    #    """
+    #    """
+    #    # grab all the config elements for the plugin
+    #    config = self._config.query(self.name)
+    #    if config != None:
+    #        for key in config:
+    #            # filter on the 'configured' key
+    #            if key == 'configured':
+    #                self.configured = True
+    #                self.set_configured(True)
+    #            else:
+    #                # check if the key exists in the plugin configuration
+    #                key_found = False
+    #                # search the key in the configuration json part
+    #                for idx in range(len(self.data['configuration'])):
+    #                    if self.data['configuration'][idx]['key'] == key:
+    #                        key_found = True
+    #                        # key found : insert value in the json
+    #                        self.data['configuration'][idx]['value'] = config[key]
+    #                if key_found == False:
+    #                    self.log.warning(u"A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.name, self.host))
 
     def start(self):
         """ to call to start the plugin
