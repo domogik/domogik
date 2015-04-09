@@ -891,10 +891,10 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
         # TODO : the below if seems useless as this is a core component and not a plugin !
         # to delete ?
-        pass
+        #pass
 
-        #self.log.debug(u"New pub message received {0}".format(msgid))
-        #self.log.debug(u"{0}".format(content))
+        self.log.debug(u"Core : New pub message received {0}".format(msgid))
+        self.log.debug(u"{0}".format(content))
         #if msgid == "plugin.status":
         #    if content["name"] == self.name and content["host"] == self.host:
         #        self.log.info(u"New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
@@ -1064,7 +1064,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.fill_data()
 
         ### check if the plugin is configured (get key 'configured' in database over queryconfig)
-        configured = self._config.query(self.name, 'configured')
+        configured = self._config.query(self.type, self.name, 'configured')
         if configured == '1':
             configured = True
         if configured == True:
@@ -1122,7 +1122,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status', 'plugin.configuration'])
 
         ### check if the plugin must be started on manager startup
-        startup = self._config.query(self.name, 'auto_startup')
+        startup = self._config.query(self.type, self.name, 'auto_startup')
         if startup == '1' or startup == 'Y':
             startup = True
         if startup == True:
@@ -1221,8 +1221,8 @@ class Plugin(GenericComponent, MQAsyncSub):
             return 0
 
         ### Actions for test mode
-        test_mode = self._config.query(self.name, "test_mode")
-        test_option = self._config.query(self.name, "test_option")
+        test_mode = self._config.query(self.type, self.name, "test_mode")
+        test_option = self._config.query(self.type, self.name, "test_option")
         test_args = ""
         if test_mode == True: 
             self.log.info("The plugin {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))

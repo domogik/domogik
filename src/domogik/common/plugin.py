@@ -215,7 +215,7 @@ class Plugin(BasePlugin, MQRep):
             if not, stop the plugin and log this
         """
         self._plugin_config = Query(self.zmq, self.log)
-        configured = self._plugin_config.query(self._name, 'configured')
+        configured = self._plugin_config.query("plugin", self._name, 'configured')
         if configured == '1':
             configured = True
         if configured != True:
@@ -250,7 +250,7 @@ class Plugin(BasePlugin, MQRep):
         """
         if self._plugin_config == None:
             self._plugin_config = Query(self.zmq, self.log)
-        value = self._plugin_config.query(self._name, key)
+        value = self._plugin_config.query("plugin", self._name, key)
         if value == None or value == 'None':
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
             value = self.get_config_default_value(key)
