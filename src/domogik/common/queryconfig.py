@@ -43,10 +43,13 @@ from domogik.common.utils import get_sanitized_hostname
 import zmq
 from domogikmq.message import MQMessage
 from domogikmq.reqrep.client import MQSyncReq
+from domogik.common import logger
 
 QUERY_CONFIG_WAIT = 5
 
 class Query():
+    """ Query for core components and plugins
+    """
 
     def __init__(self, zmq, log):
         self.qry = QueryMQ(zmq, log)
@@ -58,6 +61,25 @@ class Query():
         # TODO
         self.log.error(u"Config set feature not yet implemented")
 
+
+class QueryForBrain():
+    """ Query for brain packages
+        Brain packages have no running parts, so no logger and no zmq context...
+        So we create them
+    """
+
+    def __init__(self):
+        ### init zmq
+        zmqc = zmq.Context() 
+
+        ### init logger
+        loginst = logger.Logger('manager')
+        log = loginst.get_logger('manager')
+
+        self.qry = QueryMQ(zmqc, log)
+
+    def query(self, type, name, key = None):
+        return self.qry.query(type, name, key)
 
 
 

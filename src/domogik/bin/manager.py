@@ -133,7 +133,11 @@ class Manager(XplPlugin):
                           dest="start_scenario",
                           default=False, \
                           help="Start scenario manager if not already running.")
-        # TODO : add -E option for externals ?
+        parser.add_argument("-b",
+                          action="store_true",
+                          dest="start_butler",
+                          default=False, \
+                          help="Start butler if not already running.")
 
         ### Call the XplPlugin init  
         XplPlugin.__init__(self, name = 'manager', parser=parser, log_prefix = "", nohub=True)
@@ -145,6 +149,7 @@ class Manager(XplPlugin):
         self.log.info(u"Start rest : {0}".format(self.options.start_rest))
         self.log.info(u"Start xpl gateway : {0}".format(self.options.start_xpl))
         self.log.info(u"Start scenario manager : {0}".format(self.options.start_scenario))
+        self.log.info(u"Start butler : {0}".format(self.options.start_butler))
 
         ### create a Fifo to communicate with the init script
         self.log.info(u"Create the fifo to communicate with the init script")
@@ -207,6 +212,11 @@ class Manager(XplPlugin):
         if self.options.start_scenario:
             if not self._start_core_component("scenario"):
                 self.log.error(u"Unable to start scenario manager")
+
+        ### Start butler
+        if self.options.start_butler:
+            if not self._start_core_component("butler"):
+                self.log.error(u"Unable to start butler")
 
         ### Check for the available packages
         thr_check_available_packages = Thread(None,

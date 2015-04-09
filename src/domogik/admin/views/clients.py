@@ -713,3 +713,21 @@ def client_brain(client_id):
             active = 'brain'
             )
 
+
+@app.route('/brain/reload')
+@login_required
+def brain_reload():
+    """ To be called by ajax
+        Send a MQ request to reload the butler brain
+    """
+    try:
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('butler.reload.do')
+        res = cli.request('butler', msg.get(), timeout=10)
+        if res == None:
+            return "Error : the butler did not respond", 500
+        return "OK", 200
+    except:
+        return "Error : {0}".format(traceback.format_exc()), 500
+

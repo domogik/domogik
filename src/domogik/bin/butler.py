@@ -49,11 +49,12 @@ from domogikmq.pubsub.publisher import MQPub
 import zmq
 import os
 from subprocess import Popen, PIPE
+import time
 
 
 
 BRAIN_PKG_TYPE = "brain"
-EMPTY_BRAIN = "../butler/brain_empty.rive"
+MINIMAL_BRAIN = "{0}/../butler/brain_minimal.rive".format(os.path.dirname(os.path.abspath(__file__)))
 RIVESCRIPT_DIR = "rs"
 RIVESCRIPT_EXTENSION = ".rive"
 
@@ -111,15 +112,8 @@ class Butler(Plugin):
 
         # set rivescript variables
 
-        # load the minimal brain
-        self.brain_content = {}   # the brain raw content for display in the admin (transmitted over MQ)
-        self.brain.load_file(EMPTY_BRAIN)
-
-        # load packages for the brain
-        self.load_brain_parts()
-
-        # sort replies
-        self.brain.sort_replies()
+        # load the brain
+        self.load_all_brain()
 
         # Configure bot variables
         self.brain.set_variable("name", self.butler_name)
@@ -169,8 +163,11 @@ class Butler(Plugin):
             ### rivescript files detail
             if msg.get_action() == "butler.scripts.get":
                 self.log.info(u"Scripts request : {0}".format(msg))
-                print(self.brain_content)
                 self._mdp_reply_butler_scripts(msg)
+            ### rivescript files detail
+            elif msg.get_action() == "butler.reload.do":
+                self.log.info(u"Reload brain request : {0}".format(msg))
+                self._mdp_reply_butler_reload(msg)
         except:
             self.log.error("Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
     
@@ -187,6 +184,39 @@ class Butler(Plugin):
             msg.add_data(client_id, self.brain_content[client_id])
         self.reply(msg.get())
 
+
+    def _mdp_reply_butler_reload(self, message):
+        """ Reload the brain 
+        """
+        msg = MQMessage()
+        msg.set_action('butler.reload.result')
+        try:
+            self.load_all_brain()
+            msg.add_data("status", True)
+            msg.add_data("reason", "")
+        except:
+            msg.add_data("status", False)
+            msg.add_data("reason", "Error while reloading brain parts : {0}".format(traceback.format_exc()))
+        self.reply(msg.get())
+
+
+    def load_all_brain(self):
+        """ Load all the brain parts (included in domogik or in packages)
+            and do any other related actions
+        """
+        try:
+            # load the minimal brain
+            self.brain_content = {}   # the brain raw content for display in the admin (transmitted over MQ)
+            self.log.info("Load minimal brain : {0}".format(MINIMAL_BRAIN))
+            self.brain.load_file(MINIMAL_BRAIN)
+
+            # load packages for the brain
+            self.load_brain_parts()
+
+            # sort replies
+            self.brain.sort_replies()
+        except:
+            self.log.error("Error while loading brain : {0}".format(traceback.format_exc()))
 
     def load_brain_parts(self):
         """ Load the parts of the brain from /var/lib/domogik/domogik_packages/brain_*
@@ -294,6 +324,8 @@ class Butler(Plugin):
 
             TODO : allow Nestor to connect over irc on demand for test purpose
         """
+        # just wait for 2s to have a cleaner output
+        time.sleep(2)
         # start serving for an entire life
         while True:
             msg = raw_input("You > ")
