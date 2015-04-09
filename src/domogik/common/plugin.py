@@ -767,9 +767,11 @@ class Plugin(BasePlugin, MQRep):
         # 2013-12-20 22:48:41,045 domogik-manager DEBUG force_leave called
 
         if hasattr(self, '_name'):
-            if self._name not in CORE_COMPONENTS:
-                self._status = status
-                self._send_status()
+            #if self._name not in CORE_COMPONENTS:
+            #    self._status = status
+            #    self._send_status()
+            self._status = status
+            self._send_status()
 
     def _send_status_loop(self):
         """ send the status each STATUS_HBEAT seconds
@@ -785,8 +787,8 @@ class Plugin(BasePlugin, MQRep):
         """ 
         if hasattr(self, "_pub"):
             if self._name in CORE_COMPONENTS:
-                #type = "core"
-                return
+                type = "core"
+                #return
             else:
                 type = "plugin"
             self.log.debug("Send plugin status : {0}".format(self._status))

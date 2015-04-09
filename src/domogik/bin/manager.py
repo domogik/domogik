@@ -895,10 +895,10 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
         self.log.debug(u"Core : New pub message received {0}".format(msgid))
         self.log.debug(u"{0}".format(content))
-        #if msgid == "plugin.status":
-        #    if content["name"] == self.name and content["host"] == self.host:
-        #        self.log.info(u"New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
-        #        self.set_status(content["event"])
+        if msgid == "plugin.status":
+            if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
+                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.set_status(content["event"])
         #        # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
         #        if content["event"] == STATUS_STOP_REQUEST:
         #            self.log.info(u"The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
@@ -1142,8 +1142,8 @@ class Plugin(GenericComponent, MQAsyncSub):
         #self.log.debug(u"New pub message received {0}".format(msgid))
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
-            if content["name"] == self.name and content["host"] == self.host:
-                self.log.info(u"New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
+            if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
+                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
                 self.set_status(content["event"])
                 # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
                 if content["event"] == STATUS_STOP_REQUEST:
@@ -1336,10 +1336,11 @@ class Clients():
         while not self._stop.isSet():
             now = time.time()
             for a_client in self._clients:
-                if self._clients[a_client]['type'] == 'core':
-                    continue
+                #if self._clients[a_client]['type'] == 'core':
+                #    continue
 
-                elif self._clients[a_client]['type'] == 'plugin':
+                #elif self._clients[a_client]['type'] == 'plugin':
+                if self._clients[a_client]['type'] in ['plugin', 'core']:
                     # check if the client is dead only when the client is alive (or partially alive)
                     if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
                         delta = now - self._clients[a_client]['last_seen']
