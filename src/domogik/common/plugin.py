@@ -27,12 +27,11 @@ Base class for all xPL clients
 Implements
 ==========
 
-- XplPlugin
-- XplResult
+- Plugin
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
          Fritz SMH <fritz.smg@gmail.com> for refactoring
-@copyright: (C) 2007-2012 Domogik project
+@copyright: (C) 2007-2015 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -93,14 +92,18 @@ class Plugin(BasePlugin, MQRep):
     Global plugin class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by no xPL plugin or by the class xPL plugin which will be used by the xPL plugins
     This class is a Singleton
+
+    Please keep in mind that the name 'Plugin' is historical. This class is here the base class to use for all kind of 
+    clients : plugin (xpl plugin, interface, ...)
     '''
 
 
-    def __init__(self, name, stop_cb = None, is_manager = False, parser = None,
+    def __init__(self, name, type = "plugin", stop_cb = None, is_manager = False, parser = None,
                  daemonize = True, log_prefix = "", test = False):
         '''
-        Create XplPlugin instance, which defines system handlers
-        @param name : The name of the current plugin
+        Create Plugin instance, which defines system handlers
+        @param name : The name of the current client
+        @param type : The type of the current client (default = 'plugin' for xpl plugins
         @param stop_cb : Additionnal method to call when a stop request is received
         @param is_manager : Must be True if the child script is a Domogik Manager process
         You should never need to set it to True unless you develop your own manager
@@ -114,20 +117,21 @@ class Plugin(BasePlugin, MQRep):
         BasePlugin.__init__(self, name, stop_cb, parser, daemonize, log_prefix)
         Watcher(self)
         self.log.info(u"----------------------------------")
-        self.log.info(u"Starting plugin '{0}' (new manager instance)".format(name))
+        self.log.info(u"Starting client '{0}' (new manager instance)".format(name))
         self.log.info(u"Python version is {0}".format(sys.version_info))
         if self.options.test_option:
-            self.log.info(u"The plugin is starting in TEST mode. Test option is {0}".format(self.options.test_option))
+            self.log.info(u"The client is starting in TEST mode. Test option is {0}".format(self.options.test_option))
+        self._type = type
         self._name = name
         self._test = test   # flag used to avoid loading json in test mode
         
         '''
         Calculate the MQ name
         - For a core component this is just its component name (self._name)
-        - For a plugin this is plugin-<self._name>-self.hostname
+        - For a client this is <self._type>-<self._name>-self.hostname
 
         The reason is that the core components need a fixed name on the mq network,
-        if a plugin starts up it needs to request the config on the network, and it needs to know the worker (core component)
+        if a client starts up it needs to request the config on the network, and it needs to know the worker (core component)
         to ask the config from.
 
         Because of the above reason, every item in the core_component list can only run once
@@ -135,7 +139,7 @@ class Plugin(BasePlugin, MQRep):
         if self._name in CORE_COMPONENTS:
             self._mq_name = self._name
         else:
-            self._mq_name = "plugin-{0}.{1}".format(self._name, self.get_sanitized_hostname())
+            self._mq_name = "{0}-{1}.{2}".format(self._type, self._name, self.get_sanitized_hostname())
 
         # MQ publisher and REP
         self.zmq = zmq.Context()
@@ -164,10 +168,10 @@ class Plugin(BasePlugin, MQRep):
         self.libraries_directory = self.config['libraries_path']
         self.packages_directory = "{0}/{1}".format(self.config['libraries_path'], PACKAGES_DIR)
         self.resources_directory = "{0}/{1}".format(self.config['libraries_path'], RESOURCES_DIR)
-        self.products_directory = "{0}/{1}_{2}/{3}".format(self.packages_directory, "plugin", self._name, PRODUCTS_DIR)
+        self.products_directory = "{0}/{1}_{2}/{3}".format(self.packages_directory, self._type, self._name, PRODUCTS_DIR)
 
-        # plugin config
-        self._plugin_config = None
+        # client config
+        self._client_config = None
 
         # Get pid and write it in a file
         self._pid_dir_path = self.config['pid_dir_path']
@@ -205,33 +209,33 @@ class Plugin(BasePlugin, MQRep):
             self.check_for_pictures()
 
         # init finished
-        self.log.info(u"End init of the global Plugin part")
+        self.log.info(u"End init of the global client part")
 
 
     def check_configured(self):
-        """ For a plugin only
-            To be call in the plugin __init__()
-            Check in database (over queryconfig) if the key 'configured' is set to True for the plugin
-            if not, stop the plugin and log this
+        """ For a client only
+            To be call in the client __init__()
+            Check in database (over queryconfig) if the key 'configured' is set to True for the client
+            if not, stop the client and log this
         """
-        self._plugin_config = Query(self.zmq, self.log)
-        configured = self._plugin_config.query("plugin", self._name, 'configured')
+        self._client_config = Query(self.zmq, self.log)
+        configured = self._client_config.query(self._type, self._name, 'configured')
         if configured == '1':
             configured = True
         if configured != True:
-            self.log.error(u"The plugin is not configured (configured = '{0}'. Stopping the plugin...".format(configured))
+            self.log.error(u"The client is not configured (configured = '{0}'. Stopping the client...".format(configured))
             self.force_leave(status = STATUS_NOT_CONFIGURED)
             return False
-        self.log.info(u"The plugin is configured. Continuing (hoping that the user applied the appropriate configuration ;)")
+        self.log.info(u"The client is configured. Continuing (hoping that the user applied the appropriate configuration ;)")
         return True
 
 
     def _load_json(self):
-        """ Load the plugin json file
+        """ Load the client json file
         """
         try:
             self.log.info(u"Read the json file and validate id".format(self._name))
-            pkg_json = PackageJson(pkg_type = "plugin", name = self._name)
+            pkg_json = PackageJson(pkg_type = self._type, name = self._name)
             # check if json is valid
             if pkg_json.validate() == False:
                 # TODO : how to get the reason ?
@@ -248,9 +252,9 @@ class Plugin(BasePlugin, MQRep):
     def get_config(self, key):
         """ Try to get the config over the MQ. If value is None, get the default value
         """
-        if self._plugin_config == None:
-            self._plugin_config = Query(self.zmq, self.log)
-        value = self._plugin_config.query("plugin", self._name, key)
+        if self._client_config == None:
+            self._client_config = Query(self.zmq, self.log)
+        value = self._client_config.query(self._type, self._name, key)
         if value == None or value == 'None':
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
             value = self.get_config_default_value(key)
@@ -316,19 +320,19 @@ class Plugin(BasePlugin, MQRep):
 
         except:
             # if an error occurs : return the default value and log a warning
-            self.log.warning(u"Error while casting value '{0}' to type '{1}'. The plugin may not work!! Error : {2}".format(value, type, traceback.format_exc()))
+            self.log.warning(u"Error while casting value '{0}' to type '{1}'. The client may not work!! Error : {2}".format(value, type, traceback.format_exc()))
             return value
         return value
 
     def get_device_list(self, quit_if_no_device = False):
         """ Request the dbmgr component over MQ to get the devices list for this client
-            @param quit_if_no_device: if True, exit the plugin if there is no devices
+            @param quit_if_no_device: if True, exit the client if there is no devices
         """
         self.log.info(u"Retrieve the devices list for this client...")
         mq_client = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action('device.get')
-        msg.add_data('type', 'plugin')
+        msg.add_data('type', self._type)
         msg.add_data('name', self._name)
         msg.add_data('host', self.get_sanitized_hostname())
         result = mq_client.request('dbmgr', msg.get(), timeout=10)
@@ -350,7 +354,7 @@ class Plugin(BasePlugin, MQRep):
                                                                                     a_device['device_type_id']))
                 # log some informations about the device
                 # notice that even if we are not in the XplPlugin class we will display xpl related informations :
-                # for some no xpl plugins, there will just be nothing to display.
+                # for some no xpl clients, there will just be nothing to display.
 
                 # first : the stats
                 self.log.info(u"  xpl_stats features :")
@@ -376,7 +380,7 @@ class Plugin(BasePlugin, MQRep):
 
 
     def device_detected(self, data):
-        """ The plugin developpers can call this function when a device is detected
+        """ The clients developpers can call this function when a device is detected
             This function will check if a corresponding device exists and :
             - if so, do nothing
             - if not, add the device in a 'new devices' list
@@ -461,16 +465,16 @@ class Plugin(BasePlugin, MQRep):
 
                 # publish new devices update
                 self._pub.send_event('device.new',
-                                     {"type" : "plugin",
+                                     {"type" : self._type,
                                       "name" : self._name,
                                       "host" : self.get_sanitized_hostname(),
-                                      "client_id" : "plugin-{0}.{1}".format(self._name, self.get_sanitized_hostname()),
+                                      "client_id" : "{0}-{1}.{2}".format(self._type, self._name, self.get_sanitized_hostname()),
                                       "device" : new_device})
 
                 # TODO : later (0.4.0+), publish one "new device" notification with only the new device detected
 
             else:
-                self.log.debug(u"The device has already been detected since the plugin startup")
+                self.log.debug(u"The device has already been detected since the client startup")
 
     def generate_detected_device_id(self, data):
         """ Generate an unique id based on the content of data
@@ -480,75 +484,6 @@ class Plugin(BasePlugin, MQRep):
         chars_to_remove = ['"', '{', '}', ',', ' ', '=', '[', ']', ':']
         the_id = the_id.translate(None, ''.join(chars_to_remove))
         return the_id
-
-
-    def OLD_device_detected(self, device_type, type, feature, data):
-        """ The plugin developpers can call this function when a device is detected
-            This function will check if a corresponding device exists and : 
-            - if so, do nothing
-            - if not, add the device in a 'new devices' list
-                 - if the device is already in the 'new devices list', does nothing
-                 - if not : add it into the list and send a MQ message : an event for the UI to say a new device is detected
-
-            ### TODO : implement a req/rep MQ message to allow UI to get the new devices list
-
-            @param device_type : device_type of the detected device
-            @param data : data about the device (address or any other configuration element of a device for this plugin)
-            @param type : xpl_stats, xpl_commands
-            @param feature : a xpl_stat or xpl_command feature
-        """
-        self.log.debug(u"Device detected : device_type = {0}, data = {1}".format(device_type, data))
-        #self.log.debug(u"Already existing devices : {0}".format(self.devices))
-        # browse all devices to find if the device exists
-        found = False
-        for a_device in self.devices:
-            # first, search for device type
-            if a_device['device_type_id'] == device_type:
-                params = a_device[type][feature]['parameters']['static']
-                found = True
-                for key in data:
-                    for a_param in params:
-                        if key == a_param['key'] and data[key] != a_param['value']:
-                            found = False
-                            break
-                if found:
-                    break
-        if found:
-            self.log.debug(u"The device already exists : id={0}.".format(a_device['id']))
-        else:
-            self.log.debug(u"The device doesn't exists in database")
-         
-            # add the device feature in the new devices list : self.new_devices[device_type][type][feature] = data
-            self.log.debug(u"Check if the device has already be marked as new...")
-            found = False
-            for a_device in self.new_devices:
-                if a_device['device_type_id'] == device_type and \
-                   a_device['type'] == type and \
-                   a_device['feature'] == feature:
-
-                   if data == a_device['data']:
-                        found = True
-                    
-            if found == False:
-                new_device ={'device_type_id' : device_type,
-                             'type' : type,
-                             'feature' : feature,
-                             'data' : data}
-                self.log.info(u"New device feature detected and added in the new devices list : {0}".format(new_device))
-                self.new_devices.append(new_device)
-
-                # publish new devices update
-                self._pub.send_event('device.new',
-                                     {"type" : "plugin",
-                                      "name" : self._name,
-                                      "host" : self.get_sanitized_hostname(),
-                                      "client_id" : "plugin-{0}.{1}".format(self._name, self.get_sanitized_hostname()),
-                                      "device" : new_device})
-
-                # TODO : later (0.4.0+), publish one "new device" notification with only the new device detected
-
-            else:
-                self.log.debug(u"The device has already been detected since the plugin startup")
 
 
     def get_parameter(self, a_device, key):
@@ -614,7 +549,7 @@ class Plugin(BasePlugin, MQRep):
             self.log.warning(u"Some pictures are missing!")
         else:
             if ok_product == None:
-                self.log.info(u"There is no products defined for this plugin")
+                self.log.info(u"There is no products defined for this client")
 
 
     def ready(self, ioloopstart=1):
@@ -625,7 +560,7 @@ class Plugin(BasePlugin, MQRep):
         if self.dont_run_ready == True:
             return
 
-        ### send plugin status : STATUS_ALIVE
+        ### send client status : STATUS_ALIVE
         # TODO : why the dbmgr has no self._name defined ???????
         # temporary set as unknown to avoir blocking bugs
         if not hasattr(self, '_name'):
@@ -646,21 +581,21 @@ class Plugin(BasePlugin, MQRep):
         """
         self.log.debug(u"MQ Request received : {0}" . format(str(msg)))
 
-        ### stop the plugin
+        ### stop the client
         if msg.get_action() == "plugin.stop.do":
-            self.log.info(u"Plugin stop request : {0}".format(msg))
-            self._mdp_reply_plugin_stop(msg)
+            self.log.info(u"Client stop request : {0}".format(msg))
+            self._mdp_reply_client_stop(msg)
         elif msg.get_action() == "helper.list.get":
-            self.log.info(u"Plugin helper list request : {0}".format(msg))
+            self.log.info(u"Client helper list request : {0}".format(msg))
             self._mdp_reply_helper_list(msg)
         elif msg.get_action() == "helper.help.get":
-            self.log.info(u"Plugin helper help request : {0}".format(msg))
+            self.log.info(u"Client helper help request : {0}".format(msg))
             self._mdp_reply_helper_help(msg)
         elif msg.get_action() == "helper.do":
-            self.log.info(u"Plugin helper action request : {0}".format(msg))
+            self.log.info(u"Client helper action request : {0}".format(msg))
             self._mdp_reply_helper_do(msg)
         elif msg.get_action() == "device.new.get":
-            self.log.info(u"Plugin new devices request : {0}".format(msg))
+            self.log.info(u"Client new devices request : {0}".format(msg))
             self._mdp_reply_device_new_get(msg)
     
     def _mdp_reply_helper_do(self, msg):
@@ -695,15 +630,15 @@ class Plugin(BasePlugin, MQRep):
                 msg.add_data('help', self.helpers[content['command']]['help'])
                 self.reply(msg.get())
 
-    def _mdp_reply_plugin_stop(self, data):
-        """ Stop the plugin
+    def _mdp_reply_client_stop(self, data):
+        """ Stop the client
             @param data : MQ req message
 
             First, send the MQ Rep to 'ack' the request
-            Then, change the plugin status to STATUS_STOP_REQUEST
-            Then, quit the plugin by calling force_leave(). This should make the plugin send a STATUS_STOPPED if all is ok
+            Then, change the client status to STATUS_STOP_REQUEST
+            Then, quit the client by calling force_leave(). This should make the client send a STATUS_STOPPED if all is ok
 
-            Notice that no check is done on the MQ req content : we need nothing in it as it is directly addressed to a plugin
+            Notice that no check is done on the MQ req content : we need nothing in it as it is directly addressed to a client
         """
         # check if the message is for us
         content = data.get_data()
@@ -722,11 +657,11 @@ class Plugin(BasePlugin, MQRep):
         self.log.info("Send reply for the stop request : {0}".format(msg))
         self.reply(msg.get())
 
-        ### Change the plugin status
+        ### Change the client status
         self._set_status(STATUS_STOP_REQUEST)
 
-        ### Try to stop the plugin
-        # if it fails, the manager should try to kill the plugin
+        ### Try to stop the client
+        # if it fails, the manager should try to kill the client
         self.force_leave()
 
     def _mdp_reply_helper_list(self, data):
@@ -751,13 +686,13 @@ class Plugin(BasePlugin, MQRep):
 
 
     def _set_status(self, status):
-        """ Set the plugin status and send it
+        """ Set the client status and send it
         """
         # when ctrl-c is done, there is no more self._name at this point...
         # why ? because the force_leave method is called twice as show in the logs : 
         #
         # ^CKeyBoardInterrupt
-        # 2013-12-20 22:48:41,040 domogik-manager INFO Keyoard Interrupt detected, leave now.
+        # 2013-12-20 22:48:41,040 domogik-manager INFO Keyboard Interrupt detected, leave now.
         # Traceback (most recent call last):
         #   File "./manager.py", line 1176, in <module>
         #     main()
@@ -777,21 +712,21 @@ class Plugin(BasePlugin, MQRep):
         """ send the status each STATUS_HBEAT seconds
         """
         # TODO : we could optimize by resetting the timer each time the status is sent
-        # but as this is used only to check for dead plugins by the manager, it is not very important ;)
+        # but as this is used only to check for dead clients by the manager, it is not very important ;)
         while not self._stop.isSet():
             self._send_status()
             self._stop.wait(STATUS_HBEAT)
 
     def _send_status(self):
-        """ Send the plugin status over the MQ
+        """ Send the client status over the MQ
         """ 
         if hasattr(self, "_pub"):
             if self._name in CORE_COMPONENTS:
                 type = "core"
                 #return
             else:
-                type = "plugin"
-            self.log.debug("Send plugin status : {0}".format(self._status))
+                type = self._type
+            self.log.debug("Send client status : {0}".format(self._status))
             self._pub.send_event('plugin.status', 
                                  {"type" : type,
                                   "name" : self._name,
@@ -825,12 +760,12 @@ class Plugin(BasePlugin, MQRep):
 
     def get_data_files_directory(self):
        """
-       Return the directory where a plugin developper can store data files.
+       Return the directory where a client developper can store data files.
        If the directory doesn't exist, try to create it.
        After that, try to create a file inside it.
        If something goes wrong, generate an explicit exception.
        """
-       path = "{0}/{1}/{2}_{3}/data/".format(self.libraries_directory, PACKAGES_DIR, "plugin", self._name)
+       path = "{0}/{1}/{2}_{3}/data/".format(self.libraries_directory, PACKAGES_DIR, self._type, self._name)
        if os.path.exists(path):
            if not os.access(path, os.W_OK & os.X_OK):
                raise OSError("Can't write in directory {0}".format(path))
@@ -841,7 +776,7 @@ class Plugin(BasePlugin, MQRep):
            except:
                raise OSError("Can't create directory {0}.".format(path))
        # Commented because :
-       # a write test is done for each call of this function. For a plugin with a html server (geoloc for example), it
+       # a write test is done for each call of this function. For a client with a html server (geoloc for example), it
        # can be an issue as this makes a lot of write for 'nothing' on the disk.
        # We keep the code for now (0.4) for maybe a later use (and improved)
        #try:
@@ -867,7 +802,7 @@ class Plugin(BasePlugin, MQRep):
             if self._name in CORE_COMPONENTS:
                 type = "core"
             else:
-                type = "plugin"
+                type = self._type
             self._pub.send_event('helper.publish',
                                  {"origin" : self._mq_name,
                                   "key": key,
@@ -886,11 +821,11 @@ class Plugin(BasePlugin, MQRep):
 
     def __del__(self):
         if hasattr(self, "log"):
-            self.log.debug(u"__del__ Single plugin")
+            self.log.debug(u"__del__ Single client")
             self.log.debug(u"the stack is :")
             for elt in inspect.stack():
                 self.log.debug(u"    {0}".format(elt))
-            # we guess that if no "log" is defined, the plugin has not really started, so there is no need to call force leave (and _stop, .... won't be created)
+            # we guess that if no "log" is defined, the client has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
     def force_leave(self, status = False, return_code = None):
@@ -986,7 +921,7 @@ class Watcher:
     Tip found at http://code.activestate.com/recipes/496735/
     """
 
-    def __init__(self, plugin):
+    def __init__(self, client):
         """ Creates a child thread, which returns.  The parent
             thread waits for a KeyboardInterrupt and then kills
             the child thread.
@@ -995,17 +930,17 @@ class Watcher:
         if self.child == 0:
             return
         else:
-            self._plugin = plugin
-            self._plugin.log.debug("watcher fork")
+            self._client = client
+            self._client.log.debug("watcher fork")
             signal.signal(signal.SIGTERM, self._signal_handler)
             self.watch()
 
     def _signal_handler(self, signum, frame):
         """ Handler called when a SIGTERM is received
-        Stop the plugin
+        Stop the client
         """
-        self._plugin.log.info("SIGTERM receive, stop plugin")
-        self._plugin.force_leave()
+        self._client.log.info("SIGTERM receive, stop client")
+        self._client.force_leave()
         self.kill()
 
     def watch(self):
@@ -1013,14 +948,14 @@ class Watcher:
             os.wait()
         except KeyboardInterrupt:
             print('KeyBoardInterrupt')
-            self._plugin.log.warning("Keyoard Interrupt detected, leave now.")
-            self._plugin.force_leave()
+            self._client.log.warning("Keyboard Interrupt detected, leave now.")
+            self._client.force_leave()
             self.kill()
         except OSError:
             print(u"OSError")
-            self._plugin.log.error("OSError : {0}.".format(traceback.format_exc()))
-        return_code = self._plugin.get_return_code()
-        self._plugin.clean_return_code_file()
+            self._client.log.error("OSError : {0}.".format(traceback.format_exc()))
+        return_code = self._client.get_return_code()
+        self._client.clean_return_code_file()
         sys.exit(return_code)
 
     def kill(self):

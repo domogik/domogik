@@ -193,6 +193,9 @@ class Manager(XplPlugin):
         ### Create the brain parts list
         self._brains = {}
 
+        ### Create the interfaces list
+        self._interfaces = {}
+
         ### Start the dbmgr
         if self.options.start_dbmgr:
             if not self._start_core_component("dbmgr"):
@@ -313,7 +316,7 @@ class Manager(XplPlugin):
                                 self._device_types[device_type] = self._packages[pkg_id].get_json()
 
                         ### type = brain
-                        if type == "brain":
+                        elif type == "brain":
                             if self._brains.has_key(name):
                                 self.log.debug(u"The brain '{0}' is already registered. Reloading its data".format(name))
                                 self._brains[name].reload_data()
@@ -327,6 +330,23 @@ class Manager(XplPlugin):
                                                            self.zmq,
                                                            self.get_stop(),
                                                            self.get_sanitized_hostname())
+
+                        ### type = interface
+                        elif type == "interface":
+                            if self._interfaces.has_key(name):
+                                self.log.debug(u"The interface '{0}' is already registered. Reloading its data".format(name))
+                                self._interfaces[name].reload_data()
+                            else:
+                                self.log.info(u"New interface available : {0}".format(name))
+                                self._interfaces[name] = Interface(name, 
+                                                           self.get_sanitized_hostname(), 
+                                                           self._clients, 
+                                                           self.get_libraries_directory(),
+                                                           self.get_packages_directory(),
+                                                           self.zmq,
+                                                           self.get_stop(),
+                                                           self.get_sanitized_hostname())
+                                # The automatic startup is handled in the Interface class in __init__
 
     
             # finally, check if some packages has been uninstalled/removed
@@ -1010,6 +1030,10 @@ class Plugin(GenericComponent, MQAsyncSub):
         * start the plugin
  
         Notice also that all brain parts are to be hosted on the master Domogik
+
+        TODO : create a parent class PythonClient
+               the classes Plugin, Interface and any other thant depends on python will inherit from it
+               as there are currently a lot of common code in Plugin and Interface classes
     """
 
     def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
@@ -1078,7 +1102,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         udev_rules = {}
         udev_dir = "{0}/{1}/udev_rules/".format(self._packages_directory, self.folder)
         
-        # parse all conversion files
+        # parse all udev files
         try:
             for udev_file in os.listdir(udev_dir): 
                 if udev_file.endswith(".rules"):
@@ -1277,6 +1301,239 @@ class Plugin(GenericComponent, MQAsyncSub):
             self.log.info(u"The plugin {0} should be killed now (kill -9)".format(self.name))
         else:
             self.log.info(u"The plugin {0} has stopped itself properly.".format(self.name))
+
+
+class Interface(GenericComponent, MQAsyncSub):
+    """ This helps to handle interfaces discovered on the host filesystem
+        The MQAsyncSub helps to set the status 
+
+        Notice that some actions can't be done if the plugin host is not the server host! :
+        * check if a plugin has stopped and kill it if needed
+        * start the plugin
+ 
+    """
+
+    def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
+        """ Init an interface
+            @param name : interface name 
+            @param host : hostname
+            @param clients : clients list 
+            @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
+            @param packages_directory : path in which are stored the packages : /var/lib/domogik/packages/
+            @param zmq_context : zmq context
+            @param stop : get_stop()
+            @param local_host : get_sanitized_hostname()
+        """
+        GenericComponent.__init__(self, name = name, host = host, clients = clients)
+        self.log.info(u"New interface : {0}".format(self.name))
+
+        ### check if the interface is on he local host
+        if self.host == local_host:
+            self.local_interface = True
+        else:
+            self.local_interface = False
+
+        ### TODO : this will be to handle later : multi host (multihost)
+        # * how to find available interface on other hosts ?
+        # * how to start/stop interface on other hosts ?
+        # * ...
+        if self.local_interface == False:
+            self.log.error(u"Currently, the multi host feature for interfaces is not yet developped. This interface will not be registered")
+            return
+
+        ### set the component type
+        self.type = "interface"
+
+        ### set package path
+        self._packages_directory = packages_directory
+        self._libraries_directory = libraries_directory
+
+        ### zmq context
+        self.zmq = zmq_context
+
+        ### config
+        # used only in the function add_configuration_values_to_data()
+        # elsewhere, this function is used : self.get_config("xxxx")
+        self._config = Query(self.zmq, self.log)
+
+        ### get the interface data (from the json file)
+        status = None
+        self.data = {}
+        self.fill_data()
+
+        ### check if the interface is configured (get key 'configured' in database over queryconfig)
+        configured = self._config.query(self.type, self.name, 'configured')
+        if configured == '1':
+            configured = True
+        if configured == True:
+            self.configured = True
+        else:
+            self.configured = False
+
+        ### get udev rules informations
+        udev_rules = {}
+        udev_dir = "{0}/{1}/udev_rules/".format(self._packages_directory, self.folder)
+        
+        # parse all udev files
+        try:
+            for udev_file in os.listdir(udev_dir): 
+                if udev_file.endswith(".rules"):
+                    self.log.info("Udev rule discovered for '{0}' : {1}".format(self.client_id, udev_file))
+                    # read the content of the file
+                    with open ("{0}/{1}".format(udev_dir, udev_file), "r") as myfile:
+                        data = myfile.read()
+                        udev_rules[os.path.splitext(udev_file)[0]] = data
+        except OSError as err:
+            if err.errno == 2:
+                self.log.info("There is no udev rules file for '{0}'".format(self.client_id))
+            else:
+                self.log.error("Error while looking for udev rules for '{0}' : {1}".format(self.client_id, err))
+
+
+        # add in the data
+        self.data["udev_rules"] = udev_rules
+
+        # there is no conversion files
+
+        ### register the interface as a client
+        self.register_component()
+
+        ### subscribe the the MQ for category = interface and name = self.name
+        MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status', 'plugin.configuration'])
+
+        ### check if the interface must be started on manager startup
+        startup = self._config.query(self.type, self.name, 'auto_startup')
+        if startup == '1' or startup == 'Y':
+            startup = True
+        if startup == True:
+            self.log.info(u"Interface {0} configured to be started on manager startup. Starting...".format(name))
+            pid = self.start()
+            if pid:
+                self.log.info(u"Interface {0} started".format(name))
+            else:
+                self.log.error(u"Interface {0} failed to start".format(name))
+        else:
+            self.log.info(u"Interface {0} not configured to be started on manager startup.".format(name))
+
+
+    def on_message(self, msgid, content):
+        """ when a message is received from the MQ 
+        """
+        #self.log.debug(u"New pub message received {0}".format(msgid))
+        #self.log.debug(u"{0}".format(content))
+        if msgid == "plugin.status":
+            if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
+                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.set_status(content["event"])
+                # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
+                if content["event"] == STATUS_STOP_REQUEST:
+                    self.log.info(u"The interface '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
+                    thr_check_if_stopped = Thread(None,
+                                                  self._check_if_stopped,
+                                                  "check_if_{0}_is_stopped".format(self.name),
+                                                  (),
+                                                  {})
+                    thr_check_if_stopped.start()
+        elif msgid == "plugin.configuration":
+            self.add_configuration_values_to_data()
+            self._clients.publish_update()
+
+
+    def reload_data(self):
+        """ Just reload the client data
+        """
+        self.data = {}
+        self.fill_data()
+
+    def fill_data(self):
+        """ Fill the client data by reading the json file
+        """
+        try:
+            self.log.info(u"Interface {0} : read the json file".format(self.name))
+            pkg_json = PackageJson(pkg_type = "interface", name = self.name)
+            #we don't need to validate the json file as it has already be done in the check_avaiable_packages function
+            self.data = pkg_json.get_json()
+            self.add_configuration_values_to_data()
+        except PackageException as e:
+            self.log.error(u"Interface {0} : error while trying to read the json file".format(self.name))
+            self.log.error(u"Interface {0} : invalid json file".format(self.name))
+            self.log.error(u"Interface {0} : {1}".format(self.name, e.value))
+            self.set_status(STATUS_INVALID)
+            pass
+
+
+    def start(self):
+        """ to call to start the interface
+            @return : None if ko
+                      the pid if ok
+        """
+        ### Check if the interface is not already launched
+        # notice that this test is not really needed as the plugin also test this in startup...
+        # but the interface does it before the MQ is initiated, so the error message won't go overt the MQ.
+        # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
+
+        # TODO : add type in is_already_launched params!!!!!
+        res, pid_list = is_already_launched(self.log, self.name)
+        if res:
+            return 0
+
+        ### Actions for test mode
+        test_mode = self._config.query(self.type, self.name, "test_mode")
+        test_option = self._config.query(self.type, self.name, "test_option")
+        test_args = ""
+        if test_mode == True: 
+            self.log.info("The interface {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))
+            test_args = "-T {0}".format(test_option)
+
+        ### Try to start the interface
+        self.log.info(u"Request to start interface : {0} {1}".format(self.name, test_args))
+        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py {3}".format(self._packages_directory, self.name, self.name, test_args), \
+                                  env_pythonpath = self._libraries_directory)
+        pid = pid
+
+        # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way
+
+        self.set_pid(pid)
+        return pid
+
+
+    def exec_component(self, py_file, env_pythonpath = None):
+        """ to call to start a component
+            @param py_file : path to the .py file
+            @param env_pythonpath (optionnal): custom PYTHONPATH if needed (for packages it is needed)
+        """
+        ### Generate command
+        # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+        cmd = "{0} && ".format(STARTED_BY_MANAGER)
+        if env_pythonpath:
+            cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
+        cmd += "{0} {1}".format(PYTHON, py_file.strip())
+ 
+        ### Execute command
+        self.log.info(u"Execute command : {0}".format(cmd))
+        subp = Popen(cmd, 
+                     shell=True)
+        pid = subp.pid
+        subp.communicate()
+        return pid
+
+
+    def _check_if_stopped(self):
+        """ Check if the interface is stopped. If not, kill it
+        """
+        self._stop.wait(WAIT_AFTER_STOP_REQUEST)
+        self.log.debug("Check if the interface {0} has stopped it self. Else there will be a bloodbath".format(self.name))
+        res, pid_list = is_already_launched(self.log, self.name)
+        if res:
+            for the_pid in pid_list:
+                self.log.info(u"Try to kill pid {0}...".format(the_pid))
+                os.kill(int(the_pid), signal.SIGKILL)
+                # TODO : add one more check ?
+                # do a while loop over is_already.... ?
+                # update on 20/03/14 : it seems this is not needed currently
+            self.log.info(u"The interface {0} should be killed now (kill -9)".format(self.name))
+        else:
+            self.log.info(u"The interface {0} has stopped itself properly.".format(self.name))
 
 
 

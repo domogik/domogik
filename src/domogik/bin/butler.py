@@ -62,7 +62,7 @@ SEX_MALE = "male"
 SEX_FEMALE = "female"
 SEX_ALLOWED = [SEX_MALE, SEX_FEMALE]
 
-class Butler(Plugin):
+class Butler(Plugin, MQAsyncSub):
     """ Butler component
 
         TODO : 
@@ -124,14 +124,14 @@ class Butler(Plugin):
         print("You may type /quit to let {0} have a break".format(self.butler_name))
 
         ### MQ
-
-        # subscribe the MQ for interfaces inputs
-        #TMP#MQAsyncSub.__init__(self, self.zmq, self._name, ['interface.input'])
-
         # MQ publisher
         self._mq_name = "interface-{0}.{1}".format(self._name, self.get_sanitized_hostname())
         self.zmq = zmq.Context()
         self.pub = MQPub(self.zmq, self._mq_name)
+
+        # subscribe the MQ for interfaces inputs
+        MQAsyncSub.__init__(self, self.zmq, self._name, ['interface.input'])
+
 
         ### Interactive mode
         if self.options.interactive:
