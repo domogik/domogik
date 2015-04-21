@@ -42,11 +42,11 @@ from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import Plugin
 from domogik.butler.rivescript import RiveScript
-from domogikmq.reqrep.worker import MQRep
+#from domogikmq.reqrep.worker import MQRep
 from domogikmq.message import MQMessage
 from domogikmq.pubsub.subscriber import MQAsyncSub
 from domogikmq.pubsub.publisher import MQPub
-import zmq
+#import zmq
 import os
 from subprocess import Popen, PIPE
 import time
@@ -81,6 +81,17 @@ class Butler(Plugin, MQAsyncSub):
                           help="Butler interactive mode (must be used WITH -f).")
 
         Plugin.__init__(self, name = 'butler', parser = parser)
+
+        ### MQ
+        # MQ publisher
+        #self._mq_name = "interface-{0}.{1}".format(self._name, self.get_sanitized_hostname())
+        self._mq_name = "butler"
+        #self.zmq = zmq.Context()
+        self.pub = MQPub(self.zmq, self._mq_name)
+
+        # subscribe the MQ for interfaces inputs
+        MQAsyncSub.__init__(self, self.zmq, self._name, ['interface.input'])
+
 
         ### Configuration elements
         try:
@@ -120,22 +131,13 @@ class Butler(Plugin, MQAsyncSub):
         self.brain.set_variable("fullname", self.butler_name)
         self.brain.set_variable("sex", self.butler_sex)
 
-        print("*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
-        print("You may type /quit to let {0} have a break".format(self.butler_name))
-
-        ### MQ
-        # MQ publisher
-        self._mq_name = "interface-{0}.{1}".format(self._name, self.get_sanitized_hostname())
-        self.zmq = zmq.Context()
-        self.pub = MQPub(self.zmq, self._mq_name)
-
-        # subscribe the MQ for interfaces inputs
-        MQAsyncSub.__init__(self, self.zmq, self._name, ['interface.input'])
+        print(u"*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
+        print(u"You may type /quit to let {0} have a break".format(self.butler_name))
 
 
         ### Interactive mode
         if self.options.interactive:
-            self.log.info("Launched in interactive mode : running the chat!")
+            self.log.info(u"Launched in interactive mode : running the chat!")
             # TODO : run as a thread
             #self.run_chat()
             thr_run_chat = Thread(None,
@@ -145,7 +147,7 @@ class Butler(Plugin, MQAsyncSub):
                                   {})
             thr_run_chat.start()
         else:
-            self.log.info("Not launched in interactive mode")
+            self.log.info(u"Not launched in interactive mode")
         
 
         ### TODO
@@ -169,8 +171,8 @@ class Butler(Plugin, MQAsyncSub):
                 self.log.info(u"Reload brain request : {0}".format(msg))
                 self._mdp_reply_butler_reload(msg)
         except:
-            self.log.error("Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
-    
+            self.log.error(u"Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
+   
 
     def _mdp_reply_butler_scripts(self, message):
         """ Send the raw content for the brain parts over the MQ
@@ -192,11 +194,11 @@ class Butler(Plugin, MQAsyncSub):
         msg.set_action('butler.reload.result')
         try:
             self.load_all_brain()
-            msg.add_data("status", True)
-            msg.add_data("reason", "")
+            msg.add_data(u"status", True)
+            msg.add_data(u"reason", "")
         except:
-            msg.add_data("status", False)
-            msg.add_data("reason", "Error while reloading brain parts : {0}".format(traceback.format_exc()))
+            msg.add_data(u"status", False)
+            msg.add_data(u"reason", "Error while reloading brain parts : {0}".format(traceback.format_exc()))
         self.reply(msg.get())
 
 
@@ -207,7 +209,7 @@ class Butler(Plugin, MQAsyncSub):
         try:
             # load the minimal brain
             self.brain_content = {}   # the brain raw content for display in the admin (transmitted over MQ)
-            self.log.info("Load minimal brain : {0}".format(MINIMAL_BRAIN))
+            self.log.info(u"Load minimal brain : {0}".format(MINIMAL_BRAIN))
             self.brain.load_file(MINIMAL_BRAIN)
 
             # load packages for the brain
@@ -216,7 +218,7 @@ class Butler(Plugin, MQAsyncSub):
             # sort replies
             self.brain.sort_replies()
         except:
-            self.log.error("Error while loading brain : {0}".format(traceback.format_exc()))
+            self.log.error(u"Error while loading brain : {0}".format(traceback.format_exc()))
 
     def load_brain_parts(self):
         """ Load the parts of the brain from /var/lib/domogik/domogik_packages/brain_*
@@ -225,15 +227,15 @@ class Butler(Plugin, MQAsyncSub):
             list = []
             for a_file in os.listdir(self.get_packages_directory()):
                 if a_file[0:len(BRAIN_PKG_TYPE)] == BRAIN_PKG_TYPE:
-                    self.log.info("Brain part found : {0}".format(a_file))
+                    self.log.info(u"Brain part found : {0}".format(a_file))
                     client_id = "{0}-{1}.{2}".format(BRAIN_PKG_TYPE, a_file.split("_")[1], self.get_sanitized_hostname())
                     self.brain_content[client_id] = {}
                     rs_dir = os.path.join(self.get_packages_directory(), a_file, RIVESCRIPT_DIR)
                     if os.path.isdir(rs_dir):
-                        #self.log.debug("The brain part contains a rivescript folder ({0})".format(RIVESCRIPT_DIR))
+                        #self.log.debug(u"The brain part contains a rivescript folder ({0})".format(RIVESCRIPT_DIR))
                         lang_dir = os.path.join(rs_dir, self.lang)
                         if os.path.isdir(lang_dir):
-                            self.log.info("- Language found : {0}".format(self.lang))
+                            self.log.info(u"- Language found : {0}".format(self.lang))
                             # add the brain part to rivescript
                             self.brain.load_directory(lang_dir)
                             # add the files raw data to brain content (to be sent over MQ to the admin)
@@ -264,9 +266,9 @@ class Butler(Plugin, MQAsyncSub):
             if isinstance(query, str):
                 query = unicode(query)
 
-            #self.log.debug(u"Before calling Rivescript brain for processing : {0} (type={1})".format(query, type(query)))
+            self.log.debug(u"Before calling Rivescript brain for processing : {0} (type={1})".format(query, type(query)))
             reply = self.brain.reply(self.user_name, query)
-            #self.log.debug(u"Processing finished. The reply is : {0}".format(reply))
+            self.log.debug(u"Processing finished. The reply is : {0}".format(reply))
             return reply
         except:
             self.log.error(u"Error while processing query '{0}'. Error is : {1}".format(query, traceback.format_exc()))
@@ -284,7 +286,7 @@ class Butler(Plugin, MQAsyncSub):
         """ When a message is received from the MQ (pub/sub)
         """
         if msgid == "interface.input":
-            self.log.info("Received message : {0}".format(content))
+            self.log.info(u"Received message : {0}".format(content))
             print(type(content['text']))
 
             ### Get response from the brain
@@ -325,10 +327,10 @@ class Butler(Plugin, MQAsyncSub):
             TODO : allow Nestor to connect over irc on demand for test purpose
         """
         # just wait for 2s to have a cleaner output
-        time.sleep(2)
+        #time.sleep(2)
         # start serving for an entire life
         while True:
-            msg = raw_input("You > ")
+            msg = raw_input(u"You > ")
 
             # first, let python handle some system messages
             if msg == '/quit':

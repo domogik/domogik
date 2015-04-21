@@ -48,7 +48,7 @@ sudo apt-get update
 sudo apt-get install $pkg_list
 
 pip_list="Flask-Login \
-          Flask-Babel \
+          Flask-Babel 
          "
 
 for elt in $pip_list
