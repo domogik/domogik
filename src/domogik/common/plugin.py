@@ -99,7 +99,7 @@ class Plugin(BasePlugin, MQRep):
 
 
     def __init__(self, name, type = "plugin", stop_cb = None, is_manager = False, parser = None,
-                 daemonize = True, log_prefix = "", test = False):
+                 daemonize = True, log_prefix = "", log_on_stdout = True, test = False):
         '''
         Create Plugin instance, which defines system handlers
         @param name : The name of the current client
@@ -113,8 +113,9 @@ class Plugin(BasePlugin, MQRep):
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
         @param log_prefix : If set, use this prefix when creating the log file in Logger()
+        @param log_on_stdout : If set to True, allow to read the logs on both stdout and log file
         '''
-        BasePlugin.__init__(self, name, stop_cb, parser, daemonize, log_prefix)
+        BasePlugin.__init__(self, name, stop_cb, parser, daemonize, log_prefix, log_on_stdout)
         Watcher(self)
         self.log.info(u"----------------------------------")
         self.log.info(u"Starting client '{0}' (new manager instance)".format(name))

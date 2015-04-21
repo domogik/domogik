@@ -56,7 +56,7 @@ class BasePlugin():
     """ Basic plugin class, manage common part of all plugins.
     For all xPL plugins, the XplPlugin class must be use as a basis, not this one.
     """
-    def __init__(self, name, stop_cb = None, p = None, daemonize = True, log_prefix= ""):
+    def __init__(self, name, stop_cb = None, p = None, daemonize = True, log_prefix= "", log_on_stdout = True):
         ''' 
         @param p : An instance of ArgumentParser. If you want to add extra options to the generic option parser,
         create your own ArgumentParser instance, use parser.add_argument and then pass your parser instance as parameter.
@@ -64,6 +64,7 @@ class BasePlugin():
         @param daemonize : If set to False, force the instance *not* to daemonize, even if '-f' is not passed
         on the command line. If set to True (default), will check if -f was added.
         @param log_prefix : If set, use this prefix when creating the log file in Logger()
+        @param log_on_stdout : if set to True, allow to read logs on both stdout and log file
         '''
         ### First, check if the user is allowed to launch the plugin. The user must be the same as the one defined
         # in the file /etc/default/domogik : DOMOGIK_USER
@@ -77,7 +78,7 @@ class BasePlugin():
         if name is not None:
             self._plugin_name = name
 
-        l = logger.Logger(name, use_filename = "{0}{1}".format(log_prefix, name))
+        l = logger.Logger(name, use_filename = "{0}{1}".format(log_prefix, name), log_on_stdout = log_on_stdout)
         self.log = l.get_logger()
 
         ### Check if the plugin is not already launched
