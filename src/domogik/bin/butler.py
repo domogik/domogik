@@ -50,6 +50,7 @@ from domogikmq.pubsub.publisher import MQPub
 import os
 from subprocess import Popen, PIPE
 import time
+import unicodedata
 
 
 
@@ -263,9 +264,17 @@ class Butler(Plugin, MQAsyncSub):
             @param query : the text query
         """
         try:
+            self.log.debug(u"Before transforming query : {0})".format(query))
             if isinstance(query, str):
-                query = unicode(query)
+                query = unicode(query, 'utf-8')
 
+            # remove non standard caracters
+            query = query.replace("'", " ")
+
+            # remove accents
+            query = unicodedata.normalize('NFD', query).encode('ascii', 'ignore')
+
+            # process the query
             self.log.debug(u"Before calling Rivescript brain for processing : {0} (type={1})".format(query, type(query)))
             reply = self.brain.reply(self.user_name, query)
             self.log.debug(u"Processing finished. The reply is : {0}".format(reply))
