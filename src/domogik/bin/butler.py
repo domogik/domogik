@@ -270,6 +270,8 @@ class Butler(Plugin, MQAsyncSub):
 
             # remove non standard caracters
             query = query.replace("'", " ")
+            query = query.replace("?", " ")
+            query = query.replace("!", " ")
 
             # remove accents
             query = unicodedata.normalize('NFD', query).encode('ascii', 'ignore')
