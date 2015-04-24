@@ -50,6 +50,11 @@ rs_version = 2.0
 RS_ERR_MATCH = "ERR: No Reply Matched"
 RS_ERR_REPLY = "ERR: No Reply Found"
 
+### Patch for Domogik
+DEFAULT_WEIGHT = 10
+print("/!\ Rivescript 1.06, patched for Domogik")
+### End of patch
+
 
 class RiveScript:
     """A RiveScript interpreter for Python 2 and 3."""
@@ -1044,11 +1049,17 @@ Returns a syntax error string on error; None otherwise."""
 
         # Create a priority map.
         prior = {
-            0: []  # Default priority=0
+            ### Patch for Domogik : change default weight
+            # 0: []  # Default priority=0
+            DEFAULT_WEIGHT: []  # Default priority
+            ### End of patch
         }
 
         for trig in triggers:
-            match, weight = re.search(re_weight, trig), 0
+            ### Patch for Domogik : change default weight
+            # match, weight = re.search(re_weight, trig), 0
+            match, weight = re.search(re_weight, trig), 10
+            ### End of patch
             if match:
                 weight = int(match.group(1))
             if not weight in prior:
@@ -1749,7 +1760,10 @@ the value is unset at the end of the `reply()` method)."""
                 bucket = []
                 for rep in sorted(matched["reply"]):
                     text = matched["reply"][rep]
-                    weight = 1
+                    ### Patch for Domogik : change default weight
+                    #weight = 1
+                    weight = DEFAULT_WEIGHT
+                    ### End of patch
                     match  = re.match(re_weight, text)
                     if match:
                         weight = int(match.group(1))
