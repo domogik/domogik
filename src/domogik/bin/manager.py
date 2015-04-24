@@ -1593,11 +1593,7 @@ class Clients():
         while not self._stop.isSet():
             now = time.time()
             for a_client in self._clients:
-                #if self._clients[a_client]['type'] == 'core':
-                #    continue
-
-                #elif self._clients[a_client]['type'] == 'plugin':
-                if self._clients[a_client]['type'] in ['plugin', 'core']:
+                if self._clients[a_client]['type'] in ['plugin', 'core', 'interface']:
                     # check if the client is dead only when the client is alive (or partially alive)
                     if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
                         delta = now - self._clients[a_client]['last_seen']
