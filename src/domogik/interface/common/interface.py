@@ -96,12 +96,16 @@ class Interface(Plugin, MQAsyncSub):
         self.log.info(u"End of the interface init")
 
 
-    def send_to_butler(self, message):
+    def send_to_butler(self, message, media = None, location = None):
         """ Send a message over MQ to the butler component
         """
         self.log.info(u"Send a message to the butler : {0}".format(message))
         request = self.butler_context
         request["text"] = message
+        if media:
+            request["media"] = media
+        if location:
+            request["location"] = location
         self.mq_pub.send_event('interface.input',
                              request)
 
@@ -113,6 +117,8 @@ class Interface(Plugin, MQAsyncSub):
             self.log.debug(u"interface.output received message : {0}".format(content))
             self.process_response(content)
             return
+
+            # TODO : handle context
 
             ### filter on location, media
             # if media not cli, don't process
