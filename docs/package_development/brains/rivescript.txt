@@ -1,0 +1,11 @@
+================
+Rivescript rules
+================
+
+
+Weight
+======
+
+In rivescript, the default weight is set to 1. But the rivescript included in Domogik is patched to use a default weight of 10.
+
+If you plan to use weight in your scripts, don't forget about this!
