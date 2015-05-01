@@ -5,7 +5,7 @@
 
 
     <button type="button" id="install_a_plugin" class="btn btn-primary" data-toggle="modal" data-target="#install_instructions">
-      <span class='glyphicon glyphicon-download-alt' aria-hidden='true'></span> {% trans %}Install a plugin{% endtrans %}
+      <span class='glyphicon glyphicon-download-alt' aria-hidden='true'></span> {% trans %}Install a package{% endtrans %}
     </button>
     <button class="btn btn-default" id="start_tour">{% trans %}Start the discover tour!{% endtrans %}</button>
     
@@ -15,13 +15,13 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans %}Close{% endtrans %}</span></button>
-            <h4 class="modal-title" id="myModalLabel">{% trans %}How to install a plugin{% endtrans %}</h4>
+            <h4 class="modal-title" id="myModalLabel">{% trans %}How to install a package{% endtrans %}</h4>
           </div>
           <div class="modal-body">
-            <p>{% trans %}In the current release, you can't install plugins directly from this administration interface..{% endtrans %}</p>
-            <p>{% trans %}You will have to install a plugin from a command line, thanks to the command :{% endtrans %}</p>
-            <pre>dmg_install --install http://somewhere.com/aplugin.zip</pre>
-            <p>{% trans %}You will be able to find the plugins in the Domogik packages online repository : {% endtrans%}</p>
+            <p>{% trans %}In the current release, you can't install packages directly from this administration interface..{% endtrans %}</p>
+            <p>{% trans %}You will have to install a package from a command line, thanks to the command :{% endtrans %}</p>
+            <pre>dmg_install --install http://somewhere.com/apackage.zip</pre>
+            <p>{% trans %}You will be able to find the packages in the Domogik packages online repository : {% endtrans%}</p>
             <a href="http://repo-public.domogik.org/">http://repo-public.domogik.org/</a>
           </div>
           <div class="modal-footer">
@@ -56,10 +56,12 @@
               </h2>
               {% for client in client_list_per_host_per_type[host][type] %}
                 {% if type == "core" %}
-                  <span class="list-group-item" href="#">
+                  <a class="list-group-item" href="/core/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
                 {% elif type == "plugin" %}
                   <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
                 {% elif type == "brain" %}
+                  <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
+                {% elif type == "interface" %}
                   <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
                 {% else %}
                   <a class="list-group-item" href="#">
@@ -77,15 +79,8 @@
                   <span class="label label-info status status-label pull-right">n/a</span>
                 {% else %}
                   <span class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
-                  {% if type == "core" and client_list_per_host_per_type[host][type][client].name == "butler" %}
-                    <a id="brain_reload" href="#" class="pull-right"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> </a>
-                  {% endif %}
                 {% endif %}
-                {% if type == "core" %}
-                  </span>
-                {% else %}
-                  </a>
-                {% endif %}
+                </a>
 
                 {% if type == "plugin" %}
                   {# if the client has some xpl client compliants possibilities, parse all the clients to check if it should be added below the client #}
@@ -114,76 +109,8 @@
 </div>
 
 
-<!-- Modal for butler reload -->
-<div class="modal" id="butler_reload_ok" role="dialog" aria-labelledby="butlerReloadOK" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="butlerReloadOK">{% trans %}Butler reload done{% endtrans %}</h4>
-      </div>
-      <div class="modal-body">
-        {% trans %}The butler brain is reloaded.{% endtrans %}
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="butler_reload_error" role="dialog" aria-labelledby="butlerReloadError" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="butlerReloadError">{% trans %}Butler reload failed{% endtrans %}</h4>
-      </div>
-      <div class="modal-body">
-        {% trans %}The butler brain can't be reloaded. Maybe the butler component is not alive ?{% endtrans %}
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="butler_reload_progress" role="dialog" aria-labelledby="butlerReloadProgress" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="butlerReloadProgress">{% trans %}Loading...{% endtrans %}</h4>
-      </div>
-      <div class="modal-body">
-        <div class="progress">
-          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="1" style="width: 100%">
-            <span class="sr-only">{% trans %}Loading...{% endtrans %}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script type="text/javascript">
   $( document ).ready(function() {
-
-    /************ ajax calls *************/
-    $('a#brain_reload').bind('click', function() {
-
-      $('#butler_reload_progress').modal('show');
-      $.get('/brain/reload', function(data) {
-         
-      })
-      .done(function() {
-        $('#butler_reload_progress').modal('hide');
-        $('#butler_reload_ok').modal('show');
-      })
-      .fail(function() {
-        $('#butler_reload_progress').modal('hide');
-        $('#butler_reload_error').modal('show');
-      });
-      return false;
-    });
 
     /************** tour *****************/
     // Define the tour!

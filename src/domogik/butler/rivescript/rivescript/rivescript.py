@@ -2120,7 +2120,13 @@ the value is unset at the end of the `reply()` method)."""
             else:
                 output = '[ERR: Object Not Found]'
 
-            reply = re.sub('<call>' + re.escape(match) + r'</call>', output, reply)
+            ### Patch for Domogik
+            #reply = re.sub('<call>' + re.escape(match) + r'</call>', output, reply)
+            try:
+                reply = re.sub('<call>' + re.escape(match) + r'</call>', output, reply)
+            except UnicodeDecodeError:
+                reply = "ERROR : an UnicodeDecodeError has been caught. You should check if your rivescript script use unicode strings like this : foo = u\"unicode string\""
+            ### End of patch
 
         return reply
 

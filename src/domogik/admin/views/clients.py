@@ -24,6 +24,7 @@ from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
 import re
+import json
 
 try:
     import html.parser
@@ -31,20 +32,6 @@ try:
 except ImportError:
     import HTMLParser
     html_parser = HTMLParser.HTMLParser()
-
-
-### Regexp for brain scripts displaying
-#<button class="button" onclick="$('#target').toggle();">Show/Hide</button>
-#<div id="target" style="display: none">
-#    Hide show.....
-#</div>
-
-#RE_BRAIN_PYTHON_OBJECT_START = re.compile(r"&gt; object", re.IGNORECASE)
-#NEW_BRAIN_PYTHON_OBJECT_START = "<div class='python'>&gt; object"
-#
-#RE_BRAIN_PYTHON_OBJECT_END = re.compile(r"&lt; object", re.IGNORECASE)
-#NEW_BRAIN_PYTHON_OBJECT_END = "&lt; object</div>"
-
 
 
 
@@ -71,6 +58,18 @@ def get_client_detail(client_id):
     else:
         detail = {}
     return detail
+
+def get_butler_history():
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('butler.history.get')
+    res = cli.request('butler', msg.get(), timeout=10)
+    if res is not None:
+        history = res.get_data()['history']
+    else:
+        history = []
+    return history
+
 
 @app.route('/clients')
 @login_required
@@ -730,4 +729,30 @@ def brain_reload():
         return "OK", 200
     except:
         return "Error : {0}".format(traceback.format_exc()), 500
+
+
+@app.route('/core/<client_id>')
+@login_required
+def core(client_id):
+
+    tmp = client_id.split(".")
+    name = tmp[0].split("-")[1]
+    if name == "butler":
+        history = get_butler_history()
+        return render_template('core_butler.html',
+                loop = {'index': 1},
+                clientid = client_id,
+                history = map(json.dumps, history),
+                #history = history,
+                mactive="clients",
+                active = 'brain'
+                )
+    else:
+        return render_template('core.html',
+                loop = {'index': 1},
+                clientid = client_id,
+                mactive="clients",
+                active = 'brain'
+                )
+
 

@@ -167,3 +167,142 @@ body {
 }
 
 
+
+/******** core components *********/
+
+/* butler */
+
+#butlerChat {
+}
+
+#butlerChat .row {
+    margin-top: 1em;
+}
+
+
+
+
+
+
+/* common */
+#butlerChat .bubble {
+    position: relative;
+    width: 75%;
+    padding: 1ex;
+    padding-left: 1em;
+    background: #FFFFFF;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+#butlerChat .bubble .lead {
+    margin-bottom: 0;
+}
+
+#butlerChat .bubble .location {
+    margin-bottom: 0;
+}
+
+#butlerChat .bubble .source {
+    position: relative;
+    float: right;
+}
+
+#butlerChat .bubble .detail {
+    float: right;
+    text-align: center;
+}
+
+#butlerChat .who {
+}
+
+#butlerChat .who .photo {
+    font-size: 3em;
+    background-color: #cccccc;
+    text-align: center;
+    width: 1.2em;
+    height: 1.2em;
+}
+
+#butlerChat .who .identity {
+    text-align: center;
+}
+
+
+/* Left */
+#butlerChat .bubbleLeft {
+    border: #7F7F7F solid 2px;
+    float: left;
+    margin-left: 25px;
+}
+
+#butlerChat .bubbleLeft:after {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 8px 16px 8px 0;
+    border-color: transparent #FFFFFF;
+    display: block;
+    width: 0;
+    z-index: 1;
+    left: -16px;
+    top: 12px;
+}
+
+#butlerChat .bubbleLeft:before {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 9px 17px 9px 0;
+    border-color: transparent #7F7F7F;
+    display: block;
+    width: 0;
+    z-index: 0;
+    left: -19px;
+    top: 11px;
+}
+
+#butlerChat .whoLeft {
+    float: left;
+}
+
+
+/* Right */
+
+#butlerChat .bubbleRight {
+    border: #343434 solid 2px;
+    float: right;
+    margin-right: 25px;
+}
+
+#butlerChat .bubbleRight:after {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 8px 0 8px 16px;
+    border-color: transparent #FFFFFF;
+    display: block;
+    width: 0;
+    z-index: 1;
+    right: -16px;
+    top: 12px;
+}
+
+#butlerChat .bubbleRight:before {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 9px 0 9px 17px;
+    border-color: transparent #343434;
+    display: block;
+    width: 0;
+    z-index: 0;
+    right: -19px;
+    top: 11px;
+}
+
+#butlerChat .whoRight {
+    float: right;
+}
+

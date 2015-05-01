@@ -89,23 +89,30 @@ class Interface(Plugin, MQAsyncSub):
         # * sex (from voice recognition and post processing on the voice)
         self.butler_context = {"media" : None,
                                "location" : None,
-                               "identity" : self.source,
+                               "identity" : None,
                                "mood" : None,
                                "sex" : None
                               }
         self.log.info(u"End of the interface init")
 
 
-    def send_to_butler(self, message, media = None, location = None):
+    def send_to_butler(self, message, identity = None, media = None, location = None, sex = None, mood = None):
         """ Send a message over MQ to the butler component
         """
         self.log.info(u"Send a message to the butler : {0}".format(message))
         request = self.butler_context
         request["text"] = message
+        request["source"] = self.source
+        if identity:
+            request["identity"] = identity
         if media:
             request["media"] = media
         if location:
             request["location"] = location
+        if sex:
+            request["sex"] = sex
+        if mood:
+            request["mood"] = mood
         self.mq_pub.send_event('interface.input',
                              request)
 

@@ -103,6 +103,7 @@ class Butler(Plugin, MQAsyncSub):
             self.lang = conf['lang']
             self.butler_name = conf['name']
             self.butler_sex = conf['sex']
+            self.butler_mood = None
             if self.butler_sex not in SEX_ALLOWED:
                 self.log.error(u"The butler sex configured is not valid : '{0}'. Expecting : {1}".format(self.butler_sex, SEX_ALLOWED))
                 self.force_leave()
@@ -131,6 +132,9 @@ class Butler(Plugin, MQAsyncSub):
         self.brain.set_variable("name", self.butler_name)
         self.brain.set_variable("fullname", self.butler_name)
         self.brain.set_variable("sex", self.butler_sex)
+
+        # history
+        self.history = []
 
         print(u"*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
         print(u"You may type /quit to let {0} have a break".format(self.butler_name))
@@ -171,6 +175,10 @@ class Butler(Plugin, MQAsyncSub):
             elif msg.get_action() == "butler.reload.do":
                 self.log.info(u"Reload brain request : {0}".format(msg))
                 self._mdp_reply_butler_reload(msg)
+            ### history
+            elif msg.get_action() == "butler.history.get":
+                self.log.info(u"GEt butler history : {0}".format(msg))
+                self._mdp_reply_butler_history(msg)
         except:
             self.log.error(u"Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
    
@@ -200,6 +208,16 @@ class Butler(Plugin, MQAsyncSub):
         except:
             msg.add_data(u"status", False)
             msg.add_data(u"reason", "Error while reloading brain parts : {0}".format(traceback.format_exc()))
+        self.reply(msg.get())
+
+
+    def _mdp_reply_butler_history(self, message):
+        """ Butler history
+        """
+        msg = MQMessage()
+        msg.set_action('butler.history.result')
+        print("history > {0}".format(self.history))
+        msg.add_data("history", self.history)
         self.reply(msg.get())
 
 
@@ -264,7 +282,7 @@ class Butler(Plugin, MQAsyncSub):
             @param query : the text query
         """
         try:
-            self.log.debug(u"Before transforming query : {0})".format(query))
+            self.log.debug(u"Before transforming query : {0}".format(query))
             if isinstance(query, str):
                 query = unicode(query, 'utf-8')
 
@@ -293,12 +311,14 @@ class Butler(Plugin, MQAsyncSub):
         """
         pass
 
+    def add_to_history(self, msgid, data):
+        self.history.append({"msgid" : msgid, "context" : data})
+
     def on_message(self, msgid, content):
         """ When a message is received from the MQ (pub/sub)
         """
         if msgid == "interface.input":
             self.log.info(u"Received message : {0}".format(content))
-            print(type(content['text']))
 
             ### Get response from the brain
             # TODO : do it in a thread and if this last too long, do :
@@ -306,8 +326,9 @@ class Butler(Plugin, MQAsyncSub):
             # 10s : reply "I am checking..."
             # 20s : reply "It takes already 20s for processing, I cancel the request" and kill the thread
             #reply = self.brain.reply(self.user_name, content['text'])
+
+            self.add_to_history("interface.input", content)
             reply = self.process(content['text'])
-            print(u"DEBUG REPLY={0}".format(reply))
 
             ### Prepare response for the MQ
             # All elements that may be added in the request sent over MQ for interface.output
@@ -322,13 +343,23 @@ class Butler(Plugin, MQAsyncSub):
             #               }
             #self.context['text'] = reply
 
-            self.log.info(u"Send response over MQ : media = '{0}', location = '{1}', reply_to = '{2}', text = {3}".format(content['media'], content['location'], content['identity'], reply))
+            # fill empty data
+            for elt in ['identity', 'media', 'location', 'sex', 'mood', 'reply_to']:
+                if elt not in content:
+                    content[elt] = None
+
             # publish over MQ
-            self.pub.send_event('interface.output',
-                                {"media" : content['media'],
+            data =              {"media" : content['media'],
                                  "location" : content['location'],
-                                 "reply_to" : content['identity'],
-                                 "text" : reply})
+                                 "sex" : self.butler_sex,
+                                 "mood" : self.butler_mood,
+                                 "reply_to" : content['reply_to'],
+                                 "identity" : self.butler_name,
+                                 "text" : reply}
+            self.log.info(u"Send response over MQ : {0}".format(data))
+            self.pub.send_event('interface.output',
+                                data)
+            self.add_to_history("interface.output", data)
 
 
     def run_chat(self):

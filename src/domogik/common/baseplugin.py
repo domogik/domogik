@@ -83,7 +83,9 @@ class BasePlugin():
 
         ### Check if the plugin is not already launched
         # notice that when the plugin is launched from the manager, this call is not done as the manager already does this test before starting a plugin
-        res, pid_list = is_already_launched(self.log, name)
+        # TODO : improve ? currently, as it is not used, we set the type of the client to None
+        # in case the 'is_already_launched function would use it a day, we should find a way to get the client type
+        res, pid_list = is_already_launched(self.log, None, name)
         if res:
             sys.exit(2)
 

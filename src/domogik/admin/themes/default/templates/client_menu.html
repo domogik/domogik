@@ -28,6 +28,16 @@
             </div>
             {% else %}
             {% endif %}
+          {% elif client_detail.type == "interface" %}
+            <div id="client-status" class="btn-group navbar-brand pull-right">
+              <button type="button" class="btn btn-info btn-xs dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
+                <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a id="start" href="#">Start</a></li>
+                <li><a id="stop" href="#">Stop</a></li>
+              </ul>
+            </div>
           {% elif client_detail.type == "brain" %}
             <!-- TODO : improve layout -->
             <div class="navbar-brand"> 
@@ -49,7 +59,7 @@
               <a href="/client/{{ clientid }}">{% trans %}Informations{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
 
-            {% if client_detail.type == "plugin" or client_detail.type == "brain" %}
+            {% if client_detail.type == "plugin" or client_detail.type == "brain" or client_detail.type == "interface"%}
             <li {% if active == "config" %} class="active" {% endif %} >
               <a href="/client/{{ clientid }}/config">{% trans %}Configuration{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
@@ -97,12 +107,12 @@
         {% if client_detail %}
         $("#start").click(function() {
             console.log("start request");
-            ws.send('{"action": "plugin.start.do", "data": {"name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
+            ws.send('{"action": "plugin.start.do", "data": {"type" : "{{ client_detail.type }}", "name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
             console.log("ws send done");
         });
         $("#stop").click(function() {
             console.log("stop request");
-            ws.send('{"dst": "plugin-{{ client_detail.name }}.{{ client_detail.host }}", "action": "plugin.stop.do", "data": {"name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
+            ws.send('{"dst": "{{ client_detail.type }}-{{ client_detail.name }}.{{ client_detail.host }}", "action": "plugin.stop.do", "data": {"type" : "{{ client_detail.type }}", "name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
             console.log("ws send done");
         });
         {% endif %}

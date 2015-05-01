@@ -615,24 +615,32 @@ class Manager(XplPlugin):
             reason = "Plugin startup request : missing 'name' field"
             self.log.error(reason)
         else:
+            type = data.get_data()['type']
+            msg.add_data('type', type)
             name = data.get_data()['name']
             msg.add_data('name', name)
             host = data.get_data()['host']
             msg.add_data('host', host)
 
-            # try to start the plugin
+            # try to start the client
             try:
-                pid = self._plugins[name].start()
+                if type == "plugin":
+                    pid = self._plugins[name].start()
+                elif type == "interface":
+                    pid = self._interfaces[name].start()
+                else:
+                    pid = 0
+                    
                 if pid != 0:
                     status = True
                     reason = ""
                 else:
                     status = False
-                    reason = "Plugin '{0}' startup failed".format(name)
+                    reason = "{0} '{1}' startup failed".format(type, name)
             except KeyError:
                 # plugin doesn't exist 
                 status = False
-                reason = "Plugin '{0}' does not exist on this host".format(name)
+                reason = "{0} '{1}' does not exist on this host".format(type, name)
                 
         msg.add_data('status', status)
         msg.add_data('reason', reason)
@@ -860,7 +868,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         # notice that this test is not really needed as the plugin also test this in startup...
         # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
         # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
-        res, pid_list = is_already_launched(self.log, self.name)
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
         if res:
             return 0
 
@@ -1240,7 +1248,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         # notice that this test is not really needed as the plugin also test this in startup...
         # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
         # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
-        res, pid_list = is_already_launched(self.log, self.name)
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
         if res:
             return 0
 
@@ -1290,7 +1298,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         """
         self._stop.wait(WAIT_AFTER_STOP_REQUEST)
         self.log.debug("Check if the plugin {0} has stopped it self. Else there will be a bloodbath".format(self.name))
-        res, pid_list = is_already_launched(self.log, self.name)
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
         if res:
             for the_pid in pid_list:
                 self.log.info(u"Try to kill pid {0}...".format(the_pid))
@@ -1326,6 +1334,9 @@ class Interface(GenericComponent, MQAsyncSub):
         """
         GenericComponent.__init__(self, name = name, host = host, clients = clients)
         self.log.info(u"New interface : {0}".format(self.name))
+
+        ### change the client id as 'interface-....'
+        self.client_id = "{0}-{1}.{2}".format("interface", self.name, self.host)
 
         ### check if the interface is on he local host
         if self.host == local_host:
@@ -1468,12 +1479,12 @@ class Interface(GenericComponent, MQAsyncSub):
                       the pid if ok
         """
         ### Check if the interface is not already launched
-        # notice that this test is not really needed as the plugin also test this in startup...
+        # notice that this test is not really needed as the client also test this in startup...
         # but the interface does it before the MQ is initiated, so the error message won't go overt the MQ.
         # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
 
         # TODO : add type in is_already_launched params!!!!!
-        res, pid_list = is_already_launched(self.log, self.name)
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
         if res:
             return 0
 
@@ -1487,7 +1498,7 @@ class Interface(GenericComponent, MQAsyncSub):
 
         ### Try to start the interface
         self.log.info(u"Request to start interface : {0} {1}".format(self.name, test_args))
-        pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py {3}".format(self._packages_directory, self.name, self.name, test_args), \
+        pid = self.exec_component(py_file = "{0}/{1}_{2}/bin/{3}.py {4}".format(self._packages_directory, self.type, self.name, self.name, test_args), \
                                   env_pythonpath = self._libraries_directory)
         pid = pid
 
@@ -1523,7 +1534,7 @@ class Interface(GenericComponent, MQAsyncSub):
         """
         self._stop.wait(WAIT_AFTER_STOP_REQUEST)
         self.log.debug("Check if the interface {0} has stopped it self. Else there will be a bloodbath".format(self.name))
-        res, pid_list = is_already_launched(self.log, self.name)
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
         if res:
             for the_pid in pid_list:
                 self.log.info(u"Try to kill pid {0}...".format(the_pid))
