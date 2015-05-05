@@ -52,6 +52,7 @@ import os
 from subprocess import Popen, PIPE
 import time
 import unicodedata
+import re
 
 
 
@@ -59,6 +60,8 @@ BRAIN_PKG_TYPE = "brain"
 MINIMAL_BRAIN = "{0}/../butler/brain_minimal.rive".format(os.path.dirname(os.path.abspath(__file__)))
 RIVESCRIPT_DIR = "rs"
 RIVESCRIPT_EXTENSION = ".rive"
+
+FEATURE_TAG = "##feature##"
 
 SEX_MALE = "male"
 SEX_FEMALE = "female"
@@ -137,6 +140,10 @@ class Butler(Plugin, MQAsyncSub):
         self.learn_content = None
         self.load_all_brain()
 
+        # shortcut to allow the core brain package to reload the brain for learning
+        self.brain.reload_butler = self.reload
+
+
         # history
         self.history = []
 
@@ -181,8 +188,12 @@ class Butler(Plugin, MQAsyncSub):
                 self._mdp_reply_butler_reload(msg)
             ### history
             elif msg.get_action() == "butler.history.get":
-                self.log.info(u"GEt butler history : {0}".format(msg))
+                self.log.info(u"Get butler history : {0}".format(msg))
                 self._mdp_reply_butler_history(msg)
+            ### features
+            elif msg.get_action() == "butler.features.get":
+                self.log.info(u"Get butler features : {0}".format(msg))
+                self._mdp_reply_butler_features(msg)
         except:
             self.log.error(u"Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
    
@@ -207,7 +218,7 @@ class Butler(Plugin, MQAsyncSub):
         msg = MQMessage()
         msg.set_action('butler.reload.result')
         try:
-            self.load_all_brain()
+            self.reload()
             msg.add_data(u"status", True)
             msg.add_data(u"reason", "")
         except:
@@ -221,9 +232,21 @@ class Butler(Plugin, MQAsyncSub):
         """
         msg = MQMessage()
         msg.set_action('butler.history.result')
-        print("history > {0}".format(self.history))
         msg.add_data("history", self.history)
         self.reply(msg.get())
+
+
+    def _mdp_reply_butler_features(self, message):
+        """ Butler features
+        """
+        msg = MQMessage()
+        msg.set_action('butler.features.result')
+        msg.add_data("features", self.butler_features)
+        self.reply(msg.get())
+
+
+    def reload(self):
+        self.load_all_brain()
 
 
     def load_all_brain(self):
@@ -300,9 +323,36 @@ class Butler(Plugin, MQAsyncSub):
                 self.log.info(u"Learn file NOT found : {0}. This is not an error. You just have learn nothing to your butler ;)".format(learn_file))
             
                               
+            # to finish, find all the tagged features
+            self.get_brain_features()
+
+            # and add them to the rivescript engine...
         except:
             msg = "Error accessing packages directory : {0}. You should create it".format(str(traceback.format_exc()))
             self.log.error(msg)
+
+    def get_brain_features(self):
+        """ Extract brain features from the rivescript files :
+            // ##feature## a feature
+            + feature trigger
+            - feature response
+        """
+        self.butler_features = []
+        try:
+            self.log.info(u"Extract tagged features (##feature##) from the rivescript files")
+            for client in self.brain_content:
+                for lang in self.brain_content[client]:
+                    for fic in self.brain_content[client][lang]:
+                        for line in self.brain_content[client][lang][fic].split("\n"):
+                            if re.search(FEATURE_TAG, line):
+                                self.butler_features.append(line.split(FEATURE_TAG)[1])
+            self.log.info(u"{0} feature(s) found".format(len(self.butler_features)))
+
+            # store in the Rivescript object the features to be able to grab them from the core brain package
+            self.brain.the_features = '.\n'.join(self.butler_features)
+        except:
+            self.log.error(u"Error while extracting the features : {0}".format(traceback.format_exc()))
+                 
 
 
     def process(self, query):

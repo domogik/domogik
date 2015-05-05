@@ -194,15 +194,16 @@ def get_sensor_last_value(sensor_id):
 
 
 
-def reload_brain():
-    """ Send a message over MQ to reload the brain
-    """
-    print("Request to reload the brain...")
-    cli = MQSyncReq(zmq.Context())
-    msg = MQMessage()
-    msg.set_action('butler.reload.do')
-    cli.request('butler', msg.get(), timeout=2)
-    print("Brain reloaded")
+# TO DEL
+#def reload_brain():
+#    """ Send a message over MQ to reload the brain
+#    """
+#    print("Request to reload the brain...")
+#    cli = MQSyncReq(zmq.Context())
+#    msg = MQMessage()
+#    msg.set_action('butler.reload.do')
+#    cli.request('butler', msg.get(), timeout=2)
+#    print("Brain reloaded")
 
 
 
@@ -216,7 +217,7 @@ def learn(rs_code):
     print(rs_code)
     with open(LEARN_FILE, "a") as file:
         file.write(rs_code) 
-    reload_brain()
+#    reload_brain()
 
 
 
