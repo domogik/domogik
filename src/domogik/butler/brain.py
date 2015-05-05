@@ -53,24 +53,17 @@ import os
 BRAIN_PREFERENCES = "brain_datatype/preferences.json"
 
 
-# TODO : delete
-#class DmgDevices:
-#    """ This class is used to get informations about Domogik devices over the MQ
-#    """
-#
-#    def __init__(self):
-#        """ 
-#        """ 
-#        pass
-
-
-
 def get_packages_directory():
     cfg = Loader('domogik')
     my_conf = cfg.load()
     #self._config_files = CONFIG_FILE
     config = dict(my_conf[1])
     return os.path.join(config['libraries_path'], PACKAGES_DIR)
+
+
+
+LEARN_FILE = os.path.join(get_packages_directory(), "learn.rive")
+
 
 
 
@@ -197,3 +190,33 @@ def get_sensor_last_value(sensor_id):
         print("ERROR : {0}".format(traceback.format_exc()))
         pass
     return value
+
+
+
+
+def reload_brain():
+    """ Send a message over MQ to reload the brain
+    """
+    print("Request to reload the brain...")
+    cli = MQSyncReq(zmq.Context())
+    msg = MQMessage()
+    msg.set_action('butler.reload.do')
+    cli.request('butler', msg.get(), timeout=2)
+    print("Brain reloaded")
+
+
+
+def learn(rs_code):
+    """ Add some rivescript code in a file
+        and requets to reload the brain
+        @param rs_code : some rs_code. Example : 
+                  + ping
+                  - pong
+    """
+    print(rs_code)
+    with open(LEARN_FILE, "a") as file:
+        file.write(rs_code) 
+    reload_brain()
+
+
+

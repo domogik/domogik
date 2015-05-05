@@ -671,6 +671,10 @@ def get_brain_content(client_id):
 
     # do a post processing on content to add html inside
     for client_id in detail:
+        # we skip the learn file
+        if client_id == "learn":
+            continue
+
         for lang in detail[client_id]:
             idx = 0
             for file in detail[client_id][lang]:
@@ -734,25 +738,38 @@ def brain_reload():
 @app.route('/core/<client_id>')
 @login_required
 def core(client_id):
-
     tmp = client_id.split(".")
     name = tmp[0].split("-")[1]
     if name == "butler":
+        brain = get_brain_content("learn")
         history = get_butler_history()
         return render_template('core_butler.html',
                 loop = {'index': 1},
                 clientid = client_id,
                 history = map(json.dumps, history),
-                #history = history,
+                brain = brain,
                 mactive="clients",
-                active = 'brain'
+                active = 'home'
                 )
     else:
         return render_template('core.html',
                 loop = {'index': 1},
                 clientid = client_id,
                 mactive="clients",
-                active = 'brain'
+                active = 'home'
                 )
+
+
+@app.route('/core/<client_id>/butler_learn')
+@login_required
+def core_butler_learned(client_id):
+    brain = get_brain_content("learn")
+    return render_template('core_butler_learned.html',
+            loop = {'index': 1},
+            clientid = client_id,
+            brain = brain,
+            mactive="clients",
+            active = 'learn'
+            )
 
 

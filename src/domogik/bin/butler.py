@@ -42,6 +42,7 @@ from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import Plugin
 from domogik.butler.rivescript import RiveScript
+from domogik.butler.brain import LEARN_FILE
 #from domogikmq.reqrep.worker import MQRep
 from domogikmq.message import MQMessage
 from domogikmq.pubsub.subscriber import MQAsyncSub
@@ -125,13 +126,16 @@ class Butler(Plugin, MQAsyncSub):
 
         # set rivescript variables
 
-        # load the brain
-        self.load_all_brain()
-
         # Configure bot variables
-        self.brain.set_variable("name", self.butler_name)
-        self.brain.set_variable("fullname", self.butler_name)
-        self.brain.set_variable("sex", self.butler_sex)
+        # all must be lower case....
+        self.brain.set_variable("name", self.butler_name.lower())
+        self.brain.set_variable("fullname", self.butler_name.lower())
+        self.brain.set_variable("sex", self.butler_sex.lower())
+
+        # load the brain
+        self.brain_content = None
+        self.learn_content = None
+        self.load_all_brain()
 
         # history
         self.history = []
@@ -191,6 +195,7 @@ class Butler(Plugin, MQAsyncSub):
 
         msg = MQMessage()
         msg.set_action('butler.scripts.result')
+        msg.add_data("learn", self.learn_content)
         for client_id in self.brain_content:
             msg.add_data(client_id, self.brain_content[client_id])
         self.reply(msg.get())
@@ -244,6 +249,7 @@ class Butler(Plugin, MQAsyncSub):
         """
         try:
             list = []
+            # first load the packages parts
             for a_file in os.listdir(self.get_packages_directory()):
                 if a_file[0:len(BRAIN_PKG_TYPE)] == BRAIN_PKG_TYPE:
                     self.log.info(u"Brain part found : {0}".format(a_file))
@@ -271,6 +277,28 @@ class Butler(Plugin, MQAsyncSub):
                                         content = u"Error while reading file '{0}'. Error is : {1}".format(a_rs_file_path, traceback.format_exc())
                                         self.log.error(content)
                                     self.brain_content[client_id][self.lang][a_rs_file] = content
+
+            # and finally, load the learning file
+            # this file is generated over the time when the domogik.butler.brain  learn() function is called
+            learn_file = LEARN_FILE
+            if os.path.isfile(learn_file):
+                self.log.info(u"Learn file found : {0}".format(learn_file))
+
+                # add the brain part to rivescript
+                self.brain.load_file(learn_file)
+                try:
+                    import codecs
+                    file = codecs.open(learn_file, 'r', 'utf-8')
+                    file_content = file.read()
+                    file_header = "// File : {0}".format(learn_file)
+                    self.learn_content = u"{0}\n\n{1}".format(file_header, file_content)
+                except:
+                    self.learn_content = u"Error while reading file '{0}'. Error is : {1}".format(learn_file, traceback.format_exc())
+                    self.log.error(self.learn_content)
+            else:
+                self.learn_content = u""
+                self.log.info(u"Learn file NOT found : {0}. This is not an error. You just have learn nothing to your butler ;)".format(learn_file))
+            
                               
         except:
             msg = "Error accessing packages directory : {0}. You should create it".format(str(traceback.format_exc()))
@@ -286,13 +314,22 @@ class Butler(Plugin, MQAsyncSub):
             if isinstance(query, str):
                 query = unicode(query, 'utf-8')
 
+            # put all in lower case
+            query = query.lower()
+
             # remove non standard caracters
+            query = query.replace(",", " ")
             query = query.replace("'", " ")
             query = query.replace("?", " ")
             query = query.replace("!", " ")
 
             # remove accents
             query = unicodedata.normalize('NFD', query).encode('ascii', 'ignore')
+
+            # remove duplicate spaces
+            query = ' '.join(query.split())
+
+            self.log.debug(u"After transforming query : {0}".format(query))
 
             # process the query
             self.log.debug(u"Before calling Rivescript brain for processing : {0} (type={1})".format(query, type(query)))
@@ -353,7 +390,7 @@ class Butler(Plugin, MQAsyncSub):
                                  "location" : content['location'],
                                  "sex" : self.butler_sex,
                                  "mood" : self.butler_mood,
-                                 "reply_to" : content['reply_to'],
+                                 "reply_to" : content['source'],
                                  "identity" : self.butler_name,
                                  "text" : reply}
             self.log.info(u"Send response over MQ : {0}".format(data))

@@ -1,6 +1,7 @@
 {% extends theme("base/base.html") %}
 
 {% block content %}
+{% include theme("core_butler_menu.html") %}
 
 <div class="container">
 
@@ -34,25 +35,6 @@
 
 
 <div class="container" id="butlerChat">
-  {% for elt in history %}
-{#
-<!--
-     <div class='row'> 
-       <div class='col-md-12'> 
-         <div class='who who{% if elt['who'] == "butler" %}Right{% else %}Left{% endif %}'> 
-           <div class='photo'> 
-             <span class='glyphicon glyphicon-{% if elt['who'] == "butler" %}cog{% else %}user{% endif %}' aria-hidden='true'></span> 
-           </div> 
-           <div class='identity'>{{ elt['context']['identity'] }}</div> 
-         </div> 
-         <div class='bubble bubble{% if elt['who'] == "butler" %}Right{% else %}Left{% endif %}'> 
-           <p class='lead'>{{ elt['context']['text'] }}</p>
-         </div> 
-       </div> 
-     </div>
--->
-#}
-  {% endfor %}
 </div>
 
 
@@ -67,7 +49,7 @@
         {% trans %}The butler brain is reloaded.{% endtrans %}
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+        <button type="button" class="btn btn-info" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
       </div>
     </div>
   </div>
@@ -83,7 +65,7 @@
         {% trans %}The butler brain can't be reloaded. Maybe the butler component is not alive ?{% endtrans %}
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+        <button type="button" class="btn btn-info" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
       </div>
     </div>
   </div>
@@ -108,12 +90,14 @@
 
     <script type="text/javascript">
     $( document ).ready(function() {
-      //{{ history|safe }}
-      var history = {{ history|safe }}
-      for (elt in history) {
-          data = JSON.parse(history[elt]);
-          processMessage(data.msgid, data.context);
-      }
+
+        // generate history
+        //{{ history|safe }}
+        var history = {{ history|safe }}
+        for (elt in history) {
+            data = JSON.parse(history[elt]);
+            processMessage(data.msgid, data.context);
+        }
         
 
         ws.onmessage = function(e) {
@@ -244,6 +228,8 @@
 
                 $('#butlerChat').prepend(htmlData);
             }
+
+
     
     </script>
 
