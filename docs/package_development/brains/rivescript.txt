@@ -9,3 +9,16 @@ Weight
 In rivescript, the default weight is set to 1. But the rivescript included in Domogik is patched to use a default weight of 10.
 
 If you plan to use weight in your scripts, don't forget about this!
+
+
+Special characters
+==================
+
+All the below characters are replaced by spaces before processing : ?!.,
+
+The "-" character is not replaced as it can be used for mathematic usages. If you have a trigger that may contain a "-" in it, please handle it with "[-]"
+
+People mistakes
+===============
+
+People make sadly a lot of mistakes, especially when writing... In the rules, you may try to take the most common mistakes in account. 
