@@ -3,6 +3,32 @@ Rivescript rules
 ================
 
 
+Features
+========
+
+The butler is able to tell the user which features it can handle. To allow this, you must add a special comment and a corresponding trigger. Example with the tiem feature: ::
+
+    // ##feature## give the date
+    + give the date
+    @ shortcut date
+
+    + shortcut date
+    ...
+
+Notice that if your feature accept a parameter, you should describe it also. Example in english: ::
+
+    // ##feature## calculate parameter
+    + calculate *
+    ...
+
+Example in french: ::
+
+    // ##feature## calculer parametre
+    + calculer *
+    ...
+
+You must use only generic expressions to describe the feature and not use words like "my, your, ...". This is needed to allow natural speaking when requesting the butler to learn some commands. You can look at the *domogik-brain-core* package for more details about learning.
+
 Weight
 ======
 
