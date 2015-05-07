@@ -84,3 +84,11 @@ use_ssl = False
 ssl_certificate =
 ssl_key =
 
+###
+# Butler configuration
+###
+[butler]
+name = Aria
+lang = fr_FR
+# male/female
+sex = female
