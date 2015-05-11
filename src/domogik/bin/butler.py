@@ -135,6 +135,9 @@ class Butler(Plugin, MQAsyncSub):
         self.brain.set_variable("fullname", self.butler_name.lower())
         self.brain.set_variable("sex", self.butler_sex.lower())
 
+        # set the PYTHONPATH
+        sys.path.append(self._packages_directory)
+
         # load the brain
         self.brain_content = None
         self.learn_content = None
