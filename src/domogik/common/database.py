@@ -824,13 +824,6 @@ class DbHelper():
                     order_by(Device.id).\
                     distinct()
 
-    def upgrade_list_new(self):
-        return self.__session.query(Device.id, Device.name, Sensor.name, Sensor.id).\
-                     filter(Device.id==Sensor.device_id).\
-                     filter(Device.address==None).\
-                     order_by(Device.id).\
-                     distinct()
-
     def upgrade_do(self, oid, okey, nid, nsid):
         self.__session.expire_all()
         oldvals = self.__session.query(DeviceStats.id, DeviceStats.value, DeviceStats.timestamp).\
