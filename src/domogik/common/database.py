@@ -815,39 +815,6 @@ class DbHelper():
         return device
 
 ####
-# stats upgrade
-####
-    def upgrade_list_old(self):
-        return self.__session.query(Device.id, Device.name, DeviceStats.skey).\
-                    filter(Device.id==DeviceStats.device_id).\
-                    filter(Device.address!=None).\
-                    order_by(Device.id).\
-                    distinct()
-
-    def upgrade_do(self, oid, okey, nid, nsid):
-        self.__session.expire_all()
-        oldvals = self.__session.query(DeviceStats.id, DeviceStats.value, DeviceStats.timestamp).\
-                     filter(DeviceStats.skey==okey).\
-                     filter(DeviceStats.device_id ==oid)
-        num = 0
-        for val in oldvals:
-            # add the value
-            self.add_sensor_history(nsid, val[1], val[2])
-           # increment num
-            num += 1
-        # delete the statas
-        meta = MetaData(bind=DbHelper.__engine)
-        t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
-        self.__session.execute(
-            t_stats.delete().where(and_(t_stats.c.device_id == oid, t_stats.c.skey == okey))
-        )
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        return num
-            
-####
 # Sensor history
 ####
     def add_sensor_history(self, sid, value, date):

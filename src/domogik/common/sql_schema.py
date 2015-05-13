@@ -28,7 +28,6 @@ Implements
 
 - class PluginConfig
 - class Device
-- class DeviceStats
 - class Person
 - class UserAccount
 
