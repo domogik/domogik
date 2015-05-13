@@ -10,6 +10,7 @@ def corellateOld(devs):
         if d[0] not in ret:
             ret[d[0]] = {}
             ret[d[0]]['name'] = d[1]
+            ret[d[0]]['id'] = d[0]
             ret[d[0]]['keys'] = []
             ret[d[0]]['keys'].append( d[2] )
         else:
@@ -120,10 +121,10 @@ if __name__ == "__main__":
                         print("")
                         print("====================================================================================")
                         print("Upgrade with the folowing info")
-                        print("Old device:      {0}".format(selDev['name']))
+                        print("Old device:      {0}({1})".format(selDev['name'], selDev['id']))
                         print("Old stats key:   {0}".format(selKey))
-                        print("New device:      {0}".format(newDev[(seln - 1)]["name"]))
-                        print("New sensor:      {0}".format(newDev[(seln - 1)]["sensors"][nSen]["name"]))
+                        print("New device:      {0}({1})".format(newDev[(seln - 1)]["name"], newDev[(seln - 1)]['id']))
+                        print("New sensor:      {0}({1})".format(newDev[(seln - 1)]["sensors"][nSen]["name"], newDev[(seln - 1)]["sensors"][nSen]["id"]))
                         print("")
                         print("WARNING:")
                         print("By typing YES below this will start the upgrade process, after the process")
@@ -135,7 +136,14 @@ if __name__ == "__main__":
                         while conf not in ["YES I AM SURE", "no"]:
                             conf = raw_input("Type 'YES I AM SURE' to confirm, 'no' to cancel: ")
                         if conf == "YES I AM SURE":
-                            print("Starting the upgrade")
+                            print("Copying the stats")
+                            print("This can take some time be patiant")
+                            db.upgrade_do(selDev['id'], selKey, newDev[(seln - 1)]['id'], newDev[(seln - 1)]["sensors"][nSen]["id"])
+                            # check if this is the last key
+                            if len(old_devs[selDev['id']]['keys']) == 1:
+                                print("This was the last key of the device, so deleting the device")
+                                db.del_device(selDev['id'])
+                            print("Upgrade DONE")
                             print ""
                         else:
                             print("Upgrade CANCELED")
