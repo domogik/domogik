@@ -237,7 +237,7 @@ def client_config(client_id):
     cli = MQSyncReq(app.zmq_context)
     detail = get_client_detail(client_id)
     config = detail['data']['configuration']
-    known_items = []
+    known_items = {}
 
     # dynamically generate the wtfform
     class F(Form):
@@ -245,7 +245,7 @@ def client_config(client_id):
         pass
     for item in config:
         # keep track of the known fields
-        known_items.append(item["key"])
+        known_items[item["key"]] = item["type"]
         # handle required
         if item["required"] == "yes":
             arguments = [Required()]
@@ -296,13 +296,15 @@ def client_config(client_id):
     if request.method == 'POST' and form.validate():
         # build the requested config set
         data = {}
-        for arg, value in list(request.form.items()):
-            if arg in known_items:
-                data[arg] = getattr(form, arg).data
-        if 'auto_startup' in data.keys():
-            data['auto_startup'] = 'Y'
-        else:
-            data['auto_startup'] = 'N'
+        for key, typ in known_items.iteritems():
+            val = getattr(form, key).data
+            if typ == "boolean":
+                if val == False:
+                    val = 'N'
+                else:
+                    val = 'Y'
+            data[key] = val
+        print data
         # build the message
         msg = MQMessage()
         msg.set_action('config.set')
