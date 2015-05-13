@@ -87,6 +87,9 @@ from domogikmq.pubsub.publisher import MQPub
 from domogik.xpl.common.xplconnector import XplTimer
 from domogik.common.packagejson import PackageJson, PackageException
 
+from domogik.xpl.common.xplconnector import Listener, STATUS_HBEAT_XPL
+
+
 ### constants
 
 PYTHON = sys.executable
@@ -209,6 +212,16 @@ class Manager(XplPlugin):
                                               (),
                                               {})
         thr_check_available_packages.start()
+
+        ### Check for xpl clients that are not part of Domogik
+        # they are external clients
+        # they can be related to a plugin (example : rfxcom lan model)
+        # or to no plugin (example : an arduino DIY device that sends temperature and the plugin generic will catch this data)
+        Listener(self._register_xpl_client, self.myxpl,
+                 {'schema': 'hbeat.basic'})
+        Listener(self._register_xpl_client, self.myxpl,
+                 {'schema': 'hbeat.app'})
+
 
         ### Component is ready
         self.ready()
@@ -574,6 +587,18 @@ class Manager(XplPlugin):
         msg.add_data('status', status)
         msg.add_data('reason', reason)
         self.reply(msg.get())
+
+    def _register_xpl_client(self, message):
+        """ Register non Domogik xPL clients
+        """
+        # skip domogik components
+        if message.source_vendor_id == DMG_VENDOR_ID:
+            return
+
+        # process external clients 
+        self._clients.add(message.source_instance_id, "xpl_client", "{0}-{1}".format(message.source_vendor_id, message.source_device_id), message.source, message.source, None, None, None)
+        self._clients.set_status(message.source, STATUS_ALIVE)
+
 
 
 
@@ -1162,12 +1187,25 @@ class Clients():
                 if self._clients[a_client]['type'] == 'core':
                     continue
 
-                # check if the client is dead only when the client is alive (or partially alive)
-                if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
-                    delta = now - self._clients[a_client]['last_seen']
-                    if delta > 2*STATUS_HBEAT:
-                        # client is dead!
-                        self.set_status(a_client, STATUS_DEAD)
+                elif self._clients[a_client]['type'] == 'plugin':
+                    # check if the client is dead only when the client is alive (or partially alive)
+                    if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
+                        delta = now - self._clients[a_client]['last_seen']
+                        if delta > 2*STATUS_HBEAT:
+                            # client is dead!
+                            self.set_status(a_client, STATUS_DEAD)
+
+                elif self._clients[a_client]['type'] == 'xpl_client':
+                    # check if the client is dead only when the client is alive (a xpl client can be only ALIVE or DEAD)
+                    if self._clients[a_client]['status'] in (STATUS_ALIVE):
+                        delta = now - self._clients[a_client]['last_seen']
+                        # Here we do a shorcut.... we should check the delta related to the 'interval' information taken from
+                        # the body of the hbeat.app or hbeat.basic message.
+                        # But as usually I never see a xpl client with interval > 5, we assume that 5 is a default common value
+                        # This part may of course be improved later ;)
+                        if delta > 2*(STATUS_HBEAT_XPL*60):
+                            # client is dead!
+                            self.set_status(a_client, STATUS_DEAD)
             self._stop.wait(STATUS_HBEAT)
 
     def add(self, host, type, name, client_id, xpl_source, data, conversions, configured = None):
@@ -1182,29 +1220,49 @@ class Clients():
             @param conversions : conversions info for the client
         """
         self.log.info(u"Add new client : host={0}, type={1}, name={2}, client_id={3}, data={4}".format(host, type, name, client_id, str(data)))
-        client = { "host" : host,
-                   "type" : type,
-                   "name" : name,
-                   "xpl_source" : xpl_source,
-                   "package_id" : "{0}-{1}".format(type, name),
-                   "pid" : 0,
-                   "last_seen" : time.time(),
-                   "status" : STATUS_STOPPED,
-                   "configured" : configured}
-        client_with_details = { "host" : host,
-                   "type" : type,
-                   "name" : name,
-                   "xpl_source" : xpl_source,
-                   "package_id" : "{0}-{1}".format(type, name),
-                   "pid" : 0,
-                   "last_seen" : time.time(),
-                   "status" : STATUS_STOPPED,
-                   "configured" : configured,
-                   "data" : data}
-        self._clients[client_id] = client
-        self._clients_with_details[client_id] = client_with_details
-        self._conversions[client_id] = conversions
-        self.publish_update()
+        try:
+            if data != None:
+                try:
+                    compliant_xpl_clients = data["identity"]["compliant_xpl_clients"]
+                except KeyError:
+                    # data is empty for core components
+                    compliant_xpl_clients = []
+
+                try:
+                    xpl_clients_only = data["identity"]["xpl_clients_only"]
+                except KeyError:
+                    # data is empty for core components
+                    xpl_clients_only = []
+            else: 
+                compliant_xpl_clients = []
+                xpl_clients_only = []
+            client = { "host" : host,
+                       "type" : type,
+                       "name" : name,
+                       "xpl_source" : xpl_source,
+                       "package_id" : "{0}-{1}".format(type, name),
+                       "pid" : 0,
+                       "last_seen" : time.time(),
+                       "status" : STATUS_STOPPED,
+                       "configured" : configured,
+                       "compliant_xpl_clients" : compliant_xpl_clients,
+                       "xpl_clients_only" : xpl_clients_only}
+            client_with_details = { "host" : host,
+                       "type" : type,
+                       "name" : name,
+                       "xpl_source" : xpl_source,
+                       "package_id" : "{0}-{1}".format(type, name),
+                       "pid" : 0,
+                       "last_seen" : time.time(),
+                       "status" : STATUS_STOPPED,
+                       "configured" : configured,
+                       "data" : data}
+            self._clients[client_id] = client
+            self._clients_with_details[client_id] = client_with_details
+            self._conversions[client_id] = conversions
+            self.publish_update()
+        except:
+            self.log.error("Error when adding the client in the clients list. Error : {0}".format(traceback.format_exc()))
 
     def remove(self, client_id):
         """ Remove a client from the list

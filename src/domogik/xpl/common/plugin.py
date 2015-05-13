@@ -56,10 +56,11 @@ class XplPlugin(Plugin):
 
 
     def __init__(self, name, stop_cb = None, is_manager = False, parser = None,
-                 daemonize = True, log_prefix = "xplplugin_", test = False, nohub = False):
+                 daemonize = True, log_prefix = "xplplugin_", test = False, nohub = False, source = None):
         '''
         Create XplPlugin instance, which defines system handlers
         @param nohub : if set the hub discovery will be disabled
+        @param source : overwrite the source value (client-device.instance)
         '''
 
         Plugin.__init__(self, name, stop_cb = stop_cb, is_manager = is_manager, parser = parser, daemonize = daemonize, log_prefix = log_prefix, test = test)
@@ -74,7 +75,7 @@ class XplPlugin(Plugin):
         else:
             broadcast = "255.255.255.255"
         if 'bind_interface' in self.config:
-            self.myxpl = Manager(self.config['bind_interface'], broadcast = broadcast, plugin = self, nohub = nohub)
+            self.myxpl = Manager(self.config['bind_interface'], broadcast = broadcast, plugin = self, nohub = nohub, source = source)
         else:
             self.myxpl = Manager(broadcast = broadcast, plugin = self, nohub = nohub)
 
@@ -82,7 +83,10 @@ class XplPlugin(Plugin):
         self.enable_hbeat_called = False
 
         # define the source (in can be used in some plugins)
-        self.source = "domogik-{0}.{1}".format(self.get_plugin_name(), self.get_sanitized_hostname())
+        if source == None:
+            self.source = "{0}-{1}.{2}".format(DMG_VENDOR_ID, self.get_plugin_name(), self.get_sanitized_hostname())
+        # in case we overwrite the source : 
+            self.source = source
         self.log.info(u"End of the xPL init")
 
 

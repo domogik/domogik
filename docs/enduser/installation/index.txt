@@ -2,6 +2,12 @@
 Standard installation
 =====================
 
+If you are already a Domogik 0.3 user
+=====================================
+
+Domogik 0.4 database is really different from the 0.3 database. The process to migrate data from Domogik 0.3 to Domogik 0.4 is not fully guarantee yet. **Please do a backup of your domogik database before migrating from 0.3 to 0.4 !**.
+
+
 Installation
 ============
 
@@ -29,7 +35,7 @@ If you don't already have Python 2.7 or above (you have it if you are running a 
         $ sudo apt-get install python2.7
         $ sudo ln -sf /usr/bin/python2.7 /usr/bin/python
 
-Install the needed dependencies : 
+Here are the needed dependencies. depanding on your Linux distribution, they will be installed autmatically Debian, Ubuntu) or not.
 
 * the development packages, pip and setuptools : **python2.7-dev, python-pip, python-setuptools**
 * SSL libraries : **libssl-dev**
@@ -40,8 +46,7 @@ Install the needed dependencies :
 * MySQL server : **mysql-server**
 
 .. note::
-    * Even if setuptools is installed automatically thanks to the *setup.py* script, we need to install it before launching *install.py* : it is needed to use the *pkg_resources* module which is needed during the installation for activating the *domogik* module.
-    * Even if you plan to use mysql database instead of postgresql, you need to install the *python-psycopg2* package : it is needed by the *alembic* library.
+    * Even if you plan to use mysql database instead of postgresql, the *python-psycopg2* package is needed by the *alembic* library.
 
 The **install.py** script will install these dependencies of the following distributions:
 
@@ -96,7 +101,29 @@ Git is used to get the sources (be sure that your user is able to create some di
 Create the folder */opt/dmg/* : ::
 
     $ sudo mkdir -p /opt/dmg
+    $ sudo useradd -M domogik
     $ sudo chown domogik /opt/dmg  # assuming the user domogik already exists!
+
+
+Download Domogik 0.4.0 beta1
+****************************
+
+Download Domogik-mq : ::
+
+    $ cd /opt/dmg/
+    $ wget https://github.com/domogik/domogik-mq/archive/1.0.tar.gz -O domogik-mq-1.0.tar.gz
+    $ tar xvzf domogik-mq-1.0.tar.gz
+    $ ln -sf domogik-mq-1.0 domogik-mq
+
+Download Domogik : ::
+
+    $ cd /opt/dmg/
+    $ wget https://github.com/domogik/domogik/archive/0.4.0b1.tar.gz -O domogik-0.4.0b1.tar.gz
+    $ tar xvzf domogik-0.4.0b1.tar.gz
+    $ ln -sf domogik-0.4.0b1 domogik
+
+Download the sources on GitHub
+******************************
 
 Download Domogik-mq : ::
 

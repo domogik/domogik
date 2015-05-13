@@ -241,7 +241,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 reply_msg.add_data('uuid', str(resp_uuid))
                                 reply_msg.add_data('status', True)
                                 reply_msg.add_data('reason', None)
-                                self.log.debug(u"mq reply".format(reply_msg.get()))
+                                self.log.debug(u"mq reply (success) : {0}".format(reply_msg.get()))
                                 self.reply(reply_msg.get())
                                     
         if failed:
@@ -251,15 +251,15 @@ class XplManager(XplPlugin, MQAsyncSub):
             reply_msg.add_data('uuid', None)
             reply_msg.add_data('status', False)
             reply_msg.add_data('reason', failed)
-            self.log.debug(u"mq reply".format(reply_msg.get()))
+            self.log.debug(u"mq reply (failed) : {0}".format(reply_msg.get()))
             self.reply(reply_msg.get())
 
     def _create_xpl_trigger(self):
         """ Create a listener to catch
         all xpl-stats and xpl-trig messages
         """
-        Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-stat'})
         Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-trig'})
+        Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-stat'})
 
     def _xpl_callback(self, pkt):
         """ The callback for the xpl messages
@@ -270,11 +270,13 @@ class XplManager(XplPlugin, MQAsyncSub):
         item["clientId"] = next((cli for cli, xpl in self.client_xpl_map.items() if xpl == pkt.source), None)
         self._sensor_queue.put(item)
         self.log.debug(u"Adding new message to the sensorQueue, current length = {0}".format(self._sensor_queue.qsize()))
+        #self.log.debug(u"Adding new message to the sensorQueue, current length = {0}, message = {1}".format(self._sensor_queue.qsize(), pkt))
         self._cmd_lock_p.acquire()
         # only do this when we have outstanding commands
         if len(self._cmd_dict) > 0:
             self._cmd_pkt[time.time()] = pkt
             self.log.debug(u"Adding new message to the cmdQueue, current length = {0}".format(len(self._cmd_dict)))
+            #self.log.debug(u"Adding new message to the cmdQueue, current length = {0}, message = {1}".format(len(self._cmd_dict), pkt))
         self._cmd_lock_p.release()
 
     class _CommandThread(threading.Thread):
@@ -297,6 +299,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                 self._lock_p.acquire()
                 for pkt in self._pkt.keys():
                     if pkt < time.time() - CMDTIMEOUT:
+                        self._log.warning(u"Delete packet too old (timeout reached) : {0}".format(pkt))
                         del(self._pkt[pkt])
                 self._lock_p.release()
                 # now try to match if we have enough data
@@ -326,7 +329,10 @@ class XplManager(XplPlugin, MQAsyncSub):
                     for tim in todel_pkt:
                         if tim in self._pkt:
                             del(self._pkt[tim])
-                    self._log.debug(u"Deleting message from the cmdQueue, current length = {0}".format(len(self._pkt)))
+                    #self._log.debug(u"Deleting message from the cmdQueue, current length = {0}".format(len(self._pkt)))
+                    # TODO : remove or comment the 2 following lines
+                    #self._log.debug(u"Data to delete : {0}".format(todel_dict))
+                    #self._log.debug(u"Content before deletion : {0}".format(self._dict))
                     self._lock_p.release()
                     self._lock_d.acquire()
                     for tim in todel_dict:
