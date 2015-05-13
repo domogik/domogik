@@ -241,7 +241,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 reply_msg.add_data('uuid', str(resp_uuid))
                                 reply_msg.add_data('status', True)
                                 reply_msg.add_data('reason', None)
-                                self.log.debug(u"mq reply".format(reply_msg.get()))
+                                self.log.debug(u"mq reply (success) : {0}".format(reply_msg.get()))
                                 self.reply(reply_msg.get())
                                     
         if failed:
@@ -251,15 +251,15 @@ class XplManager(XplPlugin, MQAsyncSub):
             reply_msg.add_data('uuid', None)
             reply_msg.add_data('status', False)
             reply_msg.add_data('reason', failed)
-            self.log.debug(u"mq reply".format(reply_msg.get()))
+            self.log.debug(u"mq reply (failed) : {0}".format(reply_msg.get()))
             self.reply(reply_msg.get())
 
     def _create_xpl_trigger(self):
         """ Create a listener to catch
         all xpl-stats and xpl-trig messages
         """
-        Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-stat'})
         Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-trig'})
+        Listener(self._xpl_callback, self.myxpl, {'xpltype': 'xpl-stat'})
 
     def _xpl_callback(self, pkt):
         """ The callback for the xpl messages
@@ -270,11 +270,13 @@ class XplManager(XplPlugin, MQAsyncSub):
         item["clientId"] = next((cli for cli, xpl in self.client_xpl_map.items() if xpl == pkt.source), None)
         self._sensor_queue.put(item)
         self.log.debug(u"Adding new message to the sensorQueue, current length = {0}".format(self._sensor_queue.qsize()))
+        #self.log.debug(u"Adding new message to the sensorQueue, current length = {0}, message = {1}".format(self._sensor_queue.qsize(), pkt))
         self._cmd_lock_p.acquire()
         # only do this when we have outstanding commands
         if len(self._cmd_dict) > 0:
             self._cmd_pkt[time.time()] = pkt
             self.log.debug(u"Adding new message to the cmdQueue, current length = {0}".format(len(self._cmd_dict)))
+            #self.log.debug(u"Adding new message to the cmdQueue, current length = {0}, message = {1}".format(len(self._cmd_dict), pkt))
         self._cmd_lock_p.release()
 
     class _CommandThread(threading.Thread):
