@@ -304,7 +304,6 @@ def client_config(client_id):
                 else:
                     val = 'Y'
             data[key] = val
-        print data
         # build the message
         msg = MQMessage()
         msg.set_action('config.set')
