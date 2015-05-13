@@ -7,7 +7,7 @@ try:
 except ImportError:
     from flaskext.wtf import Form
     pass
-from wtforms import TextField, HiddenField, ValidationError, RadioField,\
+from wtforms import TextField, HiddenField, validators, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField, \
             DateField, DateTimeField, FloatField, PasswordField
 from wtforms.validators import Required
@@ -234,9 +234,10 @@ def client_devices_delete(client_id, did):
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
 def client_config(client_id):
+    cli = MQSyncReq(app.zmq_context)
     detail = get_client_detail(client_id)
     config = detail['data']['configuration']
-    known_items = []
+    known_items = {}
 
     # dynamically generate the wtfform
     class F(Form):
@@ -244,7 +245,7 @@ def client_config(client_id):
         pass
     for item in config:
         # keep track of the known fields
-        known_items.append(item["key"])
+        known_items[item["key"]] = item["type"]
         # handle required
         if item["required"] == "yes":
             arguments = [Required()]
@@ -282,22 +283,27 @@ def client_config(client_id):
             field = TextField(item["name"], arguments, description=item["description"], default=default)
         # add the field
         setattr(F, item["key"], field)
-    # add the submit button
-    field = submit = SubmitField("Save configuration")
-    setattr(F, "submit", field)
+    # Add the submit button only if there is some existing configuration to save...
+    # plugins with identity->xpl_clients_only == True for example have no configuration items
+    if config != []:
+        field = submit = SubmitField("Save configuration")
+        setattr(F, "submit", field)
+        form = F()
+    else:
+        form = None
 
-    form = F()
 
     if request.method == 'POST' and form.validate():
         # build the requested config set
         data = {}
-        for arg, value in list(request.form.items()):
-            if arg in known_items:
-                data[arg] = getattr(form, arg).data
-        if 'auto_startup' in data.keys():
-            data['auto_startup'] = 'Y'
-        else:
-            data['auto_startup'] = 'N'
+        for key, typ in known_items.iteritems():
+            val = getattr(form, key).data
+            if typ == "boolean":
+                if val == False:
+                    val = 'N'
+                else:
+                    val = 'Y'
+            data[key] = val
         # build the message
         msg = MQMessage()
         msg.set_action('config.set')
@@ -390,14 +396,27 @@ def client_devices_new_wiz(client_id, device_type_id, product):
 
     # dynamically generate the wtfform
     class F(Form):
-        name = TextField("Device", [Required()], description=gettext("the display name for this device"))
+        name = TextField("Device name", [Required()], description=gettext("The display name for this device"))
         description = TextField("Description", description=gettext("A description for this device"))
         reference = TextField("Reference", description=gettext("A reference for this device"))
         pass
+    # Form for the Global part
+    class F_global(Form):
+        pass
+    # Form for the xpl part
+    class F_xpl(Form):
+        pass
+    # Form for the xpl command part
+    class F_xpl_command(Form):
+        pass
+    # Form for the xpl stat part
+    class F_xpl_stat(Form):
+        pass
+
     # add the global params
     for item in params["global"]:
         # build the field
-        name = "Parameter - '{0}'".format(item["key"])
+        name = "{0}".format(item["key"])
         default = None
         if 'default' in item:
             default = item['default']
@@ -426,10 +445,11 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             # time, email, ipv4, ipv6, url
             field = TextField(name, [Required()], description=item["description"], default=default)
         setattr(F, "glob|{0}".format(item["key"]), field)
+        setattr(F_global, "glob|{0}".format(item["key"]), field)
     # add the xpl params
     for item in params["xpl"]:
         # build the field
-        name = "xPL Parameter - '{0}'".format(item["key"])
+        name = "{0}".format(item["key"])
         default = None
         if 'default' in item:
             default = item['default']
@@ -458,10 +478,11 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             # time, email, ipv4, ipv6, url
             field = TextField(name, [Required()], description=item["description"], default=default)
         setattr(F, "xpl|{0}".format(item["key"]), field)
+        setattr(F_xpl, "xpl|{0}".format(item["key"]), field)
     for cmd in params["xpl_commands"]:
         for item in params["xpl_commands"][cmd]:
-            # build the fiel
-            name = "Xpl-Command '{0}' Parameter '{1}'".format(cmd, item["key"])
+            # build the field
+            name = "{0} - {1}".format(cmd, item["key"])
             default = None
             if 'default' in item:
                 default = item['default']
@@ -490,10 +511,11 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 # time, email, ipv4, ipv6, url
                 field = TextField(name, [Required()], description=item["description"], default=default)
             setattr(F, "cmd|{0}|{1}".format(cmd,item["key"]), field)
+            setattr(F_xpl_command, "cmd|{0}|{1}".format(cmd,item["key"]), field)
     for cmd in params["xpl_stats"]:
         for item in params["xpl_stats"][cmd]:
-            # build the fiel
-            name = "Xpl-Stat '{0}' Parameter '{1}'".format(cmd, item["key"])
+            # build the field
+            name = "{0} - {1}".format(cmd, item["key"])
             default = None
             if 'default' in item:
                 default = item['default']
@@ -507,27 +529,33 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                     default = True
                 else:
                     default = False
-                field = BooleanField(name, [Required()], description=desc, default=default)
+                field = BooleanField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
             elif item["type"] == "integer":
-                field = IntegerField(name, [Required()], description=desc, default=default)
+                field = IntegerField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
             elif item["type"] == "date":
-                field = DateField(name, [Required()], description=desc, default=default)
+                field = DateField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
             elif item["type"] == "datetime":
-                field = DateTimeField(name, [Required()], description=desc, default=default)
+                field = DateTimeField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [Required()], description=desc, default=default)
+                field = DateTimeField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
             elif item["type"] == "choice":
                 choices = []
                 for key in sorted(item["choices"]):
                     choices.append((key, item["choices"][key]))
-                field = SelectField(name, [Required()], description=desc, choices=choices, default=default)
+                field = SelectField(name, [validators.Required(gettext("This value is required"))], description=desc, choices=choices, default=default)
             elif item["type"] == "password":
-                field = PasswordField(name, [Required()], description=desc, default=default)
+                field = PasswordField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
             else:
                 # time, email, ipv4, ipv6, url
-                field = TextField(name, [Required()], description=desc, default=default)
+                field = TextField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
             setattr(F, "stat|{0}|{1}".format(cmd,item["key"]), field)
+            setattr(F_xpl_stat, "stat|{0}|{1}".format(cmd,item["key"]), field)
+    # create the forms
     form = F()
+    form_global = F_global()
+    form_xpl = F_xpl()
+    form_xpl_command = F_xpl_command()
+    form_xpl_stat = F_xpl_stat()
 
     if request.method == 'POST' and form.validate():
         # aprams hold the stucture,
@@ -582,6 +610,10 @@ def client_devices_new_wiz(client_id, device_type_id, product):
 
     return render_template('client_device_new_wiz.html',
             form = form,
+            form_global = form_global,
+            form_xpl = form_xpl,
+            form_xpl_command = form_xpl_command,
+            form_xpl_stat = form_xpl_stat,
             params = params,
             dtype = device_type_id,
             clientid = client_id,

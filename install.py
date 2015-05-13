@@ -390,8 +390,10 @@ def install():
             #So I not found pettiest test :(
             if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
                 dist_packages_install_script = './debian_packages_install.sh'
+            elif os.system(' bash -c \'[ "`lsb_release -si`" == "Ubuntu" ]\'') == 0:
+                dist_packages_install_script = './debian_packages_install.sh'
             if dist_packages_install_script == '' :
-                raise OSError("This argument is not implemented on this distribution.")
+                raise OSError("The option --dist-packages is not implemented on this distribution. Please install the packages manually.")
             if os.system(dist_packages_install_script) != 0:
                 raise OSError("Cannot install packages correctly script '%s'" % dist_packages_install_script)
 

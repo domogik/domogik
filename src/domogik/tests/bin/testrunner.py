@@ -38,6 +38,7 @@ Implements
 from domogik import __version__ as DMG_VERSION
 from domogik.common import logger
 from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
+from domogik.common.configloader import Loader, CONFIG_FILE
 from argparse import ArgumentParser
 import os
 import json
@@ -60,9 +61,25 @@ class TestRunner():
     def __init__(self):
         """ Init
         """
+        # set logger
         l = logger.Logger("testrunner")
         l.set_format_mode("messageOnly")
         self.log = l.get_logger()
+
+        # read the config file
+        try:
+            cfg = Loader('domogik')
+            config = cfg.load()
+            conf = dict(config[1])
+
+            # pid dir path
+            self._libraries_path = conf['libraries_path']
+            self.log.debug("Libraries path is : {0}".format(self._libraries_path))
+
+        except:
+            self.log.error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
+            return
+
 
         parser = ArgumentParser(description="Launch all the tests that don't need hardware.")
 	parser.add_argument("directory",
@@ -169,7 +186,7 @@ class TestRunner():
             self.log.info("---------------------------------------------------------------------------------------")
             self.log.info("Launching {0}".format(test))
             self.log.info("---------------------------------------------------------------------------------------")
-            cmd = "{0} && cd {1} && python ./{2}.py".format(STARTED_BY_MANAGER, self.path, test)
+            cmd = "export PYTHONPATH={0} && {1} && cd {2} && python ./{3}.py".format(self._libraries_path, STARTED_BY_MANAGER, self.path, test)
             subp = Popen(cmd,
                          shell=True)
             pid = subp.pid
