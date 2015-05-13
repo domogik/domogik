@@ -1,0 +1,70 @@
+================================
+How to release a Domogik version
+================================
+
+.. todo::
+    To finish
+
+Summary
+=======
+
+There are two main branches in Domogik/Domoweb/Domodroid sources :
+
+* **master** : this is the branch which contains the last stable release.
+* **develop** : this branch contains the upgrades that are finished and will be included in the next stable delivery.
+
+Each release is a **tag** created from the **develop** branch. When the tag is about a *final* release (not a alpha/beta/candidate), this tag will be merged in the **master** branch.
+
+Each improvment or fix on Domogik/Domoweb/Domodroid must be implemented in a dedicated branch! The dedicated branch can be merged into **develop** only when developments are finished, documentation is up to date and all tests are passing.
+
+We basically follow the main lines of this `git branching model <http://nvie.com/posts/a-successful-git-branching-model/>`_
+
+Releasing
+=========
+
+Release domogik-mq if needed
+----------------------------
+
+If the Domogik release need a new version of Domogik-mq to work, create this one :
+
+* create a tag in the **develop** branch
+* merge the tag in the **master** branch
+* go on GitHub and create a release from the tag.
+
+*For the details of the command, you can use the same commands as for Domogik*.
+
+Release a beta
+--------------
+
+In the **develop** branch, make sure you merged all needed features branches :
+
+::
+
+    git checkout develop
+    git merge my_feature_A
+    git merge my_feature_B
+
+For a few days, do some tests with the develop branches on the included features.
+
+When all is ok, put a tag on the develop branch. for example for a beta release:
+
+::
+
+    git tag -a "0.4.0b1" -m "Release 0.4.0 beta 1"
+
+Go on GitHub and create a release from the tag.
+
+
+Release a final release
+-----------------------
+
+..todo ::
+    complete
+
+Create the release branch :
+
+..todo ::
+    complete
+
+In the newly created release branch, upgrade the install documentation with the final packages (tgz) from the GitHub for all needed components (domogik, domogik-mq)
+

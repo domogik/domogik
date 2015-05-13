@@ -375,7 +375,114 @@ class Plugin(BasePlugin, MQRep):
             return device_list
 
 
-    def device_detected(self, device_type, type, feature, data):
+    def device_detected(self, data):
+        """ The plugin developpers can call this function when a device is detected
+            This function will check if a corresponding device exists and :
+            - if so, do nothing
+            - if not, add the device in a 'new devices' list
+                 - if the device is already in the 'new devices list', does nothing
+                 - if not : add it into the list and send a MQ message : an event for the UI to say a new device is detected
+
+            @param data : data about the device 
+            
+            Data example : 
+            {
+                "device_type" : "...",
+                "reference" : "...",
+                "global" : [
+                    { 
+                        "key" : "....",
+                        "value" : "...."
+                    },
+                    ...
+                ],
+                "xpl" : [
+                    { 
+                        "key" : "....",
+                        "value" : "...."
+                    },
+                    ...
+                ],
+                "xpl_commands" : {
+                    "command_id" : [
+                        { 
+                            "key" : "....",
+                            "value" : "...."
+                        },
+                        ...
+                    ],
+                    "command_id_2" : [...]
+                },
+                "xpl_stats" : {
+                    "sensor_id" : [
+                        { 
+                            "key" : "....",
+                            "value" : "...."
+                        },
+                        ...
+                    ],
+                    "sensor_id_2" : [...]
+                }
+            }
+        """
+        self.log.debug(u"Device detected : data = {0}".format(data))
+        # browse all devices to find if the device exists
+        found = False
+        for a_device in self.devices:
+            # TODO : set the id if the device exists!
+            pass
+
+        if found:
+            self.log.debug(u"The device already exists : id={0}.".format(a_device['id']))
+        else:
+            self.log.debug(u"The device doesn't exists in database")
+            # generate a unique id for the device from its addresses
+            new_device_id = self.generate_detected_device_id(data)
+         
+            # add the device feature in the new devices list : self.new_devices[device_type][type][feature] = data
+            self.log.debug(u"Check if the device has already be marked as new...")
+            found = False
+            for a_device in self.new_devices:
+                if a_device['id'] == new_device_id:
+                    found = True
+
+            #for a_device in self.new_devices:
+            #    if a_device['device_type_id'] == device_type and \
+            #       a_device['type'] == type and \
+            #       a_device['feature'] == feature:
+#
+            #       if data == a_device['data']:
+            #            found = True
+                    
+            if found == False:
+                new_device = {'id' : new_device_id, 'data' : data}
+                self.log.info(u"New device feature detected and added in the new devices list : {0}".format(new_device))
+                self.new_devices.append(new_device)
+
+                # publish new devices update
+                self._pub.send_event('device.new',
+                                     {"type" : "plugin",
+                                      "name" : self._name,
+                                      "host" : self.get_sanitized_hostname(),
+                                      "client_id" : "plugin-{0}.{1}".format(self._name, self.get_sanitized_hostname()),
+                                      "device" : new_device})
+
+                # TODO : later (0.4.0+), publish one "new device" notification with only the new device detected
+
+            else:
+                self.log.debug(u"The device has already been detected since the plugin startup")
+
+    def generate_detected_device_id(self, data):
+        """ Generate an unique id based on the content of data
+        """
+        # TODO : improve to make something more sexy ?
+        the_id = json.dumps(data, sort_keys=True) 
+        chars_to_remove = ['"', '{', '}', ',', ' ', '=', '[', ']', ':']
+        the_id = the_id.translate(None, ''.join(chars_to_remove))
+        return the_id
+
+
+    def OLD_device_detected(self, device_type, type, feature, data):
         """ The plugin developpers can call this function when a device is detected
             This function will check if a corresponding device exists and : 
             - if so, do nothing

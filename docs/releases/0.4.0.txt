@@ -17,7 +17,15 @@ New database model
 ------------------
 
 A new database model has been implemented. With this new model we removed the usages but add support for multiple adress fields (like address and channel). We also added support for devices that use a different address for receiving commands and for sending there statusses (like KNX). With this implementation we increased the plugin json_version to 2, meaning that the old plugins will not work in this release.
+
 This new model is really more efficient that the previous one and will allow us to now handle more technologies in a better way.
+
+xPL is no more mandatory for core components
+--------------------------------------------
+
+Excepting dedicated xPL components, all core components (manager, rest, admin, ...) do not depend anymore of a working xPL hub to be able to start and work.
+
+But keep in mind that for now, all plugins are using xPL so a hub is still needed to use the plugins.
 
 Domogik Datatypes
 -----------------
@@ -46,16 +54,15 @@ New Rest
 The REST core component has been removed and rewritten. Now it allows only to read data in database and send commands (before it also stored the data sent by the plugins in database and some other things).
 It is now based on flask for url routing and is RESTFULLY : it uses HTTP methods (GET, POST, PUT, DELETE) and HTTP status codes.
 
+Zero MQ (message queue)
+-----------------------
+
+The 0MQ message queue system is now used in Domogik. All the internal communications are now done with 0MQ instead of using xPL. xPL is now only used to handle automation data over the network.
+
 New XplGW core component
 ------------------------
 
 The new xPLGW core component is the only gateway to the xpl network, this is the component that translates the mq messages to xPL commands and the received xPL message to message queue published events.
-
-
-Zero MQ
--------
-
-The 0MQ message queue system is now used in Domogik. All the internal communications are now done with 0MQ instead of using xPL. xPL is now only used to handle automation data over the network.
 
 New format for the plugins
 --------------------------
@@ -68,7 +75,16 @@ The plugin format has been changed. The main changes are:
 * the json file format has been reviewed and has new parts.
 * the plugin management has been improved a lot for more quality.
 * a test framework has been designed to allow automatic testing on the plugins.
+* a :doc:`documentation has been written to help you to create your own plugins </package_development/plugins/index>`.
 * ...
+
+xPL clients not related to Domogik
+**********************************
+
+Domogik can, as in the 0.3 release, handle some external xPL clients. There are 2 kind of external xPL clients:
+
+* the xPL clients related to a plugin. For example the *RFXCOM Lan xPL* hardware is handled by the *rfxcom* plugin : the python part of the plugin (used for the *RFXCOM usb model*) is not used, but all the devices declarations and features can be used for the xPL client. These clients are detected by Domogik and linked in the clients list to the related plugin.
+* the xPL clients with no relationship with a dedicated plugin. For these xPL clients, you can try to use the *generic* plugin which allow to create some Domogik devices for common xPL features (temperature, humidity, ...).
 
 New administration interface
 ----------------------------
