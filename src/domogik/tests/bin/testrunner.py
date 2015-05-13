@@ -147,7 +147,8 @@ class TestRunner():
             return False
 
         self.log.info("List of the tests (keep in mind that tests which need hardware will be skipped) :")
-        for (test, config) in self.json.iteritems():
+        for test in sorted(self.json):
+            config = self.json[test]
             to_run = True
             if config['need_hardware']:
                 to_run = False
@@ -164,7 +165,8 @@ class TestRunner():
         return True
 
     def run_testcases(self):
-        for (test, config) in self.testcases.items():
+        for test in sorted(self.testcases):
+            config = self.testcases[test]
             # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
             self.log.info("")
             self.log.info("---------------------------------------------------------------------------------------")
