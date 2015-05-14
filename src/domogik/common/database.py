@@ -712,7 +712,6 @@ class DbHelper():
             self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
             for p2 in params['xpl_stats'][a_xplstat]:
                 if p2['key'] == a_parameter['key']:
-                    print p2
                     if 'multiple' in p2:
                         mul = p2['multiple']
                     else:
