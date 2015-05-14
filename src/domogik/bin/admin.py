@@ -134,15 +134,17 @@ class Admin(Plugin):
 
 	try:
             try:
-                cfg_rest = Loader('admin')
-                config_rest = cfg_rest.load()
-                conf_rest = dict(config_rest[1])
-                self.interfaces = conf_rest['interfaces']
-                self.port = conf_rest['port']
-                # if rest_use_ssl = True, set here path for ssl certificate/key
-                self.use_ssl = conf_rest['use_ssl']
-                self.key_file = conf_rest['ssl_certificate']
-                self.cert_file = conf_rest['ssl_key']
+                # admin config
+                cfg_admin = Loader('admin')
+                config_admin = cfg_admin.load()
+                conf_admin = dict(config_admin[1])
+                self.interfaces = conf_admin['interfaces']
+                self.port = conf_admin['port']
+                # if use_ssl = True, set here path for ssl certificate/key
+                self.use_ssl = conf_admin['use_ssl']
+                self.key_file = conf_admin['ssl_certificate']
+                self.cert_file = conf_admin['ssl_key']
+
             except KeyError:
                 # default parameters
                 self.interfaces = server_interfaces
@@ -151,6 +153,7 @@ class Admin(Plugin):
 		self.key_file = ""
 		self.cert_file = ""
                 self.clean_json = False
+                self.log.error("Error while reading configuration for section [admin] : using default values instead")
             self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
 	    
 	    # get all datatypes
