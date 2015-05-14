@@ -620,3 +620,4 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             active = 'devices',
             client_detail = detail
             )
+

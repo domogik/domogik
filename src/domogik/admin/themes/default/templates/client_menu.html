@@ -70,6 +70,10 @@ TODO : remove
               <a href="/client/{{ clientid }}/dmg_devices/known">{% trans %}Domogik devices{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
 
+            <li {% if active == "advanced" %} class="active" {% endif %} >
+              <a href="/{{ client_detail.type }}_{{ client_detail.name}}/{{ clientid }}">{% trans %}Advanced{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+
           </ul>
         </div>
       </div>

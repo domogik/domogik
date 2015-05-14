@@ -195,3 +195,25 @@ def get_rest_doc_path():
 
     return "{0}/rest_doc_generated_during_install/".format(path)
 
+
+
+def get_packages_directory():
+    """ This function is already defined in the Plugin class, but this one is used by the admin in application.py
+        TODO : see if there is a cleaner way to do this!
+    """
+    # global config
+    cfg_global = Loader('domogik')
+    config_global = cfg_global.load()
+    conf_global = dict(config_global[1])
+    return "{0}/{1}".format(conf_global['libraries_path'], "domogik_packages")
+
+def get_libraries_directory():
+    """ This function is already defined in the Plugin class, but this one is used by the admin in application.py
+        TODO : see if there is a cleaner way to do this!
+    """
+    # global config
+    cfg_global = Loader('domogik')
+    config_global = cfg_global.load()
+    conf_global = dict(config_global[1])
+    return conf_global['libraries_path']
+
