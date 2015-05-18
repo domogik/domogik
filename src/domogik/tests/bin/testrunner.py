@@ -100,26 +100,26 @@ class TestRunner():
         # options
         self.log.info("Domogik release : {0}".format(DMG_VERSION))
         self.log.info("Running test with the folowing parameters:")
-	if self.options.allow_alter:
-	    self.log.info("- allow to alter the configuration or setup.")
-    if self.options.criticity not in (LOW, MEDIUM, HIGH):
-        self.options.criticity = LOW
-	    self.log.info("- criticity : {0}".format(self.options.criticity))
+	    if self.options.allow_alter:
+	        self.log.info("- allow to alter the configuration or setup.")
+        if self.options.criticity not in (LOW, MEDIUM, HIGH):
+            self.options.criticity = LOW
+        self.log.info("- criticity : {0}".format(self.options.criticity))
 
         # check tests folder
-	self.log.info("- path {0}".format(self.options.directory))
+	    self.log.info("- path {0}".format(self.options.directory))
         if not self.check_dir():
             return
 
         # check and load the json file
         self.log.info("- json file {0}".format(self.json_file))
-	if not self.load_json():
-	    return
+	    if not self.load_json():
+	        return
 
     def check_dir(self):
         self.path = None
 	
-	if self.options.directory == ".":
+	    if self.options.directory == ".":
             self.path = os.path.dirname(os.path.realpath(__file__))
         elif self.options.directory.startswith('/'):
             self.path = self.options.directory
@@ -127,22 +127,22 @@ class TestRunner():
             self.path = "{0}/{1}".format(os.path.dirname(os.path.realpath(__file__)), self.options.directory)
 	
         # check if self.path is a directory
-	if not os.path.isdir(self.path):
-	    self.log.error("Path {0} is not a directory".format(self.path))
-	    return False
+	    if not os.path.isdir(self.path):
+	        self.log.error("Path {0} is not a directory".format(self.path))
+	        return False
 
-	# cehck if we have a json file
-	self.json_file = "{0}/tests.json".format(self.path)
+	    # cehck if we have a json file
+	    self.json_file = "{0}/tests.json".format(self.path)
         if not os.path.isfile(self.json_file):
-	    self.log.error("{0} is not a valid 'tests.json' file".format(self.json_file))
-	    return False
+	        self.log.error("{0} is not a valid 'tests.json' file".format(self.json_file))
+	        return False
 
-	return True
+	    return True
 
     def load_json(self):
         try:
             self.json = json.loads(open(self.json_file).read())
-	except:
+	    except:
             self.log.error("Error during json file reading: {0}".format(traceback.format_exc()))
             return False
 
