@@ -405,7 +405,7 @@ class SensorHistory(Base):
         return SensorHistory.__tablename__
 
 class XplStat(Base):
-    __tablename__ = '{0}_xplstat'.foramt(_db_prefix)
+    __tablename__ = '{0}_xplstat'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
