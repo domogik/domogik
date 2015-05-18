@@ -149,7 +149,7 @@ class DeviceParam(Base):
     __tablename__ = '{0}_device_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('{0}.id', format(Device.get_tablename()), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
@@ -214,12 +214,12 @@ class Person(Base):
 class UserAccount(Base):
     """User account for persons : it is only used by the UI"""
 
-    __tablename__ = '%s_user_account' % _db_prefix
+    __tablename__ = '{0}_user_account'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
     login = Column(Unicode(20), nullable=False, unique=True)
     password = Column("password", Unicode(255), nullable=False)
-    person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
+    person_id = Column(Integer, ForeignKey('{0}.id'.format(Person.get_tablename())))
     person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
     skin_used = Column(Unicode(80), nullable=False, default=Unicode('default'))
@@ -246,8 +246,8 @@ class UserAccount(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s, skin=%s)>"\
-               % (self.id, self.login, self.is_admin, self.person, self.skin_used)
+        return "<UserAccount(id={0}, login='{1}', is_admin={2}, person={3}, skin={4})>"\
+               .format(self.id, self.login, self.is_admin, self.person, self.skin_used)
    # Flask-Login integration
     def is_authenticated(self):
         return True
@@ -268,10 +268,10 @@ class UserAccount(Base):
         return UserAccount.__tablename__
 
 class Command(Base):
-    __tablename__ = '%s_command' % _db_prefix
+    __tablename__ = '{0}_command'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255), nullable=False)
     reference = Column(Unicode(64))
     return_confirmation = Column(Boolean, nullable=False)
@@ -286,8 +286,8 @@ class Command(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Command(id=%s device_id=%s reference='%s' name='%s' return_confirmation=%s params=%s xpl_command=%s)>"\
-               % (self.id, self.device_id, self.reference, self.name, self.return_confirmation, self.params, self.xpl_command)
+        return "<Command(id={0} device_id={1} reference='{2}' name='{3}' return_confirmation={4} params={5} xpl_command={6})>"\
+               .format(self.id, self.device_id, self.reference, self.name, self.return_confirmation, self.params, self.xpl_command)
 
     @staticmethod
     def get_tablename():
@@ -295,9 +295,9 @@ class Command(Base):
         return Command.__tablename__
 
 class CommandParam(Base):
-    __tablename__ = '%s_command_param' % _db_prefix
+    __tablename__ = '{0}_command_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
-    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
+    cmd_id = Column(Integer, ForeignKey('{0}.id'.format(Command.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement='ignore_fk')
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
@@ -311,8 +311,8 @@ class CommandParam(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<CommandParam(cmd_id=%s key='%s' data_type='%s' conversion='%s')>"\
-               % (self.cmd_id, self.key, self.data_type, self.conversion)
+        return "<CommandParam(cmd_id={0} key='{1}' data_type='{2}' conversion='{3}')>"\
+               .format(self.cmd_id, self.key, self.data_type, self.conversion)
 
     @staticmethod
     def get_tablename():
@@ -320,10 +320,10 @@ class CommandParam(Base):
         return CommandParams.__tablename__
 
 class Sensor(Base):
-    __tablename__ = '%s_sensor' % _db_prefix
+    __tablename__ = '{0}_sensor'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     incremental = Column(Boolean, nullable=False)
@@ -360,8 +360,8 @@ class Sensor(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s min=%s max=%s timeout=%s formula='%s')>"\
-               % (self.id, self.device_id, self.reference, self.incremental, \
+        return "<Sensor(id={0} device_id={1} reference='{2}' incremental={3} name='{4}' data_type='{5}' conversion='{6}' h_store={7} h_max={8} h_expire={9} h_round={10} h_duplicate={11} min={12} max={13} timeout={14} formula='{15}')>"\
+               .format(self.id, self.device_id, self.reference, self.incremental, \
                    self.name, self.data_type, self.conversion, \
                    self.history_store, self.history_max, self.history_expire, \
                    self.history_round, self.history_duplicate, \
@@ -373,10 +373,10 @@ class Sensor(Base):
         return Sensor.__tablename__
 
 class SensorHistory(Base):
-    __tablename__ = '%s_sensor_history' % _db_prefix
+    __tablename__ = '{0}_sensor_history'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=False, index=True)
+    sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
     value_num = Column(Float, nullable=True)
     value_str = Column(Unicode(32), nullable=False)
@@ -396,8 +396,8 @@ class SensorHistory(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<SensorHistory(sensor_id=%s date=%s value_str='%s' value_num=%s orig_value_num=%s)>"\
-               % (self.sensor_id, self.date, self.value_str, self.value_num, self.original_value_num)
+        return "<SensorHistory(sensor_id={0} date={1} value_str='{2}' value_num={3} orig_value_num={4})>"\
+               .format(self.sensor_id, self.date, self.value_str, self.value_num, self.original_value_num)
 
     @staticmethod
     def get_tablename():
@@ -405,10 +405,10 @@ class SensorHistory(Base):
         return SensorHistory.__tablename__
 
 class XplStat(Base):
-    __tablename__ = '%s_xplstat' % _db_prefix
+    __tablename__ = '{0}_xplstat'.foramt(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
     name = Column(Unicode(64), nullable=False)
     schema = Column(Unicode(32), nullable=False)
@@ -422,8 +422,8 @@ class XplStat(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStat(id=%s device_id=%s name='%s' schema='%s' params=%s json_id=%s)>"\
-               % (self.id, self.device_id, self.name, self.schema, self.params, self.json_id)
+        return "<XplStat(id={0} device_id={1} name='{2}' schema='{3}' params={4} json_id={5})>"\
+               .format(self.id, self.device_id, self.name, self.schema, self.params, self.json_id)
 
     @staticmethod
     def get_tablename():
@@ -432,14 +432,14 @@ class XplStat(Base):
 
 
 class XplStatParam(Base):
-    __tablename__ = '%s_xplstat_param' % _db_prefix
+    __tablename__ = '{0}_xplstat_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
-    xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
+    xplstat_id = Column(Integer, ForeignKey('{0}.id'.format(XplStat.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
     multiple = Column(Unicode(1), nullable=True)
     static = Column(Boolean, nullable=True)
-    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=True)
+    sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=True)
     ignore_values = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
@@ -456,8 +456,8 @@ class XplStatParam(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplStatParam(stat_id=%s key='%s' value='%s' multi='%s' static=%s sensor_id=%s ignore='%s' type='%s')>"\
-               % (self.xplstat_id, self.key, self.value, self.multiple, self.static, self.sensor_id, self.ignore_values, self.type)
+        return "<XplStatParam(stat_id={0} key='{1}' value='{2}' multi='{3}' static={4} sensor_id={5} ignore='{6}' type='{7}')>"\
+               .format(self.xplstat_id, self.key, self.value, self.multiple, self.static, self.sensor_id, self.ignore_values, self.type)
 
     @staticmethod
     def get_tablename():
@@ -466,15 +466,15 @@ class XplStatParam(Base):
 
 
 class XplCommand(Base):
-    __tablename__ = '%s_xplcommand' % _db_prefix
+    __tablename__ = '{0}_xplcommand'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
-    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
+    cmd_id = Column(Integer, ForeignKey('{0}.id'.format(Command.get_tablename()), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
     name = Column(Unicode(64), nullable=False)
     schema = Column(Unicode(32), nullable=False)
-    stat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), nullable=True)
+    stat_id = Column(Integer, ForeignKey('{0}.id'.format(XplStat.get_tablename()), ondelete="cascade"), nullable=True)
     stat = relation("XplStat", backref=__tablename__, cascade="all")
     params = relationship("XplCommandParam", backref=__tablename__, cascade="all", passive_deletes=True)
 
@@ -488,8 +488,8 @@ class XplCommand(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' json_id='%s' schema='%s' stat=%s params=%s)>"\
-               % (self.id, self.device_id, self.cmd_id, self.name, self.json_id, self.schema, self.stat, self.params)
+        return "<XplCommand(id={0} device_id={1} cmd_id={2} name='{3}' json_id='{4}' schema='{5}' stat={6} params={7})>"\
+               .format(self.id, self.device_id, self.cmd_id, self.name, self.json_id, self.schema, self.stat, self.params)
 
     @staticmethod
     def get_tablename():
@@ -498,9 +498,9 @@ class XplCommand(Base):
 
 
 class XplCommandParam(Base):
-    __tablename__ = '%s_xplcommand_param' % _db_prefix
+    __tablename__ = '{0}_xplcommand_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
-    xplcmd_id = Column(Integer, ForeignKey('%s.id' % XplCommand.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
+    xplcmd_id = Column(Integer, ForeignKey('{0}.id'.format(XplCommand.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
     UniqueConstraint('xplcmd_id', 'key', name='uix_1')
@@ -512,8 +512,8 @@ class XplCommandParam(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<XplCommandParam(cmd_id=%s key='%s' value='%s')>"\
-               % (self.xplcmd_id, self.key, self.value)
+        return "<XplCommandParam(cmd_id={0} key='{1}' value='{2}')>"\
+               .format(self.xplcmd_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -521,7 +521,7 @@ class XplCommandParam(Base):
         return XplCommandParam.__tablename__
 
 class Scenario(Base):
-    __tablename__ = '%s_scenario' % _db_prefix
+    __tablename__ = '{0}_scenario'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     name = Column(Unicode(32), nullable=False, autoincrement=False)
@@ -535,8 +535,8 @@ class Scenario(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Scenario(id=%s name='%s' json='%s' disabled=%s)>"\
-               % (self.id, self.name, self.json, self.disabled)
+        return "<Scenario(id={0} name='{1}' json='{2}' disabled={3})>"\
+               .format(self.id, self.name, self.json, self.disabled)
 
     @staticmethod
     def get_tablename():
