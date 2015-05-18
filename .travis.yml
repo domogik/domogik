@@ -26,8 +26,6 @@ python:
   - "3.3"
   - "3.4"
   - "nightly"
-  - "pypy"
-  - "pypy3"
 mysql:
   adapter: mysql2
   database: domogik
