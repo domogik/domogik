@@ -102,9 +102,9 @@ class TestRunner():
         self.log.info("Running test with the folowing parameters:")
 	if self.options.allow_alter:
 	    self.log.info("- allow to alter the configuration or setup.")
-	if self.options.criticity not in (LOW, MEDIUM, HIGH):
+    if self.options.criticity not in (LOW, MEDIUM, HIGH):
         self.options.criticity = LOW
-	self.log.info("- criticity : {0}".format(self.options.criticity))
+	    self.log.info("- criticity : {0}".format(self.options.criticity))
 
         # check tests folder
 	self.log.info("- path {0}".format(self.options.directory))
