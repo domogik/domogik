@@ -101,10 +101,10 @@ def register_api(view, endpoint, url, pk='id', pk_type=None):
     urlHandler.add_url_rule(url, defaults={pk: None}, view_func=view_func, methods=['GET'])
     urlHandler.add_url_rule(url, view_func=view_func, methods=['POST'])
     if pk_type != None:
-        urlHandler.add_url_rule('%s<%s:%s>' % (url, pk_type, pk), view_func=view_func,
+        urlHandler.add_url_rule('{0}<{1}:{2}>'.format(url, pk_type, pk), view_func=view_func,
                      methods=['GET', 'PUT', 'DELETE'])
     else:
-        urlHandler.add_url_rule('%s<%s>' % (url, pk), view_func=view_func,
+        urlHandler.add_url_rule('{0}<{1}>'.format(url, pk), view_func=view_func,
                      methods=['GET', 'PUT', 'DELETE'])
 
 

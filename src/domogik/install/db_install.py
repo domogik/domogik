@@ -31,13 +31,13 @@ FAIL = '\033[91m'
 ENDC = '\033[0m'
 
 def info(msg):
-    print(u"%s [ %s ] %s" % (BLUE,msg,ENDC))
+    print(u"%{0} [ {1} ] {2}".format(BLUE,msg,ENDC))
 def ok(msg):
-    print(u"%s ==> %s  %s" % (OK,msg,ENDC))
+    print(u"{0} ==> {1} {2}".format(OK,msg,ENDC))
 def warning(msg):
-    print(u"%s ==> %s  %s" % (WARNING,msg,ENDC))
+    print(u"{0} ==> {1}  {2}".format(WARNING,msg,ENDC))
 def fail(msg):
-    print(u"%s ==> %s  %s" % (FAIL,msg,ENDC))
+    print(u"{0} ==> {1}  {2}".format(FAIL,msg,ENDC))
 ### <<<<
 
 
@@ -65,19 +65,19 @@ class DbInstall():
         
 
         mysql_script = ""
-        mysql_script+= "create database %s;\n"              %(self._db.get_db_name()    )
-        mysql_script+= "grant usage on *.* to %s@localhost "%(self._db.get_db_user()    )
-        mysql_script+= "    identified by '%s';\n"          %(self._db.get_db_password())
-        mysql_script+= "grant all privileges on %s.*"       %(self._db.get_db_name()    )
-        mysql_script+= "    to %s@localhost;\n"             %(self._db.get_db_user()    )
+        mysql_script+= "create database {0};\n".format(self._db.get_db_name())
+        mysql_script+= "grant usage on *.* to {0}@localhost ".format(self._db.get_db_user())
+        mysql_script+= "    identified by '{0}';\n".format(self._db.get_db_password())
+        mysql_script+= "grant all privileges on {0}.*".format(self._db.get_db_name())
+        mysql_script+= "    to {0}@localhost;\n".format(self._db.get_db_user())
 
         sh_script = "mysql -p -u root << TXT\n"+mysql_script+"TXT\n"
 
         info("mysql_script:\n"+mysql_script)
         info("sh_script:\n"+sh_script)
 
-        ok("Try to create database %s for user %s"%(self._db.get_db_name(),self._db.get_db_user()))
-        ok("Please entrer %s root password"%(self._db.get_db_type()))
+        ok("Try to create database {0} for user {1}".format(self._db.get_db_name(),self._db.get_db_user()))
+        ok("Please entrer {0} root password".format(self._db.get_db_type()))
         res = os.system(sh_script)
         if ( res != 0 ):
             fail("cannot create database, may be already exist ?")
@@ -119,22 +119,22 @@ class DbInstall():
         from alembic import command
 
         if not self._db.is_db_type_mysql():
-            warning("Can't backup your database, only mysql is supported (you have : %s)" % self._db.get_db_type())
+            warning("Can't backup your database, only mysql is supported (you have : {0})".format(self._db.get_db_type()))
             return
         if confirm:
             answer = raw_input("Do you want to backup your database? [Y/n] ")
             if answer == 'n':
                 return
-        answer = raw_input("Backup file? [%s] " % self.db_backup_file)
+        answer = raw_input("Backup file? [{0}] ".format(self.db_backup_file))
         if answer != '':
             bfile = answer
         else:
             bfile = self.db_backup_file
-        ok("Backing up your database to %s" % bfile)
+        ok("Backing up your database to {0}".format(bfile))
         with open(bfile, 'w') as f:
             mysqldump_cmd = ['mysqldump', '-u', self._db.get_db_user()]
             if self._db.get_db_password():
-                mysqldump_cmd.extend(('-p%s' %self._db.get_db_password(), self._db.get_db_name()))
+                mysqldump_cmd.extend(('-p{0}'.format(self._db.get_db_password()), self._db.get_db_name()))
             else:
                 mysqldump_cmd.append(self._db.get_db_name())
             mysqldump_cmd.append(">")

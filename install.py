@@ -400,7 +400,7 @@ def install():
             if dist_packages_install_script == '' :
                 raise OSError("The option --dist-packages is not implemented on this distribution. Please install the packages manually.")
             if os.system(dist_packages_install_script) != 0:
-                raise OSError("Cannot install packages correctly script '%s'" % dist_packages_install_script)
+                raise OSError("Cannot install packages correctly script '{0}'".format(dist_packages_install_script))
 
         # RUN setup.py
         if not args.setup:
@@ -461,7 +461,7 @@ def install():
         try:
             user_entry = pwd.getpwnam(user)
         except KeyError:
-            raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
+            raise KeyError("The user {0} does not exists, you MUST create it or change the DOMOGIK_USER parameter in {1}. Please report this as a bug if you used install.sh.".format(user, file))
         if os.path.isfile("/var/log/domogik/db_api.log"): 
             os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
         os.chown("/var/lock/domogik/config.lock", user_entry.pw_uid, -1)

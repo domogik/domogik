@@ -48,7 +48,7 @@ class CsvHelper():
     def add_data(self, line):
         """ add line to data
         """
-        self.data = "%s\n%s" % (self.data, line)
+        self.data = "{0}\n{1}".format(self.data, line)
 
     def get(self):
         """ getter for all csv data created
