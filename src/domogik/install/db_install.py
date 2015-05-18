@@ -31,7 +31,7 @@ FAIL = '\033[91m'
 ENDC = '\033[0m'
 
 def info(msg):
-    print(u"%{0} [ {1} ] {2}".format(BLUE,msg,ENDC))
+    print(u"{0} [ {1} ] {2}".format(BLUE,msg,ENDC))
 def ok(msg):
     print(u"{0} ==> {1} {2}".format(OK,msg,ENDC))
 def warning(msg):
