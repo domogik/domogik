@@ -34,5 +34,21 @@ Installation
 Recover your 0.3 devices history
 --------------------------------
 
+To upgrade your device you first need to create the new (the 0.4 formatted) device, so follow the doc on how to create a device.
+
+The next step is to run the statsUpgrade.py script in the domogik root folder. This script will handle the uprgade for you,
+it asks a couple of questions about what device to upgrade and where to upgrade to.
+
+The steps taken (by the script):
+* Ask the old device to uprgade
+* Ask the old stats key to upgrade
+* Request the new device
+* Request the sensor to transfere the stats to
+* Do it
+
+In the last step you will need to enter 'YES I AM SURE' and once this is entered the uprgade will happen for the select old device and stats key.
+This means that you have to do this for each device and stats key you want to upgrade.
+
+
 .. todo::
     Explain how to do it
