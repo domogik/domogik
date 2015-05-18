@@ -70,9 +70,9 @@ class Logger():
             cfg = Loader()
             config = cfg.load()[0]
             if use_filename is None:
-                filename = "%s/%s.log" % (config['log_dir_path'], component_name)
+                filename = "{0}/{1}.log".format(config['log_dir_path'], component_name)
             else:
-                filename = "%s/%s.log" % (config['log_dir_path'], use_filename)
+                filename = "{0}/{1}.log".format(config['log_dir_path'], use_filename)
             level = config['log_level']
 
             if level not in LEVELS:
@@ -80,7 +80,7 @@ class Logger():
                         "'error','critical'. Check your config.")
 
             if domogik_prefix:
-                my_logger = logging.getLogger('domogik-%s' % component_name)
+                my_logger = logging.getLogger('domogik-{0}'.format(component_name))
             else:
                 my_logger = logging.getLogger(component_name)
             # log to file

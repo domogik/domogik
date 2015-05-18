@@ -68,7 +68,7 @@ _db_prefix = dict(_config[1])['prefix']
 class PluginConfig(Base):
     """Configuration for a plugin (x10, plcbus, ...)"""
 
-    __tablename__ = '%s_plugin_config' % _db_prefix
+    __tablename__ = '{0}_plugin_config'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Unicode(30), primary_key=True)
     hostname = Column(Unicode(40), primary_key=True)
@@ -91,7 +91,7 @@ class PluginConfig(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<PluginConfig(id=%s, hostname=%s, (%s, %s))>" % (self.id, self.hostname, self.key, self.value)
+        return "<PluginConfig(id={0}, hostname={1}, ({2}, {3}))>".format(self.id, self.hostname, self.key, self.value)
 
     @staticmethod
     def get_tablename():
@@ -101,7 +101,7 @@ class PluginConfig(Base):
 class Device(Base):
     """Device"""
 
-    __tablename__ = '%s_device' % _db_prefix
+    __tablename__ = '{0}_device'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
@@ -136,8 +136,8 @@ class Device(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', client_version='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
-               % (self.id, self.name, self.description, self.reference,\
+        return "<Device(id={0}, name='{1}', desc='{2}', ref='{3}', type='{4}', client='{5}', client_version='{6}', commands={7}, sensors={8}, xplcommands={9}, xplstats={10})>"\
+                .format(self.id, self.name, self.description, self.reference,\
                   self.device_type_id, self.client_id, self.client_version, \
                   self.commands, \
                   self.sensors, self.xpl_commands, self.xpl_stats)
@@ -150,10 +150,10 @@ class Device(Base):
 class DeviceParam(Base):
     """Device config, some config parameters that are only accessable over the mq, or inside domogik, these have nothin todo with xpl"""
 
-    __tablename__ = '%s_device_param' % _db_prefix
+    __tablename__ = '{0}_device_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id',format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
@@ -184,7 +184,7 @@ class DeviceParam(Base):
 class Person(Base):
     """Persons registered in the app"""
 
-    __tablename__ = '%s_person' % _db_prefix
+    __tablename__ = '{0}_person'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Integer, primary_key=True)
     first_name = Column(Unicode(20), nullable=False)
@@ -206,8 +206,8 @@ class Person(Base):
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>"\
-               % (self.id, self.first_name, self.last_name, self.birthdate)
+        return "<Person(id={0}, first_name='{1}', last_name='{2}', birthdate='{3}')>"\
+               .format(self.id, self.first_name, self.last_name, self.birthdate)
 
     @staticmethod
     def get_tablename():

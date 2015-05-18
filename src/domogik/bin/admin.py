@@ -130,7 +130,7 @@ class Admin(Plugin):
         Plugin.__init__(self, name = 'admin')
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
-        self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
+        self.log.debug(u"locale : {0} {1}".format(locale.getdefaultlocale()[0], locale.getdefaultlocale()[1]))
 
         try:
             try:
@@ -151,7 +151,7 @@ class Admin(Plugin):
                 self.key_file = ""
                 self.cert_file = ""
             self.clean_json = False
-            self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
+            self.log.info(u"Configuration : interfaces:port = {0}:{1}".format(self.interfaces, self.port))
         
             # get all datatypes
             cli = MQSyncReq(self.zmq)
@@ -174,12 +174,12 @@ class Admin(Plugin):
             self.ready(0)
             IOLoop.instance().start()
         except:
-            self.log.error(u"%s" % self.get_exception())
+            self.log.error(u"{0}".format(self.get_exception()))
 
     def start_http(self):
         """ Start HTTP Server
         """
-        self.log.info(u"Start HTTP Server on %s:%s..." % (self.interfaces, self.port))
+        self.log.info(u"Start HTTP Server on {0}:{1}...".format(self.interfaces, self.port))
         # logger
         for log in self.log.handlers:
             admin_app.logger.addHandler(log)

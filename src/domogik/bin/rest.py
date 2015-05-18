@@ -81,7 +81,7 @@ class Rest(Plugin):
         Plugin.__init__(self, name = 'rest')
         # logging initialization
         self.log.info(u"Rest Server initialisation...")
-        self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
+        self.log.debug(u"locale : {0} {1}".format(locale.getdefaultlocale()[0], locale.getdefaultlocale()[1])
 
         # API version
         self._rest_api_version = REST_API_VERSION
@@ -97,8 +97,8 @@ class Rest(Plugin):
             # plugin installation path
             #self._package_path = conf['package_path']
             #self._src_prefix = None
-            #self.log.info(u"Set package path to '%s' " % self._package_path)
-            #self._design_dir = "%s/domogik_packages/design/" % self._package_path
+            #self.log.info(u"Set package path to '{0}' ".format(self._package_path))
+            #self._design_dir = "{0}/domogik_packages/design/".format(self._package_path)
             self.package_mode = True
     
             # HTTP server ip and port
@@ -125,7 +125,7 @@ class Rest(Plugin):
                 self.key_file = ""
                 self.cert_file = ""
                 self.clean_json = False
-            self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
+            self.log.info(u"Configuration : interfaces:port = {0}:{1}".format(self.interfaces, self.port))
     
             # SSL configuration
             try:
@@ -143,7 +143,7 @@ class Rest(Plugin):
                 self.use_ssl = USE_SSL
                 self.ssl_certificate = SSL_CERTIFICATE
             if self.use_ssl == True:
-                self.log.info(u"Configuration : SSL support activated (certificate : %s)" % self.ssl_certificate)
+                self.log.info(u"Configuration : SSL support activated (certificate : {0})".format(self.ssl_certificate))
             else:
                 self.log.info(u"Configuration : SSL support not activated")
     
@@ -168,12 +168,12 @@ class Rest(Plugin):
             self.ready(0)
             IOLoop.instance().start()
         except :
-            self.log.error(u"%s" % self.get_exception())
+            self.log.error(u"{0}".format(self.get_exception()))
 
     def start_http(self):
         """ Start HTTP Server
         """
-        self.log.info(u"Start HTTP Server on %s:%s..." % (self.interfaces, self.port))
+        self.log.info(u"Start HTTP Server on {0}:{1}...".format(self.interfaces, self.port))
         # logger
         for log in self.log.handlers:
             urlHandler.logger.addHandler(log)

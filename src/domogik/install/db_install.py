@@ -61,7 +61,7 @@ class DbInstall():
 
     def create_db(self):
         if not self._db.is_db_type_mysql():
-            raise OSError("Create data base of %s is not implemented. Sorry! "%self._db.get_db_type())
+            raise OSError("Create data base of {0} is not implemented. Sorry! ".format(self._db.get_db_type()))
         
 
         mysql_script = ""

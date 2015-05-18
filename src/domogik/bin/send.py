@@ -62,7 +62,7 @@ class Sender(XplPlugin):
         parser.add_argument("-s", "--source", dest="source", default=None, help="XPL message source.")
         XplPlugin.__init__(self, name = 'send', daemonize = False, parser = parser, nohub = True)
         mess = self.forge_message()
-        self.log.debug(u"Send message : %s" % mess)
+        self.log.debug(u"Send message : {0}".format(mess))
         self.myxpl.send(mess)
         self.force_leave()
 
@@ -74,10 +74,10 @@ class Sender(XplPlugin):
         message = XplMessage()
         message.set_type(self.options.type)
         if self.options.source != None:
-            print(u"Source forced : %s" % self.options.source)
+            print(u"Source forced : {0}".format(self.options.source))
             message.set_source(self.options.source)
         if self.options.target != None:
-            print(u"Target forced : %s" % self.options.target)
+            print(u"Target forced : {0}".format(self.options.target))
             message.set_target(self.options.target)
         message.set_schema(self.options.schema)
         datas = self.options.message.split(',')
