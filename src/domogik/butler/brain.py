@@ -219,5 +219,28 @@ def learn(rs_code):
         file.write(rs_code) 
 #    reload_brain()
 
+def trigger_bool_command(dt_type, device, value):
+    try:
+        device_name = device.lower()
+        cli = MQSyncReq(zmq.Context())
+        msg = MQMessage()
+        msg.set_action('device.get')
+        str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+        devices = json.loads(str_devices)['devices']
+        for a_device in devices:
+            if a_device['name'].lower() == device_name:
+                found = False
+                for a_command in a_device['commands']:
+                    if len(a_device['commands'][a_command]['parameters']) == 1:
+                        if a_device['commands'][a_command]['parameters'][0]['data_type'] == dt_type:
+                            cli = MQSyncReq(zmq.Context())
+                            msg = MQMessage()
+                            msg.set_action('cmd.send')
+                            msg.add_data('cmdid', a_device['commands'][a_command]['id'])
+                            msg.add_data('cmdparams', {a_device['commands'][a_command]['parameters'][0]['key'] : value})
+                            return cli.request('xplgw', msg.get(), timeout=10).get()
+    except:
+        print("ERROR : {0}".format(traceback.format_exc()))
+        pass
 
-
+    return None
