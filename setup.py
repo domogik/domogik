@@ -108,7 +108,6 @@ setup(
             dmg_manager = domogik.bin.manager:main
             dmg_send = domogik.bin.send:main
             dmg_dump = domogik.bin.dump_xpl:main
-            dmg_admin = domogik.bin.admin:main
             dmg_version = domogik.bin.version:main
             dmg_hub = domogik.bin.hub:main
             dmg_insert_data = domogik.tools.packages.insert_data:main

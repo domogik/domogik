@@ -113,6 +113,11 @@ class Manager(XplPlugin):
 
         ### Option parser
         parser = ArgumentParser()
+        parser.add_argument("-a", 
+                          action="store_true", 
+                          dest="start_admin", 
+                          default=False, \
+                          help="Start admin interface if not already running.")
         parser.add_argument("-d", 
                           action="store_true", 
                           dest="start_dbmgr", 
@@ -144,6 +149,7 @@ class Manager(XplPlugin):
         self.log.info(u"Start dbmgr : {0}".format(self.options.start_dbmgr))
         self.log.info(u"Start rest : {0}".format(self.options.start_rest))
         self.log.info(u"Start xpl gateway : {0}".format(self.options.start_xpl))
+        self.log.info(u"Start admin interface : {0}".format(self.options.start_admin))
         self.log.info(u"Start scenario manager : {0}".format(self.options.start_scenario))
 
         ### create a Fifo to communicate with the init script
@@ -199,6 +205,11 @@ class Manager(XplPlugin):
         if self.options.start_xpl:
             if not self._start_core_component("xplgw"):
                 self.log.error(u"Unable to start xpl gateway")
+
+        ### Start admin
+        if self.options.start_admin:
+            if not self._start_core_component("admin"):
+                self.log.error(u"Unable to start admin interface")
 
         ### Start scenario
         if self.options.start_scenario:
