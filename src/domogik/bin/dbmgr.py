@@ -331,12 +331,13 @@ class DBConnector(Plugin, MQRep):
                 # sometimes the given result is for another plugin/key
                 # so while we don't get the good data, we loop
                 # This bug happens rarely
+                print result
                 while result.id != name or \
                    result.type != type or \
                    result.hostname != host or \
                    result.key != key:
                     self.log.debug(u"Bad result : {0}-{1}/{2} != {3}/{4}".format(result.id, result.type, result.key, plugin, key))
-                    result = self._db.get_plugin_config(name, host, key)
+                    result = self._db.get_plugin_config(name, type, host, key)
                 val = result.value
                 if val == '':
                     val = "None"

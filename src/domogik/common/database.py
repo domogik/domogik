@@ -270,7 +270,7 @@ class DbHelper():
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).all()
 
-    def get_plugin_config(self, pl_id, pl_hostname, pl_key):
+    def get_plugin_config(self, pl_id, pl_type, pl_hostname, pl_key):
         """Return information about a plugin parameter
 
         @param pl_id : plugin id
@@ -283,6 +283,7 @@ class DbHelper():
             ret = self.__session.query(
                         PluginConfig
                     ).filter_by(id=ucode(pl_id)
+                    ).filter_by(type=ucode(pl_type)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).filter_by(key=ucode(pl_key)
                     ).first()
