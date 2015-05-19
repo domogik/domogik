@@ -72,11 +72,12 @@ class PluginConfig(Base):
     __tablename__ = '%s_plugin_config' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Unicode(30), primary_key=True)
+    type = Column(Unicode(30), primary_key=True, default='plugin')
     hostname = Column(Unicode(40), primary_key=True)
     key = Column(Unicode(255), primary_key=True)
     value = Column(UnicodeText(), nullable=False)
 
-    def __init__(self, id, hostname, key, value):
+    def __init__(self, id, type, hostname, key, value):
         """Class constructor
 
         @param id : plugin id
@@ -86,13 +87,14 @@ class PluginConfig(Base):
 
         """
         self.id = ucode(id)
+        self.type = ucode(type)
         self.hostname = ucode(hostname)
         self.key = ucode(key)
         self.value = ucode(value)
 
     def __repr__(self):
         """Return an internal representation of the class"""
-        return "<PluginConfig(id=%s, hostname=%s, (%s, %s))>" % (self.id, self.hostname, self.key, self.value)
+        return "<PluginConfig(id=%s, type=%s, hostname=%s, (%s, %s))>" % (self.id, self.type, self.hostname, self.key, self.value)
 
     @staticmethod
     def get_tablename():

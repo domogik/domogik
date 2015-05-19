@@ -255,7 +255,7 @@ class DbHelper():
         """
         return self.__session.query(PluginConfig).all()
 
-    def list_plugin_config(self, pl_id, pl_hostname):
+    def list_plugin_config(self, pl_id, pl_type, pl_hostname):
         """Return all parameters of a plugin
 
         @param pl_id : plugin id
@@ -266,6 +266,7 @@ class DbHelper():
         return self.__session.query(
                         PluginConfig
                     ).filter_by(id=ucode(pl_id)
+                    ).filter_by(type=ucode(pl_type)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).all()
 
