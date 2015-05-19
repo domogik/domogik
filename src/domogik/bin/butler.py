@@ -49,6 +49,7 @@ from domogikmq.pubsub.subscriber import MQAsyncSub
 from domogikmq.pubsub.publisher import MQPub
 #import zmq
 import os
+import sys
 from subprocess import Popen, PIPE
 import time
 import unicodedata
@@ -137,7 +138,7 @@ class Butler(Plugin, MQAsyncSub):
         self.brain.set_variable("sex", self.butler_sex.lower())
 
         # set the PYTHONPATH
-        sys.path.append(self._packages_directory)
+        sys.path.append(self.get_libraries_directory())
 
         # load the brain
         self.brain_content = None
