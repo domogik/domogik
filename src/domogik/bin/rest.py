@@ -81,7 +81,7 @@ class Rest(Plugin):
         Plugin.__init__(self, name = 'rest')
         # logging initialization
         self.log.info(u"Rest Server initialisation...")
-        self.log.debug(u"locale : {0} {1}".format(locale.getdefaultlocale()[0], locale.getdefaultlocale()[1])
+        self.log.debug(u"locale : {0} {1}".format(locale.getdefaultlocale()[0], locale.getdefaultlocale()[1]))
 
         # API version
         self._rest_api_version = REST_API_VERSION
