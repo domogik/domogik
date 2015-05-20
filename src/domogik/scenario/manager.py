@@ -129,7 +129,7 @@ class ScenarioManager:
         @return {'name':name, 'data': parsed_condition} or raise Exception
         """
         if name not in self._conditions:
-            raise KeyError('no key %s in conditions table' % name)
+            raise KeyError('no key {0} in conditions table'.format(name))
         else:
             parsed = self._conditions[name].get_parsed_condition()
             return {'name': name, 'data': parsed}
@@ -179,7 +179,7 @@ class ScenarioManager:
         @return {'name':name, 'result': evaluation result} or raise Exception
         """
         if name not in self._conditions:
-            raise KeyError('no key %s in conditions table' % name)
+            raise KeyError('no key {0} in conditions table'.format(name))
         else:
             res = self._conditions[name].eval_condition()
             return {'name': name, 'result': res}
@@ -189,7 +189,7 @@ class ScenarioManager:
         """
         if name not in self._conditions_actions \
                 or name not in self._conditions:
-            raise KeyError('no key %s in one of the _conditions tables table' % name)
+            raise KeyError('no key {0} in one of the _conditions tables table'.format(name))
         else:
             for action in self._conditions_actions[name]:
                 self._actions_mapping[action].do_action( \

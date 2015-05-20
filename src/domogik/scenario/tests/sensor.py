@@ -52,7 +52,7 @@ class SensorTest(AbstractTest):
             return None
         else:
             # check
-            self._log.debug("Evaluate %s in %s : %s" % (t, u, res))
+            self._log.debug("Evaluate {0} in {1} : {2}".format(t, u, res))
             return res
 
 

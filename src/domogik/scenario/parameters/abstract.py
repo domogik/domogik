@@ -71,7 +71,7 @@ class AbstractParameter:
             if self._thread and not init:
                 self._thread.join()
                 self._thread = None
-            self._thread = Thread(target=self._trigger, name = "call trigger %s" % self._trigger, args=[self])
+            self._thread = Thread(target=self._trigger, name = "call trigger {0}".format(self._trigger), args=[self])
             self._thread.start()
 
     def get_type(self):
