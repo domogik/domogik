@@ -227,20 +227,33 @@ def trigger_bool_command(dt_type, device, value):
         msg.set_action('device.get')
         str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
         devices = json.loads(str_devices)['devices']
+        found = None
         for a_device in devices:
             if a_device['name'].lower() == device_name:
-                found = False
+                cid = 0
                 for a_command in a_device['commands']:
-                    if len(a_device['commands'][a_command]['parameters']) == 1:
-                        if a_device['commands'][a_command]['parameters'][0]['data_type'] == dt_type:
-                            cli = MQSyncReq(zmq.Context())
-                            msg = MQMessage()
-                            msg.set_action('cmd.send')
-                            msg.add_data('cmdid', a_device['commands'][a_command]['id'])
-                            msg.add_data('cmdparams', {a_device['commands'][a_command]['parameters'][0]['key'] : value})
-                            return cli.request('xplgw', msg.get(), timeout=10).get()
+                    pid = 0
+                    for a_param in a_device['commands'][a_command]['parameters']:
+                        if a_param['data_type'] == dt_type:
+                            found = [a_device, a_command, pid]
+                            break
+                        pid = pid + 1
+                    else:
+                        continue
+                        cid = cid + 1
+                    break
+        if found:
+            dev = found[0]
+            cid = found[1]
+            pid = found[2]
+            cli = MQSyncReq(zmq.Context())
+            msg = MQMessage()
+            msg.set_action('cmd.send')
+            msg.add_data('cmdid', dev['commands'][cid]['id'])
+            msg.add_data('cmdparams', {dev['commands'][cid]['parameters'][pid]['key'] : value})
+            return cli.request('xplgw', msg.get(), timeout=10).get()
+        else:
+            return None
     except:
         print("ERROR : {0}".format(traceback.format_exc()))
-        pass
-
-    return None
+        return None
