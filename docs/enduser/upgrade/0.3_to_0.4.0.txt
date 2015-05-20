@@ -48,7 +48,3 @@ The steps taken (by the script):
 
 In the last step you will need to enter 'YES I AM SURE' and once this is entered the uprgade will happen for the select old device and stats key.
 This means that you have to do this for each device and stats key you want to upgrade.
-
-
-.. todo::
-    Explain how to do it
