@@ -7,10 +7,10 @@ except ImportError:
 import flask_login
 from flask_login import LoginManager, current_user
 try:
-	from flask.ext.babel import Babel, get_locale, format_datetime
+        from flask.ext.babel import Babel, get_locale, format_datetime
 except ImportError:
-	from flask_babel import Babel, get_locale, format_datetime
-	pass
+        from flask_babel import Babel, get_locale, format_datetime
+        pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField
 from wtforms.validators import Required
@@ -42,6 +42,7 @@ app.config['SECRET_KEY'] = 'devkey'
 app.config['RECAPTCHA_PUBLIC_KEY'] = \
 '6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
 app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Paris'
+
 
 # jinja 2 filters
 def format_babel_datetime(value, format='medium'):
