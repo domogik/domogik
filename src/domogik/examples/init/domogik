@@ -37,7 +37,6 @@ C_XPLHUB=xPL_Hub
 PYTHON_XPLHUB=dmg_hub
 MQ_BROKER=dmg_broker
 MQ_FORWARDER=dmg_forwarder
-ADMIN=dmg_admin
 DIETIME=2
 STARTTIME=5
 #PIDDIR=$(grep "^pid_dir_path" /etc/domogik/domogik.cfg | cut -d " " -f 3)
@@ -64,21 +63,10 @@ function start {
         echo "Domogik xPL hub disabled. If Domogik failed to start, make sure you have a running hub"
     fi
     start_daemon
-    start_admin
-}
-
-function start_admin {
-    echo -n " * Starting the admin interface ..."
-    /bin/su - ${DOMOGIK_USER} -c "$(which ${ADMIN}) >/dev/null"
-    if [ $? -gt 0 ]; then
-        echo " An error occured during admin startup."
-        exit 1
-    fi
-    echo " Done."
 }
 
 function start_xpl {
-    echo -n " * Starting xPL (${DOMOGIK_XPL_HUB} version)..."
+    echo -n " * Starting xPL (${DOMOGIK_XPL_HUB} version) ..."
     if [ "${DOMOGIK_XPL_HUB}" == "c" ] || [ "${DOMOGIK_XPL_HUB}" == "C" ] ; then
         if [ -z "$(which ${C_XPLHUB})" ];then
             echo "ERROR : ${C_XPLHUB} not in path, please install it somewhere in the path, or add CUSTOM_PATH to domogik system config file."
@@ -119,7 +107,7 @@ function start_manager {
 }
 
 function start_daemon {
-    echo -n " * Starting Manager (with ${MANAGER_PARAMS})..."
+    echo -n " * Starting Manager (with ${MANAGER_PARAMS}) ... "
     /bin/su - ${DOMOGIK_USER} -c "export PATH=/usr/sbin:${PATH} && ${NAME} ${MANAGER_PARAMS}"
     if [ $? -gt 0 ]; then
         echo " "
@@ -200,17 +188,6 @@ function status_manager {
     fi
 }
 
-function status_admin {
-    set +e
-    RUNNING=$(/usr/bin/pgrep -c ${ADMIN})
-    set -e
-    if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
-        echo " * ${ADMIN} is running"
-    else
-        echo " * ${ADMIN} is not running"
-    fi
-} 
-
 function status_xpl {
     if [ "${DOMOGIK_XPL_HUB}" == "c" ] || [ "${DOMOGIK_XPL_HUB}" == "C" ] ; then
         set +e
@@ -239,7 +216,6 @@ function status_xpl {
 }
 
 function stop {
-    stop_admin
     stop_plugins
     stop_manager
     if [ ${LAUNCH_DOMOGIK_XPL_HUB} == "true" ] ; then
@@ -268,16 +244,6 @@ function stop_mq {
         done
         echo " Done."
     fi
-}
-
-function stop_admin {
-    echo -n " * Stopping Admin interface..."
-    for pid in `ps ax | grep "${ADMIN}" | grep -v grep | awk '{print $1}'`; do
-        kill -15 $pid 2>/dev/null 1>&2
-        sleep ${DIETIME}
-        kill -9 $pid 2>/dev/null 1>&2
-    done
-    echo " Done."
 }
 
 function stop_xpl {
@@ -386,9 +352,6 @@ case "$1" in
                 mq)
                     start_mq
                 ;;
-                admin)
-                    start_admin
-                ;;
                 xpl)
                     start_xpl
                 ;;
@@ -398,7 +361,7 @@ case "$1" in
                     start_manager
                     ;;
                 *)
-                    echo "usage: $0 start [manager|xpl|admin|mq]"
+                    echo "usage: $0 start [manager|xpl|mq]"
                 ;;
             esac
         fi
@@ -411,9 +374,6 @@ case "$1" in
                 mq)
                     stop_mq
                 ;;
-                admin)
-                    stop_admin
-                ;;
                 xpl)
                     stop_xpl
                 ;;
@@ -424,7 +384,7 @@ case "$1" in
                     stop_manager
                 ;;
                 *)
-                    echo "usage: $0 stop [manager|xpl|admin|mq]"
+                    echo "usage: $0 stop [manager|xpl|mq]"
                 ;;
             esac
         fi
@@ -444,11 +404,6 @@ case "$1" in
                     sleep ${DIETIME}
                     start_mq
                 ;;
-                admin)
-                    stop_admin
-                    sleep ${DIETIME}
-                    start_admin
-                ;;
                 xpl)
                     stop_xpl
                     sleep ${DIETIME}
@@ -464,7 +419,7 @@ case "$1" in
                     start_manager
                     ;;
                 *)
-                    echo "usage: $0 restart [manager|xpl|admin|mq]"
+                    echo "usage: $0 restart [manager|xpl|mq]"
                 ;;
             esac
         fi
@@ -477,9 +432,6 @@ case "$1" in
                 mq)
                     status_mq
                 ;;
-                admin)
-                    status_admin
-                ;;
                 manager)
                     status_manager
                 ;;
@@ -487,13 +439,13 @@ case "$1" in
                     status_xpl
                 ;;
                 *)
-                    echo "usage: $0 status [manager|xpl|admin|mq]"
+                    echo "usage: $0 status [manager|xpl|mq]"
                 ;;
             esac
         fi
         ;;
     *)
-    echo "usage: $0 {start|stop|restart|status} [(xpl|manager|plugins|admin)]"
+    echo "usage: $0 {start|stop|restart|status} [(manager|xpl|mq)]"
     echo "More help : $0 command help"
 esac
 exit 0

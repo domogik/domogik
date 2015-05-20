@@ -4,18 +4,20 @@
 DOMOGIK_USER=domogik
 
 # This variable can take 6 parameters :
+# -a to start the admin interface (launch only on master host)
 # -d to start the database manager (launch only on master host)
 # -r to start the rest component (launch only on master host)
 # -x to start the xpl gw component (launch only on master host)
 # -s to start the scenario manager component (launch only on master host)
 # -b to start the butler component (launch only on master host)
+# -a to start the admin interface (launch only on master host)
 
 # Remember : Your domogik installation must have *one* and *only one*
 # instance of each manager running.
 # Your domogik installation won't start on this computer if :
 #  - The database manager is not already running elsewhere on the network
 #  - You do not pass -d parameter to the manager
-MANAGER_PARAMS="-d -r -x -s -b"
+MANAGER_PARAMS="-a -d -r -x -s -b"
 
 # You may want to use a xPL hub which is not the one given with Domogik
 # If so, set this option to 'false'
