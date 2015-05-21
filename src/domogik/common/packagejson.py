@@ -124,12 +124,12 @@ class PackageJson():
 
             # common configuration items
             # to add only for a plugin with identity>xpl_clients_only not set to True !
-            if self.json["identity"]["type"] == "plugin" and not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
+            if self.json["identity"]["type"] in ["plugin", "interface"] and not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
                 auto_startup = {
                                    "default": False,
-                                   "description": "Automatically start the plugin at Domogik startup",
+                                   "description": "Automatically start the client at Domogik startup",
                                    "key": "auto_startup",
-                                   "name" : "Start the plugin with Domogik",
+                                   "name" : "Start the client with Domogik",
                                    "required": True,
                                    "type": "boolean"
                                }
