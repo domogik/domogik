@@ -73,7 +73,7 @@ def get_c_hub():
 
 def build_file_list(user):
     d_files = [
-        ('/etc/domogik', [user, 0755], \
+        ('/etc/domogik', [user, 0o755], \
                 ['src/domogik/examples/config/domogik.cfg.sample', \
                 'src/domogik/examples/packages/sources.list', \
                 'src/domogik/xpl/hub/examples/config/xplhub.cfg.sample']),
@@ -86,8 +86,8 @@ def build_file_list(user):
         ('/var/lib/domogik/resources', [user, None], []),
         ('/var/lib/domogik/resources', [user, None], \
                 ['src/domogik/common/datatypes.json']),
-        ('/var/lock/domogik', [user, 0755], []),
-        ('/var/log/domogik', [user, 0755], []),
+        ('/var/lock/domogik', [user, 0o755], []),
+        ('/var/log/domogik', [user, 0o755], []),
         ('/var/log/xplhub', [user, None], []),
     ]
 
@@ -107,11 +107,11 @@ def build_file_list(user):
 
     if os.path.exists('/etc/init.d'):
         debug("Init script path is /etc/init.d")
-        d_files.append(('/etc/init.d/', [user, 0755], \
+        d_files.append(('/etc/init.d/', [user, 0o755], \
                 ['src/domogik/examples/init/domogik']))
     elif os.path.exists('/etc/rc.d'):
         debug("Init script path is /etc/rc.d")
-        d_files.append(('/etc/rc.d/', [user, 0755], \
+        d_files.append(('/etc/rc.d/', [user, 0o755], \
                 ['src/domogik/examples/init/domogik']))
     else:
         warning("Can't find firectory for init script: Require manual install")
@@ -376,7 +376,7 @@ def install():
 
         # CHECK sources not in / or /root
         info("Check the sources location (not in /root/ or /")
-        print os.getcwd()
+        print(os.getcwd())
         assert os.getcwd().startswith("/root/") == False, "Domogik sources must not be located in the /root/ folder"
 
         # CHECK mq installed
