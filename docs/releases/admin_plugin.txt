@@ -1,5 +1,0 @@
-===================
-admin_plugin branch
-===================
-
-Add the support for advanced packages configuration pages
