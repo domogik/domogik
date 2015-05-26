@@ -102,6 +102,15 @@ After creating a start script (used only by the developpers), you will now creat
     * :doc:`Make the detected devices available in the user interface <python/detected_devices>`
     * ...
 
+Dedicated administration page
+=============================
+
+:doc:`See workflow, step 3 <workflow>`
+
+Some plugin may need some advanced configuration capabilities or some helpers feature that can be used from the administration interface. This is not mandatory.
+
+* :doc:`Add dedicated administration pages <admin/index>` 
+
 Icon
 ====
 
