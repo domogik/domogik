@@ -2,6 +2,11 @@
 Rivescript rules
 ================
 
+Using python objects
+====================
+
+.. todo::
+    Explain when and how creating a lib, how to use it (PYTHONPATH from command line), etc
 
 Features
 ========
