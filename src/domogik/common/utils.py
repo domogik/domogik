@@ -122,17 +122,18 @@ def call_package_conversion(log, plugin, method, value):
     log.debug("calling {0}.{1}".format(staticclass, staticmethode))
     return staticmethode(value)
 
-def is_already_launched(log, id, manager=True):
+def is_already_launched(log, type, id, manager=True):
     """ Check if there are already some process for the component launched
         @param log : logger
-        @param id : plugin id to check with pgrep
+        @param type : client type to check with pgrep
+        @param id : client id to check with pgrep
         @param manager : do we need to find the STARTED_BY_MANAGER String?
         @return : is_launched : True/False
                   pid_list : list of the already launched processes pid
     """
     my_pid = os.getpid()
  
-    # the manager add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+    # the manager add the STARTED_BY_MANAGER useless command to allow the client to ignore this command line when it checks if it is already laucnehd or not
     # the final 'grep -v sudo' is here to exclude the lines launched by sudo from the search : using sudo make 2 results be in the grep result : one with sudo and the other one with the command (but this second one is filtered thanks to its pid)
     if manager:
         #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
@@ -140,7 +141,7 @@ def is_already_launched(log, id, manager=True):
         print "is manager"
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
-    # the grep python is needed to avoid a plugin to not start because someone is editing the plugin with vi :)
+    # the grep python is needed to avoid a client to not start because someone is editing the client with vi :)
     
     if log:
         log.info("Looking for launched instances of '{0}'".format(id))

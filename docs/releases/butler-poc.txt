@@ -1,0 +1,40 @@
+=============
+Release X.X.X - butler-poc
+=============
+
+.. todo::
+    MQ examples : butler.scripts.get : upgrade version
+    MQ examples : interface.input : todo
+    MQ examples : interface.output : todo
+    Dbmgr : upgrade script to 'foo' to 'plugin-foo'
+
+New features 
+============
+
+Butler core component
+---------------------
+
+.. todo::
+    * learning capabilities
+
+
+New package type : brain
+------------------------
+
+New package type : interface
+----------------------------
+
+
+
+Database upgrade
+----------------
+
+.. todo::
+    Table for clients configuration : add a column or change the id column values (foo => plugin-foo)
+
+
+
+
+
+
+

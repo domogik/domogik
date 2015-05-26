@@ -70,7 +70,7 @@ def check_domogik_is_running():
     ret = True
     to_check = ['dmg_hub', 'dmg_broker', 'dmg_forwarder']
     for chk in to_check:
-        status = is_already_launched(None, chk, False)
+        status = is_already_launched(None, "core", chk, False)
         if not status[0]:
             print("ERROR : component {0} is not running".format(chk))
             ret = False
@@ -79,7 +79,7 @@ def check_domogik_is_running():
 
     to_check = ['rest', 'xplgw', 'dbmgr', 'manager', 'admin', 'scenario']
     for chk in to_check:
-        status = is_already_launched(None, chk, False)
+        status = is_already_launched(None, "core", chk, False)
         if not status[0]:
             print("ERROR : component {0} is not running".format(chk))
             ret = False

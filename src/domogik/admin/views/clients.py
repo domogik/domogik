@@ -23,8 +23,29 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
+import re
+import json
+
+try:
+    import html.parser
+    html_parser = html.parser.HTMLParser()
+except ImportError:
+    import HTMLParser
+    html_parser = HTMLParser.HTMLParser()
 
 
+
+html_escape_table = {
+    "&": "&amp;",
+    '"': "&quot;",
+    "'": "&apos;",
+    ">": "&gt;",
+    "<": "&lt;",
+    }
+
+def html_escape(text):
+    """Produce entities within text."""
+    return "".join(html_escape_table.get(c,c) for c in text)
 
 def get_client_detail(client_id):
     cli = MQSyncReq(app.zmq_context)
@@ -37,6 +58,17 @@ def get_client_detail(client_id):
     else:
         detail = {}
     return detail
+
+def get_butler_history():
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('butler.history.get')
+    res = cli.request('butler', msg.get(), timeout=10)
+    if res is not None:
+        history = res.get_data()['history']
+    else:
+        history = []
+    return history
 
 @app.route('/clients')
 @login_required
@@ -55,10 +87,10 @@ def clients():
         cli_type = client_list[client]['type']
         cli_host = client_list[client]['host']
 
-        if not client_list_per_host_per_type.has_key(cli_host):
+        if cli_host not in client_list_per_host_per_type:
             client_list_per_host_per_type[cli_host] = {}
 
-        if not client_list_per_host_per_type[cli_host].has_key(cli_type):
+        if cli_type not in client_list_per_host_per_type[cli_host]:
             client_list_per_host_per_type[cli_host][cli_type] = {}
 
         client_list_per_host_per_type[cli_host][cli_type][client] = client_list[client]
@@ -67,8 +99,8 @@ def clients():
         mactive="clients",
         overview_state="collapse",
         clients=client_list,
-        client_list_per_host_per_type=client_list_per_host_per_type
-        )
+        client_list_per_host_per_type=client_list_per_host_per_type)
+
 
 @app.route('/client/<client_id>')
 @login_required
@@ -80,8 +112,8 @@ def client_detail(client_id):
             clientid = client_id,
             client_detail = detail,
             mactive="clients",
-            active = 'home'
-            )
+            active = 'home')
+
 
 @app.route('/client/<client_id>/dmg_devices/known')
 @login_required
@@ -105,7 +137,7 @@ def client_devices_known(client_id):
     # sort clients per device type
     devices_by_device_type_id = {}
     for dev in devices:
-        if devices_by_device_type_id.has_key(dev['device_type_id']):
+        if dev['device_type_id'] in devices_by_device_type_id:
             devices_by_device_type_id[dev['device_type_id']].append(dev)
         else:
             devices_by_device_type_id[dev['device_type_id']] = [dev]
@@ -118,8 +150,8 @@ def client_devices_known(client_id):
             mactive="clients",
             active = 'devices',
             rest_url = get_rest_url(),
-            client_detail = detail
-            )
+            client_detail = detail)
+
 
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
 @login_required
@@ -129,14 +161,17 @@ def client_sensor_edit(client_id, sensor_id):
         MyForm = model_form(Sensor, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
-                        exclude=['core_device', 'name', 'reference', 'incremental', 'data_type', 'conversion', 'last_value', 'last_received', 'history_duplicate','value_min','value_max'])
+                        exclude=['core_device', 'name', 'reference', \
+                                'incremental', 'data_type', 'conversion', \
+                                'last_value', 'last_received', 'history_duplicate', \
+                                'value_min', 'value_max'])
         #MyForm.history_duplicate.kwargs['validators'] = []
         MyForm.history_store.kwargs['validators'] = []
         form = MyForm(request.form, sensor)
 
         if request.method == 'POST' and form.validate():
             if request.form['history_store'] == 'y':
-                store = 1 
+                store = 1
             else:
                 store = 0
             app.db.update_sensor(sensor_id, \
@@ -156,8 +191,8 @@ def client_sensor_edit(client_id, sensor_id):
                 clientid = client_id,
                 mactive="clients",
                 active = 'devices',
-                sensor = sensor
-                )
+                sensor = sensor)
+
 
 @app.route('/client/<client_id>/dmg_devices/detected')
 @login_required
@@ -178,8 +213,8 @@ def client_devices_detected(client_id):
             clientid = client_id,
             mactive="clients",
             active = 'devices',
-            client_detail = detail
-            )
+            client_detail = detail)
+
 
 @app.route('/client/<client_id>/dmg_devices/edit/<did>', methods=['GET', 'POST'])
 @login_required
@@ -190,7 +225,9 @@ def client_devices_edit(client_id, did):
         MyForm = model_form(Device, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
-                        exclude=['params', 'commands', 'sensors', 'address', 'xpl_commands', 'xpl_stats', 'device_type_id', 'client_id', 'client_version'])
+                        exclude=['params', 'commands', 'sensors', 'address', \
+                                'xpl_commands', 'xpl_stats', 'device_type_id', \
+                                'client_id', 'client_version'])
         form = MyForm(request.form, device)
 
         if request.method == 'POST' and form.validate():
@@ -212,6 +249,7 @@ def client_devices_edit(client_id, did):
                 client_detail = detail,
                 )
 
+
 @app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required
 def client_devices_delete(client_id, did):
@@ -231,13 +269,14 @@ def client_devices_delete(client_id, did):
         flash(gettext("DbMgr did not respond on the device.delete, check the logs"), 'danger')
     return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
+
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
 def client_config(client_id):
     cli = MQSyncReq(app.zmq_context)
     detail = get_client_detail(client_id)
     config = detail['data']['configuration']
-    known_items = []
+    known_items = {}
 
     # dynamically generate the wtfform
     class F(Form):
@@ -245,7 +284,7 @@ def client_config(client_id):
         pass
     for item in config:
         # keep track of the known fields
-        known_items.append(item["key"])
+        known_items[item["key"]] = item["type"]
         # handle required
         if item["required"] == "yes":
             arguments = [Required()]
@@ -275,7 +314,8 @@ def client_config(client_id):
             choices = []
             for choice in sorted(item["choices"]):
                 choices.append((choice, choice))
-            field = SelectField(item["name"], arguments, description=item["description"], choices=choices, default=default)
+            field = SelectField(item["name"], arguments, description=item["description"], \
+                    choices=choices, default=default)
         elif item["type"] == "password":
             field = PasswordField(item["name"], [Required()], description=item["description"])
         else:
@@ -296,13 +336,14 @@ def client_config(client_id):
     if request.method == 'POST' and form.validate():
         # build the requested config set
         data = {}
-        for arg, value in list(request.form.items()):
-            if arg in known_items:
-                data[arg] = getattr(form, arg).data
-        if 'auto_startup' in data.keys():
-            data['auto_startup'] = 'Y'
-        else:
-            data['auto_startup'] = 'N'
+        for key, typ in known_items.iteritems():
+            val = getattr(form, key).data
+            if typ == "boolean":
+                if val == False:
+                    val = 'N'
+                else:
+                    val = 'Y'
+            data[key] = val
         # build the message
         msg = MQMessage()
         msg.set_action('config.set')
@@ -328,8 +369,8 @@ def client_config(client_id):
             clientid = client_id,
             mactive="clients",
             active = 'config',
-            client_detail = detail
-            )
+            client_detail = detail)
+
 
 @app.route('/client/<client_id>/dmg_devices/new')
 @login_required
@@ -350,12 +391,10 @@ def client_devices_new(client_id):
             product_label = data['device_types'][prod["type"]]['name']
             products[prod["name"]] = prod["type"]
             #if not products_per_type.has_key(prod["type"]):
-            if not products_per_type.has_key(product_label):
+            if product_label not in products_per_type:
                 products_per_type[product_label] = OrderedDict()
             products_per_type[product_label][prod['name']] = prod["type"]
     # TODO : include products icons
-        
- 
     return render_template('client_device_new.html',
             device_types = device_types_list,
             products = products,
@@ -366,17 +405,20 @@ def client_devices_new(client_id):
             client_detail = detail,
             )
 
+
 @app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>', methods=['GET', 'POST'])
 @login_required
 def client_devices_new_type(client_id, device_type_id):
     return client_devices_new_wiz(client_id, device_type_id, None)
 
+
 @app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
 @login_required
 def client_devices_new_prod(client_id, device_type_id, product):
-    return client_devices_new_wiz(client_id, 
-                                  device_type_id, 
+    return client_devices_new_wiz(client_id,
+                                  device_type_id,
                                   product)
+
 
 def client_devices_new_wiz(client_id, device_type_id, product):
     detail = get_client_detail(client_id)
@@ -503,14 +545,15 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 choices = []
                 for key in sorted(item["choices"]):
                     choices.append((key, item["choices"][key]))
-                field = SelectField(name, [Required()], description=item["description"], choices=choices, default=default)
+                field = SelectField(name, [Required()], description=item["description"], choices=choices, \
+                        default=default)
             elif item["type"] == "password":
                 field = PasswordField(name, [Required()], description=item["description"], default=default)
             else:
                 # time, email, ipv4, ipv6, url
                 field = TextField(name, [Required()], description=item["description"], default=default)
-            setattr(F, "cmd|{0}|{1}".format(cmd,item["key"]), field)
-            setattr(F_xpl_command, "cmd|{0}|{1}".format(cmd,item["key"]), field)
+            setattr(F, "cmd|{0}|{1}".format(cmd, item["key"]), field)
+            setattr(F_xpl_command, "cmd|{0}|{1}".format(cmd, item["key"]), field)
     for cmd in params["xpl_stats"]:
         for item in params["xpl_stats"][cmd]:
             # build the field
@@ -528,27 +571,35 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                     default = True
                 else:
                     default = False
-                field = BooleanField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
+                field = BooleanField(name, [validators.Required(gettext("This value is required"))], \
+                        description=desc, default=default)
             elif item["type"] == "integer":
-                field = IntegerField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
+                field = IntegerField(name, [validators.Required(gettext("This value is required"))], \
+                        description=desc, default=default)
             elif item["type"] == "date":
-                field = DateField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
+                field = DateField(name, [validators.Required(gettext("This value is required"))], \
+                        description=desc, default=default)
             elif item["type"] == "datetime":
-                field = DateTimeField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
+                field = DateTimeField(name, [validators.Required(gettext("This value is required"))], \
+                        description=desc, default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
+                field = DateTimeField(name, [validators.Required(gettext("This value is required"))], \
+                        description=desc, default=default)
             elif item["type"] == "choice":
                 choices = []
                 for key in sorted(item["choices"]):
                     choices.append((key, item["choices"][key]))
-                field = SelectField(name, [validators.Required(gettext("This value is required"))], description=desc, choices=choices, default=default)
+                field = SelectField(name, [validators.Required(gettext("This value is required"))], \
+                        description=desc, choices=choices, default=default)
             elif item["type"] == "password":
-                field = PasswordField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
+                field = PasswordField(name, [validators.Required(gettext("This value is required"))], \
+                        description=desc, default=default)
             else:
                 # time, email, ipv4, ipv6, url
-                field = TextField(name, [validators.Required(gettext("This value is required"))], description=desc, default=default)
-            setattr(F, "stat|{0}|{1}".format(cmd,item["key"]), field)
-            setattr(F_xpl_stat, "stat|{0}|{1}".format(cmd,item["key"]), field)
+                field = TextField(name, [validators.Required(gettext("This value is required"))], \
+                        description=desc, default=default)
+            setattr(F, "stat|{0}|{1}".format(cmd, item["key"]), field)
+            setattr(F_xpl_stat, "stat|{0}|{1}".format(cmd, item["key"]), field)
     # create the forms
     form = F()
     form_global = F_global()

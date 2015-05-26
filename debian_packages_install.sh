@@ -42,6 +42,7 @@ pkg_list="\
          python-zmq \
          python-gluon \
          python-babel \
+         libusb-1.0-0-dev \
          "
 
 sudo apt-get update
@@ -49,6 +50,7 @@ sudo apt-get install $pkg_list
 
 pip_list="Flask-Login \
           Flask-Babel \
+          Flask-Bootstrap \
          "
 
 for elt in $pip_list

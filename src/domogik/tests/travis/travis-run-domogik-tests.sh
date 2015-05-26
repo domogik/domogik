@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # unittests
-python $TRAVIS_BUILD_DIR/src/domogik/tests/unittests/scenario_parameters.py
+#python $TRAVIS_BUILD_DIR/src/domogik/tests/unittests/scenario_parameters.py
 python $TRAVIS_BUILD_DIR/src/domogik/tests/unittests/xplmessage_test.py
 
 echo "=== ps aux | grep domo ==="

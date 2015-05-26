@@ -1,0 +1,24 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+{% include theme("core_butler_menu.html") %}
+
+<div class="container">
+
+  <h1>{% trans %}Core component {% endtrans %}{{ clientid }}</h1>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2>{% trans %}Butler learned commands{% endtrans %}</h2>
+        </div>
+        <div class="panel-body">
+          <p>{% trans %}The butler is able to learn commands. All the commands learned are listed below. Feel free to edit the file manually if you wish.{% endtrans %}</p>
+          <pre class="pre-scrollable">{{ brain['learn'] }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
