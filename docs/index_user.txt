@@ -76,7 +76,7 @@ Quick start guide
 * :doc:`What is an orphan device ? <enduser/packages/orphans>`
 * start a client
 * :doc:`Clients status </enduser/quick_start/clients_status>`
-* :doc:`Openremote integration </enduser/openremote/index.txt>`
+* :doc:`Openremote integration </enduser/openremote/index>`
 
 Detailed guide
 --------------
