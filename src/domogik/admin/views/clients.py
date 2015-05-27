@@ -23,7 +23,29 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
+import re
+import json
 
+try:
+    import html.parser
+    html_parser = html.parser.HTMLParser()
+except ImportError:
+    import HTMLParser
+    html_parser = HTMLParser.HTMLParser()
+
+
+
+html_escape_table = {
+    "&": "&amp;",
+    '"': "&quot;",
+    "'": "&apos;",
+    ">": "&gt;",
+    "<": "&lt;",
+    }
+
+def html_escape(text):
+    """Produce entities within text."""
+    return "".join(html_escape_table.get(c,c) for c in text)
 
 def get_client_detail(client_id):
     cli = MQSyncReq(app.zmq_context)
@@ -37,6 +59,16 @@ def get_client_detail(client_id):
         detail = {}
     return detail
 
+def get_butler_history():
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('butler.history.get')
+    res = cli.request('butler', msg.get(), timeout=10)
+    if res is not None:
+        history = res.get_data()['history']
+    else:
+        history = []
+    return history
 
 @app.route('/clients')
 @login_required
@@ -637,4 +669,6 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             clientid = client_id,
             mactive="clients",
             active = 'devices',
-            client_detail = detail)
+            client_detail = detail
+            )
+

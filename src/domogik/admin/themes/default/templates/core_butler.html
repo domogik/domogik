@@ -1,0 +1,237 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+{% include theme("core_butler_menu.html") %}
+
+<div class="container">
+
+  <h1>{% trans %}Core component {% endtrans %}{{ clientid }}</h1>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2>{% trans %}Butler details{% endtrans %}</h2>
+        </div>
+        <div class="panel-body">
+          <blockquote>
+            <p>{% trans %}The butler is your personnal assistant. It will help you to control your house and it can also do some other tasks.{% endtrans %}</p>
+            <p>{% trans %}You can complete the butler capabilities by installing <em>brain</em> packages.{% endtrans %}</p>
+            <p>{% trans %}On this page, you can interact with the butler, and also see all the interactions between the interfaces and the butler.{% endtrans %}</p>
+            <a id="brain_reload" href="#" class="btn btn-info"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> {% trans %}Reload the brain{% endtrans %}</a>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container"">
+    <div class="row">
+      <div class="col-md-12" id="butlerChatSend">
+        <input type="text" placeholder="Speak here with the butler..." class="form-control" name="chatInput" id="chatInput"></input>
+      </div>
+    </div>
+</div>
+
+
+<div class="container" id="butlerChat">
+</div>
+
+
+<!-- Modal for butler reload -->
+<div class="modal" id="butler_reload_ok" role="dialog" aria-labelledby="butlerReloadOK" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="butlerReloadOK">{% trans %}Butler reload done{% endtrans %}</h4>
+      </div>
+      <div class="modal-body">
+        {% trans %}The butler brain is reloaded.{% endtrans %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="butler_reload_error" role="dialog" aria-labelledby="butlerReloadError" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="butlerReloadError">{% trans %}Butler reload failed{% endtrans %}</h4>
+      </div>
+      <div class="modal-body">
+        {% trans %}The butler brain can't be reloaded. Maybe the butler component is not alive ?{% endtrans %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-info" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="butler_reload_progress" role="dialog" aria-labelledby="butlerReloadProgress" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="butlerReloadProgress">{% trans %}Loading...{% endtrans %}</h4>
+      </div>
+      <div class="modal-body">
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="1" style="width: 100%">
+            <span class="sr-only">{% trans %}Loading...{% endtrans %}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+    $( document ).ready(function() {
+
+        // generate history
+        //{{ history|safe }}
+        var history = {{ history|safe }}
+        for (elt in history) {
+            data = JSON.parse(history[elt]);
+            processMessage(data.msgid, data.context);
+        }
+        
+
+        ws.onmessage = function(e) {
+            data = JSON.parse(e.data);
+            if (data.msgid == "interface.output" || data.msgid == "interface.input") {
+                processMessage(data.msgid, data.content);
+            }
+        };
+
+
+
+        $('#chatInput').change(function() {
+            ws.send('{"publish": "interface.input", "data": {"text" : "' + $('#chatInput').val() + '", "media" : "chat", "identity" : "admin", "source" : "{{ clientid }}"}}');
+            $('#chatInput').val('');
+
+        });
+
+
+        $('a#brain_reload').bind('click', function() {
+    
+            $('#butler_reload_progress').modal('show');
+            $.get('/brain/reload', function(data) {
+               
+            }) 
+            .done(function() {
+                $('#butler_reload_progress').modal('hide');
+                $('#butler_reload_ok').modal('show');
+            }) 
+            .fail(function() {
+                $('#butler_reload_progress').modal('hide');
+                $('#butler_reload_error').modal('show');
+            });
+            return false;
+        });  
+
+
+    });
+
+
+        //processMessage = function(data) {
+        function processMessage(msgid, content) {
+                if (msgid == "interface.output") {
+                    style = "Right";
+                    icon = "cog";
+                    sourceHtml = "";
+                }
+                else if (msgid == "interface.input") {
+                    style = "Left";
+                    icon = "user";
+                    sourceHtml = "<span class='source'>{% trans %}Source : {% endtrans %}" + content['source'] + " </span>";
+                }
+                else {
+                    return;
+                }
+                
+                // generate html
+                //htmlData = "<div class='" + inOut + "'>" + content['text'] + "</div>";
+
+                // media
+                switch(content['media']) {
+                    case "audio":
+                        mediaHtml = "<i class='fa fa-microphone fw'></i>";
+                        break;
+                    case "chat":
+                        mediaHtml = "<i class='fa fa-weixin fw'></i>";
+                        break;
+                    default:
+                        mediaHtml = "";
+                }
+
+                // location
+                switch(content['location']) {
+                    case null:
+                        locationHtml = "{% trans %}n/a{% endtrans %}";
+                        break;
+                    case undefined:
+                        locationHtml = "{% trans %}n/a{% endtrans %}";
+                        break;
+                    default:
+                        locationHtml = content['location'];
+                }
+
+                // identity
+                if (content['identity'] != null) 
+                    identityHtml = "<div class='identity'>" + content['identity'] + "</div>";
+                else
+                    identityHtml = "";
+
+                // mood
+                //moodHtml = "<i class='fa fa-smile-o fa-2x'></i>";
+                moodHtml = "";
+
+                // sex
+                switch(content['sex']) {
+                    case "male":
+                        sexHtml = "<i class='fa fa-male fa-2x'></i>";
+                        break;
+                    case "female":
+                        sexHtml = "<i class='fa fa-female fa-2x'></i>";
+                        break;
+                    default:
+                        //sexHtml = "<i class='fa fa-genderless fa-2x'></i>";
+                        sexHtml = "";
+                }
+
+
+                htmlData = " \
+                           <div class='row'> \
+                             <div class='col-md-12'> \
+                               <div class='who who" + style + "'> \
+                                 <div class='photo'> \
+                                   <span class='glyphicon glyphicon-" + icon + "' aria-hidden='true'></span> \
+                                 </div> \
+                                 " + identityHtml + " \
+                               </div> \
+                               <div class='bubble bubble" + style + "'> \
+                                 <div class='detail'> \
+                                   <div>" + moodHtml + "</div>  \
+                                   <div>" + sexHtml + "</div>  \
+                                 </div> \
+                                 <p class='lead'>" + mediaHtml + " " + content['text'] + " </p>\
+                                 <p class='location'>{% trans %}Location : {% endtrans %}" + locationHtml + " \
+                                 " + sourceHtml + " \
+                                 </p> \
+                               </div> \
+                             </div> \
+                           </div>";
+
+                $('#butlerChat').prepend(htmlData);
+            }
+
+
+    
+    </script>
+
+
+{% endblock %}

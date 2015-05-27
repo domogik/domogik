@@ -57,6 +57,11 @@ Core component : REST
 * `REST API documentation <http://apidoc.domogik.org/rest/>`_
 * :doc:`More details about the way to send commands with /cmd  </technical/rest/cmd>`
 
+Core component : butler
+----------------------
+
+* :doc:`Butler </technical/butler/index>`
+
 Packages
 --------
 
@@ -70,6 +75,7 @@ Developers Documentation
     All this part is currently in progress
 
 * :doc:`Developing a plugin </package_development/plugins/index>`
+* :doc:`Developing a brain part </package_development/brains/index>`
 * :doc:`Developing a user interface </user_interface_development/index>`
 * :doc:`Core development </core_development/index>`
 * :doc:`Releasing tasks </core_development/releasing>`

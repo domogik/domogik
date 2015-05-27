@@ -255,9 +255,10 @@ class DbHelper():
         """
         return self.__session.query(PluginConfig).all()
 
-    def list_plugin_config(self, pl_id, pl_hostname):
+    def list_plugin_config(self, pl_type, pl_id, pl_hostname):
         """Return all parameters of a plugin
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @return a list of PluginConfig objects
@@ -265,13 +266,15 @@ class DbHelper():
         """
         return self.__session.query(
                         PluginConfig
+                    ).filter_by(type=ucode(pl_type)
                     ).filter_by(id=ucode(pl_id)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).all()
 
-    def get_plugin_config(self, pl_id, pl_hostname, pl_key):
+    def get_plugin_config(self, pl_type, pl_id, pl_hostname, pl_key):
         """Return information about a plugin parameter
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key we want the value from
@@ -281,6 +284,7 @@ class DbHelper():
         try:
             ret = self.__session.query(
                         PluginConfig
+                    ).filter_by(type=ucode(pl_type)
                     ).filter_by(id=ucode(pl_id)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).filter_by(key=ucode(pl_key)
@@ -289,7 +293,7 @@ class DbHelper():
             self.log.debug(u"oups : {0}".format(traceback.format-exc()))
         return ret
 
-    def set_plugin_config(self, pl_id, pl_hostname, pl_key, pl_value):
+    def set_plugin_config(self, pl_type, pl_id, pl_hostname, pl_key, pl_value):
         """Add / update a plugin parameter
 
         @param pl_id : plugin id
@@ -303,11 +307,12 @@ class DbHelper():
         self.__session.expire_all()
         plugin_config = self.__session.query(
                                 PluginConfig
+                            ).filter_by(type=ucode(pl_type)
                             ).filter_by(id=ucode(pl_id)
                             ).filter_by(hostname=ucode(pl_hostname)
                             ).filter_by(key=ucode(pl_key)).first()
         if not plugin_config:
-            plugin_config = PluginConfig(id=pl_id, hostname=pl_hostname, key=pl_key, value=pl_value)
+            plugin_config = PluginConfig(type=pl_type, id=pl_id, hostname=pl_hostname, key=pl_key, value=pl_value)
         else:
             plugin_config.value = ucode(pl_value)
         self.__session.add(plugin_config)
@@ -317,9 +322,10 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return plugin_config
 
-    def del_plugin_config(self, pl_id, pl_hostname):
+    def del_plugin_config(self, pl_type, pl_id, pl_hostname):
         """Delete all parameters of a plugin config
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @return the deleted PluginConfig objects
@@ -329,6 +335,7 @@ class DbHelper():
         self.__session.expire_all()
         plugin_config_list = self.__session.query(
                                     PluginConfig
+                                ).filter_by(type=ucode(pl_type)
                                 ).filter_by(id=ucode(pl_id)
                                 ).filter_by(hostname=ucode(pl_hostname)).all()
         for plc in plugin_config_list:
@@ -339,9 +346,10 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : " % sql_exception, True)
         return plugin_config_list
 
-    def del_plugin_config_key(self, pl_id, pl_hostname, pl_key):
+    def del_plugin_config_key(self, pl_type, pl_id, pl_hostname, pl_key):
         """Delete a key of a plugin config
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key of the plugin config
@@ -352,6 +360,7 @@ class DbHelper():
         self.__session.expire_all()
         plugin_config = self.__session.query(
                                PluginConfig
+                           ).filter_by(type=ucode(pl_type)
                            ).filter_by(id=ucode(pl_id)
                            ).filter_by(hostname=ucode(pl_hostname)
                            ).filter_by(key=ucode(pl_key)).first()

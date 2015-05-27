@@ -1,0 +1,55 @@
+================
+Rivescript rules
+================
+
+Using python objects
+====================
+
+.. todo::
+    Explain when and how creating a lib, how to use it (PYTHONPATH from command line), etc
+
+Features
+========
+
+The butler is able to tell the user which features it can handle. To allow this, you must add a special comment and a corresponding trigger. Example with the tiem feature: ::
+
+    // ##feature## give the date
+    + give the date
+    @ shortcut date
+
+    + shortcut date
+    ...
+
+Notice that if your feature accept a parameter, you should describe it also. Example in english: ::
+
+    // ##feature## calculate parameter
+    + calculate *
+    ...
+
+Example in french: ::
+
+    // ##feature## calculer parametre
+    + calculer *
+    ...
+
+You must use only generic expressions to describe the feature and not use words like "my, your, ...". This is needed to allow natural speaking when requesting the butler to learn some commands. You can look at the *domogik-brain-core* package for more details about learning.
+
+Weight
+======
+
+In rivescript, the default weight is set to 1. But the rivescript included in Domogik is patched to use a default weight of 10.
+
+If you plan to use weight in your scripts, don't forget about this!
+
+
+Special characters
+==================
+
+All the below characters are replaced by spaces before processing : ?!.,
+
+The "-" character is not replaced as it can be used for mathematic usages. If you have a trigger that may contain a "-" in it, please handle it with "[-]"
+
+People mistakes
+===============
+
+People make sadly a lot of mistakes, especially when writing... In the rules, you may try to take the most common mistakes in account. 
