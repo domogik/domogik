@@ -16,10 +16,12 @@ How do i interface with domogik ?
 =================================
 
 OpenRemote will interface with domogik via the Rest API, it will need a couple of commands:
+
 * /sensor/<senorid>
 * /cmd/<cmdid>?params
 
 Openremote works with Commands, sensors and switches. For example to integrate a DT_Switch command in openremote you will need 3 openRemote commands:
+
 * A read command
 * A on command
 * A off command
@@ -46,6 +48,7 @@ Creating a sensor in openremote
 -------------------------------
 
 What you will need:
+
 * an openremote device
 * an openremote command (to get the sensor value)
 * an openremote sensor
@@ -56,6 +59,7 @@ Creating a switch in openremote
 For this example we will use a domogik sensor and a domogik command with DT_Switch.
 
 What we need inside openremote:
+
 * an openremote device
 * three openremote commands:
     * an read command
