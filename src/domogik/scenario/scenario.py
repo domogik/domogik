@@ -85,8 +85,12 @@ class ScenarioInstance:
         self._clean_instances()
 
     def _clean_instances(self):
-        for (uid, item) in self._mapping.items():
+        for (uid, item) in self._mapping['action'].items():
             item.destroy()
+        self._mapping['action'] = {}
+        for (uid, item) in self._mapping['test'].items():
+            item.destroy()
+        self._mapping['test'] = {}
 
     def update(self, json):
         # cleanpu the instances
@@ -144,6 +148,14 @@ class ScenarioInstance:
             self._log.debug(u"Create test instance {0} with uuid {1}".format(inst, uuid))
             obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self)
             self._mapping['test'][uuid] = obj
+            return (obj, uuid)
+        elif itype == 'action':
+            mod, clas = inst.split('.')
+            module_name = "domogik.scenario.actions.{0}".format(mod)
+            cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
+            self._log.debug(u"Create action instance {0} with uuid {1}".format(inst, uuid))
+            obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self)
+            self._mapping['action'][uuid] = obj
             return (obj, uuid)
 
     def _get_uuid(self):

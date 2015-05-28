@@ -115,7 +115,7 @@ class ScenarioManager:
         """
         with self._db.session_scope():
             for scenario in self._db.list_scenario():
-                self.create_scenario(scenario.name, scenario.json, scenario.id)
+                self.create_scenario(scenario.name, scenario.json, int(scenario.id))
 
     def shutdown(self):
         """ Callback to shut down all parameters
@@ -134,13 +134,13 @@ class ScenarioManager:
             parsed = self._conditions[name].get_parsed_condition()
             return {'name': name, 'data': parsed}
 
-    def delete_scenario(self, name, db_delete=True):
-        if name not in self._conditions:
-            self.log.info(u"Scenario {0} doesn't exist".format(name))
-            return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(name)}
+    def del_scenario(self, cid):
+        if int(cid) not in self._instances.keys():
+            self.log.info(u"Scenario {0} doesn't exist".format(cid))
+            return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
         else:
-            # TODO
-            self.log.info(u"Scenario {0} deleted".format(name))
+            self._instances[int(cid)]['instance'].destroy()
+            self.log.info(u"Scenario {0} deleted".format(cid))
 
     def create_scenario(self, name, json_input, cid=0):
         """ Create a Scenario from the provided json.

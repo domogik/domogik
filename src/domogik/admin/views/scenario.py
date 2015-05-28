@@ -39,6 +39,18 @@ def scenario():
         scenarios = scenarios,
         mactive = "scenario")
 
+@app.route('/scenario/del/<id>')
+@login_required
+def scenario_del(id):
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('scenario.delete')
+    msg.add_data('cid', id)
+    res = cli.request('scenario', msg.get(), timeout=10)
+    flash(gettext("Scenario deleted"), "success")
+    return redirect("/scenario")
+    pass
+
 @app.route('/scenario/edit/<id>', methods=['GET', 'POST'])
 @login_required
 def scenario_edit(id):

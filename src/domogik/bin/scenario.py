@@ -67,7 +67,7 @@ class ScenarioFrontend(Plugin):
                     {
                         'list': self._backend.list_conditions,
                         'new': self._backend.create_scenario,
-                        'delete': self._backend.delete_scenario,
+                        'delete': self._backend.del_scenario,
                         'get': self._backend.get_parsed_condition,
                         'evaluate': self._backend.eval_condition
                     },
