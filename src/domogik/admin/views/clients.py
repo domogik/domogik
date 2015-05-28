@@ -70,9 +70,7 @@ def get_butler_history():
         history = []
     return history
 
-@app.route('/clients')
-@login_required
-def clients():
+def get_clients_list():
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('client.list.get')
@@ -81,6 +79,20 @@ def clients():
         client_list = res.get_data()
     else:
         client_list = {}
+    return client_list
+
+@app.route('/clients')
+@login_required
+def clients():
+    #cli = MQSyncReq(app.zmq_context)
+    #msg = MQMessage()
+    #msg.set_action('client.list.get')
+    #res = cli.request('manager', msg.get(), timeout=10)
+    #if res is not None:
+    #    client_list = res.get_data()
+    #else:
+    #    client_list = {}
+    client_list = get_clients_list()
 
     client_list_per_host_per_type = OrderedDict()
     for client in client_list:
@@ -670,5 +682,125 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             mactive="clients",
             active = 'devices',
             client_detail = detail
+            )
+
+
+
+def get_brain_content(client_id):
+    # get data over MQ
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('butler.scripts.get')
+    res = cli.request('butler', msg.get(), timeout=10)
+    if res is not None:
+        data = res.get_data()
+        detail = {}
+        detail[client_id] = data[client_id]
+    else:
+        detail = {}
+
+    # do a post processing on content to add html inside
+    for client_id in detail:
+        # we skip the learn file
+        if client_id == "learn":
+            continue
+
+        for lang in detail[client_id]:
+            idx = 0
+            for file in detail[client_id][lang]:
+                content = html_escape(detail[client_id][lang][file])
+
+                # python objects
+                idx += 1
+                reg = re.compile(r"&gt; object", re.IGNORECASE)
+                content = reg.sub("<button class='btn btn-info' onclick=\"$('#python_object_{0}').toggle();\"><span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span> python object</button><div class='python' id='python_object_{0}' style='display: none'>&gt; object".format(idx), content)
+
+                reg = re.compile(r"&lt; object", re.IGNORECASE)
+                content = reg.sub("&lt; object</div>", content)
+
+                # trigger
+                reg = re.compile(r"\+(?P<trigger>.*)", re.IGNORECASE)
+                content = reg.sub("<strong>+\g<trigger></strong>", content)
+
+                # comments
+                reg = re.compile(r"//(?P<comment>.*)", re.IGNORECASE)
+                content = reg.sub("<em>//\g<comment></em>", content)
+
+
+                detail[client_id][lang][file] = content
+    return detail
+
+
+@app.route('/client/<client_id>/brain')
+@login_required
+def client_brain(client_id):
+    detail = get_client_detail(client_id)
+    brain = get_brain_content(client_id)
+
+    return render_template('client_brain.html',
+            loop = {'index': 1},
+            clientid = client_id,
+            client_detail = detail,
+            brain = brain,
+            mactive="clients",
+            active = 'brain'
+            )
+
+
+@app.route('/brain/reload')
+@login_required
+def brain_reload():
+    """ To be called by ajax
+        Send a MQ request to reload the butler brain
+    """
+    try:
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('butler.reload.do')
+        res = cli.request('butler', msg.get(), timeout=10)
+        if res == None:
+            return "Error : the butler did not respond", 500
+        return "OK", 200
+    except:
+        return "Error : {0}".format(traceback.format_exc()), 500
+
+
+@app.route('/core/<client_id>')
+@login_required
+def core(client_id):
+    tmp = client_id.split(".")
+    name = tmp[0].split("-")[1]
+    if name == "butler":
+        brain = get_brain_content("learn")
+        history = get_butler_history()
+        client_list = get_clients_list()
+        return render_template('core_butler.html',
+                loop = {'index': 1},
+                clientid = client_id,
+                client_list = client_list, 
+                history = map(json.dumps, history),
+                brain = brain,
+                mactive="clients",
+                active = 'home'
+                )
+    else:
+        return render_template('core.html',
+                loop = {'index': 1},
+                clientid = client_id,
+                mactive="clients",
+                active = 'home'
+                )
+
+
+@app.route('/core/<client_id>/butler_learn')
+@login_required
+def core_butler_learned(client_id):
+    brain = get_brain_content("learn")
+    return render_template('core_butler_learned.html',
+            loop = {'index': 1},
+            clientid = client_id,
+            brain = brain,
+            mactive="clients",
+            active = 'learn'
             )
 
