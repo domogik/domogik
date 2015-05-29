@@ -2,7 +2,14 @@
 {% import theme("base/wtf.html") as wtf %}
 
 {% block content %}
-  <div id="blocklyDiv" style="position: absolute; top: 200px; left: 200px; height: 300px; width: 900px;"></div>
+<div class="container">
+  <h1>{% trans %}Edit scenario{% endtrans %}</h1>
+  {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}  
+  <div id="blocklyArea"></div>
+
+  <!-- <pre>{{ jso }}</pre> -->
+  <!-- <div id="blocklyDiv" style="position: absolute; top: 200px; left: 200px; height: 300px; width: 900px;"></div> -->
+  <div id="blocklyDiv" style="position: absolute; width: 50%;"></div>
   <xml id="toolbox" style="display: none">
     <category name="Logic">
         <block type="logic_operation"></block>
@@ -19,7 +26,6 @@
         {% endfor %}
     </category>
   </xml>
-  {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}  
   <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
@@ -27,6 +33,9 @@
   <script type="text/javascript" src="/scenario/blocks/actions"></script>
   <script type="text/javascript" src="/scenario/blocks/tests"></script>
   <script type="text/javascript">
+    var blocklyArea = document.getElementById('blocklyArea');
+    var blocklyDiv = document.getElementById('blocklyDiv');
+
     Blockly.Blocks['dom_condition'] = {
       init: function() {
         this.setColour(210);
@@ -42,7 +51,7 @@
         this.setInputsInline(false);
       }
     };
-    Blockly.inject(
+    var workspace = Blockly.inject(
         document.getElementById('blocklyDiv'),
         {
             path: '../../',
@@ -59,6 +68,26 @@
     var json = JSON.parse('{{ jso }}');
     {% endautoescape %}
     Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
+
+    var onresize = function(e) {
+      // Compute the absolute coordinates and dimensions of blocklyArea.
+      var element = blocklyArea;
+      var x = 0;
+      var y = 0;
+      do {
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        element = element.offsetParent;
+      } while (element);
+      // Position blocklyDiv over blocklyArea.
+      blocklyDiv.style.left = x + 'px';
+      blocklyDiv.style.top = y + 'px';
+      blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+      blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+    };
+    window.addEventListener('resize', onresize, false);
+    onresize();
   </script>
  
+</div>
 {% endblock %}

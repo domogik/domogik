@@ -70,7 +70,7 @@ def scenario_edit(id):
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
-        sname = TextField("name", default=name)
+        sname = TextField("Name", default=name, description="Scenario name")
         #sdis = BooleanField("disabled", default=dis)
         sjson = HiddenField("json")
         submit = SubmitField("Send")

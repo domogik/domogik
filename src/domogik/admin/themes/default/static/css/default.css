@@ -306,3 +306,11 @@ body {
     float: right;
 }
 
+
+
+/*** scenarios ***/
+
+#blocklyArea {
+    height: 300px;
+    margin-top: 1em;
+}
