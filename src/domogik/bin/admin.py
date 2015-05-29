@@ -73,13 +73,18 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 # this is needed as the MQASyncSub uses also the on_message function and a socket, so the object is not destroyed as usual :(
 class WSList():
     def __init__(self):
-        self.web_sockets = [{"id" : "foo", "open" : True}]
+        self.web_sockets = []
     
     def add(self, data):
         self.web_sockets.append(data)
 
     def list(self):
         return self.web_sockets
+
+    def delete(self, id):
+        for ws in self.web_sockets:
+            if ws['id'] == id:
+                self.web_sockets.remove(ws)
 
 ws_list = WSList()
 
@@ -93,19 +98,14 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
 
     def open(self):
         self.id = uuid.uuid4()
-        print("Open WebSocket connection : {0}".format(self.id))
         MQAsyncSub.__init__(self, zmq.Context(), 'admin', [])
         # Ping to make sure the agent is alive.
         self.io_loop.add_timeout(datetime.timedelta(seconds=random.randint(5,30)), self.send_ping)
-        #AdminWebSocket.clients.add(self)
-        #web_sockets.append({"id" : self.id, "ws" : self, "open" : True})
         global ws_list
         ws_list.add({"id" : self.id, "ws" : self, "open" : True})
-        print(ws_list.list())
-
 
     def on_connection_timeout(self):
-        self.on_close()
+        self.close()
 
     def send_ping(self):
         try:
@@ -121,18 +121,11 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
             self.io_loop.add_timeout(datetime.timedelta(seconds=5), self.send_ping)
 
     def on_close(self):
-
-        print("Close WebSocket {0}".format(self.id))
-        print("Stop subscribing to MQ for {0}".format(self.id))
-        #self.stop_sub()
-        #AdminWebSocket.clients.remove(self)
-        #for a_ws in web_sockets:
-        #    if a_ws['id'] == self.id:
-        #        a_ws['open'] = False
-        #        print("ws set to open == False : {0}".format(self.id))
-                
+        global ws_list
+        ws_list.delete(self.id)
 
     def on_message(self, msg, content=None):
+        #print(ws_list.list())
         """ This function is quite tricky
             It is called by both WebSocketHandler and MQASyncSub...
         """
@@ -140,7 +133,6 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
             ### websocket message (from the web)
             if not content:
                 jsons = json.loads(msg)
-
                 # req/rep
                 if 'action' in jsons and 'data' in jsons:
                     cli = MQSyncReq(zmq.Context())
@@ -151,21 +143,17 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
                         cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
                     else:
                         cli.request('manager', msg.get(), timeout=10).get()
-
                 # pub
                 elif 'publish' in jsons and 'data' in jsons:
                     print("Publish : {0}".format(jsons['data']))
                     self.pub.send_event(jsons['publish'],
                                         jsons['data'])
-
             ### MQ message (from domogik)
             else:
-                #for cli in AdminWebSocket.clients:
-                #    cli.write_message({"msgid": msg, "content": content})
                 try:
                     self.write_message({"msgid": msg, "content": content})
                 except WebSocketClosedError:
-                    print("websocketclosederror..")
+                    self.close()
         except:
             print("Error : {0}".format(traceback.format_exc()))
 
@@ -177,6 +165,7 @@ class Admin(Plugin):
 
     def __init__(self, server_interfaces, server_port):
         """ Initiate DbHelper, Logs and config
+            
             Then, start HTTP server and give it initialized data
             @param server_interfaces :  interfaces of HTTP server
             @param server_port :  port of HTTP server
