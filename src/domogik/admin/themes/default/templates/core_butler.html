@@ -16,11 +16,48 @@
           <blockquote>
             <p>{% trans %}The butler is your personnal assistant. It will help you to control your house and it can also do some other tasks.{% endtrans %}</p>
             <p>{% trans %}You can complete the butler capabilities by installing <em>brain</em> packages.{% endtrans %}</p>
-            <p>{% trans %}On this page, you can interact with the butler, and also see all the interactions between the interfaces and the butler.{% endtrans %}</p>
+            <p>{% trans %}On this page, you can interact with the butler, and also see all the interactions between the <em>interfaces</em> and the butler.{% endtrans %}</p>
             <a id="brain_reload" href="#" class="btn btn-info"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> {% trans %}Reload the brain{% endtrans %}</a>
           </blockquote>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2>{% trans %}Brain packages installed{% endtrans %}</h2>
+        </div>
+        <div class="panel-body">
+          <ul>
+            {% for a_client in client_list %}
+              {% if client_list[a_client]['type'] == "brain" %}
+                <li><a href="/client/{{ a_client }}">{{ client_list[a_client]['name'] }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2>{% trans %}Interface packages installed{% endtrans %}</h2>
+        </div>
+        <div class="panel-body">
+          <ul>
+            {% for a_client in client_list %}
+              {% if client_list[a_client]['type'] == "interface" %}
+                <li><a href="/client/{{ a_client }}">{{ client_list[a_client]['name'] }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -36,6 +73,8 @@
 
 <div class="container" id="butlerChat">
 </div>
+
+<p></p>
 
 
 <!-- Modal for butler reload -->
