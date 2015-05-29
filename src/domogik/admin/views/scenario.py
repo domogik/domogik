@@ -80,12 +80,15 @@ def scenario_edit(id):
     if request.method == 'POST' and form.validate():
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
-        msg.set_action('scenario.new')
+        if form.sid.data > 0:
+            msg.set_action('scenario.update')
+        else:
+            msg.set_action('scenario.new')
         msg.add_data('name', form.sname.data)
         msg.add_data('json_input', form.sjson.data)
         msg.add_data('cid', form.sid.data)
-        print "++++++++++++++++="
         res = cli.request('scenario', msg.get(), timeout=10)
+        print res
         flash(gettext("Changes saved"), "success")
         return redirect("/scenario")
         pass

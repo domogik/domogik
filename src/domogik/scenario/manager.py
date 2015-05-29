@@ -134,15 +134,23 @@ class ScenarioManager:
             parsed = self._conditions[name].get_parsed_condition()
             return {'name': name, 'data': parsed}
 
-    def del_scenario(self, cid):
+    def update_scenario(self, cid, name, json_input):
+        self.del_scenario(cid, False)
+        self.create_scenario(name, json_input, cid, True)
+
+    def del_scenario(self, cid, doDB=True):
         if int(cid) not in self._instances.keys():
             self.log.info(u"Scenario {0} doesn't exist".format(cid))
             return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
         else:
             self._instances[int(cid)]['instance'].destroy()
+            del(self._instances[int(cid)])
+            if doDB:
+                with self._db.session_scope():
+                    self._db.del_scenario(cid)
             self.log.info(u"Scenario {0} deleted".format(cid))
 
-    def create_scenario(self, name, json_input, cid=0):
+    def create_scenario(self, name, json_input, cid=0, update=False):
         """ Create a Scenario from the provided json.
         @param name : A name for the condition instance
         @param json_input : JSON representation of the condition
@@ -164,14 +172,22 @@ class ScenarioManager:
             msg = u"the json for the scenario does not contain condition or actions for scenario {0}".format(name)
             self.log.error(msg)
             return {'status': 'NOK', 'msg': msg}
+        # db storage
+        if int(cid) == 0:
+            with self._db.session_scope():
+                scen = self._db.add_scenario(name, json_input, 0)
+                cid = scen.id
+        elif update:
+            with self._db.session_scope():
+                self._db.update_scenario(cid, name, json_input, 0)
 
         # create the condition itself
         scen = ScenarioInstance(self.log, cid, name, payload)
         self._instances[cid] = {'name': name, 'json': payload, 'instance': scen } 
         self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
-        
+     
         # return
-        return {'name': name}
+        return {'name': name, 'cid': cid}
 
     def eval_condition(self, name):
         """ Evaluate a condition calling eval_condition from Condition instance
