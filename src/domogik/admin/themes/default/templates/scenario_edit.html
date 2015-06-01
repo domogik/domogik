@@ -4,7 +4,25 @@
 {% block content %}
 <div class="container">
   <h1>{% trans %}Edit scenario{% endtrans %}</h1>
-  {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}  
+
+  <nav class="navbar navbar-default">
+  <form method="post" role="form" class="navbar-form navbar-left">
+    {{ form.csrf_token }}
+    {{ form.sid }}
+    {{ form.sjson }}
+    <div class="form-group form-group">
+      {{ form.sname(class_="form-control input-lg") }}
+    </div>
+    <button type="submit" class="btn btn-info">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {% trans %}Save{% endtrans %}
+    </button>
+    <a class="btn btn-default" data-toggle="confirmation" data-placement="bottom" data-href="/scenario/del/{{ scenario_id }}">
+      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans %}Delete{% endtrans %}
+    </a>
+  </form>
+  </nav>
+
   <div id="blocklyArea"></div>
 
   <!-- <pre>{{ jso }}</pre> -->

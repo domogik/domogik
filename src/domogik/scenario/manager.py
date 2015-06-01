@@ -44,6 +44,7 @@ import domogik.scenario.actions as s_a
 from domogik.common.database import DbHelper
 from domogik.scenario.scenario import ScenarioInstance
 from exceptions import KeyError
+import traceback
 
 
 class ScenarioManager:
@@ -139,16 +140,21 @@ class ScenarioManager:
         self.create_scenario(name, json_input, cid, True)
 
     def del_scenario(self, cid, doDB=True):
-        if int(cid) not in self._instances.keys():
-            self.log.info(u"Scenario {0} doesn't exist".format(cid))
-            return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
-        else:
-            self._instances[int(cid)]['instance'].destroy()
-            del(self._instances[int(cid)])
-            if doDB:
-                with self._db.session_scope():
-                    self._db.del_scenario(cid)
-            self.log.info(u"Scenario {0} deleted".format(cid))
+        try:
+            if cid == '' or int(cid) not in self._instances.keys():
+                self.log.info(u"Scenario deletion : id '{0}' doesn't exist".format(cid))
+                return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
+            else:
+                self._instances[int(cid)]['instance'].destroy()
+                del(self._instances[int(cid)])
+                if doDB:
+                    with self._db.session_scope():
+                        self._db.del_scenario(cid)
+                self.log.info(u"Scenario {0} deleted".format(cid))
+        except:
+            msg = u"Error while deleting the scenario id='{0}'. Error is : {1}".format(cid, traceback.format_exc())
+            self.log.error(msg)
+            return {'status': 'ERROR', 'msg': msg}
 
     def create_scenario(self, name, json_input, cid=0, update=False):
         """ Create a Scenario from the provided json.
@@ -161,6 +167,7 @@ class ScenarioManager:
         @Return {'name': name} or raise exception
         """
         try:
+            self.log.info("Create or save scenario : name = '{0}', id = '{1}', json = '{2}'".format(name, cid, json_input))
             payload = json.loads(json_input)  # quick test to check if json is valid
         except Exception as e:
             self.log.error(u"Creation of a scenario failed, invallid json: {0}".format(json_input))

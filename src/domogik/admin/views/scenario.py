@@ -78,6 +78,7 @@ def scenario_edit(id):
     form = F()
 
     if request.method == 'POST' and form.validate():
+        print("Scenario edit > POST")
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
         if form.sid.data > 0:
@@ -122,7 +123,8 @@ def scenario_edit(id):
             name = name,
             actions = actions,
             tests = tests,
-            jso = jso)
+            jso = jso,
+            scenario_id = id)
 
 @app.route('/scenario/blocks/tests')
 def scenario_blocks_tests():
