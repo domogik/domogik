@@ -22,7 +22,7 @@ pkg_list="\
          python-pkg-resources \
          python-setuptools \
          python-mysqldb \
-         python-argparse \
+         libpython-stdlib \
          python-sqlalchemy \
          python-simplejson \
          python-openssl \

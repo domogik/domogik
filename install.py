@@ -15,6 +15,7 @@ import argparse
 import shutil
 import logging
 import pkg_resources
+from subprocess import check_output, CalledProcessError
 
 
 BLUE = '\033[94m'
@@ -233,7 +234,7 @@ def write_domogik_configfile(advanced_mode):
                     config.set(sect, item[0], new_value)
                     newvalues = True
     # write the config file
-    with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
+    with open('/etc/domogik/domogik.cfg', 'w') as configfile:
         ok("Writing the config file")
         config.write(configfile)
 
@@ -254,7 +255,7 @@ def write_xplhub_configfile(advanced_mode):
                     newvalues = True
                 debug("Value {0} in xplhub.cfg set to {1}".format(item[0], new_value))
     # write the config file
-    with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
+    with open('/etc/domogik/xplhub.cfg', 'w') as configfile:
         ok("Writing the config file")
         config.write(configfile)
 
@@ -274,7 +275,7 @@ def write_domogik_configfile_from_command_line(args):
                 newvalues = True
             debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
-    with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
+    with open('/etc/domogik/domogik.cfg', 'w') as configfile:
         ok("Writing the config file")
         config.write(configfile)
 
@@ -295,7 +296,7 @@ def write_xplhub_configfile_from_command_line(args):
             debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
     if newvalues:
-        with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
+        with open('/etc/domogik/xplhub.cfg', 'w') as configfile:
             ok("Writing the config file")
             config.write(configfile)
 
@@ -393,10 +394,18 @@ def install():
             #platform.dist() and platform.linux_distribution() 
             #doesn't works with ubuntu/debian, both say debian.
             #So I not found pettiest test :(
-            if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
+            info("Check which distribution is installed")
+            dist = get_distribution()
+            ok(dist)
+            #if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
+            if dist == "Debian":
                 dist_packages_install_script = './debian_packages_install.sh'
-            elif os.system(' bash -c \'[ "`lsb_release -si`" == "Ubuntu" ]\'') == 0:
+            #elif os.system(' bash -c \'[ "`lsb_release -si`" == "Ubuntu" ]\'') == 0:
+            elif dist == "Ubuntu":
                 dist_packages_install_script = './debian_packages_install.sh'
+            #elif os.system(' bash -c \'lsb_release -si 2>&1 | grep "ImportError"\'') == 0:
+            else:
+                raise OSError("The lsb_release tool can't be executed. Maybe it is not compliant with Python 3 on your system ?")
             if dist_packages_install_script == '' :
                 raise OSError("The option --dist-packages is not implemented on this distribution. Please install the packages manually.")
             if os.system(dist_packages_install_script) != 0:
@@ -485,6 +494,23 @@ def add_arguments_for_config_file(parser, fle):
             key = "{0}_{1}".format(sect, item[0])
             parser.add_argument("--{0}".format(key),
                 help="Update section {0}, key {1} value".format(sect, item[0]))
+
+def get_distribution():
+    """ Find which distribution the server uses
+    """
+    try:
+        # first, try to use lsb_release tool
+        dist = check_output(["lsb_release", "-si"]).strip()
+        return dist
+    except CalledProcessError:
+        # lsb_release could not work with some python versions. 
+        # I encountered this on a Debian server : lsb_release had no python lib for python 3.x
+
+        # So we manually try to find the release, at least for Debian for now
+        if os.path.isfile("/etc/debian_version"):
+            print("Please ignore the ImportError just below")
+            return "Debian"
+        return "Unknown"
 
 if __name__ == "__main__":
     install()

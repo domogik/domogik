@@ -130,7 +130,7 @@ function start_daemon {
     echo " Done."
 }
 function start_mq {
-    if [ $MASTERMQ = "True" ]; then
+    if [ $MASTERMQ == "True" ]; then
         echo -n " * Starting 0MQ broker ..."
         /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_BROKER}) >/dev/null"
         if [ $? -gt 0 ]; then
@@ -150,7 +150,7 @@ function start_mq {
 }
 
 function status_mq {
-    if [ $MASTERMQ = "True" ]; then
+    if [ $MASTERMQ == "True" ]; then
         set +e
         RUNNING=$(/usr/bin/pgrep -c ${MQ_BROKER})
         set -e
@@ -252,7 +252,7 @@ function stop {
 }
 
 function stop_mq {
-    if [ $MASTERMQ = "True" ]; then
+    if [ $MASTERMQ == "True" ]; then
         echo -n " * Stopping 0MQ broker..."
         for pid in `ps ax | grep "${MQ_BROKER}" | grep -v grep | awk '{print $1}'`; do
             kill -15 $pid 2>/dev/null 1>&2
