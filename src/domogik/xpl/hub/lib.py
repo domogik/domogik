@@ -716,3 +716,7 @@ class UdpHub(DatagramProtocol):
                 self._stop.wait(self._time)
 
 
+
+
+if __name__ == "__main__":
+    Hub(True)
