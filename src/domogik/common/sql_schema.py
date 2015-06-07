@@ -72,7 +72,7 @@ class PluginConfig(Base):
     __tablename__ = '%s_plugin_config' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB'}
     id = Column(Unicode(30), primary_key=True)
-    type = Column(Unicode(30), primary_key=True, default='plugin')
+    type = Column(Unicode(30), primary_key=True, default=u'plugin')
     hostname = Column(Unicode(40), primary_key=True)
     key = Column(Unicode(255), primary_key=True)
     value = Column(UnicodeText(), nullable=False)

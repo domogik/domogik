@@ -2,35 +2,22 @@
 
 {% block content %}
 <div class="container">
-    <h1>{% trans %}Scenario list{% endtrans %}</h1>
-    <a id="start" class="btn btn-success" href="/scenario/edit/0">{% trans %}Add new{% endtrans%}</a>
+    <h1>{% trans %}Scenarios{% endtrans %}</h1>
+    <a id="start" class="btn btn-info" href="/scenario/edit/0">{% trans %}Create a new scenario{% endtrans%}</a>
+    <p></p>
     {% if scenarios|length > 0 %}
-      <table class="table table-striped" style="border-collapse:collapse;">
-            <thead>
-                    <tr>
-                        <th scope="col">{% trans %}Name{% endtrans %}</td>
-                        <th scope="col">&nbsp;</td>
-                    </tr>
-            </thead>
-            <tbody>
-            {% for data in scenarios %}
-                    <tr>
-                        <td>{{ data.name }}</td>
-                        <td>
-                                <a href="/scenario/edit/{{ data.cid }}">
-                                {% trans %}Update{% endtrans %}
-                                </a> |
-                                <a data-toggle="confirmation" data-placement="bottom" data-href="/scenario/del/{{ data.cid }}">
-                                {% trans %}Delete{% endtrans %}
-                                </a>
-
-                        </td>
-                    </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+      <ul class="list-group">
+        {% for data in scenarios %}
+          <li class="list-group-item">
+            <a href="/scenario/edit/{{ data.cid }}">
+              <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+              {{ data.name }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
     {% else %}
-    <div class="alert alert-warning">{% trans %}No scenarios found{% endtrans %}</div>
+      <div class="alert alert-warning">{% trans %}No scenarios found{% endtrans %}</div>
     {% endif %}
 </div>
 {% endblock %}
