@@ -15,6 +15,15 @@ Installation
     * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to deactivate it before installation.
     * In this example, we use a *mysql* database. If you want to use a *postgresql* database, please refer to :doc:`the specific installations steps for postgresql <postgresql>`.
 
+The sudo command
+----------------
+
+Some distributions may not include the **sudo** command as a default one. For Debian-based distribution, you can install it by doing as root : ::
+
+    # apt-get install sudo
+
+You can also simply logon as the **root** user and ignore the **sudo** part of the command for the commands that include a **sudo**.
+
 Dependencies
 ------------
 
