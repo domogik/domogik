@@ -7,6 +7,8 @@ If you are already a Domogik 0.3 user
 
 Domogik 0.4 database is really different from the 0.3 database. The process to migrate data from Domogik 0.3 to Domogik 0.4 is not fully guarantee yet. **Please do a backup of your domogik database before migrating from 0.3 to 0.4 !**.
 
+**If you come from Domogik 0.3, before installing Domogik 0.4.1 you must install Domogik 0.4.0 for the database upgrade process!**
+
 
 Installation
 ============
@@ -105,23 +107,6 @@ Create the folder */opt/dmg/* : ::
     $ sudo chown domogik /opt/dmg  # assuming the user domogik already exists!
 
 
-Download Domogik 0.4.0 beta1
-****************************
-
-Download Domogik-mq : ::
-
-    $ cd /opt/dmg/
-    $ wget https://github.com/domogik/domogik-mq/archive/1.0.tar.gz -O domogik-mq-1.0.tar.gz
-    $ tar xvzf domogik-mq-1.0.tar.gz
-    $ ln -sf domogik-mq-1.0 domogik-mq
-
-Download Domogik : ::
-
-    $ cd /opt/dmg/
-    $ wget https://github.com/domogik/domogik/archive/0.4.0b1.tar.gz -O domogik-0.4.0b1.tar.gz
-    $ tar xvzf domogik-0.4.0b1.tar.gz
-    $ ln -sf domogik-0.4.0b1 domogik
-
 Download the sources on GitHub
 ******************************
 
@@ -130,14 +115,14 @@ Download Domogik-mq : ::
     $ cd /opt/dmg/
     $ git clone https://github.com/domogik/domogik-mq.git
     $ cd domogik-mq
-    $ git checkout master
+    $ git checkout develop
 
 Download Domogik : ::
 
     $ cd /opt/dmg/
     $ git clone https://github.com/domogik/domogik.git
     $ cd domogik
-    $ git checkout master
+    $ git checkout develop
 
 Install Domogik-mq
 ------------------
@@ -178,6 +163,17 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 
 .. todo::
     Describe all the steps
+
+In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogik.cfg**, you will have to complete it with these lines: ::
+
+    [butler]
+    name = Aria
+    lang = fr_FR
+    sex = female
+
+The **name** is your butler name, use the name you want.
+The **lang** is your language : fr_FR, en_US, ...
+The **sex** is related to the name you choosed : male, female
 
 
 Make Domogik start with your computer
