@@ -41,7 +41,7 @@ Here are the needed dependencies. depanding on your Linux distribution, they wil
 
 * the development packages, pip and setuptools : **python2.7-dev, python-pip, python-setuptools**
 * SSL libraries : **libssl-dev**
-* Zero MQ librariy : **libzmq-dev**
+* Zero MQ librariy : **libzmq-dev >= 14.4**. With the 14.3 release of this library, the publish/subscribe feature will not work!
 * postgresql libraries : **libpq-dev, python-psycopg2**
 * various needed libraries : **python-mako, libffi-dev**
 * git : **git**
