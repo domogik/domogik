@@ -152,6 +152,7 @@ def scenario_blocks_tests():
                 p = []
                 jso = ""
                 for parv in params:
+                    print("TYPE={0}".format(parv['type']))
                     par = parv['name']
                     papp = "this.appendDummyInput().appendField('{0}')".format(parv['description'])
                     if parv['type'] == 'string':
@@ -160,6 +161,10 @@ def scenario_blocks_tests():
                     elif parv['type'] == 'integer':
                         jso = '{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
                         papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
+                    elif parv['type'] == 'list':
+                        jso = '{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                        papp = "{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(parv["values"]), par)
+                        print(papp)
                     p.append(papp)
                 add = """Blockly.Blocks['{0}'] = {{
                             init: function() {{

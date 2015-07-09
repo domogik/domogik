@@ -26,6 +26,11 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.parameters.abstract import AbstractParameter
+from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+import traceback
+import zmq
+import json
 
 class SensorIdParameter(AbstractParameter):
     """ This parameter  simply provides a text entry
@@ -34,9 +39,38 @@ class SensorIdParameter(AbstractParameter):
 
     def __init__(self, log = None, trigger = None):
         AbstractParameter.__init__(self, log, trigger)
-        self.set_type("string")
-        self.add_expected_entry("sensor_id", "integer", "The sensor id to check")
         self.log = log
+
+        #self.set_type("string")
+        #self.add_expected_entry("sensor_id", "integer", "The sensor id to check")
+
+        # first, let's get the devices list
+        try:
+            cli = MQSyncReq(zmq.Context())
+            msg = MQMessage()
+            msg.set_action('device.get')
+            json_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+            devices = json.loads(json_devices)['devices']
+            print(devices)
+            sensors_list = []
+            for dev in devices:
+                name = dev['name']
+                for sen_idx in dev['sensors']:
+                    sen_name = dev['sensors'][sen_idx]['name']
+                    sen_id = dev['sensors'][sen_idx]['id']
+                    sensors_list.append(['{0} : {1}'.format(name, sen_name), 
+                                         '{0}'.format(sen_id)])
+            print(sensors_list)
+        except:
+            self.log.error("Error while getting devices list : {0}".format(traceback.format_exc()))
+
+
+
+        # then, et's configure our sensor id selector :)
+        self.set_type("list")
+        self.add_expected_entry("sensor_id", "list", "The sensor id to check")
+        #list_sensors = [['sensor1', 'sensor2'], ['a', 'A']]
+        self.set_list_of_values("sensor_id", sensors_list)
 
     def evaluate(self):
         """ Return string, or none if no string entered yet
