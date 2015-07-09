@@ -171,6 +171,7 @@ class ScenarioInstance:
     def _call_actions(self):
         """ Call the needed actions for this scenario
         """
+        print "CALLING actions"
         pass
 
     def generic_trigger(self, test):
@@ -194,4 +195,4 @@ if __name__ == "__main__":
     s = ScenarioInstance(logging, 10, "name", json.loads(jsons))
     print s._parsed_condition
     print s._mapping
-
+    print s.eval_condition()
