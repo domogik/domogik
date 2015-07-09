@@ -143,6 +143,7 @@ def scenario_blocks_tests():
     msg = MQMessage()
     msg.set_action('test.list')
     res = cli.request('scenario', msg.get(), timeout=10)
+    print(res)
     if res is not None:
         res = res.get_data()
         if 'result' in res:
@@ -166,7 +167,7 @@ def scenario_blocks_tests():
                                 this.appendDummyInput().appendField("{0}");
                                 {1}
                                 this.setOutput(true);
-                                this.setInputsInline(true);
+                                this.setInputsInline(false);
                                 this.setTooltip('{2}'); 
                                 this.contextMenu = false;
                             }}
