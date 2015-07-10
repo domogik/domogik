@@ -29,6 +29,8 @@ from domogik.scenario.actions.abstract import AbstractAction
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 import zmq
+import json
+import traceback
 
 class CommandAction(AbstractAction):
     """ Simple action that log something in scenario logfile
@@ -36,7 +38,30 @@ class CommandAction(AbstractAction):
 
     def __init__(self, log=None):
         AbstractAction.__init__(self, log)
+        self.log = log
         self.set_description("Start a certain command")
+        # let's get the devices list
+        self.cmds_list = []
+        try:
+            cli = MQSyncReq(zmq.Context())
+            msg = MQMessage()
+            msg.set_action('device.get')
+            json_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+            devices = json.loads(json_devices)['devices']
+            print(devices)
+            for dev in devices:
+                name = dev['name']
+                for cmd_idx in dev['commands']:
+                    cmd_name = dev['commands'][cmd_idx]['name']
+                    cmd_id = dev['commands'][cmd_idx]['id']
+                    self.cmds_list.append(['{0} : {1}'.format(name, cmd_name), 
+                                         '{0}'.format(cmd_id)])
+            print(self.cmds_list)
+        except:
+            #self.log.error("Error while getting devices list : {0}".format(traceback.format_exc()))
+            print("Error while getting devices list : {0}".format(traceback.format_exc()))
+            pass
+
 
     def do_action(self, condition, tests):
         cli = MQSyncReq(zmq.Context())
@@ -49,15 +74,18 @@ class CommandAction(AbstractAction):
         if res:
             data = res.get_data()
             if not data['status']:
-                self._log.error("Command sending to XPL gw failed: {0}".format(res))
+                self.log.error("Command sending to XPL gw failed: {0}".format(res))
         else:
-            self._log.error("XPL gw did not respond")
+            self.log.error("XPL gw did not respond")
 
 
     def get_expected_entries(self):
+        #the_commands = [['a', 'A'], ['b', 'B']]
+        the_commands = self.cmds_list
         return {
-                 'cmdid': {'type': 'integer',
+                 'cmdid': {'type': 'list',
                           'description': 'The command to start',
+                          'values': the_commands,
                           'default': 0},
                  'cmdparams': {'type': 'dict',
                           'description': 'The parameters for this command (ui needs to look them up in the DB)',

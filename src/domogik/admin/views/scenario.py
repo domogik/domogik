@@ -152,6 +152,7 @@ def scenario_blocks_tests():
         res = res.get_data()
         if 'result' in res:
             res = res['result']
+            print(res)
             for test, params in res.iteritems():
                 p = []
                 jso = ""
@@ -223,6 +224,11 @@ def scenario_blocks_actions():
                     elif parv['type'] == 'integer':
                         jso = '{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
                         papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
+                    elif parv['type'] == 'list':
+                        jso = '{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                        the_list = parv["values"]  # [[...], [...]]
+                        papp = "{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
+                        print(papp)
                     else:
                         papp = "{0};".format(papp)
                     p.append(papp)
