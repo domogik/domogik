@@ -20,6 +20,10 @@ from domogik.common.sql_schema import UserAccount
 
 from wtforms.ext.sqlalchemy.orm import model_form
 import json
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
 
 @app.route('/scenario')
 @login_required
@@ -163,7 +167,8 @@ def scenario_blocks_tests():
                         papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
                     elif parv['type'] == 'list':
                         jso = '{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                        papp = "{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(parv["values"]), par)
+                        the_list = parv["values"]  # [[...], [...]]
+                        papp = "{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
                         print(papp)
                     p.append(papp)
                 add = """Blockly.Blocks['{0}'] = {{

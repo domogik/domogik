@@ -38,9 +38,12 @@ class ComparisonOperatorParameter(AbstractParameter):
     def __init__(self, log=None, trigger=None):
         AbstractParameter.__init__(self, log, trigger)
         self.set_type("list")
-        self.add_expected_entry("operator", "string", "Operator to use for comparison")
-        list_operator = ['<', '>', '==', '!=', '<=', '>=', 'is', 'in', 'not in']
-        self.set_list_of_values("operator", list_operator)
+        self.add_expected_entry("operator", "list", "Operator to use for comparison")
+        list_operator = ['==', '<', '>', '<=', '>=', '!=']
+        the_list = []
+        for op in list_operator:
+           the_list.append([op, op])
+        self.set_list_of_values("operator", the_list)
 
     def evaluate(self):
         """ Return chosen operator, or none if no operator choosed yet
