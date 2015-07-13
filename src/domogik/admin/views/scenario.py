@@ -120,6 +120,44 @@ def scenario_edit(id):
             if 'result' in res:
                 res = res['result']
                 tests = res.keys()
+
+        # TODO : DEL
+        # Fetch all known datatypes
+        #datatypes = []
+        #cli = MQSyncReq(app.zmq_context)
+        #msg = MQMessage()
+        #msg.set_action('datatype.get')
+        #res = cli.request('manager', msg.get(), timeout=10)
+        #if res is not None:
+        #    res = res.get_data()
+        #    if 'datatypes' in res:
+        #        res = res['datatypes']
+        #        datatypes = res.keys()
+
+        # Fetch all known devices
+        # per client > device > sensor
+        sensors = {}
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('device.get')
+        res = cli.request('dbmgr', msg.get(), timeout=10)
+        if res is not None:
+            res = res.get_data()
+            if 'devices' in res:
+                devices = res['devices']
+                for dev in devices:
+                    print(dev['client_id'])
+                    client = dev['client_id']
+                    name = dev['name']
+                    if client not in sensors:
+                        sensors[client] = {}
+                    sensors[client][name] = {}
+                    for sen in dev['sensors']:
+                        sen_id = dev['sensors'][sen]['id']
+                        sen_name = dev['sensors'][sen]['name']
+                        sensors[client][name][sen_name] = sen_id
+        print(sensors)
+
         # ouput
         return render_template('scenario_edit.html',
             mactive = "scenario",
@@ -127,6 +165,7 @@ def scenario_edit(id):
             name = name,
             actions = actions,
             tests = tests,
+            sensors = sensors,
             jso = jso,
             scenario_id = id)
 
@@ -247,3 +286,110 @@ def scenario_blocks_actions():
                     """.format(act, '\n'.join(p), params['description'], jso)
                 js = '{0}\n\r{1}'.format(js, add)
     return Response(js, content_type='text/javascript; charset=utf-8')
+
+
+@app.route('/scenario/blocks/datatypes')
+def scenario_blocks_datatypes():
+    """
+        retrieve all known datatypes and for each, generate a bockly block in json
+    """
+    js = "                        "
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('datatype.get')
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is not None:
+        res = res.get_data()
+        if 'datatypes' in res:
+            datatypes = res['datatypes']
+            for dt_type, params in datatypes.iteritems():
+                # TODO : remove this filter
+                #if dt_type not in ['DT_Temp', 'DT_Humidity', 'DT_Number']:
+                #    continue
+                
+                print(dt_type)
+                dt_parent = dt_type
+                # First, determine the parent type (DT_Number, DT_Bool, ...)
+                while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
+                    dt_parent = datatypes[dt_parent]['parent']
+                    print("..{0}".format(dt_parent))
+ 
+                # Then, start to build the block
+                block = {
+                           "id" : "{0}".format(dt_type),
+                           "message0" : "{0}".format(dt_type),
+                           "args0" : [
+                             {
+                               "type" : "field_dropdown",
+                               "name" : "NAME",
+                               "options" : []
+                             },
+                             {
+                               "type" : "input_value",
+                               "name" : "NAME",
+                               "check" : "Array"
+                             }
+                           ],
+                           "colour" : 130,
+                           "tooltip" : "",
+                           "helpUrl" : ""
+                         }
+                block['args0'][0]['options'].append(['a', 'A'])
+                block['args0'][0]['options'].append(['b', 'B'])
+                js += "var {0}_json = {1};".format(dt_type, json.dumps(block))
+                js += """
+                         Blockly.Blocks['{0}'] = {{
+                             init: function() {{
+                                 this.jsonInit({0}_json);
+                             }}
+                         }};
+                         """.format(dt_type)
+              
+    return Response(js, content_type='text/javascript; charset=utf-8')
+
+
+
+@app.route('/scenario/blocks/sensors')
+def scenario_blocks_sensors():
+    """
+        create a block for each device sensor
+    """
+    js = ""
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device.get')
+    res = cli.request('dbmgr', msg.get(), timeout=10)
+    print(res)
+    if res is not None:
+        res = res.get_data()
+        if 'devices' in res:
+            devices = res['devices']
+            for dev in devices:
+                client = dev['client_id']
+                name = dev['name']
+                for sen in dev['sensors']:
+                    p = ""
+                    jso = ""
+                    sen_id = dev['sensors'][sen]['id']
+                    sen_name = dev['sensors'][sen]['name']
+                    print(sen_name)
+                    block_id = "sensor_{0}".format(sen_id)
+                    block_description = "{0} - {1}".format(name, sen_name)
+                    p = """
+                                this.appendDummyInput().appendField('{0}').appendField(new Blockly.FieldDropdown([["{1}", "{2}"]]), 'sensor.sensor_id');
+                        """.format("Sensor", sen_name, sen_id)
+                    add = """Blockly.Blocks['{0}'] = {{
+                                init: function() {{
+                                    this.setColour(160);
+                                    this.appendDummyInput().appendField("{0}");
+                                    {1}
+                                    this.setOutput(true);
+                                    this.setInputsInline(false);
+                                    this.setTooltip('{2}'); 
+                                    this.contextMenu = false;
+                                }}
+                            }};
+                            """.format(block_id, p, block_description, jso)
+                    js = '{0}\n\r{1}'.format(js, add)
+    return Response(js, content_type='text/javascript; charset=utf-8')
+

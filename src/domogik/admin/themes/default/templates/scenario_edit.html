@@ -47,6 +47,21 @@
             <block type="{{ a }}"></block>
         {% endfor %}
     </category>
+    <category name="Sensors">
+        {% for sen_client in sensors %}
+            <category name="{{ sen_client }}">
+            {% for sen_device in sensors[sen_client] %}
+                <category name="{{ sen_device }}">
+                {% for sen_name in sensors[sen_client][sen_device] %}
+                    <category name="{{ sen_name }}">
+                        <block type="sensor_{{ sensors[sen_client][sen_device][sen_name] }}"></block>
+                    </category>
+                {% endfor %}
+                </category>
+            {% endfor %}
+            </category>
+        {% endfor %}
+    </category>
   </xml>
   <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
@@ -57,6 +72,7 @@
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
   <script type="text/javascript" src="/scenario/blocks/actions"></script>
   <script type="text/javascript" src="/scenario/blocks/tests"></script>
+  <script type="text/javascript" src="/scenario/blocks/sensors"></script>
   <script type="text/javascript">
     var blocklyArea = document.getElementById('blocklyArea');
     var blocklyDiv = document.getElementById('blocklyDiv');
