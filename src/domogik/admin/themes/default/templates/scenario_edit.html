@@ -30,8 +30,12 @@
   <div id="blocklyDiv" style="position: absolute; width: 50%;"></div>
   <xml id="toolbox" style="display: none">
     <category name="Logic">
+        <block type="logic_compare"></block>
         <block type="logic_operation"></block>
         <block type="logic_negate"></block>
+        <block type="math_round"></block>
+        <block type="math_modulo"></block>
+        <block type="math_arithmetic"></block>
     </category>
     <category name="Tests">
         {% for t in tests %}
@@ -43,13 +47,32 @@
             <block type="{{ a }}"></block>
         {% endfor %}
     </category>
+    <category name="Sensors">
+        {% for sen_client in sensors %}
+            <category name="{{ sen_client }}">
+            {% for sen_device in sensors[sen_client] %}
+                <category name="{{ sen_device }}">
+                {% for sen_name in sensors[sen_client][sen_device] %}
+                    <category name="{{ sen_name }}">
+                        <block type="sensor_{{ sensors[sen_client][sen_device][sen_name] }}"></block>
+                    </category>
+                {% endfor %}
+                </category>
+            {% endfor %}
+            </category>
+        {% endfor %}
+    </category>
   </xml>
   <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
+
+  <script type="text/javascript" src="/static/libraries/blockly/core/field_externaltextinput.js"></script>
+
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
   <script type="text/javascript" src="/scenario/blocks/actions"></script>
   <script type="text/javascript" src="/scenario/blocks/tests"></script>
+  <script type="text/javascript" src="/scenario/blocks/sensors"></script>
   <script type="text/javascript">
     var blocklyArea = document.getElementById('blocklyArea');
     var blocklyDiv = document.getElementById('blocklyDiv');

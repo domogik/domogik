@@ -38,6 +38,7 @@ class CronTest(AbstractTest):
         self.add_parameter("cron", "cron.CronParameter")
 
     def evaluate(self):
+        print("CROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOON eval")
         """ Evaluate if the text appears in the content of the page referenced by url
         """
         params = self.get_raw_parameters()

@@ -212,7 +212,6 @@ class DBConnector(Plugin, MQRep):
         """ Reply to config.set MQ req
             @param data : MQ req message
         """
-        print "#################"
         msg = MQMessage()
         msg.set_action('config.result')
         status = True
@@ -331,7 +330,6 @@ class DBConnector(Plugin, MQRep):
                 # sometimes the given result is for another plugin/key
                 # so while we don't get the good data, we loop
                 # This bug happens rarely
-                print result
                 while result.id != name or \
                    result.type != type or \
                    result.hostname != host or \
@@ -550,7 +548,6 @@ class DBConnector(Plugin, MQRep):
             dev_list = self._db.list_devices()
 
             dev_json = dev_list
-            print(dev_json)
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('devices', dev_json)
@@ -580,7 +577,6 @@ class DBConnector(Plugin, MQRep):
 
             #dev_json = json.dumps(dev_list, cls=domogik_encoder(), check_circular=False),
             dev_json = dev_list
-            print(dev_json)
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('type', type)

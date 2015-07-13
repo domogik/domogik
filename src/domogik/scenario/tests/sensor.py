@@ -36,6 +36,7 @@ class SensorTest(AbstractTest):
         AbstractTest.__init__(self, log, trigger, cond)
         self.set_description("Check if the value for a sensor is set to a specific value")
         self.add_parameter("sensor", "sensor_id.SensorIdParameter")
+        self.add_parameter("operator", "operator.ComparisonOperatorParameter")
         self.add_parameter("value", "text.TextParameter")
         self.log = log
 
@@ -52,7 +53,10 @@ class SensorTest(AbstractTest):
             return None
         else:
             # check
-            self._log.debug("Evaluate %s in %s : %s" % (t, u, res))
+            
+            self.log.debug("Evaluate : sensor={0}, value={1}".format(sen, val))
+            self.log.debug("Evaluate : sensor={0}, value={1}".format(sen.evaluate(), val.evaluate()))
+            res = False
             return res
 
 

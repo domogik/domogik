@@ -311,6 +311,7 @@ body {
 /*** scenarios ***/
 
 #blocklyArea {
-    height: 300px;
+    /* height: 300px; */
+    height: 80vh;
     margin-top: 1em;
 }

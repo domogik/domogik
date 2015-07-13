@@ -111,12 +111,12 @@ class Butler(Plugin, MQAsyncSub):
             self.butler_sex = conf['sex']
             self.butler_mood = None
             if self.butler_sex not in SEX_ALLOWED:
-                self.log.error(u"The butler sex configured is not valid : '{0}'. Expecting : {1}".format(self.butler_sex, SEX_ALLOWED))
+                self.log.error(u"Exiting : the butler sex configured is not valid : '{0}'. Expecting : {1}".format(self.butler_sex, SEX_ALLOWED))
                 self.force_leave()
                 return
        
         except:
-            self.log.error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
+            self.log.error(u"Exiting : error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
             self.force_leave()
             return
         # user name (default is 'localuser')
@@ -133,6 +133,7 @@ class Butler(Plugin, MQAsyncSub):
 
         # Configure bot variables
         # all must be lower case....
+        self.log.info("Configuring name and sex : {0}, {1}".format(self.butler_name.lower(), self.butler_sex.lower()))
         self.brain.set_variable("name", self.butler_name.lower())
         self.brain.set_variable("fullname", self.butler_name.lower())
         self.brain.set_variable("sex", self.butler_sex.lower())

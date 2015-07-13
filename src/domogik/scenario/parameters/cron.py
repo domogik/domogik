@@ -31,6 +31,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 # in evaluate check cronExpression.check_trigger_now()
 # in destroy clean up the cron expression
 
+from threading import Thread, Event
 from domogik.scenario.parameters.abstract import AbstractParameter
 from domogik.common.cron import CronExpression
 
@@ -44,6 +45,22 @@ class CronParameter(AbstractParameter):
         self.set_type("string")
         self.add_expected_entry("cron", "string", "Cron timed trigger")
         self.expr = None
+        self._event = Event()
+        self._fetch_thread = Thread(target=self._check,name="CronParameter.check")
+        self._fetch_thread.start()
+
+    def _check(self):
+        """ This method will fetch the url peridodically and put the result in self._result
+        It whould be called in some thread
+        """
+        while not self._event.is_set():
+            self._result = False
+            if self.expr:
+                self._result = self.expr.check_trigger_now()
+                if self._result:
+                    self.call_trigger()
+            # we only need to check every 60 seconds as cron works on minuts basis
+            self._event.wait(60)
 
     def fill(self, params):
         AbstractParameter.fill(self, params)
@@ -56,20 +73,11 @@ class CronParameter(AbstractParameter):
     def evaluate(self):
         """ Return string, or none if no string entered yet
         """
-        if self.expr:
-            return self.expr.check_trigger_now()
-        else:
-            return None
+        return self._result
 
-#Some basic tests
-if __name__ == "__main__":
-    import logging
-    FORMAT = "%(asctime)-15s %(message)s"
-    logging.basicConfig(format=FORMAT)
-    t = CronParameter(logging, None)
-    print("Expected entries : {0}".format(t.get_expected_entries()))
-    print("Evaluate should be None : {0}".format(t.evaluate()))
-    print("==> Setting some value for entry 'cron'")
-    data = { "cron" : "*/2 * * * *" }
-    t.fill(data)
-    print("Evaluate should return true on even minuts : {0}".format(t.evaluate()))
+    def destroy(self):
+        """ Destroy fetch thread
+        """
+        self._event.set()
+        self._fetch_thread.join()
+        AbstractParameter.destroy(self)
