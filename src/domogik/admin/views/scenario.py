@@ -399,7 +399,7 @@ def scenario_blocks_sensors():
                     block_description = "{0} - {1}".format(name, sen_name)
                     p = """
                                 this.appendDummyInput().appendField('{0}').appendField(new Blockly.FieldDropdown([["{1}", "{2}"]]), 'sensor.sensor_id');
-                        """.format("Sensor", sen_name, sen_id)
+                        """.format("Sensor : ", sen_name, sen_id)
                     add = """Blockly.Blocks['{0}'] = {{
                                 init: function() {{
                                     this.setColour({5});
