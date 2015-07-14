@@ -193,6 +193,7 @@ def scenario_blocks_tests():
             res = res['result']
             print(res)
             for test, params in res.iteritems():
+                print params
                 p = []
                 jso = ""
                 for parv in params:
@@ -357,9 +358,16 @@ def scenario_blocks_sensors():
     js = ""
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
+    msg.set_action('datatype.get')
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is not None:
+        res = res.get_data()
+        if 'datatypes' in res:
+            datatypes = res['datatypes']
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
     msg.set_action('device.get')
     res = cli.request('dbmgr', msg.get(), timeout=10)
-    print(res)
     if res is not None:
         res = res.get_data()
         if 'devices' in res:
@@ -372,7 +380,21 @@ def scenario_blocks_sensors():
                     jso = ""
                     sen_id = dev['sensors'][sen]['id']
                     sen_name = dev['sensors'][sen]['name']
-                    print(sen_name)
+                    # determ the output type
+                    sen_dt = dev['sensors'][sen]['data_type'] 
+                    dt_parent = sen_dt
+                    # First, determine the parent type (DT_Number, DT_Bool, ...)
+                    while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
+                        dt_parent = datatypes[dt_parent]['parent']
+                    if dt_parent == "DT_Bool":
+                        color = 20
+                        output = "\"Boolean\""
+                    elif dt_parent == "DT_Number":
+                        color = 65
+                        output = "\"Number\""
+                    else:
+                        color = 160
+                        output = "\"null\""
                     block_id = "sensor.SensorTest.{0}".format(sen_id)
                     block_description = "{0} - {1}".format(name, sen_name)
                     p = """
@@ -380,16 +402,16 @@ def scenario_blocks_sensors():
                         """.format("Sensor", sen_name, sen_id)
                     add = """Blockly.Blocks['{0}'] = {{
                                 init: function() {{
-                                    this.setColour(160);
+                                    this.setColour({5});
                                     this.appendDummyInput().appendField("{0}");
                                     {1}
-                                    this.setOutput(true);
+                                    this.setOutput(true, {4});
                                     this.setInputsInline(false);
                                     this.setTooltip('{2}'); 
                                     this.contextMenu = false;
                                 }}
                             }};
-                            """.format(block_id, p, block_description, jso)
+                            """.format(block_id, p, block_description, jso, output, color)
                     js = '{0}\n\r{1}'.format(js, add)
     return Response(js, content_type='text/javascript; charset=utf-8')
 
