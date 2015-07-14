@@ -54,7 +54,7 @@
                 <category name="{{ sen_device }}">
                 {% for sen_name in sensors[sen_client][sen_device] %}
                     <category name="{{ sen_name }}">
-                        <block type="sensor_{{ sensors[sen_client][sen_device][sen_name] }}"></block>
+                        <block type="sensor.sensorTest.{{ sensors[sen_client][sen_device][sen_name] }}"></block>
                     </category>
                 {% endfor %}
                 </category>
