@@ -373,7 +373,7 @@ def scenario_blocks_sensors():
                     sen_id = dev['sensors'][sen]['id']
                     sen_name = dev['sensors'][sen]['name']
                     print(sen_name)
-                    block_id = "sensor.sensorTest.{0}".format(sen_id)
+                    block_id = "sensor.SensorTest.{0}".format(sen_id)
                     block_description = "{0} - {1}".format(name, sen_name)
                     p = """
                                 this.appendDummyInput().appendField('{0}').appendField(new Blockly.FieldDropdown([["{1}", "{2}"]]), 'sensor.sensor_id');
