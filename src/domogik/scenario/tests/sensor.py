@@ -32,8 +32,8 @@ class SensorTest(AbstractTest):
     """ Sensor test
     """
 
-    def __init__(self, log = None, trigger = None, cond = None):
-        AbstractTest.__init__(self, log, trigger, cond)
+    def __init__(self, log = None, trigger = None, cond = None, params = None):
+        AbstractTest.__init__(self, log, trigger, cond, params)
         self.set_description("Check if the value for a sensor is set to a specific value")
         self.add_parameter("sensor", "sensor_id.SensorIdParameter")
         self.add_parameter("operator", "operator.ComparisonOperatorParameter")

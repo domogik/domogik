@@ -142,11 +142,11 @@ class ScenarioInstance:
     def _create_instance(self, inst, itype):
         uuid = self._get_uuid()
         if itype == 'test':
-            mod, clas = inst.split('.')
+            mod, clas, param = inst.split('.')
             module_name = "domogik.scenario.tests.{0}".format(mod)
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create test instance {0} with uuid {1}".format(inst, uuid))
-            obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self)
+            obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self, params=param)
             self._mapping['test'][uuid] = obj
             return (obj, uuid)
         elif itype == 'action':
