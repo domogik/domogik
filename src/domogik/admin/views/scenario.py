@@ -403,7 +403,7 @@ def scenario_blocks_sensors():
                     add = """Blockly.Blocks['{0}'] = {{
                                 init: function() {{
                                     this.setColour({5});
-                                    this.appendDummyInput().appendField("{0}");
+                                    this.appendDummyInput().appendField("{2}");
                                     {1}
                                     this.setOutput(true, {4});
                                     this.setInputsInline(false);
