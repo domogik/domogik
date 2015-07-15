@@ -41,20 +41,30 @@
         {% for t in tests %}
             <block type="{{ t }}"></block>
         {% endfor %}
-        </category>-->
+        </category>
+    -->
+    <!--
     <category name="Actions">
         {% for a in actions %}
             <block type="{{ a }}"></block>
         {% endfor %}
     </category>
-    <category name="Sensors">
-        {% for sen_client in sensors %}
-            <category name="{{ sen_client }}">
-            {% for sen_device in sensors[sen_client] %}
-                <category name="{{ sen_device }}">
-                {% for sen_name in sensors[sen_client][sen_device] %}
-                    <block type="sensor.SensorTest.{{ sensors[sen_client][sen_device][sen_name] }}"></block>
-                {% endfor %}
+    -->
+    <category name="Devices">
+        {% for dev_client in devices_per_clients %}
+            <category name="{{ dev_client }}">
+            {% for dev in devices_per_clients[dev_client] %}
+                <category name="{{ dev }}">
+                    <category name="Sensors">
+                    {% for sen_name in devices_per_clients[dev_client][dev]['sensors'] %}
+                        <block type="sensor.SensorTest.{{ devices_per_clients[dev_client][dev]['sensors'][sen_name] }}"></block>
+                    {% endfor %}
+                    </category>
+                    <category name="Commands">
+                    {% for cmd_name in devices_per_clients[dev_client][dev]['commands'] %}
+                        <block type="command.CommandAction.{{ devices_per_clients[dev_client][dev]['commands'][cmd_name] }}"></block>
+                    {% endfor %}
+                    </category>
                 </category>
             {% endfor %}
             </category>
@@ -70,7 +80,7 @@
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
   <script type="text/javascript" src="/scenario/blocks/actions"></script>
   <!--<script type="text/javascript" src="/scenario/blocks/tests"></script>-->
-  <script type="text/javascript" src="/scenario/blocks/sensors"></script>
+  <script type="text/javascript" src="/scenario/blocks/devices"></script>
   <script type="text/javascript">
     var blocklyArea = document.getElementById('blocklyArea');
     var blocklyDiv = document.getElementById('blocklyDiv');

@@ -135,8 +135,8 @@ def scenario_edit(id):
         #        datatypes = res.keys()
 
         # Fetch all known devices
-        # per client > device > sensor
-        sensors = {}
+        # per client > device > sensor | command
+        devices_per_clients = {}
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
         msg.set_action('device.get')
@@ -144,17 +144,23 @@ def scenario_edit(id):
         if res is not None:
             res = res.get_data()
             if 'devices' in res:
-                devices = res['devices']
-                for dev in devices:
-                    client = dev['client_id']
-                    name = dev['name']
-                    if client not in sensors:
-                        sensors[client] = {}
-                    sensors[client][name] = {}
-                    for sen in dev['sensors']:
-                        sen_id = dev['sensors'][sen]['id']
-                        sen_name = dev['sensors'][sen]['name']
-                        sensors[client][name][sen_name] = sen_id
+                result = res['devices']
+                for device in result:
+                    client = device['client_id']
+                    name = device['name']
+                    if client not in devices_per_clients:
+                        devices_per_clients[client] = {}
+                    devices_per_clients[client][name] = {}
+                    devices_per_clients[client][name]['sensors'] = {}
+                    devices_per_clients[client][name]['commands'] = {}
+                    for sen in device['sensors']:
+                        sen_id = device['sensors'][sen]['id']
+                        sen_name = device['sensors'][sen]['name']
+                        devices_per_clients[client][name]['sensors'][sen_name] = sen_id
+                    for cmd in device['commands']:
+                        cmd_id = device['commands'][cmd]['id']
+                        cmd_name = device['commands'][cmd]['name']
+                        devices_per_clients[client][name]['commands'][cmd_name] = cmd_id
 
         # ouput
         return render_template('scenario_edit.html',
@@ -163,7 +169,7 @@ def scenario_edit(id):
             name = name,
             actions = actions,
             tests = tests,
-            sensors = sensors,
+            devices_per_clients = devices_per_clients,
             jso = jso,
             scenario_id = id)
 
@@ -343,10 +349,10 @@ def scenario_blocks_datatypes():
 
 
 
-@app.route('/scenario/blocks/sensors')
-def scenario_blocks_sensors():
+@app.route('/scenario/blocks/devices')
+def scenario_blocks_devices():
     """
-        create a block for each device sensor
+        create a block for each device sensor and command
     """
     js = ""
     cli = MQSyncReq(app.zmq_context)
@@ -368,6 +374,8 @@ def scenario_blocks_sensors():
             for dev in devices:
                 client = dev['client_id']
                 name = dev['name']
+
+                ### sensors blocks
                 for sen in dev['sensors']:
                     p = ""
                     jso = ""
@@ -392,12 +400,13 @@ def scenario_blocks_sensors():
                     #block_description = "{0} - {1}".format(name, sen_name)
                     block_description = "{0}".format(client)
                     p = """
-                                this.appendDummyInput().appendField('Device {0} Sensor {1}');
+                                this.appendDummyInput().appendField('Device : {0}');
+                                this.appendDummyInput().appendField('Sensor : {1}');
                         """.format(name, sen_name)
                     add = """Blockly.Blocks['{0}'] = {{
                                 init: function() {{
                                     this.setColour({5});
-                                    //this.appendDummyInput().appendField("{0}");
+                                    this.appendDummyInput().appendField("{2}");
                                     {1}
                                     this.setOutput(true, {4});
                                     this.setInputsInline(false);
@@ -406,5 +415,58 @@ def scenario_blocks_sensors():
                             }};
                             """.format(block_id, p, block_description, jso, output, color)
                     js = '{0}\n\r{1}'.format(js, add)
+
+                ### commands blocks
+                for cmd in dev['commands']:
+                    p = ""
+                    jso = ""
+                    cmd_id = dev['commands'][cmd]['id']
+                    cmd_name = dev['commands'][cmd]['name']
+                    # parse the parameters
+                    print(dev['commands'][cmd])
+                    js_params = ""
+                    for param in dev['commands'][cmd]['parameters']:
+                        print(param)
+                        param_key = param['key']
+                        param_dt_type = param['data_type']
+                        print("- {0} / {1}".format(param_key, param_dt_type))
+                        # First, determine the parent type (DT_Number, DT_Bool, ...)
+                        dt_parent = param_dt_type
+                        while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
+                            dt_parent = datatypes[dt_parent]['parent']
+                        #if dt_parent == "DT_Bool":
+                        #    color = 20
+                        #    output = "\"Boolean\""
+                        #elif dt_parent == "DT_Number":
+                        #    color = 65
+                        #    output = "\"Number\""
+                        #else:
+                        #    color = 160
+                        #    output = "\"null\""
+                        js_params = """
+                                        this.appendDummyInput().appendField("Param : {0}/{1}");
+                                        this.appendDummyInput().appendField(new Blockly.FieldTextInput("value"), "{2}");
+                                    """.format(param_key, param_dt_type, param_key)
+                    block_id = "command.CommandAction.{0}".format(cmd_id)
+                    block_description = "{0}".format(client)
+                    p = """
+                                this.appendDummyInput().appendField('Device : {0}');
+                                this.appendDummyInput().appendField('Command : {1}');
+                        """.format(name, cmd_name)
+                    add = """Blockly.Blocks['{0}'] = {{
+                                init: function() {{
+                                    this.setColour({5});
+                                    this.appendDummyInput().appendField("{2}");
+                                    {1}
+                                    {6}
+                                    this.setPreviousStatement(true, "null");
+                                    this.setNextStatement(true, "null");
+                                    this.setInputsInline(false);
+                                    this.setTooltip('{2}'); 
+                                }}
+                            }};
+                            """.format(block_id, p, block_description, jso, output, color, js_params)
+                    js = '{0}\n\r{1}'.format(js, add)
+
     return Response(js, content_type='text/javascript; charset=utf-8')
 
