@@ -194,11 +194,15 @@ class ScenarioInstance:
             self._mapping['test'][uuid] = obj
             return (obj, uuid)
         elif itype == 'action':
-            mod, clas = inst.split('.')
+            try:
+                mod, clas, params = inst.split('.')
+            except ValueError as err:
+                mod, clas = inst.split('.')
+                params = None
             module_name = "domogik.scenario.actions.{0}".format(mod)
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create action instance {0} with uuid {1}".format(inst, uuid))
-            obj = cobj(log=self._log)
+            obj = cobj(log=self._log, params=params)
             self._mapping['action'][uuid] = obj
             return (obj, uuid)
 
