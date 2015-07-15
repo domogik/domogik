@@ -48,7 +48,6 @@ class CommandAction(AbstractAction):
             msg.set_action('device.get')
             json_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
             devices = json.loads(json_devices)['devices']
-            print(devices)
             for dev in devices:
                 name = dev['name']
                 for cmd_idx in dev['commands']:
@@ -56,7 +55,6 @@ class CommandAction(AbstractAction):
                     cmd_id = dev['commands'][cmd_idx]['id']
                     self.cmds_list.append(['{0} : {1}'.format(name, cmd_name), 
                                          '{0}'.format(cmd_id)])
-            print(self.cmds_list)
         except:
             #self.log.error("Error while getting devices list : {0}".format(traceback.format_exc()))
             print("Error while getting devices list : {0}".format(traceback.format_exc()))
