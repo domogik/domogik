@@ -108,7 +108,26 @@ class ScenarioInstance:
         print self._parsed_condition
 
     def __parse_if_part(self, part):
-        if part['type'] == 'logic_compare':
+        if part['type'] == 'logic_boolean':
+            if part['BOOL'] == "TRUE":
+                return "True"
+            else:
+                return "False"
+        elif part['type'] == 'math_number':
+            return "{0}".format(part['NUM'])
+        elif part['type'] == 'math_arithmetic':
+            if part['OP'].lower() == "add":
+                compare = "+"
+            elif part['OP'].lower() == "minus":
+                compare = "-"
+            elif part['OP'].lower() == "multiply":
+                compare = "*"
+            elif part['OP'].lower() == "divide":
+                compare = "/"
+            elif part['OP'].lower() == "power":
+                compare = "^"
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), compare, self.__parse_if_part(part['B']))
+        elif part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
                 compare = "=="
             if part['OP'].lower() == "neq":
