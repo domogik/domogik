@@ -53,16 +53,20 @@
             <category name="{{ dev_client }}">
             {% for dev in devices_per_clients[dev_client] %}
                 <category name="{{ dev }}">
+                    {% if devices_per_clients[dev_client][dev]['sensors']|length > 0 %}
                     <category name="Sensors">
                     {% for sen_name in devices_per_clients[dev_client][dev]['sensors'] %}
                         <block type="sensor.SensorTest.{{ devices_per_clients[dev_client][dev]['sensors'][sen_name] }}"></block>
                     {% endfor %}
                     </category>
+                    {% endif %}
+                    {% if devices_per_clients[dev_client][dev]['commands']|length > 0 %}
                     <category name="Commands">
                     {% for cmd_name in devices_per_clients[dev_client][dev]['commands'] %}
                         <block type="command.CommandAction.{{ devices_per_clients[dev_client][dev]['commands'][cmd_name] }}"></block>
                     {% endfor %}
                     </category>
+                    {% endif %}
                 </category>
             {% endfor %}
             </category>
