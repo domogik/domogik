@@ -399,12 +399,12 @@ def scenario_blocks_sensors():
                     #block_description = "{0} - {1}".format(name, sen_name)
                     block_description = "{0}".format(client)
                     p = """
-                                this.appendDummyInput().appendField('{0} : ').appendField(new Blockly.FieldDropdown([["{1}", "{2}"]]), 'sensor.sensor_id');
-                        """.format(name, sen_name, sen_id)
+                                this.appendDummyInput().appendField('Device {0} Sensor {1}');
+                        """.format(name, sen_name)
                     add = """Blockly.Blocks['{0}'] = {{
                                 init: function() {{
                                     this.setColour({5});
-                                    this.appendDummyInput().appendField("{2}");
+                                    //this.appendDummyInput().appendField("{0}");
                                     {1}
                                     this.setOutput(true, {4});
                                     this.setInputsInline(false);
