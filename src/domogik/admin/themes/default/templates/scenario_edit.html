@@ -37,11 +37,11 @@
         <block type="math_modulo"></block>
         <block type="math_arithmetic"></block>-->
     </category>
-    <category name="Tests">
+    <!--<category name="Tests">
         {% for t in tests %}
             <block type="{{ t }}"></block>
         {% endfor %}
-    </category>
+        </category>-->
     <category name="Actions">
         {% for a in actions %}
             <block type="{{ a }}"></block>
@@ -69,7 +69,7 @@
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
   <script type="text/javascript" src="/scenario/blocks/actions"></script>
-  <script type="text/javascript" src="/scenario/blocks/tests"></script>
+  <!--<script type="text/javascript" src="/scenario/blocks/tests"></script>-->
   <script type="text/javascript" src="/scenario/blocks/sensors"></script>
   <script type="text/javascript">
     var blocklyArea = document.getElementById('blocklyArea');
@@ -103,10 +103,12 @@
     Blockly.addChangeListener(onchange);
     //var json = JSON.parse('{"type":"dom_condition","id":"1","IF":{"type":"logic_operation","id":"10","OP":"AND","A":{"type":"cron.CronTest","id":"18","cron":"None"},"B":{"type":"textinpage.TextInPageTest","id":"22","urlpath":"None","text":"None"}},"DO":{"type":"log.LogAction","id":"28","message":"test"},"deletable":false}');
     //var json = JSON.parse('{"type":"dom_condition","id":"1","deletable":false}');
-    {% autoescape false %}
-    var json = JSON.parse('{{ jso }}');
-    {% endautoescape %}
-    Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
+    $(document).ready(function() {        
+        {% autoescape false %}
+        var json = JSON.parse('{{ jso }}');
+        {% endautoescape %}
+        Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
+    });
 
     var onresize = function(e) {
       // Compute the absolute coordinates and dimensions of blocklyArea.

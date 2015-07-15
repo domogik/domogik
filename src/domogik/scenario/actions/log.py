@@ -36,7 +36,7 @@ class LogAction(AbstractAction):
         AbstractAction.__init__(self, log)
         self.set_description("Simply put some string in log file.")
 
-    def do_action(self, condition, tests):
+    def do_action(self):
         self._log.info("{0}".format(self._params['message']))
 
     def get_expected_entries(self):
