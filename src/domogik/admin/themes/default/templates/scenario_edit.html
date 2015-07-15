@@ -43,13 +43,11 @@
         {% endfor %}
         </category>
     -->
-    <!--
     <category name="Actions">
         {% for a in actions %}
             <block type="{{ a }}"></block>
         {% endfor %}
     </category>
-    -->
     <category name="Devices">
         {% for dev_client in devices_per_clients %}
             <category name="{{ dev_client }}">
