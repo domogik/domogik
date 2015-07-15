@@ -41,9 +41,11 @@ class SensorTest(AbstractTest):
         self.set_description("Check The value for a sensor with id {0}".format(self._sensorId))
         self.log = log
         self._db = DbHelper()
+        self._res = None
         with self._db.session_scope():
             sensor = self._db.get_sensor(self._sensorId)
-            self._res = sensor.last_value
+            if sensor is not None:
+                self._res = sensor.last_value
         self._event = Event()
         self._fetch_thread = Thread(target=self._fetch,name="pollthread")
         self._fetch_thread.start()
