@@ -110,9 +110,9 @@ class ScenarioInstance:
     def __parse_if_part(self, part):
         if part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
-                compare = "is"
+                compare = "=="
             if part['OP'].lower() == "neq":
-                compare = "is not"
+                compare = "!="
             elif part['OP'].lower() == "lt":
                 compare = "<"
             elif part['OP'].lower() == "lte":
