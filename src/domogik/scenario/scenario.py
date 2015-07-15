@@ -102,12 +102,46 @@ class ScenarioInstance:
         """ parse the json and load all needed components
         """
         # step 1 parse the "do" part
-        #self.__parse_do_part(self._json['DO'])
+        self.__parse_do_part(self._json['DO'])
         # step 2 parse the "if" part        
         self._parsed_condition = self.__parse_if_part(self._json['IF'])
+        print self._parsed_condition
 
     def __parse_if_part(self, part):
-        if part['type'] == 'logic_operation':
+        if part['type'] == 'logic_boolean':
+            if part['BOOL'] == "TRUE":
+                return "True"
+            else:
+                return "False"
+        elif part['type'] == 'math_number':
+            return "{0}".format(part['NUM'])
+        elif part['type'] == 'math_arithmetic':
+            if part['OP'].lower() == "add":
+                compare = "+"
+            elif part['OP'].lower() == "minus":
+                compare = "-"
+            elif part['OP'].lower() == "multiply":
+                compare = "*"
+            elif part['OP'].lower() == "divide":
+                compare = "/"
+            elif part['OP'].lower() == "power":
+                compare = "^"
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), compare, self.__parse_if_part(part['B']))
+        elif part['type'] == 'logic_compare':
+            if part['OP'].lower() == "eq":
+                compare = "=="
+            if part['OP'].lower() == "neq":
+                compare = "!="
+            elif part['OP'].lower() == "lt":
+                compare = "<"
+            elif part['OP'].lower() == "lte":
+                compare = "<="
+            elif part['OP'].lower() == "gt":
+                compare = ">"
+            elif part['OP'].lower() == "gte":
+                compare = ">="
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), compare, self.__parse_if_part(part['B']))
+        elif part['type'] == 'logic_operation':
             return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), part['OP'].lower(), self.__parse_if_part(part['B']))
         elif part['type'] == 'logic_negate':
             return "not {0}".format(self.__parse_if_part(part['BOOL']))
@@ -115,6 +149,12 @@ class ScenarioInstance:
             test = self._create_instance(part['type'], 'test')
             test[0].fill_parameters(part)
             return "self._mapping['test']['{0}'].evaluate()".format(test[1])
+
+    def __parse_do_part(self, part):
+        action = self._create_instance(part['type'], 'action')
+        action[0].do_init(part)
+        if 'NEXT' in part:
+            self.__parse_do_part(part['NEXT'])
 
     def get_parsed_condition(self):
         """Returns the parsed condition
@@ -142,19 +182,27 @@ class ScenarioInstance:
     def _create_instance(self, inst, itype):
         uuid = self._get_uuid()
         if itype == 'test':
-            mod, clas = inst.split('.')
+            try:
+                mod, clas, param = inst.split('.')
+            except ValueError as err:
+                mod, clas = inst.split('.')
+                param = None
             module_name = "domogik.scenario.tests.{0}".format(mod)
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create test instance {0} with uuid {1}".format(inst, uuid))
-            obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self)
+            obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self, params=param)
             self._mapping['test'][uuid] = obj
             return (obj, uuid)
         elif itype == 'action':
-            mod, clas = inst.split('.')
+            try:
+                mod, clas, params = inst.split('.')
+            except ValueError as err:
+                mod, clas = inst.split('.')
+                params = None
             module_name = "domogik.scenario.actions.{0}".format(mod)
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create action instance {0} with uuid {1}".format(inst, uuid))
-            obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self)
+            obj = cobj(log=self._log, params=params)
             self._mapping['action'][uuid] = obj
             return (obj, uuid)
 
@@ -172,7 +220,9 @@ class ScenarioInstance:
         """ Call the needed actions for this scenario
         """
         print "CALLING actions"
-        pass
+        for act in self._mapping['action']:
+            self._mapping['action'][act].do_action()
+        print "END CALLING actions"
 
     def generic_trigger(self, test):
         if test.get_condition():

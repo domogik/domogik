@@ -49,7 +49,7 @@ class AbstractAction:
         - When Condition is evaluated to 'True', each action linked to it is called (do_action())
     """
 
-    def __init__(self, log=None):
+    def __init__(self, log=None, params=None):
         """ Create action's instance
         @param log : A logger instance
         @warn If you extend __init__, be sure that all parameters have a default value !

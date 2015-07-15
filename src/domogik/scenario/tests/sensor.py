@@ -26,41 +26,55 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.tests.abstract import AbstractTest
+from domogik.common.database import DbHelper
 from time import sleep
+from threading import Thread, Event
 
 class SensorTest(AbstractTest):
     """ Sensor test
+    # params == the sensorId to check the value for
     """
 
-    def __init__(self, log = None, trigger = None, cond = None):
-        AbstractTest.__init__(self, log, trigger, cond)
-        self.set_description("Check if the value for a sensor is set to a specific value")
-        self.add_parameter("sensor", "sensor_id.SensorIdParameter")
-        self.add_parameter("operator", "operator.ComparisonOperatorParameter")
-        self.add_parameter("value", "text.TextParameter")
+    def __init__(self, log = None, trigger = None, cond = None, params = None):
+        AbstractTest.__init__(self, log, trigger, cond, params)
+        self._sensorId = params
+        self.set_description("Check The value for a sensor with id {0}".format(self._sensorId))
         self.log = log
+        self._db = DbHelper()
+        self._res = None
+        with self._db.session_scope():
+            sensor = self._db.get_sensor(self._sensorId)
+            if sensor is not None:
+                self._res = sensor.last_value
+        self._event = Event()
+        self._fetch_thread = Thread(target=self._fetch,name="pollthread")
+        self._fetch_thread.start()
+
+    def _fetch(self):
+        while not self._event.is_set():
+            new = None
+            with self._db.session_scope():
+                sensor = self._db.get_sensor(self._sensorId)
+                if sensor is not None:
+                    new = sensor.last_value
+            if self._res != new:
+                self._res = new
+                self._trigger(self)
+            sleep(2)
 
     def evaluate(self):
         """ Evaluate if the text appears in the content of the page referenced by url
         """
-        self.log.debug("SensorTest : evaluate") 
-        params = self.get_raw_parameters()
-        self.log.debug("SensorTest : evaluate : params = {0}".format(params)) 
-        sen = params["sensor"]
-        val = params["value"]
-        if sen.evaluate() == None or val.evaluate() == None:
-            self.log.debug("sen.evaluate() == None or val.evaluate() == None ==> returning None")
-            return None
-        else:
-            # check
-            
-            self.log.debug("Evaluate : sensor={0}, value={1}".format(sen, val))
-            self.log.debug("Evaluate : sensor={0}, value={1}".format(sen.evaluate(), val.evaluate()))
-            res = False
-            return res
+        self.log.debug("SensorTest {0}: evaluate to {1}".format(self._sensorId, self._res)) 
+        return self._res
 
+    def destroy(self):
+        """ Destroy fetch thread
+        """
+        self._event.set()
+        self._fetch_thread.join()
+        AbstractTest.destroy(self)
 
-TEST = None
 if __name__ == "__main__":
     import logging
 

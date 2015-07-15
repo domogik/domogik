@@ -42,7 +42,7 @@ class AbstractTest:
        exception if the method can't be evaluated
     """
 
-    def __init__(self, log = None, trigger = None, cond = None):
+    def __init__(self, log = None, trigger = None, cond = None, params = None):
         """ Create the instance
         @param log : A logger instance
         @param trigger : a method to call when a parameter changes
@@ -53,6 +53,7 @@ class AbstractTest:
         self._parameters = {}
         self._description = None
         self._cond = cond
+        self._params = params
 
     def set_description(self, description):
         """ Update the description of the test
