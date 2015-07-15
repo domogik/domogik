@@ -26,28 +26,52 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.tests.abstract import AbstractTest
+from domogik.common.database import DbHelper
 from time import sleep
+from threading import Thread, Event
 
 class SensorTest(AbstractTest):
     """ Sensor test
+    # params == the sensorId to check the value for
     """
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
-        self.set_description("Check if the value for a sensor is set to a specific value")
-        print "+++++"
-        print params
-        print "+++++"
+        self._sensorId = params
+        self.set_description("Check The value for a sensor with id {0}".format(self._sensorId))
         self.log = log
+        self._db = DbHelper()
+        with self._db.session_scope():
+            sensor = self._db.get_sensor(self._sensorId)
+            self._res = sensor.last_value
+        self._event = Event()
+        self._fetch_thread = Thread(target=self._fetch,name="pollthread")
+        self._fetch_thread.start()
+
+    def _fetch(self):
+        while not self._event.is_set():
+            new = None
+            with self._db.session_scope():
+                sensor = self._db.get_sensor(self._sensorId)
+                if sensor is not None:
+                    new = sensor.last_value
+            if self._res != new:
+                self._res = new
+                self.evaluate()
 
     def evaluate(self):
         """ Evaluate if the text appears in the content of the page referenced by url
         """
-        self.log.debug("SensorTest : evaluate") 
-        return 0
+        self.log.debug("SensorTest {0}: evaluate to {1}".format(self._sensorId, self._res)) 
+        return self._res
 
+    def destroy(self):
+        """ Destroy fetch thread
+        """
+        self._event.set()
+        self._fetch_thread.join()
+        AbstractTest.destroy(self)
 
-TEST = None
 if __name__ == "__main__":
     import logging
 
