@@ -146,7 +146,6 @@ def scenario_edit(id):
             if 'devices' in res:
                 devices = res['devices']
                 for dev in devices:
-                    print(dev['client_id'])
                     client = dev['client_id']
                     name = dev['name']
                     if client not in sensors:
@@ -156,7 +155,6 @@ def scenario_edit(id):
                         sen_id = dev['sensors'][sen]['id']
                         sen_name = dev['sensors'][sen]['name']
                         sensors[client][name][sen_name] = sen_id
-        print(sensors)
 
         # ouput
         return render_template('scenario_edit.html',
@@ -186,18 +184,14 @@ def scenario_blocks_tests():
     msg = MQMessage()
     msg.set_action('test.list')
     res = cli.request('scenario', msg.get(), timeout=10)
-    print(res)
     if res is not None:
         res = res.get_data()
         if 'result' in res:
             res = res['result']
-            print(res)
             for test, params in res.iteritems():
-                print params
                 p = []
                 jso = ""
                 for parv in params:
-                    print("TYPE={0}".format(parv['type']))
                     par = parv['name']
                     papp = "this.appendDummyInput().appendField('{0}')".format(parv['description'])
                     if parv['type'] == 'string':
@@ -268,7 +262,6 @@ def scenario_blocks_actions():
                         jso = '{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
                         the_list = parv["values"]  # [[...], [...]]
                         papp = "{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
-                        print(papp)
                     else:
                         papp = "{0};".format(papp)
                     p.append(papp)
@@ -409,7 +402,6 @@ def scenario_blocks_sensors():
                                     this.setOutput(true, {4});
                                     this.setInputsInline(false);
                                     this.setTooltip('{2}'); 
-                                    this.contextMenu = false;
                                 }}
                             }};
                             """.format(block_id, p, block_description, jso, output, color)
