@@ -57,7 +57,7 @@ class SensorTest(AbstractTest):
                     new = sensor.last_value
             if self._res != new:
                 self._res = new
-                self.evaluate()
+                self._trigger(self)
 
     def evaluate(self):
         """ Evaluate if the text appears in the content of the page referenced by url
