@@ -105,9 +105,24 @@ class ScenarioInstance:
         #self.__parse_do_part(self._json['DO'])
         # step 2 parse the "if" part        
         self._parsed_condition = self.__parse_if_part(self._json['IF'])
+        print self._parsed_condition
 
     def __parse_if_part(self, part):
-        if part['type'] == 'logic_operation':
+        if part['type'] == 'logic_compare':
+            if part['OP'].lower() == "eq":
+                compare = "is"
+            if part['OP'].lower() == "neq":
+                compare = "is not"
+            elif part['OP'].lower() == "lt":
+                compare = "<"
+            elif part['OP'].lower() == "lte":
+                compare = "<="
+            elif part['OP'].lower() == "gt":
+                compare = ">"
+            elif part['OP'].lower() == "gte":
+                compare = ">="
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), compare, self.__parse_if_part(part['B']))
+        elif part['type'] == 'logic_operation':
             return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), part['OP'].lower(), self.__parse_if_part(part['B']))
         elif part['type'] == 'logic_negate':
             return "not {0}".format(self.__parse_if_part(part['BOOL']))

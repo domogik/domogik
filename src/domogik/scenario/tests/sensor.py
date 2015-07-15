@@ -35,29 +35,16 @@ class SensorTest(AbstractTest):
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
         self.set_description("Check if the value for a sensor is set to a specific value")
-        self.add_parameter("sensor", "sensor_id.SensorIdParameter")
-        self.add_parameter("operator", "operator.ComparisonOperatorParameter")
-        self.add_parameter("value", "text.TextParameter")
+        print "+++++"
+        print params
+        print "+++++"
         self.log = log
 
     def evaluate(self):
         """ Evaluate if the text appears in the content of the page referenced by url
         """
         self.log.debug("SensorTest : evaluate") 
-        params = self.get_raw_parameters()
-        self.log.debug("SensorTest : evaluate : params = {0}".format(params)) 
-        sen = params["sensor"]
-        val = params["value"]
-        if sen.evaluate() == None or val.evaluate() == None:
-            self.log.debug("sen.evaluate() == None or val.evaluate() == None ==> returning None")
-            return None
-        else:
-            # check
-            
-            self.log.debug("Evaluate : sensor={0}, value={1}".format(sen, val))
-            self.log.debug("Evaluate : sensor={0}, value={1}".format(sen.evaluate(), val.evaluate()))
-            res = False
-            return res
+        return 0
 
 
 TEST = None
