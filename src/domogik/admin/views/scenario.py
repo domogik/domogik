@@ -64,25 +64,27 @@ def scenario_edit(id):
         name = "New scenario"
         jso = default_json
         dis = 0
+        desc = None
     else:
         with app.db.session_scope():
             scen = app.db.get_scenario(id)
             jso = scen.json
             dis = scen.disabled
             name = scen.name
+            desc = scen.description
             jso.replace('\n', '').replace('\r', '')
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
         sname = TextField("Name", default=name, description="Scenario name")
-        #sdis = BooleanField("disabled", default=dis)
+        sdis = BooleanField("disabled", default=dis)
+        sdesc = TextField("Description", default=desc)
         sjson = HiddenField("json")
         submit = SubmitField("Send")
         pass
     form = F()
 
     if request.method == 'POST' and form.validate():
-        print("Scenario edit > POST")
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
         if form.sid.data > 0:
@@ -92,8 +94,9 @@ def scenario_edit(id):
         msg.add_data('name', form.sname.data)
         msg.add_data('json_input', form.sjson.data)
         msg.add_data('cid', form.sid.data)
+        msg.add_data('dis', form.sdis.data)
+        msg.add_data('desc', form.sdesc.data)
         res = cli.request('scenario', msg.get(), timeout=10)
-        print res
         flash(gettext("Changes saved"), "success")
         return redirect("/scenario")
         pass

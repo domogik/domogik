@@ -65,7 +65,7 @@ class ScenarioInstance:
     }
     """
 
-    def __init__(self, log, dbid, name, json):
+    def __init__(self, log, dbid, name, json, disabled):
         """ Create the instance
         @param log : A logger instance
         @param dbid : The id of this scenario in the db
@@ -74,6 +74,7 @@ class ScenarioInstance:
         self._log = log
         self._name = name
         self._json = json
+        self._disabled = disabled
 
         self._parsed_condition = None
         self._mapping = { 'test': {}, 'action': {} }
