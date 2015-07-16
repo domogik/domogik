@@ -3,7 +3,7 @@
  * Visual Blocks Editor
  *
  * Copyright 2013 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +30,108 @@ goog.require('goog.cssom');
 
 
 /**
+ * List of cursors.
+ * @enum {string}
+ */
+Blockly.Css.Cursor = {
+  OPEN: 'handopen',
+  CLOSED: 'handclosed',
+  DELETE: 'handdelete'
+};
+
+/**
+ * Current cursor (cached value).
+ * @type {string}
+ * @private
+ */
+Blockly.Css.currentCursor_ = '';
+
+/**
+ * Large stylesheet added by Blockly.Css.inject.
+ * @type {Element}
+ * @private
+ */
+Blockly.Css.styleSheet_ = null;
+
+/**
+ * Path to media directory, with any trailing slash removed.
+ * @type {string}
+ * @private
+ */
+Blockly.Css.mediaPath_ = '';
+
+/**
  * Inject the CSS into the DOM.  This is preferable over using a regular CSS
  * file since:
  * a) It loads synchronously and doesn't force a redraw later.
  * b) It speeds up loading by not blocking on a separate HTTP transfer.
  * c) The CSS content may be made dynamic depending on init options.
+ * @param {boolean} hasCss If false, don't inject CSS
+ *     (providing CSS becomes the document's responsibility).
+ * @param {string} pathToMedia Path from page to the Blockly media directory.
  */
-Blockly.Css.inject = function() {
-  var text = Blockly.Css.CONTENT.join('\n');
+Blockly.Css.inject = function(hasCss, pathToMedia) {
+  // Only inject the CSS once.
+  if (Blockly.Css.styleSheet_) {
+    return;
+  }
+  // Placeholder for cursor rule.  Must be first rule (index 0).
+  var text = '.blocklyDraggable {}\n';
+  if (hasCss) {
+    text += Blockly.Css.CONTENT.join('\n');
+    if (Blockly.FieldDate) {
+      text += Blockly.FieldDate.CSS.join('\n');
+    }
+  }
   // Strip off any trailing slash (either Unix or Windows).
-  var path = Blockly.pathToBlockly.replace(/[\\\/]$/, '');
-  text = text.replace(/<<<PATH>>>/g, path);
-  goog.cssom.addCssText(text);
+  Blockly.Css.mediaPath_ = pathToMedia.replace(/[\\\/]$/, '');
+  text = text.replace(/<<<PATH>>>/g, Blockly.Css.mediaPath_);
+  Blockly.Css.styleSheet_ = goog.cssom.addCssText(text).sheet;
+  Blockly.Css.setCursor(Blockly.Css.Cursor.OPEN);
+};
+
+/**
+ * Set the cursor to be displayed when over something draggable.
+ * @param {Blockly.Cursor} cursor Enum.
+ */
+Blockly.Css.setCursor = function(cursor) {
+  if (Blockly.Css.currentCursor_ == cursor) {
+    return;
+  }
+  Blockly.Css.currentCursor_ = cursor;
+  /*
+    Hotspot coordinates are baked into the CUR file, but they are still
+    required in the CSS due to a Chrome bug.
+    https://code.google.com/p/chromium/issues/detail?id=1446
+  */
+  if (cursor == Blockly.Css.Cursor.OPEN) {
+    var xy = '8 5';
+  } else {
+    var xy = '7 3';
+  }
+  var url = 'url(' + Blockly.Css.mediaPath_ + '/' + cursor +
+      '.cur) ' + xy + ', auto';
+  // There are potentially hundreds of draggable objects.  Changing their style
+  // properties individually is too slow, so change the CSS rule instead.
+  var rule = '.blocklyDraggable {\n  cursor: ' + url + ';\n}\n';
+  goog.cssom.replaceCssRule('', rule, Blockly.Css.styleSheet_, 0);
+  // There is probably only one toolbox, so just change its style property.
+  var toolboxen = document.getElementsByClassName('blocklyToolboxDiv');
+  for (var i = 0, toolbox; toolbox = toolboxen[i]; i++) {
+    if (cursor == Blockly.Css.Cursor.OPEN) {
+      toolbox.style.cursor = '';
+    } else {
+      toolbox.style.cursor = url;
+    }
+  }
+  // Set cursor on the whole document, so that rapid movements
+  // don't result in cursor changing to an arrow momentarily.
+  var html = document.body.parentNode;
+  if (cursor == Blockly.Css.Cursor.OPEN) {
+    html.style.cursor = '';
+  } else {
+    html.style.cursor = url;
+  }
 };
 
 /**
@@ -50,55 +140,60 @@ Blockly.Css.inject = function() {
 Blockly.Css.CONTENT = [
   '.blocklySvg {',
   '  background-color: #fff;',
-  '  border: 1px solid #ddd;',
+  '  outline: none;',
   '  overflow: hidden;',  /* IE overflows by default. */
   '}',
 
   '.blocklyWidgetDiv {',
-  '  position: absolute;',
   '  display: none;',
+  '  position: absolute;',
   '  z-index: 999;',
   '}',
 
-  '.blocklyDraggable {',
-    /*
-      Hotspot coordinates are baked into the CUR file, but they are still
-      required in the CSS due to a Chrome bug.
-      http://code.google.com/p/chromium/issues/detail?id=1446
-    */
-  '  cursor: url(<<<PATH>>>/media/handopen.cur) 8 5, auto;',
+  '.blocklyTooltipDiv {',
+  '  background-color: #ffffc7;',
+  '  border: 1px solid #ddc;',
+  '  box-shadow: 4px 4px 20px 1px rgba(0,0,0,.15);',
+  '  color: #000;',
+  '  display: none;',
+  '  font-family: sans-serif;',
+  '  font-size: 9pt;',
+  '  opacity: 0.9;',
+  '  padding: 2px;',
+  '  position: absolute;',
+  '  z-index: 1000;',
   '}',
 
   '.blocklyResizeSE {',
-  '  fill: #aaa;',
   '  cursor: se-resize;',
+  '  fill: #aaa;',
   '}',
 
   '.blocklyResizeSW {',
-  '  fill: #aaa;',
   '  cursor: sw-resize;',
+  '  fill: #aaa;',
   '}',
 
   '.blocklyResizeLine {',
-  '  stroke-width: 1;',
   '  stroke: #888;',
+  '  stroke-width: 1;',
   '}',
 
   '.blocklyHighlightedConnectionPath {',
-  '  stroke-width: 4px;',
-  '  stroke: #fc3;',
   '  fill: none;',
+  '  stroke: #fc3;',
+  '  stroke-width: 4px;',
   '}',
 
   '.blocklyPathLight {',
   '  fill: none;',
-  '  stroke-width: 2;',
   '  stroke-linecap: round;',
+  '  stroke-width: 1;',
   '}',
 
   '.blocklySelected>.blocklyPath {',
-  '  stroke-width: 3px;',
   '  stroke: #fc3;',
+  '  stroke-width: 3px;',
   '}',
 
   '.blocklySelected>.blocklyPathLight {',
@@ -127,9 +222,9 @@ Blockly.Css.CONTENT = [
 
   '.blocklyText {',
   '  cursor: default;',
+  '  fill: #fff;',
   '  font-family: sans-serif;',
   '  font-size: 11pt;',
-  '  fill: #fff;',
   '}',
 
   '.blocklyNonEditableText>text {',
@@ -148,8 +243,8 @@ Blockly.Css.CONTENT = [
   '}',
 
   '.blocklyEditableText:hover>rect {',
-  '  stroke-width: 2;',
   '  stroke: #fff;',
+  '  stroke-width: 2;',
   '}',
 
   '.blocklyBubbleText {',
@@ -161,9 +256,9 @@ Blockly.Css.CONTENT = [
     drag a block and selected text moves instead.
   */
   '.blocklySvg text {',
+  '  user-select: none;',
   '  -moz-user-select: none;',
   '  -webkit-user-select: none;',
-  '  user-select: none;',
   '  cursor: inherit;',
   '}',
 
@@ -175,50 +270,13 @@ Blockly.Css.CONTENT = [
   '  display: block;',
   '}',
 
-  '.blocklyTooltipBackground {',
-  '  fill: #ffffc7;',
-  '  stroke-width: 1px;',
-  '  stroke: #d8d8d8;',
-  '}',
-
-  '.blocklyTooltipShadow,',
-  '.blocklyDropdownMenuShadow {',
-  '  fill: #bbb;',
-  '  filter: url(#blocklyShadowFilter);',
-  '}',
-
-  '.blocklyTooltipText {',
-  '  font-family: sans-serif;',
-  '  font-size: 9pt;',
-  '  fill: #000;',
-  '}',
-
-  '.blocklyIconShield {',
+  '.blocklyIconGroup {',
   '  cursor: default;',
-  '  fill: #00c;',
-  '  stroke-width: 1px;',
-  '  stroke: #ccc;',
   '}',
 
-  '.blocklyIconGroup:hover>.blocklyIconShield {',
-  '  fill: #00f;',
-  '  stroke: #fff;',
-  '}',
-
-  '.blocklyIconGroup:hover>.blocklyIconMark {',
-  '  fill: #fff;',
-  '}',
-
-  '.blocklyIconMark {',
-  '  cursor: default !important;',
-  '  font-family: sans-serif;',
-  '  font-size: 9pt;',
-  '  font-weight: bold;',
-  '  fill: #ccc;',
-  '  text-anchor: middle;',
-  '}',
-
-  '.blocklyWarningBody {',
+  '.blocklyIconGroup:not(:hover),',
+  '.blocklyIconGroupReadonly {',
+  '  opacity: .6;',
   '}',
 
   '.blocklyMinimalBody {',
@@ -227,25 +285,30 @@ Blockly.Css.CONTENT = [
   '}',
 
   '.blocklyCommentTextarea {',
+  '  background-color: #ffc;',
+  '  border: 0;',
   '  margin: 0;',
   '  padding: 2px;',
-  '  border: 0;',
   '  resize: none;',
-  '  background-color: #ffc;',
   '}',
 
   '.blocklyHtmlInput {',
+  '  border: none;',
   '  font-family: sans-serif;',
   '  font-size: 11pt;',
-  '  border: none;',
   '  outline: none;',
   '  width: 100%',
   '}',
 
+  '.blocklyMainBackground {',
+  '  stroke-width: 1;',
+  '  stroke: #c6c6c6;',  /* Equates to #ddd due to border being off-pixel. */
+  '}',
+
   '.blocklyMutatorBackground {',
   '  fill: #fff;',
-  '  stroke-width: 1;',
   '  stroke: #ddd;',
+  '  stroke-width: 1;',
   '}',
 
   '.blocklyFlyoutBackground {',
@@ -253,14 +316,8 @@ Blockly.Css.CONTENT = [
   '  fill-opacity: .8;',
   '}',
 
-  '.blocklyColourBackground {',
-  '  fill: #666;',
-  '}',
-
   '.blocklyScrollbarBackground {',
-  '  fill: #fff;',
-  '  stroke-width: 1;',
-  '  stroke: #e4e4e4;',
+  '  opacity: 0;',
   '}',
 
   '.blocklyScrollbarKnob {',
@@ -270,6 +327,17 @@ Blockly.Css.CONTENT = [
   '.blocklyScrollbarBackground:hover+.blocklyScrollbarKnob,',
   '.blocklyScrollbarKnob:hover {',
   '  fill: #bbb;',
+  '}',
+
+  /* Darken flyout scrollbars due to being on a grey background. */
+  /* By contrast, workspace scrollbars are on a white background. */
+  '.blocklyFlyout .blocklyScrollbarKnob {',
+  '  fill: #bbb;',
+  '}',
+
+  '.blocklyFlyout .blocklyScrollbarBackground:hover+.blocklyScrollbarKnob,',
+  '.blocklyFlyout .blocklyScrollbarKnob:hover {',
+  '  fill: #aaa;',
   '}',
 
   '.blocklyInvalidInput {',
@@ -310,13 +378,12 @@ Blockly.Css.CONTENT = [
   /* Override the default Closure URL. */
   '.blocklyWidgetDiv .goog-option-selected .goog-menuitem-checkbox,',
   '.blocklyWidgetDiv .goog-option-selected .goog-menuitem-icon {',
-  '  background: url(<<<PATH>>>/media/sprites.png) no-repeat 0 0 !important;',
+  '  background: url(<<<PATH>>>/sprites.png) no-repeat -48px -16px !important;',
   '}',
 
   /* Category tree in Toolbox. */
   '.blocklyToolboxDiv {',
   '  background-color: #ddd;',
-  '  display: none;',
   '  overflow-x: visible;',
   '  overflow-y: auto;',
   '  position: absolute;',
@@ -346,11 +413,17 @@ Blockly.Css.CONTENT = [
   '  background-color: #e4e4e4;',
   '}',
 
+  '.blocklyTreeSeparator {',
+  '  border-bottom: solid #e5e5e5 1px;',
+  '  height: 0px;',
+  '  margin: 5px 0;',
+  '}',
+
   '.blocklyTreeIcon {',
+  '  background-image: url(<<<PATH>>>/sprites.png);',
   '  height: 16px;',
-  '  width: 16px;',
   '  vertical-align: middle;',
-  '  background-image: url(<<<PATH>>>/media/tree.png);',
+  '  width: 16px;',
   '}',
 
   '.blocklyTreeIconClosedLtr {',
@@ -365,10 +438,6 @@ Blockly.Css.CONTENT = [
   '  background-position: -16px -1px;',
   '}',
 
-  '.blocklyTreeIconNone {',
-  '  background-position: -48px -1px;',
-  '}',
-
   '.blocklyTreeSelected>.blocklyTreeIconClosedLtr {',
   '  background-position: -32px -17px;',
   '}',
@@ -381,8 +450,9 @@ Blockly.Css.CONTENT = [
   '  background-position: -16px -17px;',
   '}',
 
+  '.blocklyTreeIconNone,',
   '.blocklyTreeSelected>.blocklyTreeIconNone {',
-  '  background-position: -48px -17px;',
+  '  background-position: -48px -1px;',
   '}',
 
   '.blocklyTreeLabel {',

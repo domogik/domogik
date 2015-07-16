@@ -3,7 +3,7 @@
  * Visual Blocks Language
  *
  * Copyright 2012 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -296,5 +296,29 @@ Blockly.JavaScript['lists_getSublist'] = function(block) {
     var code = functionName + '(' + list + ', \'' +
         where1 + '\', ' + at1 + ', \'' + where2 + '\', ' + at2 + ')';
   }
+  return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+};
+
+Blockly.JavaScript['lists_split'] = function(block) {
+  // Block for splitting text into a list, or joining a list into text.
+  var value_input = Blockly.JavaScript.valueToCode(block, 'INPUT',
+      Blockly.JavaScript.ORDER_MEMBER);
+  var value_delim = Blockly.JavaScript.valueToCode(block, 'DELIM',
+      Blockly.JavaScript.ORDER_NONE) || '\'\'';
+  var mode = block.getFieldValue('MODE');
+  if (mode == 'SPLIT') {
+    if (!value_input) {
+      value_input = '\'\'';
+    }
+    var functionName = 'split';
+  } else if (mode == 'JOIN') {
+    if (!value_input) {
+      value_input = '[]';
+    }
+    var functionName = 'join';
+  } else {
+    throw 'Unknown mode: ' + mode;
+  }
+  var code = value_input + '.' + functionName + '(' + value_delim + ')';
   return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };

@@ -74,9 +74,6 @@
   </xml>
   <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
-
-  <script type="text/javascript" src="/static/libraries/blockly/core/field_externaltextinput.js"></script>
-
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
   <script type="text/javascript" src="/scenario/blocks/actions"></script>
@@ -101,19 +98,16 @@
         this.setInputsInline(false);
       }
     };
-    var workspace = Blockly.inject(
-        document.getElementById('blocklyDiv'),
+    var workspace = Blockly.inject('blocklyDiv',
         {
-            path: '../../',
+            media: '../../static/libraries/blockly/media/',
             toolbox: document.getElementById('toolbox')
         }
     );
     function onchange() {
       $('#sjson').val( Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace()) );
     }
-    Blockly.addChangeListener(onchange);
-    //var json = JSON.parse('{"type":"dom_condition","id":"1","IF":{"type":"logic_operation","id":"10","OP":"AND","A":{"type":"cron.CronTest","id":"18","cron":"None"},"B":{"type":"textinpage.TextInPageTest","id":"22","urlpath":"None","text":"None"}},"DO":{"type":"log.LogAction","id":"28","message":"test"},"deletable":false}');
-    //var json = JSON.parse('{"type":"dom_condition","id":"1","deletable":false}');
+    workspace.addChangeListener(onchange);
     $(document).ready(function() {        
         {% autoescape false %}
         var json = JSON.parse('{{ jso }}');

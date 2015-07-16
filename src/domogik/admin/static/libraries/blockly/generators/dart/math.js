@@ -3,7 +3,7 @@
  * Visual Blocks Language
  *
  * Copyright 2014 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,7 +161,8 @@ Blockly.Dart['math_constant'] = function(block) {
   var CONSTANTS = {
     'PI': ['Math.PI', Blockly.Dart.ORDER_UNARY_POSTFIX],
     'E': ['Math.E', Blockly.Dart.ORDER_UNARY_POSTFIX],
-    'GOLDEN_RATIO': ['(1 + Math.sqrt(5)) / 2', Blockly.Dart.ORDER_MULTIPLICATIVE],
+    'GOLDEN_RATIO':
+        ['(1 + Math.sqrt(5)) / 2', Blockly.Dart.ORDER_MULTIPLICATIVE],
     'SQRT2': ['Math.SQRT2', Blockly.Dart.ORDER_UNARY_POSTFIX],
     'SQRT1_2': ['Math.SQRT1_2', Blockly.Dart.ORDER_UNARY_POSTFIX],
     'INFINITY': ['double.INFINITY', Blockly.Dart.ORDER_ATOMIC]
