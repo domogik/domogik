@@ -110,9 +110,9 @@ class ScenarioInstance:
     def __parse_if_part(self, part):
         if part['type'] == 'logic_boolean':
             if part['BOOL'] == "TRUE":
-                return "True"
+                return "\"1\""
             else:
-                return "False"
+                return "\"0\""
         elif part['type'] == 'math_number':
             return "\"{0}\"".format(part['NUM'])
         elif part['type'] == 'math_arithmetic':
