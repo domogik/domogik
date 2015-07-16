@@ -106,7 +106,6 @@ class ScenarioInstance:
         self.__parse_do_part(self._json['DO'])
         # step 2 parse the "if" part        
         self._parsed_condition = self.__parse_if_part(self._json['IF'])
-        print self._parsed_condition
 
     def __parse_if_part(self, part):
         if part['type'] == 'logic_boolean':
