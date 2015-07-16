@@ -83,6 +83,9 @@ class AbstractAction:
         @param params : An extra Hash of parameters used by action, if we keep exemple inside `get_expected_entries`
         documentation, params could be {'mail': 'me@mybox.com'}
         """
+        # we need to remove type and id => its not needed here
+        del params['type']
+        del params['id']
         self._params = params
         pass
 
