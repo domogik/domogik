@@ -32,7 +32,7 @@ class LogAction(AbstractAction):
     """ Simple action that log something in scenario logfile
     """
 
-    def __init__(self, log=None):
+    def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log)
         self.set_description("Simply put some string in log file.")
 

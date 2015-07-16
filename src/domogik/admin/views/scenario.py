@@ -109,6 +109,7 @@ def scenario_edit(id):
             if 'result' in res:
                 res = res['result']
                 actions = res.keys()
+        actions.remove(u'command.CommandAction')
         # Fetch all known tests
         tests = []
         cli = MQSyncReq(app.zmq_context)
@@ -120,19 +121,7 @@ def scenario_edit(id):
             if 'result' in res:
                 res = res['result']
                 tests = res.keys()
-
-        # TODO : DEL
-        # Fetch all known datatypes
-        #datatypes = []
-        #cli = MQSyncReq(app.zmq_context)
-        #msg = MQMessage()
-        #msg.set_action('datatype.get')
-        #res = cli.request('manager', msg.get(), timeout=10)
-        #if res is not None:
-        #    res = res.get_data()
-        #    if 'datatypes' in res:
-        #        res = res['datatypes']
-        #        datatypes = res.keys()
+        tests.remove(u'sensor.SensorTest')
 
         # Fetch all known devices
         # per client > device > sensor | command
@@ -195,6 +184,8 @@ def scenario_blocks_tests():
         if 'result' in res:
             res = res['result']
             for test, params in res.iteritems():
+                print test
+                if test == "sensor.SensorTest": continue
                 p = []
                 jso = ""
                 for parv in params:
@@ -254,6 +245,7 @@ def scenario_blocks_actions():
         if 'result' in res:
             res = res['result']
             for act, params in res.iteritems():
+                if act == "command.CommandAction": continue
                 p = []
                 jso = ""
                 for par, parv in params['parameters'].iteritems():
@@ -286,68 +278,6 @@ def scenario_blocks_actions():
                     """.format(act, '\n'.join(p), params['description'], jso)
                 js = '{0}\n\r{1}'.format(js, add)
     return Response(js, content_type='text/javascript; charset=utf-8')
-
-
-@app.route('/scenario/blocks/datatypes')
-def scenario_blocks_datatypes():
-    """
-        retrieve all known datatypes and for each, generate a bockly block in json
-    """
-    js = "                        "
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('datatype.get')
-    res = cli.request('manager', msg.get(), timeout=10)
-    if res is not None:
-        res = res.get_data()
-        if 'datatypes' in res:
-            datatypes = res['datatypes']
-            for dt_type, params in datatypes.iteritems():
-                # TODO : remove this filter
-                #if dt_type not in ['DT_Temp', 'DT_Humidity', 'DT_Number']:
-                #    continue
-                
-                print(dt_type)
-                dt_parent = dt_type
-                # First, determine the parent type (DT_Number, DT_Bool, ...)
-                while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
-                    dt_parent = datatypes[dt_parent]['parent']
-                    print("..{0}".format(dt_parent))
- 
-                # Then, start to build the block
-                block = {
-                           "id" : "{0}".format(dt_type),
-                           "message0" : "{0}".format(dt_type),
-                           "args0" : [
-                             {
-                               "type" : "field_dropdown",
-                               "name" : "NAME",
-                               "options" : []
-                             },
-                             {
-                               "type" : "input_value",
-                               "name" : "NAME",
-                               "check" : "Array"
-                             }
-                           ],
-                           "colour" : 130,
-                           "tooltip" : "",
-                           "helpUrl" : ""
-                         }
-                block['args0'][0]['options'].append(['a', 'A'])
-                block['args0'][0]['options'].append(['b', 'B'])
-                js += "var {0}_json = {1};".format(dt_type, json.dumps(block))
-                js += """
-                         Blockly.Blocks['{0}'] = {{
-                             init: function() {{
-                                 this.jsonInit({0}_json);
-                             }}
-                         }};
-                         """.format(dt_type)
-              
-    return Response(js, content_type='text/javascript; charset=utf-8')
-
-
 
 @app.route('/scenario/blocks/devices')
 def scenario_blocks_devices():
@@ -423,13 +353,10 @@ def scenario_blocks_devices():
                     cmd_id = dev['commands'][cmd]['id']
                     cmd_name = dev['commands'][cmd]['name']
                     # parse the parameters
-                    print(dev['commands'][cmd])
                     js_params = ""
                     for param in dev['commands'][cmd]['parameters']:
-                        print(param)
                         param_key = param['key']
                         param_dt_type = param['data_type']
-                        print("- {0} / {1}".format(param_key, param_dt_type))
                         # First, determine the parent type (DT_Number, DT_Bool, ...)
                         dt_parent = param_dt_type
                         while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:

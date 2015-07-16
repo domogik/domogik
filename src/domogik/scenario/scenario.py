@@ -114,7 +114,7 @@ class ScenarioInstance:
             else:
                 return "False"
         elif part['type'] == 'math_number':
-            return "{0}".format(part['NUM'])
+            return "\"{0}\"".format(part['NUM'])
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
                 compare = "+"
