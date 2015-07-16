@@ -327,23 +327,18 @@ def scenario_blocks_devices():
                         color = 160
                         output = "\"null\""
                     block_id = "sensor.SensorTest.{0}".format(sen_id)
-                    #block_description = "{0} - {1}".format(name, sen_name)
-                    block_description = "{0}".format(client)
-                    p = """
-                                this.appendDummyInput().appendField('Device : {0}');
-                                this.appendDummyInput().appendField('Sensor : {1}');
-                        """.format(name, sen_name)
+                    block_description = "{0}@{1}".format(name, client)
                     add = """Blockly.Blocks['{0}'] = {{
                                 init: function() {{
                                     this.setColour({5});
                                     this.appendDummyInput().appendField("{2}");
-                                    {1}
+                                    this.appendDummyInput().appendField('Sensor : {1}');
                                     this.setOutput(true, {4});
                                     this.setInputsInline(false);
                                     this.setTooltip('{2}'); 
                                 }}
                             }};
-                            """.format(block_id, p, block_description, jso, output, color)
+                            """.format(block_id, sen_name, block_description, jso, output, color)
                     js = '{0}\n\r{1}'.format(js, add)
 
                 ### commands blocks
@@ -352,6 +347,7 @@ def scenario_blocks_devices():
                     jso = ""
                     cmd_id = dev['commands'][cmd]['id']
                     cmd_name = dev['commands'][cmd]['name']
+                    color = 1;
                     # parse the parameters
                     js_params = ""
                     for param in dev['commands'][cmd]['parameters']:
@@ -371,20 +367,43 @@ def scenario_blocks_devices():
                         #    color = 160
                         #    output = "\"null\""
                         js_params = """
-                                        this.appendDummyInput().appendField("Param : {0}/{1}");
-                                        this.appendDummyInput().appendField(new Blockly.FieldTextInput("value"), "{2}");
-                                    """.format(param_key, param_dt_type, param_key)
+                                        this.appendDummyInput().appendField("- {0} : ")
+                                    """.format(param_key)
+                        list_options = None
+                        if "labels" in datatypes[param_dt_type]:
+                            list_options = datatypes[param_dt_type]['labels']
+                        if "values" in datatypes[param_dt_type]:
+                            list_options = datatypes[param_dt_type]['values']
+                        if list_options != None:
+                            print("OPTIONS : {0}".format(list_options))
+                            js_list_options = "["
+                            for opt in list_options:
+                                js_list_options += "['{0}', '{1}'],".format(list_options[opt], opt)
+                            js_list_options += "]"
+                            js_params += """
+                                            .appendField(new Blockly.FieldDropdown({0}), "{1}");
+                                        """.format(js_list_options, param_key)
+                        else: 
+                            param_format = ""
+                            if 'format' in datatypes[param_dt_type]:
+                                param_format = datatypes[param_dt_type]['format']
+                                print("PF={0}".format(param_format))
+                                if param_format == None:
+                                    param_format = ""
+                                else:
+                                    param_format = "({0})".format(param_format)
+                            js_params += """
+                                            .appendField(new Blockly.FieldTextInput(""), "{0}")
+                                            .appendField("{1}");
+                                        """.format(param_key, param_format)
                     block_id = "command.CommandAction.{0}".format(cmd_id)
-                    block_description = "{0}".format(client)
-                    p = """
-                                this.appendDummyInput().appendField('Device : {0}');
-                                this.appendDummyInput().appendField('Command : {1}');
-                        """.format(name, cmd_name)
+                    block_description = "{0}@{1}".format(name, client)
                     add = """Blockly.Blocks['{0}'] = {{
                                 init: function() {{
                                     this.setColour({5});
                                     this.appendDummyInput().appendField("{2}");
-                                    {1}
+                                    this.appendDummyInput().appendField('Command : {1}');
+                                    this.appendDummyInput().appendField('Parameters : ');
                                     {6}
                                     this.setPreviousStatement(true, "null");
                                     this.setNextStatement(true, "null");
@@ -392,7 +411,7 @@ def scenario_blocks_devices():
                                     this.setTooltip('{2}'); 
                                 }}
                             }};
-                            """.format(block_id, p, block_description, jso, output, color, js_params)
+                            """.format(block_id, cmd_name, block_description, jso, output, color, js_params)
                     js = '{0}\n\r{1}'.format(js, add)
 
     return Response(js, content_type='text/javascript; charset=utf-8')
