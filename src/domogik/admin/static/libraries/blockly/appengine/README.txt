@@ -16,19 +16,28 @@ blockly/
  |- README.txt
  |- storage.js
  |- storage.py
- |- closure-library-read-only/
+ |- closure-library/  (Optional)
  `- static/
-     |- apps/
+     |- blocks/
      |- core/
      |- demos/
      |- generators/
-     |- language/
      |- media/
+     |- msg/
      |- tests/
-     `- blockly_compressed.js
+     |- blockly_compressed.js
+     |- blockly_uncompressed.js  (Optional)
+     |- blocks_compressed.js
+     |- dart_compressed.js
+     |- javascript_compressed.js
+     |- php_compressed.js
+     `- python_compressed.js
 
-Instructions for fetching Closure may be found here:
-  http://code.google.com/p/blockly/wiki/Closure
+Instructions for fetching the optional Closure library may be found here:
+  https://developers.google.com/blockly/hacking/closure
+
+Go to https://appengine.google.com/ and create your App Engine application.
+Modify the 'application' name of app.yaml to your App Engine application name.
 
 Finally, upload this directory structure to your App Engine account,
-wait a minute, then go to http://YOURNAME.appspot.com/
+wait a minute, then go to http://YOURAPPNAME.appspot.com/
