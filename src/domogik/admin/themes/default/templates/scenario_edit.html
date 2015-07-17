@@ -5,8 +5,9 @@
 <div class="container">
   <h1>{% trans %}Edit scenario{% endtrans %}</h1>
 
-  <nav class="navbar navbar-default">
-  <form method="post" role="form" class="navbar-form navbar-left">
+  <!-- <form method="post" role="form" class="navbar-form navbar-left"> -->
+  <form id="scenario_form" method="post" role="form" class="">
+  <nav id="scenario_navbar" class="navbar navbar-default">
     {{ form.csrf_token }}
     {{ form.sid }}
     {{ form.sjson }}
@@ -20,15 +21,26 @@
     <a class="btn btn-default" data-toggle="confirmation" data-placement="bottom" data-href="/scenario/del/{{ scenario_id }}">
       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans %}Delete{% endtrans %}
     </a>
-    {{ form.sdis(class_="form-control input-lg") }}
-    {{ form.sdesc(class_="form-control input-lg") }}
-  </form>
   </nav>
+  <div class="form-group">
+    <label class="control-label col-xs-3">{{ form.sdis.label }}</label>
+    <div class="col-xs-9">
+      {{ form.sdis() }}
+      <span class="help-block">{{ form.sdis.description }}</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-xs-3">{{ form.sdesc.label }}</label>
+    <div class="col-xs-9">
+      {{ form.sdesc() }}
+      <span class="help-block">{{ form.sdesc.description }}</span>
+    </div>
+  </div>
+  </form>
 
   <div id="blocklyArea"></div>
 
   <!-- <pre>{{ jso }}</pre> -->
-  <!-- <div id="blocklyDiv" style="position: absolute; top: 200px; left: 200px; height: 300px; width: 900px;"></div> -->
   <div id="blocklyDiv" style="position: absolute; width: 50%;"></div>
   <xml id="toolbox" style="display: none">
     <category name="Logic">

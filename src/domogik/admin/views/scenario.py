@@ -14,7 +14,7 @@ except ImportError:
     from flaskext.wtf import Form
     pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
-            BooleanField, SubmitField, SelectField, IntegerField
+            BooleanField, SubmitField, SelectField, IntegerField, TextAreaField
 from wtforms.validators import Required
 from domogik.common.sql_schema import UserAccount
 
@@ -77,8 +77,8 @@ def scenario_edit(id):
     class F(Form):
         sid = HiddenField("id", default=id)
         sname = TextField("Name", default=name, description="Scenario name")
-        sdis = BooleanField("disabled", default=dis)
-        sdesc = TextField("Description", default=desc)
+        sdis = BooleanField("Disable", default=dis)
+        sdesc = TextAreaField("Description", default=desc)
         sjson = HiddenField("json")
         submit = SubmitField("Send")
         pass
