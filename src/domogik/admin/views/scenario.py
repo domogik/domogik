@@ -154,6 +154,19 @@ def scenario_edit(id):
                         cmd_name = device['commands'][cmd]['name']
                         devices_per_clients[client][name]['commands'][cmd_name] = cmd_id
 
+        # Fetch all known datatypes
+        datatypes = []
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is not None:
+            res = res.get_data()
+            if 'datatypes' in res:
+                res = res['datatypes']
+                datatypes = res.keys()
+        print(datatypes)
+
         # ouput
         return render_template('scenario_edit.html',
             mactive = "scenario",
@@ -162,6 +175,7 @@ def scenario_edit(id):
             actions = actions,
             tests = tests,
             devices_per_clients = devices_per_clients,
+            datatypes = datatypes,
             jso = jso,
             scenario_id = id)
 
@@ -303,6 +317,8 @@ def scenario_blocks_devices():
     if res is not None:
         res = res.get_data()
         if 'devices' in res:
+            # create a list of the used datatypes in sensors to build only these datatype blocks
+            used_datatypes = []
             devices = res['devices']
             for dev in devices:
                 client = dev['client_id']
@@ -316,6 +332,8 @@ def scenario_blocks_devices():
                     sen_name = dev['sensors'][sen]['name']
                     # determ the output type
                     sen_dt = dev['sensors'][sen]['data_type'] 
+                    if sen_dt not in used_datatypes:
+                        used_datatypes.append(sen_dt)
                     dt_parent = sen_dt
                     # First, determine the parent type (DT_Number, DT_Bool, ...)
                     while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
@@ -416,6 +434,49 @@ def scenario_blocks_devices():
                             }};
                             """.format(block_id, cmd_name, block_description, jso, output, color, js_params)
                     js = '{0}\n\r{1}'.format(js, add)
+
+            #for dt_type in used_datatypes:
+            for dt_type in datatypes:
+                dt_parent = dt_type
+                # First, determine the parent type (DT_Number, DT_Bool, ...)
+                while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
+                    dt_parent = datatypes[dt_parent]['parent']
+                if dt_parent == "DT_Bool":
+                    color = 20
+                    output = "\"Boolean\""
+                    opt = "["
+                    for lab in datatypes[dt_type]['labels']:
+                        opt += u"['{0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
+                    opt += "]"
+                    input = """
+                             this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "BOOL");
+                            """.format(opt)
+                elif dt_parent == "DT_Number":
+                    color = 65
+                    output = "\"Number\""
+                    input = """
+                             this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
+                            """
+                else:
+                    color = 160
+                    output = "\"null\""
+                    input = """
+                             this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
+                            """
+
+                add = """Blockly.Blocks['{0}'] = {{
+                            init: function() {{
+                                this.setColour({1});
+                                this.appendDummyInput().appendField("{0}");
+                                {3}
+                                this.setTooltip('{0}'); 
+                                this.setOutput(true, {2});
+                                this.setInputsInline(false);
+                            }}
+                        }};
+                        """.format(dt_type, color, output, input)
+                js = '{0}\n\r{1}'.format(js, add)
+                
 
     return Response(js, content_type='text/javascript; charset=utf-8')
 

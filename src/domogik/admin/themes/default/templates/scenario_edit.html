@@ -38,6 +38,7 @@
         <block type="logic_boolean"></block>
         <block type="math_number"></block>
         <block type="math_arithmetic"></block>
+        <block type="text"></block>
     </category>
     <category name="Tests">
         {% for t in tests %}
@@ -47,6 +48,11 @@
     <category name="Actions">
         {% for a in actions %}
             <block type="{{ a }}"></block>
+        {% endfor %}
+    </category>
+    <category name="Datatypes">
+        {% for d in datatypes %}
+            <block type="{{ d }}"></block>
         {% endfor %}
     </category>
     <category name="Devices">

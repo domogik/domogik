@@ -27,7 +27,9 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 import uuid
 from exceptions import ValueError
-
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
+import zmq
 
 class ScenarioInstance:
     """ This class provides base methods for the scenarios
@@ -76,6 +78,8 @@ class ScenarioInstance:
         self._json = json
         self._disabled = disabled
 
+        self.zmq = zmq.Context()
+
         self._parsed_condition = None
         self._mapping = { 'test': {}, 'action': {} }
         if not self._disabled:
@@ -103,12 +107,36 @@ class ScenarioInstance:
     def _instanciate(self):
         """ parse the json and load all needed components
         """
+        ## get the datatypes
+        cli = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        datatypes = None
+        if res is not None:
+            res = res.get_data()
+            if 'datatypes' in res:
+                datatypes = res['datatypes']
         # step 1 parse the "do" part
         self.__parse_do_part(self._json['DO'])
         # step 2 parse the "if" part        
-        self._parsed_condition = self.__parse_if_part(self._json['IF'])
+        self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
 
-    def __parse_if_part(self, part):
+    def __parse_if_part(self, part, datatypes = None):
+        # translate datatype to default blocks
+        if part['type'][0:3] == 'DT_':
+            # find the parent
+            dt_parent = part['type']
+            while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
+                dt_parent = datatypes[dt_parent]['parent']
+            # translate
+            if dt_parent == "DT_BOOL":
+                part['type'] = "logic_boolean"
+            elif dt_parent == "DT_Number":
+                part['type'] = "math_number"
+            elif dt_parent == "DT_String":
+                part['type'] = "text"
+        # parse it
         if part['type'] == 'logic_boolean':
             if part['BOOL'] == "TRUE":
                 return "\"1\""
@@ -116,6 +144,8 @@ class ScenarioInstance:
                 return "\"0\""
         elif part['type'] == 'math_number':
             return "\"{0}\"".format(part['NUM'])
+        elif part['type'] == 'text':
+            return "\"{0}\"".format(part['TEXT'])
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
                 compare = "+"
@@ -127,7 +157,7 @@ class ScenarioInstance:
                 compare = "/"
             elif part['OP'].lower() == "power":
                 compare = "^"
-            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), compare, self.__parse_if_part(part['B']))
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A'], datatypes), compare, self.__parse_if_part(part['B'], datatypes))
         elif part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
                 compare = "=="
@@ -141,9 +171,9 @@ class ScenarioInstance:
                 compare = ">"
             elif part['OP'].lower() == "gte":
                 compare = ">="
-            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), compare, self.__parse_if_part(part['B']))
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A'], datatypes), compare, self.__parse_if_part(part['B'], datatypes))
         elif part['type'] == 'logic_operation':
-            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), part['OP'].lower(), self.__parse_if_part(part['B']))
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A'], datatypes), part['OP'].lower(), self.__parse_if_part(part['B'], datatypes))
         elif part['type'] == 'logic_negate':
             return "not {0}".format(self.__parse_if_part(part['BOOL']))
         else:
