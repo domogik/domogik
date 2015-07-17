@@ -65,7 +65,7 @@ class ScenarioInstance:
     }
     """
 
-    def __init__(self, log, dbid, name, json):
+    def __init__(self, log, dbid, name, json, disabled):
         """ Create the instance
         @param log : A logger instance
         @param dbid : The id of this scenario in the db
@@ -74,10 +74,12 @@ class ScenarioInstance:
         self._log = log
         self._name = name
         self._json = json
+        self._disabled = disabled
 
         self._parsed_condition = None
         self._mapping = { 'test': {}, 'action': {} }
-        self._instanciate()
+        if not self._disabled:
+            self._instanciate()
 
     def destroy(self):
         """ Cleanup the class
@@ -105,14 +107,13 @@ class ScenarioInstance:
         self.__parse_do_part(self._json['DO'])
         # step 2 parse the "if" part        
         self._parsed_condition = self.__parse_if_part(self._json['IF'])
-        print self._parsed_condition
 
     def __parse_if_part(self, part):
         if part['type'] == 'logic_boolean':
             if part['BOOL'] == "TRUE":
-                return "True"
+                return "\"1\""
             else:
-                return "False"
+                return "\"0\""
         elif part['type'] == 'math_number':
             return "\"{0}\"".format(part['NUM'])
         elif part['type'] == 'math_arithmetic':

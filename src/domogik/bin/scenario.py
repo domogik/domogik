@@ -93,7 +93,7 @@ class ScenarioFrontend(Plugin):
             self.log.error(u"Exception occured during message processing.")
             trace = str(traceback.format_exc())
             self.log.debug(trace)
-            self._mdp_reply(msg.get_action(), "error", {"details": trace})
+            self._mdp_reply(msg.get_action(), {"status": "errpr", "details": trace})
 
     def _mdp_reply(self, action, payload):
         msg = MQMessage()

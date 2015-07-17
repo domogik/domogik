@@ -116,7 +116,7 @@ class ScenarioManager:
         """
         with self._db.session_scope():
             for scenario in self._db.list_scenario():
-                self.create_scenario(scenario.name, scenario.json, int(scenario.id))
+                self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description)
 
     def shutdown(self):
         """ Callback to shut down all parameters
@@ -135,9 +135,9 @@ class ScenarioManager:
             parsed = self._conditions[name].get_parsed_condition()
             return {'name': name, 'data': parsed}
 
-    def update_scenario(self, cid, name, json_input):
+    def update_scenario(self, cid, name, json_input, dis, desc):
         self.del_scenario(cid, False)
-        self.create_scenario(name, json_input, cid, True)
+        self.create_scenario(name, json_input, cid, dis, desc, True)
 
     def del_scenario(self, cid, doDB=True):
         try:
@@ -156,7 +156,7 @@ class ScenarioManager:
             self.log.error(msg)
             return {'status': 'ERROR', 'msg': msg}
 
-    def create_scenario(self, name, json_input, cid=0, update=False):
+    def create_scenario(self, name, json_input, cid=0, dis=False, desc=None, update=False):
         """ Create a Scenario from the provided json.
         @param name : A name for the condition instance
         @param json_input : JSON representation of the condition
@@ -182,14 +182,14 @@ class ScenarioManager:
         # db storage
         if int(cid) == 0:
             with self._db.session_scope():
-                scen = self._db.add_scenario(name, json_input, 0)
+                scen = self._db.add_scenario(name, json_input, dis, desc)
                 cid = scen.id
         elif update:
             with self._db.session_scope():
-                self._db.update_scenario(cid, name, json_input, 0)
+                self._db.update_scenario(cid, name, json_input, dis, desc)
 
         # create the condition itself
-        scen = ScenarioInstance(self.log, cid, name, payload)
+        scen = ScenarioInstance(self.log, cid, name, payload, dis)
         self._instances[cid] = {'name': name, 'json': payload, 'instance': scen } 
         self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
      
