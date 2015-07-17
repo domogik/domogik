@@ -475,7 +475,7 @@ def scenario_blocks_devices():
                             }}
                         }};
                         """.format(dt_type, color, output, input)
-                js = '{0}\n\r{1}'.format(js, add)
+                js = u'{0}\n\r{1}'.format(js, add)
                 
 
     return Response(js, content_type='text/javascript; charset=utf-8')

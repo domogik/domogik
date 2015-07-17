@@ -130,7 +130,8 @@ class ScenarioInstance:
             while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                 dt_parent = datatypes[dt_parent]['parent']
             # translate
-            if dt_parent == "DT_BOOL":
+            print("PARENT={0}".format(dt_parent))
+            if dt_parent == "DT_Bool":
                 part['type'] = "logic_boolean"
             elif dt_parent == "DT_Number":
                 part['type'] = "math_number"
@@ -214,6 +215,7 @@ class ScenarioInstance:
         uuid = self._get_uuid()
         if itype == 'test':
             try:
+                print inst
                 mod, clas, param = inst.split('.')
             except ValueError as err:
                 mod, clas = inst.split('.')
