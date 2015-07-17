@@ -139,7 +139,7 @@ class ScenarioInstance:
                 part['type'] = "text"
         # parse it
         if part['type'] == 'logic_boolean':
-            if part['BOOL'] == "TRUE":
+            if part['BOOL'] in ("TRUE", "1", 1, True):
                 return "\"1\""
             else:
                 return "\"0\""
