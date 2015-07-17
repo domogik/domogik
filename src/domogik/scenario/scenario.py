@@ -118,14 +118,13 @@ class ScenarioInstance:
             if 'datatypes' in res:
                 datatypes = res['datatypes']
         # step 1 parse the "do" part
-        #self.__parse_do_part(self._json['DO'], datatypes)
         self.__parse_do_part(self._json['DO'])
         # step 2 parse the "if" part        
-        self._parsed_condition = self.__parse_if_part(self._json['IF'])
+        self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
 
     def __parse_if_part(self, part, datatypes = None):
         # translate datatype to default blocks
-        if part['type'][0:2] == 'DT_':
+        if part['type'][0:3] == 'DT_':
             # find the parent
             dt_parent = part['type']
             while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
@@ -172,9 +171,9 @@ class ScenarioInstance:
                 compare = ">"
             elif part['OP'].lower() == "gte":
                 compare = ">="
-            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), compare, self.__parse_if_part(part['B']))
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A'], datatypes), compare, self.__parse_if_part(part['B'], datatypes))
         elif part['type'] == 'logic_operation':
-            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), part['OP'].lower(), self.__parse_if_part(part['B']))
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A'], datatypes), part['OP'].lower(), self.__parse_if_part(part['B'], datatypes))
         elif part['type'] == 'logic_negate':
             return "not {0}".format(self.__parse_if_part(part['BOOL']))
         else:
