@@ -103,12 +103,34 @@ class ScenarioInstance:
     def _instanciate(self):
         """ parse the json and load all needed components
         """
+        ## get the datatypes
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        datatypes = None
+        if res is not None:
+            res = res.get_data()
+            if 'datatypes' in res:
+                datatypes = res['datatypes']
         # step 1 parse the "do" part
-        self.__parse_do_part(self._json['DO'])
+        self.__parse_do_part(self._json['DO'], datatypes)
         # step 2 parse the "if" part        
         self._parsed_condition = self.__parse_if_part(self._json['IF'])
 
-    def __parse_if_part(self, part):
+    def __parse_if_part(self, part, datatypes):
+        # translate datatype to default blocks
+        if part['type'].startswitch('DT_'):
+            # find the parent
+            dt_parent = part['type']
+            while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
+                dt_parent = datatypes[dt_parent]['parent']
+            # translate
+            if dt_parent == "DT_BOOL":
+                part['type'] = "logic_boolean"
+            elif dt_parent == "DT_Number":
+                part['type'] = "math_number"
+        # parse it
         if part['type'] == 'logic_boolean':
             if part['BOOL'] == "TRUE":
                 return "\"1\""
@@ -127,7 +149,7 @@ class ScenarioInstance:
                 compare = "/"
             elif part['OP'].lower() == "power":
                 compare = "^"
-            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A']), compare, self.__parse_if_part(part['B']))
+            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A'], datatypes), compare, self.__parse_if_part(part['B'], datatypes))
         elif part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
                 compare = "=="
