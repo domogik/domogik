@@ -27,7 +27,8 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 import uuid
 from exceptions import ValueError
-
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 
 class ScenarioInstance:
     """ This class provides base methods for the scenarios
