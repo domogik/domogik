@@ -29,6 +29,7 @@ import uuid
 from exceptions import ValueError
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
+import zmq
 
 class ScenarioInstance:
     """ This class provides base methods for the scenarios
@@ -77,6 +78,8 @@ class ScenarioInstance:
         self._json = json
         self._disabled = disabled
 
+        self.zmq = zmq.Context()
+
         self._parsed_condition = None
         self._mapping = { 'test': {}, 'action': {} }
         if not self._disabled:
@@ -105,7 +108,7 @@ class ScenarioInstance:
         """ parse the json and load all needed components
         """
         ## get the datatypes
-        cli = MQSyncReq(app.zmq_context)
+        cli = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action('datatype.get')
         res = cli.request('manager', msg.get(), timeout=10)
@@ -115,13 +118,14 @@ class ScenarioInstance:
             if 'datatypes' in res:
                 datatypes = res['datatypes']
         # step 1 parse the "do" part
-        self.__parse_do_part(self._json['DO'], datatypes)
+        #self.__parse_do_part(self._json['DO'], datatypes)
+        self.__parse_do_part(self._json['DO'])
         # step 2 parse the "if" part        
         self._parsed_condition = self.__parse_if_part(self._json['IF'])
 
-    def __parse_if_part(self, part, datatypes):
+    def __parse_if_part(self, part, datatypes = None):
         # translate datatype to default blocks
-        if part['type'].startswitch('DT_'):
+        if part['type'][0:2] == 'DT_':
             # find the parent
             dt_parent = part['type']
             while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
