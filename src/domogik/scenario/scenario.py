@@ -130,6 +130,8 @@ class ScenarioInstance:
                 part['type'] = "logic_boolean"
             elif dt_parent == "DT_Number":
                 part['type'] = "math_number"
+            elif dt_parent == "DT_String":
+                part['type'] = "text"
         # parse it
         if part['type'] == 'logic_boolean':
             if part['BOOL'] == "TRUE":
@@ -138,6 +140,8 @@ class ScenarioInstance:
                 return "\"0\""
         elif part['type'] == 'math_number':
             return "\"{0}\"".format(part['NUM'])
+        elif part['type'] == 'text':
+            return "\"{0}\"".format(part['TEXT'])
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
                 compare = "+"
