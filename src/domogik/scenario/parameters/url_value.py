@@ -27,7 +27,12 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.scenario.parameters.abstract import AbstractParameter
 from threading import Thread, Event
-from urllib import urlopen
+try:
+    # python3
+    from urllib.request import urlopen
+except ImportError:
+    # python2
+    from urllib import urlopen
 import sys
 
 class UrlParameter(AbstractParameter):
