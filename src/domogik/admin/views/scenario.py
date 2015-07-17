@@ -444,15 +444,25 @@ def scenario_blocks_devices():
                 if dt_parent == "DT_Bool":
                     color = 20
                     output = "\"Boolean\""
+                    opt = "["
+                    for lab in datatypes[dt_type]['labels']:
+                        opt += u"['{0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
+                    opt += "]"
+                    input = """
+                             this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "BOOL");
+                            """.format(opt)
                 elif dt_parent == "DT_Number":
                     color = 65
                     output = "\"Number\""
                     input = """
-                             this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "value");
+                             this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
                             """
                 else:
                     color = 160
                     output = "\"null\""
+                    input = """
+                             this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
+                            """
 
                 add = """Blockly.Blocks['{0}'] = {{
                             init: function() {{
