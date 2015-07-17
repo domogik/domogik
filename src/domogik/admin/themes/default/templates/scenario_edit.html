@@ -49,6 +49,11 @@
             <block type="{{ a }}"></block>
         {% endfor %}
     </category>
+    <category name="Datatypes">
+        {% for d in datatypes %}
+            <block type="{{ d }}"></block>
+        {% endfor %}
+    </category>
     <category name="Devices">
         {% for dev_client in devices_per_clients %}
             <category name="{{ dev_client }}">
