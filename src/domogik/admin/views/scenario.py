@@ -303,6 +303,8 @@ def scenario_blocks_devices():
     if res is not None:
         res = res.get_data()
         if 'devices' in res:
+            # create a list of the used datatypes in sensors to build only these datatype blocks
+            used_datatypes = []
             devices = res['devices']
             for dev in devices:
                 client = dev['client_id']
@@ -316,6 +318,8 @@ def scenario_blocks_devices():
                     sen_name = dev['sensors'][sen]['name']
                     # determ the output type
                     sen_dt = dev['sensors'][sen]['data_type'] 
+                    if sen_dt not in used_datatypes:
+                        used_datatypes.append(sen_dt)
                     dt_parent = sen_dt
                     # First, determine the parent type (DT_Number, DT_Bool, ...)
                     while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
@@ -416,6 +420,34 @@ def scenario_blocks_devices():
                             }};
                             """.format(block_id, cmd_name, block_description, jso, output, color, js_params)
                     js = '{0}\n\r{1}'.format(js, add)
+
+            for dt_type in used_datatypes:
+                dt_parent = dt_type
+                # First, determine the parent type (DT_Number, DT_Bool, ...)
+                while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
+                    dt_parent = datatypes[dt_parent]['parent']
+                if dt_parent == "DT_Bool":
+                    color = 20
+                    output = "\"Boolean\""
+                elif dt_parent == "DT_Number":
+                    color = 65
+                    output = "\"Number\""
+                else:
+                    color = 160
+                    output = "\"null\""
+
+                add = """Blockly.Blocks['{0}'] = {{
+                            init: function() {{
+                                this.setColour({1});
+                                this.appendDummyInput().appendField("{0}");
+                                this.setTooltip('{0}'); 
+                                this.setOutput(true, {2});
+                                this.setInputsInline(false);
+                            }}
+                        }};
+                        """.format(dt_type, color, output)
+                js = '{0}\n\r{1}'.format(js, add)
+                
 
     return Response(js, content_type='text/javascript; charset=utf-8')
 
