@@ -61,7 +61,7 @@ def scenario_edit(id):
     default_json = '{"type":"dom_condition","id":"1","deletable":false}'
     # laod the json
     if int(id) == 0:
-        name = u"New scenario"
+        name = u""
         jso = default_json
         dis = 0
         desc = None
