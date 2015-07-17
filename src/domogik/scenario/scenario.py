@@ -78,7 +78,8 @@ class ScenarioInstance:
 
         self._parsed_condition = None
         self._mapping = { 'test': {}, 'action': {} }
-        self._instanciate()
+        if not self._disabled:
+            self._instanciate()
 
     def destroy(self):
         """ Cleanup the class
