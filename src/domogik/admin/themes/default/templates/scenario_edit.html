@@ -101,9 +101,14 @@
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
+<!--
   <script type="text/javascript" src="/scenario/blocks/actions"></script>
   <script type="text/javascript" src="/scenario/blocks/tests"></script>
   <script type="text/javascript" src="/scenario/blocks/devices"></script>
+-->
+  <script type="text/javascript">
+    {{ blocks_js | safe }}
+  </script>
   <script type="text/javascript">
     var blocklyArea = document.getElementById('blocklyArea');
     var blocklyDiv = document.getElementById('blocklyDiv');
