@@ -167,7 +167,7 @@ class ScenarioManager:
         @Return {'name': name} or raise exception
         """
         try:
-            self.log.info("Create or save scenario : name = '{0}', id = '{1}', json = '{2}'".format(name, cid, json_input))
+            self.log.info(u"Create or save scenario : name = '{1}', id = '{1}', json = '{2}'".format(name, cid, json_input))
             payload = json.loads(json_input)  # quick test to check if json is valid
         except Exception as e:
             self.log.error(u"Creation of a scenario failed, invallid json: {0}".format(json_input))
