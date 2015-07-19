@@ -20,7 +20,7 @@ You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 @author: Fritz SMH <fritz.smh@gmail.com>
-@copyright: (C) 2007-2013 Domogik project
+@copyright: (C) 2007-2015 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
