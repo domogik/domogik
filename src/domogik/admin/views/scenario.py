@@ -232,7 +232,7 @@ def scenario_blocks_js():
         p = []
         jso = u""
         for par, parv in params['parameters'].iteritems():
-            papp = u"this.appendDummyInput().appendField('{0}')".format(parv['description'])
+            papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
             if parv['type'] == 'string':
                 jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
                 papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
