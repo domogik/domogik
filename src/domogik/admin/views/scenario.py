@@ -250,7 +250,7 @@ def scenario_blocks_js():
                 init: function() {{
                     this.setHelpUrl('');
                     this.setColour(160);
-                    this.appendDummyInput().appendField("{0}");
+                    this.appendDummyInput().appendField("{2}");
                     {1}
                     this.setPreviousStatement(true, "null");
                     this.setNextStatement(true, "null");
