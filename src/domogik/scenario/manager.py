@@ -255,21 +255,40 @@ class ScenarioManager:
         self.log.debug("ScenarioManager : list tests")
         res = {}
         tests = self.__return_list_of_classes(s_t)
+
         for name, cls in tests:
             self.log.debug("- {0}".format(name))
             inst = cls(log = self.log)
-            res[name] = []
+
+            params = []
             for p, i in inst.get_parameters().iteritems():
                 for param, info in i['expected'].iteritems():
-                    res[name].append({
+                    params.append({
                             "name": "{0}.{1}".format(p, param),
                             "description": info['description'],
                             "type": info['type'],
                             "values": info['values'],
                             "filters": info['filters'],
                         })
-            inst.destroy()
+
+            res[name] = {"parameters": params,
+                         "description": inst.get_description()}
         return res
+        #for name, cls in tests:
+        #    self.log.debug("- {0}".format(name))
+        #    inst = cls(log = self.log)
+        #    res[name] = []
+        #    for p, i in inst.get_parameters().iteritems():
+        #        for param, info in i['expected'].iteritems():
+        #            res[name].append({
+        #                    "name": "{0}.{1}".format(p, param),
+        #                    "description": info['description'],
+        #                    "type": info['type'],
+        #                    "values": info['values'],
+        #                    "filters": info['filters'],
+        #                })
+        #    inst.destroy()
+        #return res
 
     def list_conditions(self):
         """ Return the list of conditions as JSON

@@ -34,11 +34,10 @@ class CronTest(AbstractTest):
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
-        self.set_description("Trigger on a certain timed event")
+        self.set_description("Trigger on a crontab rule")
         self.add_parameter("cron", "cron.CronParameter")
 
     def evaluate(self):
-        print("CROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOON eval")
         """ Evaluate if the text appears in the content of the page referenced by url
         """
         params = self.get_raw_parameters()

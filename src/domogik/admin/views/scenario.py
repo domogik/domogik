@@ -191,14 +191,15 @@ def scenario_blocks_js():
     js = ""
 
     ### tests
+    print("SCE_TEST = {0}".format(scenario_tests))
     for test, params in scenario_tests.iteritems():
-        print test
         if test == "sensor.SensorTest": continue
         p = []
         jso = u""
-        for parv in params:
+        #for parv in params:
+        for parv in params['parameters']:
             par = parv['name']
-            papp = u"this.appendDummyInput().appendField('{0}')".format(parv['description'])
+            papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
             if parv['type'] == 'string':
                 jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
                 papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
@@ -214,7 +215,7 @@ def scenario_blocks_js():
         add = u"""Blockly.Blocks['{0}'] = {{
                     init: function() {{
                         this.setColour(160);
-                        this.appendDummyInput().appendField("{0}");
+                        this.appendDummyInput().appendField("{2}");
                         {1}
                         this.setOutput(true);
                         this.setInputsInline(false);
@@ -222,7 +223,7 @@ def scenario_blocks_js():
                         this.contextMenu = false;
                     }}
                 }};
-                """.format(test, '\n'.join(p), parv['description'], jso)
+                """.format(test, '\n'.join(p), params['description'], jso)
         js = u'{0}\n\r{1}'.format(js, add)
 
 
