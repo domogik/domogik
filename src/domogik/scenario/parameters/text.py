@@ -35,7 +35,7 @@ class TextParameter(AbstractParameter):
     def __init__(self, log = None, trigger = None):
         AbstractParameter.__init__(self, log, trigger)
         self.set_type("string")
-        self.add_expected_entry("text", "string", "Some text")
+        self.add_expected_entry("text", "string", "Text")
 
 
     def evaluate(self):

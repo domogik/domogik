@@ -167,7 +167,7 @@ class ScenarioManager:
         @Return {'name': name} or raise exception
         """
         try:
-            self.log.info("Create or save scenario : name = '{0}', id = '{1}', json = '{2}'".format(name, cid, json_input))
+            self.log.info(u"Create or save scenario : name = '{1}', id = '{1}', json = '{2}'".format(name, cid, json_input))
             payload = json.loads(json_input)  # quick test to check if json is valid
         except Exception as e:
             self.log.error(u"Creation of a scenario failed, invallid json: {0}".format(json_input))
@@ -255,21 +255,40 @@ class ScenarioManager:
         self.log.debug("ScenarioManager : list tests")
         res = {}
         tests = self.__return_list_of_classes(s_t)
+
         for name, cls in tests:
             self.log.debug("- {0}".format(name))
             inst = cls(log = self.log)
-            res[name] = []
+
+            params = []
             for p, i in inst.get_parameters().iteritems():
                 for param, info in i['expected'].iteritems():
-                    res[name].append({
+                    params.append({
                             "name": "{0}.{1}".format(p, param),
                             "description": info['description'],
                             "type": info['type'],
                             "values": info['values'],
                             "filters": info['filters'],
                         })
-            inst.destroy()
+
+            res[name] = {"parameters": params,
+                         "description": inst.get_description()}
         return res
+        #for name, cls in tests:
+        #    self.log.debug("- {0}".format(name))
+        #    inst = cls(log = self.log)
+        #    res[name] = []
+        #    for p, i in inst.get_parameters().iteritems():
+        #        for param, info in i['expected'].iteritems():
+        #            res[name].append({
+        #                    "name": "{0}.{1}".format(p, param),
+        #                    "description": info['description'],
+        #                    "type": info['type'],
+        #                    "values": info['values'],
+        #                    "filters": info['filters'],
+        #                })
+        #    inst.destroy()
+        #return res
 
     def list_conditions(self):
         """ Return the list of conditions as JSON

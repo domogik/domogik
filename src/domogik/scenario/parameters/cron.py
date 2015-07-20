@@ -43,7 +43,7 @@ class CronParameter(AbstractParameter):
     def __init__(self, log = None, trigger = None):
         AbstractParameter.__init__(self, log, trigger)
         self.set_type("string")
-        self.add_expected_entry("cron", "string", "Cron timed trigger")
+        self.add_expected_entry("cron", "string", "Cron expression")
         self.expr = None
         self._event = Event()
         self._fetch_thread = Thread(target=self._check,name="CronParameter.check")
