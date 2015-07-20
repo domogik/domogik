@@ -32,8 +32,8 @@ class TextInPageTest(AbstractTest):
     """ Simple test to check if a word is contained in an url
     """
 
-    def __init__(self, log = None, trigger = None, cond=None):
-        AbstractTest.__init__(self, log, trigger, cond)
+    def __init__(self, log = None, trigger = None, cond=None, params=None):
+        AbstractTest.__init__(self, log, trigger, cond, params)
         self.set_description("Check if a web page contains some word")
         self.add_parameter("url", "url_value.UrlParameter")
         self.add_parameter("text", "text.TextParameter")
