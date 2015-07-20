@@ -206,7 +206,6 @@ class ScenarioInstance:
         res = eval(self._parsed_condition)
         self._log.debug("_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, eval(self._parsed_condition)))
         if res:
-            self._call_actions()
             return True
         else:
             return False

@@ -42,8 +42,8 @@ class UrlParameter(AbstractParameter):
     def __init__(self, log = None, trigger = None):
         AbstractParameter.__init__(self, log, trigger)
         self.set_type("url")
-        self.add_expected_entry("urlpath", "string", "Url the script will fetch")
-        self.add_expected_entry("interval", "string", "Interval between 2 fetch in second")
+        self.add_expected_entry("urlpath", "string", "Url")
+        self.add_expected_entry("interval", "string", "Number of seconds between 2 checks")
         self.set_default_value("interval", "10")
         self._result = None
         self._event = Event()

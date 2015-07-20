@@ -26,33 +26,22 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.actions.abstract import AbstractAction
-import traceback
-try:
-    # python3
-    from urllib.request import urlopen
-except ImportError:
-    # python2
-    from urllib import urlopen
+import time
 
 
-class CallUrlAction(AbstractAction):
-    """ Simple action that call an url
+class PauseAction(AbstractAction):
+    """ Do a pause between 2 actions
     """
 
     def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log)
-        self.set_description("Call an url.")
+        self.set_description("Do a pause.")
 
     def do_action(self):
-        self._log.info("Calling url : {0}".format(self._params['url']))
-        try:
-            html = urlopen(self._params['url'])
-            self._log.info("Call url OK")
-        except:
-            self._log.warning("Error when calling url from action.CallUrlAction : {0}".format(traceback.format_exc()))
-           
+        self._log.info("Do a pause of {0} seconds".format(self._params['delay']))
+
     def get_expected_entries(self):
-        return {'url': {'type': 'string',
-                        'description': 'Url',
-                        'default': 'http://'}
+        return {'delay': {'type': 'integer',
+                            'description': 'Delay in seconds',
+                            'default': '5'}
                }
