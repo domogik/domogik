@@ -212,6 +212,30 @@ It will start :
 * The database manager and the REST interface module (which will take in account the parameters you defined in your configuration file : host, IP...)
 * The administration web interface
 
+Set up the automatic backup
+---------------------------
+
+If you want (and you should), you could configure a daily (or weekly) backup. Domogik provides a python backup script : **backup.py**. 
+
+To use it, edit your crontab file: ::
+
+    crontab -e
+
+And add at the end the below lines: ::
+
+    # Domogik backup each night at 1:00
+    0 1 * * * /opt/dmg/domogik/backup.py > /var/log/domogik/backup-$(date "+\%Y\%m\%d_\%H\%M").log 2>&1
+
+The default backup folder is **/var/lib/domogik/backup/**. You can change it in the file **/etc/domogik/domogik.cfg** in the section **[backup]**. Example: ::
+
+    ###
+    # Backup configuration
+    ###
+    [backup]
+    folder=/var/lib/domogik/backup/
+
+
+
 Next step : domoweb, the web user interface
 -------------------------------------------
 

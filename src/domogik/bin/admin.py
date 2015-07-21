@@ -131,24 +131,26 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
         """
         try:
             ### websocket message (from the web)
+            # there are the mesages send by the administration javascript part thanks to the ws.send(...) function
             if not content:
                 jsons = json.loads(msg)
                 # req/rep
-                if 'action' in jsons and 'data' in jsons:
+                if 'mq_request' in jsons and 'data' in jsons:
                     cli = MQSyncReq(zmq.Context())
                     msg = MQMessage()
-                    msg.set_action(str(jsons['action']))
+                    msg.set_action(str(jsons['mq_request']))
                     msg.set_data(jsons['data'])
                     if 'dst' in jsons:
                         cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
                     else:
                         cli.request('manager', msg.get(), timeout=10).get()
                 # pub
-                elif 'publish' in jsons and 'data' in jsons:
+                elif 'mq_publish' in jsons and 'data' in jsons:
                     print("Publish : {0}".format(jsons['data']))
-                    self.pub.send_event(jsons['publish'],
+                    self.pub.send_event(jsons['mq_publish'],
                                         jsons['data'])
             ### MQ message (from domogik)
+            # these are the published messages which are received here
             else:
                 try:
                     self.write_message({"msgid": msg, "content": content})

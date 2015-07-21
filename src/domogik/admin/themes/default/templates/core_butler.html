@@ -149,7 +149,7 @@
 
 
         $('#chatInput').change(function() {
-            ws.send('{"publish": "interface.input", "data": {"text" : "' + $('#chatInput').val() + '", "media" : "chat", "identity" : "admin", "source" : "{{ clientid }}"}}');
+            ws.send('{"mq_publish": "interface.input", "data": {"text" : "' + $('#chatInput').val() + '", "media" : "chat", "identity" : "admin", "source" : "{{ clientid }}"}}');
             $('#chatInput').val('');
 
         });

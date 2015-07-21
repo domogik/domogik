@@ -92,3 +92,10 @@ name = Aria
 lang = fr_FR
 # male/female
 sex = female
+
+
+###
+# Backup configuration
+###
+[backup]
+folder=/var/lib/domogik/backup/

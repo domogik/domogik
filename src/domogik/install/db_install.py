@@ -139,7 +139,8 @@ class DbInstall():
             else:
                 mysqldump_cmd.append(self._db.get_db_name())
             mysqldump_cmd.append(">")
-            mysqldump_cmd.append(self.db_backup_file)
+            #mysqldump_cmd.append(self.db_backup_file)
+            mysqldump_cmd.append(bfile)
             os.system(" ".join(mysqldump_cmd))
     
 if __name__ == "__main__":
