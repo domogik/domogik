@@ -96,6 +96,16 @@ def backup_config(folder):
         print(cmd)
         os.system(cmd)
 
+def backup_learn_file(folder):
+    files = [{ 'src' : '/var/lib/domogik/domogik_packages/learn.rive',
+               'dst' : 'domogik-learn-file.tgz'}]
+    for fic in files:
+        src = fic['src']
+        dst = fic['dst']
+        cmd = "tar cvzf {0}/{1} {2}".format(folder, dst, src)
+        print(cmd)
+        os.system(cmd)
+
     
 if __name__ == "__main__":
     folder = get_backup_dir()
@@ -108,6 +118,7 @@ if __name__ == "__main__":
                     raise e
             backup_database(folder)
             backup_config(folder)
+            backup_learn_file(folder)
         except:
             print("Error while doing the backup : {0}".format(traceback.format_exc()))
             

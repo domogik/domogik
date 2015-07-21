@@ -262,7 +262,7 @@ class ScenarioInstance:
             if cond.get_parsed_condition() is None:
                 return
             st = cond.eval_condition()
-            self._log.info("Condition {0} evaluated to {1}".format(self._name, st))
+            self._log.info(u"Condition {0} evaluated to {1}".format(self._name, st))
             if st:
                 self._call_actions()
         else:

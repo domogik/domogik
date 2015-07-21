@@ -192,6 +192,7 @@ class ScenarioManager:
         scen = ScenarioInstance(self.log, cid, name, payload, dis)
         self._instances[cid] = {'name': name, 'json': payload, 'instance': scen } 
         self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
+        self._instances[cid]['instance'].eval_condition()
      
         # return
         return {'name': name, 'cid': cid}
