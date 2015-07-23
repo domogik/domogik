@@ -339,3 +339,9 @@ body {
     color: white;
     text-decoration: none;
 }
+
+/*** forms ***/
+
+input {
+    max-width: 100%;
+}
