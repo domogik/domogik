@@ -330,8 +330,12 @@ body {
     height: 80vh;
 }
 
-h1.xunderline {
-    padding-bottom: 0.3em;
-    border-bottom: 3px solid #005774;
-    width: 80vw;
+
+/*** devices ***/
+
+#myDevices > li.active > a,
+#myDevices > li.active > a:hover,
+#myDevices > li.active > a:focus {
+    color: white;
+    text-decoration: none;
 }
