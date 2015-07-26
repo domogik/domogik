@@ -42,11 +42,11 @@
           <!-- Devices list -->
           <div class="col-md-4">
             <h2>{% trans %}Known Devices{% endtrans %}</h2>
-            <ul class="list-group" id="myTabs">
+            <ul class="list-group" id="myDevices">
               {% for device_type_id in devices_by_device_type_id %}
                 <li class="list-group-item"><strong>{{ device_type_id }}</strong><span class="badge">{{ devices_by_device_type_id[device_type_id]|length }}</span></li>
                 {% for data in devices_by_device_type_id[device_type_id] %}
-                  <li class="list-group-item"><a href="#detail-{{ data.id }}"><span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> {{ data.name }}</a></li>
+                  <li class="list-group-item"><a href="#detail-{{ data.id }}" class="device"><span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> {{ data.name }}</a></li>
                 {% endfor %}
               {% endfor %}
             </ul>
@@ -274,7 +274,7 @@
         <script type="text/javascript">
         // Enable the Tabs
         
-        $('#myTabs a').click(function (e) {
+        $('#myDevices a').click(function (e) {
             e.preventDefault()
             $(this).tab('show')
           });
