@@ -50,7 +50,7 @@ import os
 # datatype.
 # For example, the plugin weather has a lot of DT_Temp sensors, but when we request for the current temperature, we
 # want to get the data from one sensor!
-BRAIN_PREFERENCES = "brain_datatype/preferences.json"
+BRAIN_PREFERENCES = "brain_base/preferences.json"
 
 
 def get_packages_directory():
