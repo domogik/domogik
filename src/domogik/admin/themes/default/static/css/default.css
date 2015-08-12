@@ -12,6 +12,10 @@ body {
     margin-bottom: 1em;
 }
 
+h5 {
+    font-weight: bold;
+}
+
 
 /** login **/
 
