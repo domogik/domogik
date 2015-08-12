@@ -695,7 +695,11 @@ def get_brain_content(client_id):
     if res is not None:
         data = res.get_data()
         detail = {}
-        detail[client_id] = data[client_id]
+        try:
+            detail[client_id] = data[client_id]
+        except KeyError:
+            # this can happen if you install a package and don't do a butler reload!
+            detail[client_id] = None
     else:
         detail = {}
 
