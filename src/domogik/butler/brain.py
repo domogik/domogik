@@ -65,23 +65,36 @@ def get_packages_directory():
 LEARN_FILE = os.path.join(get_packages_directory(), "learn.rive")
 
 
-
-
-def get_sensor_value(dt_type, device_name):
-    """ Search for a sensor matching the dt_type and the device name
+def get_sensor_value(dt_type, device_name, sensor_reference = None):
+    """ If sensor_reference = None
+            Search for a sensor matching the dt_type and the device name
+        Else
+            Search for a dedicated sensor matching the device_name
         @param dt_type : a domogik datatype : DT_Temperature, DT_Humidity, ...
         @param device_name : the device name
+        @param sensor_reference : the sensor name
     """
-    device_name = ' '.join(device_name)
+    if isinstance(device_name, list):
+        device_name = ' '.join(device_name)
     #print("Device name = {0}".format(device_name))
     #print("Datatype = {0}".format(dt_type))
 
     ### search for all devices of the appropriate dt_type 
-    candidates = get_sensors_for_datatype(dt_type)
-    #print("Candidates for the appropriate datatype : {0}".format(candidates))
+    if sensor_reference:
+        check_preferences = False
+    else:
+        check_preferences = True
+    candidates = get_sensors_for_datatype(dt_type, check_preferences)
+    print("Candidates for the appropriate datatype : {0}".format(candidates))
 
-    ### then, search for any device that matches the device name
-    the_sensor = filter_sensors_by_device_name(candidates, device_name)
+    if sensor_reference:
+        ### then search for the sensor with the appropriate reference
+        the_sensor = filter_sensors_by_reference_and_device_name(candidates, sensor_reference, device_name)
+    else:
+        ### then, search for any device that matches the device name
+        the_sensor = filter_sensors_by_device_name(candidates, device_name)
+
+    print("The sensor is : {0}".format(the_sensor))
 
     ### no corresponding sensor :(
     if the_sensor == None:
@@ -90,25 +103,28 @@ def get_sensor_value(dt_type, device_name):
     ### corresponding sensor!
     # let's get the sensor value
 
-    the_value = get_sensor_last_value(the_sensor['sensor_id'])
+    the_value = the_sensor['last_value']
 
     return the_value
     
 
 
 
-def get_sensors_for_datatype(dt_type):
+def get_sensors_for_datatype(dt_type, check_preferences = True):
     """ Find the matching devices and features
     """
 
-    # TODO : upgrade to load only once and then keep in memory
-    preferences_file = os.path.join(get_packages_directory(), BRAIN_PREFERENCES)
-    try:
-        preferences_fp = open(preferences_file)
-        preferences = json.load(preferences_fp)
-    except:
-        print("Error while loading preferences (maybe no preferences file ? {0} : {1}".format(preferences_file, traceback.format_exc()))
-        pass
+    if check_preferences:
+        # TODO : upgrade to load only once and then keep in memory
+        preferences_file = os.path.join(get_packages_directory(), BRAIN_PREFERENCES)
+        try:
+            preferences_fp = open(preferences_file)
+            preferences = json.load(preferences_fp)
+        except:
+            print("Error while loading preferences (maybe no preferences file ? {0} : {1}".format(preferences_file, traceback.format_exc()))
+            pass
+    else:
+        preferences = {}
 
     candidates = []
 
@@ -127,9 +143,12 @@ def get_sensors_for_datatype(dt_type):
             candidates_for_this_device = {}
             for a_sensor in a_device["sensors"]:
                 if a_device["sensors"][a_sensor]["data_type"] == dt_type:
+                    #print(a_device["sensors"][a_sensor])
                     candidates_for_this_device[a_sensor] = {"device_name" : a_device["name"],
                                                             "device_id" : a_device["id"],
+                                                            "last_value" : a_device["sensors"][a_sensor]["last_value"],
                                                             "sensor_name" : a_device["sensors"][a_sensor]["name"],
+                                                            "sensor_reference" : a_device["sensors"][a_sensor]["reference"],
                                                             "sensor_id" : a_device["sensors"][a_sensor]["id"]}
             # if there are several candidates for a device, we check if there are some preferences defined
             # and if so, we use them
@@ -138,8 +157,13 @@ def get_sensors_for_datatype(dt_type):
                 #print("Check for preferences for the package '{0}'....".format(package))
                 if preferences.has_key(package): 
                     if preferences[package].has_key(dt_type):
-                        #print("Preferences found for datatype '{0}' : sensor '{1}'".format(dt_type, preferences[package][dt_type]))
+                        print("Preferences found for datatype '{0}' : sensor '{1}'".format(dt_type, preferences[package][dt_type]))
                         candidates.append(candidates_for_this_device[preferences[package][dt_type]])
+                else:
+                    # yes we have only one entry, but we need to get the value related to the key...
+                    # so we use a for to get the unique key here and so get only the value
+                    for key in candidates_for_this_device:
+                        candidates.append(candidates_for_this_device[key])
             else:
                 if candidates_for_this_device != {}:
                     # yes we have only one entry, but we need to get the value related to the key...
@@ -155,6 +179,27 @@ def get_sensors_for_datatype(dt_type):
 
 
 
+def filter_sensors_by_reference_and_device_name(candidates, reference, device_name):
+    """ find in the sensors list, the good one
+        IF the device_name == None, we assume there is only one corresponding device
+    """
+    reference = reference.lower()
+    if device_name != None:
+        device_name = device_name.lower()
+    for a_sensor in candidates:
+        try:
+            if device_name == None and a_sensor["sensor_reference"].lower() == reference:
+                return a_sensor
+            #print(device_name)
+            #print(a_sensor["device_name"])
+            if device_name == a_sensor["device_name"].lower() and a_sensor["sensor_reference"].lower() == reference:
+                return a_sensor
+        except:
+            print("ERROR : {0}".format(traceback.format_exc()))
+            pass
+
+    return None
+    
 def filter_sensors_by_device_name(candidates, device_name):
     """ for each given sensor, check the most appropriate choice depending on device_name
     """
@@ -175,38 +220,6 @@ def filter_sensors_by_device_name(candidates, device_name):
     return None
 
 
-def get_sensor_last_value(sensor_id):
-    """ Get the last value of a sensor by its id
-    """
-    cli = MQSyncReq(zmq.Context())
-    msg = MQMessage()
-    msg.set_action('sensor_history.get')
-    msg.add_data('sensor_id', sensor_id)
-    try:
-        value_str = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
-        value_json = json.loads(value_str)
-        value = value_json['values'][0]
-    except:
-        print("ERROR : {0}".format(traceback.format_exc()))
-        pass
-    return value
-
-
-
-
-# TO DEL
-#def reload_brain():
-#    """ Send a message over MQ to reload the brain
-#    """
-#    print("Request to reload the brain...")
-#    cli = MQSyncReq(zmq.Context())
-#    msg = MQMessage()
-#    msg.set_action('butler.reload.do')
-#    cli.request('butler', msg.get(), timeout=2)
-#    print("Brain reloaded")
-
-
-
 def learn(rs_code):
     """ Add some rivescript code in a file
         and requets to reload the brain
@@ -214,7 +227,7 @@ def learn(rs_code):
                   + ping
                   - pong
     """
-    print(rs_code)
+    #print(rs_code)
     with open(LEARN_FILE, "a") as file:
         file.write(rs_code) 
 #    reload_brain()
