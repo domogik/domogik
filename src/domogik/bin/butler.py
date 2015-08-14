@@ -58,7 +58,7 @@ import sys
 
 
 
-BRAIN_PKG_TYPE = "brain"
+BRAIN_PKG_TYPES = ["brain", "plugin"]
 MINIMAL_BRAIN = "{0}/../butler/brain_minimal.rive".format(os.path.dirname(os.path.abspath(__file__)))
 RIVESCRIPT_DIR = "rs"
 RIVESCRIPT_EXTENSION = ".rive"
@@ -275,17 +275,26 @@ class Butler(Plugin, MQAsyncSub):
 
     def load_brain_parts(self):
         """ Load the parts of the brain from /var/lib/domogik/domogik_packages/brain_*
+            and also plugin_* because some plugins may need dedicated brain parts :
+            - weather forecast
+            - anything less generic than a datatype basic usage
         """
         try:
             list = []
             # first load the packages parts
             for a_file in os.listdir(self.get_packages_directory()):
-                if a_file[0:len(BRAIN_PKG_TYPE)] == BRAIN_PKG_TYPE:
-                    self.log.info(u"Brain part found : {0}".format(a_file))
-                    client_id = "{0}-{1}.{2}".format(BRAIN_PKG_TYPE, a_file.split("_")[1], self.get_sanitized_hostname())
+                try:
+                    pkg_type, name = a_file.split("_")
+                except ValueError:
+                    # not a foo_bar file : skip it
+                    continue
+                #if a_file[0:len(BRAIN_PKG_TYPE)] == BRAIN_PKG_TYPE:
+                if pkg_type in BRAIN_PKG_TYPES:
+                    client_id = "{0}-{1}.{2}".format(pkg_type, a_file.split("_")[1], self.get_sanitized_hostname())
                     self.brain_content[client_id] = {}
                     rs_dir = os.path.join(self.get_packages_directory(), a_file, RIVESCRIPT_DIR)
                     if os.path.isdir(rs_dir):
+                        self.log.info(u"Brain part found : {0}".format(a_file))
                         #self.log.debug(u"The brain part contains a rivescript folder ({0})".format(RIVESCRIPT_DIR))
                         lang_dir = os.path.join(rs_dir, self.lang)
                         if os.path.isdir(lang_dir):
