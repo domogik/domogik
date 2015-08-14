@@ -71,7 +71,7 @@
             </li>
             {% endif %}
 
-            {% if client_detail.type == "brain" %}
+            {% if client_detail.type == "plugin" or client_detail.type == "brain" %}
             <li {% if active == "brain" %} class="active" {% endif %} >
               <a href="/client/{{ clientid }}/brain">{% trans %}Brain details{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
