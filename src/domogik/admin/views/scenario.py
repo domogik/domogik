@@ -219,7 +219,7 @@ def scenario_blocks_js():
                         {1}
                         this.setOutput(true);
                         this.setInputsInline(false);
-                        this.setTooltip('{2}'); 
+                        this.setTooltip("{2}"); 
                         this.contextMenu = false;
                     }}
                 }};
@@ -255,7 +255,7 @@ def scenario_blocks_js():
                     {1}
                     this.setPreviousStatement(true, "null");
                     this.setNextStatement(true, "null");
-                    this.setTooltip('{2}');
+                    this.setTooltip("{2}");
                     this.setInputsInline(false);
                 }}
             }};
@@ -304,10 +304,10 @@ def scenario_blocks_js():
                         init: function() {{
                             this.setColour({5});
                             this.appendDummyInput().appendField("{2}");
-                            this.appendDummyInput().appendField('Sensor : {1}');
+                            this.appendDummyInput().appendField("Sensor : {1}");
                             this.setOutput(true, {4});
                             this.setInputsInline(false);
-                            this.setTooltip('{2}'); 
+                            this.setTooltip("{2}"); 
                         }}
                     }};
                     """.format(block_id, sen_name, block_description, jso, output, color)
@@ -375,13 +375,13 @@ def scenario_blocks_js():
                         init: function() {{
                             this.setColour({5});
                             this.appendDummyInput().appendField("{2}");
-                            this.appendDummyInput().appendField('Command : {1}');
-                            this.appendDummyInput().appendField('Parameters : ');
+                            this.appendDummyInput().appendField("Command : {1}");
+                            this.appendDummyInput().appendField("Parameters : ");
                             {6}
                             this.setPreviousStatement(true, "null");
                             this.setNextStatement(true, "null");
                             this.setInputsInline(false);
-                            this.setTooltip('{2}'); 
+                            this.setTooltip("{2}"); 
                         }}
                     }};
                     """.format(block_id, cmd_name, block_description, jso, output, color, js_params)
@@ -422,7 +422,7 @@ def scenario_blocks_js():
                         this.setColour({1});
                         this.appendDummyInput().appendField("{0}");
                         {3}
-                        this.setTooltip('{0}'); 
+                        this.setTooltip("{0}"); 
                         this.setOutput(true, {2});
                         this.setInputsInline(false);
                     }}
