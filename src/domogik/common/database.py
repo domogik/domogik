@@ -900,8 +900,10 @@ class DbHelper():
                         newval = value
                         self.log.error("Failed to apply formula ({0}) to sensor ({1}): {2}".format(sensor.formula, sensor, exp))
                     value = newval
-                # only store stats if the value is different
-                if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
+                ### only store stats if the value is different
+                # if duplicate == 1 we allow duplicate values
+                # else we skip if the new value has the same value as the last one in database
+                if (sensor.history_duplicate == 1) or (sensor.history_duplicate == 0 and str(sensor.last_value) != str(value)):
                     # handle history_round
                     # reduce device stats
                     if sensor.history_round > 0:
