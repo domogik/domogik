@@ -359,6 +359,7 @@ class XplManager(XplPlugin, MQAsyncSub):
             self._pub = pub
 
         def _find_storeparam(self, item):
+            #print("ITEM = {0}".format(item['msg']))
             found = False
             tostore = []
             for xplstat in self._db.get_all_xpl_stat():
@@ -366,9 +367,24 @@ class XplManager(XplPlugin, MQAsyncSub):
                 matching = 0
                 statics = 0
                 if xplstat.schema == item["msg"].schema:
+                    #print("  XPLSTAT = {0}".format(xplstat))
                     # we found a possible xplstat
                     # try to match all params and try to find a sensorid and a vlaue to store
                     for param in xplstat.params:
+                        #print("    PARAM = {0}".format(param))
+                        ### Caution !
+                        # in case you, who are reading this, have to debug something like that :
+                        # 2015-08-16 22:04:26,190 domogik-xplgw INFO Storing stat for device 'Garage' (6) and sensor 'Humidity' (69): key 'current' with value '53' after conversion.
+                        # 2015-08-16 22:04:26,306 domogik-xplgw INFO Storing stat for device 'Salon' (10) and sensor 'Humidity' (76): key 'current' with value '53' after conversion.
+                        # 2015-08-16 22:04:26,420 domogik-xplgw INFO Storing stat for device 'Chambre d'Ewan' (11) and sensor 'Humidity' (80): key 'current' with value '53' after conversion.
+                        # 2015-08-16 22:04:26,533 domogik-xplgw INFO Storing stat for device 'Chambre des parents' (12) and sensor 'Humidity' (84): key 'current' with value '53' after conversion.
+                        # 2015-08-16 22:04:26,651 domogik-xplgw INFO Storing stat for device 'Chambre de Laly' (13) and sensor 'Humidity' (88): key 'current' with value '53' after conversion.
+                        # 2015-08-16 22:04:26,770 domogik-xplgw INFO Storing stat for device 'Entrée' (17) and sensor 'Humidity' (133): key 'current' with value '53' after conversion.
+                        #
+                        # which means that for a single xPL message, the value is stored in several sensors (WTF!!! ?)
+                        # It can be related to the fact that the device address key is no more corresponding between the plugin (info.json and xpl sent by python) and the way the device was create in the databse
+                        # this should not happen, but in case... well, we may try to find a fix...
+
                         if param.key in item["msg"].data and param.static:
                             statics = statics + 1
                             if param.multiple is not None and len(param.multiple) == 1 and item["msg"].data[param.key] in param.value.split(param.multiple):
@@ -377,8 +393,10 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 matching = matching + 1
                     # now we have a matching xplstat, go and find all sensors
                     if matching == statics:
+                        #print("  MATHING !!!!!")
                         for param in xplstat.params:
-                            if param.key in item["msg"].data and not param.static:
+                            if param.key in item["msg"].data and not param.static:     
+                                #print("    ===> TOSTORE !!!!!!!!! : {0}".format({'param': param, 'value': item["msg"].data[param.key]}))
                                 tostore.append( {'param': param, 'value': item["msg"].data[param.key]} )
                     if len(tostore) > 0:
                         found = True
@@ -399,7 +417,8 @@ class XplManager(XplPlugin, MQAsyncSub):
                         with self._db.session_scope():
                             fdata = self._find_storeparam(item)
                             if fdata:
-                                self._log.debug(u"Found a matching sensor, so starting the storage procedure")
+                                #// ICI !!!
+                                self._log.debug(u"Found a matching sensor, so starting the storage procedure. Sensor : {0}".format(fdata))
                                 for data in fdata[1]:
                                     value = data['value']
                                     storeparam = data['param']
