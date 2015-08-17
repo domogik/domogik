@@ -72,7 +72,7 @@ def scenario_edit(id):
             dis = scen.disabled
             name = scen.name
             desc = scen.description
-            jso.replace('\n', '').replace('\r', '')
+            jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'")
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
@@ -191,7 +191,6 @@ def scenario_blocks_js():
     js = ""
 
     ### tests
-    print("SCE_TEST = {0}".format(scenario_tests))
     for test, params in scenario_tests.iteritems():
         if test == "sensor.SensorTest": continue
         p = []
@@ -210,7 +209,6 @@ def scenario_blocks_js():
                 jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
                 the_list = parv["values"]  # [[...], [...]]
                 papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
-                print(papp)
             p.append(papp)
         add = u"""Blockly.Blocks['{0}'] = {{
                     init: function() {{
@@ -354,7 +352,6 @@ def scenario_blocks_js():
                 if "values" in datatypes[param_dt_type]:
                     list_options = datatypes[param_dt_type]['values']
                 if list_options != None:
-                    print("OPTIONS : {0}".format(list_options))
                     js_list_options = u"["
                     for opt in list_options:
                         js_list_options += u"['{0}', '{1}'],".format(list_options[opt], opt)
@@ -366,7 +363,6 @@ def scenario_blocks_js():
                     param_format = u""
                     if 'format' in datatypes[param_dt_type]:
                         param_format = datatypes[param_dt_type]['format']
-                        print("PF={0}".format(param_format))
                         if param_format == None:
                             param_format = u""
                         else:
@@ -400,7 +396,6 @@ def scenario_blocks_js():
             js = u'{0}\n\r{1}'.format(js, add)
 
     #### datatypes
-    print("USED DT={0}".format(used_datatypes))
     for dt_type in used_datatypes:
         dt_parent = dt_type
         # First, determine the parent type (DT_Number, DT_Bool, ...)
