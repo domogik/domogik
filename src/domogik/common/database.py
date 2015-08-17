@@ -903,6 +903,13 @@ class DbHelper():
                 ### only store stats if the value is different
                 # if duplicate == 1 we allow duplicate values
                 # else we skip if the new value has the same value as the last one in database
+                #
+                # TODO : maybe we could improve this part and do the following :
+                # if not duplicate
+                #     if new_value == last_value == before_last_value:
+                #         insert new_value
+                #         delete last_value
+                # so we would keep only the first and the last value of the N same values 
                 if (sensor.history_duplicate == 1) or (sensor.history_duplicate == 0 and str(sensor.last_value) != str(value)):
                     # handle history_round
                     # reduce device stats
