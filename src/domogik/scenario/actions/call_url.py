@@ -30,9 +30,11 @@ import traceback
 try:
     # python3
     from urllib.request import urlopen
+    from urllib.parse import quote, urlparse
 except ImportError:
     # python2
-    from urllib import urlopen
+    from urllib import urlopen, quote
+    from urlparse import parse_qs, urlparse
 
 
 class CallUrlAction(AbstractAction):
@@ -44,12 +46,31 @@ class CallUrlAction(AbstractAction):
         self.set_description("Call an url.")
 
     def do_action(self):
-        self._log.info("Calling url : {0}".format(self._params['url']))
+        self._log.info(u"Calling url : {0}".format(self._params['url']))
         try:
-            html = urlopen(self._params['url'])
-            self._log.info("Call url OK")
+            # TODO : encore only the args!
+            #        so, first, split url and then process it
+            #        p3 porting : http://docs.pythonsprints.com/python3_porting/py-porting.html
+
+            # encode url
+            url = self._params['url']
+            url = self._params['url'].encode('utf-8')
+            url_elts = urlparse(url)
+            url_args = url_elts.query.split("&")
+            new_url_args = u""
+            for arg in url_args:
+                key, value = arg.split("=")
+                new_url_args += u"{0}={1}&".format(quote(key), quote(value))
+            new_url = u"{0}://{1}{2}?{3}".format(url_elts.scheme,
+                                               url_elts.netloc,
+                                               url_elts.path,
+                                               new_url_args)
+            # call url
+            self._log.debug(u"Calling url (transformed) : {0}".format(new_url))
+            html = urlopen(new_url)
+            self._log.info(u"Call url OK")
         except:
-            self._log.warning("Error when calling url from action.CallUrlAction : {0}".format(traceback.format_exc()))
+            self._log.warning(u"Error when calling url from action.CallUrlAction : {0}".format(traceback.format_exc()))
            
     def get_expected_entries(self):
         return {'url': {'type': 'string',
