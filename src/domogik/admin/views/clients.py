@@ -706,7 +706,7 @@ def get_brain_content(client_id):
     # do a post processing on content to add html inside
     for client_id in detail:
         # we skip the learn file
-        if client_id == "learn":
+        if client_id in ["learn", "not_understood"]:
             continue
 
         for lang in detail[client_id]:
@@ -806,5 +806,17 @@ def core_butler_learned(client_id):
             brain = brain,
             mactive="clients",
             active = 'learn'
+            )
+
+@app.route('/core/<client_id>/butler_not_understood')
+@login_required
+def core_butler_not_understood(client_id):
+    brain = get_brain_content("not_understood")
+    return render_template('core_butler_not_understood.html',
+            loop = {'index': 1},
+            clientid = client_id,
+            brain = brain,
+            mactive="clients",
+            active = 'not_understood'
             )
 

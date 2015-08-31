@@ -62,7 +62,8 @@ def get_packages_directory():
 
 
 
-LEARN_FILE = os.path.join(get_packages_directory(), "learn.rive")
+LEARN_FILE = os.path.join(get_packages_directory(), "butler_learn.rive")
+STAR_FILE = os.path.join(get_packages_directory(), "butler_unknown_queries.log")
 
 
 def get_sensor_value(dt_type, device_name, sensor_reference = None):
@@ -227,10 +228,8 @@ def learn(rs_code):
                   + ping
                   - pong
     """
-    #print(rs_code)
     with open(LEARN_FILE, "a") as file:
         file.write(rs_code) 
-#    reload_brain()
 
 def trigger_bool_command(dt_type, device, value):
     try:
@@ -270,3 +269,12 @@ def trigger_bool_command(dt_type, device, value):
     except:
         print("ERROR : {0}".format(traceback.format_exc()))
         return None
+
+
+def process_star(query):
+    """ function to process the '*' pattern :
+        - store input query in a dedicated log file
+        - ...
+    """
+    with open(STAR_FILE, "a") as file:
+        file.write(query) 
