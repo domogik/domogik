@@ -39,6 +39,7 @@ class PauseAction(AbstractAction):
 
     def do_action(self):
         self._log.info("Do a pause of {0} seconds".format(self._params['delay']))
+        time.sleep(int(self._params['delay']))
 
     def get_expected_entries(self):
         return {'delay': {'type': 'integer',
