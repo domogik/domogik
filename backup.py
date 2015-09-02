@@ -99,7 +99,7 @@ def backup_config(folder):
 def backup_learn_file(folder):
     files = [{ 'src' : '/var/lib/domogik/domogik_packages/butler_learn.rive',
                'dst' : 'domogik-butler-learn-file.tgz'},
-             { 'src' : '/var/lib/domogik/domogik_packages/butler_unknown_queries.rive',
+             { 'src' : '/var/lib/domogik/domogik_packages/butler_not_understood_queries.log',
                'dst' : 'domogik-butler-unknown_queries-file.tgz'}]
     for fic in files:
         src = fic['src']
