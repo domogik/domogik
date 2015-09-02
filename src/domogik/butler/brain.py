@@ -43,6 +43,9 @@ import zmq
 import traceback
 import json
 import os
+import re
+import unicodedata
+from random import randint
 
 ### Brain preferences
 # This file is included in the package domogik-brain-datatype
@@ -63,7 +66,40 @@ def get_packages_directory():
 
 
 LEARN_FILE = os.path.join(get_packages_directory(), "butler_learn.rive")
-STAR_FILE = os.path.join(get_packages_directory(), "butler_unknown_queries.log")
+STAR_FILE = os.path.join(get_packages_directory(), "butler_not_understood_queries.log")
+
+
+def clean_input(data):
+    """ Remove some characters, accents, ...
+    """
+    if isinstance(data, str):
+        data = unicode(data, 'utf-8')
+
+    # put all in lower case
+    data = data.lower()
+
+    # remove blanks on startup and end
+    data = data.strip()
+
+    if len(data) == 0:
+        return ""
+
+    # remove last character if needed
+    if data[-1] in ['.', '!', '?']:
+        data = data[:-1]
+
+    # remove non standard caracters
+    data = data.replace(",", " ")
+    data = data.replace("'", " ")
+    data = data.replace("?", " ")
+    data = data.replace("!", " ")
+
+    # remove accents
+    data = unicodedata.normalize('NFD', data).encode('ascii', 'ignore')
+
+    # remove duplicate spaces
+    data = ' '.join(data.split())
+    return data
 
 
 def get_sensor_value(dt_type, device_name, sensor_reference = None):
@@ -77,7 +113,7 @@ def get_sensor_value(dt_type, device_name, sensor_reference = None):
     """
     if isinstance(device_name, list):
         device_name = ' '.join(device_name)
-    #print("Device name = {0}".format(device_name))
+    print("Device name = {0}".format(device_name))
     #print("Datatype = {0}".format(dt_type))
 
     ### search for all devices of the appropriate dt_type 
@@ -186,14 +222,12 @@ def filter_sensors_by_reference_and_device_name(candidates, reference, device_na
     """
     reference = reference.lower()
     if device_name != None:
-        device_name = device_name.lower()
+        device_name = clean_input(device_name)
     for a_sensor in candidates:
         try:
             if device_name == None and a_sensor["sensor_reference"].lower() == reference:
                 return a_sensor
-            #print(device_name)
-            #print(a_sensor["device_name"])
-            if device_name == a_sensor["device_name"].lower() and a_sensor["sensor_reference"].lower() == reference:
+            if device_name == clean_input(a_sensor["device_name"]) and a_sensor["sensor_reference"].lower() == reference:
                 return a_sensor
         except:
             print("ERROR : {0}".format(traceback.format_exc()))
@@ -204,12 +238,12 @@ def filter_sensors_by_reference_and_device_name(candidates, reference, device_na
 def filter_sensors_by_device_name(candidates, device_name):
     """ for each given sensor, check the most appropriate choice depending on device_name
     """
-    device_name = device_name.lower()
+    device_name = clean_input(device_name)
 
     # first, check if we got an exact match !
     for a_sensor in candidates:
         try:
-            if a_sensor["device_name"].lower() == device_name:
+            if clean_input(a_sensor["device_name"]) == device_name:
                 return a_sensor
         except:
             print("ERROR : {0}".format(traceback.format_exc()))
@@ -229,7 +263,7 @@ def learn(rs_code):
                   - pong
     """
     with open(LEARN_FILE, "a") as file:
-        file.write(rs_code) 
+        file.write(rs_code + "\n\n") 
 
 def trigger_bool_command(dt_type, device, value):
     try:
@@ -271,10 +305,70 @@ def trigger_bool_command(dt_type, device, value):
         return None
 
 
-def process_star(query):
+def process_star(not_understood_responses, suggest_intro, rs):
     """ function to process the '*' pattern :
         - store input query in a dedicated log file
-        - ...
+        - Try to see if we can suggest an alternate command to the user based on the suggestions list
+
+        @param not_understood_responses : i18n responses for no matching suggestions
+        @param suggest_intro : a start sentence (i18n) to suggest a match
+        @param rs : rivescript brain
     """
-    with open(STAR_FILE, "a") as file:
-        file.write(query) 
+    query = rs.query
+    suggests = rs.the_suggestions
+    ### see if some suggestion matches
+    found_suggest = False
+    for a_suggest in suggests:
+        for line in a_suggest.split('\n'):
+            if len(line) > 0:
+                if line[0] == "?":
+                    regexp = line[1:].strip()
+                elif line[0] == "@":
+                    shortcut = line
+                    shortcut_sample = shortcut[1:].strip()
+                else:
+                    pass
+        m = re.match(regexp, query)
+        if m != None:
+            query_with_star = query
+            #print("Suggest match for query : {0}".format(query))
+            #print("Regexp : '{0}', found : {1}".format(regexp, m.groups()))
+            for idx in range(0, len(m.groups())):
+                #print(idx)
+                #print(m.groups()[idx])
+                pattern = "<star{0}>".format(idx+1)
+                #print(pattern)
+                shortcut_sample = shortcut_sample.replace(pattern, m.groups()[idx])
+                query_with_star = query_with_star.replace(m.groups()[idx], "*")
+            found_suggest = True
+            rs.last_suggestion_matched = {"regexp" : regexp,
+                                          "query" : query,
+                                          "query_with_star" : query_with_star,
+                                          "shortcut" : shortcut,
+                                          "shortcut_sample" : shortcut_sample}
+            return u"{0} {1}".format(suggest_intro, shortcut_sample)
+
+    ### log not understood queries
+    if found_suggest == False:
+        with open(STAR_FILE, "a") as file:
+            file.write(query) 
+        return not_understood_responses[randint(0, len(not_understood_responses)-1)]
+
+
+def learn_from_suggestion(rs):
+    """ function called by rivescript if 'process_star' found a matching suggest and the user accepts it
+        @param rs : rivescript brain
+    """
+    #print(rs.last_suggestion_matched)
+    ls = rs.last_suggestion_matched
+    rs_code = u""
+    rs_code += u"// learned from suggestions\n"
+    rs_code += u"// Query : {0}\n".format(ls['query'])
+    rs_code += u"// Regexp : {0}\n".format(ls['regexp'])
+    rs_code += u"// Shortcut : {0}\n".format(ls['shortcut'])
+    rs_code += u"// Shortcut sample: {0}\n".format(ls['shortcut_sample'])
+    rs_code += u"+ {0}\n".format(ls['query_with_star'])
+    rs_code += u"{0}\n".format(ls['shortcut'])
+    print(rs_code)
+    learn(rs_code)
+    rs.reload_butler()
