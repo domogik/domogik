@@ -308,13 +308,13 @@ def scenario_blocks_js():
                         init: function() {{
                             this.setColour({5});
                             this.appendDummyInput().appendField("{2}");
-                            this.appendDummyInput().appendField("Sensor : {1}");
+                            this.appendDummyInput().appendField("Sensor : {1} ({6})");
                             this.setOutput(true, {4});
                             this.setInputsInline(false);
                             this.setTooltip("{2}"); 
                         }}
                     }};
-                    """.format(block_id, sen_name, block_description, jso, output, color)
+                    """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
             js = u'{0}\n\r{1}'.format(js, add)
 
         ### commands blocks
