@@ -773,6 +773,8 @@ def client_doc_static(client_id, path):
     pkg = client_id.split(".")[0].replace("-", "_")
     root_path = os.path.join(get_packages_directory(), pkg)
     root_path = os.path.join(root_path, "_build_doc/html/")
+    if not os.path.isfile(os.path.join(root_path, path)):
+        return render_template('client_no_doc.html')
     return send_from_directory(root_path, path)
 
 @app.route('/brain/reload')
