@@ -38,9 +38,10 @@ Implements
 from domogik import __version__ as DMG_VERSION
 from domogik.common import logger
 from domogik.common.configloader import Loader
-from domogik.common.plugin import PACKAGES_DIR
+from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR
 from domogik.common.packagejson import PackageJson, PackageException
 from argparse import ArgumentParser
+from subprocess import Popen, PIPE
 import re
 import os
 import sys
@@ -110,6 +111,7 @@ class PackageInstaller():
         config = cfg.load()
         conf = dict(config[1])
         self.pkg_path = os.path.join(conf['libraries_path'], PACKAGES_DIR)
+        self.resources_path = os.path.join(conf['libraries_path'], RESOURCES_DIR)
 
         # install a package
         if self.options.install:
@@ -198,8 +200,11 @@ class PackageInstaller():
         except: 
             self.log.error("Error while creating the symbolic link to install the package : {0}".format(traceback.format_exc()))
             return
-        self.log.info("Package installed!")
+
+        self.log.info("Generate the docummentation...")
+        self.build_doc(os.path.join(symlink_full, "docs"))
         
+        self.log.info("Package installed!")
 
     def install_zip_file(self, path, hash, upgrade):
         """ Install the zip file
@@ -311,6 +316,9 @@ class PackageInstaller():
                 return
 
 
+        self.log.info("Generate the docummentation...")
+        self.build_doc(os.path.join(pkg_folder, "docs"))
+        
         self.log.info("Package installed!")
 
 
@@ -383,6 +391,11 @@ class PackageInstaller():
             - the package is a symlink : just delete it
             - the package is a folder : ask before deleting it
         """
+        # do some input checks
+        if package in [".", ".."]:
+            self.log.error("Bad package name : you should use the package name. Example : dmg_package -r plugin_diskfree")
+            return
+
         pkg_folder = os.path.join(self.pkg_path, package)
 
         # check if the package is a symlink
@@ -519,6 +532,20 @@ class PackageInstaller():
             zf.close()
         except:
             self.log.error("Error while creating the backup : {0}".format(traceback.format_exc()))
+
+    def build_doc(self, doc_path):
+        """ Build the doc with sphinx to access it from the admin
+            The doc will be built in ../build_doc related to the package doc folder
+        """
+        conf_py = os.path.join(self.resources_path, "sphinx/")
+        build_doc_dir = "../_build_doc"
+        makefile = os.path.join(self.resources_path, "sphinx/Makefile")
+        # -e if used to use environments vars
+        cmd = "cd {0} && export BUILDDIR={1} && export SPHINXOPTS='-c {2}' && make -e -f {3} html".format(doc_path, os.path.join(doc_path, build_doc_dir), conf_py, makefile)
+        print(cmd)
+        subp = Popen(cmd, 
+                     shell=True)
+        subp.communicate()
 
 
 def main():

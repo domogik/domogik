@@ -1,5 +1,5 @@
 from domogik.admin.application import app, render_template
-from flask import request, flash, redirect
+from flask import request, flash, redirect, send_from_directory
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 try:
@@ -750,6 +750,26 @@ def client_brain(client_id):
             active = 'brain'
             )
 
+
+@app.route('/client/<client_id>/doc')
+@login_required
+def client_doc(client_id):
+    detail = get_client_detail(client_id)
+
+    return render_template('client_doc.html',
+            loop = {'index': 1},
+            clientid = client_id,
+            client_detail = detail,
+            mactive="clients",
+            active = 'doc'
+            )
+
+
+@app.route('/client/<client_id>/doc_static/<path:path>')
+@login_required
+def client_doc_static(client_id, path):
+    print(path)
+    return send_from_directory("/var/lib/domogik//domogik_packages/plugin_teleinfo/_build_doc/html/", path)
 
 @app.route('/brain/reload')
 @login_required

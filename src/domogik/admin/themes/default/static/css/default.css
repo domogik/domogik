@@ -349,3 +349,11 @@ h5 {
 input {
     max-width: 100%;
 }
+
+
+/*** iframe (for doc) ***/
+
+iframe {
+    border: none;
+    width: 100%;
+}

@@ -1,0 +1,19 @@
+{% extends theme("base/base.html") %}
+{% import theme("base/wtf.html") as wtf %}
+
+{% block content %}
+{% include theme("client_menu.html") %}
+<div class="container">
+  <h1>Documentation</h1>
+  <iframe id="doc_iframe" src="/client/{{ clientid }}/doc_static/index.html" onLoad="calcHeight()">
+  </iframe>
+</div>
+
+<script type="text/javascript">
+    function calcHeight() {
+        var theHeight = document.getElementById('doc_iframe').contentWindow.document.body.scrollHeight;
+        document.getElementById('doc_iframe').height = theHeight;
+    }
+</script>
+{% endblock %}
+

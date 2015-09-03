@@ -81,6 +81,13 @@
               <a href="/{{ client_detail.type }}_{{ client_detail.name}}/{{ clientid }}">{% trans %}Advanced{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
 
+            {% if client_detail.type != "core" %}
+            <li {% if active == "doc" %} class="active" {% endif %} >
+              <a href="/client/{{ clientid }}/doc">{% trans %}Documentation{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+            {% endif %}
+
+
           </ul>
         </div>
       </div>

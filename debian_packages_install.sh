@@ -51,6 +51,7 @@ sudo apt-get install $pkg_list
 pip_list="Flask-Login \
           Flask-Babel \
           Flask-Bootstrap \
+          sphinx-better-theme \
          "
 
 for elt in $pip_list
