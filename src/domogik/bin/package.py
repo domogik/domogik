@@ -100,6 +100,11 @@ class PackageInstaller():
                           "--remove", 
                           dest="uninstall", 
                           help="Remove (uninstall) a package. Example : plugin_rfxcom")
+        parser.add_argument("-d", 
+                          "--refresh-docs", 
+                          dest="refresh_docs", 
+                          action = "store_true",
+                          help="Refresh all packages documentations (usefull when you use the git sources")
         parser.add_argument("-H", 
                           "--hash", 
                           dest="hash", 
@@ -130,6 +135,10 @@ class PackageInstaller():
                 self.install(self.options.upgrade, hash = self.options.hash, upgrade = True)
             else:
                 self.install(self.options.upgrade, hash = None, upgrade = True)
+
+        # refresh the docs
+        elif self.options.refresh_docs:
+            self.refresh_docs()
 
         # no choice : display the list of installed packages
         else:
@@ -546,6 +555,24 @@ class PackageInstaller():
         subp = Popen(cmd, 
                      shell=True)
         subp.communicate()
+
+
+    def refresh_docs(self):
+        """ Rebuild the doc for all installeded packages
+        """
+        packages = os.listdir(self.pkg_path)
+        for a_package in packages:
+            # this is a directory
+            path = os.path.join(self.pkg_path, a_package)
+            if os.path.isdir(path):
+                try:
+                    self.log.info("Package {0} ".format(a_package))
+                    self.build_doc(os.path.join(path, "docs/"))
+                    self.log.info("\n\n")
+    
+                except:
+                    self.log.error("ERROR : {0}".format(traceback.format_exc()))
+    
 
 
 def main():
