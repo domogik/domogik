@@ -1,7 +1,9 @@
+from domogik.common.utils import get_packages_directory
 from domogik.admin.application import app, render_template
 from flask import request, flash, redirect, send_from_directory
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
+import os
 try:
     from flask_wtf import Form
 except ImportError:
@@ -768,8 +770,10 @@ def client_doc(client_id):
 @app.route('/client/<client_id>/doc_static/<path:path>')
 @login_required
 def client_doc_static(client_id, path):
-    print(path)
-    return send_from_directory("/var/lib/domogik//domogik_packages/plugin_teleinfo/_build_doc/html/", path)
+    pkg = client_id.split(".")[0].replace("-", "_")
+    root_path = os.path.join(get_packages_directory(), pkg)
+    root_path = os.path.join(root_path, "_build_doc/html/")
+    return send_from_directory(root_path, path)
 
 @app.route('/brain/reload')
 @login_required
