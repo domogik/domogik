@@ -55,7 +55,7 @@ Here are the needed dependencies. depanding on your Linux distribution, they wil
 * various needed libraries : **python-mako, libffi-dev**
 * git : **git**
 * MySQL server : **mysql-server**
-* Sphinx theme : **sphinx-better-theme**
+* Sphinx and Sphinx theme : **python-sphinx, sphinx-better-theme**
 
 .. note::
     * Even if you plan to use mysql database instead of postgresql, the *python-psycopg2* package is needed by the *alembic* library.
