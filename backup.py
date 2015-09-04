@@ -97,8 +97,10 @@ def backup_config(folder):
         os.system(cmd)
 
 def backup_learn_file(folder):
-    files = [{ 'src' : '/var/lib/domogik/domogik_packages/learn.rive',
-               'dst' : 'domogik-learn-file.tgz'}]
+    files = [{ 'src' : '/var/lib/domogik/domogik_packages/butler_learn.rive',
+               'dst' : 'domogik-butler-learn-file.tgz'},
+             { 'src' : '/var/lib/domogik/domogik_packages/butler_not_understood_queries.log',
+               'dst' : 'domogik-butler-unknown_queries-file.tgz'}]
     for fic in files:
         src = fic['src']
         dst = fic['dst']

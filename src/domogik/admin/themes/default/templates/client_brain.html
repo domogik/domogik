@@ -4,37 +4,41 @@
 {% block content %}
 {% include theme("client_menu.html") %}
 <div class="container">
-    <h2>{% trans %}What is the brain ?{% endtrans %}</h2>
-    <!-- help -->
-    <div class="alert alert-info" role="alert">
-      <p>
-        {% trans %}The butler brain uses Rivescript to describe the way you can interact with the butler. Each brain package contains one (or several) rivescript files and each contains a part of the butler brain. The more brain packages you will install, the more things the butler will be able to do!{% endtrans %}
-      </p>
-      <p>
-        {% trans %}Below, you will see the file(s) for your language which are contained in this package. By reading them you will be able to guess how to interact with your butler. If you have any doubt, you may read the Rivescript help.{% endtrans %}
-      </p>
-
-      <p><a class="btn btn-info" href="http://www.rivescript.com/docs/tutorial" alt="{% trans %}Rivescript help{% endtrans %}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {% trans %}Rivescript help{% endtrans %}</a></p>
-    </div>
-    <!-- summrary -->
-    <h2>{% trans %}Files{% endtrans %}</h2>
-    <ul>
-    {% for a_lang in brain[clientid] %}
-      {% for a_file in brain[clientid][a_lang] %}
-        <li>
-          <a href="#{{ a_file }}_{{ a_lang }}">{{ a_file }} ({{ a_lang }})</a>
-        </li>
+    {% if brain[clientid]|length == 0 %}
+      <div class="alert alert-info">{% trans %}There is no brain part for this package.{% endtrans %}</div>
+    {% else %}
+      <h2>{% trans %}What is the brain ?{% endtrans %}</h2>
+      <!-- help -->
+      <div class="alert alert-info" role="alert">
+        <p>
+          {% trans %}The butler brain uses Rivescript to describe the way you can interact with the butler. Each brain package contains one (or several) rivescript files and each contains a part of the butler brain. The more brain packages you will install, the more things the butler will be able to do!{% endtrans %}
+        </p>
+        <p>
+          {% trans %}Below, you will see the file(s) for your language which are contained in this package. By reading them you will be able to guess how to interact with your butler. If you have any doubt, you may read the Rivescript help.{% endtrans %}
+        </p>
+  
+        <p><a class="btn btn-info" href="http://www.rivescript.com/docs/tutorial" alt="{% trans %}Rivescript help{% endtrans %}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {% trans %}Rivescript help{% endtrans %}</a></p>
+      </div>
+      <!-- summrary -->
+      <h2>{% trans %}Files{% endtrans %}</h2>
+      <ul>
+      {% for a_lang in brain[clientid] %}
+        {% for a_file in brain[clientid][a_lang] %}
+          <li>
+            <a href="#{{ a_file }}_{{ a_lang }}">{{ a_file }} ({{ a_lang }})</a>
+          </li>
+        {% endfor %}
       {% endfor %}
-    {% endfor %}
-    </ul>
-
-    <!-- content -->
-    {% for a_lang in brain[clientid] %}
-      {% for a_file in brain[clientid][a_lang] %}
-        <h3 id="{{ a_file }}_{{ a_lang }}">{{ a_file }} <small>{{ a_lang }}</small></h3>
-        <pre class="brain_code"><code>{{ brain[clientid][a_lang][a_file]|safe }}</code></pre>
+      </ul>
+  
+      <!-- content -->
+      {% for a_lang in brain[clientid] %}
+        {% for a_file in brain[clientid][a_lang] %}
+          <h3 id="{{ a_file }}_{{ a_lang }}">{{ a_file }} <small>{{ a_lang }}</small></h3>
+          <pre class="brain_code"><code>{{ brain[clientid][a_lang][a_file]|safe }}</code></pre>
+        {% endfor %}
       {% endfor %}
-    {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}
 

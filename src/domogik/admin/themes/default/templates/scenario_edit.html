@@ -4,11 +4,7 @@
 {% block content %}
 <div class="container">
   <h1>{% trans %}Scenario {% endtrans %}</h1>
-  <!-- <form method="post" role="form" class="navbar-form navbar-left"> -->
   <form id="scenario_form" method="post" role="form" class="form-horizontal">
-  <!--
-  <nav id="scenario_navbar" class="navbar navbar-default">
-  -->
     <div class="form-inline">
     {{ form.csrf_token }}
     {{ form.sid }}
@@ -24,9 +20,6 @@
     </a>
     </div>
     </div>
-  <!--
-  </nav>
-  -->
   <div class="form-group">
     <label class="control-label col-xs-3">{{ form.sdis.label }}</label>
     <div class="col-xs-9">
@@ -43,6 +36,10 @@
   </div>
   </form>
 
+
+  <div class="alert alert-info" role="alert">
+    In the current release, you are limited to one action per scenario. This will be improved in a next release.
+  </div>
 
   <!-- <pre>{{ jso }}</pre> -->
   <div id="blocklyArea"></div>

@@ -8,6 +8,10 @@ Using python objects
 .. todo::
     Explain when and how creating a lib, how to use it (PYTHONPATH from command line), etc
 
+
+.. todo::
+    Explain why [de ] and not [de] because of space : [de] * => de main instead of demain for demain
+
 Features
 ========
 

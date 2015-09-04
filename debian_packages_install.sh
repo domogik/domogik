@@ -42,20 +42,22 @@ pkg_list="\
          python-zmq \
          python-gluon \
          python-babel \
+         python-sphinx \
          libusb-1.0-0-dev \
          "
 
-sudo apt-get update
-sudo apt-get install $pkg_list
+apt-get update
+apt-get install $pkg_list
 
 pip_list="Flask-Login \
           Flask-Babel \
           Flask-Bootstrap \
+          sphinx-better-theme \
          "
 
 for elt in $pip_list
   do
-    sudo pip install $elt
+    pip install $elt
 done
 
 

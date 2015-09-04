@@ -107,3 +107,13 @@ Here is an example for the plugin diskfree : ::
     {% endblock %}
 
 You are free to put anything you want/need in the **container** div. But you need to keep all the others lines as given.
+
+Use Domogik Message Queue (MQ)
+==============================
+
+If you need to use the MQ from your admin page, you can by using WebSockets in Javascript : a gateway is available in the admin.
+
+
+.. todo::
+    Examples
+

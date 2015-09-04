@@ -81,6 +81,9 @@ def build_file_list(user):
         ('/var/lib/domogik/resources', [user, None], []),
         ('/var/lib/domogik/resources', [user, None], \
                 ['src/domogik/common/datatypes.json']),
+        ('/var/lib/domogik/resources/sphinx', [user, None], \
+                ['docs/Makefile',
+                 'docs/conf-packages.py']),
         ('/var/lock/domogik', [user, 0755], []),
         ('/var/log/domogik', [user, 0755], []),
         ('/var/log/xplhub', [user, None], []),
@@ -149,6 +152,9 @@ def copy_files(user):
                     os.system('chown {0} {1}'.format(perm[0], dfname))
                 #if perm[1] != None:
                 #    os.system('chmod {0} {1}'.format(perm[1], dfname))
+
+        # rename files
+        os.rename('/var/lib/domogik/resources/sphinx/conf-packages.py', '/var/lib/domogik/resources/sphinx/conf.py')
     except:
         raise
 

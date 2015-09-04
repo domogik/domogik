@@ -43,6 +43,8 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import Plugin
 from domogik.butler.rivescript import RiveScript
 from domogik.butler.brain import LEARN_FILE
+from domogik.butler.brain import STAR_FILE
+from domogik.butler.brain import clean_input
 #from domogikmq.reqrep.worker import MQRep
 from domogikmq.message import MQMessage
 from domogikmq.pubsub.subscriber import MQAsyncSub
@@ -52,18 +54,18 @@ import os
 import sys
 from subprocess import Popen, PIPE
 import time
-import unicodedata
 import re
 import sys
 
 
 
-BRAIN_PKG_TYPE = "brain"
+BRAIN_PKG_TYPES = ["brain", "plugin"]
 MINIMAL_BRAIN = "{0}/../butler/brain_minimal.rive".format(os.path.dirname(os.path.abspath(__file__)))
 RIVESCRIPT_DIR = "rs"
 RIVESCRIPT_EXTENSION = ".rive"
 
 FEATURE_TAG = "##feature##"
+SUGGEST_REGEXP = r'\/\* *##suggest##.*\n([\S\s]*?)\*\/'
 
 SEX_MALE = "male"
 SEX_FEMALE = "female"
@@ -144,6 +146,7 @@ class Butler(Plugin, MQAsyncSub):
         # load the brain
         self.brain_content = None
         self.learn_content = None
+        self.not_understood_content = None
         self.load_all_brain()
 
         # shortcut to allow the core brain package to reload the brain for learning
@@ -210,9 +213,13 @@ class Butler(Plugin, MQAsyncSub):
 
         # TODO : handle choice of the client in the req message
 
+        # load not understood queries data
+        self.read_not_understood_file()
+
         msg = MQMessage()
         msg.set_action('butler.scripts.result')
         msg.add_data("learn", self.learn_content)
+        msg.add_data("not_understood", self.not_understood_content)
         for client_id in self.brain_content:
             msg.add_data(client_id, self.brain_content[client_id])
         self.reply(msg.get())
@@ -275,17 +282,26 @@ class Butler(Plugin, MQAsyncSub):
 
     def load_brain_parts(self):
         """ Load the parts of the brain from /var/lib/domogik/domogik_packages/brain_*
+            and also plugin_* because some plugins may need dedicated brain parts :
+            - weather forecast
+            - anything less generic than a datatype basic usage
         """
         try:
             list = []
             # first load the packages parts
             for a_file in os.listdir(self.get_packages_directory()):
-                if a_file[0:len(BRAIN_PKG_TYPE)] == BRAIN_PKG_TYPE:
-                    self.log.info(u"Brain part found : {0}".format(a_file))
-                    client_id = "{0}-{1}.{2}".format(BRAIN_PKG_TYPE, a_file.split("_")[1], self.get_sanitized_hostname())
+                try:
+                    pkg_type, name = a_file.split("_")
+                except ValueError:
+                    # not a foo_bar file : skip it
+                    continue
+                #if a_file[0:len(BRAIN_PKG_TYPE)] == BRAIN_PKG_TYPE:
+                if pkg_type in BRAIN_PKG_TYPES:
+                    client_id = "{0}-{1}.{2}".format(pkg_type, a_file.split("_")[1], self.get_sanitized_hostname())
                     self.brain_content[client_id] = {}
                     rs_dir = os.path.join(self.get_packages_directory(), a_file, RIVESCRIPT_DIR)
                     if os.path.isdir(rs_dir):
+                        self.log.info(u"Brain part found : {0}".format(a_file))
                         #self.log.debug(u"The brain part contains a rivescript folder ({0})".format(RIVESCRIPT_DIR))
                         lang_dir = os.path.join(rs_dir, self.lang)
                         if os.path.isdir(lang_dir):
@@ -330,32 +346,43 @@ class Butler(Plugin, MQAsyncSub):
             
                               
             # to finish, find all the tagged features
-            self.get_brain_features()
+            # and all the tagged suggestions
+            self.get_brain_features_and_suggestions()
 
-            # and add them to the rivescript engine...
         except:
             msg = "Error accessing packages directory : {0}. You should create it".format(str(traceback.format_exc()))
             self.log.error(msg)
 
-    def get_brain_features(self):
-        """ Extract brain features from the rivescript files :
+    def get_brain_features_and_suggestions(self):
+        """ Extract brain features and suggestions  from the rivescript files :
             // ##feature## a feature
             + feature trigger
             - feature response
+
+            /* ##suggest##
+            ? ...
+            @ ...
+            */
         """
         self.butler_features = []
+        self.butler_suggestions = []
         try:
-            self.log.info(u"Extract tagged features (##feature##) from the rivescript files")
+            self.log.info(u"Extract tagged features (##feature##) and suggestions (##suggest##) from the rivescript files")
             for client in self.brain_content:
                 for lang in self.brain_content[client]:
                     for fic in self.brain_content[client][lang]:
+                        the_suggests = re.findall(SUGGEST_REGEXP, self.brain_content[client][lang][fic])
+                        if the_suggests != []:
+                            self.butler_suggestions.extend(the_suggests)
                         for line in self.brain_content[client][lang][fic].split("\n"):
                             if re.search(FEATURE_TAG, line):
                                 self.butler_features.append(line.split(FEATURE_TAG)[1])
             self.log.info(u"{0} feature(s) found".format(len(self.butler_features)))
+            self.log.info(u"{0} suggestion(s) found".format(len(self.butler_suggestions)))
 
-            # store in the Rivescript object the features to be able to grab them from the core brain package
+            # store in the Rivescript object the features and suggestions to be able to grab them from the core brain package
             self.brain.the_features = '.\n'.join(self.butler_features)
+            self.brain.the_suggestions = self.butler_suggestions
         except:
             self.log.error(u"Error while extracting the features : {0}".format(traceback.format_exc()))
                  
@@ -367,25 +394,12 @@ class Butler(Plugin, MQAsyncSub):
         """
         try:
             self.log.debug(u"Before transforming query : {0}".format(query))
-            if isinstance(query, str):
-                query = unicode(query, 'utf-8')
+            self.brain.raw_query = query
 
-            # put all in lower case
-            query = query.lower()
-
-            # remove non standard caracters
-            query = query.replace(",", " ")
-            query = query.replace("'", " ")
-            query = query.replace("?", " ")
-            query = query.replace("!", " ")
-
-            # remove accents
-            query = unicodedata.normalize('NFD', query).encode('ascii', 'ignore')
-
-            # remove duplicate spaces
-            query = ' '.join(query.split())
+            query = clean_input(query)
 
             self.log.debug(u"After transforming query : {0}".format(query))
+            self.brain.query = query
 
             # process the query
             self.log.debug(u"Before calling Rivescript brain for processing : {0} (type={1})".format(query, type(query)))
@@ -485,7 +499,24 @@ class Butler(Plugin, MQAsyncSub):
             #pid = subp.pid
             #subp.communicate()
 
+    def read_not_understood_file(self):
+        """ Get the content of the non understood queries file
+        """
+        if os.path.isfile(STAR_FILE):
+            self.log.info(u"Not understood queries file found : {0}".format(STAR_FILE))
 
+            try:
+                import codecs
+                file = codecs.open(STAR_FILE, 'r', 'utf-8')
+                file_content = file.read()
+                file_header = "// File : {0}".format(STAR_FILE)
+                self.not_understood_content = u"{0}\n\n{1}".format(file_header, file_content)
+            except:
+                self.not_understood_content = u"Error while reading file '{0}'. Error is : {1}".format(STAR_FILE, traceback.format_exc())
+                self.log.error(self.not_understood_content)
+        else:
+            self.not_understood_content = u""
+            self.log.info(u"Not understood queries file NOT found : {0}. This is not an error. Your butler is just awesome (or unused) ;)".format(STAR_FILE))
 
 if __name__ == "__main__":
     Butler()

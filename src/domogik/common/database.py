@@ -524,8 +524,8 @@ class DbHelper():
 
     def add_full_device(self, params, client_data):
         try:
-            print params
-            print json
+            #print params
+            #print json
             created_xpl_stats = {}
             created_xpl_cmd = {}
             created_sensors = {}
@@ -571,10 +571,15 @@ class DbHelper():
                 self.__session.add(sensor)
                 self.__session.flush()
                 created_sensors[a_sensor] = sensor.id
+                #print("CLIENT_DATA={0}".format(client_data))
+                #print("PARAMS={0}".format(params))
                 for a_stat in client_data['xpl_stats']:
                     stat = client_data['xpl_stats'][a_stat]
                     for param in stat['parameters']['dynamic']:
-                        if param['sensor'] == a_sensor:
+                        #print("A_STAT={0}".format(a_stat))
+                        #print("PARAM={0}".format(param))
+                        #print("A_SENSOR={0}".format(a_sensor))
+                        if param['sensor'] == a_sensor and a_stat in params['xpl_stats']:
                             stats_list.append(a_stat)
             
     
@@ -657,7 +662,7 @@ class DbHelper():
                     if p['xpl']:
                         for p2 in params['xpl']:
                             if p2['key'] == p['key']:
-                                print("P={0}   / P2={0}".format(p, p2))
+                                #print("P={0}   / P2={0}".format(p, p2))
                                 par = XplStatParam(xplstat_id = stat.id , \
                                           sensor_id = None, \
                                           key = p['key'], \
@@ -723,7 +728,7 @@ class DbHelper():
             self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
             for p2 in params['xpl_stats'][a_xplstat]:
                 if p2['key'] == a_parameter['key']:
-                    print p2
+                    #print p2
                     if 'multiple' in p2:
                         mul = p2['multiple']
                     else:
@@ -895,8 +900,17 @@ class DbHelper():
                         newval = value
                         self.log.error("Failed to apply formula ({0}) to sensor ({1}): {2}".format(sensor.formula, sensor, exp))
                     value = newval
-                # only store stats if the value is different
-                if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
+                ### only store stats if the value is different
+                # if duplicate == 1 we allow duplicate values
+                # else we skip if the new value has the same value as the last one in database
+                #
+                # TODO : maybe we could improve this part and do the following :
+                # if not duplicate
+                #     if new_value == last_value == before_last_value:
+                #         insert new_value
+                #         delete last_value
+                # so we would keep only the first and the last value of the N same values 
+                if (sensor.history_duplicate == 1) or (sensor.history_duplicate == 0 and str(sensor.last_value) != str(value)):
                     # handle history_round
                     # reduce device stats
                     if sensor.history_round > 0:

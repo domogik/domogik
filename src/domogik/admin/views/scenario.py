@@ -72,7 +72,7 @@ def scenario_edit(id):
             dis = scen.disabled
             name = scen.name
             desc = scen.description
-            jso.replace('\n', '').replace('\r', '')
+            jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'")
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
@@ -191,7 +191,6 @@ def scenario_blocks_js():
     js = ""
 
     ### tests
-    print("SCE_TEST = {0}".format(scenario_tests))
     for test, params in scenario_tests.iteritems():
         if test == "sensor.SensorTest": continue
         p = []
@@ -210,7 +209,6 @@ def scenario_blocks_js():
                 jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
                 the_list = parv["values"]  # [[...], [...]]
                 papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
-                print(papp)
             p.append(papp)
         add = u"""Blockly.Blocks['{0}'] = {{
                     init: function() {{
@@ -219,7 +217,7 @@ def scenario_blocks_js():
                         {1}
                         this.setOutput(true);
                         this.setInputsInline(false);
-                        this.setTooltip('{2}'); 
+                        this.setTooltip("{2}"); 
                         this.contextMenu = false;
                     }}
                 }};
@@ -247,6 +245,11 @@ def scenario_blocks_js():
             else:
                 papp = u"{0};".format(papp)
             p.append(papp)
+
+        ### TODO : reactivate setNextStatement to true !
+        # for now, it is set to false as we are not yet able to do 2 actions without an edition bug
+        # so we deactivated it :(
+
         add = u"""Blockly.Blocks['{0}'] = {{
                 init: function() {{
                     this.setHelpUrl('');
@@ -254,8 +257,9 @@ def scenario_blocks_js():
                     this.appendDummyInput().appendField("{2}");
                     {1}
                     this.setPreviousStatement(true, "null");
-                    this.setNextStatement(true, "null");
-                    this.setTooltip('{2}');
+                    // this.setNextStatement(true, "null");
+                    this.setNextStatement(false, "null");
+                    this.setTooltip("{2}");
                     this.setInputsInline(false);
                 }}
             }};
@@ -304,13 +308,13 @@ def scenario_blocks_js():
                         init: function() {{
                             this.setColour({5});
                             this.appendDummyInput().appendField("{2}");
-                            this.appendDummyInput().appendField('Sensor : {1}');
+                            this.appendDummyInput().appendField("Sensor : {1} ({6})");
                             this.setOutput(true, {4});
                             this.setInputsInline(false);
-                            this.setTooltip('{2}'); 
+                            this.setTooltip("{2}"); 
                         }}
                     }};
-                    """.format(block_id, sen_name, block_description, jso, output, color)
+                    """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
             js = u'{0}\n\r{1}'.format(js, add)
 
         ### commands blocks
@@ -348,7 +352,6 @@ def scenario_blocks_js():
                 if "values" in datatypes[param_dt_type]:
                     list_options = datatypes[param_dt_type]['values']
                 if list_options != None:
-                    print("OPTIONS : {0}".format(list_options))
                     js_list_options = u"["
                     for opt in list_options:
                         js_list_options += u"['{0}', '{1}'],".format(list_options[opt], opt)
@@ -360,7 +363,6 @@ def scenario_blocks_js():
                     param_format = u""
                     if 'format' in datatypes[param_dt_type]:
                         param_format = datatypes[param_dt_type]['format']
-                        print("PF={0}".format(param_format))
                         if param_format == None:
                             param_format = u""
                         else:
@@ -371,24 +373,29 @@ def scenario_blocks_js():
                                 """.format(param_key, param_format)
             block_id = u"command.CommandAction.{0}".format(cmd_id)
             block_description = u"{0}@{1}".format(name, client)
+
+            ### TODO : reactivate setNextStatement to true !
+            # for now, it is set to false as we are not yet able to do 2 actions without an edition bug
+            # so we deactivated it :(
+
             add = u"""Blockly.Blocks['{0}'] = {{
                         init: function() {{
                             this.setColour({5});
                             this.appendDummyInput().appendField("{2}");
-                            this.appendDummyInput().appendField('Command : {1}');
-                            this.appendDummyInput().appendField('Parameters : ');
+                            this.appendDummyInput().appendField("Command : {1}");
+                            this.appendDummyInput().appendField("Parameters : ");
                             {6}
                             this.setPreviousStatement(true, "null");
-                            this.setNextStatement(true, "null");
+                            // this.setNextStatement(true, "null");
+                            this.setNextStatement(false, "null");
                             this.setInputsInline(false);
-                            this.setTooltip('{2}'); 
+                            this.setTooltip("{2}"); 
                         }}
                     }};
                     """.format(block_id, cmd_name, block_description, jso, output, color, js_params)
             js = u'{0}\n\r{1}'.format(js, add)
 
     #### datatypes
-    print("USED DT={0}".format(used_datatypes))
     for dt_type in used_datatypes:
         dt_parent = dt_type
         # First, determine the parent type (DT_Number, DT_Bool, ...)
@@ -422,7 +429,7 @@ def scenario_blocks_js():
                         this.setColour({1});
                         this.appendDummyInput().appendField("{0}");
                         {3}
-                        this.setTooltip('{0}'); 
+                        this.setTooltip("{0}"); 
                         this.setOutput(true, {2});
                         this.setInputsInline(false);
                     }}

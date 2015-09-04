@@ -71,7 +71,7 @@
             </li>
             {% endif %}
 
-            {% if client_detail.type == "brain" %}
+            {% if client_detail.type == "plugin" or client_detail.type == "brain" %}
             <li {% if active == "brain" %} class="active" {% endif %} >
               <a href="/client/{{ clientid }}/brain">{% trans %}Brain details{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
@@ -80,6 +80,13 @@
             <li {% if active == "advanced" %} class="active" {% endif %} >
               <a href="/{{ client_detail.type }}_{{ client_detail.name}}/{{ clientid }}">{% trans %}Advanced{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
+
+            {% if client_detail.type != "core" %}
+            <li {% if active == "doc" %} class="active" {% endif %} >
+              <a href="/client/{{ clientid }}/doc">{% trans %}Documentation{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+            {% endif %}
+
 
           </ul>
         </div>

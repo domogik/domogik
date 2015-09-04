@@ -26,6 +26,9 @@
             <li {% if active == "learn" %} class="active" {% endif %} >
               <a href="/core/{{ clientid }}/butler_learn">{% trans %}Learned commands{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
+            <li {% if active == "not_understood" %} class="active" {% endif %} >
+              <a href="/core/{{ clientid }}/butler_not_understood">{% trans %}Not understood queries{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
           </ul>
         </div>
       </div>

@@ -353,24 +353,29 @@ class DBConnector(Plugin, MQRep):
         status = True
         reason = False
 
+        self.log.debug(u"Deleting device : {0}".format(data))
         try:
             did = data.get_data()['did']
             if did:
                 res = self._db.del_device(did)
+                #print(res)
                 if not res:
                     status = False
                 else:
                     status = True 
             else:
                 status = False
-                reason = "Device delete failed"
+                reason = "There is no such device"
+                self.log.debug(reason)
             # delete done
         except DbHelperException as d:
             status = False
             reason = "Error while deleting device: {0}".format(d.value)
+            self.log.error(reason)
         except:
             status = False
             reason = "Error while deleting device: {0}".format(traceback.format_exc())
+            self.log.error(reason)
         # send the result
         msg = MQMessage()
         msg.set_action('device.delete.result')
@@ -509,13 +514,18 @@ class DBConnector(Plugin, MQRep):
                         result['xpl_commands'][xcmdn].append(param)
             # find the xplStats
             sensors = pjson['device_types'][dev_type_id]['sensors']
+            #print("SENSORS = {0}".format(sensors))
             for xstatn in pjson['xpl_stats']:
+                #print("XSTATN = {0}".format(xstatn))
                 xstat = pjson['xpl_stats'][xstatn]
                 for sparam in xstat['parameters']['dynamic']:
-                    if 'sensor' in sparam:
+                    #print("XSTATN = {0}, SPARAM = {1}".format(xstatn, sparam))
+                    if 'sensor' in sparam and xstatn in sensors:
                         if sparam['sensor'] in sensors:
+                            #print("ADD") 
                             stats.append(xstatn)
             result['xpl_stats'] = {}
+            #print("STATS = {0}".format(stats))
             for xstatn in stats:
                 xstat = pjson['xpl_stats'][xstatn]
                 result['xpl_stats'][xstatn] = []

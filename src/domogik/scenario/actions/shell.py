@@ -26,23 +26,27 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.actions.abstract import AbstractAction
-import time
+import subprocess
 
 
-class PauseAction(AbstractAction):
-    """ Do a pause between 2 actions
+class ShellAction(AbstractAction):
+    """ Execute a shell script
     """
 
     def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log)
-        self.set_description("Do a pause.")
+        self.set_description("Execute a shell command.")
 
     def do_action(self):
-        self._log.info("Do a pause of {0} seconds".format(self._params['delay']))
-        time.sleep(int(self._params['delay']))
+        self._log.info("Execute the shell script {0}".format(self._params['shell_command']))
+        cmd = subprocess.Popen(self._params['shell_command'].split(), 
+                               shell = True,
+                               stdout = subprocess.PIPE)
+        stdout = cmd.communicate()[0]
+        self._log.debug("Output for shell command {0} : \n{1}".format(self._params['shell_command'], stdout))
 
     def get_expected_entries(self):
-        return {'delay': {'type': 'integer',
-                            'description': 'Delay in seconds',
-                            'default': '5'}
+        return {'shell_command': {'type': 'string',
+                            'description': 'Shell command',
+                            'default': 'echo "Hello world"'}
                }

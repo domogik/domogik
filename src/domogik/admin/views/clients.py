@@ -1,7 +1,9 @@
+from domogik.common.utils import get_packages_directory
 from domogik.admin.application import app, render_template
-from flask import request, flash, redirect
+from flask import request, flash, redirect, send_from_directory
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
+import os
 try:
     from flask_wtf import Form
 except ImportError:
@@ -695,14 +697,18 @@ def get_brain_content(client_id):
     if res is not None:
         data = res.get_data()
         detail = {}
-        detail[client_id] = data[client_id]
+        try:
+            detail[client_id] = data[client_id]
+        except KeyError:
+            # this can happen if you install a package and don't do a butler reload!
+            detail[client_id] = None
     else:
         detail = {}
 
     # do a post processing on content to add html inside
     for client_id in detail:
         # we skip the learn file
-        if client_id == "learn":
+        if client_id in ["learn", "not_understood"]:
             continue
 
         for lang in detail[client_id]:
@@ -746,6 +752,30 @@ def client_brain(client_id):
             active = 'brain'
             )
 
+
+@app.route('/client/<client_id>/doc')
+@login_required
+def client_doc(client_id):
+    detail = get_client_detail(client_id)
+
+    return render_template('client_doc.html',
+            loop = {'index': 1},
+            clientid = client_id,
+            client_detail = detail,
+            mactive="clients",
+            active = 'doc'
+            )
+
+
+@app.route('/client/<client_id>/doc_static/<path:path>')
+@login_required
+def client_doc_static(client_id, path):
+    pkg = client_id.split(".")[0].replace("-", "_")
+    root_path = os.path.join(get_packages_directory(), pkg)
+    root_path = os.path.join(root_path, "_build_doc/html/")
+    if not os.path.isfile(os.path.join(root_path, path)):
+        return render_template('client_no_doc.html')
+    return send_from_directory(root_path, path)
 
 @app.route('/brain/reload')
 @login_required
@@ -802,5 +832,17 @@ def core_butler_learned(client_id):
             brain = brain,
             mactive="clients",
             active = 'learn'
+            )
+
+@app.route('/core/<client_id>/butler_not_understood')
+@login_required
+def core_butler_not_understood(client_id):
+    brain = get_brain_content("not_understood")
+    return render_template('core_butler_not_understood.html',
+            loop = {'index': 1},
+            clientid = client_id,
+            brain = brain,
+            mactive="clients",
+            active = 'not_understood'
             )
 

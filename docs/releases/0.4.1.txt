@@ -8,6 +8,13 @@ Release 0.4.1
 New features 
 ============
 
+Scenarios
+---------
+
+You can now create some scenario with Domogik!
+There is still one limitation : we are restricted to one action per scenario. This issue is related to blockly, if you are familiar with this library, please contact us ;)
+
+
 Butler core component
 ---------------------
 
@@ -34,6 +41,11 @@ An interface package is a wa to communicate with the butler. It can be for examp
 * voice responses
 * irc 
 * etc
+
+Android application : Domogik butler
+------------------------------------
+
+The **Domogik butler** application will help you to interact with the butler from your Android devices.
 
 Database upgrade
 ----------------

@@ -12,6 +12,10 @@ body {
     margin-bottom: 1em;
 }
 
+h5 {
+    font-weight: bold;
+}
+
 
 /** login **/
 
@@ -344,4 +348,12 @@ body {
 
 input {
     max-width: 100%;
+}
+
+
+/*** iframe (for doc) ***/
+
+iframe {
+    border: none;
+    width: 100%;
 }

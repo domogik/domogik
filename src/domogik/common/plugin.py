@@ -434,8 +434,53 @@ class Plugin(BasePlugin, MQRep):
         # browse all devices to find if the device exists
         found = False
         for a_device in self.devices:
-            # TODO : set the id if the device exists!
-            pass
+            # filter on appropriate device_type
+            if a_device['device_type_id'] != data['device_type']:
+                continue
+
+            # handle "main" global parameters
+            # TODO ????
+
+            # handle xpl global parameters
+            if data['xpl'] != []:
+                for dev_feature in a_device['xpl_stats']:
+                    for dev_param in a_device['xpl_stats'][dev_feature]['parameters']['static']:
+                        #print(dev_param)
+                        for found_param in data['xpl']:
+                            if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
+                                found = True
+                                #print("FOUND")
+                                break
+                for dev_feature in a_device['xpl_commands']:
+                    for dev_param in a_device['xpl_commands'][dev_feature]['parameters']['static']:
+                        #print(dev_param)
+                        for found_param in data['xpl']:
+                            if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
+                                found = True
+                                #print("FOUND")
+                                break
+
+            # handle xpl specific parameters
+            if not found and data['xpl_stats'] != []:
+                for dev_feature in a_device['xpl_stats']:
+                    for dev_param in a_device['xpl_stats'][dev_feature]['parameters']['static']:
+                        #print(dev_param)
+                        for found_param in data['xpl_stats']:
+                            if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
+                                found = True
+                                #print("FOUND")
+                                break
+
+            if not found and data['xpl_commands'] != []:
+                for dev_feature in a_device['xpl_commands']:
+                    for dev_param in a_device['xpl_commands'][dev_feature]['parameters']['static']:
+                        #print(dev_param)
+                        for found_param in data['xpl_commands']:
+                            if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
+                                found = True
+                                #print("FOUND")
+                                break
+
 
         if found:
             self.log.debug(u"The device already exists : id={0}.".format(a_device['id']))

@@ -55,6 +55,7 @@ Here are the needed dependencies. depanding on your Linux distribution, they wil
 * various needed libraries : **python-mako, libffi-dev**
 * git : **git**
 * MySQL server : **mysql-server**
+* Sphinx and Sphinx theme : **python-sphinx, sphinx-better-theme**
 
 .. note::
     * Even if you plan to use mysql database instead of postgresql, the *python-psycopg2* package is needed by the *alembic* library.
@@ -225,6 +226,8 @@ And add at the end the below lines: ::
 
     # Domogik backup each night at 1:00
     0 1 * * * /opt/dmg/domogik/backup.py > /var/log/domogik/backup-$(date "+\%Y\%m\%d_\%H\%M").log 2>&1
+    # Domogik : regenerate packages documentation each hour
+    0 * * * * /opt/dmg/domogik/src/domogik/bin/package.py >> /var/log/domogik/refresh_docs_pkg-$(date "+\%Y\%m\%d").log 2>&1
 
 The default backup folder is **/var/lib/domogik/backup/**. You can change it in the file **/etc/domogik/domogik.cfg** in the section **[backup]**. Example: ::
 
