@@ -350,6 +350,7 @@ def process_star(not_understood_responses, suggest_intro, rs):
 
     ### log not understood queries
     if found_suggest == False:
+        query = u"{0}\n".format(query)
         with open(STAR_FILE, "a") as file:
             file.write(query) 
         return not_understood_responses[randint(0, len(not_understood_responses)-1)]
