@@ -3,7 +3,7 @@
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,16 @@
 
 /**
  * @fileoverview Utility methods.
- * These methods are not specific to Blockly, and could be factored out if
- * a JavaScript framework such as Closure were used.
+ * These methods are not specific to Blockly, and could be factored out into
+ * a JavaScript framework such as Closure.
  * @author fraser@google.com (Neil Fraser)
  */
 'use strict';
 
 goog.provide('Blockly.utils');
+
+goog.require('goog.events.BrowserFeature');
+goog.require('goog.userAgent');
 
 
 /**
@@ -72,6 +75,19 @@ Blockly.removeClass_ = function(element, className) {
 };
 
 /**
+ * Checks if an element has the specified CSS class.
+ * Similar to Closure's goog.dom.classes.has, except it handles SVG elements.
+ * @param {!Element} element DOM element to check.
+ * @param {string} className Name of class to check.
+ * @return {boolean} True if class exists, false otherwise.
+ * @private
+ */
+Blockly.hasClass_ = function(element, className) {
+  var classes = element.getAttribute('class');
+  return (' ' + classes + ' ').indexOf(' ' + className + ' ') != -1;
+};
+
+/**
  * Bind an event to a function call.
  * @param {!Node} node Node upon which to listen.
  * @param {string} name Event name to listen to (e.g. 'mousedown').
@@ -81,9 +97,13 @@ Blockly.removeClass_ = function(element, className) {
  * @private
  */
 Blockly.bindEvent_ = function(node, name, thisObject, func) {
-  var wrapFunc = function(e) {
-    func.apply(thisObject, arguments);
-  };
+  if (thisObject) {
+    var wrapFunc = function(e) {
+      func.call(thisObject, e);
+    };
+  } else {
+    var wrapFunc = func;
+  }
   node.addEventListener(name, wrapFunc, false);
   var bindData = [[node, name, wrapFunc]];
   // Add equivalent touch event.
@@ -96,13 +116,15 @@ Blockly.bindEvent_ = function(node, name, thisObject, func) {
         e.clientX = touchPoint.clientX;
         e.clientY = touchPoint.clientY;
       }
-      func.apply(thisObject, arguments);
-      // Stop the browser from scrolling/zooming the page
+      func.call(thisObject, e);
+      // Stop the browser from scrolling/zooming the page.
       e.preventDefault();
     };
-    node.addEventListener(Blockly.bindEvent_.TOUCH_MAP[name],
-                             wrapFunc, false);
-    bindData.push([node, Blockly.bindEvent_.TOUCH_MAP[name], wrapFunc]);
+    for (var i = 0, eventName;
+         eventName = Blockly.bindEvent_.TOUCH_MAP[name][i]; i++) {
+      node.addEventListener(eventName, wrapFunc, false);
+      bindData.push([node, eventName, wrapFunc]);
+    }
   }
   return bindData;
 };
@@ -113,11 +135,11 @@ Blockly.bindEvent_ = function(node, name, thisObject, func) {
  * @type {Object}
  */
 Blockly.bindEvent_.TOUCH_MAP = {};
-if ('ontouchstart' in document.documentElement) {
+if (goog.events.BrowserFeature.TOUCH_ENABLED) {
   Blockly.bindEvent_.TOUCH_MAP = {
-    'mousedown': 'touchstart',
-    'mousemove': 'touchmove',
-    'mouseup': 'touchend'
+    'mousedown': ['touchstart'],
+    'mousemove': ['touchmove'],
+    'mouseup': ['touchend', 'touchcancel']
   };
 }
 
@@ -145,15 +167,23 @@ Blockly.unbindEvent_ = function(bindData) {
  * @param {string} eventName Name of event (e.g. 'click').
  */
 Blockly.fireUiEventNow = function(node, eventName) {
-  var doc = document;
-  if (doc.createEvent) {
+  // Remove the event from the anti-duplicate database.
+  var list = Blockly.fireUiEvent.DB_[eventName];
+  if (list) {
+    var i = list.indexOf(node);
+    if (i != -1) {
+      list.splice(i, 1);
+    }
+  }
+  // Fire the event in a browser-compatible way.
+  if (document.createEvent) {
     // W3
-    var evt = doc.createEvent('UIEvents');
+    var evt = document.createEvent('UIEvents');
     evt.initEvent(eventName, true, true);  // event type, bubbling, cancelable
     node.dispatchEvent(evt);
-  } else if (doc.createEventObject) {
+  } else if (document.createEventObject) {
     // MSIE
-    var evt = doc.createEventObject();
+    var evt = document.createEventObject();
     node.fireEvent('on' + eventName, evt);
   } else {
     throw 'FireEvent: No event creation mechanism.';
@@ -161,16 +191,35 @@ Blockly.fireUiEventNow = function(node, eventName) {
 };
 
 /**
- * Fire a synthetic event asynchronously.
+ * Fire a synthetic event asynchronously.  Groups of simultaneous events (e.g.
+ * a tree of blocks being deleted) are merged into one event.
  * @param {!EventTarget} node The event's target node.
  * @param {string} eventName Name of event (e.g. 'click').
  */
 Blockly.fireUiEvent = function(node, eventName) {
+  var list = Blockly.fireUiEvent.DB_[eventName];
+  if (list) {
+    if (list.indexOf(node) != -1) {
+      // This event is already scheduled to fire.
+      return;
+    }
+    list.push(node);
+  } else {
+    Blockly.fireUiEvent.DB_[eventName] = [node];
+  }
   var fire = function() {
     Blockly.fireUiEventNow(node, eventName);
-  }
+  };
   setTimeout(fire, 0);
 };
+
+/**
+ * Database of upcoming firing event types.
+ * Used to fire only one event after multiple changes.
+ * @type {!Object}
+ * @private
+ */
+Blockly.fireUiEvent.DB_ = {};
 
 /**
  * Don't do anything for this event, just halt propagation.
@@ -183,9 +232,23 @@ Blockly.noEvent = function(e) {
 };
 
 /**
+ * Is this event targeting a text input widget?
+ * @param {!Event} e An event.
+ * @return {boolean} True if text input.
+ * @private
+ */
+Blockly.isTargetInput_ = function(e) {
+  return e.target.type == 'textarea' || e.target.type == 'text' ||
+         e.target.type == 'number' || e.target.type == 'email' ||
+         e.target.type == 'password' || e.target.type == 'search' ||
+         e.target.type == 'tel' || e.target.type == 'url' ||
+         e.target.isContentEditable;
+};
+
+/**
  * Return the coordinates of the top-left corner of this element relative to
- * its parent.
- * @param {!Element} element Element to find the coordinates of.
+ * its parent.  Only for SVG elements and children (e.g. rect, g, path).
+ * @param {!Element} element SVG element to find the coordinates of.
  * @return {!Object} Object with .x and .y properties.
  * @private
  */
@@ -209,9 +272,9 @@ Blockly.getRelativeXY_ = function(element) {
   var r = transform &&
           transform.match(/translate\(\s*([-\d.]+)([ ,]\s*([-\d.]+)\s*\))?/);
   if (r) {
-    xy.x += parseInt(r[1], 10);
+    xy.x += parseFloat(r[1]);
     if (r[3]) {
-      xy.y += parseInt(r[3], 10);
+      xy.y += parseFloat(r[3]);
     }
   }
   return xy;
@@ -219,7 +282,7 @@ Blockly.getRelativeXY_ = function(element) {
 
 /**
  * Return the absolute coordinates of the top-left corner of this element.
- * The origin (0,0) is the top-left corner of the Blockly svg.
+ * The origin (0,0) is the top-left corner of the nearest SVG.
  * @param {!Element} element Element to find the coordinates of.
  * @return {!Object} Object with .x and .y properties.
  * @private
@@ -233,20 +296,8 @@ Blockly.getSvgXY_ = function(element) {
     x += xy.x;
     y += xy.y;
     element = element.parentNode;
-  } while (element && element != Blockly.svg);
+  } while (element && element.nodeName.toLowerCase() != 'svg');
   return {x: x, y: y};
-};
-
-/**
- * Return the absolute coordinates of the top-left corner of this element.
- * The origin (0,0) is the top-left corner of the page body.
- * @param {!Element} element Element to find the coordinates of.
- * @return {!Object} Object with .x and .y properties.
- * @private
- */
-Blockly.getAbsoluteXY_ = function(element) {
-  var xy = Blockly.getSvgXY_(element);
-  return Blockly.convertCoordinates(xy.x, xy.y, false);
 };
 
 /**
@@ -275,54 +326,53 @@ Blockly.createSvgElement = function(name, attrs, opt_parent) {
 };
 
 /**
+ * Deselect any selections on the webpage.
+ * Chrome will select text outside the SVG when double-clicking.
+ * Deselect this text, so that it doesn't mess up any subsequent drag.
+ */
+Blockly.removeAllRanges = function() {
+  if (getSelection()) {
+    setTimeout(function() {
+        try {
+          var selection = getSelection();
+          if (!selection.isCollapsed) {
+            selection.removeAllRanges();
+          }
+        } catch (e) {
+          // MSIE throws 'error 800a025e' here.
+        }
+      }, 0);
+  }
+};
+
+/**
  * Is this event a right-click?
  * @param {!Event} e Mouse event.
  * @return {boolean} True if right-click.
  */
 Blockly.isRightButton = function(e) {
-  // Control-clicking in WebKit on Mac OS X fails to change button to 2.
-  return e.button == 2 || e.ctrlKey;
-};
-
-/**
- * Convert between HTML coordinates and SVG coordinates.
- * @param {number} x X input coordinate.
- * @param {number} y Y input coordinate.
- * @param {boolean} toSvg True to convert to SVG coordinates.
- *     False to convert to mouse/HTML coordinates.
- * @return {!Object} Object with x and y properties in output coordinates.
- */
-Blockly.convertCoordinates = function(x, y, toSvg) {
-  if (toSvg) {
-    x -= window.scrollX || window.pageXOffset;
-    y -= window.scrollY || window.pageYOffset;
+  if (e.ctrlKey && goog.userAgent.MAC) {
+    // Control-clicking on Mac OS X is treated as a right-click.
+    // WebKit on Mac OS X fails to change button to 2 (but Gecko does).
+    return true;
   }
-  var svgPoint = Blockly.svg.createSVGPoint();
-  svgPoint.x = x;
-  svgPoint.y = y;
-  var matrix = Blockly.svg.getScreenCTM();
-  if (toSvg) {
-    matrix = matrix.inverse();
-  }
-  var xy = svgPoint.matrixTransform(matrix);
-  if (!toSvg) {
-    xy.x += window.scrollX || window.pageXOffset;
-    xy.y += window.scrollY || window.pageYOffset;
-  }
-  return xy;
+  return e.button == 2;
 };
 
 /**
  * Return the converted coordinates of the given mouse event.
  * The origin (0,0) is the top-left corner of the Blockly svg.
  * @param {!Event} e Mouse event.
+ * @param {!Element} svg SVG element.
  * @return {!Object} Object with .x and .y properties.
  */
-Blockly.mouseToSvg = function(e) {
-  var scrollX = window.scrollX || window.pageXOffset;
-  var scrollY = window.scrollY || window.pageYOffset;
-  return Blockly.convertCoordinates(e.clientX + scrollX,
-                                    e.clientY + scrollY, true);
+Blockly.mouseToSvg = function(e, svg) {
+  var svgPoint = svg.createSVGPoint();
+  svgPoint.x = e.clientX;
+  svgPoint.y = e.clientY;
+  var matrix = svg.getScreenCTM();
+  matrix = matrix.inverse();
+  return svgPoint.matrixTransform(matrix);
 };
 
 /**
@@ -345,7 +395,7 @@ Blockly.shortestStringLength = function(array) {
  * Given an array of strings, return the length of the common prefix.
  * Words may not be split.  Any space after a word is included in the length.
  * @param {!Array.<string>} array Array of strings.
- * @param {?number} opt_shortest Length of shortest string.
+ * @param {number=} opt_shortest Length of shortest string.
  * @return {number} Length of common prefix.
  */
 Blockly.commonWordPrefix = function(array, opt_shortest) {
@@ -380,7 +430,7 @@ Blockly.commonWordPrefix = function(array, opt_shortest) {
  * Given an array of strings, return the length of the common suffix.
  * Words may not be split.  Any space after a word is included in the length.
  * @param {!Array.<string>} array Array of strings.
- * @param {?number} opt_shortest Length of shortest string.
+ * @param {number=} opt_shortest Length of shortest string.
  * @return {number} Length of common suffix.
  */
 Blockly.commonWordSuffix = function(array, opt_shortest) {
@@ -418,4 +468,62 @@ Blockly.commonWordSuffix = function(array, opt_shortest) {
  */
 Blockly.isNumber = function(str) {
   return !!str.match(/^\s*-?\d+(\.\d+)?\s*$/);
+};
+
+/**
+ * Parse a string with any number of interpolation tokens (%1, %2, ...).
+ * '%' characters may be self-escaped (%%).
+ * @param {string} message Text containing interpolation tokens.
+ * @return {!Array.<string|number>} Array of strings and numbers.
+ */
+Blockly.tokenizeInterpolation = function(message) {
+  var tokens = [];
+  var chars = message.split('');
+  chars.push('');  // End marker.
+  // Parse the message with a finite state machine.
+  // 0 - Base case.
+  // 1 - % found.
+  // 2 - Digit found.
+  var state = 0;
+  var buffer = [];
+  var number = null;
+  for (var i = 0; i < chars.length; i++) {
+    var c = chars[i];
+    if (state == 0) {
+      if (c == '%') {
+        state = 1;  // Start escape.
+      } else {
+        buffer.push(c);  // Regular char.
+      }
+    } else if (state == 1) {
+      if (c == '%') {
+        buffer.push(c);  // Escaped %: %%
+        state = 0;
+      } else if ('0' <= c && c <= '9') {
+        state = 2;
+        number = c;
+        var text = buffer.join('');
+        if (text) {
+          tokens.push(text);
+        }
+        buffer.length = 0;
+      } else {
+        buffer.push('%', c);  // Not an escape: %a
+        state = 0;
+      }
+    } else if (state == 2) {
+      if ('0' <= c && c <= '9') {
+        number += c;  // Multi-digit number.
+      } else {
+        tokens.push(parseInt(number, 10));
+        i--;  // Parse this char again.
+        state = 0;
+      }
+    }
+  }
+  var text = buffer.join('');
+  if (text) {
+    tokens.push(text);
+  }
+  return tokens;
 };

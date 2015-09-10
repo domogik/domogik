@@ -49,7 +49,7 @@ class AbstractAction:
         - When Condition is evaluated to 'True', each action linked to it is called (do_action())
     """
 
-    def __init__(self, log=None):
+    def __init__(self, log=None, params=None):
         """ Create action's instance
         @param log : A logger instance
         @warn If you extend __init__, be sure that all parameters have a default value !
@@ -83,6 +83,9 @@ class AbstractAction:
         @param params : An extra Hash of parameters used by action, if we keep exemple inside `get_expected_entries`
         documentation, params could be {'mail': 'me@mybox.com'}
         """
+        # we need to remove type and id => its not needed here
+        del params['type']
+        del params['id']
         self._params = params
         pass
 

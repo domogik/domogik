@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <title>Blockly Demo: JS Interpreter</title>
-  <script type="text/javascript" src="acorn_interpreter.js"></script>
-  <script type="text/javascript" src="../../blockly_compressed.js"></script>
-  <script type="text/javascript" src="../../blocks_compressed.js"></script>
-  <script type="text/javascript" src="../../javascript_compressed.js"></script>
-  <script type="text/javascript" src="../../msg/js/en.js"></script>
+  <script src="acorn_interpreter.js"></script>
+  <script src="../../blockly_compressed.js"></script>
+  <script src="../../blocks_compressed.js"></script>
+  <script src="../../javascript_compressed.js"></script>
+  <script src="../../msg/js/en.js"></script>
   <style>
     body {
       background-color: #fff;
@@ -20,12 +20,12 @@
   </style>
 </head>
 <body>
-  <h1><a href="https://blockly.googlecode.com/">Blockly</a> &gt;
+  <h1><a href="https://developers.google.com/blockly/">Blockly</a> &gt;
     <a href="../index.html">Demos</a> &gt; JS Interpreter</h1>
 
   <p>This is a simple demo of executing code wth a sandboxed JavaScript interpreter.</p>
 
-  <p>&rarr; More info on <a href="https://code.google.com/p/blockly/wiki/JSInterpreter">JS Interpreter</a>...</p>
+  <p>&rarr; More info on <a href="https://developers.google.com/blockly/installation/js-interpreter">JS Interpreter</a>...</p>
 
   <p>
     <button onclick="parseCode()">Parse JavaScript</button>
@@ -71,9 +71,61 @@
     <category name="Functions" custom="PROCEDURE"></category>
   </xml>
 
+  <xml id="startBlocks" style="display: none">
+    <block type="variables_set" inline="true" x="20" y="20">
+      <field name="VAR">n</field>
+      <value name="VALUE">
+        <block type="math_number">
+          <field name="NUM">1</field>
+        </block>
+      </value>
+      <next>
+        <block type="controls_repeat_ext" inline="true">
+          <value name="TIMES">
+            <block type="math_number">
+              <field name="NUM">4</field>
+            </block>
+          </value>
+          <statement name="DO">
+            <block type="variables_set" inline="true">
+              <field name="VAR">n</field>
+              <value name="VALUE">
+                <block type="math_arithmetic" inline="true">
+                  <field name="OP">MULTIPLY</field>
+                  <value name="A">
+                    <block type="variables_get">
+                      <field name="VAR">n</field>
+                    </block>
+                  </value>
+                  <value name="B">
+                    <block type="math_number">
+                      <field name="NUM">2</field>
+                    </block>
+                  </value>
+                </block>
+              </value>
+            </block>
+          </statement>
+          <next>
+            <block type="text_print" inline="false">
+              <value name="TEXT">
+                <block type="variables_get">
+                  <field name="VAR">n</field>
+                </block>
+              </value>
+            </block>
+          </next>
+        </block>
+      </next>
+    </block>
+  </xml>
+
   <script>
-    Blockly.inject(document.getElementById('blocklyDiv'),
-        {path: '../../', toolbox: document.getElementById('toolbox')});
+    var workspace = Blockly.inject('blocklyDiv',
+        {media: '../../media/',
+         toolbox: document.getElementById('toolbox')});
+    Blockly.Xml.domToWorkspace(workspace,
+        document.getElementById('startBlocks'));
 
     var myInterpreter = null;
 
@@ -106,7 +158,7 @@
     var highlightPause = false;
 
     function highlightBlock(id) {
-      Blockly.mainWorkspace.highlightBlock(id);
+      workspace.highlightBlock(id);
       highlightPause = true;
     }
 
@@ -114,14 +166,14 @@
       // Generate JavaScript code and parse it.
       Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
       Blockly.JavaScript.addReservedWords('highlightBlock');
-      var code = Blockly.JavaScript.workspaceToCode();
+      var code = Blockly.JavaScript.workspaceToCode(workspace);
       myInterpreter = new Interpreter(code, initApi);
 
       alert('Ready to execute this code:\n\n' + code);
       document.getElementById('stepButton').disabled = '';
       highlightPause = false;
-      Blockly.mainWorkspace.traceOn(true);
-      Blockly.mainWorkspace.highlightBlock(null);
+      workspace.traceOn(true);
+      workspace.highlightBlock(null);
     }
 
     function stepCode() {

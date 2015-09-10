@@ -68,3 +68,14 @@ Create the release branch :
 
 In the newly created release branch, upgrade the install documentation with the final packages (tgz) from the GitHub for all needed components (domogik, domogik-mq)
 
+
+Prepare the next release
+========================
+
+Each improvment must be developed in a dieicated branch. For the example, let's call this branch **wip** (work in progress).
+
+When the **wip** branch is ready (development finished and tested, documentation, written), the branch can be mergerd in the **develop** branch to be included in the next stable release. Here are the steps to follow : 
+
+* in your **wip** branch, do a ``git merge develop`` to merge **develop** in **wip**. Then, do some tests in your **wip** branch to check if all is still ok. 
+* go on the **develop** branch : ``git checkout develop`` and do the merge from **wip** into **develop** : ``git merge wip``. Do again some tests to see if all is ok.
+* in the **develop** branch, go in the **docs/releases/** folder and create or fill the next release related file to tell what will be included in the release.

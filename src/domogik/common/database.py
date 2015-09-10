@@ -255,9 +255,10 @@ class DbHelper():
         """
         return self.__session.query(PluginConfig).all()
 
-    def list_plugin_config(self, pl_id, pl_hostname):
+    def list_plugin_config(self, pl_type, pl_id, pl_hostname):
         """Return all parameters of a plugin
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @return a list of PluginConfig objects
@@ -265,13 +266,15 @@ class DbHelper():
         """
         return self.__session.query(
                         PluginConfig
+                    ).filter_by(type=ucode(pl_type)
                     ).filter_by(id=ucode(pl_id)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).all()
 
-    def get_plugin_config(self, pl_id, pl_hostname, pl_key):
+    def get_plugin_config(self, pl_type, pl_id, pl_hostname, pl_key):
         """Return information about a plugin parameter
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key we want the value from
@@ -281,6 +284,7 @@ class DbHelper():
         try:
             ret = self.__session.query(
                         PluginConfig
+                    ).filter_by(type=ucode(pl_type)
                     ).filter_by(id=ucode(pl_id)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).filter_by(key=ucode(pl_key)
@@ -289,7 +293,7 @@ class DbHelper():
             self.log.debug(u"oups : {0}".format(traceback.format-exc()))
         return ret
 
-    def set_plugin_config(self, pl_id, pl_hostname, pl_key, pl_value):
+    def set_plugin_config(self, pl_type, pl_id, pl_hostname, pl_key, pl_value):
         """Add / update a plugin parameter
 
         @param pl_id : plugin id
@@ -303,11 +307,12 @@ class DbHelper():
         self.__session.expire_all()
         plugin_config = self.__session.query(
                                 PluginConfig
+                            ).filter_by(type=ucode(pl_type)
                             ).filter_by(id=ucode(pl_id)
                             ).filter_by(hostname=ucode(pl_hostname)
                             ).filter_by(key=ucode(pl_key)).first()
         if not plugin_config:
-            plugin_config = PluginConfig(id=pl_id, hostname=pl_hostname, key=pl_key, value=pl_value)
+            plugin_config = PluginConfig(type=pl_type, id=pl_id, hostname=pl_hostname, key=pl_key, value=pl_value)
         else:
             plugin_config.value = ucode(pl_value)
         self.__session.add(plugin_config)
@@ -317,9 +322,10 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return plugin_config
 
-    def del_plugin_config(self, pl_id, pl_hostname):
+    def del_plugin_config(self, pl_type, pl_id, pl_hostname):
         """Delete all parameters of a plugin config
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @return the deleted PluginConfig objects
@@ -329,6 +335,7 @@ class DbHelper():
         self.__session.expire_all()
         plugin_config_list = self.__session.query(
                                     PluginConfig
+                                ).filter_by(type=ucode(pl_type)
                                 ).filter_by(id=ucode(pl_id)
                                 ).filter_by(hostname=ucode(pl_hostname)).all()
         for plc in plugin_config_list:
@@ -339,9 +346,10 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : " % sql_exception, True)
         return plugin_config_list
 
-    def del_plugin_config_key(self, pl_id, pl_hostname, pl_key):
+    def del_plugin_config_key(self, pl_type, pl_id, pl_hostname, pl_key):
         """Delete a key of a plugin config
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key of the plugin config
@@ -352,6 +360,7 @@ class DbHelper():
         self.__session.expire_all()
         plugin_config = self.__session.query(
                                PluginConfig
+                           ).filter_by(type=ucode(pl_type)
                            ).filter_by(id=ucode(pl_id)
                            ).filter_by(hostname=ucode(pl_hostname)
                            ).filter_by(key=ucode(pl_key)).first()
@@ -515,8 +524,8 @@ class DbHelper():
 
     def add_full_device(self, params, client_data):
         try:
-            print params
-            print json
+            #print params
+            #print json
             created_xpl_stats = {}
             created_xpl_cmd = {}
             created_sensors = {}
@@ -562,10 +571,15 @@ class DbHelper():
                 self.__session.add(sensor)
                 self.__session.flush()
                 created_sensors[a_sensor] = sensor.id
+                #print("CLIENT_DATA={0}".format(client_data))
+                #print("PARAMS={0}".format(params))
                 for a_stat in client_data['xpl_stats']:
                     stat = client_data['xpl_stats'][a_stat]
                     for param in stat['parameters']['dynamic']:
-                        if param['sensor'] == a_sensor:
+                        #print("A_STAT={0}".format(a_stat))
+                        #print("PARAM={0}".format(param))
+                        #print("A_SENSOR={0}".format(a_sensor))
+                        if param['sensor'] == a_sensor and a_stat in params['xpl_stats']:
                             stats_list.append(a_stat)
             
     
@@ -648,7 +662,7 @@ class DbHelper():
                     if p['xpl']:
                         for p2 in params['xpl']:
                             if p2['key'] == p['key']:
-                                print("P={0}   / P2={0}".format(p, p2))
+                                #print("P={0}   / P2={0}".format(p, p2))
                                 par = XplStatParam(xplstat_id = stat.id , \
                                           sensor_id = None, \
                                           key = p['key'], \
@@ -714,7 +728,7 @@ class DbHelper():
             self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
             for p2 in params['xpl_stats'][a_xplstat]:
                 if p2['key'] == a_parameter['key']:
-                    print p2
+                    #print p2
                     if 'multiple' in p2:
                         mul = p2['multiple']
                     else:
@@ -846,8 +860,17 @@ class DbHelper():
                         newval = value
                         self.log.error("Failed to apply formula ({0}) to sensor ({1}): {2}".format(sensor.formula, sensor, exp))
                     value = newval
-                # only store stats if the value is different
-                if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
+                ### only store stats if the value is different
+                # if duplicate == 1 we allow duplicate values
+                # else we skip if the new value has the same value as the last one in database
+                #
+                # TODO : maybe we could improve this part and do the following :
+                # if not duplicate
+                #     if new_value == last_value == before_last_value:
+                #         insert new_value
+                #         delete last_value
+                # so we would keep only the first and the last value of the N same values 
+                if (sensor.history_duplicate == 1) or (sensor.history_duplicate == 0 and str(sensor.last_value) != str(value)):
                     # handle history_round
                     # reduce device stats
                     if sensor.history_round > 0:
@@ -1724,9 +1747,9 @@ class DbHelper():
     def get_scenario_by_name(self, s_name):
         return self.__session.query(Scenario).filter(Scenario.name==s_name).first()
 
-    def add_scenario(self, name, json, disabled):
+    def add_scenario(self, name, json, disabled, desc):
         self.__session.expire_all()
-        scenario = Scenario(name=name, json=json, disabled=disabled)
+        scenario = Scenario(name=name, json=json, disabled=disabled, description=desc)
         self.__session.add(scenario)
         try:
             self.__session.commit()
@@ -1734,7 +1757,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return scenario
 
-    def update_scenario(self, s_id, name=None, json=None, disabled=None):
+    def update_scenario(self, s_id, name=None, json=None, disabled=None, description=None):
         self.__session.expire_all()
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is None:
@@ -1745,6 +1768,8 @@ class DbHelper():
             scenario.json = ucode(json)
         if disabled is not None:
             scenario.disabled = disabled
+        if description is not None:
+            scenario.description = description
         self.__session.add(scenario)
         try:
             self.__session.commit()

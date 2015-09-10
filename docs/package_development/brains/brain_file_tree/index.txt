@@ -1,0 +1,27 @@
+===================
+The brain file tree
+===================
+
+The brain file tree will at least contains (assuming the brain name is *mybrain*):
+
+* **__init__.py** : an empty file needed by python
+* **info.json** : the json file which describe the brain and its features. This file must always be named like this!
+* **rs/<lang>/*.rive** : the rivescript files
+
+* **doc/** : the sphynx documentation in ReST format
+* **design/** : this folder will contain all graphical resources (icons, ...)
+
+  * **design/icon.png** : the brain icon (png, 96px * 96px). This file must always be named like this!
+
+Some other items may be added: 
+
+* **data** : if needed this folder can contain data needed by the brain or the brain may write data in it
+* **tests** : if the brain have some tests scripts, they must be here
+* **lib/** : the python libraries
+  
+  * **lib/__init__.py** : an empty file needed by python
+  * **lib/mybrain.py** : the python library part
+
+
+
+

@@ -32,15 +32,15 @@ class LogAction(AbstractAction):
     """ Simple action that log something in scenario logfile
     """
 
-    def __init__(self, log=None):
+    def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log)
-        self.set_description("Simply put some string in log file.")
+        self.set_description("Log a message in the scenario component logs.")
 
-    def do_action(self, condition, tests):
+    def do_action(self):
         self._log.info("{0}".format(self._params['message']))
 
     def get_expected_entries(self):
         return {'message': {'type': 'string',
-                            'description': 'some extra message to put in log',
+                            'description': 'Message',
                             'default': ''}
                }

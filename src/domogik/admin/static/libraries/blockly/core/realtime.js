@@ -3,7 +3,7 @@
  * Visual Blocks Editor
  *
  * Copyright 2014 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@
  * @fileoverview Common support code for Blockly apps using realtime
  * collaboration.
  * Note that to use this you must set up a project via the Google Developers
- * Console. Instructions on how to do that can be found in the Blockly wiki page
- * at https://code.google.com/p/blockly/wiki/RealtimeCollaboration
+ * Console. Instructions on how to do that can be found at
+ * https://developers.google.com/blockly/realtime-collaboration
  * Once you do that you can set the clientId in
  * Blockly.Realtime.rtclientOptions_
  * @author markf@google.com (Mark Friedman)
@@ -41,13 +41,6 @@ goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.style');
 goog.require('rtclient');
-
-/**
- * URL for progress indicator.
- * @type {string}
- * @private
- */
-Blockly.Realtime.PROGRESS_URL_ = 'media/progress.gif';
 
 /**
  * Is realtime collaboration enabled?
@@ -152,14 +145,14 @@ Blockly.Realtime.redoElementId_ = null;
  * @type {string}
  * @private
  */
-Blockly.Realtime.PROGRESS_URL_ = 'media/progress.gif';
+Blockly.Realtime.PROGRESS_URL_ = 'progress.gif';
 
 /**
  * URL of the anonymous user image.
  * @type {string}
  * @private
  */
-Blockly.Realtime.ANONYMOUS_URL_ = 'media/anon.jpeg';
+Blockly.Realtime.ANONYMOUS_URL_ = 'anon.jpeg';
 
 /**
  * This function is called the first time that the Realtime model is created
@@ -185,7 +178,7 @@ Blockly.Realtime.initializeModel_ = function(model) {
  * @param {!Blockly.Block} block The block to remove.
  */
 Blockly.Realtime.removeBlock = function(block) {
-  Blockly.Realtime.blocksMap_.delete(block.id.toString());
+  Blockly.Realtime.blocksMap_['delete'](block.id.toString());
 };
 
 /**
@@ -228,7 +221,7 @@ Blockly.Realtime.getBlockById = function(id) {
 };
 
 /**
- * Log the event for debugging purposses.
+ * Log the event for debugging purposes.
  * @param {gapi.drive.realtime.BaseModelEvent} evt The event that occurred.
  * @private
  */
@@ -270,9 +263,9 @@ Blockly.Realtime.onObjectChange_ = function(evt) {
             event.property == 'relativeY') {
           Blockly.Realtime.doWithinSync_(function() {
             if (!block.svg_) {
-              // If this is a move of a newly disconnected (i.e newly top
+              // If this is a move of a newly disconnected (i.e. newly top
               // level) block it will not have any svg (because it has been
-              // disposed of by it's parent), so we need to handle that here.
+              // disposed of by its parent), so we need to handle that here.
               Blockly.Realtime.placeBlockOnWorkspace_(block, false);
             }
             Blockly.Realtime.moveBlock_(block);
@@ -545,7 +538,7 @@ Blockly.Realtime.afterAuth_ = function() {
   // This is a workaround for the fact that the code in realtime-client-utils.js
   // doesn't deal with auth timeouts correctly.  So we explicitly reauthorize at
   // regular intervals.
-  window.setTimeout(
+  setTimeout(
       function() {
         Blockly.Realtime.realtimeLoader_.authorizer.authorize(
             Blockly.Realtime.afterAuth_);
@@ -722,7 +715,7 @@ Blockly.Realtime.startRealtime = function(uiInitialize, uiContainer, options) {
   Blockly.Realtime.enabled_ = true;
   // Note that we need to setup the UI for realtime authorization before
   // loading the realtime code (which, in turn, will handle initializing the
-  // rest of the Blockly UI.
+  // rest of the Blockly UI).
   var authDiv = Blockly.Realtime.addAuthUi_(uiContainer);
   Blockly.Realtime.initUi_ = function() {
     uiInitialize();
@@ -746,8 +739,8 @@ Blockly.Realtime.startRealtime = function(uiInitialize, uiContainer, options) {
  * @private
  */
 Blockly.Realtime.addAuthUi_ = function(uiContainer) {
-  // Add progess indicator to the UI container.
-  uiContainer.style.background = 'url(' + Blockly.pathToBlockly +
+  // Add progress indicator to the UI container.
+  uiContainer.style.background = 'url(' + Blockly.pathToMedia +
       Blockly.Realtime.PROGRESS_URL_ + ') no-repeat center center';
   // Setup authorization button
   var blocklyDivBounds = goog.style.getBounds(uiContainer);
@@ -792,7 +785,7 @@ Blockly.Realtime.updateCollabUi_ = function() {
   for (var i = 0; i < collaboratorsList.length; i++) {
     var collaborator = collaboratorsList[i];
     var imgSrc = collaborator.photoUrl ||
-        Blockly.pathToBlockly + Blockly.Realtime.ANONYMOUS_URL_;
+        Blockly.pathToMedia + Blockly.Realtime.ANONYMOUS_URL_;
     var img = goog.dom.createDom('img',
         {
           'src': imgSrc,
@@ -824,7 +817,7 @@ Blockly.Realtime.onCollaboratorLeft_ = function(event) {
 
 /**
  * Execute a command.  Generally, a command is the result of a user action
- * e.g., a click, drag or context menu selection.
+ * e.g. a click, drag or context menu selection.
  * @param {function()} cmdThunk A function representing the command execution.
  */
 Blockly.Realtime.doCommand = function(cmdThunk) {

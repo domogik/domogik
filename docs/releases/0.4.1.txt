@@ -1,0 +1,58 @@
+=============
+Release 0.4.1
+=============
+
+.. todo::
+    This release is actually in development. This page will be updated soon.
+
+New features 
+============
+
+Scenarios
+---------
+
+You can now create some scenario with Domogik!
+There is still one limitation : we are restricted to one action per scenario. This issue is related to blockly, if you are familiar with this library, please contact us ;)
+
+
+Butler core component
+---------------------
+
+The butler is your Domogik assistant. You can interact with it thanks to the **interface** packages. These packages can allow you to speak or listen to the butler, discuss with it over irc, ...
+
+The butler is not able to do anything without **brain** packages. You must at least install the following brain packages :
+
+* **core** : this one will add support for basic interactions.
+* **datatype** : this one will allow you to control Domogik by requesting for sensors valus or control your appliances.
+
+There are also other brain packages that can grab informations from internet.
+
+New package type : brain
+------------------------
+
+The brain packages are related to the **butler** component : each brain package will add some capabilities to the butler.
+
+New package type : interface
+----------------------------
+
+An interface package is a wa to communicate with the butler. It can be for example :
+
+* voice control
+* voice responses
+* irc 
+* etc
+
+Android application : Domogik butler
+------------------------------------
+
+The **Domogik butler** application will help you to interact with the butler from your Android devices.
+
+Database upgrade
+----------------
+
+The table for clients configuration have been upgraded. The upgrade will be automatically done during the installation.
+
+Packages dedicated admin pages
+------------------------------
+
+Now the packages can include some specific pages for Domogik administration. The content of these pages will be available rom the **Advanced** menu in a client page.

@@ -1,6 +1,6 @@
-====================
-Packages development
-====================
+===================
+Plugins development
+===================
 
 .. note::
     If you think something is not clear or is missing in this documentation, please send an email to our developpers mailing list : *domogik-developers@lists.labs.libre-entreprise.org* and explain us clearly what is not clear or what could be added.
@@ -25,7 +25,7 @@ Branches management
 * :doc:`The branches management is detailed in the workflow of a plugin development <workflow>`
 
 Plugin name
-==========
+===========
 
 Choose a name that describes the plugin as good as possible. Notice that a plugin can not use more than 8 characters and they should be all lower case. 
 This restriction is linked to xPL and is not a Domogik limitation.
@@ -101,6 +101,15 @@ After creating a start script (used only by the developpers), you will now creat
 
     * :doc:`Make the detected devices available in the user interface <python/detected_devices>`
     * ...
+
+Dedicated administration page
+=============================
+
+:doc:`See workflow, step 3 <workflow>`
+
+Some plugin may need some advanced configuration capabilities or some helpers feature that can be used from the administration interface. This is not mandatory.
+
+* :doc:`Add dedicated administration pages <admin/index>` 
 
 Icon
 ====

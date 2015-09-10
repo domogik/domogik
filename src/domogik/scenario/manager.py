@@ -44,6 +44,7 @@ import domogik.scenario.actions as s_a
 from domogik.common.database import DbHelper
 from domogik.scenario.scenario import ScenarioInstance
 from exceptions import KeyError
+import traceback
 
 
 class ScenarioManager:
@@ -115,7 +116,7 @@ class ScenarioManager:
         """
         with self._db.session_scope():
             for scenario in self._db.list_scenario():
-                self.create_scenario(scenario.name, scenario.json, scenario.id)
+                self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description)
 
     def shutdown(self):
         """ Callback to shut down all parameters
@@ -134,15 +135,28 @@ class ScenarioManager:
             parsed = self._conditions[name].get_parsed_condition()
             return {'name': name, 'data': parsed}
 
-    def delete_scenario(self, name, db_delete=True):
-        if name not in self._conditions:
-            self.log.info(u"Scenario {0} doesn't exist".format(name))
-            return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(name)}
-        else:
-            # TODO
-            self.log.info(u"Scenario {0} deleted".format(name))
+    def update_scenario(self, cid, name, json_input, dis, desc):
+        self.del_scenario(cid, False)
+        self.create_scenario(name, json_input, cid, dis, desc, True)
 
-    def create_scenario(self, name, json_input, cid=0):
+    def del_scenario(self, cid, doDB=True):
+        try:
+            if cid == '' or int(cid) not in self._instances.keys():
+                self.log.info(u"Scenario deletion : id '{0}' doesn't exist".format(cid))
+                return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
+            else:
+                self._instances[int(cid)]['instance'].destroy()
+                del(self._instances[int(cid)])
+                if doDB:
+                    with self._db.session_scope():
+                        self._db.del_scenario(cid)
+                self.log.info(u"Scenario {0} deleted".format(cid))
+        except:
+            msg = u"Error while deleting the scenario id='{0}'. Error is : {1}".format(cid, traceback.format_exc())
+            self.log.error(msg)
+            return {'status': 'ERROR', 'msg': msg}
+
+    def create_scenario(self, name, json_input, cid=0, dis=False, desc=None, update=False):
         """ Create a Scenario from the provided json.
         @param name : A name for the condition instance
         @param json_input : JSON representation of the condition
@@ -153,6 +167,7 @@ class ScenarioManager:
         @Return {'name': name} or raise exception
         """
         try:
+            self.log.info(u"Create or save scenario : name = '{1}', id = '{1}', json = '{2}'".format(name, cid, json_input))
             payload = json.loads(json_input)  # quick test to check if json is valid
         except Exception as e:
             self.log.error(u"Creation of a scenario failed, invallid json: {0}".format(json_input))
@@ -164,14 +179,23 @@ class ScenarioManager:
             msg = u"the json for the scenario does not contain condition or actions for scenario {0}".format(name)
             self.log.error(msg)
             return {'status': 'NOK', 'msg': msg}
+        # db storage
+        if int(cid) == 0:
+            with self._db.session_scope():
+                scen = self._db.add_scenario(name, json_input, dis, desc)
+                cid = scen.id
+        elif update:
+            with self._db.session_scope():
+                self._db.update_scenario(cid, name, json_input, dis, desc)
 
         # create the condition itself
-        scen = ScenarioInstance(self.log, cid, name, payload)
+        scen = ScenarioInstance(self.log, cid, name, payload, dis)
         self._instances[cid] = {'name': name, 'json': payload, 'instance': scen } 
         self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
-        
+        self._instances[cid]['instance'].eval_condition()
+     
         # return
-        return {'name': name}
+        return {'name': name, 'cid': cid}
 
     def eval_condition(self, name):
         """ Evaluate a condition calling eval_condition from Condition instance
@@ -232,21 +256,40 @@ class ScenarioManager:
         self.log.debug("ScenarioManager : list tests")
         res = {}
         tests = self.__return_list_of_classes(s_t)
+
         for name, cls in tests:
             self.log.debug("- {0}".format(name))
             inst = cls(log = self.log)
-            res[name] = []
+
+            params = []
             for p, i in inst.get_parameters().iteritems():
                 for param, info in i['expected'].iteritems():
-                    res[name].append({
+                    params.append({
                             "name": "{0}.{1}".format(p, param),
                             "description": info['description'],
                             "type": info['type'],
                             "values": info['values'],
                             "filters": info['filters'],
                         })
-            inst.destroy()
+
+            res[name] = {"parameters": params,
+                         "description": inst.get_description()}
         return res
+        #for name, cls in tests:
+        #    self.log.debug("- {0}".format(name))
+        #    inst = cls(log = self.log)
+        #    res[name] = []
+        #    for p, i in inst.get_parameters().iteritems():
+        #        for param, info in i['expected'].iteritems():
+        #            res[name].append({
+        #                    "name": "{0}.{1}".format(p, param),
+        #                    "description": info['description'],
+        #                    "type": info['type'],
+        #                    "values": info['values'],
+        #                    "filters": info['filters'],
+        #                })
+        #    inst.destroy()
+        #return res
 
     def list_conditions(self):
         """ Return the list of conditions as JSON

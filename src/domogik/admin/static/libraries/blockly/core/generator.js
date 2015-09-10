@@ -3,7 +3,7 @@
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ goog.require('Blockly.Block');
 Blockly.Generator = function(name) {
   this.name_ = name;
   this.RESERVED_WORDS_ = '';
+  this.FUNCTION_NAME_PLACEHOLDER_REGEXP_ =
+      new RegExp(this.FUNCTION_NAME_PLACEHOLDER_, 'g');
 };
 
 /**
@@ -49,7 +51,7 @@ Blockly.Generator.NAME_TYPE = 'generated_function';
  * Arbitrary code to inject into locations that risk causing infinite loops.
  * Any instances of '%1' will be replaced by the block ID that failed.
  * E.g. '  checkTimeout(%1);\n'
- * @type ?string
+ * @type {?string}
  */
 Blockly.Generator.prototype.INFINITE_LOOP_TRAP = null;
 
@@ -57,18 +59,24 @@ Blockly.Generator.prototype.INFINITE_LOOP_TRAP = null;
  * Arbitrary code to inject before every statement.
  * Any instances of '%1' will be replaced by the block ID of the statement.
  * E.g. 'highlight(%1);\n'
- * @type ?string
+ * @type {?string}
  */
 Blockly.Generator.prototype.STATEMENT_PREFIX = null;
 
 /**
  * Generate code for all blocks in the workspace to the specified language.
+ * @param {Blockly.Workspace} workspace Workspace to generate code from.
  * @return {string} Generated code.
  */
-Blockly.Generator.prototype.workspaceToCode = function() {
+Blockly.Generator.prototype.workspaceToCode = function(workspace) {
+  if (!workspace) {
+    // Backwards compatability from before there could be multiple workspaces.
+    console.warn('No workspace specified in workspaceToCode call.  Guessing.');
+    workspace = Blockly.getMainWorkspace();
+  }
   var code = [];
-  this.init();
-  var blocks = Blockly.mainWorkspace.getTopBlocks(true);
+  this.init(workspace);
+  var blocks = workspace.getTopBlocks(true);
   for (var x = 0, block; block = blocks[x]; x++) {
     var line = this.blockToCode(block);
     if (goog.isArray(line)) {
@@ -204,7 +212,8 @@ Blockly.Generator.prototype.valueToCode = function(block, name, order) {
     throw 'Expecting valid order from value block "' + targetBlock.type + '".';
   }
   if (code && order <= innerOrder) {
-    if (order == innerOrder || (order == 0 || order == 99)) {
+    if (order == innerOrder && (order == 0 || order == 99)) {
+      // Don't generate parens around NONE-NONE and ATOMIC-ATOMIC pairs.
       // 0 is the atomic order, 99 is the none order.  No parentheses needed.
       // In all known languages multiple such code blocks are not order
       // sensitive.  In fact in Python ('a' 'b') 'c' would fail.
@@ -278,10 +287,9 @@ Blockly.Generator.prototype.addReservedWords = function(words) {
  * Blockly.Generator.provideFunction_.  It must not be legal code that could
  * legitimately appear in a function definition (or comment), and it must
  * not confuse the regular expression parser.
+ * @private
  */
 Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_ = '{leCUI8hutHZI4480Dc}';
-Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_REGEXP_ =
-    new RegExp(Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_, 'g');
 
 /**
  * Define a function to be included in the generated code.

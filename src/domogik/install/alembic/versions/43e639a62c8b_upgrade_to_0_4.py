@@ -119,15 +119,15 @@ def upgrade():
     	sa.PrimaryKeyConstraint('xplcmd_id', 'key'),
     	mysql_engine='InnoDB'
     )
-    op.drop_constraint('core_device_ibfk_1', Device.__tablename__, type_='foreignkey')
-    op.drop_constraint('core_device_ibfk_2', Device.__tablename__, type_='foreignkey')
-    op.drop_constraint('core_device_type_ibfk_1', 'core_device_type', type_='foreignkey')
+    #op.drop_constraint('core_device_ibfk_1', Device.__tablename__, type_='foreignkey')
+    #op.drop_constraint('core_device_ibfk_2', Device.__tablename__, type_='foreignkey')
+    #op.drop_constraint('core_device_type_ibfk_1', 'core_device_type', type_='foreignkey')
     op.add_column(Device.__tablename__, sa.Column('client_id', sa.Unicode(length=80), nullable=False))
     op.drop_column(Device.__tablename__, u'device_usage_id')
     op.alter_column(Device.__tablename__, u'address',
                existing_type=mysql.VARCHAR(length=255),
                nullable=True)
-    op.alter_column(PluginConfig.__tablename__, u'`key`',
+    op.alter_column(PluginConfig.__tablename__, u'key',
                existing_type=sa.Unicode(length=30),
                type_=sa.Unicode(length=255))
     op.alter_column(PluginConfig.__tablename__, u'value',
