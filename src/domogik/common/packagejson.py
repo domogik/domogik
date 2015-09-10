@@ -82,15 +82,9 @@ class PackageJson():
                 config = cfg.load()
                 conf = dict(config[1])
 
-                if pkg_type == "plugin":
+                if pkg_type in ["plugin", "brain", "interface"]:
                     json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
                     icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
-                # TODO : reactivate later
-                #elif pkg_type == "external":
-                #    if conf.has_key('package_path'):
-                #        json_directory = "%s/domogik_packages/externals/" % (conf['package_path'])
-                #    else:
-                #        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
                 else:
                     raise PackageException("Type '%s' doesn't exists" % pkg_type)
                 #json_file = "%s/%s.json" % (json_directory, name)
@@ -130,12 +124,12 @@ class PackageJson():
 
             # common configuration items
             # to add only for a plugin with identity>xpl_clients_only not set to True !
-            if not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
+            if self.json["identity"]["type"] in ["plugin", "interface"] and not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
                 auto_startup = {
                                    "default": False,
-                                   "description": "Automatically start the plugin at Domogik startup",
+                                   "description": "Automatically start the client at Domogik startup",
                                    "key": "auto_startup",
-                                   "name" : "Start the plugin with Domogik",
+                                   "name" : "Start the client with Domogik",
                                    "required": True,
                                    "type": "boolean"
                                }

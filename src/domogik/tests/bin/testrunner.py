@@ -109,28 +109,12 @@ class TestRunner():
         # check tests folder
 	self.log.info("- path {0}".format(self.options.directory))
         if not self.check_dir():
-            return 
+            return
 
         # check and load the json file
         self.log.info("- json file {0}".format(self.json_file))
 	if not self.load_json():
 	    return
-
-        # run the test cases
-        self._run_testcases()
-
-        # Display a summary and manager return code
-        rc = 0
-        self.log.info("")
-        self.log.info("Tests summary :")
-        self.log.info("---------------")
-       
-        for res in self.results:
-            if self.results[res]['return_code'] == 0:
-                self.log.info("Test {0} : OK".format(res))
-            else:
-                self.log.info("Test {0} : ERROR".format(res))
-                rc = 1
 
     def check_dir(self):
         self.path = None
@@ -163,7 +147,8 @@ class TestRunner():
             return False
 
         self.log.info("List of the tests (keep in mind that tests which need hardware will be skipped) :")
-        for (test, config) in self.json.iteritems():
+        for test in sorted(self.json):
+            config = self.json[test]
             to_run = True
             if config['need_hardware']:
                 to_run = False
@@ -179,8 +164,9 @@ class TestRunner():
             self.log.info("{0} {1} : need hardware={2}, alter config or setup={3}, criticity={4}".format(indicator, test, config['need_hardware'], config['alter_configuration_or_setup'], config['criticity']))
         return True
 
-    def _run_testcases(self):
-        for (test, config) in self.testcases.items():
+    def run_testcases(self):
+        for test in sorted(self.testcases):
+            config = self.testcases[test]
             # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
             self.log.info("")
             self.log.info("---------------------------------------------------------------------------------------")
@@ -195,6 +181,18 @@ class TestRunner():
             # do a pause to be sure the previous test (and so plugin instance) has been killed
             self.log.debug("Do a 60s pause... (yeah, this is a lot but Travis CI is not so quick!!!)")
             time.sleep(60)
+        # Display a summary and manager return code
+        rc = 0
+        self.log.info("")
+        self.log.info("Tests summary :")
+        self.log.info("---------------")
+       
+        for res in self.results:
+            if self.results[res]['return_code'] == 0:
+                self.log.info("Test {0} : OK".format(res))
+            else:
+                self.log.info("Test {0} : ERROR".format(res))
+                rc = 1
 
     def get_result(self):
         """ Return 0 if all is ok
@@ -209,8 +207,13 @@ class TestRunner():
 
 
 def main():
-    testr = TestRunner()
-    cr = testr.get_result()
+    try:
+        testr = TestRunner()
+        testr.run_testcases()
+        cr = testr.get_result()
+    except Exception as exp:
+        print exp
+        cr = 1
     sys.exit(cr)
 
 if __name__ == "__main__":

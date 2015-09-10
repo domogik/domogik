@@ -42,6 +42,7 @@ from domogik.common import logger
 from domogik.common.configloader import Loader
 from domogik.common.utils import get_ip_for_interfaces
 from domogikmq.pubsub.subscriber import MQAsyncSub
+from domogikmq.pubsub.publisher import MQPub
 from domogikmq.message import MQMessage
 from domogikmq.reqrep.client import MQSyncReq
 from domogik.admin.application import app as admin_app
@@ -53,29 +54,58 @@ import time
 import json
 import datetime
 import random
+import uuid
+from threading import Thread, Lock
 zmq.eventloop.ioloop.install()
 from tornado.wsgi import WSGIContainer
 from tornado.ioloop import IOLoop, PeriodicCallback 
 from tornado.httpserver import HTTPServer
 from tornado.web import FallbackHandler, Application
-from tornado.websocket import WebSocketHandler
+from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 ################################################################################
+
+### web sockets cleanup
+# this is used to list all webscokets
+# example : [{'open': True, 'ws': <domogik.bin.admin.AdminWebSocket object at 0x7f9568f09bd0>}, {'open': True, 'ws': <domogik.bin.admin.AdminWebSocket object at 0x7f9568f17710>}]
+# a timer will check for ws with open == False and destroy them
+#
+# this is needed as the MQASyncSub uses also the on_message function and a socket, so the object is not destroyed as usual :(
+class WSList():
+    def __init__(self):
+        self.web_sockets = []
+    
+    def add(self, data):
+        self.web_sockets.append(data)
+
+    def list(self):
+        return self.web_sockets
+
+    def delete(self, id):
+        for ws in self.web_sockets:
+            if ws['id'] == id:
+                self.web_sockets.remove(ws)
+
+ws_list = WSList()
+
 class AdminWebSocket(WebSocketHandler, MQAsyncSub):
-    clients = set()
+    #clients = set()
 
     def __init__(self, application, request, **kwargs):
         WebSocketHandler.__init__(self, application, request, **kwargs)
         self.io_loop = IOLoop.instance()
+        self.pub = MQPub(zmq.Context(), 'admin')
 
     def open(self):
+        self.id = uuid.uuid4()
         MQAsyncSub.__init__(self, zmq.Context(), 'admin', [])
         # Ping to make sure the agent is alive.
         self.io_loop.add_timeout(datetime.timedelta(seconds=random.randint(5,30)), self.send_ping)
-        AdminWebSocket.clients.add(self)
+        global ws_list
+        ws_list.add({"id" : self.id, "ws" : self, "open" : True})
 
     def on_connection_timeout(self):
-        self.on_close()
+        self.close()
 
     def send_ping(self):
         try:
@@ -91,26 +121,41 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub):
             self.io_loop.add_timeout(datetime.timedelta(seconds=5), self.send_ping)
 
     def on_close(self):
-        AdminWebSocket.clients.remove(self)
+        global ws_list
+        ws_list.delete(self.id)
 
     def on_message(self, msg, content=None):
+        #print(ws_list.list())
+        """ This function is quite tricky
+            It is called by both WebSocketHandler and MQASyncSub...
+        """
         try:
+            ### websocket message (from the web)
+            # there are the mesages send by the administration javascript part thanks to the ws.send(...) function
             if not content:
-                # this is a websocket message
                 jsons = json.loads(msg)
-                if 'action' in jsons and 'data' in jsons:
+                # req/rep
+                if 'mq_request' in jsons and 'data' in jsons:
                     cli = MQSyncReq(zmq.Context())
                     msg = MQMessage()
-                    msg.set_action(str(jsons['action']))
+                    msg.set_action(str(jsons['mq_request']))
                     msg.set_data(jsons['data'])
                     if 'dst' in jsons:
                         cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
                     else:
                         cli.request('manager', msg.get(), timeout=10).get()
+                # pub
+                elif 'mq_publish' in jsons and 'data' in jsons:
+                    print("Publish : {0}".format(jsons['data']))
+                    self.pub.send_event(jsons['mq_publish'],
+                                        jsons['data'])
+            ### MQ message (from domogik)
+            # these are the published messages which are received here
             else:
-                # this is a mq message
-                for cli in AdminWebSocket.clients:
-                    cli.write_message({"msgid": msg, "content": content})
+                try:
+                    self.write_message({"msgid": msg, "content": content})
+                except WebSocketClosedError:
+                    self.close()
         except:
             print("Error : {0}".format(traceback.format_exc()))
 
@@ -122,6 +167,7 @@ class Admin(Plugin):
 
     def __init__(self, server_interfaces, server_port):
         """ Initiate DbHelper, Logs and config
+            
             Then, start HTTP server and give it initialized data
             @param server_interfaces :  interfaces of HTTP server
             @param server_port :  port of HTTP server
@@ -134,15 +180,17 @@ class Admin(Plugin):
 
 	try:
             try:
-                cfg_rest = Loader('admin')
-                config_rest = cfg_rest.load()
-                conf_rest = dict(config_rest[1])
-                self.interfaces = conf_rest['interfaces']
-                self.port = conf_rest['port']
-                # if rest_use_ssl = True, set here path for ssl certificate/key
-                self.use_ssl = conf_rest['use_ssl']
-                self.key_file = conf_rest['ssl_certificate']
-                self.cert_file = conf_rest['ssl_key']
+                # admin config
+                cfg_admin = Loader('admin')
+                config_admin = cfg_admin.load()
+                conf_admin = dict(config_admin[1])
+                self.interfaces = conf_admin['interfaces']
+                self.port = conf_admin['port']
+                # if use_ssl = True, set here path for ssl certificate/key
+                self.use_ssl = conf_admin['use_ssl']
+                self.key_file = conf_admin['ssl_certificate']
+                self.cert_file = conf_admin['ssl_key']
+
             except KeyError:
                 # default parameters
                 self.interfaces = server_interfaces
@@ -151,6 +199,7 @@ class Admin(Plugin):
 		self.key_file = ""
 		self.cert_file = ""
                 self.clean_json = False
+                self.log.error("Error while reading configuration for section [admin] : using default values instead")
             self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
 	    
 	    # get all datatypes
@@ -239,9 +288,30 @@ class Admin(Plugin):
         return my_exception
 
 
+def clean_websockets():
+    global ws_list
+
+    while True:
+        time.sleep(5)
+        print("Start cleaning websockets...")
+        print(ws_list.list())
+        #for a_ws in web_sockets:
+        #    print(a_ws)
+        #    if a_ws["open"] == False:
+        #        print("Closing {0}".format(a_ws['id']))
+
 def main():
     ''' Called by the easyinstall mapping script
     '''
+    # launch the cleanup process
+    thr_cleanup = Thread(None,
+                         clean_websockets,
+                         "clean_ws",
+                         (),
+                         {})
+    #thr_cleanup.start()
+
+    # launch the admin
     Admin('lo', '40406')
 
 if __name__ == '__main__':

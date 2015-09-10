@@ -47,7 +47,8 @@ def login():
                 user = app.db.get_user_account_by_login(request.form["user"])
                 if user.is_admin:
                     login_user(user)
-                    flash(gettext("Login successfull"), "success")
+                    # as we see the page after the login, there is no need to tell this is a success ;)
+                    #flash(gettext("Login successfull"), "success")
                     return redirect('/')
                 else:
                     flash(gettext("This user is not an admin"), "warning")

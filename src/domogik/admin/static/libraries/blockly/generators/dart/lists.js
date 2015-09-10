@@ -3,7 +3,7 @@
  * Visual Blocks Language
  *
  * Copyright 2014 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -248,7 +248,8 @@ Blockly.Dart['lists_setIndex'] = function(block) {
     var code = cacheList();
     var xVar = Blockly.Dart.variableDB_.getDistinctName(
         'tmp_x', Blockly.Variables.NAME_TYPE);
-    code += 'int ' + xVar + ' = new Math.Random().nextInt(' + list + '.length);';
+    code += 'int ' + xVar +
+        ' = new Math.Random().nextInt(' + list + '.length);';
     if (mode == 'SET') {
       code += list + '[' + xVar + '] = ' + value + ';\n';
       return code;
@@ -306,5 +307,29 @@ Blockly.Dart['lists_getSublist'] = function(block) {
     var code = functionName + '(' + list + ', \'' +
         where1 + '\', ' + at1 + ', \'' + where2 + '\', ' + at2 + ')';
   }
+  return [code, Blockly.Dart.ORDER_UNARY_POSTFIX];
+};
+
+Blockly.Dart['lists_split'] = function(block) {
+  // Block for splitting text into a list, or joining a list into text.
+  var value_input = Blockly.Dart.valueToCode(block, 'INPUT',
+      Blockly.Dart.ORDER_UNARY_POSTFIX);
+  var value_delim = Blockly.Dart.valueToCode(block, 'DELIM',
+      Blockly.Dart.ORDER_NONE) || '\'\'';
+  var mode = block.getFieldValue('MODE');
+  if (mode == 'SPLIT') {
+    if (!value_input) {
+      value_input = '\'\'';
+    }
+    var functionName = 'split';
+  } else if (mode == 'JOIN') {
+    if (!value_input) {
+      value_input = '[]';
+    }
+    var functionName = 'join';
+  } else {
+    throw 'Unknown mode: ' + mode;
+  }
+  var code = value_input + '.' + functionName + '(' + value_delim + ')';
   return [code, Blockly.Dart.ORDER_UNARY_POSTFIX];
 };
