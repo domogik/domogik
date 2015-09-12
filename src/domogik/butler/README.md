@@ -3,6 +3,18 @@ Rivescript informations
 
 The included rivescript library is version 1.0.6 : https://github.com/aichaos/rivescript-python/archive/v1.06.zip
 
+Patches applied on rivescript/python.py
+=======================================
+
+    89,92c89
+    <         # Patch Fritz to allow python objects in .rive files 
+    <         #return str(reply)
+    <         return reply
+    <         # Patch end
+    ---
+    >         return str(reply)
+
+
 Patches applied on the library
 ==============================
 
