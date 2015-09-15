@@ -35,7 +35,7 @@ Implements
 """
 
 
-from domogik.common.plugin import PACKAGES_DIR
+from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogikmq.message import MQMessage
 from domogikmq.reqrep.client import MQSyncReq
@@ -63,10 +63,17 @@ def get_packages_directory():
     config = dict(my_conf[1])
     return os.path.join(config['libraries_path'], PACKAGES_DIR)
 
+def get_resources_directory():
+    cfg = Loader('domogik')
+    my_conf = cfg.load()
+    #self._config_files = CONFIG_FILE
+    config = dict(my_conf[1])
+    return os.path.join(config['libraries_path'], RESOURCES_DIR)
 
 
-LEARN_FILE = os.path.join(get_packages_directory(), "butler_learn.rive")
-STAR_FILE = os.path.join(get_packages_directory(), "butler_not_understood_queries.log")
+
+LEARN_FILE = os.path.join(get_resources_directory(), "butler", "butler_learn.rive")
+STAR_FILE = os.path.join(get_resources_directory(), "butler", "butler_not_understood_queries.log")
 
 
 def clean_input(data):

@@ -79,6 +79,7 @@ def build_file_list(user):
         ('/var/lib/domogik/domogik_packages', [user, None], \
                 ['src/domogik/common/__init__.py']),
         ('/var/lib/domogik/resources', [user, None], []),
+        ('/var/lib/domogik/resources/butler', [user, None], []),
         ('/var/lib/domogik/resources', [user, None], \
                 ['src/domogik/common/datatypes.json']),
         ('/var/lib/domogik/resources/sphinx', [user, None], \
