@@ -19,8 +19,26 @@ Each improvment or fix on Domogik/Domoweb/Domodroid must be implemented in a ded
 
 We basically follow the main lines of this `git branching model <http://nvie.com/posts/a-successful-git-branching-model/>`_
 
-Releasing
-=========
+Before releasing
+================
+
+* Check **Release note is ok**
+* Check website is ready
+* Check countdown website is ready
+* Check installation doc is up to date for Domogik, Domoweb
+* Do we need a new MQ release ?
+
+
+Releasing - step 1 - prepare the packages
+=========================================
+
+List of packages that could be upgraded in the release:
+
+* domogik
+* domoweb
+* domogik-mq
+* domodroid
+* Andorid butler application
 
 Release domogik-mq if needed
 ----------------------------
@@ -67,6 +85,28 @@ Create the release branch :
     complete
 
 In the newly created release branch, upgrade the install documentation with the final packages (tgz) from the GitHub for all needed components (domogik, domogik-mq)
+
+
+Releasing - step 2 - prepare resources
+======================================
+
+Here are the resources related to a version :
+
+* documentation
+* website
+
+Documentation
+-------------
+
+* Upgrade the doc header template in domogik sources
+* Rebuild all docs to include new header
+
+
+Website
+-------
+
+* If available put the countdown page
+* Set up the new website
 
 
 Prepare the next release
