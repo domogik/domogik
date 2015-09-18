@@ -6,7 +6,7 @@ Packages management
 Install a package
 =================
 
-In Domogik 0.4.0 the packages installation can only be done from the command line. In 0.4.1 we should restore an installation process from the administration user interface.
+In Domogik 0.4.x the packages installation can only be done from the command line. In the next releases we should restore an installation process from the administration user interface.
 
 There are 3 ways to install a package from the command line:
 
@@ -15,6 +15,10 @@ There are 3 ways to install a package from the command line:
 * install from an online file.
 
 Notice that in all cases, the package name will be created thanks to the **info.json** file included in the package. So you can have folders or zip files with stranges names like *master.zip*, *foo.zip*, ...
+
+For now, **after installing a package, you should restart Domogik!** : ::
+
+    sudo /etc/init.d/domogik restart
 
 Install from an existing folder
 -------------------------------
