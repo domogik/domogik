@@ -89,7 +89,7 @@ List the installed packages
 To list the installed packages, just launch the **dmg_package** tools without any parameters: ::
 
     $ dmg_package 
-    2013-11-22 23:11:35,993 domogik-package INFO Domogik release : 0.4.0
+    2013-11-22 23:11:35,993 domogik-package INFO Domogik release : 0.4.1
     2013-11-22 23:11:35,994 domogik-package INFO 
     2013-11-22 23:11:35,994 domogik-package INFO Package plugin_onewire 
     2013-11-22 23:11:35,995 domogik-package INFO  - version : 0.4

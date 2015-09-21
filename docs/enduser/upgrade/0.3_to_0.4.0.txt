@@ -1,26 +1,26 @@
 ===================================
-Upgrading from Domogik 0.3 to 0.4.0
+Upgrading from Domogik 0.3 to 0.4.x
 ===================================
 
 
 Warning
 =======
 
-There is a big gap between the releases 0.3 and 0.4.0 for several reasons:
+There is a big gap between the releases 0.3 and 0.4 for several reasons:
 
 * The plugins format has been upgraded.
 * The database model and the way to handle devices and their features has totally changed.
 * The administration interface has moved from Domoweb to Domogik (on port 40406 by default).
 * ...
 
-For more informations, please check the :doc:`0.4.0 release page <../../releases/0.4.0>`
+For more informations, please check the :doc:`0.4.0 release page <../../releases/0.4.0>` and the :doc:`0.4.1 release page <../../releases/0.4.1>`
 
-Before starting to upgrade from 0.3 to 0.4.0, please notice that: 
+Before starting to upgrade from 0.3 to 0.4, please notice that: 
 
 * **There is no user interface available** : you won't be able to nicely view or control your devices. The user interface is still in development.
 * **0.3 or 0.2 plugins are not compliant with Domogik 0.4 and most of them are not yet converted to the new format** : you may be able to not use all of your technologies yet.
 * **as the database model has been changed, all the existing devices will be unusable, but there is a way to recover their history and so to keep the data** : keep in mind that some bugs can occurs so please, do a database backup before the installation!
-* **you can't upgrade from 0.2 to 0.4.0 : you will need to install the 0.3 release first**.
+* **you can't upgrade from 0.2 to 0.4 : you will need to install the 0.3 release first**.
 
 Steps to upgrade
 ================
