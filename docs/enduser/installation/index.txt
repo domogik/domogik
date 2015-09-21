@@ -224,6 +224,12 @@ It will start :
 * The database manager and the REST interface module (which will take in account the parameters you defined in your configuration file : host, IP...)
 * The administration web interface
 
+.. note::
+    Default **login** and **password** are : 
+
+    * login : admin
+    * password : 123
+
 Set up the automatic backup
 ---------------------------
 
