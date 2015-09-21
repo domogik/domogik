@@ -7,7 +7,9 @@ If you are already a Domogik 0.3 user
 
 Domogik 0.4 database is really different from the 0.3 database. The process to migrate data from Domogik 0.3 to Domogik 0.4 is not fully guarantee yet. **Please do a backup of your domogik database before migrating from 0.3 to 0.4 !**.
 
-**If you come from Domogik 0.3, before installing Domogik 0.4.1 you must install Domogik 0.4.0 for the database upgrade process!**
+**If you come from Domogik 0.3, you can directly install Domogik 0.4.1.**
+
+If you encounter any issue during the database upgrade, please come on our irc channel and request us some help!
 
 
 Installation
@@ -60,11 +62,11 @@ Here are the needed dependencies. depanding on your Linux distribution, they wil
 .. note::
     * Even if you plan to use mysql database instead of postgresql, the *python-psycopg2* package is needed by the *alembic* library.
 
-The **install.py** script will install these dependencies of the following distributions:
+The **install.py** script will install these dependencies for the following distributions:
 
 * Debian based distributions
 
-For all other distributions, please install them manually.
+For all the other distributions, please install them manually.
 
 Mysql server
 ------------
@@ -180,10 +182,19 @@ In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogi
     name = Aria
     lang = fr_FR
     sex = female
+    
+    [backup]
+    folder = /opt/dmg/backup
 
-The **name** is your butler name, use the name you want.
-The **lang** is your language : fr_FR, en_US, ...
-The **sex** is related to the name you choosed : male, female
+Butler section : 
+
+* The **name** is your butler name, use the name you want.
+* The **lang** is your language : fr_FR, en_US, ...
+* The **sex** is related to the name you choosed : male, female
+
+Backup section : 
+
+* The **folder** location is the place in which all domogik data will be backuped (database, configuration files, etc).
 
 
 Make Domogik start with your computer

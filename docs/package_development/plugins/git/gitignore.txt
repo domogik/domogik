@@ -8,6 +8,7 @@ Git
 For each plugin, a .gitignore file must be created in the root directory. Create it like this: ::
 
     $ echo "*.pyc
-    *.swp" > .gitignore
+    *.swp
+    _build_doc" > .gitignore
 
 This file is used by git to exclude some files from the repository.
