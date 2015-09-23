@@ -305,7 +305,13 @@ def needupdate():
     # first check if there are already some config files
     if os.path.isfile("/etc/domogik/domogik.cfg") or \
        os.path.isfile("/etc/domogik/xplhub.cfg"):
-        print("Do you want to keep your current config files ? [Y/n]: "),
+        # TODO : restore after 0.4.1
+        #print("Do you want to keep your current config files ? [Y/n]: "),
+        print("Configuration files")
+        print("Please notice that Domogik 0.3.x configuration files are no more compliant with Domogik 0.4 :")
+        print("- backup your Domogik 0.3 configuration files")
+        print("- say 'n' to the question to recreate them from scratch")
+        print("Do you want to keep your current config files ? [Y/n]: ")
         new_value = sys.stdin.readline().rstrip('\n')
         if new_value == "y" or new_value == "Y" or new_value == '':
             debug("keeping curent config files")
