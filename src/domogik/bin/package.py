@@ -212,8 +212,17 @@ class PackageInstaller():
 
         self.log.info("Generate the docummentation...")
         self.build_doc(os.path.join(symlink_full, "docs"))
+
+        self.display_post_install_informations()
         
+    def display_post_install_informations(self):
+        self.log.info("=========================================")
+        self.log.info("")
         self.log.info("Package installed!")
+        self.log.info("")
+        self.log.info("FOR NOW, AFTER INSTALLING A PACKAGE, YOU NEED TO RESTART DOMOGIK MANAGER !")
+        self.log.info("To do this, please do : ")
+        self.log.info("sudo /etc/init.d/domogik restart")
 
     def install_zip_file(self, path, hash, upgrade):
         """ Install the zip file
@@ -328,7 +337,7 @@ class PackageInstaller():
         self.log.info("Generate the docummentation...")
         self.build_doc(os.path.join(pkg_folder, "docs"))
         
-        self.log.info("Package installed!")
+        self.display_post_install_informations()
 
 
     def download_from_url(self, url):

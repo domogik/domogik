@@ -358,7 +358,6 @@ class DBConnector(Plugin, MQRep):
             did = data.get_data()['did']
             if did:
                 res = self._db.del_device(did)
-                #print(res)
                 if not res:
                     status = False
                 else:
@@ -520,7 +519,17 @@ class DBConnector(Plugin, MQRep):
                 xstat = pjson['xpl_stats'][xstatn]
                 for sparam in xstat['parameters']['dynamic']:
                     #print("XSTATN = {0}, SPARAM = {1}".format(xstatn, sparam))
-                    if 'sensor' in sparam and xstatn in sensors:
+                    #if 'sensor' in sparam and xstatn in sensors:
+                    # => This condition was used to fix a bug which occurs while creating complexe devices for rfxcom
+                    #    But is introduced a bug for the geoloc plugin...
+                    #    In fact we had to fix the rfxcom info.json file (open_close uses now rssi_open_close instead of
+                    #    rssi_lighting2
+                    #    So, this one is NOT the good one.
+                    if 'sensor' in sparam:
+                    # => this condition was the original one restored to make the geoloc pluin ok for tests
+                    #    Strangely, there is no issue while using the admin (which uses only mq)
+                    #    but is sucks with test library which uses rest...
+                    #    This one is the good one
                         if sparam['sensor'] in sensors:
                             #print("ADD") 
                             stats.append(xstatn)

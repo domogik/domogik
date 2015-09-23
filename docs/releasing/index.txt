@@ -47,6 +47,7 @@ If the Domogik release need a new version of Domogik-mq to work, create this one
 
 * create a tag in the **develop** branch
 * merge the tag in the **master** branch
+* update if needed the README.md in master to make all reference on master and not develop
 * go on GitHub and create a release from the tag.
 
 *For the details of the command, you can use the same commands as for Domogik*.
@@ -78,6 +79,7 @@ Release a final release
 
 ..todo ::
     complete
+    * update if needed the README.md in master to make all reference on master and not develop
 
 Create the release branch :
 
@@ -98,7 +100,9 @@ Here are the resources related to a version :
 Documentation
 -------------
 
-* Upgrade the doc header template in domogik sources
+* Upgrade the doc header template in domogik sources (layout.html in _theme/domogiksite)
+* Upgrade the doc index on the VM (static_index/index.tpl)
+* Upgrade the docs.domogik.org/domogik|web shortcuts on the VM if neded in /etc/nginx/...
 * Rebuild all docs to include new header
 
 
