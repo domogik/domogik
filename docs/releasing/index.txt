@@ -22,6 +22,11 @@ We basically follow the main lines of this `git branching model <http://nvie.com
 Before releasing
 ================
 
+* Do some database migration tests
+  * run a previous release fresh install and backup this database (empty)
+  * load the backup, run the install, do a mysqldump -d to get only the structure and store it in xx_to_yy.sql file
+  * drop the database, run the install, do a mysqldump -d and store it in yy.sql file
+  * do a diff between xx_to_yy.sql and yy.sql, they must be the same !
 * Check **Release note is ok**
 * Check website is ready
 * Check countdown website is ready
