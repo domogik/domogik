@@ -127,7 +127,7 @@ Download Domogik-mq : ::
     $ cd /opt/dmg/
     $ git clone https://github.com/domogik/domogik-mq.git
     $ cd domogik-mq
-    $ git checkout develop
+    $ git checkout master
 
 Download Domogik : ::
 
@@ -176,7 +176,7 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 .. todo::
     Describe all the steps
 
-In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogik.cfg**, you will have to complete it with these lines: ::
+In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogik.cfg**, you will have to complete it with these lines for Domoik 0.4.1 : ::
 
     [butler]
     name = Aria
