@@ -88,7 +88,7 @@ def upgrade():
     	sa.Column('key', sa.Unicode(length=32), autoincrement=False, nullable=False),
     	sa.Column('value', sa.Unicode(length=255), nullable=True),
         sa.Column('static', sa.Boolean(), nullable=False),
-        sa.Column('sensor_id', sa.Integer(), nullable=False),
+        sa.Column('sensor_id', sa.Integer(), nullable=True),
         sa.Column('ignore_values', sa.Unicode(length=255), nullable=True),
         sa.Column('type', sa.Unicode(length=32), nullable=True),
         sa.ForeignKeyConstraint(['sensor_id'], [u'{0}.id'.format(Sensor.__tablename__)], ondelete='cascade'),
