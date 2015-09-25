@@ -70,7 +70,7 @@ class PluginConfig(Base):
     """Configuration for a plugin (x10, plcbus, ...)"""
 
     __tablename__ = '%s_plugin_config' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Unicode(30), primary_key=True)
     type = Column(Unicode(30), primary_key=True, default=u'plugin')
     hostname = Column(Unicode(40), primary_key=True)
@@ -105,7 +105,7 @@ class Device(Base):
     """Device"""
 
     __tablename__ = '%s_device' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
@@ -155,7 +155,7 @@ class DeviceParam(Base):
     """Device config, some config parameters that are only accessable over the mq, or inside domogik, these have nothin todo with xpl"""
 
     __tablename__ = '%s_device_param' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
@@ -189,7 +189,7 @@ class DeviceStats(Base):
     """Device stats (values that were associated to the device)"""
 
     __tablename__ = '%s_device_stats' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     date = Column(DateTime, nullable=False, index=True)
     # This is used for mysql compatibility reasons as timestamps are NOT handled in Unix Time format
@@ -242,7 +242,7 @@ class Person(Base):
     """Persons registered in the app"""
 
     __tablename__ = '%s_person' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     first_name = Column(Unicode(20), nullable=False)
     last_name = Column(Unicode(20), nullable=False)
@@ -276,7 +276,7 @@ class UserAccount(Base):
     """User account for persons : it is only used by the UI"""
 
     __tablename__ = '%s_user_account' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     login = Column(Unicode(20), nullable=False, unique=True)
     password = Column("password", Unicode(255), nullable=False)
@@ -330,7 +330,7 @@ class UserAccount(Base):
 
 class Command(Base):
     __tablename__ = '%s_command' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True) 
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255), nullable=False)
@@ -357,7 +357,7 @@ class Command(Base):
 
 class CommandParam(Base):
     __tablename__ = '%s_command_param' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement='ignore_fk')
     data_type = Column(Unicode(32), nullable=False)
@@ -382,7 +382,7 @@ class CommandParam(Base):
 
 class Sensor(Base):
     __tablename__ = '%s_sensor' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True) 
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
@@ -435,7 +435,7 @@ class Sensor(Base):
 
 class SensorHistory(Base):
     __tablename__ = '%s_sensor_history' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True) 
     sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
@@ -467,7 +467,7 @@ class SensorHistory(Base):
 
 class XplStat(Base):
     __tablename__ = '%s_xplstat' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
@@ -494,7 +494,7 @@ class XplStat(Base):
 
 class XplStatParam(Base):
     __tablename__ = '%s_xplstat_param' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
@@ -528,7 +528,7 @@ class XplStatParam(Base):
 
 class XplCommand(Base):
     __tablename__ = '%s_xplcommand' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
     cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), nullable=False)
@@ -560,7 +560,7 @@ class XplCommand(Base):
 
 class XplCommandParam(Base):
     __tablename__ = '%s_xplcommand_param' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     xplcmd_id = Column(Integer, ForeignKey('%s.id' % XplCommand.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
@@ -583,7 +583,7 @@ class XplCommandParam(Base):
 
 class Scenario(Base):
     __tablename__ = '%s_scenario' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB'}
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     name = Column(Unicode(32), nullable=False, autoincrement=False)
     json = Column(UnicodeText(), nullable=False)
