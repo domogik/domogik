@@ -216,7 +216,6 @@ class PackageInstaller():
         self.display_post_install_informations()
         
     def display_post_install_informations(self):
-        self.log.info("=========================================")
         self.log.info("")
         self.log.info("Package installed!")
         self.log.info("")
@@ -514,7 +513,7 @@ class PackageInstaller():
         """ check if it is already installed!
         """
         if os.path.isdir(os.path.join(self.pkg_path, install_name)):
-            self.log.error("The package '{0}' is already installed! Please uninstall it first".format(install_name))
+            self.log.error("The package '{0}' is already installed! Please use --upgrade instead of --install".format(install_name))
             return True
         return False
 
@@ -560,9 +559,9 @@ class PackageInstaller():
         makefile = os.path.join(self.resources_path, "sphinx/Makefile")
         # -e if used to use environments vars
         cmd = "cd {0} && export BUILDDIR={1} && export SPHINXOPTS='-c {2}' && make -e -f {3} html".format(doc_path, os.path.join(doc_path, build_doc_dir), conf_py, makefile)
-        print(cmd)
         subp = Popen(cmd, 
-                     shell=True)
+                     shell=True,
+                     stdout=PIPE, stderr=PIPE)
         subp.communicate()
 
 
