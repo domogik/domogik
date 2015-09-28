@@ -24,8 +24,9 @@ def upgrade():
     	sa.Column('device_id', sa.Integer(), nullable=False),
     	sa.Column('key', sa.Unicode(length=32), autoincrement=False, nullable=False),
     	sa.Column('value', sa.Unicode(length=255), nullable=True),
+    	sa.Column('type', sa.Unicode(length=32), nullable=True),
         sa.ForeignKeyConstraint(['device_id'], [u'{0}.id'.format(Device.__tablename__)], ondelete='cascade'),
-    	sa.PrimaryKeyConstraint('id'),
+    	sa.PrimaryKeyConstraint('id', 'key'),
     	mysql_engine='InnoDB'
     )
     op.create_table(Sensor.__tablename__,
@@ -33,14 +34,20 @@ def upgrade():
     	sa.Column('device_id', sa.Integer(), nullable=False),
     	sa.Column('name', sa.Unicode(length=255), nullable=True),
     	sa.Column('reference', sa.Unicode(length=64), nullable=True),
+        sa.Column('incremental', sa.Boolean(), nullable=False),
+        sa.Column('formula', sa.UnicodeText()),
     	sa.Column('data_type', sa.Unicode(length=32), nullable=False),
     	sa.Column('conversion', sa.Unicode(length=255), nullable=True),
     	sa.Column('last_value', sa.Unicode(length=32), nullable=True),
     	sa.Column('last_received', sa.Integer(), nullable=True),
+        sa.Column('value_min', sa.Float(), nullable=True),
+        sa.Column('value_max', sa.Float(), nullable=True),
         sa.Column('history_store', sa.Boolean(), nullable=False),
         sa.Column('history_max', sa.Integer(), nullable=True),
         sa.Column('history_expire', sa.Integer(), nullable=True),
         sa.Column('history_round', sa.Float(), nullable=True),
+        sa.Column('history_duplicate', sa.Boolean(), nullable=False),
+        sa.Column('timeout', sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(['device_id'], [u'{0}.id'.format(Device.__tablename__)], ondelete='cascade'),
     	sa.PrimaryKeyConstraint('id'),
     	mysql_engine='InnoDB'
@@ -71,6 +78,7 @@ def upgrade():
     	sa.Column('date', sa.DateTime(), nullable=False, index=True),
     	sa.Column('value_num', sa.Float(), nullable=True),
     	sa.Column('value_str', sa.Unicode(length=32), nullable=False),
+    	sa.Column('original_value_num', sa.Float(), nullable=True),
     	sa.ForeignKeyConstraint(['sensor_id'], [u'{0}.id'.format(Sensor.__tablename__)], ondelete='cascade'),
     	sa.PrimaryKeyConstraint('id'),
     	mysql_engine='InnoDB'
@@ -80,7 +88,7 @@ def upgrade():
     	sa.Column('key', sa.Unicode(length=32), autoincrement=False, nullable=False),
     	sa.Column('value', sa.Unicode(length=255), nullable=True),
         sa.Column('static', sa.Boolean(), nullable=False),
-        sa.Column('sensor_id', sa.Integer(), nullable=False),
+        sa.Column('sensor_id', sa.Integer(), nullable=True),
         sa.Column('ignore_values', sa.Unicode(length=255), nullable=True),
         sa.Column('type', sa.Unicode(length=32), nullable=True),
         sa.ForeignKeyConstraint(['sensor_id'], [u'{0}.id'.format(Sensor.__tablename__)], ondelete='cascade'),
@@ -96,8 +104,8 @@ def upgrade():
     	sa.Column('name', sa.Unicode(length=64), nullable=False),
     	sa.Column('schema', sa.Unicode(length=32), nullable=False),
     	sa.Column('stat_id', sa.Integer(), nullable=True),
-    	sa.ForeignKeyConstraint(['cmd_id'], [u'{0}.id'.format(Command.__tablename__)], ondelete='cascade'),
     	sa.ForeignKeyConstraint(['device_id'], [u'{0}.id'.format(Device.__tablename__)], ondelete='cascade'),
+    	sa.ForeignKeyConstraint(['cmd_id'], [u'{0}.id'.format(Command.__tablename__)], ondelete='cascade'),
     	sa.ForeignKeyConstraint(['stat_id'], [u'{0}.id'.format(XplStat.__tablename__)], ondelete='cascade'),
     	sa.PrimaryKeyConstraint('id'),
     	mysql_engine='InnoDB'
@@ -110,7 +118,7 @@ def upgrade():
     	sa.ForeignKeyConstraint(['cmd_id'], [u'{0}.id'.format(Command.__tablename__)], ondelete='cascade'),
     	sa.PrimaryKeyConstraint('cmd_id', 'key'),
     	mysql_engine='InnoDB'
-    )
+        )
     op.create_table(XplCommandParam.__tablename__,
 	sa.Column('xplcmd_id', sa.Integer(), nullable=False),
     	sa.Column('key', sa.Unicode(length=32), autoincrement=False, nullable=False),
@@ -119,10 +127,13 @@ def upgrade():
     	sa.PrimaryKeyConstraint('xplcmd_id', 'key'),
     	mysql_engine='InnoDB'
     )
-    #op.drop_constraint('core_device_ibfk_1', Device.__tablename__, type_='foreignkey')
-    #op.drop_constraint('core_device_ibfk_2', Device.__tablename__, type_='foreignkey')
-    #op.drop_constraint('core_device_type_ibfk_1', 'core_device_type', type_='foreignkey')
+    op.drop_constraint('core_device_ibfk_1', Device.__tablename__, type_='foreignkey')
+    op.drop_constraint('core_device_ibfk_2', Device.__tablename__, type_='foreignkey')
+    op.drop_constraint('core_device_type_ibfk_1', 'core_device_type', type_='foreignkey')
+    op.drop_index('device_type_id', Device.__tablename__)
+    op.create_index('ix_core_device_device_type_id', Device.__tablename__, ['device_type_id'])
     op.add_column(Device.__tablename__, sa.Column('client_id', sa.Unicode(length=80), nullable=False))
+    op.add_column(Device.__tablename__, sa.Column('client_version', sa.Unicode(length=32), nullable=False))
     op.drop_column(Device.__tablename__, u'device_usage_id')
     op.alter_column(Device.__tablename__, u'address',
                existing_type=mysql.VARCHAR(length=255),

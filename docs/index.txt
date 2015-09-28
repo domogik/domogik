@@ -3,11 +3,6 @@ Domogik
 =======
 
 
-.. todo::
-    This release is actually in development.
-    Some parts of this documentation still need to be updated!
-
-
 .. |user| image:: index_user.png
     :target: index_user.html
 

@@ -10,6 +10,7 @@ import argparse
 import shutil
 import logging
 import pkg_resources
+from subprocess import Popen, PIPE, STDOUT
 
 
 BLUE = '\033[94m'
@@ -79,6 +80,7 @@ def build_file_list(user):
         ('/var/lib/domogik/domogik_packages', [user, None], \
                 ['src/domogik/common/__init__.py']),
         ('/var/lib/domogik/resources', [user, None], []),
+        ('/var/lib/domogik/resources/butler', [user, None], []),
         ('/var/lib/domogik/resources', [user, None], \
                 ['src/domogik/common/datatypes.json']),
         ('/var/lib/domogik/resources/sphinx', [user, None], \
@@ -304,7 +306,13 @@ def needupdate():
     # first check if there are already some config files
     if os.path.isfile("/etc/domogik/domogik.cfg") or \
        os.path.isfile("/etc/domogik/xplhub.cfg"):
-        print("Do you want to keep your current config files ? [Y/n]: "),
+        # TODO : restore after 0.4.1
+        #print("Do you want to keep your current config files ? [Y/n]: "),
+        print("Configuration files")
+        print("Please notice that Domogik 0.3.x configuration files are no more compliant with Domogik 0.4 :")
+        print("- backup your Domogik 0.3 configuration files")
+        print("- say 'n' to the question to recreate them from scratch")
+        print("Do you want to keep your current config files ? [Y/n]: ")
         new_value = sys.stdin.readline().rstrip('\n')
         if new_value == "y" or new_value == "Y" or new_value == '':
             debug("keeping curent config files")
@@ -388,6 +396,15 @@ def install():
             except ImportError:
                 fail("Please install Domogik MQ first! (https://github.com/domogik/domogik-mq)")
                 exit(0)
+
+        # Execute database fix for some 0.2/0.3 databases
+        info("Process some database upgrade issues with previous releases")
+        cmd = "sh ./src/domogik/install/db_fix_03.sh"
+        p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        lines_iterator = iter(p.stdout.readline, b"")
+        for line in lines_iterator:
+            print(line)
+
 
         if args.dist_packages:
             dist_packages_install_script = ''

@@ -35,7 +35,7 @@ Implements
 """
 
 
-from domogik.common.plugin import PACKAGES_DIR
+from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogikmq.message import MQMessage
 from domogikmq.reqrep.client import MQSyncReq
@@ -63,10 +63,17 @@ def get_packages_directory():
     config = dict(my_conf[1])
     return os.path.join(config['libraries_path'], PACKAGES_DIR)
 
+def get_resources_directory():
+    cfg = Loader('domogik')
+    my_conf = cfg.load()
+    #self._config_files = CONFIG_FILE
+    config = dict(my_conf[1])
+    return os.path.join(config['libraries_path'], RESOURCES_DIR)
 
 
-LEARN_FILE = os.path.join(get_packages_directory(), "butler_learn.rive")
-STAR_FILE = os.path.join(get_packages_directory(), "butler_not_understood_queries.log")
+
+LEARN_FILE = os.path.join(get_resources_directory(), "butler", "butler_learn.rive")
+STAR_FILE = os.path.join(get_resources_directory(), "butler", "butler_not_understood_queries.log")
 
 
 def clean_input(data):
@@ -255,15 +262,22 @@ def filter_sensors_by_device_name(candidates, device_name):
     return None
 
 
-def learn(rs_code):
+def learn(rs_code, comment = None):
     """ Add some rivescript code in a file
         and requets to reload the brain
         @param rs_code : some rs_code. Example : 
                   + ping
                   - pong
     """
+    utf8_data = ""
+    if comment != None:
+        utf8_data += comment.encode('UTF-8')
+    else:
+        utf8_data += "// Added by the butler during a learning process\n"
+
+    utf8_data += rs_code.encode('UTF-8')
     with open(LEARN_FILE, "a") as file:
-        file.write(rs_code + "\n\n") 
+        file.write(utf8_data + "\n\n") 
 
 def trigger_bool_command(dt_type, device, value):
     try:
@@ -331,12 +345,12 @@ def process_star(not_understood_responses, suggest_intro, rs):
         m = re.match(regexp, query)
         if m != None:
             query_with_star = query
-            #print("Suggest match for query : {0}".format(query))
-            #print("Regexp : '{0}', found : {1}".format(regexp, m.groups()))
+            #print(u"Suggest match for query : {0}".format(query))
+            #print(u"Regexp : '{0}', found : {1}".format(regexp, m.groups()))
             for idx in range(0, len(m.groups())):
                 #print(idx)
                 #print(m.groups()[idx])
-                pattern = "<star{0}>".format(idx+1)
+                pattern = u"<star{0}>".format(idx+1)
                 #print(pattern)
                 shortcut_sample = shortcut_sample.replace(pattern, m.groups()[idx])
                 query_with_star = query_with_star.replace(m.groups()[idx], "*")
@@ -350,6 +364,7 @@ def process_star(not_understood_responses, suggest_intro, rs):
 
     ### log not understood queries
     if found_suggest == False:
+        query = u"{0}\n".format(query)
         with open(STAR_FILE, "a") as file:
             file.write(query) 
         return not_understood_responses[randint(0, len(not_understood_responses)-1)]
@@ -361,14 +376,15 @@ def learn_from_suggestion(rs):
     """
     #print(rs.last_suggestion_matched)
     ls = rs.last_suggestion_matched
+    rs_comment = u""
+    rs_comment += u"// learned from suggestions\n"
+    rs_comment += u"// Query : {0}\n".format(ls['query'])
+    rs_comment += u"// Regexp : {0}\n".format(ls['regexp'])
+    rs_comment += u"// Shortcut : {0}\n".format(ls['shortcut'])
+    rs_comment += u"// Shortcut sample: {0}\n".format(ls['shortcut_sample'])
     rs_code = u""
-    rs_code += u"// learned from suggestions\n"
-    rs_code += u"// Query : {0}\n".format(ls['query'])
-    rs_code += u"// Regexp : {0}\n".format(ls['regexp'])
-    rs_code += u"// Shortcut : {0}\n".format(ls['shortcut'])
-    rs_code += u"// Shortcut sample: {0}\n".format(ls['shortcut_sample'])
     rs_code += u"+ {0}\n".format(ls['query_with_star'])
     rs_code += u"{0}\n".format(ls['shortcut'])
-    print(rs_code)
-    learn(rs_code)
+    print(u"{0}{1}".format(rs_comment, rs_code))
+    learn(rs_code, comment = rs_comment)
     rs.reload_butler()

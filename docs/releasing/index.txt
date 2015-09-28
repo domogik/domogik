@@ -19,8 +19,31 @@ Each improvment or fix on Domogik/Domoweb/Domodroid must be implemented in a ded
 
 We basically follow the main lines of this `git branching model <http://nvie.com/posts/a-successful-git-branching-model/>`_
 
-Releasing
-=========
+Before releasing
+================
+
+* Do some database migration tests
+  * run a previous release fresh install and backup this database (empty)
+  * load the backup, run the install, do a mysqldump -d to get only the structure and store it in xx_to_yy.sql file
+  * drop the database, run the install, do a mysqldump -d and store it in yy.sql file
+  * do a diff between xx_to_yy.sql and yy.sql, they must be the same !
+* Check **Release note is ok**
+* Check website is ready
+* Check countdown website is ready
+* Check installation doc is up to date for Domogik, Domoweb
+* Do we need a new MQ release ?
+
+
+Releasing - step 1 - prepare the packages
+=========================================
+
+List of packages that could be upgraded in the release:
+
+* domogik
+* domoweb
+* domogik-mq
+* domodroid
+* Andorid butler application
 
 Release domogik-mq if needed
 ----------------------------
@@ -29,6 +52,7 @@ If the Domogik release need a new version of Domogik-mq to work, create this one
 
 * create a tag in the **develop** branch
 * merge the tag in the **master** branch
+* update if needed the README.md in master to make all reference on master and not develop
 * go on GitHub and create a release from the tag.
 
 *For the details of the command, you can use the same commands as for Domogik*.
@@ -60,6 +84,7 @@ Release a final release
 
 ..todo ::
     complete
+    * update if needed the README.md in master to make all reference on master and not develop
 
 Create the release branch :
 
@@ -67,6 +92,30 @@ Create the release branch :
     complete
 
 In the newly created release branch, upgrade the install documentation with the final packages (tgz) from the GitHub for all needed components (domogik, domogik-mq)
+
+
+Releasing - step 2 - prepare resources
+======================================
+
+Here are the resources related to a version :
+
+* documentation
+* website
+
+Documentation
+-------------
+
+* Upgrade the doc header template in domogik sources (layout.html in _theme/domogiksite)
+* Upgrade the doc index on the VM (static_index/index.tpl)
+* Upgrade the docs.domogik.org/domogik|web shortcuts on the VM if neded in /etc/nginx/...
+* Rebuild all docs to include new header
+
+
+Website
+-------
+
+* If available put the countdown page
+* Set up the new website
 
 
 Prepare the next release
