@@ -118,6 +118,10 @@ function start_daemon {
     echo " Done."
 }
 function start_mq {
+    if [ "X$MASTERMQ" = "X" ]; then
+        echo " * ERROR : MQ is not installed. Please install it"
+        exit 1
+    fi 
     if [ $MASTERMQ = "True" ]; then
         echo -n " * Starting 0MQ broker ..."
         /bin/su - ${DOMOGIK_USER} -c "$(which ${MQ_BROKER}) >/dev/null"
@@ -228,6 +232,10 @@ function stop {
 }
 
 function stop_mq {
+    if [ "X$MASTERMQ" = "X" ]; then
+        echo " * ERROR : MQ is not installed. Please install it"
+        exit 1
+    fi 
     if [ $MASTERMQ = "True" ]; then
         echo -n " * Stopping 0MQ broker..."
         for pid in `ps ax | grep "${MQ_BROKER}" | grep -v grep | awk '{print $1}'`; do

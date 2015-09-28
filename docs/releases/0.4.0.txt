@@ -2,9 +2,6 @@
 Release 0.4.0
 =============
 
-.. todo::
-    This release is actually in alpha/beta/rc status. This page will be updated soon.
-
 New features 
 ============
 
@@ -106,12 +103,4 @@ The installation script has been totally rewritten. You can now use it with opti
 Files moved
 -----------
 
-Some files have been moved in the source tree
-
-=============== ============= =============
-What            Old location  New location
-=============== ============= =============
-Main binarys    xpl/bin       bin
---------------- ------------- -------------
-Rest libs       xpl/lib/rest  rest
-=============== ============= =============
+A lot of files have been moved in the source tree.

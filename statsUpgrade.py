@@ -22,10 +22,10 @@ if __name__ == "__main__":
     print("Welcome to the DOmogik upgrade system")
     print("This system can upgrade statistics to DOMOGIk 0.4")
     print("Source: 0.3")
-    print("Destination: 0.4")
-    if __version__ != "0.4.0":
+    print("Destination: 0.4.X")
+    if __version__ != "0.4.0" || __version__ != "0.4.1" :
         print("")
-        print("ERROR: This is only supported in domogik 0.4.0")
+        print("ERROR: This is only supported in domogik 0.4.X")
         print("Your domogik version is {0}".format(__version__))
         print("")
         exit()

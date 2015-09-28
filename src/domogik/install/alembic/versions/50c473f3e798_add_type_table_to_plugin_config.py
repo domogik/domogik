@@ -15,7 +15,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
 def upgrade():
-    op.add_column('core_plugin_config', sa.Column('type', sa.Unicode(length=30), nullable=False, server_default=u'plugin'))
+    op.add_column('core_plugin_config', sa.Column('type', sa.Unicode(length=30), nullable=False))
     op.drop_constraint('PRIMARY', 'core_plugin_config', type_='primary')
     op.create_primary_key('prim', 'core_plugin_config', ['id', 'type', 'hostname', 'key']) 
 

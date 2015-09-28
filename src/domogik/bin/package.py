@@ -212,8 +212,16 @@ class PackageInstaller():
 
         self.log.info("Generate the docummentation...")
         self.build_doc(os.path.join(symlink_full, "docs"))
+
+        self.display_post_install_informations()
         
+    def display_post_install_informations(self):
+        self.log.info("")
         self.log.info("Package installed!")
+        self.log.info("")
+        self.log.info("FOR NOW, AFTER INSTALLING A PACKAGE, YOU NEED TO RESTART DOMOGIK MANAGER !")
+        self.log.info("To do this, please do : ")
+        self.log.info("sudo /etc/init.d/domogik restart")
 
     def install_zip_file(self, path, hash, upgrade):
         """ Install the zip file
@@ -328,7 +336,7 @@ class PackageInstaller():
         self.log.info("Generate the docummentation...")
         self.build_doc(os.path.join(pkg_folder, "docs"))
         
-        self.log.info("Package installed!")
+        self.display_post_install_informations()
 
 
     def download_from_url(self, url):
@@ -505,7 +513,7 @@ class PackageInstaller():
         """ check if it is already installed!
         """
         if os.path.isdir(os.path.join(self.pkg_path, install_name)):
-            self.log.error("The package '{0}' is already installed! Please uninstall it first".format(install_name))
+            self.log.error("The package '{0}' is already installed! Please use --upgrade instead of --install".format(install_name))
             return True
         return False
 
@@ -551,9 +559,9 @@ class PackageInstaller():
         makefile = os.path.join(self.resources_path, "sphinx/Makefile")
         # -e if used to use environments vars
         cmd = "cd {0} && export BUILDDIR={1} && export SPHINXOPTS='-c {2}' && make -e -f {3} html".format(doc_path, os.path.join(doc_path, build_doc_dir), conf_py, makefile)
-        print(cmd)
         subp = Popen(cmd, 
-                     shell=True)
+                     shell=True,
+                     stdout=PIPE, stderr=PIPE)
         subp.communicate()
 
 
