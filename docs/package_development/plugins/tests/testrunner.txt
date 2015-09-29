@@ -40,7 +40,7 @@ Example
 In this example, there is only one test file to lauch, which is named *tests*. ::
 
     $ dmg_testrunner -a -c low /var/lib/domogik/domogik_packages/plugin_diskfree/tests/
-    Domogik release : 0.4.0
+    Domogik release : 0.4.1
     Running test with the folowing parameters:
     - allow to alter the configuration or setup.
     - criticity : low

@@ -180,7 +180,8 @@ class AbstractParameter:
         """
         if ename not in self._expected:
             raise ValueError("You must add the entry with @add_expected_entry@ before setting a list of values for it")
-        if ( type(lof) != list ) or ( [i for i in lof if type(i) != str] != [] ):
+        # notice that we allow the list of lists for sensors listing : [label, id]
+        if ( type(lof) != list ) or ( [i for i in lof if type(i) not in [str, list]] != [] ):
             raise ValueError("`lof` must be a list of strings or an empty list.")
         self._list_of_values[ename] = lof
 
@@ -234,10 +235,22 @@ class AbstractParameter:
         @raise ValueError if a list_of_values has been defined for an entry and the submitted value is not in this list
         """
         for entry in params:
+            print("ENTRY={0}".format(entry))
             for name, val in entry.iteritems():
                 if name in self._expected:
-                    if name in self.get_list_of_values() and val not in self.get_list_of_values()[name]:
-                        raise ValueError("The submitted value for entry " + entry + " is not in list of authorized values")
+                    print("NAME={0}".format(name))
+                    print("VAL={0}".format(val))
+                    print("EXPEC={0}".format(self._expected))
+                    print("LIST_VAL={0}".format(self.get_list_of_values()))
+                    if name in self.get_list_of_values():
+                        if self._expected[name]['type'] == 'list':
+                            # TODO : improve ?
+                            pass
+ 
+                        else:
+                            # for non list entries, we check in the available values
+                            if val not in self.get_list_of_values()[name]:
+                                raise ValueError("The submitted value for entry '{0}' is not in list of authorized values.".format(entry))
                     self._params[name] = val
         self.call_trigger(1)
 

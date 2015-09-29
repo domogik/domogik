@@ -3,7 +3,7 @@
  * Visual Blocks Language
  *
  * Copyright 2014 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,10 +132,10 @@ Blockly.Dart['controls_for'] = function(block) {
       code += '(' + increment + ').abs();\n';
     }
     code += 'if (' + startVar + ' > ' + endVar + ') {\n';
-    code += Blockly.Dart.INDENT + incVar + ' = -' + incVar +';\n';
+    code += Blockly.Dart.INDENT + incVar + ' = -' + incVar + ';\n';
     code += '}\n';
     code += 'for (' + variable0 + ' = ' + startVar + ';\n' +
-        '     '  + incVar + ' >= 0 ? ' +
+        '     ' + incVar + ' >= 0 ? ' +
         variable0 + ' <= ' + endVar + ' : ' +
         variable0 + ' >= ' + endVar + ';\n' +
         '     ' + variable0 + ' += ' + incVar + ') {\n' +

@@ -3,7 +3,7 @@
  * Visual Blocks Editor
  *
  * Copyright 2012 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,15 @@
  */
 'use strict';
 
-goog.provide('Blockly.Blocks.text');
+goog.provide('Blockly.Blocks.texts');
 
 goog.require('Blockly.Blocks');
 
+
+/**
+ * Common HSV hue for all blocks in this category.
+ */
+Blockly.Blocks.texts.HUE = 160;
 
 Blockly.Blocks['text'] = {
   /**
@@ -36,7 +41,7 @@ Blockly.Blocks['text'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.TEXT_TEXT_HELPURL);
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.appendDummyInput()
         .appendField(this.newQuote_(true))
         .appendField(new Blockly.FieldTextInput(''), 'TEXT')
@@ -48,16 +53,16 @@ Blockly.Blocks['text'] = {
    * Create an image of an open or closed quote.
    * @param {boolean} open True if open quote, false if closed.
    * @return {!Blockly.FieldImage} The field image of the quote.
+   * @this Blockly.Block
    * @private
    */
   newQuote_: function(open) {
-    if (open == Blockly.RTL) {
-      var file = 'quote1.png';
+    if (open == this.RTL) {
+      var file = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAQAAAAqJXdxAAAAqUlEQVQI1z3KvUpCcRiA8ef9E4JNHhI0aFEacm1o0BsI0Slx8wa8gLauoDnoBhq7DcfWhggONDmJJgqCPA7neJ7p934EOOKOnM8Q7PDElo/4x4lFb2DmuUjcUzS3URnGib9qaPNbuXvBO3sGPHJDRG6fGVdMSeWDP2q99FQdFrz26Gu5Tq7dFMzUvbXy8KXeAj57cOklgA+u1B5AoslLtGIHQMaCVnwDnADZIFIrXsoXrgAAAABJRU5ErkJggg==';
     } else {
-      var file = 'quote0.png';
+      var file = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAQAAAAqJXdxAAAAn0lEQVQI1z3OMa5BURSF4f/cQhAKjUQhuQmFNwGJEUi0RKN5rU7FHKhpjEH3TEMtkdBSCY1EIv8r7nFX9e29V7EBAOvu7RPjwmWGH/VuF8CyN9/OAdvqIXYLvtRaNjx9mMTDyo+NjAN1HNcl9ZQ5oQMM3dgDUqDo1l8DzvwmtZN7mnD+PkmLa+4mhrxVA9fRowBWmVBhFy5gYEjKMfz9AylsaRRgGzvZAAAAAElFTkSuQmCC';
     }
-    return new Blockly.FieldImage(Blockly.pathToBlockly + 'media/' + file,
-                                  12, 12, '"');
+    return new Blockly.FieldImage(file, 12, 12, '"');
   }
 };
 
@@ -68,14 +73,12 @@ Blockly.Blocks['text_join'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.TEXT_JOIN_HELPURL);
-    this.setColour(160);
-    this.appendValueInput('ADD0')
-        .appendField(Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH);
-    this.appendValueInput('ADD1');
+    this.setColour(Blockly.Blocks.texts.HUE);
+    this.itemCount_ = 2;
+    this.updateShape_();
     this.setOutput(true, 'String');
     this.setMutator(new Blockly.Mutator(['text_create_join_item']));
     this.setTooltip(Blockly.Msg.TEXT_JOIN_TOOLTIP);
-    this.itemCount_ = 2;
   },
   /**
    * Create XML to represent number of text inputs.
@@ -93,23 +96,8 @@ Blockly.Blocks['text_join'] = {
    * @this Blockly.Block
    */
   domToMutation: function(xmlElement) {
-    for (var x = 0; x < this.itemCount_; x++) {
-      this.removeInput('ADD' + x);
-    }
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
-    for (var x = 0; x < this.itemCount_; x++) {
-      var input = this.appendValueInput('ADD' + x);
-      if (x == 0) {
-        input.appendField(Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH);
-      }
-    }
-    if (this.itemCount_ == 0) {
-      this.appendDummyInput('EMPTY')
-          .appendField(new Blockly.FieldImage(Blockly.pathToBlockly +
-          'media/quote0.png', 12, 12, '"'))
-          .appendField(new Blockly.FieldImage(Blockly.pathToBlockly +
-          'media/quote1.png', 12, 12, '"'));
-    }
+    this.updateShape_();
   },
   /**
    * Populate the mutator's dialog with this block's components.
@@ -122,7 +110,7 @@ Blockly.Blocks['text_join'] = {
                                            'text_create_join_container');
     containerBlock.initSvg();
     var connection = containerBlock.getInput('STACK').connection;
-    for (var x = 0; x < this.itemCount_; x++) {
+    for (var i = 0; i < this.itemCount_; i++) {
       var itemBlock = Blockly.Block.obtain(workspace, 'text_create_join_item');
       itemBlock.initSvg();
       connection.connect(itemBlock.previousConnection);
@@ -136,36 +124,23 @@ Blockly.Blocks['text_join'] = {
    * @this Blockly.Block
    */
   compose: function(containerBlock) {
-    // Disconnect all input blocks and remove all inputs.
-    if (this.itemCount_ == 0) {
-      this.removeInput('EMPTY');
-    } else {
-      for (var x = this.itemCount_ - 1; x >= 0; x--) {
-        this.removeInput('ADD' + x);
-      }
-    }
-    this.itemCount_ = 0;
-    // Rebuild the block's inputs.
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    // Count number of inputs.
+    var connections = [];
+    var i = 0;
     while (itemBlock) {
-      var input = this.appendValueInput('ADD' + this.itemCount_);
-      if (this.itemCount_ == 0) {
-        input.appendField(Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH);
-      }
-      // Reconnect any child blocks.
-      if (itemBlock.valueConnection_) {
-        input.connection.connect(itemBlock.valueConnection_);
-      }
-      this.itemCount_++;
+      connections[i] = itemBlock.valueConnection_;
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
+      i++;
     }
-    if (this.itemCount_ == 0) {
-      this.appendDummyInput('EMPTY')
-          .appendField(new Blockly.FieldImage(Blockly.pathToBlockly +
-          'media/quote0.png', 12, 12, '"'))
-          .appendField(new Blockly.FieldImage(Blockly.pathToBlockly +
-          'media/quote1.png', 12, 12, '"'));
+    this.itemCount_ = i;
+    this.updateShape_();
+    // Reconnect any child blocks.
+    for (var i = 0; i < this.itemCount_; i++) {
+      if (connections[i]) {
+        this.getInput('ADD' + i).connection.connect(connections[i]);
+      }
     }
   },
   /**
@@ -175,15 +150,46 @@ Blockly.Blocks['text_join'] = {
    */
   saveConnections: function(containerBlock) {
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
-    var x = 0;
+    var i = 0;
     while (itemBlock) {
-      var input = this.getInput('ADD' + x);
+      var input = this.getInput('ADD' + i);
       itemBlock.valueConnection_ = input && input.connection.targetConnection;
-      x++;
+      i++;
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
     }
-  }
+  },
+  /**
+   * Modify this block to have the correct number of inputs.
+   * @private
+   * @this Blockly.Block
+   */
+  updateShape_: function() {
+    // Delete everything.
+    if (this.getInput('EMPTY')) {
+      this.removeInput('EMPTY');
+    } else {
+      var i = 0;
+      while (this.getInput('ADD' + i)) {
+        this.removeInput('ADD' + i);
+        i++;
+      }
+    }
+    // Rebuild block.
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField(this.newQuote_(true))
+          .appendField(this.newQuote_(false));
+    } else {
+      for (var i = 0; i < this.itemCount_; i++) {
+        var input = this.appendValueInput('ADD' + i);
+        if (i == 0) {
+          input.appendField(Blockly.Msg.TEXT_JOIN_TITLE_CREATEWITH);
+        }
+      }
+    }
+  },
+  newQuote_: Blockly.Blocks['text'].newQuote_
 };
 
 Blockly.Blocks['text_create_join_container'] = {
@@ -192,7 +198,7 @@ Blockly.Blocks['text_create_join_container'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.appendDummyInput()
         .appendField(Blockly.Msg.TEXT_CREATE_JOIN_TITLE_JOIN);
     this.appendStatementInput('STACK');
@@ -207,7 +213,7 @@ Blockly.Blocks['text_create_join_item'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.appendDummyInput()
         .appendField(Blockly.Msg.TEXT_CREATE_JOIN_ITEM_TITLE_ITEM);
     this.setPreviousStatement(true);
@@ -224,7 +230,7 @@ Blockly.Blocks['text_append'] = {
    */
   init: function() {
     this.setHelpUrl(Blockly.Msg.TEXT_APPEND_HELPURL);
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.appendValueInput('TEXT')
         .appendField(Blockly.Msg.TEXT_APPEND_TO)
         .appendField(new Blockly.FieldVariable(
@@ -267,13 +273,20 @@ Blockly.Blocks['text_length'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setHelpUrl(Blockly.Msg.TEXT_LENGTH_HELPURL);
-    this.setColour(160);
-    this.interpolateMsg(Blockly.Msg.TEXT_LENGTH_TITLE,
-                        ['VALUE', ['String', 'Array'], Blockly.ALIGN_RIGHT],
-                        Blockly.ALIGN_RIGHT);
-    this.setOutput(true, 'Number');
-    this.setTooltip(Blockly.Msg.TEXT_LENGTH_TOOLTIP);
+    this.jsonInit({
+      "message0": Blockly.Msg.TEXT_LENGTH_TITLE,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "VALUE",
+          "check": ['String', 'Array']
+        }
+      ],
+      "output": 'Number',
+      "colour": Blockly.Blocks.texts.HUE,
+      "tooltip": Blockly.Msg.TEXT_LENGTH_TOOLTIP,
+      "helpUrl": Blockly.Msg.TEXT_LENGTH_HELPURL
+    });
   }
 };
 
@@ -283,13 +296,20 @@ Blockly.Blocks['text_isEmpty'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setHelpUrl(Blockly.Msg.TEXT_ISEMPTY_HELPURL);
-    this.setColour(160);
-    this.interpolateMsg(Blockly.Msg.TEXT_ISEMPTY_TITLE,
-                        ['VALUE', ['String', 'Array'], Blockly.ALIGN_RIGHT],
-                        Blockly.ALIGN_RIGHT);
-    this.setOutput(true, 'Boolean');
-    this.setTooltip(Blockly.Msg.TEXT_ISEMPTY_TOOLTIP);
+    this.jsonInit({
+      "message0": Blockly.Msg.TEXT_ISEMPTY_TITLE,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "VALUE",
+          "check": ['String', 'Array']
+        }
+      ],
+      "output": 'Boolean',
+      "colour": Blockly.Blocks.texts.HUE,
+      "tooltip": Blockly.Msg.TEXT_ISEMPTY_TOOLTIP,
+      "helpUrl": Blockly.Msg.TEXT_ISEMPTY_HELPURL
+    });
   }
 };
 
@@ -303,7 +323,7 @@ Blockly.Blocks['text_indexOf'] = {
         [[Blockly.Msg.TEXT_INDEXOF_OPERATOR_FIRST, 'FIRST'],
          [Blockly.Msg.TEXT_INDEXOF_OPERATOR_LAST, 'LAST']];
     this.setHelpUrl(Blockly.Msg.TEXT_INDEXOF_HELPURL);
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.setOutput(true, 'Number');
     this.appendValueInput('VALUE')
         .setCheck('String')
@@ -332,7 +352,7 @@ Blockly.Blocks['text_charAt'] = {
          [Blockly.Msg.TEXT_CHARAT_LAST, 'LAST'],
          [Blockly.Msg.TEXT_CHARAT_RANDOM, 'RANDOM']];
     this.setHelpUrl(Blockly.Msg.TEXT_CHARAT_HELPURL);
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.setOutput(true, 'String');
     this.appendValueInput('VALUE')
         .setCheck('String')
@@ -411,16 +431,16 @@ Blockly.Blocks['text_getSubstring'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.WHERE_OPTIONS_1 =
+    this['WHERE_OPTIONS_1'] =
         [[Blockly.Msg.TEXT_GET_SUBSTRING_START_FROM_START, 'FROM_START'],
          [Blockly.Msg.TEXT_GET_SUBSTRING_START_FROM_END, 'FROM_END'],
          [Blockly.Msg.TEXT_GET_SUBSTRING_START_FIRST, 'FIRST']];
-    this.WHERE_OPTIONS_2 =
+    this['WHERE_OPTIONS_2'] =
         [[Blockly.Msg.TEXT_GET_SUBSTRING_END_FROM_START, 'FROM_START'],
          [Blockly.Msg.TEXT_GET_SUBSTRING_END_FROM_END, 'FROM_END'],
          [Blockly.Msg.TEXT_GET_SUBSTRING_END_LAST, 'LAST']];
     this.setHelpUrl(Blockly.Msg.TEXT_GET_SUBSTRING_HELPURL);
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.appendValueInput('STRING')
         .setCheck('String')
         .appendField(Blockly.Msg.TEXT_GET_SUBSTRING_INPUT_IN_TEXT);
@@ -521,7 +541,7 @@ Blockly.Blocks['text_changeCase'] = {
          [Blockly.Msg.TEXT_CHANGECASE_OPERATOR_LOWERCASE, 'LOWERCASE'],
          [Blockly.Msg.TEXT_CHANGECASE_OPERATOR_TITLECASE, 'TITLECASE']];
     this.setHelpUrl(Blockly.Msg.TEXT_CHANGECASE_HELPURL);
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.appendValueInput('TEXT')
         .setCheck('String')
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'CASE');
@@ -541,7 +561,7 @@ Blockly.Blocks['text_trim'] = {
          [Blockly.Msg.TEXT_TRIM_OPERATOR_LEFT, 'LEFT'],
          [Blockly.Msg.TEXT_TRIM_OPERATOR_RIGHT, 'RIGHT']];
     this.setHelpUrl(Blockly.Msg.TEXT_TRIM_HELPURL);
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     this.appendValueInput('TEXT')
         .setCheck('String')
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'MODE');
@@ -556,14 +576,20 @@ Blockly.Blocks['text_print'] = {
    * @this Blockly.Block
    */
   init: function() {
-    this.setHelpUrl(Blockly.Msg.TEXT_PRINT_HELPURL);
-    this.setColour(160);
-    this.interpolateMsg(Blockly.Msg.TEXT_PRINT_TITLE,
-                        ['TEXT', null, Blockly.ALIGN_RIGHT],
-                        Blockly.ALIGN_RIGHT);
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip(Blockly.Msg.TEXT_PRINT_TOOLTIP);
+    this.jsonInit({
+      "message0": Blockly.Msg.TEXT_PRINT_TITLE,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "TEXT"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": Blockly.Blocks.texts.HUE,
+      "tooltip": Blockly.Msg.TEXT_PRINT_TOOLTIP,
+      "helpUrl": Blockly.Msg.TEXT_PRINT_HELPURL
+    });
   }
 };
 
@@ -579,7 +605,7 @@ Blockly.Blocks['text_prompt'] = {
     // Assign 'this' to a variable for use in the closure below.
     var thisBlock = this;
     this.setHelpUrl(Blockly.Msg.TEXT_PROMPT_HELPURL);
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     var dropdown = new Blockly.FieldDropdown(TYPES, function(newOp) {
       if (newOp == 'NUMBER') {
         thisBlock.changeOutput('Number');
@@ -616,7 +642,7 @@ Blockly.Blocks['text_prompt_ext'] = {
     // Assign 'this' to a variable for use in the closure below.
     var thisBlock = this;
     this.setHelpUrl(Blockly.Msg.TEXT_PROMPT_HELPURL);
-    this.setColour(160);
+    this.setColour(Blockly.Blocks.texts.HUE);
     var dropdown = new Blockly.FieldDropdown(TYPES, function(newOp) {
       if (newOp == 'NUMBER') {
         thisBlock.changeOutput('Number');

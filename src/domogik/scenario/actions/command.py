@@ -29,37 +29,38 @@ from domogik.scenario.actions.abstract import AbstractAction
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 import zmq
+import json
+import traceback
 
 class CommandAction(AbstractAction):
     """ Simple action that log something in scenario logfile
     """
 
-    def __init__(self, log=None):
-        AbstractAction.__init__(self, log)
+    def __init__(self, log=None, params=None):
+        AbstractAction.__init__(self, log, params)
+        self.log = log
         self.set_description("Start a certain command")
+        self._cmdId = params
 
-    def do_action(self, condition, tests):
+    def do_action(self):
+        print self._params
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('cmd.send')
-        msg.add_data('cmdid', self._params['cmdid'])
-        msg.add_data('cmdparams', self._params['cmdparams'])
+        msg.add_data('cmdid', self._cmdId)
+        msg.add_data('cmdparams', self._params)
         # do the request
         res = cli.request('xplgw', msg.get(), timeout=10)
         if res:
             data = res.get_data()
             if not data['status']:
-                self._log.error("Command sending to XPL gw failed: {0}".format(res))
+                self.log.error("Command sending to XPL gw failed: {0}".format(res))
         else:
-            self._log.error("XPL gw did not respond")
-
+            self.log.error("XPL gw did not respond")
 
     def get_expected_entries(self):
         return {
-                 'cmdid': {'type': 'integer',
-                          'description': 'The command to start',
-                          'default': 0},
                  'cmdparams': {'type': 'dict',
-                          'description': 'The parameters for this command (ui needs to look them up in the DB)',
+                          'description': 'The parameters for this command',
                           'default': {}}
                }

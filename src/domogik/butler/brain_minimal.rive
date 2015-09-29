@@ -1,0 +1,7 @@
++ *{weight=1}
+- en_EN : there is no data loaded in the brain, please install at least the core brain packages. \n
+^ fr_FR : aucune donnée n'est chargée. Veuillez installer au moins les packages core du cerveau.
+
++ ping
+- pong
+

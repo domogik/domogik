@@ -42,11 +42,11 @@
           <!-- Devices list -->
           <div class="col-md-4">
             <h2>{% trans %}Known Devices{% endtrans %}</h2>
-            <ul class="list-group" id="myTabs">
+            <ul class="list-group" id="myDevices">
               {% for device_type_id in devices_by_device_type_id %}
                 <li class="list-group-item"><strong>{{ device_type_id }}</strong><span class="badge">{{ devices_by_device_type_id[device_type_id]|length }}</span></li>
                 {% for data in devices_by_device_type_id[device_type_id] %}
-                  <li class="list-group-item"><a href="#detail-{{ data.id }}"><span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> {{ data.name }}</a></li>
+                  <li class="list-group-item"><a href="#detail-{{ data.id }}" class="device"><span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> {{ data.name }}</a></li>
                 {% endfor %}
               {% endfor %}
             </ul>
@@ -137,9 +137,48 @@
                                       <td>{% if sen.last_value %}{{ sen.last_received|datetime }}{% endif %}</td>
                                     <tr>
                                     </tr>
-                                      <th>{% trans %}Rest URL{% endtrans %}</th>
-                                      {% set sensor_url = rest_url + "/sensorhistory/id/" + sen.id|string + "/last/10" %}
+                                      <th>{% trans %}REST URL{% endtrans %}</th>
+                                      {% set sensor_url = rest_url + "/sensorhistory/id/" + sen.id|string + "/last/1" %}
                                       <td><a href="{{ sensor_url }}">{{ sensor_url }}</a></td>
+                                    </tr>
+                                    <tr>
+                                      <th>{% trans %}Openremote usage{% endtrans %}</th>
+                                      <td>
+                                        <h5>{% trans %}Create the command{% endtrans %}</h5>
+                                        <p>
+                                          <em>{% trans %}To create a sensor, you need to create a command which will grab the value.{% endtrans %}</em>
+                                        </p>
+                                        <p>
+                                          {% trans %}You have to configure the following fields :{% endtrans %}
+                                        </p>
+                                        <ul>
+                                          <li><strong>{% trans %}Url{% endtrans %}</strong> : {{ sensor_url }}</li>
+                                          <li><strong>{% trans %}Polling interval{% endtrans %}</strong> : 1s</li>
+                                          <li><strong>{% trans %}JSONPath expression{% endtrans %}</strong> : $[0].value_str</li>
+                                        </ul>
+
+                                        <h5>{% trans %}Create the sensor{% endtrans %}</h5>
+                                        <p>
+                                          {% trans %}You have to create a <strong>custom sensor</strong>{% endtrans %}
+                                        </p>
+                                        <p>
+                                          {% trans %}Choose the newly created command.{% endtrans %}
+                                        </p>
+                                        {% if sen.data_type == "DT_Bool" or datatypes[sen.data_type]['parent'] == "DT_Bool" %}
+                                          <p>
+                                            {% trans %}Configure the <strong>Custom state items</strong> like this :{% endtrans %}
+                                          </p>
+                                          <table class="table table-bordered">
+                                            <thead>
+                                              <tr> <th>Name</th><th>Value</th> </tr>
+                                            </thead>
+                                            <tbody>
+                                              <tr> <td>off</td><td>0</td> </tr>
+                                              <tr> <td>on</td><td>1</td> </tr>
+                                            </tbody>
+                                          </table>
+                                        {% endif %}
+                                      </td>
                                     </tr>
                                   </tbody>
                                 </table>
@@ -167,10 +206,10 @@
                                       </tr>
                                       <tr>
                                         <th>{% trans %}Data Type{% endtrans %}</th>
-                                        <td>{{ param.data_type }} : {{ datatypes[param.data_type] }}</td>
+                                        <td>{{ param.data_type }} <!--: {{ datatypes[param.data_type] }}--></td>
                                       </tr>
                                       <tr>
-                                        <th>{% trans %}Example REST url{% endtrans %}</th>
+                                        <th>{% trans %}REST url{% endtrans %}</th>
                                         <td>
                                           {% trans %}Urls{% endtrans %}:
                                           {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
@@ -188,6 +227,35 @@
                                             </div>
                                           {% else %}
                                             {{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;key&gt;
+                                          {% endif %}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <th>{% trans %}Openremote usage{% endtrans %}</th>
+                                        <td>
+                                          {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
+                                            <h5>{% trans %}Create the commands{% endtrans %}</h5>
+                                            <p>
+                                              <em>{% trans %}You only need to configure the URL field.{% endtrans %}</em>
+                                            </p>
+                                            <ul>
+                                              <li><strong>{% trans %}Url for{% endtrans %} : {{ datatypes[param.data_type]['labels']['0'] }}</strong> : {{ url_0 }}</li>
+                                              <li><strong>{% trans %}Url for{% endtrans %} : {{ datatypes[param.data_type]['labels']['1'] }}</strong> : {{ url_1 }}</li>
+                                              <li><strong>{% trans %}Url for : status{% endtrans %}</strong> : {% trans %}see the corresponding sensor{% endtrans %}</li>
+                                            </ul>
+                                            <h5>{% trans %}Create the sensor{% endtrans %}</h5>
+                                            <p>
+                                              {% trans %}You have to create a <strong>custom sensor</strong>{% endtrans %}
+                                            </p>
+                                            <p>
+                                              {% trans %}For the command, select the status command created.{% endtrans %}
+                                            </p>
+                                            <h5>{% trans %}Create the switch{% endtrans %}</h5>
+                                            <p>
+                                              {% trans %}To create the switch, use the commands and the sensor created.{% endtrans %}
+                                            </p>
+                                          {% else %}
+                                            <em>{% trans %}Not yet documented.{% endtrans %}</em>
                                           {% endif %}
                                         </td>
                                       </tr>
@@ -274,7 +342,7 @@
         <script type="text/javascript">
         // Enable the Tabs
         
-        $('#myTabs a').click(function (e) {
+        $('#myDevices a').click(function (e) {
             e.preventDefault()
             $(this).tab('show')
           });

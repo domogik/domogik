@@ -1,0 +1,15 @@
+{% extends theme("base/base.html") %}
+{% block content %}
+<div class="container">
+  <h1>{% trans %}500 - Internal server error{% endtrans %}</h1>
+  <p>{% trans %}Ooops! It seems that something is broken somewhere...{% endtrans %}</p>
+  <p>{% trans %}This page means that you encountered an error. If this is not expected (and why would you expect for an error ?) you could do the following to help us :{% endtrans %}</p>
+  <ul>
+    <li>{% trans %}Check in the logs if you find anything.{% endtrans %}</li>
+    <li>{% trans %}If there is nothing in the logs, you could start the admin in a terminal : {% endtrans %}<code>killall -9 dmg_admin ; dmg_admin -f</code>{% trans %} and check if you see some errors.{% endtrans %}</li>
+    <li>{% trans %}With these informations, create a ticket on our bug tracker :{% endtrans %} <a href='http://tracker.domogik.org/projects/domogik/issues/new'>http://tracker.domogik.org/projects/domogik/issues/new</a></li>
+    <li>{% trans %}Take a cup of coffee or tea.{% endtrans %}</li>
+  </ul>
+</div>
+
+{% endblock %}

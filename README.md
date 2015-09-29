@@ -1,6 +1,6 @@
 Official website : www.domogik.org
 
-[![Build Status](https://travis-ci.org/domogik/domogik.svg?branch=master)](https://travis-ci.org/domogik/domogik)
+[![Build Status](https://travis-ci.org/domogik/domogik.svg?branch=develop)](https://travis-ci.org/domogik/domogik)
 
 INSTALL
 =======
