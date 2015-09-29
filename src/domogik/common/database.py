@@ -852,6 +852,7 @@ class DbHelper():
         oldvals = self.__session.query(DeviceStats.id, DeviceStats.value, DeviceStats.timestamp).\
                      filter(DeviceStats.skey==okey).\
                      filter(DeviceStats.device_id ==oid)
+        nb = oldvals.count()
         num = 0
         print("Insert stats... {0}".format(time.strftime("%X")))
         print("Please notice : if your database is big, this operation may take a long time (more than an hour)")
@@ -862,7 +863,7 @@ class DbHelper():
             if num%1000 == 0:
                 sys.stdout.write(".")
             if num%10000 == 9999:
-                sys.stdout.write(" {0}\n".format(time.strftime("%X")))
+                sys.stdout.write(" {0}/{1} done. {2}\n".format(num, nb, time.strftime("%X")))
             num += 1
         # delete the statas
         print("\nDelete stats... {0}".format(time.strftime("%X")))
