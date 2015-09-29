@@ -17,6 +17,7 @@ from domogik.common.sql_schema import \
 	Sensor, Device, Command, XplStat, DeviceParam, \
 	SensorHistory, XplStatParam, XplCommand, \
 	XplCommandParam, CommandParam, PluginConfig
+import traceback
 
 def upgrade():
     op.create_table(DeviceParam.__tablename__,
@@ -127,10 +128,13 @@ def upgrade():
     	sa.PrimaryKeyConstraint('xplcmd_id', 'key'),
     	mysql_engine='InnoDB'
     )
-    op.drop_constraint('core_device_ibfk_1', Device.__tablename__, type_='foreignkey')
-    op.drop_constraint('core_device_ibfk_2', Device.__tablename__, type_='foreignkey')
-    op.drop_constraint('core_device_type_ibfk_1', 'core_device_type', type_='foreignkey')
-    op.drop_index('device_type_id', Device.__tablename__)
+    try:
+        op.drop_constraint('core_device_ibfk_1', Device.__tablename__, type_='foreignkey')
+        op.drop_constraint('core_device_ibfk_2', Device.__tablename__, type_='foreignkey')
+        op.drop_constraint('core_device_type_ibfk_1', 'core_device_type', type_='foreignkey')
+        op.drop_index('device_type_id', Device.__tablename__)
+    except:
+        print("ERROR while dropping constraints. This CAN be normal if your first Domogik release was a 0.2 release. Please continue the installation process and if you encounter some issues, create a ticket with this error. The error is  : {0}".format(traceback.format_exc()))
     op.create_index('ix_core_device_device_type_id', Device.__tablename__, ['device_type_id'])
     op.add_column(Device.__tablename__, sa.Column('client_id', sa.Unicode(length=80), nullable=False))
     op.add_column(Device.__tablename__, sa.Column('client_version', sa.Unicode(length=32), nullable=False))

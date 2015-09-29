@@ -23,7 +23,7 @@ if __name__ == "__main__":
     print("This system can upgrade statistics to DOMOGIk 0.4")
     print("Source: 0.3")
     print("Destination: 0.4")
-    if __version__ != "0.4.0":
+    if __version__ != "0.4.1":
         print("")
         print("ERROR: This is only supported in domogik 0.4.0")
         print("Your domogik version is {0}".format(__version__))
@@ -101,7 +101,7 @@ if __name__ == "__main__":
                     print("")
                     l = 1
                     for nSen in newDev[(seln - 1)]['sensors']:
-                        print("{0}. {1}".format(l, newDev[(seln - 1)]['sensors'][nSen]["name"]))
+                        print("{0}. {1} ({2})".format(l, newDev[(seln - 1)]['sensors'][nSen]["name"], newDev[(seln - 1)]['sensors'][nSen]['reference']))
                         l = l + 1
                     print("0. Exit")
                     sels = l + 1
@@ -137,7 +137,7 @@ if __name__ == "__main__":
                             conf = raw_input("Type 'YES I AM SURE' to confirm, 'no' to cancel: ")
                         if conf == "YES I AM SURE":
                             print("Copying the stats")
-                            print("This can take some time be patiant")
+                            print("This can take some time be patient")
                             db.upgrade_do(selDev['id'], selKey, newDev[(seln - 1)]['id'], newDev[(seln - 1)]["sensors"][nSen]["id"])
                             # check if this is the last key
                             if len(old_devs[selDev['id']]['keys']) == 1:
