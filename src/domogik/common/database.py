@@ -854,6 +854,7 @@ class DbHelper():
                      filter(DeviceStats.device_id ==oid)
         num = 0
         print("Insert stats... {0}".format(time.strftime("%X")))
+        print("Please notice : if your database is big, this operation may take a long time (more than an hour)")
         for val in oldvals:
             # add the value
             self.add_sensor_history(nsid, val[1], val[2])
