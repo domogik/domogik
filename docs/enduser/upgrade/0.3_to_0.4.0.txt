@@ -17,7 +17,6 @@ For more informations, please check the :doc:`0.4.0 release page <../../releases
 
 Before starting to upgrade from 0.3 to 0.4, please notice that:
 
-* **There is no user interface available** : you won't be able to nicely view or control your devices. The user interface is still in development.
 * **0.3 or 0.2 plugins are not compliant with Domogik 0.4 and most of them are not yet converted to the new format** : you may be able to not use all of your technologies yet.
 * **as the database model has been changed, all the existing devices will be unusable, but there is a way to recover their history and so to keep the data** : keep in mind that some bugs can occurs so please, do a database backup before the installation!
 * **you can't upgrade from 0.2 to 0.4 : you will need to install the 0.3 release first**.
