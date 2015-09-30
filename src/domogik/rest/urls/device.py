@@ -8,13 +8,6 @@ import json
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 
-@urlHandler.route('/device/old/', methods=['GET'])
-@json_response
-@timeit
-def device_list_old():
-    b = urlHandler.db.list_old_devices()
-    return 200, b
-
 @urlHandler.route('/device/params/<client_id>/<dev_type_id>', methods=['GET'])
 @json_response
 @timeit
