@@ -31,6 +31,7 @@ Before releasing
 * Check website is ready
 * Check countdown website is ready
 * Check installation doc is up to date for Domogik, Domoweb
+* Upgrade version number in apidoc.json or MQ and rest
 * Do we need a new MQ release ?
 
 
