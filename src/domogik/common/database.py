@@ -393,12 +393,6 @@ class DbHelper():
             device_list.append(self.get_device(device=device))
         return device_list
 
-    def list_old_devices(self):
-        """Return a list of devices
-        @return a list of Device objects (only the devices that are inot known by this realease)
-        """
-        return self.__session.query(Device).filter(Device.address!=None).all()
-
     def get_device_sql(self, d_id):
         return self.__session.query(Device).filter_by(id=d_id).first()
 
