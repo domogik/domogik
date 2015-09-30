@@ -380,9 +380,8 @@ class DbHelper():
         """Return a list of devices
         @return a list of Device objects (only the devices that are known by this realease)
         """
-        #return self.__session.query(Device).filter(Device.address==None).all()
         device_list = []
-        for device in self.__session.query(Device).filter(Device.address==None).all():
+        for device in self.__session.query(Device).all():
             device_list.append(self.get_device(device=device))
         return device_list
 
