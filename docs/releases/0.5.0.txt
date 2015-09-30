@@ -1,3 +1,7 @@
 =============
 Release 0.5.0
 =============
+
+Upgrades in the db
+------------------
+The old not used table core_device_stats is deleted, same for the address field on a device. This finished the db upgrade we started in 0.4.x release.
