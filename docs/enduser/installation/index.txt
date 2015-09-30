@@ -119,22 +119,24 @@ Create the folder */opt/dmg/* : ::
     $ sudo chown domogik /opt/dmg  # assuming the user domogik already exists!
 
 
-Download the sources on GitHub
-******************************
+Download the packages
+*********************
 
 Download Domogik-mq : ::
 
     $ cd /opt/dmg/
-    $ git clone https://github.com/domogik/domogik-mq.git
+    $ wget --content-disposition https://github.com/domogik/domogik-mq/archive/1.1.tar.gz
+    $ tar xvzf domogik-mq-1.1.tar.gz
+    $ ln -s domogik-mq-1.1 domogik-mq
     $ cd domogik-mq
-    $ git checkout master
 
 Download Domogik : ::
 
     $ cd /opt/dmg/
-    $ git clone https://github.com/domogik/domogik.git
+    $ wget --content-disposition https://github.com/domogik/domogik/archive/0.4.1.tar.gz
+    $ tar xvzf domogik-0.4.1.tar.gz
+    $ ln -s domogik-0.4.1 domogik
     $ cd domogik
-    $ git checkout develop
 
 Install Domogik-mq
 ------------------
