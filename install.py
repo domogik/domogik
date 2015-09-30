@@ -398,12 +398,12 @@ def install():
                 exit(0)
 
         # Execute database fix for some 0.2/0.3 databases
-        info("Process some database upgrade issues with previous releases")
-        cmd = "sh ./src/domogik/install/db_fix_03.sh"
-        p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
-        lines_iterator = iter(p.stdout.readline, b"")
-        for line in lines_iterator:
-            print(line)
+        #info("Process some database upgrade issues with previous releases")
+        #cmd = "sh ./src/domogik/install/db_fix_03.sh"
+        #p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        #lines_iterator = iter(p.stdout.readline, b"")
+        #for line in lines_iterator:
+        #    print(line)
 
 
         if args.dist_packages:
