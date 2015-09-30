@@ -95,7 +95,7 @@ class DeviceConsistency():
             else:
                 self._result['sensor_add'] = data
         elif code == -1:
-            self._type == "raise":
+            if self._type == "raise":
                 raise DeviceConsistencyException(code, "Sensor ({0}) is in the device but not in the plugin".format(data))
             else:
                 self._result['sensor_del'] = data
@@ -130,15 +130,17 @@ class DeviceConsistency():
         # check the versions
         if self.d_json["client_version"] > self.p_json['identity']['version']:
             self._raise(0, "The device ({0}) has a newer client version then the plugin ({1})".format(self.d_json["client_version"], self.p_json['identity']['version']))
-        #if self.d_json["client_version"] < self.p_json['identity']['version']:
-        #    self._raise(0, "The device ({0}) has an older client version then the plugin ({1})".format(self.d_json["client_version"], self.p_json['identity']['version']))
+        if self.d_json["client_version"] == self.p_json['identity']['version']:
+            self._raise(0, "The device ({0}) and the plugin ({1}) client version are the same".format(self.d_json["client_version"], self.p_json['identity']['version']))
 
     def _validate_device_type(self):
         # check if the device_type exists
         if self.d_json['device_type_id'] not in self.p_json['device_types'].keys():
             self._raise(0, "Device type {0} is not known by this plugin".format(self.d_json['device_type_id']))
         # TODO non-xpl params
+        print "TODO non-xpl params"
         # TODO xpl params in every xpl_stat/xpl_command
+        # not sure if this is needed
 
     def _validate_command(self):
         # check that we need to remove commands
@@ -174,13 +176,16 @@ class DeviceConsistency():
         for sen in self.p_json['device_types'][self.d_json['device_type_id']]["sensors"]:
             if sen not in self.d_json['sensors'].keys():
                 self._raise(1, sen)
+            print "TODO find xpl stats for this sensor {0}".format(sen)
 
     def _validate_xpl_command(self, cmd):
         print "TODO xpl command {0}".format(cmd)
+        print "TODO xpl command params {0}".format(cmd)
 
     def _validate_xpl_stat(Self, stat):
         # check that all xpl_stats exist + all params are there
         print "TODO xpl stat {0}".format(stat)
+        print "TODO xpl stat params {0}".format(stat)
 
 if __name__ == "__main__":
     db = DbHelper()
@@ -188,4 +193,5 @@ if __name__ == "__main__":
         device_json = db.get_device(85)
     device_json = json.loads(json.dumps(device_json))
     plugin_json = PackageJson(name="velbus")
-    DeviceConsistency("raise", device_json, plugin_json.json)
+    dc = DeviceConsistency("raise", device_json, plugin_json.json)
+    dc.check()
