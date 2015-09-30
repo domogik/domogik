@@ -23,7 +23,7 @@ if __name__ == "__main__":
     print("This system can upgrade statistics to DOMOGIk 0.4")
     print("Source: 0.3")
     print("Destination: 0.4.X")
-    if __version__ != "0.4.0" || __version__ != "0.4.1" :
+    if __version__  not in ("0.4.0", "0.4.1"):
         print("")
         print("ERROR: This is only supported in domogik 0.4.X")
         print("Your domogik version is {0}".format(__version__))
@@ -101,7 +101,7 @@ if __name__ == "__main__":
                     print("")
                     l = 1
                     for nSen in newDev[(seln - 1)]['sensors']:
-                        print("{0}. {1}".format(l, newDev[(seln - 1)]['sensors'][nSen]["name"]))
+                        print("{0}. {1} ({2})".format(l, newDev[(seln - 1)]['sensors'][nSen]["name"], newDev[(seln - 1)]['sensors'][nSen]['reference']))
                         l = l + 1
                     print("0. Exit")
                     sels = l + 1
@@ -120,11 +120,16 @@ if __name__ == "__main__":
                             l = l + 1
                         print("")
                         print("====================================================================================")
+                        # info stored in vars
+                        # selDev            = old device
+                        # selKey            = old key
+                        # newDev[(seln-1))  = new Dev
+                        # selS              = new sensor
                         print("Upgrade with the folowing info")
                         print("Old device:      {0}({1})".format(selDev['name'], selDev['id']))
                         print("Old stats key:   {0}".format(selKey))
                         print("New device:      {0}({1})".format(newDev[(seln - 1)]["name"], newDev[(seln - 1)]['id']))
-                        print("New sensor:      {0}({1})".format(newDev[(seln - 1)]["sensors"][nSen]["name"], newDev[(seln - 1)]["sensors"][nSen]["id"]))
+                        print("New sensor:      {0}({1})".format(newDev[(seln - 1)]["sensors"][selS]["name"], newDev[(seln - 1)]["sensors"][selS]["id"]))
                         print("")
                         print("WARNING:")
                         print("By typing YES below this will start the upgrade process, after the process")
@@ -137,8 +142,8 @@ if __name__ == "__main__":
                             conf = raw_input("Type 'YES I AM SURE' to confirm, 'no' to cancel: ")
                         if conf == "YES I AM SURE":
                             print("Copying the stats")
-                            print("This can take some time be patiant")
-                            db.upgrade_do(selDev['id'], selKey, newDev[(seln - 1)]['id'], newDev[(seln - 1)]["sensors"][nSen]["id"])
+                            print("This can take some time be patient")
+                            db.upgrade_do(selDev['id'], selKey, newDev[(seln - 1)]['id'], newDev[(seln - 1)]["sensors"][selS]["id"])
                             # check if this is the last key
                             if len(old_devs[selDev['id']]['keys']) == 1:
                                 print("This was the last key of the device, so deleting the device")

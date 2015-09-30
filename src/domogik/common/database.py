@@ -40,6 +40,7 @@ Implements
 
 import datetime, hashlib, time
 import traceback
+import sys
 
 import json
 import sqlalchemy
@@ -847,16 +848,25 @@ class DbHelper():
 
     def upgrade_do(self, oid, okey, nid, nsid):
         self.__session.expire_all()
+        print("Load old stats... {0}".format(time.strftime("%X")))
         oldvals = self.__session.query(DeviceStats.id, DeviceStats.value, DeviceStats.timestamp).\
                      filter(DeviceStats.skey==okey).\
                      filter(DeviceStats.device_id ==oid)
+        nb = oldvals.count()
         num = 0
+        print("Insert stats... {0}".format(time.strftime("%X")))
+        print("Please notice : if your database is big, this operation may take a long time (more than an hour)")
         for val in oldvals:
             # add the value
             self.add_sensor_history(nsid, val[1], val[2])
-           # increment num
+            # increment num
+            if num%1000 == 0:
+                sys.stdout.write(".")
+            if num%10000 == 9999:
+                sys.stdout.write(" {0}/{1} done. {2}\n".format(num, nb, time.strftime("%X")))
             num += 1
         # delete the statas
+        print("\nDelete stats... {0}".format(time.strftime("%X")))
         meta = MetaData(bind=DbHelper.__engine)
         t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
         self.__session.execute(
@@ -866,6 +876,7 @@ class DbHelper():
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+        print("Done! {0}".format(time.strftime("%X")))
         return num
             
 ####

@@ -15,9 +15,8 @@ There is a big gap between the releases 0.3 and 0.4 for several reasons:
 
 For more informations, please check the :doc:`0.4.0 release page <../../releases/0.4.0>` and the :doc:`0.4.1 release page <../../releases/0.4.1>`
 
-Before starting to upgrade from 0.3 to 0.4, please notice that: 
+Before starting to upgrade from 0.3 to 0.4, please notice that:
 
-* **There is no user interface available** : you won't be able to nicely view or control your devices. The user interface is still in development.
 * **0.3 or 0.2 plugins are not compliant with Domogik 0.4 and most of them are not yet converted to the new format** : you may be able to not use all of your technologies yet.
 * **as the database model has been changed, all the existing devices will be unusable, but there is a way to recover their history and so to keep the data** : keep in mind that some bugs can occurs so please, do a database backup before the installation!
 * **you can't upgrade from 0.2 to 0.4 : you will need to install the 0.3 release first**.
@@ -28,8 +27,9 @@ Steps to upgrade
 Installation
 ------------
 
-.. todo::
-    Link to doc, backup
+First, install Domogik 0.4.1. Then install the needed plugins. Create the devices with the plugins in the same way you did in 0.3.0.
+
+Now you can start recovery
 
 Recover your 0.3 devices history
 --------------------------------
@@ -48,3 +48,105 @@ The steps taken (by the script):
 
 In the last step you will need to enter 'YES I AM SURE' and once this is entered the uprgade will happen for the select old device and stats key.
 This means that you have to do this for each device and stats key you want to upgrade.
+
+Example
+*******
+
+::
+
+    $ ./statsUpgrade.py
+    Welcome to the DOmogik upgrade system
+    This system can upgrade statistics to DOMOGIk 0.4
+    Source: 0.3
+    Destination: 0.4.X
+    Here is a list of all old devices, select the one you want to upgrade
+    
+    1. temp_retour_plancher
+    2. mirroir
+    3. Nanoz vert
+    4. Nanoz rouge-vert
+    ...
+    13. teleinfo
+    ...
+    71. stick s2
+    0. Exit
+    Select Action: 13
+    Selected Device teleinfo:
+    
+    Now select the stats key you want to upgrade for this device
+    
+    1. iinst
+    2. ptec
+    3. adps
+    4. hchc
+    5. hhphc
+    6. imax
+    7. papp
+    8. hchp
+    0. Cancel
+    Select Action: 1
+    
+    Select device 'teleinfo' with key 'iinst' to upgrade
+    
+    Select the sensor to copy the data to
+    
+    1. Teleinfo
+    0. Exit
+    Select Action: 1
+    
+    Select the sensor to copy the data to
+    
+    1. Tariff option (optarif)
+    2. Maximum power on phasis 3 (imax3)
+    3. Peak hours index if option = EJP (ejphpm)
+    4. Maximum power on phasis 1 (imax1)
+    5. Counter status (motdetat)
+    6. Off peak hours index for red days if option = tempo (bbrhcjr)
+    7. Off peak hours index (hchc)
+    8. Peak hours index for blue days if option = tempo (bbrhpjb)
+    9. Off peak hours index for white days if option = tempo (bbrhcjw)
+    10. Normal hours index if option = EJP (ejphn)
+    11. Peak hours index for white days if option = tempo (bbrhpjw)
+    12. Maximum power on phasis 2 (imax2)
+    13. Off peak hours index for blue days if option = tempo (bbrhcjb)
+    14. Peak hours index for red days if option = tempo (bbrhpjr)
+    15. Peak hours index (hchp)
+    16. EJP notice (30 minutes before the period) if option = EJP (pejp)
+    17. Power subscribed (isousc)
+    18. Instant power on phasis 1 (iinst1)
+    19. Instant power on phasis 3 (iinst3)
+    20. Instant power on phasis 2 (iinst2)
+    21. Current tariff period (ptec)
+    22. Instant power (iinst)
+    23. Electric meter address (adco)
+    24. Base option index (base)
+    25. Maximum power (imax)
+    26. ADPS - power subscribed reached (adps)
+    27. Apparent power (papp)
+    28. Hourly group (hhphc)
+    0. Exit
+    Select Action: 22
+    
+    ====================================================================================
+    Upgrade with the folowing info
+    Old device:      teleinfo(15)
+    Old stats key:   iinst
+    New device:      Teleinfo(175)
+    New sensor:      Instant power(5)
+    
+    WARNING:
+    By typing YES below this will start the upgrade process, after the process
+    the upgraded stats keys will be DELETED from the core_device_stats sql tabel.
+    This process can not be reversed, it is advised to make a backup of your
+    datatabse before starting this process
+    
+    Type 'YES I AM SURE' to confirm, 'no' to cancel:   YES I AM SUR
+    Copying the stats
+    This can take some time be patient
+    Load old stats... 12:46:25
+    Insert stats... 12:46:25
+    Please notice : if your database is big, this operation may take a long time (more than an our)
+    .......... 9999/522963 done. 12:47:00
+    .......... 19999/522963 done. 12:48:00
+    ...
+
