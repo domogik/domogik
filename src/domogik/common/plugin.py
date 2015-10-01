@@ -280,9 +280,11 @@ class Plugin(BasePlugin, MQRep):
         """
         for idx in range(len(self.json_data['configuration'])):
             if self.json_data['configuration'][idx]['key'] == key:
-                type = self.json_data['configuration'][idx]['default']
+                type = self.json_data['configuration'][idx]['type']
                 self.log.info(u"Casting value for key '{0}' in type '{1}'...".format(key, type)) 
-                return self.cast(value, type)
+                cvalue =  self.cast(value, type)
+                self.log.info(u"Value is : {0}".format(cvalue))
+                return cvalue
 
         # no cast operation : return the value
         if value == "None":
@@ -298,9 +300,9 @@ class Plugin(BasePlugin, MQRep):
             if type == "boolean":
                 # just in case, the "True"/"False" are not already converted in True/False
                 # this is (currently) done on queryconfig side
-                if value == "True":
+                if value in ["True", "Y"]:
                     return True
-                elif value ==  "False":
+                elif value in  ["False", "N"]:
                     return False
             # type == choice : nothing to do
             if type == "date": 
