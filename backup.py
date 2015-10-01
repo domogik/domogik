@@ -47,6 +47,7 @@ import errno
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader, CONFIG_FILE
+from domogik.butler.brain import LEARN_FILE, STAR_FILE
 from sqlalchemy import create_engine, MetaData, Table
 from alembic.config import Config
 from alembic import command
@@ -85,10 +86,11 @@ def backup_database(folder):
     os.system(" ".join(mysqldump_cmd))
 
 def backup_config(folder):
+    now = time.strftime("%Y%m%d-%H%M")
     files = [{ 'src' : '/etc/domogik/',
-               'dst' : 'domogik-etc.tgz'},
+               'dst' : 'domogik-etc-{0}.tgz'.format(now)},
              { 'src' : '/etc/default/domogik*',
-               'dst' : 'domogik-default.tgz'}]
+               'dst' : 'domogik-default-{0}.tgz'.format(now)}]
     for fic in files:
         src = fic['src']
         dst = fic['dst']
@@ -96,11 +98,12 @@ def backup_config(folder):
         print(cmd)
         os.system(cmd)
 
-def backup_learn_file(folder):
-    files = [{ 'src' : '/var/lib/domogik/domogik_packages/butler_learn.rive',
-               'dst' : 'domogik-butler-learn-file.tgz'},
-             { 'src' : '/var/lib/domogik/domogik_packages/butler_not_understood_queries.log',
-               'dst' : 'domogik-butler-unknown_queries-file.tgz'}]
+def backup_butler_file(folder):
+    now = time.strftime("%Y%m%d-%H%M")
+    files = [{ 'src' : LEARN_FILE,
+               'dst' : 'domogik-butler-learn-file-{0}.tgz'.format(now)},
+             { 'src' : STAR_FILE,
+               'dst' : 'domogik-butler-unknown_queries-file-{0}.tgz'.format(now)}]
     for fic in files:
         src = fic['src']
         dst = fic['dst']
@@ -120,7 +123,7 @@ if __name__ == "__main__":
                     raise e
             backup_database(folder)
             backup_config(folder)
-            backup_learn_file(folder)
+            backup_butler_file(folder)
         except:
             print("Error while doing the backup : {0}".format(traceback.format_exc()))
             

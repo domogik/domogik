@@ -14,6 +14,7 @@ End User Documentation
 
 Releases history
 ----------------
+* :doc:`Release 0.5.0 </releases/0.5.0>` 
 * :doc:`Release 0.4.1 </releases/0.4.1>` 
 * :doc:`Release 0.4.0 </releases/0.4.0>` 
 * :doc:`Release 0.3.0 </releases/0.3.0>`
@@ -32,6 +33,9 @@ Basic installation
 
 First, you will need to do run the :doc:`standard installation </enduser/installation/index>`.
 
+.. note::
+    **If you upgrade from 0.3 to 0.4**, please check the :doc:`upgrade 0.3 to 0.4 tutorial <enduser/upgrade/0.3_to_0.4.0>`.
+
 If you encounter some errors, please check :doc:`the errors and solutions page </enduser/errors/index>`
 
 Then, you will need to:
@@ -39,8 +43,6 @@ Then, you will need to:
 * Configure Domogik over the administration interface
 * Install a control user interface like Domoweb or Domodroid
 
-.. note::
-    **If you upgrade from 0.3 to 0.4**, please check the :doc:`upgrade 0.3 to 0.4.0 tutorial <enduser/upgrade/0.3_to_0.4.0>`.
 
 Uninstallation
 **************

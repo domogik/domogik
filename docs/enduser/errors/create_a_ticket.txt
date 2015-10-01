@@ -7,12 +7,12 @@ If you encountered an issue, you may want to open a ticket.
 Open a ticket for Domogik
 =========================
 
-Just go on http://tracker.domogik.org/projects/domogik/issues/new
+Just go on http://github.com/domogik/domogik/issues/new
 
 Open a ticket for Domoweb
 =========================
 
-Just go on http://tracker.domogik.org/projects/domoweb/issues/new
+Just go on http://github.com/domogik/domoweb/issues/new
 
 Open a ticket for a plugin
 ==========================

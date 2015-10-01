@@ -8,13 +8,6 @@ import json
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 
-@urlHandler.route('/device/old/', methods=['GET'])
-@json_response
-@timeit
-def device_list_old():
-    b = urlHandler.db.list_old_devices()
-    return 200, b
-
 @urlHandler.route('/device/params/<client_id>/<dev_type_id>', methods=['GET'])
 @json_response
 @timeit
@@ -72,9 +65,14 @@ def device_params(client_id, dev_type_id):
     msg.set_action('device.params')
     msg.add_data('device_type', dev_type_id)
     res = cli.request('dbmgr', msg.get(), timeout=10)
-    result = ""
+    result = {}
     if res:
         res = res.get_data()
+        print(type(res['result']))
+        # test if dbmgr returns a str ("Failed")
+        # and process this case...
+        if isinstance(res['result'], str) or isinstance(res['result'], unicode):
+            return 500, "DbMgr did not respond as expected, check the logs. Response is : {0}. {1}".format(res['result'], res['reason'])
         result = res['result'];
         result["client_id"] = client_id
     # return the info

@@ -3,18 +3,6 @@
 {% block document %}
     <div id="dmgnavbar" class='dmgen'>
         <a id='logo' title="Return to the main page" href="http://www.domogik.org">Domogik - Free home automation</a>
-        <ul id='dmgcas'>
-            <li><a href='http://wiki.domogik.org/tiki-register.php'>Register</a></li>
-        </ul>
-        <ul id='dmgsections'>
-            <li><a title="Domogik news, project and more" href="http://www.domogik.org">Home</a></li>
-            <li><a title="User Documentation" href="http://docs.domogik.org">Documentation</a></li>
-            <li><a title="Community documentation" href="http://wiki.domogik.org">Wiki</a></li>
-            <li><a title="Report and track bugs" href="http://tracker.domogik.org/projects/domogik">Tracker</a></li>
-            <li><a title="Community forums" href="http://forum.domogik.org">Forums</a></li>
-            <li><a title="Get Domogik" href="http://www.domogik.org/Download">Download</a></li>
-            <li><a title="List Packages" href="http://repo.domogik.org/package">Packages</a></li>
-        </ul>
     </div>
     <div id="custom-doc" class="{% block bodyclass %}{{ 'yui-t6' if pagename != 'indexDESACTIVATED' else '' }}{% endblock %}">
         <div id="hd">
@@ -29,7 +17,17 @@
                 {{ reldelim2 }} <a href="{{ next.link|e }}" title="{{ next.title|e }}">Next</a>
             {%- endif %}
             </div>
-            <div id="site-nav"><a href="/">Home</a> - Domogik: <a href="/domogik/stable/en/">0.4 (stable on master)</a>  {{ reldelim2 }} <a href="/domogik/develop/en/">develop</a> {{ reldelim2 }} <a href="/domogik/0.3/en/">0.3</a> {{ reldelim2 }} <a href="/domogik/0.2/en/">0.2</a> {{ reldelim2 }} <a href="/domogik/0.1/en/">0.1</a> {{ reldelim2 }}  - Domoweb: <a href="/domoweb/dev/en/">dev</a> {{ reldelim2 }} <a href="/domoweb/0.3/en/">0.3</a> {{ reldelim2 }} <a href="/domoweb/0.2/en/">0.2</a> - Domodroid: <a href="http://domodroid.readthedocs.org/">all</a></div>
+            <div id="site-nav">
+              <a href="/">Home</a> - 
+              Domogik: <a href="/domogik/stable/en/">0.4.1 (stable on master)</a>  {{ reldelim2 }} 
+                       <a href="/domogik/develop/en/">develop</a> {{ reldelim2 }} 
+                       <a href="/domogik/0.3/en/">0.3</a> - 
+
+              Domoweb: <a href="/domoweb/stable/en/">0.4 (stable on master)</a> {{ reldelim2 }} 
+                       <a href="/domoweb/dev/en/">dev</a> {{ reldelim2 }} 
+                       <a href="/domoweb/0.3/en/">0.3</a> - 
+
+              Domodroid: <a href="http://domodroid.readthedocs.org/">all</a></div>
         </div>
         <div id="bd">
             <div id="yui-main">
