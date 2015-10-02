@@ -185,7 +185,7 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 
 .. warning::
 
-     Some Ubuntu 15.04 users encountered this error during the installation : ::
+     Some Ubuntu 14.04 and 15.04 users encountered this error during the installation : ::
 
          Installed /opt/dmg/domogik-0.4.1/src
          Processing dependencies for Domogik==0.4.0
