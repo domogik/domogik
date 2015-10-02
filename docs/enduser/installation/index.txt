@@ -274,6 +274,33 @@ Set the backup file
     * If you want to use the C xPL hub instead of the python xPL hub, you need to update manually the configuration after Domogik installation. See :doc:`here </xplhub/index>` for more informations on the xpl hub.
 
 
+..warning::
+
+     Some Ubuntu 15.04 users encountered this error during the installation : ::
+
+         Installed /opt/dmg/domogik-0.4.1/src
+         Processing dependencies for Domogik==0.4.0
+         Searching for Flask-Themes2
+         Reading https://pypi.python.org/simple/Flask-Themes2/
+         Best match: Flask-Themes2 0.1.4.linux-x86-64
+         Downloading https://pypi.python.org/packages/any/F/Flask-Themes2/Flask-Themes2-0.1.4.linux-x86_64.tar.gz#md5=71321801f51576557850b4b08b70af89
+         Processing Flask-Themes2-0.1.4.linux-x86_64.tar.gz
+         error: Couldn't find a setup script in /tmp/easy_install-KnIzW3/Flask-Themes2-0.1.4.linux-x86_64.tar.gz
+         ========= TRACEBACK =============
+         Traceback (most recent call last):
+           File "./install.py", line 427, in install
+             raise OSError("setup.py doesn't finish correctly")
+         OSError: setup.py doesn't finish correctly
+         
+         =================================
+         ERROR:root:(<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
+          ==> (<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
+
+    You can fix this by doing: ::
+
+        sudo pip install flask-themes
+
+    And restart Domogik installation.
 
 In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogik.cfg**, you will have to complete it with these lines for Domoik 0.4.1 : ::
 
