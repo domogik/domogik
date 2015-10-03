@@ -39,7 +39,7 @@ On all Debian-based distributions (Raspbian for example), please install the **l
 
 On other distributions, please refer to your distribution documentation.
 
-Dependencies
+Dependencies 
 ------------
 
 Check your Python version with the below command: ::
@@ -152,7 +152,16 @@ Download Domogik : ::
 Install Domogik-mq
 ------------------
 
-::
+For now, before installing domogik-mq, you need to install some packages manually :
+
+* libzmq-dev
+* python-dev
+
+On all Debian-based distributions, just do: ::
+
+    $ sudo apt-get install libzmq-dev
+
+Then, install Domogik-mq: ::
 
     $ cd /opt/dmg/domogik-mq
     $ sudo ./install.py
@@ -218,7 +227,7 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 
     You can fix this by doing: ::
 
-        sudo pip install flask-themes
+        sudo pip install -e git://github.com/sysr-q/flask-themes2.git#egg=flask_themes2-dev
 
     And restart Domogik installation.
 
