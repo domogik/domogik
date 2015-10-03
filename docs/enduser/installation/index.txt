@@ -155,11 +155,12 @@ Install Domogik-mq
 For now, before installing domogik-mq, you need to install some packages manually :
 
 * libzmq-dev
-* python-dev
+* python2.7-dev
 
 On all Debian-based distributions, just do: ::
 
     $ sudo apt-get install libzmq-dev
+    $ sudo apt-get install python2.7-dev
 
 Then, install Domogik-mq: ::
 
