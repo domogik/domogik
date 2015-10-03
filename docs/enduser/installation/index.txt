@@ -409,7 +409,7 @@ The default backup folder is **/var/lib/domogik/backup/**. You can change it in 
 Next step : domoweb, the web user interface
 -------------------------------------------
 
-Check in the Domoweb documentation.
+Check in the Domoweb documentation : http://docs.domogik.org/domoweb/
 
 It doesn't work?
 ----------------
