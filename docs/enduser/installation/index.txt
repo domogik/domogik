@@ -373,6 +373,8 @@ It will start :
 * The administration web interface
 
 .. note::
+    Domogik administration is available on http://<ip>:40406/
+
     Default **login** and **password** are : 
 
     * login : admin
