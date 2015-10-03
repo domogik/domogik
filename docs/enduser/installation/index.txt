@@ -28,6 +28,17 @@ Some distributions may not include the **sudo** command as a default one. For De
 
 You can also simply logon as the **root** user and ignore the **sudo** part of the command for the commands that include a **sudo**.
 
+The lsb_release command
+-----------------------
+
+Domogik installation script uses the ``lsb_release -si`` command to check which Linux distribution you are using. Some Linux distribution has not this package instlled by default. This is the case for **Raspbian** for example. 
+
+On all Debian-based distributions (Raspbian for example), please install the **lsb-release** package like this: ::
+
+    # apt-get install lsb-release
+
+On other distributions, please refer to your distribution documentation.
+
 Dependencies
 ------------
 
