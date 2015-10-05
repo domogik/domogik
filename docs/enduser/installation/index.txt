@@ -199,14 +199,6 @@ This is the ip address which will be used by Domogik Message Queue (MQ). You sho
 Install Domogik 
 ---------------
 
-For now, before installing domogik, you need to install some packages manually :
-
-* libpq-dev
-
-On all Debian-based distributions, just do: ::
-
-    $ sudo apt-get install libpq-dev
-
 Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
 
     $ cd /opt/dmg/domogik/
