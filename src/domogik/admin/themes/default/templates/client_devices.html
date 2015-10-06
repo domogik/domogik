@@ -129,7 +129,19 @@
                                     <tr>
                                     </tr>
                                       <th>{% trans %}Last value{% endtrans %}</th>
-                                      <td>{% if sen.last_value %}{{ sen.last_value }}{% if datatypes[sen.data_type].unit %}&nbsp;{{ datatypes[sen.data_type].unit }}{% endif %}{% else %}&nbsp;{% endif %}</td>
+                                      <td>
+                                        {% if sen.last_value %}
+                                          {{ sen.last_value }}
+                                          {% if datatypes[sen.data_type].unit %}
+                                            &nbsp;{{ datatypes[sen.data_type].unit }}
+                                          {% endif %}
+                                          {% if sen.data_type == "DT_Bool" or datatypes[sen.data_type]['parent'] == "DT_Bool" %}
+                                            <em>( {{ datatypes[sen.data_type]['labels'][sen.last_value] }} )</em>
+                                          {% endif %}
+                                        {% else %}
+                                          &nbsp;
+                                        {% endif %}
+                                      </td>
                                     <tr>
                                     </tr>
                                       <th>{% trans %}Last received{% endtrans %}</th>
