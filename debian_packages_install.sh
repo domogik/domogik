@@ -12,6 +12,28 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
+
+function continue() {
+
+    if [ $1 -ne 0 ] ; then
+        echo "Something bad happens during command"
+        echo "You should stop this step to see what is bad"
+        cont=""
+        while [ "x${cont}" == "x" ] ; do
+            echo "Continue [Y/n] ?"
+            read cont
+            if [ "x${cont}" == "xY" ] ; then
+                echo "OK, let's continue..."
+            elif [ "x${cont}" == "xn" ] ; then
+                echo "Exiting!"
+                exit 1
+            else
+                cont=""
+            fi
+        done
+    fi
+}
+
 pkg_list="\
          git \
          alembic \
@@ -27,7 +49,6 @@ pkg_list="\
          python-pkg-resources \
          python-setuptools \
          python-mysqldb \
-         python-argparse \
          python-sqlalchemy \
          python-simplejson \
          python-openssl \
@@ -52,7 +73,10 @@ pkg_list="\
          "
 
 apt-get update
+continue $? 
+    
 apt-get install $pkg_list
+continue $? 
 
 pip_list="Flask-Login \
           Flask-Babel \
@@ -63,6 +87,7 @@ pip_list="Flask-Login \
 for elt in $pip_list
   do
     pip install $elt
+    continue $? 
 done
 
 
