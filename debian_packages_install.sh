@@ -6,6 +6,11 @@
 # * mysql-server is not installed by the install.py script as the database must 
 #   be created before launching the install.py script
 
+# Make sure only root can run our script
+if [ "$(id -u)" != "0" ]; then
+    echo "This script must be run as root" 1>&2
+    exit 1
+fi
 
 pkg_list="\
          git \

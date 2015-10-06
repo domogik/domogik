@@ -28,7 +28,18 @@ Some distributions may not include the **sudo** command as a default one. For De
 
 You can also simply logon as the **root** user and ignore the **sudo** part of the command for the commands that include a **sudo**.
 
-Dependencies
+The lsb_release command
+-----------------------
+
+Domogik installation script uses the ``lsb_release -si`` command to check which Linux distribution you are using. Some Linux distribution has not this package instlled by default. This is the case for **Raspbian** for example. 
+
+On all Debian-based distributions (Raspbian for example), please install the **lsb-release** package like this: ::
+
+    # apt-get install lsb-release
+
+On other distributions, please refer to your distribution documentation.
+
+Dependencies 
 ------------
 
 Check your Python version with the below command: ::
@@ -141,7 +152,17 @@ Download Domogik : ::
 Install Domogik-mq
 ------------------
 
-::
+For now, before installing domogik-mq, you need to install some packages manually :
+
+* libzmq-dev
+* python2.7-dev
+
+On all Debian-based distributions, just do: ::
+
+    $ sudo apt-get install libzmq-dev
+    $ sudo apt-get install python2.7-dev
+
+Then, install Domogik-mq: ::
 
     $ cd /opt/dmg/domogik-mq
     $ sudo ./install.py
@@ -182,6 +203,34 @@ Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *ins
 
     $ cd /opt/dmg/domogik/
     $ sudo ./install.py --dist-packages
+
+.. warning::
+
+     Some Ubuntu 14.04 and 15.04 users encountered this error during the installation : ::
+
+         Installed /opt/dmg/domogik-0.4.1/src
+         Processing dependencies for Domogik==0.4.0
+         Searching for Flask-Themes2
+         Reading https://pypi.python.org/simple/Flask-Themes2/
+         Best match: Flask-Themes2 0.1.4.linux-x86-64
+         Downloading https://pypi.python.org/packages/any/F/Flask-Themes2/Flask-Themes2-0.1.4.linux-x86_64.tar.gz#md5=71321801f51576557850b4b08b70af89
+         Processing Flask-Themes2-0.1.4.linux-x86_64.tar.gz
+         error: Couldn't find a setup script in /tmp/easy_install-KnIzW3/Flask-Themes2-0.1.4.linux-x86_64.tar.gz
+         ========= TRACEBACK =============
+         Traceback (most recent call last):
+           File "./install.py", line 427, in install
+             raise OSError("setup.py doesn't finish correctly")
+         OSError: setup.py doesn't finish correctly
+         
+         =================================
+         ERROR:root:(<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
+          ==> (<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
+
+    You can fix this by doing: ::
+
+        sudo pip install -e git://github.com/sysr-q/flask-themes2.git#egg=flask_themes2-dev
+
+    And restart Domogik installation.
 
 You will be requested to give some informations. ::
 
@@ -324,6 +373,8 @@ It will start :
 * The administration web interface
 
 .. note::
+    Domogik administration is available on http://<ip>:40406/ if you didn't change the port number.
+
     Default **login** and **password** are : 
 
     * login : admin
@@ -358,7 +409,7 @@ The default backup folder is **/var/lib/domogik/backup/**. You can change it in 
 Next step : domoweb, the web user interface
 -------------------------------------------
 
-Check in the Domoweb documentation.
+Check in the Domoweb documentation : http://docs.domogik.org/domoweb/
 
 It doesn't work?
 ----------------
