@@ -30,6 +30,10 @@
     </div>
 
 
+    {% if msg_core_dead != None %}
+      <div class="alert alert-warning">{{ msg_core_dead | safe }}</div>
+    {% endif %}
+
     {% if clients|length > 0 %}
       {% for host in client_list_per_host_per_type %}
         <h1>{% trans %}Clients on server{% endtrans %} {{ host }}</h1>
