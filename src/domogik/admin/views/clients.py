@@ -710,30 +710,32 @@ def get_brain_content(client_id):
         # we skip the learn file
         if client_id in ["learn", "not_understood"]:
             continue
+        if detail[client_id]:
+            for lang in detail[client_id]:
+                idx = 0
+                for file in detail[client_id][lang]:
+                    content = html_escape(detail[client_id][lang][file])
 
-        for lang in detail[client_id]:
-            idx = 0
-            for file in detail[client_id][lang]:
-                content = html_escape(detail[client_id][lang][file])
+                    # python objects
+                    idx += 1
+                    reg = re.compile(r"&gt; object", re.IGNORECASE)
+                    content = reg.sub("<button class='btn btn-info' onclick=\"$('#python_object_{0}').toggle();\"><span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span> python object</button><div class='python' id='python_object_{0}' style='display: none'>&gt; object".format(idx), content)
 
-                # python objects
-                idx += 1
-                reg = re.compile(r"&gt; object", re.IGNORECASE)
-                content = reg.sub("<button class='btn btn-info' onclick=\"$('#python_object_{0}').toggle();\"><span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span> python object</button><div class='python' id='python_object_{0}' style='display: none'>&gt; object".format(idx), content)
+                    reg = re.compile(r"&lt; object", re.IGNORECASE)
+                    content = reg.sub("&lt; object</div>", content)
 
-                reg = re.compile(r"&lt; object", re.IGNORECASE)
-                content = reg.sub("&lt; object</div>", content)
+                    # trigger
+                    reg = re.compile(r"\+(?P<trigger>.*)", re.IGNORECASE)
+                    content = reg.sub("<strong>+\g<trigger></strong>", content)
 
-                # trigger
-                reg = re.compile(r"\+(?P<trigger>.*)", re.IGNORECASE)
-                content = reg.sub("<strong>+\g<trigger></strong>", content)
-
-                # comments
-                reg = re.compile(r"//(?P<comment>.*)", re.IGNORECASE)
-                content = reg.sub("<em>//\g<comment></em>", content)
+                    # comments
+                    reg = re.compile(r"//(?P<comment>.*)", re.IGNORECASE)
+                    content = reg.sub("<em>//\g<comment></em>", content)
 
 
-                detail[client_id][lang][file] = content
+                    detail[client_id][lang][file] = content
+        else:
+            detail[client_id] = ""
     return detail
 
 
