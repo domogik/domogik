@@ -67,11 +67,20 @@ def get_ip_for_interfaces(interface_list=[], ip_type=AF_INET):
     ips = []
     for intf in interface_list:
         if intf in interfaces():
-            for addr in ifaddresses(intf)[ip_type]:
-                ips.append(addr['addr'])
+            try:
+                for addr in ifaddresses(intf)[ip_type]:
+                    ips.append(addr['addr'])
+            except KeyError as err:
+                assert "Interface {0} does not exist does not have an address of type {1}".format(intf, ip_type)
         else:
             assert "Interface {0} does not exist".format(intf)
     return ips
+
+def interface_has_ip(interface):
+    if len(get_ip_for_interfaces([interface])) == 0:
+        return False
+    else:
+        return True
 
 def get_sanitized_hostname():
     """ Get the sanitized hostname of the host 

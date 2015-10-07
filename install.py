@@ -220,15 +220,19 @@ def is_xplhub_advanced(advanced_mode, sect, key):
             else:
                 return False
 
-def write_domogik_configfile(advanced_mode):
+def write_domogik_configfile(advanced_mode, intf):
     # read the sample config file
     newvalues = False
     config = ConfigParser.RawConfigParser()
     config.read( ['/etc/domogik/domogik.cfg.sample'] )
+    itf = ['bind_interface', 'interfaces']
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            if is_domogik_advanced(advanced_mode, sect, item[0]):
+            if item[0] in itf  and not advanced_mode:
+                config.set(sect, item[0], intf)
+                debug("Value {0} in xplhub.cfg set to {1}".format(item[0], intf))
+            elif is_domogik_advanced(advanced_mode, sect, item[0]):
                 print("Key {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
@@ -240,7 +244,7 @@ def write_domogik_configfile(advanced_mode):
         ok("Writing the config file")
         config.write(configfile)
 
-def write_xplhub_configfile(advanced_mode):
+def write_xplhub_configfile(advanced_mode, intf):
     # read the sample config file
     newvalues = False
     config = ConfigParser.RawConfigParser()
@@ -248,7 +252,10 @@ def write_xplhub_configfile(advanced_mode):
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            if is_xplhub_advanced(advanced_mode, sect, item[0]):
+            if item[0] == 'interfaces' and not advanced_mode:
+                config.set(sect, item[0], intf)
+                debug("Value {0} in xplhub.cfg set to {1}".format(item[0], intf))
+            elif is_xplhub_advanced(advanced_mode, sect, item[0]):
                 print("Key {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
@@ -308,7 +315,7 @@ def needupdate():
        os.path.isfile("/etc/domogik/xplhub.cfg"):
         # TODO : restore after 0.4.1
         #print("Do you want to keep your current config files ? [Y/n]: "),
-        print("Configuration files")
+        info("Configuration files")
         print("Please notice that Domogik 0.3.x configuration files are no more compliant with Domogik 0.4 :")
         print("- backup your Domogik 0.3 configuration files")
         print("- say 'n' to the question to recreate them from scratch")
@@ -322,22 +329,26 @@ def needupdate():
             return True
     return True
 
-# not used
-#def config(advanced, notest):
-#    try:
-#        am_i_root()
-#        if needupdate():
-#            write_configfile(advanced)
-#        if not notest:
-#            test_config()
-#    except:
-#        import traceback
-#        traceback.format_exc()
-#        fail(sys.exc_info())
-
 def update_default(user):
     info("Update /etc/default/domogik")
     os.system('sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER={0};" /etc/default/domogik'.format(user))
+
+def find_interface():
+    info("Trying to find an interface to listen on")
+    try:
+        import traceback
+        pkg_resources.get_distribution("domogik").activate()
+        from domogik.common.utils import get_interfaces, interface_has_ip
+        for intf in get_interfaces():
+            if intf == 'lo':
+                continue
+            if interface_has_ip(intf):
+                break
+    except:
+        error("Trace: {0}".format(traceback.format_exc()))
+    else:
+        ok("Selected interface {0}".format(intf))
+    return intf
 
 def install():
     parser = argparse.ArgumentParser(description='Domogik installation.')
@@ -374,7 +385,6 @@ def install():
             "src/domogik/examples/config/domogik.cfg.sample")
     add_arguments_for_config_file(parser, \
             "src/domogik/xpl/hub/examples/config/xplhub.cfg.sample")
-
 
     args = parser.parse_args()
     try:
@@ -452,14 +462,15 @@ def install():
             write_domogik_configfile_from_command_line(args)
             info("Update the config file : /etc/domogik/xplhub.cfg")
             write_xplhub_configfile_from_command_line(args)
-
         else:
             if not args.config and needupdate():
+                # select the correct inetrface
+                intf = find_interface()
+                # update the config file
                 info("Update the config file : /etc/domogik/domogik.cfg")
-                write_domogik_configfile(False)
+                write_domogik_configfile(False, intf)
                 info("Update the config file : /etc/domogik/xplhub.cfg")
-                write_xplhub_configfile(False)
-
+                write_xplhub_configfile(False, intf)
 
         # upgrade db
         if not args.db:
