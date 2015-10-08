@@ -21,6 +21,7 @@ except ImportError:
     pass
 
 from domogik.common.sql_schema import Device, Sensor
+from domogik.common.plugin import STATUS_DEAD
 from wtforms.ext.sqlalchemy.orm import model_form
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
@@ -97,9 +98,15 @@ def clients():
     client_list = get_clients_list()
 
     client_list_per_host_per_type = OrderedDict()
+    num_core = 0
+    num_core_dead = 0
     for client in client_list:
         cli_type = client_list[client]['type']
         cli_host = client_list[client]['host']
+        if cli_type == "core":
+            num_core += 1
+            if client_list[client]['status'] == STATUS_DEAD:
+                num_core_dead += 1
 
         if cli_host not in client_list_per_host_per_type:
             client_list_per_host_per_type[cli_host] = {}
@@ -109,11 +116,22 @@ def clients():
 
         client_list_per_host_per_type[cli_host][cli_type][client] = client_list[client]
 
+    # if all the core clients are dead, there is an issue with MQ pub/sub (forwarder)
+    # so display a message
+    if num_core > 0 and num_core == num_core_dead:
+        msg_core_dead = "Ooups, it seems that you have an issue with your current configuration!<br>"
+        msg_core_dead += "The message queue is not working for PUB/SUB messages.<br>"
+        msg_core_dead += "This is related to the component MQ forwarder.<br>"
+        msg_core_dead += "The related configuration file is : /etc/domogik/domogik-mq.cfg.<br>"
+    else: 
+        msg_core_dead = None
+
     return render_template('clients.html',
         mactive="clients",
         overview_state="collapse",
         clients=client_list,
-        client_list_per_host_per_type=client_list_per_host_per_type)
+        client_list_per_host_per_type=client_list_per_host_per_type,
+        msg_core_dead = msg_core_dead)
 
 
 @app.route('/client/<client_id>')

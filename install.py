@@ -426,8 +426,10 @@ def install():
                 dist_packages_install_script = './debian_packages_install.sh'
             elif os.system(' bash -c \'[ "`lsb_release -si`" == "Ubuntu" ]\'') == 0:
                 dist_packages_install_script = './debian_packages_install.sh'
+            elif os.system(' bash -c \'[ "`lsb_release -si`" == "Raspbian" ]\'') == 0:
+                dist_packages_install_script = './debian_packages_install.sh'
             if dist_packages_install_script == '' :
-                raise OSError("The option --dist-packages is not implemented on this distribution. Please install the packages manually.")
+                raise OSError("The option --dist-packages is not implemented on this distribution. \nPlease install the packages manually.\n When packages have been installed, you can re reun the installation script without the --dist-packages option.")
             if os.system(dist_packages_install_script) != 0:
                 raise OSError("Cannot install packages correctly script '%s'" % dist_packages_install_script)
 
