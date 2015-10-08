@@ -80,7 +80,7 @@
                 {% elif type == "brain" %}
                   <span class="label label-info status status-label pull-right">n/a</span>
                 {% else %}
-                  <span class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
+                  <span id="status-{{host}}-{{type}}-{{client_list_per_host_per_type[host][type][client].name}}" class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
                 {% endif %}
                 </a>
 
@@ -107,6 +107,20 @@
     {% else %}
         <div class="alert alert-warning">{% trans %}No clients found (even core components!): is Domogik manager running?{% endtrans %}</div>
     {% endif %}
-
 </div>
+<script type="text/javascript">
+$( document ).ready(function() {
+    ws.onmessage = function(e) {
+        data = JSON.parse(e.data);
+        if (data.msgid == "plugin.status") {
+            msg = data.content;
+            el = '#status-'+msg['host']+'-'+msg['type']+'-'+msg['name'];
+            if ( $(el) ) {
+                $(el).text(msg['event']);
+                $(el).removeClass().addClass('label label-info status status-label status-'+msg['event']+' pull-right');
+            }
+        }
+    }
+});
+</script>
 {% endblock %}
