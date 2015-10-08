@@ -231,7 +231,7 @@ def write_domogik_configfile(advanced_mode, intf):
         for item in config.items(sect):
             if item[0] in itf  and not advanced_mode:
                 config.set(sect, item[0], intf)
-                debug("Value {0} in xplhub.cfg set to {1}".format(item[0], intf))
+                debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
             elif is_domogik_advanced(advanced_mode, sect, item[0]):
                 print("Key {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
