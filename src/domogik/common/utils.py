@@ -51,7 +51,7 @@ REGEXP_PS_SEPARATOR = re.compile('[\s]+')
 def get_interfaces():
     return interfaces()
 
-def get_ip_for_interfaces(interface_list=[], ip_type=AF_INET):
+def get_ip_for_interfaces(interface_list=[], ip_type=AF_INET, log = None):
     """ Returns all ips that are available for the interfaces in the list
     @param interface_list: a list of interfaces to ge the ips for,
         if the list is empty it will retrun all ips for this system
@@ -60,20 +60,36 @@ def get_ip_for_interfaces(interface_list=[], ip_type=AF_INET):
         AF_INET6: for ipv6
     @return: a list of ips
     """
+    all = False
     if type(interface_list) is not list:
         assert "The interface_list should be a list"
-    if len(interface_list) == 0:
+    if len(interface_list) == 0 or interface_list == ['*']:
+        all = True
         interface_list = interfaces()
     ips = []
     for intf in interface_list:
+        intf = intf.strip()
         if intf in interfaces():
             try:
                 for addr in ifaddresses(intf)[ip_type]:
                     ips.append(addr['addr'])
-            except KeyError as err:
-                assert "Interface {0} does not exist does not have an address of type {1}".format(intf, ip_type)
+            except:
+                if not all:
+                    msg = "There is no such working network interface: {0}".format(intf)
+                    if log != None:
+                        log.error(msg)
+                    else:
+                        print("ERROR : {0}".format(msg))
+                else:
+                    msg = "The network interface '{0}' is not available".format(intf)
+                    if log != None:
+                        log.debug(msg)
+                    else:
+                        print("{0}".format(msg))
         else:
             assert "Interface {0} does not exist".format(intf)
+            if log != None:
+                log.error("Interface {0} does not exist".format(intf))
     return ips
 
 def interface_has_ip(interface):
