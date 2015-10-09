@@ -222,10 +222,10 @@ class DbHelper():
         else:
             url = "%s://" % self.__db_config['type']
         if self.__db_config['port'] != '':
-            url = "%s%s:%s@%s:%s/%s" % (url, self.__db_config['user'], self.__db_config['password'],
+            url = "%s%s:%s@%s:%s/%s?charset=utf8" % (url, self.__db_config['user'], self.__db_config['password'],
                                         self.__db_config['host'], self.__db_config['port'], self.__db_config['name'])
         else:
-            url = "%s%s:%s@%s/%s" % (url, self.__db_config['user'], self.__db_config['password'],
+            url = "%s%s:%s@%s/%s?charset=utf8" % (url, self.__db_config['user'], self.__db_config['password'],
                                      self.__db_config['host'], self.__db_config['name'])
         return url
     
