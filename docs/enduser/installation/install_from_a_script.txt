@@ -2,10 +2,6 @@
 Install Domogik from a script
 =============================
 
-.. todo::
-
-    Add the domogik-mq install script
-
 Purpose
 =======
 
@@ -99,7 +95,7 @@ To know all the options available to install Domogik, you can just launch *insta
       -h, --help            show this help message and exit
       --dist-packages       Try to use distribution packages instead of pip
                             packages
-      --create-database     create and allow domogik to access to it, if it is not
+      --no-create-database  create and allow domogik to access to it, if it is not
                             already created
       --no-setup            Don't install the python packages
       --no-test             Don't run a config test
@@ -163,7 +159,7 @@ Of course! Here is an example of one developper script named *do_install.sh*. Th
     --user fritz \
     --command-line \
     --domogik_log_level debug \
-    --domogik_bind_interface 192.168.1.10 \
+    --domogik_bind_interface eth0 \
     --database_name dmgtest10 \
     --rest_interfaces eth0 \
     --rest_clean_json True \
