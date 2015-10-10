@@ -14,6 +14,7 @@ End User Documentation
 
 Releases history
 ----------------
+* :doc:`Release 0.4.2 </releases/0.4.2>` 
 * :doc:`Release 0.4.1 </releases/0.4.1>` 
 * :doc:`Release 0.4.0 </releases/0.4.0>` 
 * :doc:`Release 0.3.0 </releases/0.3.0>`

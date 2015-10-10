@@ -1,0 +1,12 @@
+=============
+Release 0.4.2
+=============
+
+Purpose
+=======
+
+This release is a fix release. It includes mainly some fixes related to the 0.4.1 release. It also include a few minor improvments.
+
+Related milestone : https://github.com/domogik/domogik/milestones/0.4.1%20users%20issues
+
+
