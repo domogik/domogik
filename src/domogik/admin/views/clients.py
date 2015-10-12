@@ -20,7 +20,7 @@ except ImportError:
     from flask_babel import gettext, ngettext
     pass
 
-from domogik.common.sql_schema import Device, Sensor
+from domogik.common.sql_schema import Device, DeviceParam, Sensor
 from domogik.common.plugin import STATUS_DEAD
 from wtforms.ext.sqlalchemy.orm import model_form
 from collections import OrderedDict
@@ -225,6 +225,51 @@ def client_sensor_edit(client_id, sensor_id):
                 active = 'devices',
                 sensor = sensor)
 
+@app.route('/client/<client_id>/global/edit/<dev_id>', methods=['GET', 'POST'])
+@login_required
+def client_global_edit(client_id, dev_id):
+    with app.db.session_scope():
+        dev = app.db.get_device(dev_id)
+        class F(Form):
+            pass
+        for item in dev["parameters"]:
+            item = dev["parameters"][item]
+            default = item["value"]
+            arguments = [Required()]
+            # build the field
+            if item["type"] == "boolean":
+                if default == 'Y' or default == 1 or default == True:
+                    default = True
+                else:
+                    default = False
+                field = BooleanField(item["key"], arguments, default=default)
+            elif item["type"] == "integer":
+                field = IntegerField(item["key"], arguments, default=default)
+            elif item["type"] == "float":
+                field = DateTimeField(item["key"], arguments, default=default)
+            else:
+                # time, email, ipv4, ipv6, url
+                field = TextField(item["key"], arguments, default=default)
+            # add the field
+            setattr(F, "{0}-{1}".format(item["id"], item["key"]), field)
+        form = F()
+
+        if request.method == 'POST' and form.validate():
+            for item in request.form:
+                if item != "csrf_token":
+                    id, name = item.split("-")
+                    app.db.udpate_device_param(id, value=request.form.get(item))
+            return redirect("/client/{0}/dmg_devices/known".format(client_id))
+            pass
+        else:
+                return render_template('client_global.html',
+                form = form,
+                clientid = client_id,
+                client_detail = get_client_detail(client_id),
+                mactive="clients",
+                active = 'devices',
+                device = dev)
+
 
 @app.route('/client/<client_id>/dmg_devices/detected')
 @login_required
@@ -264,10 +309,10 @@ def client_devices_edit(client_id, did):
 
         if request.method == 'POST' and form.validate():
             # save it
-            app.db.update_device(did, \
-                    d_name=request.form['name'], \
-                    d_description=request.form['description'], \
-                    d_reference=request.form['reference'])
+            #app.db.update_device(did, \
+            #        d_name=request.form['name'], \
+            #        d_description=request.form['description'], \
+            #        d_reference=request.form['reference'])
             # message the suer
             flash(gettext("Device saved"), 'success')
             # redirect
