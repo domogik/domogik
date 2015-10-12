@@ -932,8 +932,8 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         # to delete ?
         #pass
 
-        self.log.debug(u"Core : New pub message received {0}".format(msgid))
-        self.log.debug(u"{0}".format(content))
+        #self.log.debug(u"Core : New pub message received {0}".format(msgid))
+        #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
                 self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
@@ -1733,6 +1733,22 @@ class Clients():
         self._clients[client_id]['status'] = new_status
         self._clients_with_details[client_id]['status'] = new_status
         self.log.info(u"Status set : {0} => {1}".format(client_id, new_status))
+        # in case the client is dead, it means that it could have been killed or anything else. 
+        # so the client was not able to send itself the plugin.status message with status 'dead'...
+        # so the manager will do it for the client!
+        if new_status == STATUS_DEAD:
+            self.log.debug("Send plugin.status for client {0} and status = {1}....".format(client_id, STATUS_DEAD))
+            try:
+                package, host = client_id.split(".")
+                type, name = package.split("-")
+                self._pub.send_event('plugin.status', 
+                                     {"type" : type,
+                                      "name" : name,
+                                      "host" : host,
+                                      "event" : STATUS_DEAD})
+            except:
+                # bad data...
+                pass
         self.publish_update()
 
     def set_pid(self, client_id, pid):

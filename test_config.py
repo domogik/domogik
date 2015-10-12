@@ -209,6 +209,7 @@ def test_user_config_file(user_home, user_entry):
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
     rest = dict(config.items('rest'))
+    admin = dict(config.items('admin'))
     ok("Config file correctly loaded")
 
     info("Parse [domogik] section")
@@ -257,6 +258,12 @@ def test_user_config_file(user_home, user_entry):
     for ipadd in get_ip_for_interfaces(rest['interfaces'].split(",")):
         _check_port_availability(ipadd, rest['port'])
     ok("Rest server IP/port is not bound by anything else")
+
+    # Check [admin] section
+    info("Parse [admin] section")
+    for ipadd in get_ip_for_interfaces(admin['interfaces'].split(",")):
+        _check_port_availability(ipadd, admin['port'])
+    ok("Admin server IP/port is not bound by anything else")
 
 def test_init():
     info("Check init.d / rc.d")
