@@ -197,7 +197,6 @@ class CronExpression(object):
 
         if cpm:
             """ Do compare """
-            print cpm
             return True
         else:
             return False
@@ -322,7 +321,7 @@ class CronExpression(object):
         >>> parse_atom("*/9",(0,23))
         set([0, 9, 18])
         """
-        print("CronExpression > _parse_atom. parse = {0}, minmax = {1}".format(parse, minmax))
+        #print("CronExpression > _parse_atom. parse = {0}, minmax = {1}".format(parse, minmax))
         try:
             parse = parse.strip()
             increment = 1
