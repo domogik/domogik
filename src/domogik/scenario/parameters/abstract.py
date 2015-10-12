@@ -235,13 +235,13 @@ class AbstractParameter:
         @raise ValueError if a list_of_values has been defined for an entry and the submitted value is not in this list
         """
         for entry in params:
-            print("ENTRY={0}".format(entry))
+            #print("ENTRY={0}".format(entry))
             for name, val in entry.iteritems():
                 if name in self._expected:
-                    print("NAME={0}".format(name))
-                    print("VAL={0}".format(val))
-                    print("EXPEC={0}".format(self._expected))
-                    print("LIST_VAL={0}".format(self.get_list_of_values()))
+                    #print("NAME={0}".format(name))
+                    #print("VAL={0}".format(val))
+                    #print("EXPEC={0}".format(self._expected))
+                    #print("LIST_VAL={0}".format(self.get_list_of_values()))
                     if name in self.get_list_of_values():
                         if self._expected[name]['type'] == 'list':
                             # TODO : improve ?
