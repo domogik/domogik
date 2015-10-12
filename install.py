@@ -465,7 +465,7 @@ def install():
             write_xplhub_configfile_from_command_line(args)
         else:
             if not args.config and needupdate():
-                # select the correct inetrface
+                # select the correct interface
                 intf = find_interface()
                 # update the config file
                 info("Update the config file : /etc/domogik/domogik.cfg")
