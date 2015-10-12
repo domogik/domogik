@@ -72,7 +72,7 @@ def scenario_edit(id):
             dis = scen.disabled
             name = scen.name
             desc = scen.description
-            jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'")
+            jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'").replace('"', '\\"')
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
