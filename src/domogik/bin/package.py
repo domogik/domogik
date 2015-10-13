@@ -394,12 +394,16 @@ class PackageInstaller():
                 # if no streaming
                 else:
                     f.write(response.content)
-                    
-
+        except OpenSSL.SSL.ZeroReturnError as exp:
+            self.log.error("Error while downloading the package : SSL handshaking failed")
+            self.log.error("Please try again")
+            raise
         except: 
             self.log.error("Error while downloading the package : {0}".format(traceback.format_exc()))
-        self.log.info("Download finished")
-        return downloaded_file, mime
+            raise
+        else:
+            self.log.info("Download finished")
+            return downloaded_file, mime
 
     def uninstall(self, package):
         """ Uninstall a package
