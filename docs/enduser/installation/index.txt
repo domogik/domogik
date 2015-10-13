@@ -79,6 +79,15 @@ The **install.py** script will install these dependencies for the following dist
 
 For all the other distributions, please install them manually.
 
+Dependencies to install manually
+********************************
+
+The **netifaces python library** can't be installed automatically. For now you will have to install it manually. Example for debian based distributions: ::
+
+    $ sudo apt-get install python2.7-dev
+    $ sudo pip install netifaces
+
+
 Mysql server
 ------------
 
@@ -91,7 +100,7 @@ Install the packages for mysql server: ::
 
     $ sudo apt-get install mysql-server
 
-During the installation, **Domogik will automatically create the database**, but if you want to create the database your self, log on the mysql database as root user: ::
+During the installation, **Domogik will automatically create the database**, but if you want to create the database yourself, log on the mysql database as root user: ::
 
     $ mysql -u root -p
     Enter password: 
