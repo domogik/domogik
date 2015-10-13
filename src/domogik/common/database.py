@@ -427,98 +427,113 @@ class DbHelper():
         # params
         json_device['parameters'] = {}
         for a_param in device.params:
-            json_param = { 'id': a_param.id,
-                           'key': a_param.key,
-                           'type': a_param.type,
-                           'value': a_param.value
-                           }
-            json_device['parameters'][a_param.key] = json_param
+            try:
+                json_param = { 'id': a_param.id,
+                               'key': a_param.key,
+                               'type': a_param.type,
+                               'value': a_param.value
+                               }
+                json_device['parameters'][a_param.key] = json_param
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
         
         # complete with sensors informations
         json_device['sensors'] = {}
         for a_sensor in device.sensors:
-            json_sensor = { 'id' : a_sensor.id,
-                            'name' : a_sensor.name,
-                            'incremental' : a_sensor.incremental,
-                            'formula' : a_sensor.formula,
-                            'data_type' : a_sensor.data_type,
-                            'conversion' : a_sensor.conversion, 
-                            'timeout' : a_sensor.timeout, 
-                            'last_value' : a_sensor.last_value, 
-                            'last_received' : a_sensor.last_received,
-                            'value_min' : a_sensor.value_min,
-                            'value_max' : a_sensor.value_max,
-                            'reference' : a_sensor.reference
-                          }
-            json_device['sensors'][a_sensor.reference] = json_sensor
+            try:
+                json_sensor = { 'id' : a_sensor.id,
+                                'name' : a_sensor.name,
+                                'incremental' : a_sensor.incremental,
+                                'formula' : a_sensor.formula,
+                                'data_type' : a_sensor.data_type,
+                                'conversion' : a_sensor.conversion, 
+                                'timeout' : a_sensor.timeout, 
+                                'last_value' : a_sensor.last_value, 
+                                'last_received' : a_sensor.last_received,
+                                'value_min' : a_sensor.value_min,
+                                'value_max' : a_sensor.value_max,
+                                'reference' : a_sensor.reference
+                              }
+                json_device['sensors'][a_sensor.reference] = json_sensor
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # complete with commands information
         json_device['commands'] = {}
         for a_cmd in device.commands:
-            json_command = {
-                    'id': a_cmd.id,
-                    'name': a_cmd.name,
-                    'return_confirmation': a_cmd.return_confirmation,
-                    'xpl_command' : a_cmd.xpl_command.json_id,
-                    'parameters': []
-                    }
-            for a_cmd_param in a_cmd.params:
-                json_command['parameters'].append({ 'key': a_cmd_param.key,
-                                                    'data_type': a_cmd_param.data_type,
-                                                    'conversion': a_cmd_param.conversion
-                                                })
-            json_device['commands'][a_cmd.reference] = json_command
+            try:
+                json_command = {
+                        'id': a_cmd.id,
+                        'name': a_cmd.name,
+                        'return_confirmation': a_cmd.return_confirmation,
+                        'xpl_command' : a_cmd.xpl_command.json_id,
+                        'parameters': []
+                        }
+                for a_cmd_param in a_cmd.params:
+                    json_command['parameters'].append({ 'key': a_cmd_param.key,
+                                                        'data_type': a_cmd_param.data_type,
+                                                        'conversion': a_cmd_param.conversion
+                                                    })
+                json_device['commands'][a_cmd.reference] = json_command
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # complete for each xpl_stat information
         json_device['xpl_stats'] = {}
         for a_xplstat in device.xpl_stats:
-            json_xplstat = { 'id' : a_xplstat.id,
-                             'json_id' : a_xplstat.json_id,
-                             'name' : a_xplstat.name,
-                             'schema' : a_xplstat.schema,
-                             'parameters' : {
-                                'static' : [],
-                                'dynamic' : []
-                             }
-                           }
-            # and for each xpl_stat, add the parameters informations
-            # the loop is done twice : 
-            # - for the dynamic parameters
-            # - for the static parameters
-            for a_xplstat_param in a_xplstat.params:
-                if a_xplstat_param.static == False and a_xplstat_param.sensor_id is not None:
-                    if a_xplstat_param.sensor_id:
-                        for sen in device.sensors:
-                            if sen.id == a_xplstat_param.sensor_id:
-                                sensor_name = sen.reference
+            try:
+                json_xplstat = { 'id' : a_xplstat.id,
+                                 'json_id' : a_xplstat.json_id,
+                                 'name' : a_xplstat.name,
+                                 'schema' : a_xplstat.schema,
+                                 'parameters' : {
+                                    'static' : [],
+                                    'dynamic' : []
+                                 }
+                               }
+                # and for each xpl_stat, add the parameters informations
+                # the loop is done twice : 
+                # - for the dynamic parameters
+                # - for the static parameters
+                for a_xplstat_param in a_xplstat.params:
+                    if a_xplstat_param.static == False and a_xplstat_param.sensor_id is not None:
+                        if a_xplstat_param.sensor_id:
+                            for sen in device.sensors:
+                                if sen.id == a_xplstat_param.sensor_id:
+                                    sensor_name = sen.reference
+                        else:
+                            sensor_name = None
+                        json_xplstat['parameters']['dynamic'].append({ 'key' :  a_xplstat_param.key,
+                                                                       'ignore_values' :  a_xplstat_param.ignore_values,
+                                                                       'sensor_name': sensor_name
+                                                                    })
                     else:
-                        sensor_name = None
-                    json_xplstat['parameters']['dynamic'].append({ 'key' :  a_xplstat_param.key,
-                                                                   'ignore_values' :  a_xplstat_param.ignore_values,
-                                                                   'sensor_name': sensor_name
-                                                                })
-                else:
-                    json_xplstat['parameters']['static'].append({ 'key' :  a_xplstat_param.key,
-                                                                  'type' : a_xplstat_param.type,
-                                                                  'value' :  a_xplstat_param.value,
-                                                                })
-                 
-            json_device['xpl_stats'][a_xplstat.json_id] = json_xplstat
+                        json_xplstat['parameters']['static'].append({ 'key' :  a_xplstat_param.key,
+                                                                      'type' : a_xplstat_param.type,
+                                                                      'value' :  a_xplstat_param.value,
+                                                                    })
+                     
+                json_device['xpl_stats'][a_xplstat.json_id] = json_xplstat
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # xpl_commands
         json_device['xpl_commands'] = {}
         for a_xplcmd in device.xpl_commands:
-            json_xplcmd = { 'id': a_xplcmd.id,
-                            'name' : a_xplcmd.name,
-                            'schema' : a_xplcmd.schema,
-                            'xpl_stat_ack': a_xplcmd.stat.json_id,
-                            'parameters' : []
-                            }
-            for a_xplcmd_param in a_xplcmd.params:
-                json_xplcmd['parameters'].append({ 'key' :  a_xplcmd_param.key,
-                                                   'value' :  a_xplcmd_param.value
-                                                })
-            json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
+            try:
+                json_xplcmd = { 'id': a_xplcmd.id,
+                                'name' : a_xplcmd.name,
+                                'schema' : a_xplcmd.schema,
+                                'xpl_stat_ack': a_xplcmd.stat.json_id,
+                                'parameters' : []
+                                }
+                for a_xplcmd_param in a_xplcmd.params:
+                    json_xplcmd['parameters'].append({ 'key' :  a_xplcmd_param.key,
+                                                       'value' :  a_xplcmd_param.value
+                                                    })
+                json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # global parameters
         return json_device
