@@ -75,6 +75,21 @@ pkg_list="\
 apt-get update
 continue $? 
     
+# special case for python argparse....
+python -c "import argparsex"
+if [ $? -ne 0 ] ; then
+    echo "Argparse module for python is not installed. Trying to install it..."
+    pip install argparse
+    if [ $? -ne 0 ] ; then
+        echo "Error while installing argparse module"
+        continue $? 
+    fi
+
+else
+    echo "Argparse module for python is already installed"
+fi
+
+# standard packages
 apt-get install $pkg_list
 continue $? 
 
