@@ -165,7 +165,7 @@ On all Debian-based distributions, just do: ::
 Then, install Domogik-mq: ::
 
     $ cd /opt/dmg/domogik-mq
-    $ sudo ./install.py
+    $ sudo ./install.py --dist-packages
 
 You will be requested to give some informations. ::
 
