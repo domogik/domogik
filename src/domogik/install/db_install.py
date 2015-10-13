@@ -104,19 +104,24 @@ class DbInstall():
         from sqlalchemy_utils import database_exists, create_database
         ok("Checking if the mysql db exists")
         with self._db.session_scope():
-            if not database_exists(self._db.get_engine().url):
-                #create_database(self._db.get_engine().url)
-                #if database_exists(self._db.get_engine().url):
-                #    ok("Database created sucessfully")
-                #    return True
-                #else:
-                #    fail("Database creation failed")
-                #    return False
-                info("Database does not exist")
+            try:
+                if not database_exists(self._db.get_engine().url):
+                    #create_database(self._db.get_engine().url)
+                    #if database_exists(self._db.get_engine().url):
+                    #    ok("Database created sucessfully")
+                    #    return True
+                    #else:
+                    #    fail("Database creation failed")
+                    #    return False
+                    info("Database does not exist")
+                    return False
+                else:
+                    info("Database already exists")
+                    return True
+            except:
+                info("Database does not exist or user grants not yet applied")
                 return False
-            else:
-                info("Database already exists")
-                return True
+                
 
     def install_or_upgrade_db(self, skip_backup=False):
         from domogik.common import sql_schema
