@@ -89,6 +89,26 @@ else
     echo "Argparse module for python is already installed"
 fi
 
+# special case for Flask-theme2
+# Some Ubuntu 14.04 and 15.04 users encountered this error during the installation :
+# Searching for Flask-Themes2
+# Reading https://pypi.python.org/simple/Flask-Themes2/
+# Best match: Flask-Themes2 0.1.4.linux-x86-64
+# Downloading https://pypi.python.org/packages/any/F/Flask-Themes2/Flask-Themes2-0.1.4.linux-x86_64.tar.gz#md5=71321801f51576557850b4b08b70af89
+# Processing Flask-Themes2-0.1.4.linux-x86_64.tar.gz
+# error: Couldn't find a setup script in /tmp/easy_install-KnIzW3/Flask-Themes2-0.1.4.linux-x86_64.tar.gz
+# ========= TRACEBACK =============
+# Traceback (most recent call last):
+#   File "./install.py", line 427, in install
+#     raise OSError("setup.py doesn't finish correctly")
+# OSError: setup.py doesn't finish correctly
+# 
+# =================================
+# ERROR:root:(<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
+#  ==> (<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
+pip install -e git://github.com/sysr-q/flask-themes2.git#egg=flask_themes2-dev
+continue $? 
+
 # standard packages
 apt-get install $pkg_list
 continue $? 
