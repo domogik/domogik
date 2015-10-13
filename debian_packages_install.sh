@@ -76,7 +76,7 @@ apt-get update
 continue $? 
     
 # special case for python argparse....
-python -c "import argparsex"
+python -c "import argparse"
 if [ $? -ne 0 ] ; then
     echo "Argparse module for python is not installed. Trying to install it..."
     pip install argparse
@@ -117,6 +117,7 @@ pip_list="Flask-Login \
           Flask-Babel \
           Flask-Bootstrap \
           sphinx-better-theme \
+          sqlalchemy-utils \
          "
 
 for elt in $pip_list
