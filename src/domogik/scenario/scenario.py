@@ -94,6 +94,14 @@ class ScenarioInstance:
         self._mapping = { 'test': {}, 'action': {} }
         if not self._disabled:
             self._instanciate()
+    
+    def enable(self):
+        self._disabled = False
+        self._instanciate()
+
+    def disable(self):
+        self._disabled = True
+        self._clean_instances()
 
     def destroy(self):
         """ Cleanup the class
