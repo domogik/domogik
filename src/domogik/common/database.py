@@ -53,7 +53,7 @@ from domogik.common import logger
 #from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
-        Device, DeviceStats, DeviceParam,
+        Device, DeviceParam,
         PluginConfig, Person,
         UserAccount,
         Scenario,
@@ -380,9 +380,8 @@ class DbHelper():
         """Return a list of devices
         @return a list of Device objects (only the devices that are known by this realease)
         """
-        #return self.__session.query(Device).filter(Device.address==None).all()
         device_list = []
-        for device in self.__session.query(Device).filter(Device.address==None).all():
+        for device in self.__session.query(Device).all():
             device_list.append(self.get_device(device=device))
         return device_list
 
@@ -392,12 +391,6 @@ class DbHelper():
         for device in self.__session.query(Device).filter_by(client_id=p_id).all():
             device_list.append(self.get_device(device=device))
         return device_list
-
-    def list_old_devices(self):
-        """Return a list of devices
-        @return a list of Device objects (only the devices that are inot known by this realease)
-        """
-        return self.__session.query(Device).filter(Device.address!=None).all()
 
     def get_device_sql(self, d_id):
         return self.__session.query(Device).filter_by(id=d_id).first()
@@ -813,13 +806,6 @@ class DbHelper():
         if device is None:
             self.__raise_dbhelper_exception("Device with id %s couldn't be found" % d_id)
         
-        # Use this method rather than cascade deletion (much faster)
-        meta = MetaData(bind=DbHelper.__engine)
-        t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
-        self.__session.execute(
-            t_stats.delete().where(t_stats.c.device_id == d_id)
-        )
-
         # delete sensor history data
         ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
         meta = MetaData(bind=DbHelper.__engine)
@@ -836,49 +822,6 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return device
 
-####
-# stats upgrade
-####
-    def upgrade_list_old(self):
-        return self.__session.query(Device.id, Device.name, DeviceStats.skey).\
-                    filter(Device.id==DeviceStats.device_id).\
-                    filter(Device.address!=None).\
-                    order_by(Device.id).\
-                    distinct()
-
-    def upgrade_do(self, oid, okey, nid, nsid):
-        self.__session.expire_all()
-        print("Load old stats... {0}".format(time.strftime("%X")))
-        oldvals = self.__session.query(DeviceStats.id, DeviceStats.value, DeviceStats.timestamp).\
-                     filter(DeviceStats.skey==okey).\
-                     filter(DeviceStats.device_id ==oid)
-        nb = oldvals.count()
-        num = 0
-        print("Insert stats... {0}".format(time.strftime("%X")))
-        print("Please notice : if your database is big, this operation may take a long time (more than an hour)")
-        for val in oldvals:
-            # add the value
-            self.add_sensor_history(nsid, val[1], val[2])
-            # increment num
-            if num%1000 == 0:
-                sys.stdout.write(".")
-            if num%10000 == 9999:
-                sys.stdout.write(" {0}/{1} done. {2}\n".format(num, nb, time.strftime("%X")))
-            num += 1
-        # delete the statas
-        print("\nDelete stats... {0}".format(time.strftime("%X")))
-        meta = MetaData(bind=DbHelper.__engine)
-        t_stats = Table(DeviceStats.__tablename__, meta, autoload=True)
-        self.__session.execute(
-            t_stats.delete().where(and_(t_stats.c.device_id == oid, t_stats.c.skey == okey))
-        )
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
-        print("Done! {0}".format(time.strftime("%X")))
-        return num
-            
 ####
 # Sensor history
 ####

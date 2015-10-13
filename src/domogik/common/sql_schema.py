@@ -28,7 +28,6 @@ Implements
 
 - class PluginConfig
 - class Device
-- class DeviceStats
 - class Person
 - class UserAccount
 
@@ -110,7 +109,6 @@ class Device(Base):
     name = Column(Unicode(30), nullable=False)
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
-    address = Column(Unicode(255), nullable=True)
     device_type_id = Column(Unicode(80), nullable=False, index=True)
     client_id = Column(Unicode(80), nullable=False)
     client_version = Column(Unicode(32), nullable=False)
@@ -184,59 +182,6 @@ class DeviceParam(Base):
     def get_tablename():
         """Return the table name associated to the class"""
         return Device.__tablename__
-
-class DeviceStats(Base):
-    """Device stats (values that were associated to the device)"""
-
-    __tablename__ = '%s_device_stats' % _db_prefix
-    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
-    date = Column(DateTime, nullable=False, index=True)
-    # This is used for mysql compatibility reasons as timestamps are NOT handled in Unix Time format
-    timestamp = Column(Integer, nullable=False)
-    skey = Column(Unicode(30), nullable=False, index=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename()), nullable=False)
-    device = relation(Device)
-    # We have both types for value field because we need an explicit numerical field in case we want to compute
-    # arithmetical operations (min/max/avg etc.). If it is a numerical value, both fields are filled in. If it is a
-    # character value only 'value' field is filled in.
-    __value_num = Column('value_num', Float)
-    value = Column('value_str', Unicode(255))
-    __table_args__ = (Index('ix_core_device_stats_date_skey_device_id', "date", "skey", "device_id"), )
-
-    def __init__(self, date, timestamp, skey, device_id, value):
-        """Class constructor
-
-        @param date : date when the stat was recorded
-        @param timestamp : corresponding timestamp
-        @param skey : key for the stat
-        @param device_id : device id
-        @param value : stat value (numerical or string)
-
-        """
-        self.date = date
-        self.timestamp = timestamp
-        self.skey = ucode(skey)
-        try:
-            self.__value_num = float(value)
-        except ValueError:
-            pass
-        self.value = ucode(value)
-        self.device_id = device_id
-
-    def get_date_as_timestamp(self):
-        """Convert DateTime value to timestamp"""
-        return time.mktime(self.date.timetuple())
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<DeviceStats(%s, date='%s', (%s, %s), device=%s)>" % (self.id, self.date, self.skey, self.value,
-                                                                      self.device)
-
-    @staticmethod
-    def get_tablename():
-        """Return the table name associated to the class"""
-        return DeviceStats.__tablename__
 
 class Person(Base):
     """Persons registered in the app"""
