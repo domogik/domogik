@@ -72,7 +72,7 @@ def scenario_edit(id):
             dis = scen.disabled
             name = scen.name
             desc = scen.description
-            jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'")
+            jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'").replace('"', '\\"')
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
@@ -144,6 +144,9 @@ def scenario_blocks_js():
         res = res.get_data()
         if 'result' in res:
             scenario_tests = res['result']
+    else:
+        print("Error : no scenario tests found!")
+        scenario_tests = {}
 
     tests = scenario_tests.keys()
     tests.remove(u'sensor.SensorTest')
@@ -159,12 +162,16 @@ def scenario_blocks_js():
         res = res.get_data()
         if 'result' in res:
             scenario_actions = res['result']
+    else:
+        print("Error : no scenario actions found!")
+        scenario_actions = {}
 
     actions = scenario_actions.keys()
     actions.remove(u'command.CommandAction')
 
     # datatypes
     datatypes = {}
+    used_datatypes = []
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('datatype.get')
@@ -173,6 +180,9 @@ def scenario_blocks_js():
         res = res.get_data()
         if 'datatypes' in res:
             datatypes = res['datatypes']
+    else:
+        print("Error : no datatypes found!")
+        datatypes = {}
 
     # devices 
     cli = MQSyncReq(app.zmq_context)
@@ -185,6 +195,9 @@ def scenario_blocks_js():
             # create a list of the used datatypes in sensors to build only these datatype blocks
             used_datatypes = []
             devices = res['devices']
+    else:
+        print("Error : no devices found!")
+        devices = []
 
 
     ### Now start the javascript geenration
@@ -270,130 +283,133 @@ def scenario_blocks_js():
     ### devices sensors and commands
     devices_per_clients = {}
     for dev in devices:
-        client = dev['client_id']
-        name = dev['name']
-        if client not in devices_per_clients:
-            devices_per_clients[client] = {}
-        devices_per_clients[client][name] = {}
-        devices_per_clients[client][name]['sensors'] = {}
-        devices_per_clients[client][name]['commands'] = {}
-
-        ### sensors blocks
-        for sen in dev['sensors']:
-            p = u""
-            jso = u""
-            sen_id = dev['sensors'][sen]['id']
-            sen_name = dev['sensors'][sen]['name']
-            devices_per_clients[client][name]['sensors'][sen_name] = sen_id
-            # determ the output type
-            sen_dt = dev['sensors'][sen]['data_type'] 
-            if sen_dt not in used_datatypes:
-                used_datatypes.append(sen_dt)
-            dt_parent = sen_dt
-            # First, determine the parent type (DT_Number, DT_Bool, ...)
-            while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
-                dt_parent = datatypes[dt_parent]['parent']
-            if dt_parent == "DT_Bool":
-                color = 20
-                output = "\"Boolean\""
-            elif dt_parent == "DT_Number":
-                color = 65
-                output = "\"Number\""
-            else:
-                color = 160
-                output = "\"null\""
-            block_id = u"sensor.SensorTest.{0}".format(sen_id)
-            block_description = u"{0}@{1}".format(name, client)
-            add = u"""Blockly.Blocks['{0}'] = {{
-                        init: function() {{
-                            this.setColour({5});
-                            this.appendDummyInput().appendField("{2}");
-                            this.appendDummyInput().appendField("Sensor : {1} ({6})");
-                            this.setOutput(true, {4});
-                            this.setInputsInline(false);
-                            this.setTooltip("{2}"); 
-                        }}
-                    }};
-                    """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
-            js = u'{0}\n\r{1}'.format(js, add)
-
-        ### commands blocks
-        for cmd in dev['commands']:
-            p = u""
-            jso = u""
-            cmd_id = dev['commands'][cmd]['id']
-            cmd_name = dev['commands'][cmd]['name']
-            devices_per_clients[client][name]['commands'][cmd_name] = cmd_id
-            color = 1;
-            # parse the parameters
-            js_params = ""
-            for param in dev['commands'][cmd]['parameters']:
-                param_key = param['key']
-                param_dt_type = param['data_type']
+        try:
+            client = dev['client_id']
+            name = dev['name']
+            if client not in devices_per_clients:
+                devices_per_clients[client] = {}
+            devices_per_clients[client][name] = {}
+            devices_per_clients[client][name]['sensors'] = {}
+            devices_per_clients[client][name]['commands'] = {}
+    
+            ### sensors blocks
+            for sen in dev['sensors']:
+                p = u""
+                jso = u""
+                sen_id = dev['sensors'][sen]['id']
+                sen_name = dev['sensors'][sen]['name']
+                devices_per_clients[client][name]['sensors'][sen_name] = sen_id
+                # determ the output type
+                sen_dt = dev['sensors'][sen]['data_type'] 
+                if sen_dt not in used_datatypes:
+                    used_datatypes.append(sen_dt)
+                dt_parent = sen_dt
                 # First, determine the parent type (DT_Number, DT_Bool, ...)
-                dt_parent = param_dt_type
                 while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                     dt_parent = datatypes[dt_parent]['parent']
-                #if dt_parent == "DT_Bool":
-                #    color = 20
-                #    output = "\"Boolean\""
-                #elif dt_parent == "DT_Number":
-                #    color = 65
-                #    output = "\"Number\""
-                #else:
-                #    color = 160
-                #    output = "\"null\""
-                js_params = u"""
-                                this.appendDummyInput().appendField("- {0} : ")
-                            """.format(param_key)
-                list_options = None
-                if "labels" in datatypes[param_dt_type]:
-                    list_options = datatypes[param_dt_type]['labels']
-                if "values" in datatypes[param_dt_type]:
-                    list_options = datatypes[param_dt_type]['values']
-                if list_options != None:
-                    js_list_options = u"["
-                    for opt in list_options:
-                        js_list_options += u"['{0}', '{1}'],".format(list_options[opt], opt)
-                    js_list_options += u"]"
-                    js_params += u"""
-                                    .appendField(new Blockly.FieldDropdown({0}), "{1}");
-                                """.format(js_list_options, param_key)
-                else: 
-                    param_format = u""
-                    if 'format' in datatypes[param_dt_type]:
-                        param_format = datatypes[param_dt_type]['format']
-                        if param_format == None:
-                            param_format = u""
-                        else:
-                            param_format = u"({0})".format(param_format)
-                    js_params += u"""
-                                    .appendField(new Blockly.FieldTextInput(""), "{0}")
-                                    .appendField("{1}");
-                                """.format(param_key, param_format)
-            block_id = u"command.CommandAction.{0}".format(cmd_id)
-            block_description = u"{0}@{1}".format(name, client)
-
-            ### TODO : reactivate setNextStatement to true !
-            # for now, it is set to false as we are not yet able to do 2 actions without an edition bug
-            # so we deactivated it :(
-
-            add = u"""Blockly.Blocks['{0}'] = {{
-                        init: function() {{
-                            this.setColour({5});
-                            this.appendDummyInput().appendField("{2}");
-                            this.appendDummyInput().appendField("Command : {1}");
-                            this.appendDummyInput().appendField("Parameters : ");
-                            {6}
-                            this.setPreviousStatement(true, "null");
-                            // this.setNextStatement(true, "null");
-                            this.setNextStatement(false, "null");
-                            this.setInputsInline(false);
-                            this.setTooltip("{2}"); 
-                        }}
-                    }};
-                    """.format(block_id, cmd_name, block_description, jso, output, color, js_params)
-            js = u'{0}\n\r{1}'.format(js, add)
+                if dt_parent == "DT_Bool":
+                    color = 20
+                    output = "\"Boolean\""
+                elif dt_parent == "DT_Number":
+                    color = 65
+                    output = "\"Number\""
+                else:
+                    color = 160
+                    output = "\"null\""
+                block_id = u"sensor.SensorTest.{0}".format(sen_id)
+                block_description = u"{0}@{1}".format(name, client)
+                add = u"""Blockly.Blocks['{0}'] = {{
+                            init: function() {{
+                                this.setColour({5});
+                                this.appendDummyInput().appendField("{2}");
+                                this.appendDummyInput().appendField("Sensor : {1} ({6})");
+                                this.setOutput(true, {4});
+                                this.setInputsInline(false);
+                                this.setTooltip("{2}"); 
+                            }}
+                        }};
+                        """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
+                js = u'{0}\n\r{1}'.format(js, add)
+    
+            ### commands blocks
+            for cmd in dev['commands']:
+                p = u""
+                jso = u""
+                cmd_id = dev['commands'][cmd]['id']
+                cmd_name = dev['commands'][cmd]['name']
+                devices_per_clients[client][name]['commands'][cmd_name] = cmd_id
+                color = 1;
+                # parse the parameters
+                js_params = ""
+                for param in dev['commands'][cmd]['parameters']:
+                    param_key = param['key']
+                    param_dt_type = param['data_type']
+                    # First, determine the parent type (DT_Number, DT_Bool, ...)
+                    dt_parent = param_dt_type
+                    while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
+                        dt_parent = datatypes[dt_parent]['parent']
+                    #if dt_parent == "DT_Bool":
+                    #    color = 20
+                    #    output = "\"Boolean\""
+                    #elif dt_parent == "DT_Number":
+                    #    color = 65
+                    #    output = "\"Number\""
+                    #else:
+                    #    color = 160
+                    #    output = "\"null\""
+                    js_params = u"""
+                                    this.appendDummyInput().appendField("- {0} : ")
+                                """.format(param_key)
+                    list_options = None
+                    if "labels" in datatypes[param_dt_type]:
+                        list_options = datatypes[param_dt_type]['labels']
+                    if "values" in datatypes[param_dt_type]:
+                        list_options = datatypes[param_dt_type]['values']
+                    if list_options != None:
+                        js_list_options = u"["
+                        for opt in list_options:
+                            js_list_options += u"['{0}', '{1}'],".format(list_options[opt], opt)
+                        js_list_options += u"]"
+                        js_params += u"""
+                                        .appendField(new Blockly.FieldDropdown({0}), "{1}");
+                                    """.format(js_list_options, param_key)
+                    else: 
+                        param_format = u""
+                        if 'format' in datatypes[param_dt_type]:
+                            param_format = datatypes[param_dt_type]['format']
+                            if param_format == None:
+                                param_format = u""
+                            else:
+                                param_format = u"({0})".format(param_format)
+                        js_params += u"""
+                                        .appendField(new Blockly.FieldTextInput(""), "{0}")
+                                        .appendField("{1}");
+                                    """.format(param_key, param_format)
+                block_id = u"command.CommandAction.{0}".format(cmd_id)
+                block_description = u"{0}@{1}".format(name, client)
+    
+                ### TODO : reactivate setNextStatement to true !
+                # for now, it is set to false as we are not yet able to do 2 actions without an edition bug
+                # so we deactivated it :(
+    
+                add = u"""Blockly.Blocks['{0}'] = {{
+                            init: function() {{
+                                this.setColour({5});
+                                this.appendDummyInput().appendField("{2}");
+                                this.appendDummyInput().appendField("Command : {1}");
+                                this.appendDummyInput().appendField("Parameters : ");
+                                {6}
+                                this.setPreviousStatement(true, "null");
+                                // this.setNextStatement(true, "null");
+                                this.setNextStatement(false, "null");
+                                this.setInputsInline(false);
+                                this.setTooltip("{2}"); 
+                            }}
+                        }};
+                        """.format(block_id, cmd_name, block_description, jso, output, color, js_params)
+                js = u'{0}\n\r{1}'.format(js, add)
+        except:
+            print("ERROR while looking on a device : {0}".format(traceback.format_exc()))
 
     #### datatypes
     for dt_type in used_datatypes:

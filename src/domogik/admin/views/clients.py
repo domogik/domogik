@@ -28,6 +28,7 @@ from domogik.common.utils import get_rest_url
 from operator import itemgetter
 import re
 import json
+import traceback
 
 try:
     import html.parser
@@ -164,7 +165,12 @@ def client_devices_known(client_id):
 
     # todo : grab from MQ ?
     with app.db.session_scope():
-        devices = app.db.list_devices_by_plugin(client_id)
+        try:
+            devices = app.db.list_devices_by_plugin(client_id)
+            error = None
+        except:
+            error = "Error while retrieving the devices list. Error is : {0}".format(traceback.format_exc())
+            devices = []
 
     # sort clients per device type
     devices_by_device_type_id = {}
@@ -182,7 +188,8 @@ def client_devices_known(client_id):
             mactive="clients",
             active = 'devices',
             rest_url = get_rest_url(),
-            client_detail = detail)
+            client_detail = detail,
+            error = error)
 
 
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
