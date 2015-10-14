@@ -258,11 +258,6 @@ def scenario_blocks_js():
             else:
                 papp = u"{0};".format(papp)
             p.append(papp)
-
-        ### TODO : reactivate setNextStatement to true !
-        # for now, it is set to false as we are not yet able to do 2 actions without an edition bug
-        # so we deactivated it :(
-
         add = u"""Blockly.Blocks['{0}'] = {{
                 init: function() {{
                     this.setHelpUrl('');
@@ -270,8 +265,7 @@ def scenario_blocks_js():
                     this.appendDummyInput().appendField("{2}");
                     {1}
                     this.setPreviousStatement(true, "null");
-                    // this.setNextStatement(true, "null");
-                    this.setNextStatement(false, "null");
+                    this.setNextStatement(true, "null");
                     this.setTooltip("{2}");
                     this.setInputsInline(false);
                 }}
@@ -387,11 +381,6 @@ def scenario_blocks_js():
                                     """.format(param_key, param_format)
                 block_id = u"command.CommandAction.{0}".format(cmd_id)
                 block_description = u"{0}@{1}".format(name, client)
-    
-                ### TODO : reactivate setNextStatement to true !
-                # for now, it is set to false as we are not yet able to do 2 actions without an edition bug
-                # so we deactivated it :(
-    
                 add = u"""Blockly.Blocks['{0}'] = {{
                             init: function() {{
                                 this.setColour({5});
@@ -400,8 +389,7 @@ def scenario_blocks_js():
                                 this.appendDummyInput().appendField("Parameters : ");
                                 {6}
                                 this.setPreviousStatement(true, "null");
-                                // this.setNextStatement(true, "null");
-                                this.setNextStatement(false, "null");
+                                this.setNextStatement(true, "null");
                                 this.setInputsInline(false);
                                 this.setTooltip("{2}"); 
                             }}
