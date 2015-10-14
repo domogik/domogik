@@ -305,9 +305,13 @@ class ScenarioManager:
                 self.log.info(u"Scenario enable : id '{0}' doesn't exist".format(cid))
                 return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
             else:
-                self._instances[int(cid)]['instance'].enable()
-                # TODO persistent?
-                self.log.info(u"Scenario {0} enabled".format(cid))
+                if self._instances[int(cid)]['instance'].enable():
+                    # TODO persistent?
+                    self.log.info(u"Scenario {0} enabled".format(cid))
+                    return {'status': 'OK', 'msg': u"Scenario {0} enabled".format(cid)}
+                else:
+                    self.log.info(u"Scenario {0} already enabled".format(cid))
+                    return {'status': 'ERROR', 'msg': u"Scenario {0} already enabled".format(cid)}
         except:
             msg = u"Error while enabling the scenario id='{0}'. Error is : {1}".format(cid, traceback.format_exc())
             self.log.error(msg)
@@ -319,9 +323,13 @@ class ScenarioManager:
                 self.log.info(u"Scenario disable : id '{0}' doesn't exist".format(cid))
                 return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
             else:
-                self._instances[int(cid)]['instance'].disable()
-                # TODO persistent?
-                self.log.info(u"Scenario {0} disabled".format(cid))
+                if self._instances[int(cid)]['instance'].disable():
+                    # TODO persistent?
+                    self.log.info(u"Scenario {0} disabled".format(cid))
+                    return {'status': 'OK', 'msg': u"Scenario {0} disabled".format(cid)}
+                else:
+                    self.log.info(u"Scenario {0} already disabled".format(cid))
+                    return {'status': 'ERROR', 'msg': u"Scenario {0} already disabled".format(cid)}
         except:
             msg = u"Error while disabling the scenario id='{0}'. Error is : {1}".format(cid, traceback.format_exc())
             self.log.error(msg)

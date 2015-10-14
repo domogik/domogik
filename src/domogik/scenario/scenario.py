@@ -96,12 +96,20 @@ class ScenarioInstance:
             self._instanciate()
     
     def enable(self):
-        self._disabled = False
-        self._instanciate()
+        if self._disabled:
+            self._disabled = False
+            self._instanciate()
+            return True
+        else:
+            return False
 
     def disable(self):
-        self._disabled = True
-        self._clean_instances()
+        if not self._disabled:
+            self._disabled = True
+            self._clean_instances()
+            return True
+        else:
+            return False
 
     def destroy(self):
         """ Cleanup the class
@@ -125,20 +133,11 @@ class ScenarioInstance:
     def _instanciate(self):
         """ parse the json and load all needed components
         """
-        ## get the datatypes
-        cli = MQSyncReq(self.zmq)
-        msg = MQMessage()
-        msg.set_action('datatype.get')
-        res = cli.request('manager', msg.get(), timeout=10)
-        datatypes = None
-        if res is not None:
-            res = res.get_data()
-            if 'datatypes' in res:
-                datatypes = res['datatypes']
+        print self._json
         # step 1 parse the "do" part
         self.__parse_do_part(self._json['DO'])
         # step 2 parse the "if" part        
-        self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
+        self._parsed_condition = self.__parse_if_part(self._json['IF'], self.datatypes)
 
     def __parse_if_part(self, part, datatypes = None):
         # translate datatype to default blocks
