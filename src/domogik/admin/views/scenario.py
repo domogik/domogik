@@ -149,7 +149,11 @@ def scenario_blocks_js():
         scenario_tests = {}
 
     tests = scenario_tests.keys()
-    tests.remove(u'sensor.SensorTest')
+    try:
+        tests.remove(u'sensor.SensorTest')
+    except ValueError:
+        # in case the list is empty because of another issue...
+        print("Errror : can't remove sensor.SensorTest from tests. Error is : {0}".format(traceback.format_exc()))
 
     # scenarios actions (log, call url, ...)
     scenario_actions = {}
@@ -167,7 +171,11 @@ def scenario_blocks_js():
         scenario_actions = {}
 
     actions = scenario_actions.keys()
-    actions.remove(u'command.CommandAction')
+    try:
+        actions.remove(u'command.CommandAction')
+    except ValueError:
+        # in case the list is empty because of another issue...
+        print("Errror : can't remove command.CommandAction from actions. Error is : {0}".format(traceback.format_exc()))
 
     # datatypes
     datatypes = {}
