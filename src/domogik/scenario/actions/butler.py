@@ -49,7 +49,6 @@ class ButlerAction(AbstractAction):
             self.butler_name = conf['name']
             self.butler_sex = conf['sex']
         except:
-            print("Err : {0}".format(traceback.format_exc()))
             self._log.error(u"ButlerACtion init : error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
 
         ### MQ
