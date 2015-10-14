@@ -151,18 +151,31 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
               block.setFieldValue(jsonChild, key);
             break;
           case 'object':
-            input = block.getInput(key);
-            if (!input) {
-              throw 'Input ' + key + ' does not exist in block ' + prototypeName;
-            }
             blockChild = Blockly.JSON.jsonToBlock(workspace, jsonChild,
                   opt_reuseBlock);
-            if (blockChild.outputConnection) {
-              input.connection.connect(blockChild.outputConnection);
-            } else if (blockChild.previousConnection) {
-              input.connection.connect(blockChild.previousConnection);
+            if (key == 'NEXT') {
+              if (!block.nextConnection) {
+                throw 'Next statement does not exist.';
+              } else if (block.nextConnection.targetConnection) {
+                // This could happen if there is more than one XML 'next' tag.
+                throw 'Next statement is already connected.';
+              }
+              if (!blockChild.previousConnection) {
+                throw 'Next block does not have previous statement.';
+              }
+              block.nextConnection.connect(blockChild.previousConnection);
             } else {
-              throw 'Child block does not have output or previous statement.';
+            input = block.getInput(key);
+              if (!input) {
+                throw 'Input ' + key + ' does not exist in block ' + prototypeName;
+              }
+              if (blockChild.outputConnection) {
+                input.connection.connect(blockChild.outputConnection);
+              } else if (blockChild.previousConnection) {
+                input.connection.connect(blockChild.previousConnection);
+              } else {
+                throw 'Child block does not have output or previous statement.';
+              }
             }
             break;
           default:

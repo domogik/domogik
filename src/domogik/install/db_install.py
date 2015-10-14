@@ -61,30 +61,62 @@ class DbInstall():
         self._engine = create_engine(self._url)
 
     def create_db(self):
+        from sqlalchemy_utils import database_exists, create_database
+
         if not self._db.is_db_type_mysql():
             raise OSError("Create data base of %s is not implemented. Sorry! "%self._db.get_db_type())
-        
+
+        info("Checking the db existance")
+        if self.check_db_exists() == True:
+            info("The database already exists, we won't create it")
+            return
 
         mysql_script = ""
-        mysql_script+= "create database %s;\n"              %(self._db.get_db_name()    )
-        mysql_script+= "grant usage on *.* to %s@localhost "%(self._db.get_db_user()    )
-        mysql_script+= "    identified by '%s';\n"          %(self._db.get_db_password())
-        mysql_script+= "grant all privileges on %s.*"       %(self._db.get_db_name()    )
-        mysql_script+= "    to %s@localhost;\n"             %(self._db.get_db_user()    )
-
+        mysql_script+= "grant usage on *.* to '{0}'@'localhost' identified by '{1}';\n".format(self._db.get_db_user(), self._db.get_db_password())
+        mysql_script+= "grant usage on *.* to '{0}'@'%' identified by '{1}';\n".format(self._db.get_db_user(), self._db.get_db_password())
+        mysql_script+= "grant all privileges on {0}.* to '{1}'@'localhost';\n".format(self._db.get_db_name(), self._db.get_db_user())
+        mysql_script+= "grant all privileges on {0}.* to '{1}'@'%';\n".format(self._db.get_db_name(), self._db.get_db_user())
+        mysql_script+= "flush privileges;\n".format(self._db.get_db_name(), self._db.get_db_user())
         sh_script = "mysql -p -u root << TXT\n"+mysql_script+"TXT\n"
+        ok("Applying user permissions for {0}".format(self._db.get_db_user()))
+        print("---------------------------------------------------")
+        print(sh_script)
+        print("---------------------------------------------------")
 
-        info("mysql_script:\n"+mysql_script)
-        info("sh_script:\n"+sh_script)
-
-        ok("Try to create database %s for user %s"%(self._db.get_db_name(),self._db.get_db_user()))
         ok("Please entrer %s root password"%(self._db.get_db_type()))
         res = os.system(sh_script)
         if ( res != 0 ):
-            fail("cannot create database, may be already exist ?")
+            fail("Cannot apply permissions")
         else:
             ok("Done!");
+            ok("Create dataabse")
+            create_database(self._db.get_engine().url)
+            if database_exists(self._db.get_engine().url):
+                ok("Database created sucessfully")
+                return True
+            else:
+                fail("Database creation failed")
+                return False
 
+
+
+    def check_db_exists(self):
+        from sqlalchemy_utils import database_exists, create_database
+        ok("Checking if the mysql db exists")
+        with self._db.session_scope():
+            if not database_exists(self._db.get_engine().url):
+                #create_database(self._db.get_engine().url)
+                #if database_exists(self._db.get_engine().url):
+                #    ok("Database created sucessfully")
+                #    return True
+                #else:
+                #    fail("Database creation failed")
+                #    return False
+                info("Database does not exist")
+                return False
+            else:
+                info("Database already exists")
+                return True
 
     def install_or_upgrade_db(self, skip_backup=False):
         from domogik.common import sql_schema

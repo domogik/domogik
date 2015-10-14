@@ -79,11 +79,29 @@ class ScenarioInstance:
         self._disabled = disabled
 
         self.zmq = zmq.Context()
+        # datatypes
+        self.datatypes = {}
+        cli = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is not None:
+            res = res.get_data()
+            if 'datatypes' in res:
+                self.datatypes = res['datatypes']
 
         self._parsed_condition = None
         self._mapping = { 'test': {}, 'action': {} }
         if not self._disabled:
             self._instanciate()
+    
+    def enable(self):
+        self._disabled = False
+        self._instanciate()
+
+    def disable(self):
+        self._disabled = True
+        self._clean_instances()
 
     def destroy(self):
         """ Cleanup the class
@@ -144,7 +162,7 @@ class ScenarioInstance:
             else:
                 return "\"0\""
         elif part['type'] == 'math_number':
-            return "\"{0}\"".format(part['NUM'])
+            return "float(\"{0}\")".format(part['NUM'])
         elif part['type'] == 'text':
             return "\"{0}\"".format(part['TEXT'])
         elif part['type'] == 'math_arithmetic':

@@ -253,9 +253,17 @@ class Admin(Plugin):
             self.http_server = HTTPServer(tapp)
 	# listen on the interfaces
 	if self.interfaces != "":
+            # value can be : lo, eth0, ...
+            # or also : '*' to catch all interfaces, whatever they are
 	    intf = self.interfaces.split(',')
-	    for ip in get_ip_for_interfaces(intf):
+            self.log.info("The admin will be available on the below addresses : ")
+            num_int = 0
+	    for ip in get_ip_for_interfaces(intf, log = self.log):
+                self.log.info(" - {0}:{1} [BIND]".format(ip, self.port))
 	        self.http_server.listen(int(self.port), address=ip)
+                num_int += 1
+            if num_int == 0:
+                self.log.error("The admin is not configured to use any working network interface! Please check configuration!!!!!!")
         else:
             self.http_server.bind(int(self.port))
             self.http_server.start(1)

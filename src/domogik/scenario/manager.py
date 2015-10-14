@@ -299,6 +299,34 @@ class ScenarioManager:
             ret.append({'cid': cid, 'name': inst['name'], 'json': inst['json']})
         return ret
 
+    def enable_scenario(self, cid):
+        try:
+            if cid == '' or int(cid) not in self._instances.keys():
+                self.log.info(u"Scenario enable : id '{0}' doesn't exist".format(cid))
+                return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
+            else:
+                self._instances[int(cid)]['instance'].enable()
+                # TODO persistent?
+                self.log.info(u"Scenario {0} enabled".format(cid))
+        except:
+            msg = u"Error while enabling the scenario id='{0}'. Error is : {1}".format(cid, traceback.format_exc())
+            self.log.error(msg)
+            return {'status': 'ERROR', 'msg': msg}
+ 
+    def disable_scenario(self, cid):
+        try:
+            if cid == '' or int(cid) not in self._instances.keys():
+                self.log.info(u"Scenario disable : id '{0}' doesn't exist".format(cid))
+                return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
+            else:
+                self._instances[int(cid)]['instance'].disable()
+                # TODO persistent?
+                self.log.info(u"Scenario {0} disabled".format(cid))
+        except:
+            msg = u"Error while disabling the scenario id='{0}'. Error is : {1}".format(cid, traceback.format_exc())
+            self.log.error(msg)
+            return {'status': 'ERROR', 'msg': msg}
+
     def __return_list_of_classes(self, package):
         """ Return the list of module/classes in a package
         @param package : a reference to the package that need to be explored

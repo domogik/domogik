@@ -69,28 +69,27 @@ def test_imports():
     try:
         import domogik
     except ImportError:
-        warning("domogik package can not be imported, did you made ./setup.py develop or ./setup.py install ?")
+        warning("domogik package can not be imported, check installation logs!")
         good = False
     try:
         import OpenSSL
     except ImportError:
-        warning("OpenSSL can't be imported, please exec ./setup.py develop or ./setup.py install and check it \
-                downloads and install pyOpenSSL correctly.")
+        warning("OpenSSL can't be imported, check installation logs!")
         good = False
     try:
         import sqlalchemy
     except ImportError:
-        warning("Can't import sqlalchemy, please install it")
+        warning("Can't import sqlalchemy, check installation logs!")
         good = False
     try:
         import httplib
     except ImportError:
-        warning("Can't import httplib, please install it by hand (>= 2) or exec ./setup.py develop or ./setup.py install")
+        warning("Can't import httplib, check installation logs!")
         good = False
     try:
         import simplejson
     except ImportError:
-        warning("Can't import simplejson, please install it by hand (>= 1.1) or exec ./setup.py develop or ./setup.py install")
+        warning("Can't import simplejson, check installation logs!")
         good = False
     assert good, "One or more import have failed, please install required packages and restart this script."
     ok("Imports are good")
@@ -209,6 +208,7 @@ def test_user_config_file(user_home, user_entry):
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
     rest = dict(config.items('rest'))
+    admin = dict(config.items('admin'))
     ok("Config file correctly loaded")
 
     info("Parse [domogik] section")
@@ -257,6 +257,12 @@ def test_user_config_file(user_home, user_entry):
     for ipadd in get_ip_for_interfaces(rest['interfaces'].split(",")):
         _check_port_availability(ipadd, rest['port'])
     ok("Rest server IP/port is not bound by anything else")
+
+    # Check [admin] section
+    info("Parse [admin] section")
+    for ipadd in get_ip_for_interfaces(admin['interfaces'].split(",")):
+        _check_port_availability(ipadd, admin['port'])
+    ok("Admin server IP/port is not bound by anything else")
 
 def test_init():
     info("Check init.d / rc.d")
