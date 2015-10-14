@@ -30,6 +30,7 @@ else:
     def is_hidden_field_filter(field):
         return isinstance(field, HiddenField)
 from flask.ext.themes2 import Themes, render_theme_template
+import traceback
 
 
 ### init Flask
@@ -178,19 +179,23 @@ sys.path.append(get_libraries_directory())
 
 from domogik.admin.views.client_advanced_empty import nothing_adm
 for a_client in os.listdir(get_packages_directory()):
-    if os.path.isdir(os.path.join(get_packages_directory(), a_client)):
-        # check if there is an "admin" folder with an __init__.py file in it
-        #print(a_client)
-        if os.path.isfile(os.path.join(get_packages_directory(), a_client, "admin", "__init__.py")):
-            #print("=> admin")
-            pkg = "domogik_packages.{0}.admin".format(a_client)
-            pkg_adm = "{0}_adm".format(a_client)
-            #print(u"Try to import module : {0} => {1}_adm".format(pkg, a_client))
-            the_adm = getattr(__import__(pkg, fromlist=[pkg_adm], level=1), pkg_adm)
-            app.register_blueprint(the_adm, url_prefix="/{0}".format(a_client))
-        # if no admin for the client, include the generic empty page
-        else:
-            app.register_blueprint(nothing_adm, url_prefix="/{0}".format(a_client))
+    try:
+        if os.path.isdir(os.path.join(get_packages_directory(), a_client)):
+            # check if there is an "admin" folder with an __init__.py file in it
+            #print(a_client)
+            if os.path.isfile(os.path.join(get_packages_directory(), a_client, "admin", "__init__.py")):
+                #print("=> admin")
+                app.loger.info("Load advanced page for package '{0}'".format(a_client))
+                pkg = "domogik_packages.{0}.admin".format(a_client)
+                pkg_adm = "{0}_adm".format(a_client)
+                #print(u"Try to import module : {0} => {1}_adm".format(pkg, a_client))
+                the_adm = getattr(__import__(pkg, fromlist=[pkg_adm], level=1), pkg_adm)
+                app.register_blueprint(the_adm, url_prefix="/{0}".format(a_client))
+            # if no admin for the client, include the generic empty page
+            else:
+                app.register_blueprint(nothing_adm, url_prefix="/{0}".format(a_client))
+    except:
+        app.logger.error("Error while trying to load package '{0}' advanced page in the admin. The error is : {1}".format(a_client, traceback.format_exc()))
 
 
 ### import all files inside the view module

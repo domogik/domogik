@@ -69,28 +69,27 @@ def test_imports():
     try:
         import domogik
     except ImportError:
-        warning("domogik package can not be imported, did you made ./setup.py develop or ./setup.py install ?")
+        warning("domogik package can not be imported, check installation logs!")
         good = False
     try:
         import OpenSSL
     except ImportError:
-        warning("OpenSSL can't be imported, please exec ./setup.py develop or ./setup.py install and check it \
-                downloads and install pyOpenSSL correctly.")
+        warning("OpenSSL can't be imported, check installation logs!")
         good = False
     try:
         import sqlalchemy
     except ImportError:
-        warning("Can't import sqlalchemy, please install it")
+        warning("Can't import sqlalchemy, check installation logs!")
         good = False
     try:
         import httplib
     except ImportError:
-        warning("Can't import httplib, please install it by hand (>= 2) or exec ./setup.py develop or ./setup.py install")
+        warning("Can't import httplib, check installation logs!")
         good = False
     try:
         import simplejson
     except ImportError:
-        warning("Can't import simplejson, please install it by hand (>= 1.1) or exec ./setup.py develop or ./setup.py install")
+        warning("Can't import simplejson, check installation logs!")
         good = False
     assert good, "One or more import have failed, please install required packages and restart this script."
     ok("Imports are good")

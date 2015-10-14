@@ -33,6 +33,10 @@
     </div>
 
 
+    {% if error != None %}
+      <div class="alert alert-warning">{{ error | safe }}</div>
+    {% endif %}
+
 
     {% if devices|length > 0 %}
       <div class="container-fluid">
