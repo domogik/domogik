@@ -63,7 +63,6 @@ pkg_list="\
          python-flaskext.wtf \
          python-tornado \
          python-requests \
-         python-daemon \
          python-magic \
          python-zmq \
          python-gluon \
