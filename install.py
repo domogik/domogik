@@ -344,7 +344,7 @@ def find_interface():
             if interface_has_ip(intf):
                 break
     except:
-        error("Trace: {0}".format(traceback.format_exc()))
+        fail("Trace: {0}".format(traceback.format_exc()))
     else:
         ok("Selected interface {0}".format(intf))
     return intf
