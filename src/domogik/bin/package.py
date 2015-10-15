@@ -410,7 +410,7 @@ class PackageInstaller():
                     raise
                 else:
                     do_again = True
-                    self.log.ingo("Retrying...")
+                    self.log.info("Retrying...")
             except: 
                 self.log.error("Error while downloading the package : {0}".format(traceback.format_exc()))
                 raise
