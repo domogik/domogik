@@ -7,7 +7,7 @@ If you are already a Domogik 0.3 user
 
 Domogik 0.4 database is really different from the 0.3 database. The process to migrate data from Domogik 0.3 to Domogik 0.4 is not fully guarantee yet. **Please do a backup of your domogik database before migrating from 0.3 to 0.4 !**.
 
-**If you come from Domogik 0.3, you can directly install Domogik 0.4.1.**
+**If you come from Domogik 0.3, you can directly install Domogik 0.4.2.**
 
 If you encounter any issue during the database upgrade, please come on our irc channel and request us some help!
 
@@ -35,7 +35,7 @@ Domogik installation script uses the ``lsb_release -si`` command to check which 
 
 On all Debian-based distributions (Raspbian for example), please install the **lsb-release** package like this: ::
 
-    # apt-get install lsb-release
+    $ sudo apt-get install lsb-release
 
 On other distributions, please refer to your distribution documentation.
 
@@ -65,7 +65,7 @@ Here are the needed dependencies. depanding on your Linux distribution, they wil
 * SSL libraries : **libssl-dev**
 * Zero MQ librariy : **libzmq-dev >= 14.4**. With the 14.3 release of this library, the publish/subscribe feature will not work!
 * postgresql libraries : **libpq-dev, python-psycopg2**
-* various needed libraries : **python-mako, libffi-dev**
+* various needed libraries : **python-mako, libffi-dev, python-netifaces**
 * git : **git**
 * MySQL server : **mysql-server**
 * Sphinx and Sphinx theme : **python-sphinx, sphinx-better-theme**
@@ -79,19 +79,28 @@ The **install.py** script will install these dependencies for the following dist
 
 For all the other distributions, please install them manually.
 
+Dependencies to install manually
+********************************
+
+The **netifaces python library** can't be installed automatically. For now you will have to install it manually. Example for debian based distributions: ::
+
+    $ sudo apt-get install python2.7-dev
+    $ sudo pip install netifaces
+
+
 Mysql server
 ------------
 
 .. note::
     * If you have already a Mysql server installed, you will only have to create the Domogik database.
     * Please note that Domogik does not automatically install the mysql server.
-    * It is highly recommended to use the **innodb engine** (which can be enabled in /etc/mysql/my.cnf)
+    * If you choose to manually create the database, it is highly recommended to use the **innodb engine** (which can be enabled in /etc/mysql/my.cnf)
 
 Install the packages for mysql server: ::
 
     $ sudo apt-get install mysql-server
 
-Log on the mysql database as root user: ::
+During the installation, **Domogik will automatically create the database**, but if you want to create the database yourself, log on the mysql database as root user: ::
 
     $ mysql -u root -p
     Enter password: 
@@ -136,36 +145,26 @@ Download the packages
 Download Domogik-mq : ::
 
     $ cd /opt/dmg/
-    $ wget --content-disposition https://github.com/domogik/domogik-mq/archive/1.1.tar.gz
-    $ tar xvzf domogik-mq-1.1.tar.gz
-    $ ln -s domogik-mq-1.1 domogik-mq
+    $ wget --content-disposition https://github.com/domogik/domogik-mq/archive/1.2.tar.gz
+    $ tar xvzf domogik-mq-1.2.tar.gz
+    $ ln -s domogik-mq-1.2 domogik-mq
     $ cd domogik-mq
 
 Download Domogik : ::
 
     $ cd /opt/dmg/
-    $ wget --content-disposition https://github.com/domogik/domogik/archive/0.4.1.tar.gz
-    $ tar xvzf domogik-0.4.1.tar.gz
-    $ ln -s domogik-0.4.1 domogik
+    $ wget --content-disposition https://github.com/domogik/domogik/archive/0.4.2.tar.gz
+    $ tar xvzf domogik-0.4.2.tar.gz
+    $ ln -s domogik-0.4.2 domogik
     $ cd domogik
 
 Install Domogik-mq
 ------------------
 
-For now, before installing domogik-mq, you need to install some packages manually :
-
-* libzmq-dev
-* python2.7-dev
-
-On all Debian-based distributions, just do: ::
-
-    $ sudo apt-get install libzmq-dev
-    $ sudo apt-get install python2.7-dev
-
-Then, install Domogik-mq: ::
+Install Domogik-mq: ::
 
     $ cd /opt/dmg/domogik-mq
-    $ sudo ./install.py
+    $ sudo ./install.py --dist-packages
 
 You will be requested to give some informations. ::
 
@@ -190,47 +189,21 @@ Just keep the default values. ::
 
 If you are installing Domogik as a developper, you may use the *debug* level. Else, please set up the *info* level. ::
 
-    Key ip [127.0.0.1]: 
-
-This is the ip address which will be used by Domogik Message Queue (MQ). You should set up the server ip address, for example *192.168.1.10*.
-
-
 
 Install Domogik 
 ---------------
+
+.. note::
+
+    **For Domogik 0.4.1 users**
+    
+    During the installation, please don't keep your current configuration files!
+    The **bind_interface** value changes : this is no more an ip address, this is now the interface name.
 
 Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
 
     $ cd /opt/dmg/domogik/
     $ sudo ./install.py --dist-packages
-
-.. warning::
-
-     Some Ubuntu 14.04 and 15.04 users encountered this error during the installation : ::
-
-         Installed /opt/dmg/domogik-0.4.1/src
-         Processing dependencies for Domogik==0.4.0
-         Searching for Flask-Themes2
-         Reading https://pypi.python.org/simple/Flask-Themes2/
-         Best match: Flask-Themes2 0.1.4.linux-x86-64
-         Downloading https://pypi.python.org/packages/any/F/Flask-Themes2/Flask-Themes2-0.1.4.linux-x86_64.tar.gz#md5=71321801f51576557850b4b08b70af89
-         Processing Flask-Themes2-0.1.4.linux-x86_64.tar.gz
-         error: Couldn't find a setup script in /tmp/easy_install-KnIzW3/Flask-Themes2-0.1.4.linux-x86_64.tar.gz
-         ========= TRACEBACK =============
-         Traceback (most recent call last):
-           File "./install.py", line 427, in install
-             raise OSError("setup.py doesn't finish correctly")
-         OSError: setup.py doesn't finish correctly
-         
-         =================================
-         ERROR:root:(<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
-          ==> (<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
-
-    You can fix this by doing: ::
-
-        sudo pip install -e git://github.com/sysr-q/flask-themes2.git#egg=flask_themes2-dev
-
-    And restart Domogik installation.
 
 You will be requested to give some informations. ::
 
@@ -252,11 +225,7 @@ If you already have a Domogik installation, you could keep your configuration fi
     [ Starting on section domogik ]
     Key log_level [debug]:
 
-For this 0.4.1 release, you should keep the *debug* level. ::
-
-    Key bind_interface [127.0.0.1]: 
-
-This is the ip address which will be used by Domogik to send xPL messages. You should set up the server ip address, for example *192.168.1.10*. ::
+For this 0.4.2 release, you should keep the *debug* level. ::
 
     [ Starting on section database ]
     Key type [mysql]:
@@ -270,23 +239,21 @@ This is the ip address which will be used by Domogik to send xPL messages. You s
 Set up the database credentials. I you created the database as defined in this page, you can keep the default values. ::
 
     [ Starting on section rest ]
-    Key interfaces [lo]: 
     Key port [40405]:
     Key use_ssl [False]:
     Key ssl_certificate []:
     Key ssl_key []:
     Key clean_json [False]:
 
-Set up your network inerface name (**eth0** in most cases) for the **interfaces** parameter. You should keep the default value for all the others. ::
+You should keep the default values. ::
 
     [ Starting on section admin ]
-    Key interfaces [lo,eth0]:
     Key port [40406]:
     Key use_ssl [False]:
     Key ssl_certificate []:
     Key ssl_key []:
 
-If your default network interface is set in the **interfaces** default value, keep all the default values. ::
+You should keep the default values. ::
 
     [ Starting on section butler ]
     Key name [Aria]:
@@ -302,10 +269,9 @@ Set the folder you want to use to save Domogik backups. ::
 
     [ Update the config file : /etc/domogik/xplhub.cfg ]
     [ Starting on section hub ]
-    Key interfaces [lo]: 
     Key log_level [error]:
 
-These options are used by the xPL hub. Set your default network interface name (*eth0* ?) as **interfaces**. ::
+You should keep the default values. ::
 
     [ Installing or upgrading the db ]
     ==> Creating backup
@@ -324,7 +290,7 @@ Set the backup file
 
 
 
-In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogik.cfg**, you will have to complete it with these lines for Domoik 0.4.1 : ::
+In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogik.cfg**, you will have to complete it with these lines for Domogik 0.4.2 : ::
 
     [butler]
     name = Aria
@@ -333,6 +299,10 @@ In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogi
     
     [backup]
     folder = /opt/dmg/backup
+
+And you will also have to replace the below line value (use a network interface name instead of an ip address). Example: ::
+
+    bind_interface = eth0
 
 Butler section : 
 

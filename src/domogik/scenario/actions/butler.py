@@ -29,6 +29,7 @@ from domogik.scenario.actions.abstract import AbstractAction
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogikmq.pubsub.publisher import MQPub
 import zmq
+import traceback
 
 
 class ButlerAction(AbstractAction):
