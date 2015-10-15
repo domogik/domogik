@@ -67,7 +67,7 @@ print "******************************************"
 
 setup(
     name = 'Domogik',
-    version = '0.4.0',
+    version = '0.4.2',
     url = 'http://www.domogik.org/',
     description = 'OpenSource home automation software',
     author = 'Domogik team',
