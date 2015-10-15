@@ -129,6 +129,7 @@ class ScenarioInstance:
                 datatypes = res['datatypes']
         # step 1 parse the "do" part
         self.__parse_do_part(self._json['DO'])
+        print self._mapping['action']
         # step 2 parse the "if" part        
         self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
 
@@ -245,7 +246,8 @@ class ScenarioInstance:
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create action instance {0} with uuid {1}".format(inst, uuid))
             obj = cobj(log=self._log, params=params)
-            self._mapping['action'][uuid] = obj
+            index = "{0}-{1}".format(len(self._mapping['action']), uuid)
+            self._mapping['action'][index] = obj
             return (obj, uuid)
 
     def _get_uuid(self):
@@ -262,7 +264,7 @@ class ScenarioInstance:
         """ Call the needed actions for this scenario
         """
         print "CALLING actions"
-        for act in self._mapping['action']:
+        for act in sorted(self._mapping['action']):
             self._mapping['action'][act].do_action()
         print "END CALLING actions"
 
