@@ -139,6 +139,15 @@ def test_clients_list():
 
 
 
+# ADVANCED TESTS
+#######################################################################################################
+
+def test_plugin():
+    # TODO
+    # - install the domogik-plugin-test
+    # - launch its tests
+    pass
+
 
 
 # LAUNCH TESTS
