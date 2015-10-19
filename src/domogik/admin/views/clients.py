@@ -237,19 +237,22 @@ def client_sensor_edit(client_id, sensor_id):
 def client_global_edit(client_id, dev_id):
     with app.db.session_scope():
         dev = app.db.get_device(dev_id)
+        known_items = {}
         class F(Form):
             pass
         for item in dev["parameters"]:
             item = dev["parameters"][item]
             default = item["value"]
             arguments = [Required()]
+            # keep track of the known fields
+            known_items[item["key"]] = {u"id": item["id"], u"type": item["type"]}
             # build the field
             if item["type"] == "boolean":
-                if default == 'Y' or default == 1 or default == True:
+                if default == 'y' or default == 1 or default == True: # in db value stored in lowcase
                     default = True
                 else:
                     default = False
-                field = BooleanField(item["key"], arguments, default=default)
+                field = BooleanField(item["key"], [validators.optional()], default=default) # set to optional field due to WTForm BooleanField return no data for false value (HTML checkbox)
             elif item["type"] == "integer":
                 field = IntegerField(item["key"], arguments, default=default)
             elif item["type"] == "float":
@@ -260,12 +263,15 @@ def client_global_edit(client_id, dev_id):
             # add the field
             setattr(F, "{0}-{1}".format(item["id"], item["key"]), field)
         form = F()
-
         if request.method == 'POST' and form.validate():
-            for item in request.form:
-                if item != "csrf_token":
-                    id, name = item.split("-")
-                    app.db.udpate_device_param(id, value=request.form.get(item))
+            for key, item in known_items.iteritems():
+                val = getattr(form, "{0}-{1}".format(item["id"], key)).data
+                if item["type"] == "boolean":
+                    if val == False:
+                        val = 'n' # in db value stored in lowcase
+                    else:
+                        val = 'y' # in db value stored in lowcase
+                app.db.udpate_device_param(item["id"], value=val)
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
             pass
         else:
