@@ -98,7 +98,7 @@ def scenario_edit(id):
         msg.add_data('desc', form.sdesc.data)
         res = cli.request('scenario', msg.get(), timeout=10)
         if res:
-            data = re.get_data()
+            data = res.get_data()
             if 'result' in data:
                 if 'status' in data['result']:
                     if data['result']['status'] == 'OK':
