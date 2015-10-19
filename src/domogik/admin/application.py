@@ -111,13 +111,13 @@ for a_client in os.listdir(get_packages_directory()):
     try:
         if os.path.isdir(os.path.join(get_packages_directory(), a_client)):
             # check if there is an "admin" folder with an __init__.py file in it
-            #print(a_client)
+            print(a_client)
             if os.path.isfile(os.path.join(get_packages_directory(), a_client, "admin", "__init__.py")):
-                #print("=> admin")
-                app.loger.info("Load advanced page for package '{0}'".format(a_client))
+                print("=> admin")
+                app.logger.info("Load advanced page for package '{0}'".format(a_client))
                 pkg = "domogik_packages.{0}.admin".format(a_client)
                 pkg_adm = "{0}_adm".format(a_client)
-                #print(u"Try to import module : {0} => {1}_adm".format(pkg, a_client))
+                print(u"Try to import module : {0} => {1}_adm".format(pkg, a_client))
                 the_adm = getattr(__import__(pkg, fromlist=[pkg_adm], level=1), pkg_adm)
                 app.register_blueprint(the_adm, url_prefix="/{0}".format(a_client))
             # if no admin for the client, include the generic empty page
@@ -125,6 +125,7 @@ for a_client in os.listdir(get_packages_directory()):
                 app.register_blueprint(nothing_adm, url_prefix="/{0}".format(a_client))
     except:
         app.logger.error("Error while trying to load package '{0}' advanced page in the admin. The error is : {1}".format(a_client, traceback.format_exc()))
+        print("Error while trying to load package '{0}' advanced page in the admin. The error is : {1}".format(a_client, traceback.format_exc()))
 
 
 ### import all files inside the view module
