@@ -136,8 +136,9 @@ class ScenarioManager:
             return {'name': name, 'data': parsed}
 
     def update_scenario(self, cid, name, json_input, dis, desc):
-        self.del_scenario(cid, False)
-        self.create_scenario(name, json_input, cid, dis, desc, True)
+        if int(cid) != 0:
+            self.del_scenario(cid, False)
+        return self.create_scenario(name, json_input, cid, dis, desc, True)
 
     def del_scenario(self, cid, doDB=True):
         try:
@@ -166,6 +167,7 @@ class ScenarioManager:
             - actions => the json that will be used for creating the actions instances
         @Return {'name': name} or raise exception
         """
+        ocid = cid
         try:
             self.log.info(u"Create or save scenario : name = '{1}', id = '{1}', json = '{2}'".format(name, cid, json_input))
             payload = json.loads(json_input)  # quick test to check if json is valid
@@ -180,7 +182,7 @@ class ScenarioManager:
             self.log.error(msg)
             return {'status': 'NOK', 'msg': msg}
         # db storage
-        if int(cid) == 0:
+        if int(ocid) == 0:
             with self._db.session_scope():
                 scen = self._db.add_scenario(name, json_input, dis, desc)
                 cid = scen.id
@@ -189,11 +191,18 @@ class ScenarioManager:
                 self._db.update_scenario(cid, name, json_input, dis, desc)
 
         # create the condition itself
-        scen = ScenarioInstance(self.log, cid, name, payload, dis)
-        self._instances[cid] = {'name': name, 'json': payload, 'instance': scen } 
-        self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
-        self._instances[cid]['instance'].eval_condition()
-     
+        try:
+            scen = ScenarioInstance(self.log, cid, name, payload, dis)
+            self._instances[cid] = {'name': name, 'json': payload, 'instance': scen } 
+            self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
+            self._instances[cid]['instance'].eval_condition()
+        except Exception as e:  
+            if int(ocid) == 0:
+                with self._db.session_scope():
+                    self._db.del_scenario(cid)
+            self.log.error(u"Creation of a scenario failed")
+            self.log.debug(e)
+            return {'status': 'NOK', 'msg': 'Creation of scenario failed'}
         # return
         return {'name': name, 'cid': cid}
 

@@ -127,11 +127,13 @@ class ScenarioInstance:
             res = res.get_data()
             if 'datatypes' in res:
                 datatypes = res['datatypes']
-        # step 1 parse the "do" part
-        self.__parse_do_part(self._json['DO'])
-        print self._mapping['action']
-        # step 2 parse the "if" part        
-        self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
+        try:
+            # step 1 parse the "do" part
+            self.__parse_do_part(self._json['DO'])
+            # step 2 parse the "if" part        
+            self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
+        except:
+            raise
 
     def __parse_if_part(self, part, datatypes = None):
         # translate datatype to default blocks
