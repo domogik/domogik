@@ -1873,7 +1873,7 @@ class DbHelper():
         self.__session.expire_all()
         config = self.__session.query(DeviceParam).filter_by(id=dc_id).first()
         if config is None:
-            self.__raise_dbhelper_exception("ScenarioUUID with id %s couldn't be found" % u_id)
+            self.__raise_dbhelper_exception("Global device param with id %s couldn't be found" % u_id)
         if key is not None:
             config.key = ucode(key)
         if value is not None:
