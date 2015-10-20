@@ -327,21 +327,30 @@ class Plugin(BasePlugin, MQRep):
             return value
         return value
 
-    def get_device_list(self, quit_if_no_device = False):
+    def get_device_list(self, quit_if_no_device = False, max_attempt = 2):
         """ Request the dbmgr component over MQ to get the devices list for this client
-            @param quit_if_no_device: if True, exit the client if there is no devices
+            @param quit_if_no_device: if True, exit the client if there is no devices or MQ request fail
+            @param max_attempt : number of retry MQ request if it fail
         """
         self.log.info(u"Retrieve the devices list for this client...")
-        mq_client = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action('device.get')
         msg.add_data('type', self._type)
         msg.add_data('name', self._name)
         msg.add_data('host', self.get_sanitized_hostname())
-        result = mq_client.request('dbmgr', msg.get(), timeout=10)
+        attempt = 1
+        result = None
+        while not result and attempt <= max_attempt :
+            mq_client = MQSyncReq(self.zmq)
+            result = mq_client.request('dbmgr', msg.get(), timeout=10)
+            if not result:
+                self.log.warn(u"Unable to retrieve the device list (attempt {0})".format(attempt))
+                attempt += 1
         if not result:
-            self.log.error(u"Unable to retrieve the device list")
-            self.force_leave()
+            self.log.error(u"Unable to retrieve the device list, max attempt achieved : {0}".format(max_attempt))
+            if quit_if_no_device:
+                self.log.warn(u"The developper requested to stop the client if error on retrieve the device list")
+                self.force_leave()
             return []
         else:
             device_list = result.get_data()['devices']
