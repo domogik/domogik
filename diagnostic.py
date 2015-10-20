@@ -93,8 +93,17 @@ def test_grants():
     # TODO
     # - get the domogik user
     # - check all files have the grants
+    # - check /var/log/domogik
+    # - check /var/run/domogik
     pass
 
+
+# PORT TESTS
+#######################################################################################################
+
+def test_ports_are_open():
+    # TODO
+    pass
 
 # XPL TEST
 #######################################################################################################
