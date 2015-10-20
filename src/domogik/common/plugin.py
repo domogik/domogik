@@ -344,7 +344,7 @@ class Plugin(BasePlugin, MQRep):
             mq_client = MQSyncReq(self.zmq)
             result = mq_client.request('dbmgr', msg.get(), timeout=10)
             if not result:
-                self.log.warn(u"Unable to retrieve the device list (attempt {0})".format(attempt))
+                self.log.warn(u"Unable to retrieve the device list (attempt {0}/{1})".format(attempt, max_attempt))
                 attempt += 1
         if not result:
             self.log.error(u"Unable to retrieve the device list, max attempt achieved : {0}".format(max_attempt))
