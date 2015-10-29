@@ -350,8 +350,8 @@ It will start :
     * login : admin
     * password : 123
 
-Set up the automatic backup
----------------------------
+Set up the automatic backup  and packages documentation automatic upgrade
+-------------------------------------------------------------------------
 
 If you want (and you should), you could configure a daily (or weekly) backup. Domogik provides a python backup script : **backup.py**. 
 
