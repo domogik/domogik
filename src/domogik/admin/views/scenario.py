@@ -97,7 +97,23 @@ def scenario_edit(id):
         msg.add_data('dis', form.sdis.data)
         msg.add_data('desc', form.sdesc.data)
         res = cli.request('scenario', msg.get(), timeout=10)
-        flash(gettext(u"Changes saved"), "success")
+        if res:
+            data = res.get_data()
+            if 'result' in data:
+                if 'status' in data['result']:
+                    if data['result']['status'] == 'OK':
+                        flash(gettext(u"Changes saved"), "success")
+                    else:
+                        if 'msg' in data['result']:
+                            flash(data['result']['msg'], "error")
+                        else:
+                            flash(gettext(u"Changes not saved"), "error")
+                else:
+                    flash(gettext(u"Unexpected result from scenario manager"), "warning")
+            else:
+                flash(gettext(u"Unexpected result from scenario manager"), "warning")
+        else:
+            flash(gettext(u"Unexpected result from scenario manager"), "warning")
         return redirect("/scenario")
         pass
     else:

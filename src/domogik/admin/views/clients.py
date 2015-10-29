@@ -316,10 +316,10 @@ def client_devices_edit(client_id, did):
 
         if request.method == 'POST' and form.validate():
             # save it
-            #app.db.update_device(did, \
-            #        d_name=request.form['name'], \
-            #        d_description=request.form['description'], \
-            #        d_reference=request.form['reference'])
+            app.db.update_device(did, \
+                    d_name=request.form['name'], \
+                    d_description=request.form['description'], \
+                    d_reference=request.form['reference'])
             # message the suer
             flash(gettext("Device saved"), 'success')
             # redirect
