@@ -15,6 +15,7 @@ def api_datatype():
     @api {get} /datatype Retrieve all datatypes
     @apiName getDataTypes
     @apiGroup DataType
+    @apiVersion 0.4.1
 
     @apiSuccess {json} result The json representation of the datatypes
 

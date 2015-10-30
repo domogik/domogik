@@ -16,6 +16,7 @@ def device_params(client_id, dev_type_id):
     @api {get} /device/params/<clientId>/<device_type> Retrieve the needed parameter for creating a device
     @apiName getDeviceParams
     @apiGroup Device
+    @apiVersion 0.4.1
 
     @apiParam {String} clientId The clientId to request the parameter from
     @apiParam {String} device_type The device type to request the parameters for

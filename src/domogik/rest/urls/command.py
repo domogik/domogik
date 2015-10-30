@@ -20,6 +20,7 @@ def api_ncommand(cid):
     @api {get} /cmd/id/<int:cid> Trigger a command
     @apiName getCommand
     @apiGroup Command
+    @apiVersion 0.4.1
 
     @apiParam {Number} id The commandId to generate
     @apiParam Key A key value pair for each command param

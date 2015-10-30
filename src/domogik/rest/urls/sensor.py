@@ -10,6 +10,7 @@ class sensorAPI(MethodView):
         @api {get} /sensor/<id> Retrieve a/all sensors
         @apiName getSensor
         @apiGroup Sensor
+        @apiVersion 0.4.1
 
         @apiParam {Number} [id] If provided only the sensor that matches this ID will be provided
 
@@ -53,6 +54,7 @@ class sensorAPI(MethodView):
         @api {put} /sensor/id Update a specifick sensor
         @apiName putSensor
         @apiGroup Sensor
+        @apiVersion 0.4.1
 
         @apiParamTitle (url) Url parameters
         @apiParam (url) {Number} id The sensorId to update

@@ -14,6 +14,7 @@ def api_root():
     @api {get} / Get the status of the REST server
     @apiName getStatus
     @apiGroup Status
+    @apiVersion 0.4.1
 
     @apiSuccess {json} result A json result with the status
 

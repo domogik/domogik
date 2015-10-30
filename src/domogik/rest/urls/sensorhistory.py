@@ -15,6 +15,7 @@ def sensorHistory_latest(sid):
     @api {get} /sensorhistory/id/<id>/latest Retrieve the last stored value for a sensor
     @apiName getSensorHistoryLatest
     @apiGroup SensorHistory
+    @apiVersion 0.4.1
 
     @apiParam {Number} id The id of the sensor we want to retrieve the history from
 
