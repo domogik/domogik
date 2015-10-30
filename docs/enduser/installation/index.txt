@@ -12,6 +12,13 @@ Domogik 0.4 database is really different from the 0.3 database. The process to m
 If you encounter any issue during the database upgrade, please come on our irc channel and request us some help!
 
 
+If you plan to install Domogik on a Raspberry pi
+================================================
+
+If you want to use a Raspberry pi A/B/B+, you should forget to install Domogik on it. Currently Domogik uses too much memory for these models.
+
+Domogik should work fine on a Raspberry pi 2 only.
+
 Installation
 ============
 
