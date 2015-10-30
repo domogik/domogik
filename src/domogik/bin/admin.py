@@ -274,7 +274,7 @@ class Admin(Plugin):
                 self.log.error("The admin is not configured to use any working network interface! Please check configuration!!!!!!")
         else:
             self.http_server.bind(int(self.port))
-            self.http_server.start(1)
+            self.http_server.start(0)
         return
 
     def stop_http(self):
