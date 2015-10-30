@@ -187,8 +187,12 @@ class Butler(Plugin, MQAsyncSub):
             @param msg : MQ req message
         """
         try:
+            ### discuss over Req/Rep (used by rest url)
+            if msg.get_action() == "butler.discuss.do":
+                self.log.info(u"Discuss request : {0}".format(msg))
+                self._mdp_reply_butler_discuss(msg)
             ### rivescript files detail
-            if msg.get_action() == "butler.scripts.get":
+            elif msg.get_action() == "butler.scripts.get":
                 self.log.info(u"Scripts request : {0}".format(msg))
                 self._mdp_reply_butler_scripts(msg)
             ### rivescript files detail
@@ -206,6 +210,42 @@ class Butler(Plugin, MQAsyncSub):
         except:
             self.log.error(u"Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
    
+
+    def _mdp_reply_butler_discuss(self, message):
+        """ Discuss over req/rep
+            this should not be called with a 10 seconds timeout...
+        """
+        # TODO : merge with the on_message function !!!
+
+        content = message.get_data()
+        self.log.info(u"Received message : {0}".format(content))
+
+        self.add_to_history("interface.input", content)
+        reply = self.process(content['text'])
+
+        # fill empty data
+        for elt in ['identity', 'media', 'location', 'sex', 'mood', 'reply_to']:
+            if elt not in content:
+                content[elt] = None
+
+        # publish over MQ
+        data =              {"media" : content['media'],
+                             "location" : content['location'],
+                             "sex" : self.butler_sex,
+                             "mood" : self.butler_mood,
+                             "reply_to" : content['source'],
+                             "identity" : self.butler_name,
+                             "text" : reply}
+        self.log.info(u"Send response over MQ : {0}".format(data))
+
+
+        msg = MQMessage()
+        msg.set_action('butler.discuss.result')
+        msg.set_data(data)
+        self.reply(msg.get())
+
+        self.add_to_history("interface.output", data)
+
 
     def _mdp_reply_butler_scripts(self, message):
         """ Send the raw content for the brain parts over the MQ
@@ -425,6 +465,9 @@ class Butler(Plugin, MQAsyncSub):
         """ When a message is received from the MQ (pub/sub)
         """
         if msgid == "interface.input":
+            # TODO :
+            # merge with the on_mdp_reply_butler_disscuss() function
+
             self.log.info(u"Received message : {0}".format(content))
 
             ### Get response from the brain

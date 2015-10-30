@@ -115,6 +115,7 @@ import domogik.rest.urls.status
 import domogik.rest.urls.command
 import domogik.rest.urls.datatype
 import domogik.rest.urls.sensorhistory
+import domogik.rest.urls.butler
 
 # more complex URLS
 from domogik.rest.urls.device import *
