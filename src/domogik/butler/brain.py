@@ -342,7 +342,14 @@ def process_star(not_understood_responses, suggest_intro, rs):
                     shortcut_sample = shortcut[1:].strip()
                 else:
                     pass
-        m = re.match(regexp, query)
+        # strangely, on some installs, some regexp are not ok and raise a 'nothing to repeat' error
+        # the below try.. except will catch them and avoid blocking the * feature
+        try:
+            m = re.match(regexp, query)
+        except:
+            print("The following suggest is skipped due to an error. Suggest : '{0}'. Error : {1}".format(regexp, traceback.format_exc()))
+            m = None
+
         if m != None:
             query_with_star = query
             #print(u"Suggest match for query : {0}".format(query))
