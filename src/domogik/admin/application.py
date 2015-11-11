@@ -78,6 +78,8 @@ app.jinja_env.filters['sortid'] = sort_by_id
 # create acces_log
 @app.after_request
 def write_access_log_after(response):
+    if str(request.path).startswith('/rest/'):
+        app.db.close_session()
     app.logger.debug(' => response status code: {0}'.format(response.status_code))
     app.logger.debug(' => response content_type: {0}'.format(response.content_type))
     #app.logger.debug(' => response data: {0}'.format(response.response))
@@ -85,6 +87,8 @@ def write_access_log_after(response):
 
 @app.before_request
 def write_acces_log_before():
+    if str(request.path).startswith('/rest/'):
+        app.db.open_session()
     app.json_stop_at = []
     app.logger.info('http request for {0} received'.format(request.path))
 
