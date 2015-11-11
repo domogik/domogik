@@ -207,7 +207,6 @@ def test_user_config_file(user_home, user_entry):
     #check [domogik] section
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
-    rest = dict(config.items('rest'))
     admin = dict(config.items('admin'))
     ok("Config file correctly loaded")
 
@@ -251,12 +250,6 @@ def test_user_config_file(user_home, user_entry):
     assert d.get_engine() != None, "Engine is not set, it seems something went wrong during connection to the database"
 
     ok("[database] section seems good")
-
-    # Check [rest] section
-    info("Parse [rest] section")
-    for ipadd in get_ip_for_interfaces(rest['interfaces'].split(",")):
-        _check_port_availability(ipadd, rest['port'])
-    ok("Rest server IP/port is not bound by anything else")
 
     # Check [admin] section
     info("Parse [admin] section")
