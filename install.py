@@ -189,9 +189,9 @@ def create_user(d_user, d_shell = "/bin/sh"):
 def is_domogik_advanced(advanced_mode, sect, key):
     advanced_keys = {
         'domogik': ['libraries_path', 'src_prefix', \
-                'log_dir_path', 'pid_dir_path', 'broadcast'],
-        'database': ['db_prefix', 'pool_recycle'],
-        'rest': ['rest_server_port', 'rest_use_ssl', 'rest_ssl_certificate'],
+                'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level'],
+        'database': ['prefix', 'pool_recycle'],
+        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json'],
     }
     if advanced_mode:
         return True
@@ -206,7 +206,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
 
 def is_xplhub_advanced(advanced_mode, sect, key):
     advanced_keys = {
-        'hub': ['log_dir_path', 'log_bandwidth', 'log_invalid_data'],
+        'hub': ['log_dir_path', 'log_bandwidth', 'log_invalid_data', 'log_level'],
     }
     if advanced_mode:
         return True
@@ -232,7 +232,7 @@ def write_domogik_configfile(advanced_mode, intf):
                 config.set(sect, item[0], intf)
                 debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
             elif is_domogik_advanced(advanced_mode, sect, item[0]):
-                print("Key {0} [{1}]: ".format(item[0], item[1])),
+                print("- {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
                     # need to write it to config file
@@ -255,7 +255,7 @@ def write_xplhub_configfile(advanced_mode, intf):
                 config.set(sect, item[0], intf)
                 debug("Value {0} in xplhub.cfg set to {1}".format(item[0], intf))
             elif is_xplhub_advanced(advanced_mode, sect, item[0]):
-                print("Key {0} [{1}]: ".format(item[0], item[1])),
+                print("- {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
                     # need to write it to config file
@@ -312,12 +312,10 @@ def needupdate():
     # first check if there are already some config files
     if os.path.isfile("/etc/domogik/domogik.cfg") or \
        os.path.isfile("/etc/domogik/xplhub.cfg"):
-        # TODO : restore after 0.4.1
-        #print("Do you want to keep your current config files ? [Y/n]: "),
         info("Configuration files")
-        print("Please notice that Domogik 0.3.x configuration files are no more compliant with Domogik 0.4 :")
-        print("- backup your Domogik 0.3 configuration files")
-        print("- say 'n' to the question to recreate them from scratch")
+        # DEL # print("Please notice that Domogik 0.3.x configuration files are no more compliant with Domogik 0.4 :")
+        # DEL # print("- backup your Domogik 0.3 configuration files")
+        # DEL # print("- say 'n' to the question to recreate them from scratch")
         print("Do you want to keep your current config files ? [Y/n]: ")
         new_value = sys.stdin.readline().rstrip('\n')
         if new_value == "y" or new_value == "Y" or new_value == '':
@@ -374,6 +372,8 @@ def install():
                    help="Set the domogik user")
     parser.add_argument("--user-shell", dest="user_shell",
                    help="Set the domogik user shell")
+    parser.add_argument('--advanced', dest='advanced_mode', action="store_true",
+                   default=False, help='Allow to configure all options in interactive mode')
 
     # generate dynamically all arguments for the various config files
     # notice that we MUST NOT have the same sections in the different files!
@@ -468,9 +468,9 @@ def install():
                 intf = find_interface()
                 # update the config file
                 info("Update the config file : /etc/domogik/domogik.cfg")
-                write_domogik_configfile(False, intf)
+                write_domogik_configfile(args.advanced_mode, intf)
                 info("Update the config file : /etc/domogik/xplhub.cfg")
-                write_xplhub_configfile(False, intf)
+                write_xplhub_configfile(args.advanced_mode, intf)
 
         # upgrade db
         if not args.db:
