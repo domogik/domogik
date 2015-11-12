@@ -62,7 +62,7 @@ from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.httpserver import HTTPServer
 from tornado.web import FallbackHandler, Application
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
-REST_API_VERSION = "0.7"
+REST_API_VERSION = "0.8"
 
 ################################################################################
 
