@@ -208,7 +208,7 @@ def get_rest_url():
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
 
-    return "http://{0}:{1}/rest/".format(ip, port)
+    return "http://{0}:{1}/rest".format(ip, port)
 
 
 def get_rest_doc_path():
