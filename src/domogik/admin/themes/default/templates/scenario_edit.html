@@ -36,11 +36,6 @@
   </div>
   </form>
 
-
-  <div class="alert alert-info" role="alert">
-    In the current release, you are limited to one action per scenario. This will be improved in a next release.
-  </div>
-
   <!-- <pre>{{ jso }}</pre> -->
   <div id="blocklyArea"></div>
   <div id="blocklyDiv" style="position: absolute; width: 50%;"></div>
@@ -127,7 +122,7 @@
       $('#sjson').val( Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace()) );
     }
     workspace.addChangeListener(onchange);
-    $(document).ready(function() {        
+    $(document).ready(function() {
         {% autoescape false %}
         var json = JSON.parse('{{ jso }}');
         {% endautoescape %}

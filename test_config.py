@@ -208,6 +208,8 @@ def test_user_config_file(user_home, user_entry):
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
     admin = dict(config.items('admin'))
+    butler = dict(config.items('butler'))
+    backup = dict(config.items('backup'))
     ok("Config file correctly loaded")
 
     info("Parse [domogik] section")

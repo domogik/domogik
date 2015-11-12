@@ -133,11 +133,23 @@ class ScenarioInstance:
     def _instanciate(self):
         """ parse the json and load all needed components
         """
-        print self._json
-        # step 1 parse the "do" part
-        self.__parse_do_part(self._json['DO'])
-        # step 2 parse the "if" part        
-        self._parsed_condition = self.__parse_if_part(self._json['IF'], self.datatypes)
+        ## get the datatypes
+        cli = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        datatypes = None
+        if res is not None:
+            res = res.get_data()
+            if 'datatypes' in res:
+                datatypes = res['datatypes']
+        try:
+            # step 1 parse the "do" part
+            self.__parse_do_part(self._json['DO'])
+            # step 2 parse the "if" part        
+            self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
+        except:
+            raise
 
     def __parse_if_part(self, part, datatypes = None):
         # translate datatype to default blocks
@@ -252,7 +264,8 @@ class ScenarioInstance:
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create action instance {0} with uuid {1}".format(inst, uuid))
             obj = cobj(log=self._log, params=params)
-            self._mapping['action'][uuid] = obj
+            index = "{0}-{1}".format(len(self._mapping['action']), uuid)
+            self._mapping['action'][index] = obj
             return (obj, uuid)
 
     def _get_uuid(self):
@@ -269,7 +282,7 @@ class ScenarioInstance:
         """ Call the needed actions for this scenario
         """
         print "CALLING actions"
-        for act in self._mapping['action']:
+        for act in sorted(self._mapping['action']):
             self._mapping['action'][act].do_action()
         print "END CALLING actions"
 

@@ -71,7 +71,6 @@ def build_file_list(user):
     d_files = [
         ('/etc/domogik', [user, 0755], \
                 ['src/domogik/examples/config/domogik.cfg.sample', \
-                'src/domogik/examples/packages/sources.list', \
                 'src/domogik/xpl/hub/examples/config/xplhub.cfg.sample']),
         ('/var/cache/domogik', [user, None], []),
         ('/var/cache/domogik/pkg-cache', [user, None], []),
@@ -345,7 +344,7 @@ def find_interface():
             if interface_has_ip(intf):
                 break
     except:
-        error("Trace: {0}".format(traceback.format_exc()))
+        fail("Trace: {0}".format(traceback.format_exc()))
     else:
         ok("Selected interface {0}".format(intf))
     return intf
