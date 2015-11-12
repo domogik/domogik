@@ -25,6 +25,8 @@ We choose to include REST services in the Admin component, so :
 
 This merge is a first step of a global performances improvment plan. Each release will include one improvment related to performances.
 
+REST Api version is upgraded to 0.8 (previously : 0.7)
+
 Install script upgrades
 -----------------------
 
