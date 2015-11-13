@@ -7,6 +7,14 @@ If you are already a Domogik 0.3 user
 
 You must first install Domogik 0.4.2 release. Then, you will be able to upgrade to Domogik 0.5
 
+Important notice about the 0.5 release
+======================================
+
+In the 0.5 release, the Rest component has been merger in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
+
+* use the admin port (40406) instead of the previous rest port (40404)
+* add */rest/* in front of all old Rest url. Example : */device/* become */rest/device/*.
+
 If you plan to install Domogik on a Raspberry pi
 ================================================
 
