@@ -19,6 +19,7 @@
             {% if client_detail['data']['identity']['xpl_clients_only'] == False %}
             <div id="client-status" class="btn-group navbar-brand pull-right">
               <button type="button" class="btn btn-info btn-xs dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
+                <i class='fa'></i>
                 <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" role="menu">
@@ -40,12 +41,12 @@
             </div>
           {% elif client_detail.type == "brain" %}
             <!-- TODO : improve layout -->
-            <div class="navbar-brand"> 
+            <div class="navbar-brand">
               <span id="client-status" class="label label-info status status-label pull-right">{% trans %}n/a{% endtrans %}</span>
             </div>
           {% else %}
             <!-- TODO : improve layout -->
-            <div class="navbar-brand"> 
+            <div class="navbar-brand">
               <span id="client-status" class="label label-info status status-label status-{{client_detail.status}} pull-right">{{client_detail.status}}</span>
             </div>
           {% endif %}
@@ -105,6 +106,7 @@
                 if ( data.content['host'] == '{{client_detail.host}}' && '{{client_detail.package_id}}' == data.content['type'] + '-'+ data.content['name'] ) {
                 console.log(data.content['event']);
                     $('#client-status .status').text(data.content['event']);
+                    $('#client-status .fa').removeClass('fa-spinner fa-spin');
                     // for plugins, update the button classes
                     $('#client-status button').removeClass().addClass('btn btn-info btn-xs dropdown-toggle status-'+data.content['event']);
                     // for clients which are not plugins, update the label classes
@@ -118,15 +120,17 @@
         {% if client_detail %}
         $("#start").click(function() {
             console.log("start request");
+            $('#client-status .fa').addClass('fa-spinner fa-spin');
             ws.send('{"mq_request": "plugin.start.do", "data": {"type" : "{{ client_detail.type }}", "name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
             console.log("ws send done");
         });
         $("#stop").click(function() {
             console.log("stop request");
+            $('#client-status .fa').addClass('fa-spinner fa-spin');
             ws.send('{"dst": "{{ client_detail.type }}-{{ client_detail.name }}.{{ client_detail.host }}", "mq_request": "plugin.stop.do", "data": {"type" : "{{ client_detail.type }}", "name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
             console.log("ws send done");
         });
         {% endif %}
     });
-    
+
     </script>
