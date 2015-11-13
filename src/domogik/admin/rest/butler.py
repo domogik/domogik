@@ -1,4 +1,4 @@
-from domogik.rest.url import urlHandler, json_response, timeit
+from domogik.admin.application import app, json_response, timeit
 import sys
 import os
 import domogik
@@ -9,7 +9,7 @@ from domogikmq.message import MQMessage
 from domogikmq.reqrep.client import MQSyncReq
 import traceback
 
-@urlHandler.route('/butler/discuss', methods=['POST'])
+@app.route('/rest/butler/discuss', methods=['POST'])
 @json_response
 @timeit
 def api_butler_discuss():
@@ -63,7 +63,7 @@ def api_butler_discuss():
     except:
         return 400, {'msg': u"Error while decoding received json data. Error is : {0}".format(traceback.format_exc())}
 
-    cli = MQSyncReq(urlHandler.zmq_context)
+    cli = MQSyncReq(app.zmq_context)
 
     msg = MQMessage()
     msg.set_action('butler.discuss.do')

@@ -7,3 +7,36 @@ Upgrades in the db
 
 * The old not used table core_device_stats is deleted, same for the address field on a device. This finished the db upgrade we started in 0.4.x release.
 * Close #96 : SQLAlchemy UTF-8 connection. This allow to use non latin languages with the butler (Russian for example)
+
+Merge of Rest and Admin components
+----------------------------------
+
+Before 0.5 release, there were :
+
+* an Admin component used to allow the user to do administrative tasks (packages configuration, devices creation, ...)
+* a REST server which allows user interfaces, scripts, ... to do some actions on Domogik (get devices informations, create a new device, etc...)
+
+To limit the memory footprint of Domogik, we choose to merge the both components as they are basically both web servers.
+
+We choose to include REST services in the Admin component, so : 
+
+* The REST service is now available on the same port as Domogik Administration (40406 per default).
+* The REST service urls will all start with */rest/*. Example : */device/* become */rest/device/*.
+
+This merge is a first step of a global performances improvment plan. Each release will include one improvment related to performances.
+
+REST Api version is upgraded to 0.8 (previously : 0.7)
+
+Install script upgrades
+-----------------------
+
+The install script has been improved to make the install process more simple.
+
+* Some options that are not changed by most of the users are now hidden during the installation process. You still access them with the *--advanced* option or by editing the configuration file after the installation.
+
+If you are wondering about how the network configuration is done, well the choice is automatically made for you by the installation script since the 0.4.2 release.
+
+Scenarios
+---------
+
+A help dialog has been added in the scenario page. It show with an example how to create a scenario.

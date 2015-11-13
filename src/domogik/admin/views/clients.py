@@ -187,7 +187,8 @@ def client_devices_known(client_id):
             clientid = client_id,
             mactive="clients",
             active = 'devices',
-            rest_url = get_rest_url(),
+            #rest_url = get_rest_url(),
+            rest_url = request.url_root + "rest",
             client_detail = detail,
             error = error)
 

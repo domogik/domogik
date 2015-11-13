@@ -1,4 +1,4 @@
-from domogik.rest.url import urlHandler, json_response, timeit
+from domogik.admin.application import app, json_response, timeit
 from domogik.common.configloader import Loader
 import sys
 import os
@@ -7,12 +7,12 @@ from subprocess import Popen, PIPE
 from flask import Response
 import json
 
-@urlHandler.route('/datatype')
+@app.route('/rest/datatype')
 @json_response
 @timeit
 def api_datatype():
     """
-    @api {get} /datatype Retrieve all datatypes
+    @api {get} /rest/datatype Retrieve all datatypes
     @apiName getDataTypes
     @apiGroup DataType
     @apiVersion 0.4.1

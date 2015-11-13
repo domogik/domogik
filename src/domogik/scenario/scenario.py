@@ -96,12 +96,20 @@ class ScenarioInstance:
             self._instanciate()
     
     def enable(self):
-        self._disabled = False
-        self._instanciate()
+        if self._disabled:
+            self._disabled = False
+            self._instanciate()
+            return True
+        else:
+            return False
 
     def disable(self):
-        self._disabled = True
-        self._clean_instances()
+        if not self._disabled:
+            self._disabled = True
+            self._clean_instances()
+            return True
+        else:
+            return False
 
     def destroy(self):
         """ Cleanup the class

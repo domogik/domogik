@@ -1,4 +1,4 @@
-from domogik.rest.url import urlHandler, json_response, timeit
+from domogik.admin.application import app, json_response, timeit
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 import sys
@@ -12,12 +12,12 @@ from domogikmq.pubsub.subscriber import MQSyncSub
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 
-@urlHandler.route('/cmd/id/<int:cid>', methods=['GET'])
+@app.route('/rest/cmd/id/<int:cid>', methods=['GET'])
 @json_response
 @timeit
 def api_ncommand(cid):
     """
-    @api {get} /cmd/id/<int:cid> Trigger a command
+    @api {get} /rest/cmd/id/<int:cid> Trigger a command
     @apiName getCommand
     @apiGroup Command
     @apiVersion 0.4.1
@@ -40,7 +40,7 @@ def api_ncommand(cid):
             msg: 'Bad command Id'
         }
     """
-    cli = MQSyncReq(urlHandler.zmq_context)
+    cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('cmd.send')
     msg.add_data('cmdid', cid)

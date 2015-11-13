@@ -24,7 +24,7 @@ Plugin purpose
 
 Domogik manager
 - called with init.d script to start Domogik
-- launch rest, dbmgr and plugins
+- launch dbmgr and plugins
 - manage plugins (start, check for dead plugins) and maintains a list
 - give informations about plugins when requested
 
@@ -123,11 +123,6 @@ class Manager(XplPlugin):
                           dest="start_dbmgr", 
                           default=False, \
                           help="Start database manager if not already running.")
-        parser.add_argument("-r", 
-                          action="store_true", 
-                          dest="start_rest", 
-                          default=False, \
-                          help="Start rest if not already running.")
         parser.add_argument("-x", 
                           action="store_true", 
                           dest="start_xpl", 
@@ -151,7 +146,6 @@ class Manager(XplPlugin):
         self.log.info(u"Manager startup")
         self.log.info(u"Host : {0}".format(self.get_sanitized_hostname()))
         self.log.info(u"Start dbmgr : {0}".format(self.options.start_dbmgr))
-        self.log.info(u"Start rest : {0}".format(self.options.start_rest))
         self.log.info(u"Start xpl gateway : {0}".format(self.options.start_xpl))
         self.log.info(u"Start admin interface : {0}".format(self.options.start_admin))
         self.log.info(u"Start scenario manager : {0}".format(self.options.start_scenario))
@@ -206,11 +200,6 @@ class Manager(XplPlugin):
         if self.options.start_dbmgr:
             if not self._start_core_component("dbmgr"):
                 self.log.error(u"Unable to start dbmgr")
-
-        ### Start rest
-        if self.options.start_rest:
-            if not self._start_core_component("rest"):
-                self.log.error(u"Unable to start rest")
 
         ### Start xpl GW
         if self.options.start_xpl:
@@ -403,7 +392,7 @@ class Manager(XplPlugin):
 
     def _start_core_component(self, name):
         """ Start a core component
-            @param name : component name : dbmgr, rest
+            @param name : component name : dbmgr
         """
         self._inc_startup_lock()
         component = CoreComponent(name, self.get_sanitized_hostname(), self._clients, self.zmq)
@@ -843,7 +832,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
     def __init__(self, name, host, clients, zmq_context):
         """ Init a component
-            @param name : component name (dbmgr, rest)
+            @param name : component name (dbmgr)
             @param host : hostname
             @param clients : clients list 
             @param zmq_context : 0MQ context

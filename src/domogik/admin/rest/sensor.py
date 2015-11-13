@@ -1,4 +1,4 @@
-from domogik.rest.url import *
+from domogik.admin.application import app, json_response, timeit, register_api
 from flask import request
 from flask.views import MethodView
 
@@ -7,7 +7,7 @@ class sensorAPI(MethodView):
 
     def get(self, id):
         """
-        @api {get} /sensor/<id> Retrieve a/all sensors
+        @api {get} /rest/sensor/<id> Retrieve a/all sensors
         @apiName getSensor
         @apiGroup Sensor
         @apiVersion 0.4.1
@@ -42,16 +42,16 @@ class sensorAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        urlHandler.json_stop_at = ["core_device"]
+        app.json_stop_at = ["core_device"]
         if id != None:
-            b = urlHandler.db.get_sensor(id)
+            b = app.db.get_sensor(id)
         else:
-            b = urlHandler.db.get_all_sensor()
+            b = app.db.get_all_sensor()
         return 200, b
 
     def put(self, id):
         """
-        @api {put} /sensor/id Update a specifick sensor
+        @api {put} /rest/sensor/id Update a specifick sensor
         @apiName putSensor
         @apiGroup Sensor
         @apiVersion 0.4.1
@@ -92,14 +92,13 @@ class sensorAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-
-        dbr = urlHandler.db.update_sensor(\
-                id, \
-                history_round=request.form.get('round'), \
-                history_store=request.form.get('store'), \
-                history_max=request.form.get('max'), \
-                history_expire=request.form.get('expire') \
-                )
+        dbr = app.db.update_sensor(\
+            id, \
+            history_round=request.form.get('round'), \
+            history_store=request.form.get('store'), \
+            history_max=request.form.get('max'), \
+            history_expire=request.form.get('expire') \
+            )
         return 200, dbr
 
-register_api(sensorAPI, 'sensor_api', '/sensor/', pk='id')
+register_api(sensorAPI, 'sensor_api', '/rest/sensor/', pk='id')

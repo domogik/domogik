@@ -57,19 +57,20 @@ prefix = core
 #pool_recycle = 3600
 
 ###
-# REST section
+# Admin interface
 ###
-[rest]
-# REST is a plugin that allows all UI to get info in database or to discuss 
-# with xpl network.
-# REST is a HTTP server. Following parameters will indicate REST on which 
+[admin]
+# Admin is the component that handles 2 things:
+# 1- the admin UI
+# 2- the rest inetrface
+# its a HTTP server. Following parameters will indicate REST on which 
 # ip:port it will run
 # * means that it will be available on all network interfaces
 #interfaces = eth0, lo
 #interfaces = eth0
 #interfaces = *
 interfaces = lo
-port = 40405
+port = 40406
 # set to True if you want to use rest with ssl (https://....)
 use_ssl = False
 # if rest_use_ssl = True, set here path for ssl certificate/key
@@ -77,16 +78,6 @@ ssl_certificate =
 ssl_key =
 # if set to True, this will result in a nicely formatted json
 clean_json = False
-
-###
-# Admin interface
-###
-[admin]
-interfaces = lo
-port = 40406
-use_ssl = False
-ssl_certificate =
-ssl_key =
 
 ###
 # Butler configuration

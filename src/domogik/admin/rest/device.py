@@ -1,5 +1,5 @@
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
-from domogik.rest.url import urlHandler, json_response, register_api, timeit
+from domogik.admin.application import app, json_response, register_api, timeit
 from flask.views import MethodView
 from flask import request
 import zmq
@@ -8,12 +8,12 @@ import json
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 
-@urlHandler.route('/device/params/<client_id>/<dev_type_id>', methods=['GET'])
+@app.route('/rest/device/params/<client_id>/<dev_type_id>', methods=['GET'])
 @json_response
 @timeit
 def device_params(client_id, dev_type_id):
     """
-    @api {get} /device/params/<clientId>/<device_type> Retrieve the needed parameter for creating a device
+    @api {get} /rest/device/params/<clientId>/<device_type> Retrieve the needed parameter for creating a device
     @apiName getDeviceParams
     @apiGroup Device
     @apiVersion 0.4.1
@@ -61,7 +61,7 @@ def device_params(client_id, dev_type_id):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    cli = MQSyncReq(urlHandler.zmq_context)
+    cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('device.params')
     msg.add_data('device_type', dev_type_id)
@@ -84,7 +84,7 @@ class deviceAPI(MethodView):
 
     def get(self, did):
         """
-        @api {get} /device/<id> Retrieve a/all domogik Device
+        @api {get} /rest/device/<id> Retrieve a/all domogik Device
         @apiName getDevice
         @apiGroup Device
 
@@ -167,9 +167,9 @@ class deviceAPI(MethodView):
             HTTTP/1.1 404 Not Found
         """
         if did != None:
-            b = urlHandler.db.get_device(did)
+            b = app.db.get_device(did)
         else:
-            b = urlHandler.db.list_devices()
+            b = app.db.list_devices()
         if b == None:
             return 404, b
         else:
@@ -177,7 +177,7 @@ class deviceAPI(MethodView):
 
     def delete(self, did):
         """
-        @api {del} /device/id Delete a device
+        @api {del} /rest/device/id Delete a device
         @apiName delDevice
         @apiGroup Device
 
@@ -191,7 +191,7 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 500 INTERNAL SERVER ERROR
         """
-        cli = MQSyncReq(urlHandler.zmq_context)
+        cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
         msg.set_action('device.delete')
         msg.set_data({'did': did})
@@ -208,7 +208,7 @@ class deviceAPI(MethodView):
 
     def post(self):
         """
-        @api {post} /device Create a device
+        @api {post} /rest/device Create a device
         @apiName postDevice
         @apiGroup Device
 
@@ -291,7 +291,7 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 500 Internal Server Error
         """
-        cli = MQSyncReq(urlHandler.zmq_context)
+        cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
         msg.set_action('device.create')
         msg.set_data({'data': json.loads(request.form.get('params'))})
@@ -308,7 +308,7 @@ class deviceAPI(MethodView):
 
     def put(self, did):
         """
-        @api {put} /device/<id> Update a specifick device
+        @api {put} /rest/device/<id> Update a specifick device
         @apiName putDevice
         @apiGroup Device
 
@@ -395,13 +395,12 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-
-        b = urlHandler.db.update_device(
+        b = app.db.update_device(
             did,
             request.form.get('name'),
             request.form.get('description'),
             request.form.get('reference'),
         )
-        return 200, urlHandler.db.get_device(did)
+        return 200, app.db.get_device(did)
 
-register_api(deviceAPI, 'device', '/device/', pk='did', pk_type='int')
+register_api(deviceAPI, 'device', '/rest/device/', pk='did', pk_type='int')

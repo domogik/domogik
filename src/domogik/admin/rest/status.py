@@ -1,4 +1,4 @@
-from domogik.rest.url import urlHandler, json_response, timeit
+from domogik.admin.application import app, json_response, timeit
 from domogik.common.configloader import Loader
 import sys
 import os
@@ -6,12 +6,12 @@ import domogik
 from subprocess import Popen, PIPE
 from flask import Response
 
-@urlHandler.route('/')
+@app.route('/rest/')
 @json_response
 @timeit
 def api_root():
     """
-    @api {get} / Get the status of the REST server
+    @api {get} /rest/ Get the status of the REST server
     @apiName getStatus
     @apiGroup Status
     @apiVersion 0.4.1
@@ -41,26 +41,17 @@ def api_root():
     """
     # domogik global version
     global_version = sys.modules["domogik"].__version__
-    # domogik src version
-    domogik_path = os.path.dirname(domogik.rest.__file__)
-    subp = Popen("cd %s ; hg branch | xargs hg log -l1 --template '{branch}.{rev} - {date|isodate}' -b" % domogik_path, shell=True, stdout=PIPE, stderr=PIPE)
-    (stdout, stderr) = subp.communicate()
-    # if hg id has no error, we are using source  repository
-    if subp.returncode == 0:
-        src_version= "%s" % (stdout)
-    # else, we send dmg version
-    else:
-        src_version = global_version
+    src_version = global_version
 
     info = {}
-    info["REST_API_version"] = urlHandler.apiversion
-    info["SSL"] = urlHandler.use_ssl
+    info["REST_API_version"] = app.apiversion
     info["Domogik_version"] = global_version
     info["Sources_version"] = src_version
-    info["Host"] = urlHandler.hostname
+    info["SSL"] = app.use_ssl
+    info["Host"] = app.hostname
 
     # for compatibility with Rest API < 0.6
-    info["REST_API_release"] = urlHandler.apiversion
+    info["REST_API_release"] = app.apiversion
     info["Domogik_release"] = global_version
     info["Sources_release"] = src_version
 
@@ -76,12 +67,12 @@ def api_root():
     data = {"info" : info, "mq": mq}
     return 200, data
 
-@urlHandler.route('/map')
+@app.route('/rest/map')
 @json_response
 @timeit
 def api_map():
     rules = []
-    for rule in urlHandler.url_map.iter_rules():
+    for rule in app.url_map.iter_rules():
         rules.append({\
             'url': rule.rule, \
             'method': list(rule.methods), \

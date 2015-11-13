@@ -1,4 +1,4 @@
-from domogik.rest.url import urlHandler, json_response, timeit
+from domogik.admin.application import app, json_response, timeit
 from domogik.common.configloader import Loader
 import sys
 import os
@@ -7,12 +7,12 @@ from subprocess import Popen, PIPE
 from flask import Response
 
 
-@urlHandler.route('/sensorhistory/id/<int:sid>/latest')
+@app.route('/rest/sensorhistory/id/<int:sid>/latest')
 @json_response
 @timeit
 def sensorHistory_latest(sid):
     """
-    @api {get} /sensorhistory/id/<id>/latest Retrieve the last stored value for a sensor
+    @api {get} /rest/sensorhistory/id/<id>/latest Retrieve the last stored value for a sensor
     @apiName getSensorHistoryLatest
     @apiGroup SensorHistory
     @apiVersion 0.4.1
@@ -21,7 +21,7 @@ def sensorHistory_latest(sid):
 
     @apiSuccess {json} result The json representing the latest value
     
-    @apiSampleRequest /sensorhistory/id/2/latest
+    @apiSampleRequest /rest/ensorhistory/id/2/latest
 
     @apiSuccessExample Success-Response:
         HTTTP/1.1 200 OK
@@ -39,14 +39,14 @@ def sensorHistory_latest(sid):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, urlHandler.db.list_sensor_history(sid, 1)
+    return 200, app.db.list_sensor_history(sid, 1)
 
-@urlHandler.route('/sensorhistory/id/<int:sid>/last/<int:num>')
+@app.route('/rest/sensorhistory/id/<int:sid>/last/<int:num>')
 @json_response
 @timeit
 def sensorHistory_last(sid, num):
     """
-    @api {get} /sensorhistory/id/<id>/last/<num> Retrieve the last x number of stored value for a sensor
+    @api {get} /rest/sensorhistory/id/<id>/last/<num> Retrieve the last x number of stored value for a sensor
     @apiName getSensorHistoryLast
     @apiGroup SensorHistory
 
@@ -55,7 +55,7 @@ def sensorHistory_last(sid, num):
 
     @apiSuccess {json} result The json representing the latest value
 
-    @apiSampleRequest /sensorhistory/id/2/last/3
+    @apiSampleRequest /rest/sensorhistory/id/2/last/3
 
     @apiSuccessExample Success-Response:
         HTTTP/1.1 200 OK
@@ -89,14 +89,14 @@ def sensorHistory_last(sid, num):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, urlHandler.db.list_sensor_history(sid, num)
+    return 200, app.db.list_sensor_history(sid, num)
 
-@urlHandler.route('/sensorhistory/id/<int:sid>/from/<int:ftime>')
+@app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>')
 @json_response
 @timeit
 def sensorHistory_from(sid, ftime):
     """
-    @api {get} /sensorhistory/id/<id>/from/<tstamp> Retrieve the history from a certain timestamp on
+    @api {get} /rest/sensorhistory/id/<id>/from/<tstamp> Retrieve the history from a certain timestamp on
     @apiName getSensorHistoryFrom
     @apiGroup SensorHistory
 
@@ -105,7 +105,7 @@ def sensorHistory_from(sid, ftime):
 
     @apiSuccess {json} result The json representing the latest value
 
-    @apiSampleRequest /sensorhistory/id/2/from/1412750000
+    @apiSampleRequest /rest/sensorhistory/id/2/from/1412750000
 
     @apiSuccessExample Success-Response:
         HTTTP/1.1 200 OK
@@ -139,14 +139,14 @@ def sensorHistory_from(sid, ftime):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, urlHandler.db.list_sensor_history_between(sid, ftime)
+    return 200, app.db.list_sensor_history_between(sid, ftime)
 
-@urlHandler.route('/sensorhistory/id/<int:sid>/from/<int:ftime>/to/<int:ttime>')
+@app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/to/<int:ttime>')
 @json_response
 @timeit
 def sensorHistory_from_to(sid, ftime, ttime):
     """
-    @api {get} /sensorhistory/id/<id>/from/<tstampFrom>/to/<tstampTo> Retrieve the history between 2 timestamps
+    @api {get} /rest/sensorhistory/id/<id>/from/<tstampFrom>/to/<tstampTo> Retrieve the history between 2 timestamps
     @apiName getSensorHistoryFromTo
     @apiGroup SensorHistory
 
@@ -156,7 +156,7 @@ def sensorHistory_from_to(sid, ftime, ttime):
 
     @apiSuccess {json} result The json representing the latest value
 
-    @apiSampleRequest /sensorhistory/id/2/from/1412750000/to/1412760000
+    @apiSampleRequest /rest/sensorhistory/id/2/from/1412750000/to/1412760000
 
     @apiSuccessExample Success-Response:
         HTTTP/1.1 200 OK
@@ -190,14 +190,14 @@ def sensorHistory_from_to(sid, ftime, ttime):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, urlHandler.db.list_sensor_history_between(sid, ftime, ttime)
+    return 200, app.db.list_sensor_history_between(sid, ftime, ttime)
 
-@urlHandler.route('/sensorhistory/id/<int:sid>/from/<int:ftime>/to/<int:ttime>/interval/<interval>/selector/<selector>')
+@app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/to/<int:ttime>/interval/<interval>/selector/<selector>')
 @json_response
 @timeit
 def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
     """
-    @api {get} /sensorhistory/id/<id>/from/<tstampFrom>/to/<tstampTo>/interval/<interval>/selector/<selector> Retrieve the filtered and calculated history between 2 timestamps
+    @api {get} /rest/sensorhistory/id/<id>/from/<tstampFrom>/to/<tstampTo>/interval/<interval>/selector/<selector> Retrieve the filtered and calculated history between 2 timestamps
     @apiName getSensorHistoryFilter
     @apiGroup SensorHistory
 
@@ -209,7 +209,7 @@ def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
 
     @apiSuccess {json} result The json representing the latest value
 
-    @apiSampleRequest /sensorhistory/id/2/from/1/to/1412750000/interval/week/selector/avg
+    @apiSampleRequest /rest/sensorhistory/id/2/from/1/to/1412750000/interval/week/selector/avg
 
     @apiSuccessExample Success-Response:
         HTTTP/1.1 200 OK
@@ -257,16 +257,16 @@ def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, urlHandler.db.list_sensor_history_filter(
+    return 200, app.db.list_sensor_history_filter(
             sid=sid, frm=ftime, to=ttime,
             step_used=interval, function_used=selector)
 
-@urlHandler.route('/sensorhistory/id/<int:sid>/from/<int:ftime>/interval/<interval>/selector/<selector>')
+@app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/interval/<interval>/selector/<selector>')
 @json_response
 @timeit
 def sensorHistory_from_to_filter(sid, ftime, interval, selector):
     """
-    @api {get} /sensorhistory/id/<id>/from/<tstampFrom>/interval/<interval>/selector/<selector> Retrieve the filtered and calculated history starting from a certain timestamp
+    @api {get} /rest/sensorhistory/id/<id>/from/<tstampFrom>/interval/<interval>/selector/<selector> Retrieve the filtered and calculated history starting from a certain timestamp
     @apiName getSensorHistoryFilter2
     @apiGroup SensorHistory
 
@@ -277,7 +277,7 @@ def sensorHistory_from_to_filter(sid, ftime, interval, selector):
 
     @apiSuccess {json} result The json representing the latest value
 
-    @apiSampleRequest /sensorhistory/id/2/from/1/interval/week/selector/avg
+    @apiSampleRequest /rest/sensorhistory/id/2/from/1/interval/week/selector/avg
 
     @apiSuccessExample Success-Response:
         HTTTP/1.1 200 OK
@@ -325,6 +325,6 @@ def sensorHistory_from_to_filter(sid, ftime, interval, selector):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, urlHandler.db.list_sensor_history_filter(
+    return 200, app.db.list_sensor_history_filter(
             sid=sid, frm=ftime, to=None,
             step_used=interval, function_used=selector)

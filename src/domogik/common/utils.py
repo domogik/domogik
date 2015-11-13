@@ -198,7 +198,7 @@ def is_already_launched(log, type, id, manager=True):
 def get_rest_url():
     """ Build and return the rest url
     """
-    cfg = Loader('rest')
+    cfg = Loader('admin')
     config = cfg.load()
     conf = dict(config[1])
     ### get REST ip and port
@@ -208,7 +208,7 @@ def get_rest_url():
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
 
-    return "http://{0}:{1}".format(ip, port)
+    return "http://{0}:{1}/rest".format(ip, port)
 
 
 def get_rest_doc_path():
