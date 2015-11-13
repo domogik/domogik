@@ -24,6 +24,7 @@ try:
     from urllib import quote
 except ImportError:
     from urllib.parse import quote
+import traceback
 
 @app.route('/scenario')
 @login_required
