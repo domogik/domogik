@@ -35,3 +35,8 @@ The install script has been improved to make the install process more simple.
 * Some options that are not changed by most of the users are now hidden during the installation process. You still access them with the *--advanced* option or by editing the configuration file after the installation.
 
 If you are wondering about how the network configuration is done, well the choice is automatically made for you by the installation script since the 0.4.2 release.
+
+Scenarios
+---------
+
+A help dialog has been added in the scenario page. It show with an example how to create a scenario.
