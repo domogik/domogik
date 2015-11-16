@@ -46,4 +46,9 @@ Scenarios
 
 A help dialog has been added in the scenario page. It show with an example how to create a scenario.
 
+Butler
+------
 
+A new Rest service has been added. See the chapter about Rest for more informations.
+
+Now, if a client sends an *uuid* field in the json while speaking to the butler, the butler will responds with the same uuid in the json response.
