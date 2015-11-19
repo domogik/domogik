@@ -6,48 +6,59 @@ The included rivescript library is version 1.0.6 : https://github.com/aichaos/ri
 Patches applied on rivescript/python.py
 =======================================
 
-    89,92c89
-    <         # Patch Fritz to allow python objects in .rive files 
-    <         #return str(reply)
-    <         return reply
-    <         # Patch end
+    30d29
+    < 
+    88c87,92
+    <         return str(reply)
     ---
-    >         return str(reply)
-
+    >         ### Fritz - patch
+    >         # old #
+    >         #return str(reply)
+    >         # new #
+    >         return reply
+    >         ### Fritz - patch end
 
 Patches applied on the library
 ==============================
 
 The library is patched :
 
-    53,57d52
-    < ### Patch for Domogik
-    < DEFAULT_WEIGHT = 10
-    < print("/!\ Rivescript 1.06, patched for Domogik")
-    < ### End of patch
-    < 
-    1052,1055c1047
-    <             ### Patch for Domogik : change default weight
-    <             # 0: []  # Default priority=0
-    <             DEFAULT_WEIGHT: []  # Default priority
-    <             ### End of patch
-    ---
-    >             0: []  # Default priority=0
-    1059,1062c1051
-    <             ### Patch for Domogik : change default weight
-    <             # match, weight = re.search(re_weight, trig), 0
-    <             match, weight = re.search(re_weight, trig), 10
-    <             ### End of patch
-    ---
-    >             match, weight = re.search(re_weight, trig), 0
-    1763,1766c1752
-    <                     ### Patch for Domogik : change default weight
-    <                     #weight = 1
-    <                     weight = DEFAULT_WEIGHT
-    <                     ### End of patch
-    ---
-    >                     weight = 1
 
+    85a86,92
+    > ### Fritz - patch
+    > # old #
+    > # (nothing) #
+    > # new #
+    > DEFAULT_WEIGHT = 10
+    > print("/!\ Rivescript 1.06, patched for Domogik")
+    > ### Fritz - patch end
+    1112c1119,1124
+    <             0: []  # Default priority=0
+    ---
+    >             ### fritz - patch
+    >             # old #
+    >             # 0: []  # Default priority=0
+    >             # new #
+    >             DEFAULT_WEIGHT: []  # Default priority
+    >             ### fritz - patch end
+    1116c1128,1133
+    <             match, weight = re.search(RE.weight, trig), 0
+    ---
+    >             # fritz - patch
+    >             # old #
+    >             # match, weight = re.search(RE.weight, trig), 0
+    >             # new #
+    >             match, weight = re.search(RE.weight, trig), DEFAULT_WEIGHT
+    >             # fritz - patch end
+    1830c1847,1852
+    <                     weight = 1
+    ---
+    >                     ### fritz - patch
+    >                     # old #
+    >                     # weight = 1
+    >                     # new #
+    >                     weight = DEFAULT_WEIGHT
+    >                     ### fritz - patch end
 
 This is needed to allow some brain packages to propose some actions with some generic sentences that could also be used in other brain packages which are more important.
 For example, the wolfram package should be used only when there is no other match.
