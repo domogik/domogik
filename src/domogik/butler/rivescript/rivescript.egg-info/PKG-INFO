@@ -1,0 +1,16 @@
+Metadata-Version: 1.1
+Name: rivescript
+Version: 1.8.0
+Summary: A Chatterbot Scripting Language
+Home-page: https://github.com/aichaos/rivescript-python
+Author: Noah Petherbridge
+Author-email: root@kirsle.net
+License: MIT
+Description: A scripting language to make it easy to write responses for a chatterbot.
+Keywords: bot,chatbot,chatterbot,ai,aiml,chatscript,buddyscript
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence

@@ -1,5 +1,21 @@
 Revision history for the Python package RiveScript.
 
+1.8.0  Oct 10 2015
+	- New algorithm for handling variable tags (<get>, <set>, <add>, <sub>,
+	  <mult>, <div>, <bot> and <env>) that allows for iterative nesting of
+	  these tags (for example, <set copy=<get orig>> will work now).
+	- Fix sorting algorithm, so triggers with matching word counts will be
+	  sorted by length descending.
+	- stream() function can accept a multiline string instead of an array
+	- Speed optimization by precompiling as many regexps as possible (what was
+	  especially helpful was to precompile substitution and simple trigger
+	  regexps), taking the time-to-reply for the default brain from ~0.19s down
+	  to ~0.04s
+	- Add support for `! local concat` option to override concatenation mode
+	  (file scoped)
+	- Fix the regexp used when matching optionals so that the triggers don't match
+	  on inputs where they shouldn't. (RiveScript-JS issue #46)
+
 1.06  Nov 25 2014
 	- Change package name from python-rivescript to simply rivescript.
 	- Change from the GPLv2 license to the MIT license.

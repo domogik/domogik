@@ -41,7 +41,7 @@ from threading import Thread
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import Plugin
-from domogik.butler.rivescript import RiveScript
+from domogik.butler.rivescript.rivescript import RiveScript
 from domogik.butler.brain import LEARN_FILE
 from domogik.butler.brain import STAR_FILE
 from domogik.butler.brain import clean_input

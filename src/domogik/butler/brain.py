@@ -102,7 +102,20 @@ def clean_input(data):
     data = data.replace("!", " ")
 
     # remove accents
-    data = unicodedata.normalize('NFD', data).encode('ascii', 'ignore')
+    # TODO : improve for multiple languages
+    accents = {u"à" : "a", 
+               u"â" : "a",
+               u"ä" : "a",
+               u"é" : "e",
+               u"è" : "e",
+               u"ê" : "e",
+               u"ë" : "e",
+               u"ï" : "i",
+               u"ô" : "o",
+               u"ö" : "o",
+               u"ù" : "u"}
+    for an_accent in accents:
+        data = data.replace(an_accent, accents[an_accent])
 
     # remove duplicate spaces
     data = ' '.join(data.split())
@@ -366,7 +379,7 @@ def process_star(not_understood_responses, suggest_intro, rs):
     if found_suggest == False:
         query = u"{0}\n".format(query)
         with open(STAR_FILE, "a") as file:
-            file.write(query) 
+            file.write(query.encode('UTF-8')) 
         return not_understood_responses[randint(0, len(not_understood_responses)-1)]
 
 
