@@ -11,7 +11,7 @@ from domogik.common.utils import get_rest_doc_path
 
 
 # But for now... well, we will just redirect to the official online Api doc
-@app.route('/rest')
-def rest():
+@app.route('/apidoc')
+def apidoc():
     return redirect("http://apidoc.domogik.org/")
 
