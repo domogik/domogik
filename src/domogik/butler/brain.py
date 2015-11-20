@@ -133,7 +133,7 @@ def get_sensor_value(dt_type, device_name, sensor_reference = None):
     """
     if isinstance(device_name, list):
         device_name = ' '.join(device_name)
-    print("Device name = {0}".format(device_name))
+    print(u"Device name = {0}".format(device_name))
     #print("Datatype = {0}".format(dt_type))
 
     ### search for all devices of the appropriate dt_type 
@@ -142,7 +142,7 @@ def get_sensor_value(dt_type, device_name, sensor_reference = None):
     else:
         check_preferences = True
     candidates = get_sensors_for_datatype(dt_type, check_preferences)
-    print("Candidates for the appropriate datatype : {0}".format(candidates))
+    print(u"Candidates for the appropriate datatype : {0}".format(candidates))
 
     if sensor_reference:
         ### then search for the sensor with the appropriate reference
@@ -151,7 +151,7 @@ def get_sensor_value(dt_type, device_name, sensor_reference = None):
         ### then, search for any device that matches the device name
         the_sensor = filter_sensors_by_device_name(candidates, device_name)
 
-    print("The sensor is : {0}".format(the_sensor))
+    print(u"The sensor is : {0}".format(the_sensor))
 
     ### no corresponding sensor :(
     if the_sensor == None:
@@ -178,7 +178,7 @@ def get_sensors_for_datatype(dt_type, check_preferences = True):
             preferences_fp = open(preferences_file)
             preferences = json.load(preferences_fp)
         except:
-            print("Error while loading preferences (maybe no preferences file ? {0} : {1}".format(preferences_file, traceback.format_exc()))
+            print(u"Error while loading preferences (maybe no preferences file ? {0} : {1}".format(preferences_file, traceback.format_exc()))
             pass
     else:
         preferences = {}
@@ -211,10 +211,10 @@ def get_sensors_for_datatype(dt_type, check_preferences = True):
             # and if so, we use them
             if len(candidates_for_this_device) > 1:
                 package = a_device["client_id"].split(".")[0]
-                #print("Check for preferences for the package '{0}'....".format(package))
+                #print(u"Check for preferences for the package '{0}'....".format(package))
                 if preferences.has_key(package): 
                     if preferences[package].has_key(dt_type):
-                        print("Preferences found for datatype '{0}' : sensor '{1}'".format(dt_type, preferences[package][dt_type]))
+                        print(u"Preferences found for datatype '{0}' : sensor '{1}'".format(dt_type, preferences[package][dt_type]))
                         candidates.append(candidates_for_this_device[preferences[package][dt_type]])
                 else:
                     # yes we have only one entry, but we need to get the value related to the key...
@@ -230,7 +230,7 @@ def get_sensors_for_datatype(dt_type, check_preferences = True):
 
         return candidates                
     except:
-        print("ERROR : {0}".format(traceback.format_exc()))
+        print(u"ERROR : {0}".format(traceback.format_exc()))
         pass
 
 
@@ -250,7 +250,7 @@ def filter_sensors_by_reference_and_device_name(candidates, reference, device_na
             if device_name == clean_input(a_sensor["device_name"]) and a_sensor["sensor_reference"].lower() == reference:
                 return a_sensor
         except:
-            print("ERROR : {0}".format(traceback.format_exc()))
+            print(u"ERROR : {0}".format(traceback.format_exc()))
             pass
 
     return None
@@ -266,7 +266,7 @@ def filter_sensors_by_device_name(candidates, device_name):
             if clean_input(a_sensor["device_name"]) == device_name:
                 return a_sensor
         except:
-            print("ERROR : {0}".format(traceback.format_exc()))
+            print(u"ERROR : {0}".format(traceback.format_exc()))
             pass
 
 
@@ -295,7 +295,7 @@ def learn(rs_code, comment = None):
 def trigger_bool_command(dt_type, device, value):
     try:
         device_name = device.lower()
-        print("Device name = {0}".format(device_name))
+        print(u"Device name = {0}".format(device_name))
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('device.get')
@@ -329,7 +329,7 @@ def trigger_bool_command(dt_type, device, value):
         else:
             return None
     except:
-        print("ERROR : {0}".format(traceback.format_exc()))
+        print(u"ERROR : {0}".format(traceback.format_exc()))
         return None
 
 
