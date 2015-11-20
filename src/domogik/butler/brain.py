@@ -114,8 +114,8 @@ def clean_input(data):
                u"ô" : "o",
                u"ö" : "o",
                u"ù" : "u"}
-    for an_accent in accents:
-        data = data.replace(an_accent, accents[an_accent])
+    #for an_accent in accents:
+    #    data = data.replace(an_accent, accents[an_accent])
 
     # remove duplicate spaces
     data = ' '.join(data.split())
