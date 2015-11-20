@@ -27,6 +27,7 @@ from __future__ import print_function, unicode_literals
 
 __docformat__ = 'plaintext'
 
+
 class PyRiveObjects(object):
     """A RiveScript object handler for Python code.
 
@@ -84,12 +85,7 @@ handler on your RiveScript object:
                 reply = ''
         except Exception as e:
             raise PythonObjectError("Error executing Python object: " + str(e))
-        ### Fritz - patch
-        # old #
-        #return str(reply)
-        # new #
-        return reply
-        ### Fritz - patch end
+        return str(reply)
 
 
 class PythonObjectError(Exception):

@@ -55,6 +55,5 @@ rivescript/rivescript.py
 rivescript.egg-info/PKG-INFO
 rivescript.egg-info/SOURCES.txt
 rivescript.egg-info/dependency_links.txt
-rivescript.egg-info/pbr.json
 rivescript.egg-info/requires.txt
 rivescript.egg-info/top_level.txt
