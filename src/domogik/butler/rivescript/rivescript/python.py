@@ -85,7 +85,12 @@ handler on your RiveScript object:
                 reply = ''
         except Exception as e:
             raise PythonObjectError("Error executing Python object: " + str(e))
-        return str(reply)
+        ### Fritz - patch
+        # old #
+        #return str(reply)
+        # new #
+        return reply
+        ### Fritz - patch end
 
 
 class PythonObjectError(Exception):

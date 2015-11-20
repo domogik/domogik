@@ -83,6 +83,15 @@ RS_ERR_OBJECT = "[ERR: Error when executing Python object]"
 RS_ERR_OBJECT_HANDLER = "[ERR: No Object Handler]"
 RS_ERR_OBJECT_MISSING = "[ERR: Object Not Found]"
 
+### Fritz - patch
+# old #
+# (nothing) #
+# new #
+import unicodedata
+
+DEFAULT_WEIGHT = 10
+print("/!\ Rivescript 1.80, patched for Domogik purpose")
+### Fritz - patch end
 
 class RiveScript(object):
     """A RiveScript interpreter for Python 2 and 3."""
@@ -1109,11 +1118,21 @@ Returns a syntax error string on error; None otherwise."""
 
         # Create a priority map.
         prior = {
-            0: []  # Default priority=0
+            ### fritz - patch
+            # old #
+            # 0: []  # Default priority=0
+            # new #
+            DEFAULT_WEIGHT: []  # Default priority
+            ### fritz - patch end
         }
 
         for trig in triggers:
-            match, weight = re.search(RE.weight, trig), 0
+            # fritz - patch
+            # old #
+            # match, weight = re.search(RE.weight, trig), 0
+            # new #
+            match, weight = re.search(RE.weight, trig), DEFAULT_WEIGHT
+            # fritz - patch end
             if match:
                 weight = int(match.group(1))
             if weight not in prior:
@@ -1588,6 +1607,11 @@ the value is unset at the end of the `reply()` method)."""
             # For the bot's reply, also strip common punctuation.
             if botreply:
                 msg = re.sub(RE.utf8_punct, '', msg)
+
+            # fritz patch
+            # replace accented by non accented characters for latin languages
+            msg = remove_accents(msg) 
+            # fritz patch end
         else:
             # For everything else, strip all non-alphanumerics.
             msg = self._strip_nasties(msg)
@@ -1827,7 +1851,12 @@ the value is unset at the end of the `reply()` method)."""
                 bucket = []
                 for rep in sorted(matched["reply"]):
                     text = matched["reply"][rep]
-                    weight = 1
+                    ### fritz - patch
+                    # old #
+                    # weight = 1
+                    # new #
+                    weight = DEFAULT_WEIGHT
+                    ### fritz - patch end
                     match  = re.match(RE.weight, text)
                     if match:
                         weight = int(match.group(1))
@@ -2501,6 +2530,14 @@ class RepliesNotSortedError(Exception):
     """sort_replies() was not called after the RiveScript documents were loaded, critical error"""
     pass
 
+# fritz patch
+# old #
+# (nothing)
+# new #
+def remove_accents(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+# fritz patch end
 
 ################################################################################
 # Interactive Mode                                                             #
