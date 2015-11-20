@@ -295,6 +295,7 @@ def learn(rs_code, comment = None):
 def trigger_bool_command(dt_type, device, value):
     try:
         device_name = device.lower()
+        print("Device name = {0}".format(device_name))
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('device.get')
