@@ -342,7 +342,7 @@ def process_star(not_understood_responses, suggest_intro, rs):
         @param suggest_intro : a start sentence (i18n) to suggest a match
         @param rs : rivescript brain
     """
-    query = rs.query
+    query = remove_accents(rs.query)
     suggests = rs.the_suggestions
     ### see if some suggestion matches
     found_suggest = False
@@ -350,7 +350,8 @@ def process_star(not_understood_responses, suggest_intro, rs):
         for line in a_suggest.split('\n'):
             if len(line) > 0:
                 if line[0] == "?":
-                    regexp = line[1:].strip()
+                    regexp_raw = line[1:].strip()
+                    regexp = remove_accents(regexp_raw)
                 elif line[0] == "@":
                     shortcut = line
                     shortcut_sample = shortcut[1:].strip()
@@ -402,3 +403,10 @@ def learn_from_suggestion(rs):
     print(u"{0}{1}".format(rs_comment, rs_code))
     learn(rs_code, comment = rs_comment)
     rs.reload_butler()
+
+
+def remove_accents(input_str):
+    """ Remove accents in utf-8 strings
+    """
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
