@@ -24,15 +24,17 @@ Patches applied on the library
 The library is patched :
 
 
-    85a86,92
+    85a86,94
     > ### Fritz - patch
     > # old #
     > # (nothing) #
     > # new #
+    > import unicodedata
+    > 
     > DEFAULT_WEIGHT = 10
-    > print("/!\ Rivescript 1.06, patched for Domogik")
+    > print("/!\ Rivescript 1.80, patched for Domogik purpose")
     > ### Fritz - patch end
-    1112c1119,1124
+    1112c1121,1126
     <             0: []  # Default priority=0
     ---
     >             ### fritz - patch
@@ -41,7 +43,7 @@ The library is patched :
     >             # new #
     >             DEFAULT_WEIGHT: []  # Default priority
     >             ### fritz - patch end
-    1116c1128,1133
+    1116c1130,1135
     <             match, weight = re.search(RE.weight, trig), 0
     ---
     >             # fritz - patch
@@ -50,7 +52,13 @@ The library is patched :
     >             # new #
     >             match, weight = re.search(RE.weight, trig), DEFAULT_WEIGHT
     >             # fritz - patch end
-    1830c1847,1852
+    1590a1610,1614
+    > 
+    >             # fritz patch
+    >             # replace accented by non accented characters for latin languages
+    >             msg = remove_accents(msg) 
+    >             # fritz patch end
+    1830c1854,1859
     <                     weight = 1
     ---
     >                     ### fritz - patch
@@ -59,6 +67,15 @@ The library is patched :
     >                     # new #
     >                     weight = DEFAULT_WEIGHT
     >                     ### fritz - patch end
+    2503a2533,2540
+    > # fritz patch
+    > # old #
+    > # (nothing)
+    > # new #
+    > def remove_accents(input_str):
+    >     nfkd_form = unicodedata.normalize('NFKD', input_str)
+    >     return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+    > # fritz patch end
 
 This is needed to allow some brain packages to propose some actions with some generic sentences that could also be used in other brain packages which are more important.
 For example, the wolfram package should be used only when there is no other match.

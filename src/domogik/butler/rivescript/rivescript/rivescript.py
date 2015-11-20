@@ -87,8 +87,10 @@ RS_ERR_OBJECT_MISSING = "[ERR: Object Not Found]"
 # old #
 # (nothing) #
 # new #
+import unicodedata
+
 DEFAULT_WEIGHT = 10
-print("/!\ Rivescript 1.06, patched for Domogik")
+print("/!\ Rivescript 1.80, patched for Domogik purpose")
 ### Fritz - patch end
 
 class RiveScript(object):
@@ -1605,6 +1607,11 @@ the value is unset at the end of the `reply()` method)."""
             # For the bot's reply, also strip common punctuation.
             if botreply:
                 msg = re.sub(RE.utf8_punct, '', msg)
+
+            # fritz patch
+            # replace accented by non accented characters for latin languages
+            msg = remove_accents(msg) 
+            # fritz patch end
         else:
             # For everything else, strip all non-alphanumerics.
             msg = self._strip_nasties(msg)
@@ -2523,6 +2530,14 @@ class RepliesNotSortedError(Exception):
     """sort_replies() was not called after the RiveScript documents were loaded, critical error"""
     pass
 
+# fritz patch
+# old #
+# (nothing)
+# new #
+def remove_accents(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+# fritz patch end
 
 ################################################################################
 # Interactive Mode                                                             #
