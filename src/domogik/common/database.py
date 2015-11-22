@@ -1829,6 +1829,16 @@ class DbHelper():
         return config
 
 ###################
+# Timeline
+###################
+    def get_timeline(self):
+        """ Get the history of the last events
+        """
+        return self.__session.query(SensorHistory).filter().order_by(SensorHistory.date.desc()).limit(500)
+
+
+
+###################
 # helper functions
 ###################
     def __raise_dbhelper_exception(self, error_msg, with_rollback=False):
