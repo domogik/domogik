@@ -48,7 +48,7 @@
 }
 
 .cbp_tmtimeline > li .cbp_tmtime span:first-child {
-	font-size: 0.9em;
+	font-size: 1.3em;
 	color: #bdd0db;
 }
 
@@ -66,10 +66,10 @@
 	margin: 0 0 15px 25%;
 	background: #3594cb;
 	color: #fff;
-	padding: 2em;
-	font-size: 1.2em;
+	padding: 0.7em;
+	font-size: 1.5em;
 	font-weight: 300;
-	line-height: 1.4;
+	line-height: 1;
 	position: relative;
 	border-radius: 5px;
 }
@@ -80,7 +80,7 @@
 
 .cbp_tmtimeline > li .cbp_tmlabel h3 { 
 	margin-top: 0px;
-	padding: 0 0 10px 0;
+	padding: 0 0 0px 0;
 	border-bottom: 1px solid rgba(255,255,255,0.4);
 }
 .cbp_tmtimeline > li .cbp_tmlabel h3 small { 
@@ -109,7 +109,7 @@
 .cbp_tmtimeline > li .cbp_tmicon {
 	width: 40px;
 	height: 40px;
-	font-family: 'ecoico';
+	//font-family: 'ecoico';
 	speak: none;
 	font-style: normal;
 	font-weight: normal;
@@ -129,6 +129,7 @@
 	margin: 0 0 0 -25px;
 }
 
+/*
 .cbp_tmicon-phone:before {
 	content: "\e000";
 }
@@ -144,6 +145,7 @@
 .cbp_tmicon-earth:before {
 	content: "\e003";
 }
+*/
 
 /* Example Media Queries */
 @media screen and (max-width: 65.375em) {
@@ -208,7 +210,7 @@
 		<div class="cbp_tmlabel">
 			<h3>{{ elt.device_name }} <small>({{ elt.client }})</small></h3>
                         {% for sensor in elt.sensors_changes %}
-			<p>{{ sensor.sensor_name }} : {{ sensor.value }}</p>
+			<p>{{ sensor.sensor_name }} : {{ sensor.value }} {% if sensor.unit is not none %}{{ sensor.unit }}{% endif %} </p>
                         {% endfor %}
 		</div>
 	</li>

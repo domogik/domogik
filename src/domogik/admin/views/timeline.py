@@ -24,19 +24,30 @@ def timeline():
         print("Error : no devices found!")
         devices = []
 
+    # datatypes
+    datatypes = {}
+    used_datatypes = []
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('datatype.get')
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is not None:
+        res = res.get_data()
+        if 'datatypes' in res:
+            datatypes = res['datatypes']
+    else:
+        print("Error : no datatypes found!")
+        datatypes = {}
 
 
     # timeline
     with app.db.session_scope():
         timeline = []
         data = app.db.get_timeline()
-        print(data)
-        print(data.value)
         previous_device_id = 0
         previous_date = None
         sensors_changes_for_the_device = []
         for elt in data:
-            print(elt)
    
             found = False
             dt_type = None
@@ -44,6 +55,12 @@ def timeline():
             for dev in devices:
                 for sensor in dev['sensors']:
                     id = dev['sensors'][sensor]['id']
+
+                    if "unit" in datatypes[dev['sensors'][sensor]["data_type"]]:
+                        unit = datatypes[dev['sensors'][sensor]["data_type"]]["unit"]
+                    else:
+                        unit = None
+
                     if id == elt.sensor_id:
                         if dev['id'] == previous_device_id and elt.date == previous_date:
                             pass
@@ -64,6 +81,7 @@ def timeline():
 
                         sensors_changes_for_the_device.append({"sensor_name" : dev['sensors'][sensor]['name'],
                                                                "dt_type" : dev['sensors'][sensor]['data_type'],
+                                                               "unit" : unit,
                                                                "value" : elt.value_str})
                         found = True
                         break
