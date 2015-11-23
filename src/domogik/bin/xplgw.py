@@ -267,6 +267,7 @@ class XplManager(XplPlugin, MQAsyncSub):
         """
         item = {}
         item["msg"] = pkt
+        item["received_datetime"] = calendar.timegm(time.gmtime())
         item["clientId"] = next((cli for cli, xpl in self.client_xpl_map.items() if xpl == pkt.source), None)
         self._sensor_queue.put(item)
         self.log.debug(u"Adding new message to the sensorQueue, current length = {0}".format(self._sensor_queue.qsize()))
@@ -422,7 +423,8 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 for data in fdata[1]:
                                     value = data['value']
                                     storeparam = data['param']
-                                    current_date = calendar.timegm(time.gmtime())
+                                    #current_date = calendar.timegm(time.gmtime())
+                                    current_date = item["received_datetime"]
                                     store = True
                                     if storeparam.ignore_values:
                                         if value in eval(storeparam.ignore_values):
