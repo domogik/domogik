@@ -152,13 +152,15 @@ def test_config_files():
     if params:
         ok("Manager params seem good")
 
+    # The xPL hub is no more used by default, no need to test it
+
     #Check if we can find xPL_Hub
-    info("Check xPL_Hub is in path")
-    path = os.environ['PATH'].split(':')
-    path.append(custom_path)
-    l = [p for p in path if os.path.exists(os.path.join(p, 'xPL_Hub'))]
-    assert l != [], "xPL_Hub can't be found, please double check CUSTOM_PATH is correctly defined if you are in development mode. In install mode, check your architecture is supported or check src/domogik/xpl/tools/COMPILE.txt, then restart test_config.py"
-    ok("xPL_Hub found in the path")
+    #info("Check xPL_Hub is in path")
+    #path = os.environ['PATH'].split(':')
+    #path.append(custom_path)
+    #l = [p for p in path if os.path.exists(os.path.join(p, 'xPL_Hub'))]
+    #assert l != [], "xPL_Hub can't be found, please double check CUSTOM_PATH is correctly defined if you are in development mode. In install mode, check your architecture is supported or check src/domogik/xpl/tools/COMPILE.txt, then restart test_config.py"
+    #ok("xPL_Hub found in the path")
 
     info("Test user / config file")
 
