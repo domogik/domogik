@@ -32,6 +32,9 @@ def timeline():
         data = app.db.get_timeline()
         print(data)
         print(data.value)
+        previous_device_id = 0
+        previous_date = None
+        sensors_changes_for_the_device = []
         for elt in data:
             print(elt)
    
@@ -42,23 +45,33 @@ def timeline():
                 for sensor in dev['sensors']:
                     id = dev['sensors'][sensor]['id']
                     if id == elt.sensor_id:
-                        sensor_name = dev['sensors'][sensor]['name']
-                        dt_type = dev['sensors'][sensor]['data_type']
+                        if dev['id'] == previous_device_id and elt.date == previous_date:
+                            pass
+                        else:
+                            if previous_device_id != 0:
+                                timeline.append({ "datetime" : elt.date,
+                                                  "date" : elt.date.date(),
+                                                  "time" : elt.date.time(),
+                                                  "device_name" : device_name,
+                                                  "client" : client,
+                                                  "sensors_changes" : sensors_changes_for_the_device,
+                                                })
+                            sensors_changes_for_the_device = []
+                            device_name = dev['name']
+                            device_id = dev['id']
+                            client = dev['client_id']
+
+
+                        sensors_changes_for_the_device.append({"sensor_name" : dev['sensors'][sensor]['name'],
+                                                               "dt_type" : dev['sensors'][sensor]['data_type'],
+                                                               "value" : elt.value_str})
                         found = True
                         break
                 if found == True:
-                    device_name = dev['name']
                     break
                   
-            timeline.append({ "datetime" : elt.date,
-                              "date" : elt.date.date(),
-                              "time" : elt.date.time(),
-                              "device_name" : device_name,
-                              "device_name" : device_name,
-                              "sensor_name" : sensor_name,
-                              "dt_type" : dt_type,
-                              "value" : elt.value_str
-                            })
+            previous_device_id = device_id
+            previous_date = elt.date
          
 
     return render_template('timeline.html',

@@ -78,10 +78,13 @@
 	background: #6cbfee;
 }
 
-.cbp_tmtimeline > li .cbp_tmlabel h2 { 
+.cbp_tmtimeline > li .cbp_tmlabel h3 { 
 	margin-top: 0px;
 	padding: 0 0 10px 0;
 	border-bottom: 1px solid rgba(255,255,255,0.4);
+}
+.cbp_tmtimeline > li .cbp_tmlabel h3 small { 
+	color: #ffffff;
 }
 
 /* The triangle */
@@ -201,10 +204,12 @@
     {% for elt in timeline %}
 	<li>
 		<time class="cbp_tmtime" datetime="{{ elt.datetime }}"><span>{{ elt.date }}</span> <span>{{ elt.time }}</span></time>
-		<div class="cbp_tmicon">X</div>
+		<div class="cbp_tmicon"> </div>
 		<div class="cbp_tmlabel">
-			<h2>{{ elt.device_name }} - {{ elt.sensor_name }}</h2>
-			<p>New value : {{ elt.value }}</p>
+			<h3>{{ elt.device_name }} <small>({{ elt.client }})</small></h3>
+                        {% for sensor in elt.sensors_changes %}
+			<p>{{ sensor.sensor_name }} : {{ sensor.value }}</p>
+                        {% endfor %}
 		</div>
 	</li>
     {% endfor %}
