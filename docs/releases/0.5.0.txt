@@ -52,3 +52,9 @@ Butler
 A new Rest service has been added. See the chapter about Rest for more informations.
 
 Now, if a client sends an *uuid* field in the json while speaking to the butler, the butler will responds with the same uuid in the json response.
+
+
+Admin : new section : timeline
+------------------------------
+
+A timeline has been added to the Administration. It displays the last sensors changes on a timeline.
