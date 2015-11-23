@@ -63,6 +63,7 @@ BRAIN_PKG_TYPES = ["brain", "plugin"]
 MINIMAL_BRAIN = "{0}/../butler/brain_minimal.rive".format(os.path.dirname(os.path.abspath(__file__)))
 RIVESCRIPT_DIR = "rs"
 RIVESCRIPT_EXTENSION = ".rive"
+BRAIN_BASE = "brain_base"
 
 FEATURE_TAG = "##feature##"
 SUGGEST_REGEXP = r'\/\* *##suggest##.*\n([\S\s]*?)\*\/'
@@ -329,7 +330,14 @@ class Butler(Plugin, MQAsyncSub):
         try:
             list = []
             # first load the packages parts
-            for a_file in os.listdir(self.get_packages_directory()):
+            dir_list = os.listdir(self.get_packages_directory())
+
+            # first, make sure the brain_base package is loaded the first!!
+            if BRAIN_BASE in dir_list:
+                dir_list.remove(BRAIN_BASE)
+                dir_list = [BRAIN_BASE] + dir_list
+
+            for a_file in dir_list:
                 try:
                     pkg_type, name = a_file.split("_")
                 except ValueError:
