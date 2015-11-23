@@ -11,6 +11,7 @@ import shutil
 import logging
 import pkg_resources
 from subprocess import Popen, PIPE, STDOUT
+from distutils import version
 
 
 BLUE = '\033[94m'
@@ -474,6 +475,14 @@ def install():
 
         # upgrade db
         if not args.db:
+
+            # check if alembic version is at least 0.7.4. Else raise an error
+            from alembic import __version__ as alembic_version
+            if version.StrictVersion(alembic_version) < version.StrictVersion("0.7.4"):
+                fail("The 'alembic' version installed on this system ({0}) is not recent enough. Please install at least alembic >= 0.7.4".format(alembic_version))
+                exit(0)
+
+            # do db upgrade
             try:
                 user_entry = pwd.getpwnam(user)
             except KeyError:
