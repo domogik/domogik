@@ -46,6 +46,7 @@ import os
 import re
 import unicodedata
 from random import randint
+import locale
 
 ### Brain preferences
 # This file is included in the package domogik-brain-datatype
@@ -122,7 +123,7 @@ def clean_input(data):
     return data
 
 
-def get_sensor_value(dt_type, device_name, sensor_reference = None):
+def get_sensor_value(log, user_locale, dt_type, device_name, sensor_reference = None):
     """ If sensor_reference = None
             Search for a sensor matching the dt_type and the device name
         Else
@@ -133,25 +134,25 @@ def get_sensor_value(dt_type, device_name, sensor_reference = None):
     """
     if isinstance(device_name, list):
         device_name = ' '.join(device_name)
-    print(u"Device name = {0}".format(device_name))
-    #print("Datatype = {0}".format(dt_type))
+    log.info(u"Device name = {0}".format(device_name))
+    #log.info("Datatype = {0}".format(dt_type))
 
     ### search for all devices of the appropriate dt_type 
     if sensor_reference:
         check_preferences = False
     else:
         check_preferences = True
-    candidates = get_sensors_for_datatype(dt_type, check_preferences)
-    print(u"Candidates for the appropriate datatype : {0}".format(candidates))
+    candidates = get_sensors_for_datatype(dt_type, check_preferences, log)
+    log.info(u"Candidates for the appropriate datatype : {0}".format(candidates))
 
     if sensor_reference:
         ### then search for the sensor with the appropriate reference
-        the_sensor = filter_sensors_by_reference_and_device_name(candidates, sensor_reference, device_name)
+        the_sensor = filter_sensors_by_reference_and_device_name(candidates, sensor_reference, device_name, log)
     else:
         ### then, search for any device that matches the device name
-        the_sensor = filter_sensors_by_device_name(candidates, device_name)
+        the_sensor = filter_sensors_by_device_name(candidates, device_name, log)
 
-    print(u"The sensor is : {0}".format(the_sensor))
+    log.info(u"The sensor is : {0}".format(the_sensor))
 
     ### no corresponding sensor :(
     if the_sensor == None:
@@ -161,13 +162,34 @@ def get_sensor_value(dt_type, device_name, sensor_reference = None):
     # let's get the sensor value
 
     the_value = the_sensor['last_value']
+    log.info(u"The value is : {0}".format(the_value))
 
+    #print("A : {0}".format(is_float_and_not_int(1)))   
+    #print("A : {0}".format(is_float_and_not_int(11)))
+    #print("A : {0}".format(is_float_and_not_int(11.2)))
+    try:
+        the_locale = "{0}.UTF-8".format(user_locale)
+        #locale.setlocale(locale.LC_ALL, str("fr_FR.UTF-8"))
+        locale.setlocale(locale.LC_ALL, the_locale)
+        the_value = locale.format("%g", float(the_value))
+    except:
+        log.warning("Unable to format the value with the locale '{0}'".format(the_locale))
     return the_value
     
 
+def is_float_and_not_int(x):
+    try:
+        a = float(x)
+        b = int(x)
+    except ValueError:
+        return False
+    else:
+        print(a)
+        print(b)
+        return a == b
 
 
-def get_sensors_for_datatype(dt_type, check_preferences = True):
+def get_sensors_for_datatype(dt_type, check_preferences = True, log = None):
     """ Find the matching devices and features
     """
 
@@ -178,8 +200,10 @@ def get_sensors_for_datatype(dt_type, check_preferences = True):
             preferences_fp = open(preferences_file)
             preferences = json.load(preferences_fp)
         except:
-            print(u"Error while loading preferences (maybe no preferences file ? {0} : {1}".format(preferences_file, traceback.format_exc()))
+            log.error(u"Error while loading preferences (maybe no preferences file ? {0} : {1}".format(preferences_file, traceback.format_exc()))
             pass
+        finally:
+            preferences_fp.close()
     else:
         preferences = {}
 
@@ -214,7 +238,7 @@ def get_sensors_for_datatype(dt_type, check_preferences = True):
                 #print(u"Check for preferences for the package '{0}'....".format(package))
                 if preferences.has_key(package): 
                     if preferences[package].has_key(dt_type):
-                        print(u"Preferences found for datatype '{0}' : sensor '{1}'".format(dt_type, preferences[package][dt_type]))
+                        log.info(u"Preferences found for datatype '{0}' : sensor '{1}'".format(dt_type, preferences[package][dt_type]))
                         candidates.append(candidates_for_this_device[preferences[package][dt_type]])
                 else:
                     # yes we have only one entry, but we need to get the value related to the key...
@@ -230,16 +254,17 @@ def get_sensors_for_datatype(dt_type, check_preferences = True):
 
         return candidates                
     except:
-        print(u"ERROR : {0}".format(traceback.format_exc()))
+        log.error(u"ERROR : {0}".format(traceback.format_exc()))
         pass
 
 
 
 
-def filter_sensors_by_reference_and_device_name(candidates, reference, device_name):
+def filter_sensors_by_reference_and_device_name(candidates, reference, device_name, log):
     """ find in the sensors list, the good one
         IF the device_name == None, we assume there is only one corresponding device
     """
+    log.info("Filter sensors by reference ({0}) and device name ({1})...".format(reference, device_name))
     reference = reference.lower()
     if device_name != None:
         device_name = clean_input(device_name)
@@ -250,14 +275,15 @@ def filter_sensors_by_reference_and_device_name(candidates, reference, device_na
             if device_name == clean_input(a_sensor["device_name"]) and a_sensor["sensor_reference"].lower() == reference:
                 return a_sensor
         except:
-            print(u"ERROR : {0}".format(traceback.format_exc()))
+            log.error(u"ERROR : {0}".format(traceback.format_exc()))
             pass
 
     return None
     
-def filter_sensors_by_device_name(candidates, device_name):
+def filter_sensors_by_device_name(candidates, device_name, log):
     """ for each given sensor, check the most appropriate choice depending on device_name
     """
+    log.info("Filter sensors by device name ({0})...".format(device_name))
     device_name = clean_input(device_name)
 
     # first, check if we got an exact match !
@@ -266,7 +292,7 @@ def filter_sensors_by_device_name(candidates, device_name):
             if clean_input(a_sensor["device_name"]) == device_name:
                 return a_sensor
         except:
-            print(u"ERROR : {0}".format(traceback.format_exc()))
+            log.error(u"ERROR : {0}".format(traceback.format_exc()))
             pass
 
 
@@ -292,10 +318,10 @@ def learn(rs_code, comment = None):
     with open(LEARN_FILE, "a") as file:
         file.write(utf8_data + "\n\n") 
 
-def trigger_bool_command(dt_type, device, value):
+def trigger_bool_command(log, user_locale, dt_type, device, value):
     try:
         device_name = device.lower()
-        print(u"Device name = {0}".format(device_name))
+        log.info(u"Device name = {0}".format(device_name))
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('device.get')
@@ -329,7 +355,7 @@ def trigger_bool_command(dt_type, device, value):
         else:
             return None
     except:
-        print(u"ERROR : {0}".format(traceback.format_exc()))
+        log.error(u"ERROR : {0}".format(traceback.format_exc()))
         return None
 
 
@@ -400,7 +426,7 @@ def learn_from_suggestion(rs):
     rs_code = u""
     rs_code += u"+ {0}\n".format(ls['query_with_star'])
     rs_code += u"{0}\n".format(ls['shortcut'])
-    print(u"{0}{1}".format(rs_comment, rs_code))
+    #print(u"{0}{1}".format(rs_comment, rs_code))
     learn(rs_code, comment = rs_comment)
     rs.reload_butler()
 

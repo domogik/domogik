@@ -53,6 +53,10 @@ A new Rest service has been added. See the chapter about Rest for more informati
 
 Now, if a client sends an *uuid* field in the json while speaking to the butler, the butler will responds with the same uuid in the json response.
 
+The butler packages can now log data in the butler log file.
+
+Some core butler functions interfaces have changd. **All brain packages must be upgrade to Domogik 0.5 compliant releases.**
+
 
 Admin : new section : timeline
 ------------------------------

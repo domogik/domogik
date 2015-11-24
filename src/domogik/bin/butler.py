@@ -153,6 +153,9 @@ class Butler(Plugin, MQAsyncSub):
         # shortcut to allow the core brain package to reload the brain for learning
         self.brain.reload_butler = self.reload
 
+        # shortcut to allow the core brain package to do logging
+        self.brain.log = self.log
+
 
         # history
         self.history = []

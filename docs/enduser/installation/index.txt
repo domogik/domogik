@@ -15,6 +15,8 @@ In the 0.5 release, the Rest component has been merger in the Admin component. I
 * use the admin port (40406) instead of the previous rest port (40404)
 * add */rest/* in front of all old Rest url. Example : */device/* become */rest/device/*.
 
+Some core butler functions interfaces have changd. **All brain packages must be upgrade to Domogik 0.5 compliant releases.**
+
 If you plan to install Domogik on a Raspberry pi
 ================================================
 
