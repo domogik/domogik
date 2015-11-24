@@ -103,20 +103,7 @@ def clean_input(data):
     data = data.replace("!", " ")
 
     # remove accents
-    # TODO : improve for multiple languages
-    accents = {u"à" : "a", 
-               u"â" : "a",
-               u"ä" : "a",
-               u"é" : "e",
-               u"è" : "e",
-               u"ê" : "e",
-               u"ë" : "e",
-               u"ï" : "i",
-               u"ô" : "o",
-               u"ö" : "o",
-               u"ù" : "u"}
-    #for an_accent in accents:
-    #    data = data.replace(an_accent, accents[an_accent])
+    data = remove_accents(data)
 
     # remove duplicate spaces
     data = ' '.join(data.split())
