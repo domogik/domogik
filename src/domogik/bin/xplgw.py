@@ -92,7 +92,7 @@ class XplManager(XplPlugin, MQAsyncSub):
         # start handling the xplmessages
         self._s_thread = self._SensorThread(\
             self.log, self._sensor_queue, \
-            self.client_conversion_map, self.pub)
+            self._get_conversion_map, self.pub)
         self._s_thread.start()
         # start handling the command reponses in a thread
         self._c_thread = self._CommandThread(\
@@ -171,6 +171,11 @@ class XplManager(XplPlugin, MQAsyncSub):
             tmp[cli] = data[cli]
         self.client_conversion_map = tmp
 
+    def _get_conversion_map(self):
+        """Return clients conversion maps
+        """
+        return self.client_conversion_map
+        
     def _send_xpl_command(self, data):
         """ Reply to config.get MQ req
             @param data : MQ req message
@@ -217,8 +222,12 @@ class XplManager(XplPlugin, MQAsyncSub):
                                     if par.conversion is not None and par.conversion != '':
                                         if dev['client_id'] in self.client_conversion_map:
                                             if par.conversion in self.client_conversion_map[dev['client_id']]:
+                                                self.log.debug( \
+                                                    u"Calling conversion {0}".format(par.conversion))
                                                 exec(self.client_conversion_map[dev['client_id']][par.conversion])
                                                 value = locals()[par.conversion](value)
+                                    self.log.debug( \
+                                        u"Command parameter after conversion {0} = {1}".format(par.key, value))
                                     msg.add_data({par.key : value})
                                 else:
                                     failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par.key)
@@ -243,7 +252,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                                 reply_msg.add_data('reason', None)
                                 self.log.debug(u"mq reply (success) : {0}".format(reply_msg.get()))
                                 self.reply(reply_msg.get())
-                                    
+
         if failed:
             self.log.error(failed)
             reply_msg = MQMessage()
@@ -436,10 +445,10 @@ class XplManager(XplPlugin, MQAsyncSub):
                                         dev = self._db.get_device(sen.device_id)
                                         # check if we need a conversion
                                         if sen.conversion is not None and sen.conversion != '':
-                                            if dev['client_id'] in self._conv and sen.conversion in self._conv[dev['client_id']]:
+                                            if dev['client_id'] in self._conv() and sen.conversion in self._conv()[dev['client_id']]:
                                                 self._log.debug( \
                                                     u"Calling conversion {0}".format(sen.conversion))
-                                                exec(self._conv[dev['client_id']][sen.conversion])
+                                                exec(self._conv()[dev['client_id']][sen.conversion])
                                                 value = locals()[sen.conversion](value)
                                         self._log.info( \
                                                 u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}): key '{4}' with value '{5}' after conversion." \
