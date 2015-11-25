@@ -8,7 +8,17 @@ from flask.ext.babel import gettext, ngettext
 @app.route('/timeline')
 @login_required
 def timeline():
+    return timeline_generic()
 
+@app.route('/timeline/device/<int:device_id>')
+@login_required
+def timeline_device(device_id):
+    return timeline_generic(device_id = device_id)
+
+
+
+
+def timeline_generic(device_id = None):
     # devices 
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -43,12 +53,42 @@ def timeline():
     # timeline
     with app.db.session_scope():
         timeline = []
-        data = app.db.get_timeline()
+        data = app.db.get_timeline(device_id = device_id)
         previous_device_id = 0
         previous_date = None
         sensors_changes_for_the_device = []
         for elt in data:
+            print(elt)
+            (device_name, client, sensor_name, sensor_dt_type, sensor_id, date_of_value, value) = elt
    
+            if "unit" in datatypes[sensor_dt_type]:
+                unit = datatypes[sensor_dt_type]["unit"]
+            else:
+                unit = None
+
+            if device_id == previous_device_id and date_of_value == previous_date:
+                pass
+            else:
+                if previous_device_id != 0:
+                    timeline.append({ "datetime" : previous_date,
+                                      "date" : previous_date.date(),
+                                      "time" : previous_date.time(),
+                                      "device_name" : previous_device_name,
+                                      "client" : previous_client,
+                                      "sensors_changes" : sensors_changes_for_the_device
+                                    })
+                sensors_changes_for_the_device = []
+
+            sensors_changes_for_the_device.append({"sensor_name" : sensor_name,
+                                                   "dt_type" : sensor_dt_type,
+                                                   "unit" : unit,
+                                                   "value" : value})
+            previous_device_id = device_id
+            previous_device_name = device_name
+            previous_client = client
+            previous_date = date_of_value
+
+            """
             found = False
             dt_type = None
             sensor_name = None
@@ -90,6 +130,7 @@ def timeline():
                   
             previous_device_id = device_id
             previous_date = elt.date
+            """
          
 
     return render_template('timeline.html',
