@@ -54,7 +54,7 @@ def api_datatype():
     cfg = Loader('domogik')
     config = cfg.load()
     conf = dict(config[1])
-    json_file = "{0}/datatypes.json".format(urlHandler.resources_directory)
+    json_file = "{0}/datatypes.json".format(app.resources_directory)
     data = json.load(open(json_file))
 
     return 200, data
