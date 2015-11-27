@@ -173,14 +173,14 @@ class ScenarioManager:
             payload = json.loads(json_input)  # quick test to check if json is valid
         except Exception as e:
             self.log.error(u"Creation of a scenario failed, invallid json: {0}".format(json_input))
-            self.log.debug(e)
-            return {'status': 'NOK', 'msg': 'invallid json'}
+            self.log.error(u"Error is : {0}".format(tracebeck.format_exc()))
+            return {'status': 'ERROR', 'msg': 'invallid json'}
 
         if 'IF' not in payload.keys() \
                 or 'DO' not in payload.keys():
             msg = u"the json for the scenario does not contain condition or actions for scenario {0}".format(name)
             self.log.error(msg)
-            return {'status': 'NOK', 'msg': msg}
+            return {'status': 'ERROR', 'msg': msg}
         # db storage
         if int(ocid) == 0:
             with self._db.session_scope():
@@ -200,11 +200,10 @@ class ScenarioManager:
             if int(ocid) == 0:
                 with self._db.session_scope():
                     self._db.del_scenario(cid)
-            self.log.error(u"Creation of a scenario failed")
-            self.log.debug(e)
-            return {'status': 'NOK', 'msg': 'Creation of scenario failed'}
+            self.log.error(u"Creation of a scenario failed. Error is : {0}".format(traceback.format_exc()))
+            return {'status': 'ERROR', 'msg': 'Creation of scenario failed'}
         # return
-        return {'name': name, 'cid': cid}
+        return {'name': name, 'status': 'OK', 'cid': cid}
 
     def eval_condition(self, name):
         """ Evaluate a condition calling eval_condition from Condition instance
