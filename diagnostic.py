@@ -14,16 +14,16 @@ FILE=os.path.join(tempfile.gettempdir(), "domogik_diagnostic.log")
 #######################################################################################################
 
 def ok(msg):
-    print(u"OK : {0}".format(msg))
+    print(u"OK       : {0}".format(msg))
 
 def info(msg):
-    print(u"INFO : {0}".format(msg))
+    print(u"INFO     : {0}".format(msg))
 
 def warning(msg):
-    print(u"WARNING : {0}".format(msg))
+    print(u"WARNING  : {0}".format(msg))
 
 def error(msg):
-    print(u"ERROR : {0}".format(msg))
+    print(u"ERROR    : {0}".format(msg))
 
 def solution(msg):
     print(u"SOLUTION : {0}".format(msg))
@@ -37,7 +37,9 @@ def get_install_path():
         import domogik
         path = domogik.__path__[0]
         getParentFolder = lambda fh: os.path.abspath(os.path.join(os.path.normpath(fh),os.path.pardir))
-        return getParentFolder(getParentFolder(path))
+        pp = getParentFolder(getParentFolder(path))
+        info(u"Install path : {0}".format(pp))
+        return pp
     except:
         error("Error while getting domogik module path : {0}".format(traceback.format_exc()))
         return None
@@ -123,12 +125,52 @@ def send_xpl_and_get_it():
 # MQ TESTS - GLOBAL
 #######################################################################################################
 
-def test_pubsub():
+def test_mq_mmi_services():
+    # Test the broker services
+
+    import zmq
+    from zmq.eventloop.ioloop import IOLoop
+    from domogikmq.reqrep.client import MQSyncReq
+    from domogikmq.message import MQMessage
+    cli = MQSyncReq(zmq.Context())
+    info("Looking for MQ mmi services (broker)")
+    res = cli.rawrequest('mmi.services', '', timeout=10)
+    if res == None:
+        error("No response from MQ mmi.services request : MQ req/rep is KO")
+        return
+    info("MQ mmi services response is : {0}".format(res))
+    components = res[0].replace(" ", "").split(",")
+    for core in ['manager', 'dbmgr', 'admin', 'scenario', 'butler', 'xplgw']:
+        if core in components:
+            ok("MQ rep/req service OK for component : {0}".format(core))
+        else:
+            error("MQ rep/req service KO for component : {0}".format(core))
+
+def test_mq_pubsub():
     # TODO
     # - subscribe
     # - publish
     # - check we got the MQ msg
-    pass
+
+    info("If this is the last line displayed, there is an issue with MQ pub/sub : no plugin.status message is received from Domogik. If so, please check Domogik is up and runnin before launching the diagnostic script")
+    import zmq
+    from domogikmq.pubsub.subscriber import MQSyncSub
+
+    # test subscription is OK
+    class TestMQSub(MQSyncSub):
+
+        def __init__(self):
+            MQSyncSub.__init__(self, zmq.Context(), 'diag', ['plugin.status'])
+            try:
+                msg = self.wait_for_event()
+                if "content" in msg:
+                    ok("MQ : plugin.status message received. MS pub/sub is working")
+                else:
+                    warning("MQ : plugin.status message received but the content is not good")
+            except:
+                error("Error while waiting for a domogik component MQ status message. Error is : {0}".format(traceback.format_exc()))
+
+    t = TestMQSub()
 
 def test_reqrep():
     # TODO : 
@@ -164,5 +206,9 @@ def test_plugin():
 
 if __name__ == "__main__":
     test_import_domogik()
+    get_install_path()
     test_config_files()
-    print(get_install_path())
+
+    # MQ
+    test_mq_mmi_services()  # test broker services
+    test_mq_pubsub()
