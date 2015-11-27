@@ -122,7 +122,7 @@ def get_sensor_value(log, user_locale, dt_type, device_name, sensor_reference = 
     if isinstance(device_name, list):
         device_name = ' '.join(device_name)
     log.info(u"Device name = {0}".format(device_name))
-    #log.info("Datatype = {0}".format(dt_type))
+    #log.info(u"Datatype = {0}".format(dt_type))
 
     ### search for all devices of the appropriate dt_type 
     if sensor_reference:
@@ -158,9 +158,9 @@ def get_sensor_value(log, user_locale, dt_type, device_name, sensor_reference = 
         the_locale = "{0}.UTF-8".format(user_locale)
         #locale.setlocale(locale.LC_ALL, str("fr_FR.UTF-8"))
         locale.setlocale(locale.LC_ALL, the_locale)
-        the_value = locale.format("%g", float(the_value))
+        the_value = locale.format(u"%g", float(the_value))
     except:
-        log.warning("Unable to format the value with the locale '{0}'".format(the_locale))
+        log.warning(u"Unable to format the value with the locale '{0}'".format(the_locale))
     return the_value
     
 
@@ -251,7 +251,7 @@ def filter_sensors_by_reference_and_device_name(candidates, reference, device_na
     """ find in the sensors list, the good one
         IF the device_name == None, we assume there is only one corresponding device
     """
-    log.info("Filter sensors by reference ({0}) and device name ({1})...".format(reference, device_name))
+    log.info(u"Filter sensors by reference ({0}) and device name ({1})...".format(reference, device_name))
     reference = reference.lower()
     if device_name != None:
         device_name = clean_input(device_name)
@@ -270,7 +270,7 @@ def filter_sensors_by_reference_and_device_name(candidates, reference, device_na
 def filter_sensors_by_device_name(candidates, device_name, log):
     """ for each given sensor, check the most appropriate choice depending on device_name
     """
-    log.info("Filter sensors by device name ({0})...".format(device_name))
+    log.info(u"Filter sensors by device name ({0})...".format(device_name))
     device_name = clean_input(device_name)
 
     # first, check if we got an exact match !
@@ -375,7 +375,7 @@ def process_star(not_understood_responses, suggest_intro, rs):
         try:
             m = re.match(regexp, query)
         except:
-            print("The following suggest is skipped due to an error. Suggest : '{0}'. Error : {1}".format(regexp, traceback.format_exc()))
+            rs.log.error(u"The following suggest is skipped due to an error. Suggest : '{0}'. Error : {1}".format(regexp, traceback.format_exc()))
             m = None
 
         if m != None:
