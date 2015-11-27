@@ -111,7 +111,7 @@ class XplManager(XplPlugin, MQAsyncSub):
             if msg.get_action() == "test":
                 pass
             if msg.get_action() == "cmd.send":
-                self._send_xpl_command(msg)
+                self._send_command(msg)
         except Exception as exp:
             self.log.error(traceback.format_exc())
 
@@ -175,93 +175,109 @@ class XplManager(XplPlugin, MQAsyncSub):
         """Return clients conversion maps
         """
         return self.client_conversion_map
-        
-    def _send_xpl_command(self, data):
+
+    def _send_command(self, data):
+         with self._db.session_scope():
+            self.log.info(u"Received new cmd request: {0}".format(data))
+            failed = False
+            status = False
+            uuid = None
+            request = data.get_data()
+            if 'cmdid' not in request:
+                failed = "cmdid not in message data"
+                status = False
+            if 'cmdparams' not in request:
+                failed = "cmdparams not in message data"
+                status = False
+            if not failed:
+                # get the command
+                cmd = self._db.get_command(request['cmdid'])
+                if cmd is not None:
+                    if cmd.xpl_command is not None:
+                        status, uuid, failed = self._send_xpl_command(cmd, request)
+                    else:
+                        status, uuid, failed = self._send_mq_command(cmd)
+                        failed = "TODO no xpl command for this command"
+                        self.log.error(failed)
+                        status = False
+                        pass
+                else:
+                    failed = "Can not find the command"
+                    status = False
+            else:
+                status = False
+            # reply
+            reply_msg = MQMessage()
+            reply_msg.set_action('cmd.send.result')
+            reply_msg.add_data('uuid', str(uuid))
+            reply_msg.add_data('status', status)
+            reply_msg.add_data('reason', failed)
+            self.log.debug(u"mq reply : {0}".format(reply_msg.get()))
+            self.reply(reply_msg.get())
+    
+    def _send_mq_command(self, cmd):
+        return True, None, None
+
+    def _send_xpl_command(self, cmd, request):
         """ Reply to config.get MQ req
             @param data : MQ req message
                 Needed info in data:
                 - cmdid         => command id to send
                 - cmdparams     => key/value pair of all params needed for this command
         """
-        with self._db.session_scope():
-            self.log.info(u"Received new cmd request: {0}".format(data))
-            failed = False
-            request = data.get_data()
-            if 'cmdid' not in request:
-                failed = "cmdid not in message data"
-            if 'cmdparams' not in request:
-                failed = "cmdparams not in message data"
+        failed = False
+        xplcmd = cmd.xpl_command
+        xplstat = self._db.get_xpl_stat(xplcmd.stat_id)
+        if xplstat is not None:
+            # get the device from the db
+            dev = self._db.get_device(int(cmd.device_id))
+            msg = XplMessage()
+            if not dev['client_id'] in self.client_xpl_map.keys():
+                self._load_client_to_xpl_target()
+            if not dev['client_id'] in self.client_xpl_map.keys():
+                failed = "Can not fincd xpl source for {0} client_id".format(dev['client_id'])
+            else:
+                msg.set_target(self.client_xpl_map[dev['client_id']])
+            msg.set_source(self.myxpl.get_source())
+            msg.set_type("xpl-cmnd")
+            msg.set_schema(xplcmd.schema)
+            # static paramsw
+            for par in xplcmd.params:
+                msg.add_data({par.key : par.value})
+            # dynamic params
+            for par in cmd.params:
+                if par.key in request['cmdparams']:
+                    value = request['cmdparams'][par.key]
+                    # chieck if we need a conversion
+                    if par.conversion is not None and par.conversion != '':
+                        if dev['client_id'] in self.client_conversion_map:
+                            if par.conversion in self.client_conversion_map[dev['client_id']]:
+                                self.log.debug( \
+                                    u"Calling conversion {0}".format(par.conversion))
+                                exec(self.client_conversion_map[dev['client_id']][par.conversion])
+                                value = locals()[par.conversion](value)
+                    self.log.debug( \
+                        u"Command parameter after conversion {0} = {1}".format(par.key, value))
+                    msg.add_data({par.key : value})
+                else:
+                    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par.key)
             if not failed:
-                # get the command
-                cmd = self._db.get_command(request['cmdid'])
-                if cmd is not None:
-                    if cmd.xpl_command is not None:
-                        xplcmd = cmd.xpl_command
-                        xplstat = self._db.get_xpl_stat(xplcmd.stat_id)
-                        if xplstat is not None:
-                            # get the device from the db
-                            dev = self._db.get_device(int(cmd.device_id))
-                            msg = XplMessage()
-                            if not dev['client_id'] in self.client_xpl_map.keys():
-                                self._load_client_to_xpl_target()
-                            if not dev['client_id'] in self.client_xpl_map.keys():
-                                failed = "Can not fincd xpl source for {0} client_id".format(dev['client_id'])
-                            else:
-                                msg.set_target(self.client_xpl_map[dev['client_id']])
-                            msg.set_source(self.myxpl.get_source())
-                            msg.set_type("xpl-cmnd")
-                            msg.set_schema(xplcmd.schema)
-                            # static paramsw
-                            for par in xplcmd.params:
-                                msg.add_data({par.key : par.value})
-                            # dynamic params
-                            for par in cmd.params:
-                                if par.key in request['cmdparams']:
-                                    value = request['cmdparams'][par.key]
-                                    # chieck if we need a conversion
-                                    if par.conversion is not None and par.conversion != '':
-                                        if dev['client_id'] in self.client_conversion_map:
-                                            if par.conversion in self.client_conversion_map[dev['client_id']]:
-                                                self.log.debug( \
-                                                    u"Calling conversion {0}".format(par.conversion))
-                                                exec(self.client_conversion_map[dev['client_id']][par.conversion])
-                                                value = locals()[par.conversion](value)
-                                    self.log.debug( \
-                                        u"Command parameter after conversion {0} = {1}".format(par.key, value))
-                                    msg.add_data({par.key : value})
-                                else:
-                                    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par.key)
-                            if not failed:
-                                # send out the msg
-                                self.log.debug(u"Sending xplmessage: {0}".format(msg))
-                                self.myxpl.send(msg)
-                                xplstat = self._db.detach(xplstat)
-                                # generate an uuid for the matching answer published messages
-                                if xplstat != None:
-                                    resp_uuid = uuid4()
-                                    self._cmd_lock_d.acquire()
-                                    self._cmd_dict[str(resp_uuid)] = xplstat
-                                    self._cmd_lock_d.release()
-                                else:
-                                    resp_uuid = None
-                                # send the response
-                                reply_msg = MQMessage()
-                                reply_msg.set_action('cmd.send.result')
-                                reply_msg.add_data('uuid', str(resp_uuid))
-                                reply_msg.add_data('status', True)
-                                reply_msg.add_data('reason', None)
-                                self.log.debug(u"mq reply (success) : {0}".format(reply_msg.get()))
-                                self.reply(reply_msg.get())
-
+                # send out the msg
+                self.log.debug(u"Sending xplmessage: {0}".format(msg))
+                self.myxpl.send(msg)
+                xplstat = self._db.detach(xplstat)
+                # generate an uuid for the matching answer published messages
+                if xplstat != None:
+                    resp_uuid = uuid4()
+                    self._cmd_lock_d.acquire()
+                    self._cmd_dict[str(resp_uuid)] = xplstat
+                    self._cmd_lock_d.release()
+                else:
+                    resp_uuid = None
+                return True, resp_uuid, None
         if failed:
             self.log.error(failed)
-            reply_msg = MQMessage()
-            reply_msg.set_action('cmd.send.result')
-            reply_msg.add_data('uuid', None)
-            reply_msg.add_data('status', False)
-            reply_msg.add_data('reason', failed)
-            self.log.debug(u"mq reply (failed) : {0}".format(reply_msg.get()))
-            self.reply(reply_msg.get())
+            return False, None, failed
 
     def _create_xpl_trigger(self):
         """ Create a listener to catch
@@ -291,7 +307,7 @@ class XplManager(XplPlugin, MQAsyncSub):
 
     class _CommandThread(threading.Thread):
         """ commandthread class
-        Class responsible for handling one xpl command
+        Class responsible for handling one xpl command response
         """
         def __init__(self, log, db, lock_d, lock_p, dic, pkt, pub):
             threading.Thread.__init__(self)
