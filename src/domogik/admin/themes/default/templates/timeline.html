@@ -200,21 +200,25 @@
 </style>
 
 <div class="container">
-    <h2>{% trans %}Timeline{% endtrans %}</h2>
+    <h2>{% trans %}Timeline{% endtrans %}{% if device_name is not none %} - {{ device_name }}{% endif %}</h2>
 
-    <ul class="cbp_tmtimeline">
-    {% for elt in timeline %}
-	<li>
-		<time class="cbp_tmtime" datetime="{{ elt.datetime }}"><span>{{ elt.date }}</span> <span>{{ elt.time }}</span></time>
-		<div class="cbp_tmicon"> </div>
-		<div class="cbp_tmlabel">
-			<h3>{{ elt.device_name }} <small>({{ elt.client }})</small></h3>
-                        {% for sensor in elt.sensors_changes %}
-			<p>{{ sensor.sensor_name }} : {{ sensor.value }} {% if sensor.unit is not none %}{{ sensor.unit }}{% endif %} </p>
-                        {% endfor %}
-		</div>
-	</li>
-    {% endfor %}
-    </ul>
+    {% if timeline|length > 0 %}
+        <ul class="cbp_tmtimeline">
+        {% for elt in timeline %}
+    	<li>
+    		<time class="cbp_tmtime" datetime="{{ elt.datetime }}"><span>{{ elt.date }}</span> <span>{{ elt.time }}</span></time>
+    		<div class="cbp_tmicon"> </div>
+    		<div class="cbp_tmlabel">
+    			<h3>{{ elt.device_name }} <small>({{ elt.client }})</small></h3>
+                            {% for sensor in elt.sensors_changes %}
+    			<p>{{ sensor.sensor_name }} : {{ sensor.value }} {% if sensor.unit is not none %}{{ sensor.unit }}{% endif %} </p>
+                            {% endfor %}
+    		</div>
+    	</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-warning">{% trans %}No history found for this device!{% endtrans %}</div>
+    {% endif %}
 </div>
 {% endblock %}

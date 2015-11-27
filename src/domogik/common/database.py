@@ -1834,11 +1834,10 @@ class DbHelper():
     def get_timeline(self, device_id = None):
         """ Get the history of the last events
         """
-        #return self.__session.query(SensorHistory).filter().order_by(SensorHistory.date.desc()).limit(500)
-        #return self.__session.query(SensorHistory, Sensor).filter(Sensor.id == SensorHistory.sensor_id).order_by(SensorHistory.date.desc()).limit(501)
-        print("BEFORE QUERY")
+        print(device_id)
         return self.__session.query(
                                     Device.name,
+                                    Device.id,
                                     Device.client_id,
                                     Sensor.name,
                                     Sensor.data_type,
@@ -1846,12 +1845,12 @@ class DbHelper():
                                     SensorHistory.date,
                                     SensorHistory.value_str
                              ) \
+                             .filter(Device.id == device_id) \
                              .join(Sensor) \
                              .join(SensorHistory) \
                              .order_by(SensorHistory.date.desc()) \
-                             .limit(500)
+                             .limit(100)
 
-                             #.filter(Device.id == int(device_id)) \
 
 
 ###################
