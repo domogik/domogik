@@ -243,6 +243,7 @@ class Admin(Plugin):
         admin_app.apiversion = REST_API_VERSION
         admin_app.use_ssl = self.use_ssl
         admin_app.hostname = self.get_sanitized_hostname()
+        admin_app.resources_directory = self.get_resources_directory()
         
 	tapp = Application([
 	    (r"/ws", AdminWebSocket),
