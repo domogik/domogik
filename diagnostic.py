@@ -53,7 +53,8 @@ def get_install_path():
 def test_import_domogik():
     try:
         import domogik
-        ok("Domogik module can be imported")
+        ver = domogik.__version__
+        ok("Domogik module can be imported (version is {0})".format(ver))
         return True
     except:
         error("Error while importing domogik module")
