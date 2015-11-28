@@ -117,6 +117,7 @@ pip_list="Flask-Login \
           Flask-Bootstrap \
           sphinx-better-theme \
           sqlalchemy-utils \
+          linux-metrics
          "
 
 for elt in $pip_list

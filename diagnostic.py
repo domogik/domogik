@@ -7,11 +7,21 @@
 import tempfile
 import traceback
 import os
+import linux_metrics
+import socket
 
 FILE=os.path.join(tempfile.gettempdir(), "domogik_diagnostic.log")
 
 # LOG FUNCTIONS
 #######################################################################################################
+
+is_warning = False
+is_error = False
+
+def title(msg):
+    print(u"===========================================================")
+    print(u"   {0}".format(msg))
+    print(u"===========================================================")
 
 def ok(msg):
     print(u"OK       : {0}".format(msg))
@@ -21,13 +31,65 @@ def info(msg):
 
 def warning(msg):
     print(u"WARNING  : {0}".format(msg))
+    is_warning = True
 
 def error(msg):
     print(u"ERROR    : {0}".format(msg))
+    is_error = True
 
 def solution(msg):
     print(u"SOLUTION : {0}".format(msg))
 
+
+# SERVER RELATED FUNCTIONS
+#######################################################################################################
+
+def get_current_metrics():
+    info("System informations :")
+    cpu_data = linux_metrics.cpu_stat.cpu_info()
+    info("- cpu - model          : {0}".format(cpu_data['model name']))
+    info("- cpu - num processors : {0}".format(cpu_data['processor_count']))
+    info("- cpu - num cores      : {0}".format(cpu_data['cpu cores']))
+    num_cores = cpu_data['cpu cores']
+
+    info("System usage :")
+    cpu_info = linux_metrics.cpu_stat.cpu_percents()
+    info("- cpu (idle)           : {0}".format(cpu_info['idle']))
+    info("- cpu (system)         : {0}".format(cpu_info['system']))
+    info("- cpu (user)           : {0}".format(cpu_info['user']))
+    info("- cpu (iowait)         : {0}".format(cpu_info['iowait']))
+
+    load_avg = linux_metrics.cpu_stat.load_avg()
+    info("- load average         : {0} / {1} / {2}".format(load_avg[0], load_avg[1], load_avg[2]))
+    load_warn = False
+    if load_avg[0] > num_cores:
+        warning("The system load is important")
+        load_warn = True
+    if not load_warn and load_avg[1] > num_cores:
+        warning("The system load is important")
+        load_warn = True
+    if not load_warn and load_avg[2] > num_cores:
+        warning("The system load is important")
+        load_warn = True
+    if not load_warn:
+        ok("System load is ok")
+   
+    mem = linux_metrics.mem_stat.mem_stats()
+    used, total, _, _, _, _ = mem
+    used = used/(1024*1024)
+    total = total/(1024*1024)
+    info("- memory - total (Mb)  : {0}".format(total))
+    info("- memory - used (Mb)   : {0}".format(used))
+
+    if total < 900:
+        error("Domogik needs at least 1Gb of memory on the system to run")
+    elif total < 1800:
+        warning("Your system have less than 2Gb of memory. Depending of what is already installed on your server, it may not be enough")
+    else:
+        ok("There is enough memory on the system (if others applications does not use all of it!)")
+
+    if total - used < 100:
+        warning("There is less than 100Mb of memory free.")
 
 # UTIL FUNCTIONS
 #######################################################################################################
@@ -106,7 +168,16 @@ def test_grants():
 
 def test_ports_are_open():
     # TODO
+    #print(test_a_port("192.68.1.10", 40406))
     pass
+
+def test_a_port(ip, port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = sock.connect_ex((ip, port))
+    if result == 0:
+       return True
+    else:
+       return False
 
 # XPL TEST
 #######################################################################################################
@@ -206,10 +277,30 @@ def test_plugin():
 #######################################################################################################
 
 if __name__ == "__main__":
+    # System informations
+    title("System informations")
+    get_current_metrics()
+
+    # Domogik package and configuration
+    title("Domogik installations checks")
     test_import_domogik()
     get_install_path()
     test_config_files()
 
+    # Ports
+    title("Domogik web services up ?")
+    test_ports_are_open()
+    
     # MQ
+    title("Domogik Message Queue (MQ) checks")
     test_mq_mmi_services()  # test broker services
     test_mq_pubsub()
+
+    # Summary
+    title("Summary")
+    if is_warning:
+        print(u"There were some warnings !")
+    if is_error:
+        print(u"There were some errors !")
+    if not is_warning and not is_error:
+        print(u"All seems OK")
