@@ -459,9 +459,10 @@ class DbHelper():
                         'id': a_cmd.id,
                         'name': a_cmd.name,
                         'return_confirmation': a_cmd.return_confirmation,
-                        'xpl_command' : a_cmd.xpl_command.json_id,
                         'parameters': []
                         }
+                if a_cmd.xpl_command:
+                    json_command['xpl_command'] = a_cmd.xpl_command.json_id
                 for a_cmd_param in a_cmd.params:
                     json_command['parameters'].append({ 'key': a_cmd_param.key,
                                                         'data_type': a_cmd_param.data_type,
