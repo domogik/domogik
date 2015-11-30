@@ -257,8 +257,9 @@ class PackageJson():
                 raise PackageException("Commands part is NOT a dictionary!")
             for cmdid in self.json["commands"]:
                 cmd = self.json["commands"][cmdid]
-                expected = ['name', 'return_confirmation', 'parameters', 'xpl_command']
-                self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys())
+                expected = ['name', 'return_confirmation', 'parameters']
+                optional = ['xpl_command']
+                self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys(), optional)
                 # validate the params
                 expected = ['key', 'data_type', 'conversion']
                 if type(cmd['parameters']) != list:
@@ -266,7 +267,7 @@ class PackageJson():
                 for par in cmd['parameters']:
                     self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
                 # see that the xpl_command is defined
-                if cmd["xpl_command"] not in self.json["xpl_commands"].keys():
+                if "xpl_command" in cmd and cmd["xpl_command"] not in self.json["xpl_commands"].keys():
                     raise PackageException("xpl_command {0} defined in command {1} is not found".format(cmd["xpl_command"], cmdid))
 
             #validate the sensors
