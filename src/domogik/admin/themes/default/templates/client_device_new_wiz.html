@@ -46,7 +46,9 @@
           <div class="form-group ">
             <label class="control-label col-xs-3">{{ item.label }}</label>
             <div class="col-xs-9">
-              {{ item(size = 50) }}  
+              {{ item }}
+              <!-- The below is not working fine with lists! -->
+              <!-- {{ item(size = 50) }}  -->
               <span class="help-block">{{ item.description }}</span>
             </div>
           </div>

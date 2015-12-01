@@ -569,8 +569,12 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         elif item["type"] == "choice":
             choices = []
             for key in sorted(item["choices"]):
-                choices.append((key, item["choices"][key]))
-            field = SelectField(name, [Required()], description=item["description"], choices=choices)
+                # TODO : test if this is only a list of values
+                #        or a dict ?
+                #        And handle/display them in the appropriate way 
+                #choices.append((key, item["choices"][key]))
+                choices.append((key, key))
+            field = SelectField(name, [Required()], description=item["description"], choices=choices, default=default)
         elif item["type"] == "password":
             field = PasswordField(name, [Required()], description=item["description"], default=default)
         else:
