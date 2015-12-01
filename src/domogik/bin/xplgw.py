@@ -35,7 +35,7 @@ class XplManager(XplPlugin):
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.database import DbHelper
-from domogik.xpl.common.xplmessage import XplMessage
+from domogik.xpl.common.xplmessage import XplMessage, XplMessageError
 from domogikmq.pubsub.publisher import MQPub
 from domogikmq.pubsub.subscriber import MQSyncSub
 from domogikmq.reqrep.client import MQSyncReq
@@ -231,13 +231,14 @@ class XplManager(XplPlugin, MQAsyncSub):
                     status = False
             else:
                 status = False
+            self.log.debug("   => status: {0}, uuid: {1}, msg: {2}".format(status, uuid, failed))
             # reply
             reply_msg = MQMessage()
             reply_msg.set_action('cmd.send.result')
             reply_msg.add_data('uuid', str(uuid))
             reply_msg.add_data('status', status)
             reply_msg.add_data('reason', failed)
-            self.log.debug(u"mq reply : {0}".format(reply_msg.get()))
+            self.log.debug(u"   => mq reply to requestor")
             self.reply(reply_msg.get())
     
     def _send_mq_command(self, cmd, request):
@@ -248,6 +249,7 @@ class XplManager(XplPlugin, MQAsyncSub):
             - device id
             - params
         """
+        self.log.debug(u"   => Generating MQ message to plugin")
         failed = False
         status = True
         dev = self._db.get_device(int(cmd.device_id))
@@ -263,17 +265,19 @@ class XplManager(XplPlugin, MQAsyncSub):
                     if dev['client_id'] in self.client_conversion_map:
                         if par.conversion in self.client_conversion_map[dev['client_id']]:
                             self.log.debug( \
-                                u"Calling conversion {0}".format(par.conversion))
+                                u"      => Calling conversion {0}".format(par.conversion))
                             exec(self.client_conversion_map[dev['client_id']][par.conversion])
                             value = locals()[par.conversion](value)
                 self.log.debug( \
-                    u"Command parameter after conversion {0} = {1}".format(par.key, value))
+                    u"      => Command parameter after conversion {0} = {1}".format(par.key, value))
                 msg.add_data(par.key, value)
             else:
                 failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par.key)
                 status = False
         # send to the plugin
         cli = MQSyncReq(self.zmq)
+        self.log.debug(u"   => Sending MQ message to the plugin")
+        print msg
         response = cli.request(str(dev['client_id']), msg.get(), timeout=10)
         if not response:
             failed = "Sending the command to the client failed"
@@ -292,6 +296,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                 - cmdid         => command id to send
                 - cmdparams     => key/value pair of all params needed for this command
         """
+        self.log.debug(u"   => Generating XPL message to plugin")
         failed = False
         xplcmd = cmd.xpl_command
         xplstat = self._db.get_xpl_stat(xplcmd.stat_id)
@@ -320,18 +325,21 @@ class XplManager(XplPlugin, MQAsyncSub):
                         if dev['client_id'] in self.client_conversion_map:
                             if par.conversion in self.client_conversion_map[dev['client_id']]:
                                 self.log.debug( \
-                                    u"Calling conversion {0}".format(par.conversion))
+                                    u"      => Calling conversion {0}".format(par.conversion))
                                 exec(self.client_conversion_map[dev['client_id']][par.conversion])
                                 value = locals()[par.conversion](value)
                     self.log.debug( \
-                        u"Command parameter after conversion {0} = {1}".format(par.key, value))
+                        u"      => Command parameter after conversion {0} = {1}".format(par.key, value))
                     msg.add_data({par.key : value})
                 else:
                     failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par.key)
             if not failed:
                 # send out the msg
-                self.log.debug(u"Sending xplmessage: {0}".format(msg))
-                self.myxpl.send(msg)
+                self.log.debug(u"   => Sending xplmessage: {0}".format(msg))
+                try:
+                    self.myxpl.send(msg)
+                except XplMessageError as msg:
+                    failed = msg
                 xplstat = self._db.detach(xplstat)
                 # generate an uuid for the matching answer published messages
                 if xplstat != None:
