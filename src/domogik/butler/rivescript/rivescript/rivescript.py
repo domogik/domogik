@@ -174,6 +174,13 @@ This may be called as either a class method or a method of a RiveScript object."
             print(header, message, "at", fname, "line", lineno)
         else:
             print(header, message)
+        ### fritz - patch
+        # old #
+        # (nothing)
+        # new #
+        if hasattr(self, "log"):
+            self.log.error(u"RS : {0}".format(message))
+        ### fritz - patch end
 
     ############################################################################
     # Loading and Parsing Methods                                              #

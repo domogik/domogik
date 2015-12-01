@@ -77,7 +77,10 @@ class SensorTest(AbstractTest):
 
     def _convert(self, val):
         if self._dt_parent == "DT_Number":
-            return float(val)
+            if val != None:
+                return float(val)
+            else:
+                return None
         else:
             return val
 

@@ -80,6 +80,7 @@
                             <li><strong>{% trans %}Description{% endtrans %}</strong> : {{ data.description }}</li>
                             {% set device_url = rest_url + "/device/" + data.id|string %}
                             <li><strong>{% trans %}Rest url{% endtrans %}</strong> : <a href='{{ device_url }}'>{{ device_url }}</a></li>
+                            <li><strong><a href="/timeline/device/{{ data.id }}">{% trans %}View the device timeline{% endtrans %}</a></strong></a></li>
                           </ul>
                         </div>
                       </div>

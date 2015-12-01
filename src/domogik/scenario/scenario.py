@@ -30,6 +30,7 @@ from exceptions import ValueError
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 import zmq
+import traceback
 
 class ScenarioInstance:
     """ This class provides base methods for the scenarios
@@ -283,7 +284,10 @@ class ScenarioInstance:
         """
         print "CALLING actions"
         for act in sorted(self._mapping['action']):
-            self._mapping['action'][act].do_action()
+            try:
+                self._mapping['action'][act].do_action()
+            except:
+                self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
         print "END CALLING actions"
 
     def generic_trigger(self, test):

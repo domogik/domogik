@@ -6,6 +6,7 @@ from flask_login import login_required
 from flask.ext.babel import gettext, ngettext
 
 @app.route('/timeline')
+@app.route('/timeline/')
 @login_required
 def timeline():
     return timeline_generic()
@@ -13,26 +14,12 @@ def timeline():
 @app.route('/timeline/device/<int:device_id>')
 @login_required
 def timeline_device(device_id):
-    return timeline_generic(device_id = device_id)
+    return timeline_generic(the_device_id = device_id)
 
 
 
 
-def timeline_generic(device_id = None):
-    # devices 
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('device.get')
-    res = cli.request('dbmgr', msg.get(), timeout=10)
-    if res is not None:
-        res = res.get_data()
-        if 'devices' in res:
-            # create a list of the used datatypes in sensors to build only these datatype blocks
-            used_datatypes = []
-            devices = res['devices']
-    else:
-        print("Error : no devices found!")
-        devices = []
+def timeline_generic(the_device_id = None):
 
     # datatypes
     datatypes = {}
@@ -53,13 +40,14 @@ def timeline_generic(device_id = None):
     # timeline
     with app.db.session_scope():
         timeline = []
-        data = app.db.get_timeline(device_id = device_id)
+        data = app.db.get_timeline(device_id = the_device_id)
         previous_device_id = 0
         previous_date = None
         sensors_changes_for_the_device = []
+        has_history = False
         for elt in data:
             print(elt)
-            (device_name, client, sensor_name, sensor_dt_type, sensor_id, date_of_value, value) = elt
+            (device_name, device_id, client, sensor_name, sensor_dt_type, sensor_id, date_of_value, value) = elt
    
             if "unit" in datatypes[sensor_dt_type]:
                 unit = datatypes[sensor_dt_type]["unit"]
@@ -88,53 +76,19 @@ def timeline_generic(device_id = None):
             previous_client = client
             previous_date = date_of_value
 
-            """
-            found = False
-            dt_type = None
-            sensor_name = None
-            for dev in devices:
-                for sensor in dev['sensors']:
-                    id = dev['sensors'][sensor]['id']
+            has_history = True
 
-                    if "unit" in datatypes[dev['sensors'][sensor]["data_type"]]:
-                        unit = datatypes[dev['sensors'][sensor]["data_type"]]["unit"]
-                    else:
-                        unit = None
+    if the_device_id != None and has_history:
+        # we will set a dispaly device name
+        the_device_name = device_name
+    else:
+        the_device_name = None
 
-                    if id == elt.sensor_id:
-                        if dev['id'] == previous_device_id and elt.date == previous_date:
-                            pass
-                        else:
-                            if previous_device_id != 0:
-                                timeline.append({ "datetime" : elt.date,
-                                                  "date" : elt.date.date(),
-                                                  "time" : elt.date.time(),
-                                                  "device_name" : device_name,
-                                                  "client" : client,
-                                                  "sensors_changes" : sensors_changes_for_the_device,
-                                                })
-                            sensors_changes_for_the_device = []
-                            device_name = dev['name']
-                            device_id = dev['id']
-                            client = dev['client_id']
-
-
-                        sensors_changes_for_the_device.append({"sensor_name" : dev['sensors'][sensor]['name'],
-                                                               "dt_type" : dev['sensors'][sensor]['data_type'],
-                                                               "unit" : unit,
-                                                               "value" : elt.value_str})
-                        found = True
-                        break
-                if found == True:
-                    break
-                  
-            previous_device_id = device_id
-            previous_date = elt.date
-            """
          
 
     return render_template('timeline.html',
         mactive="timeline",
+        device_name=the_device_name,
         timeline=timeline
         )
 

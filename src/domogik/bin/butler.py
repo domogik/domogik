@@ -443,6 +443,7 @@ class Butler(Plugin, MQAsyncSub):
         """ Process the input query by calling rivescript brain
             @param query : the text query
         """
+        reply = ""
         try:
             self.log.debug(u"Before transforming query : {0}".format(query))
             self.brain.raw_query = query
@@ -459,8 +460,6 @@ class Butler(Plugin, MQAsyncSub):
             return reply
         except:
             self.log.error(u"Error while processing query '{0}'. Error is : {1}".format(query, traceback.format_exc()))
-            self.log.error(reply)
-            self.log.error(type(reply))
             return "Error"
 
 
