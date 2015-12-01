@@ -36,9 +36,15 @@ PackageJson
 
 from domogik.common.configloader import Loader
 import traceback
-import urllib2
 import datetime
 import json
+try:
+    # python3
+    from urllib.request import urlopen
+except ImportError:
+    # python2
+    from urllib import urlopen
+
 #TODO : why this import fails ?
 #from domogik.xpl.common.plugin import PACKAGES_DIR
 PACKAGES_DIR = "domogik_packages"
@@ -99,7 +105,7 @@ class PackageJson():
             elif url != None:
                 json_file = url
                 icon_file = None
-                json_data = urllib2.urlopen(json_file)
+                json_data = urlopen(json_file)
                 # TODO : there is an error here!!!!!
                 self.json = json.load(xml_data)
 
