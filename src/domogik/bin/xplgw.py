@@ -64,7 +64,7 @@ class XplManager(XplPlugin, MQAsyncSub):
         XplPlugin.__init__(self, 'xplgw', log_prefix="")
         MQAsyncSub.__init__(\
             self, self.zmq, 'xplgw', \
-            ['client.conversion', 'client.list', 'plugin.sensor'])
+            ['client.conversion', 'client.list', 'client.sensor'])
 
         self.log.info(u"XPL manager initialisation...")
         self._db = DbHelper()
@@ -130,7 +130,7 @@ class XplManager(XplPlugin, MQAsyncSub):
                 self._parse_conversions(content)
             elif msgid == 'client.list':
                 self._parse_xpl_target(content)
-            elif msgid == 'plugin.sensor':
+            elif msgid == 'client.sensor':
                 self._handle_mq_sensor(content)
         except Exception as exp:
             self.log.error(traceback.format_exc())
@@ -140,11 +140,11 @@ class XplManager(XplPlugin, MQAsyncSub):
         the sensorStorage thread will do all conversion
         and store it eventually in the db
         """
-        time = calendar.timegm(time.gmtime())
+        tim = calendar.timegm(time.gmtime())
         for sensorid in content:
             data = {}
             data['sensor_id'] = sensorid
-            data['time'] = time
+            data['time'] = tim
             data['value'] = content[sensorid]
             self._sensor_store_queue.put(data)
         self.log.debug(u"Adding new message to the sensorStoreQueue, current length = {0}".format(self._sensor_store_queue.qsize()))
@@ -219,7 +219,6 @@ class XplManager(XplPlugin, MQAsyncSub):
             if not failed:
                 # get the command
                 cmd = self._db.get_command(request['cmdid'])
-                print cmd
                 if cmd is not None:
                     if cmd.xpl_command is not None:
                         status, uuid, failed = self._send_xpl_command(cmd, request)
@@ -277,7 +276,6 @@ class XplManager(XplPlugin, MQAsyncSub):
         # send to the plugin
         cli = MQSyncReq(self.zmq)
         self.log.debug(u"   => Sending MQ message to the plugin")
-        print msg
         response = cli.request(str(dev['client_id']), msg.get(), timeout=10)
         if not response:
             failed = "Sending the command to the client failed"
