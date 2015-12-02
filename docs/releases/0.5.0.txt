@@ -61,4 +61,12 @@ Some core butler functions interfaces have changd. **All brain packages must be 
 Admin : new section : timeline
 ------------------------------
 
-A timeline has been added to the Administration. It displays the last sensors changes on a timeline.
+A timeline has been added to the Administration. It displays the last sensors changes on a timeline. You can also see each device timeline.
+
+
+Plugins : no xpl plugins
+------------------------
+
+It is now possible to create no xPl plugins.
+
+.. todo:: complete
