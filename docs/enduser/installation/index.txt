@@ -152,9 +152,9 @@ Download the packages
 Download Domogik-mq : ::
 
     $ cd /opt/dmg/
-    $ wget --content-disposition https://github.com/domogik/domogik-mq/archive/1.2.tar.gz
-    $ tar xvzf domogik-mq-1.2.tar.gz
-    $ ln -s domogik-mq-1.2 domogik-mq
+    $ wget --content-disposition https://github.com/domogik/domogik-mq/archive/1.3.tar.gz
+    $ tar xvzf domogik-mq-1.3.tar.gz
+    $ ln -s domogik-mq-1.3 domogik-mq
     $ cd domogik-mq
 
 Download Domogik : ::
@@ -183,18 +183,6 @@ Give the system user you will use to install Domogik. You can use a dedicated us
     Install MQ as master (lib+daemon) or client (lib only) ? [M/s]:
 
 On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.4), on the main server, choose the default option and on the other servers, choose the client option. ::
-
-    [ Update /etc/default/domogik-mq ]
-    [ Update the config file : /etc/domogik/domogik-mq.cfg ]
-    [ Starting on section mq ]
-    Key log_dir_path [/var/log/domogik/]:
-    Key pid_dir_path [/var/run/domogik/]:
-
-Just keep the default values. ::
-
-    Key log_level [debug]:
-
-If you are installing Domogik as a developper, you may use the *debug* level. Else, please set up the *info* level. ::
 
 
 Install Domogik 
