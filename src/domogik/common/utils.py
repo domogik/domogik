@@ -244,3 +244,13 @@ def get_libraries_directory():
     conf_global = dict(config_global[1])
     return conf_global['libraries_path']
 
+def get_data_files_directory_for_plugin(plugin_name):
+    """ This function is already defined in the Plugin class, but this one is used by the admin in application.py
+        In fact, this is not really the same function as this one takes one parameter
+    """
+    # global config
+    cfg_global = Loader('domogik')
+    config_global = cfg_global.load()
+    conf_global = dict(config_global[1])
+    return "{0}/{1}/plugin_{2}/data".format(conf_global['libraries_path'], "domogik_packages", plugin_name)
+

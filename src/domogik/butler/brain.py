@@ -111,6 +111,12 @@ def clean_input(data):
 
 
 def get_sensor_value(log, user_locale, dt_type, device_name, sensor_reference = None):
+    value, date = get_sensor_value_and_date(log, user_locale, dt_type, device_name, sensor_reference)
+    return value
+
+
+
+def get_sensor_value_and_date(log, user_locale, dt_type, device_name, sensor_reference = None):
     """ If sensor_reference = None
             Search for a sensor matching the dt_type and the device name
         Else
@@ -143,25 +149,39 @@ def get_sensor_value(log, user_locale, dt_type, device_name, sensor_reference = 
 
     ### no corresponding sensor :(
     if the_sensor == None:
-        return None
+        return None, None
 
     ### corresponding sensor!
     # let's get the sensor value
 
     the_value = the_sensor['last_value']
+    last_received = the_sensor['last_received']
     log.info(u"The value is : {0}".format(the_value))
 
     #print("A : {0}".format(is_float_and_not_int(1)))   
     #print("A : {0}".format(is_float_and_not_int(11)))
     #print("A : {0}".format(is_float_and_not_int(11.2)))
-    try:
-        the_locale = "{0}.UTF-8".format(user_locale)
-        #locale.setlocale(locale.LC_ALL, str("fr_FR.UTF-8"))
-        locale.setlocale(locale.LC_ALL, the_locale)
-        the_value = locale.format(u"%g", float(the_value))
-    except:
-        log.warning(u"Unable to format the value with the locale '{0}'".format(the_locale))
-    return the_value
+
+    # do some checks to see if we should try to convert as a float or not
+    do_convert = True
+    if the_value != None and len(the_value) > 0:
+        # if a value is a number but starts with a "0", it should be some special value which is not intented to
+        # be converted
+        if the_value[0] == "0":
+            do_convert = False
+
+    if do_convert:
+        try:
+            if len(user_locale.split(".")) > 1:     # fr_FR.UTF-8
+                the_locale = "{0}".format(user_locale)
+            else:                                   # fr_FR
+                the_locale = "{0}.UTF-8".format(user_locale)
+            #locale.setlocale(locale.LC_ALL, str("fr_FR.UTF-8"))
+            locale.setlocale(locale.LC_ALL, the_locale)
+            the_value = locale.format(u"%g", float(the_value))
+        except:
+            log.warning(u"Unable to format the value '{0}' as float/int with the locale '{1}'".format(the_value, the_locale))
+    return the_value, last_received
     
 
 def is_float_and_not_int(x):
@@ -171,8 +191,6 @@ def is_float_and_not_int(x):
     except ValueError:
         return False
     else:
-        print(a)
-        print(b)
         return a == b
 
 
@@ -214,6 +232,7 @@ def get_sensors_for_datatype(dt_type, check_preferences = True, log = None):
                     #print(a_device["sensors"][a_sensor])
                     candidates_for_this_device[a_sensor] = {"device_name" : a_device["name"],
                                                             "device_id" : a_device["id"],
+                                                            "last_received" : a_device["sensors"][a_sensor]["last_received"],
                                                             "last_value" : a_device["sensors"][a_sensor]["last_value"],
                                                             "sensor_name" : a_device["sensors"][a_sensor]["name"],
                                                             "sensor_reference" : a_device["sensors"][a_sensor]["reference"],
