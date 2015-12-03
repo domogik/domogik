@@ -6,6 +6,7 @@
 # Examples :
 #interfaces = eth0, lo
 #interfaces = eth0
+#interfaces = *
 interfaces = lo
 
 # The directory in which log files will be created

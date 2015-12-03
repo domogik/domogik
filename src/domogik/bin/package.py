@@ -55,6 +55,8 @@ import tempfile
 from distutils import version
 import time
 import hashlib
+import OpenSSL
+
 
 
 
@@ -342,64 +344,80 @@ class PackageInstaller():
     def download_from_url(self, url):
         """ Download a package from an url
         """
-        try:
-            self.log.info("Start downloading {0}".format(url))
-
-            #response = requests.get(url)
-
-
-            # create an empty temporary file
-            downloaded_file = tempfile.NamedTemporaryFile(delete = False).name
-
-            # process the download
-            with open(downloaded_file, "wb") as f:
-                response = requests.get(url, stream=STREAM)
-                total_length = response.headers.get('content-length')
-            
-                # check the http response code
-                if response.status_code != 200:
-                    self.log.error("Error while downloading the package : HTTP {0}".format(response.status_code))
-                    return None, None
-
-                # check the mime type
-                peek = response.iter_content(256).next()
-                mime = magic.from_buffer(peek, mime=True)
-                if mime not in ALLOWED_MIMES:
-                    self.log.error("The package downloaded has not a compliant mime type : {0}. The mime type should be one of these : {1}".format(mime, ALLOWED_MIMES))
-                    return None, None
-
-                # download
-                # if streaming is activated
-                if STREAM:
-                    if total_length is None: # no content length header
-                        f.write(response.content)
+        max_tries = 2
+        num_try = 1
+        do_again = True
+        # we do a loop because of the 'OpenSSL.SSL.ZeroReturnError' error... if you launch again manually, the second
+        # time it works.... (yeah, WTF!!!!)
+        while do_again == True:
+            do_again = False
+            try:
+                self.log.info("Start downloading {0}".format(url))
+    
+                #response = requests.get(url)
+    
+    
+                # create an empty temporary file
+                downloaded_file = tempfile.NamedTemporaryFile(delete = False).name
+    
+                # process the download
+                with open(downloaded_file, "wb") as f:
+                    response = requests.get(url, stream=STREAM)
+                    total_length = response.headers.get('content-length')
+                
+                    # check the http response code
+                    if response.status_code != 200:
+                        self.log.error("Error while downloading the package : HTTP {0}".format(response.status_code))
+                        return None, None
+    
+                    # check the mime type
+                    peek = response.iter_content(256).next()
+                    mime = magic.from_buffer(peek, mime=True)
+                    if mime not in ALLOWED_MIMES:
+                        self.log.error("The package downloaded has not a compliant mime type : {0}. The mime type should be one of these : {1}".format(mime, ALLOWED_MIMES))
+                        return None, None
+    
+                    # download
+                    # if streaming is activated
+                    if STREAM:
+                        if total_length is None: # no content length header
+                            f.write(response.content)
+                        else:
+                            dl = 0
+                            total_length = int(total_length)
+                            old_progress = 0
+                            for data in response.iter_content(chunk_size=1024):
+                                #self.log.info(dl)
+                                if data:
+                                    f.write(data)
+                                    f.flush()
+                                    dl += len(data)
+                                    
+                                    #progress = int(50 * dl / total_length)
+                                    #if progress - old_progress > 5 or progress >= 49:
+                                    #    old_progress = progress 
+                                    #    sys.stdout.write("\r[%s%s]" % ('=' * progress, ' ' * (50-progress)) )    
+                                    #    sys.stdout.flush()
+                            #sys.stdout.write("\n")
+                            os.fsync(f)
+                    # if no streaming
                     else:
-                        dl = 0
-                        total_length = int(total_length)
-                        old_progress = 0
-                        for data in response.iter_content(chunk_size=1024):
-                            #self.log.info(dl)
-                            if data:
-                                f.write(data)
-                                f.flush()
-                                dl += len(data)
-                                
-                                #progress = int(50 * dl / total_length)
-                                #if progress - old_progress > 5 or progress >= 49:
-                                #    old_progress = progress 
-                                #    sys.stdout.write("\r[%s%s]" % ('=' * progress, ' ' * (50-progress)) )    
-                                #    sys.stdout.flush()
-                        #sys.stdout.write("\n")
-                        os.fsync(f)
-                # if no streaming
+                        f.write(response.content)
+            except OpenSSL.SSL.ZeroReturnError as exp:
+                self.log.error("Error while downloading the package : SSL handshaking failed")
+                self.log.error("Please try again")
+                if num_try == max_tries:
+                    raise
                 else:
-                    f.write(response.content)
-                    
-
-        except: 
-            self.log.error("Error while downloading the package : {0}".format(traceback.format_exc()))
-        self.log.info("Download finished")
-        return downloaded_file, mime
+                    do_again = True
+                    self.log.info("Retrying...")
+            except: 
+                self.log.error("Error while downloading the package : {0}".format(traceback.format_exc()))
+                raise
+            else:
+                self.log.info("Download finished")
+                return downloaded_file, mime
+            num_try += 1
 
     def uninstall(self, package):
         """ Uninstall a package

@@ -72,7 +72,7 @@ STATUS_INVALID = "invalid"
 STATUS_HBEAT = 15
 
 # core components
-CORE_COMPONENTS = ['manager', 'rest', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin', 'butler']
+CORE_COMPONENTS = ['manager', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin', 'butler']
 
 # folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "domogik_packages"
@@ -327,21 +327,30 @@ class Plugin(BasePlugin, MQRep):
             return value
         return value
 
-    def get_device_list(self, quit_if_no_device = False):
+    def get_device_list(self, quit_if_no_device = False, max_attempt = 2):
         """ Request the dbmgr component over MQ to get the devices list for this client
-            @param quit_if_no_device: if True, exit the client if there is no devices
+            @param quit_if_no_device: if True, exit the client if there is no devices or MQ request fail
+            @param max_attempt : number of retry MQ request if it fail
         """
         self.log.info(u"Retrieve the devices list for this client...")
-        mq_client = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action('device.get')
         msg.add_data('type', self._type)
         msg.add_data('name', self._name)
         msg.add_data('host', self.get_sanitized_hostname())
-        result = mq_client.request('dbmgr', msg.get(), timeout=10)
+        attempt = 1
+        result = None
+        while not result and attempt <= max_attempt :
+            mq_client = MQSyncReq(self.zmq)
+            result = mq_client.request('dbmgr', msg.get(), timeout=10)
+            if not result:
+                self.log.warn(u"Unable to retrieve the device list (attempt {0}/{1})".format(attempt, max_attempt))
+                attempt += 1
         if not result:
-            self.log.error(u"Unable to retrieve the device list")
-            self.force_leave()
+            self.log.error(u"Unable to retrieve the device list, max attempt achieved : {0}".format(max_attempt))
+            if quit_if_no_device:
+                self.log.warn(u"The developper requested to stop the client if error on retrieve the device list")
+                self.force_leave()
             return []
         else:
             device_list = result.get_data()['devices']
@@ -373,10 +382,10 @@ class Plugin(BasePlugin, MQRep):
                 # then, the commands
                 self.log.info(u"  xpl_commands features :")
                 for a_xpl_cmd in a_device['xpl_commands']:
-                    self.log.info(u" - {0}".format(a_xpl_cmd))
-                    self.log.info(u" + Parameters :")
+                    self.log.info(u"  - {0}".format(a_xpl_cmd))
+                    self.log.info(u"    Parameters :")
                     for a_feature in a_device['xpl_commands'][a_xpl_cmd]['parameters']:
-                        self.log.info(u" - {0} = {1}".format(a_feature['key'], a_feature['value']))
+                        self.log.info(u"    - {0} = {1}".format(a_feature['key'], a_feature['value']))
 
             self.devices = device_list
             return device_list
@@ -436,53 +445,54 @@ class Plugin(BasePlugin, MQRep):
         # browse all devices to find if the device exists
         found = False
         for a_device in self.devices:
-            # filter on appropriate device_type
-            if a_device['device_type_id'] != data['device_type']:
-                continue
-
-            # handle "main" global parameters
-            # TODO ????
-
-            # handle xpl global parameters
-            if data['xpl'] != []:
-                for dev_feature in a_device['xpl_stats']:
-                    for dev_param in a_device['xpl_stats'][dev_feature]['parameters']['static']:
-                        #print(dev_param)
-                        for found_param in data['xpl']:
-                            if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
-                                found = True
-                                #print("FOUND")
-                                break
-                for dev_feature in a_device['xpl_commands']:
-                    for dev_param in a_device['xpl_commands'][dev_feature]['parameters']['static']:
-                        #print(dev_param)
-                        for found_param in data['xpl']:
-                            if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
-                                found = True
-                                #print("FOUND")
-                                break
-
-            # handle xpl specific parameters
-            if not found and data['xpl_stats'] != []:
-                for dev_feature in a_device['xpl_stats']:
-                    for dev_param in a_device['xpl_stats'][dev_feature]['parameters']['static']:
-                        #print(dev_param)
-                        for found_param in data['xpl_stats']:
-                            if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
-                                found = True
-                                #print("FOUND")
-                                break
-
-            if not found and data['xpl_commands'] != []:
-                for dev_feature in a_device['xpl_commands']:
-                    for dev_param in a_device['xpl_commands'][dev_feature]['parameters']['static']:
-                        #print(dev_param)
-                        for found_param in data['xpl_commands']:
-                            if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
-                                found = True
-                                #print("FOUND")
-                                break
-
+            try:
+                # filter on appropriate device_type
+                if a_device['device_type_id'] != data['device_type']:
+                    continue
+    
+                # handle "main" global parameters
+                # TODO ????
+    
+                # handle xpl global parameters
+                if data['xpl'] != []:
+                    for dev_feature in a_device['xpl_stats']:
+                        for dev_param in a_device['xpl_stats'][dev_feature]['parameters']['static']:
+                            #print(dev_param)
+                            for found_param in data['xpl']:
+                                if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
+                                    found = True
+                                    #print("FOUND")
+                                    break
+                    for dev_feature in a_device['xpl_commands']:
+                        for dev_param in a_device['xpl_commands'][dev_feature]['parameters']['static']:
+                            #print(dev_param)
+                            for found_param in data['xpl']:
+                                if dev_param['key'] == found_param['key'] and dev_param['value'] == found_param['value']:
+                                    found = True
+                                    #print("FOUND")
+                                    break
+    
+                # handle xpl specific parameters
+                if not found and data['xpl_stats'] != []:
+                    for dev_feature in a_device['xpl_stats']:
+                        for dev_param in a_device['xpl_stats'][dev_feature]['parameters']['static']:
+                            for found_param in data['xpl_stats']:
+                                for a_param in data['xpl_stats'][found_param]:
+                                    if dev_param['key'] == a_param['key'] and dev_param['value'] == a_param['value']:
+                                        found = True
+                                        break
+    
+                if not found and data['xpl_commands'] != []:
+                    for dev_feature in a_device['xpl_commands']:
+                        for dev_param in a_device['xpl_commands'][dev_feature]['parameters']['static']:
+                            for found_param in data['xpl_commands']:
+                                for a_param in data['xpl_commands'][found_param]:
+                                    if dev_param['key'] == a_param['key'] and dev_param['value'] == a_param['value']:
+                                        found = True
+                                        break
+            except:
+                self.log.error("Error while checking if the device already exists. We will assume the device is found to avoid later errors. Error is : {0}".format(traceback.format_exc()))
+                found = True 
 
         if found:
             self.log.debug(u"The device already exists : id={0}.".format(a_device['id']))

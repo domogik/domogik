@@ -36,9 +36,15 @@ PackageJson
 
 from domogik.common.configloader import Loader
 import traceback
-import urllib2
 import datetime
 import json
+try:
+    # python3
+    from urllib.request import urlopen
+except ImportError:
+    # python2
+    from urllib import urlopen
+
 #TODO : why this import fails ?
 #from domogik.xpl.common.plugin import PACKAGES_DIR
 PACKAGES_DIR = "domogik_packages"
@@ -99,7 +105,7 @@ class PackageJson():
             elif url != None:
                 json_file = url
                 icon_file = None
-                json_data = urllib2.urlopen(json_file)
+                json_data = urlopen(json_file)
                 # TODO : there is an error here!!!!!
                 self.json = json.load(xml_data)
 
@@ -257,8 +263,9 @@ class PackageJson():
                 raise PackageException("Commands part is NOT a dictionary!")
             for cmdid in self.json["commands"]:
                 cmd = self.json["commands"][cmdid]
-                expected = ['name', 'return_confirmation', 'parameters', 'xpl_command']
-                self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys())
+                expected = ['name', 'return_confirmation', 'parameters']
+                optional = ['xpl_command']
+                self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys(), optional)
                 # validate the params
                 expected = ['key', 'data_type', 'conversion']
                 if type(cmd['parameters']) != list:
@@ -266,7 +273,7 @@ class PackageJson():
                 for par in cmd['parameters']:
                     self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
                 # see that the xpl_command is defined
-                if cmd["xpl_command"] not in self.json["xpl_commands"].keys():
+                if "xpl_command" in cmd and cmd["xpl_command"] not in self.json["xpl_commands"].keys():
                     raise PackageException("xpl_command {0} defined in command {1} is not found".format(cmd["xpl_command"], cmdid))
 
             #validate the sensors

@@ -51,7 +51,7 @@ REGEXP_PS_SEPARATOR = re.compile('[\s]+')
 def get_interfaces():
     return interfaces()
 
-def get_ip_for_interfaces(interface_list=[], ip_type=AF_INET):
+def get_ip_for_interfaces(interface_list=[], ip_type=AF_INET, log = None):
     """ Returns all ips that are available for the interfaces in the list
     @param interface_list: a list of interfaces to ge the ips for,
         if the list is empty it will retrun all ips for this system
@@ -60,18 +60,43 @@ def get_ip_for_interfaces(interface_list=[], ip_type=AF_INET):
         AF_INET6: for ipv6
     @return: a list of ips
     """
+    all = False
     if type(interface_list) is not list:
         assert "The interface_list should be a list"
-    if len(interface_list) == 0:
+    if len(interface_list) == 0 or interface_list == ['*']:
+        all = True
         interface_list = interfaces()
     ips = []
     for intf in interface_list:
+        intf = intf.strip()
         if intf in interfaces():
-            for addr in ifaddresses(intf)[ip_type]:
-                ips.append(addr['addr'])
+            try:
+                for addr in ifaddresses(intf)[ip_type]:
+                    ips.append(addr['addr'])
+            except:
+                if not all:
+                    msg = "There is no such working network interface: {0}".format(intf)
+                    if log != None:
+                        log.error(msg)
+                    else:
+                        print("ERROR : {0}".format(msg))
+                else:
+                    msg = "The network interface '{0}' is not available".format(intf)
+                    if log != None:
+                        log.debug(msg)
+                    else:
+                        print("{0}".format(msg))
         else:
             assert "Interface {0} does not exist".format(intf)
+            if log != None:
+                log.error("Interface {0} does not exist".format(intf))
     return ips
+
+def interface_has_ip(interface):
+    if len(get_ip_for_interfaces([interface])) == 0:
+        return False
+    else:
+        return True
 
 def get_sanitized_hostname():
     """ Get the sanitized hostname of the host 
@@ -135,9 +160,10 @@ def is_already_launched(log, type, id, manager=True):
  
     # the manager add the STARTED_BY_MANAGER useless command to allow the client to ignore this command line when it checks if it is already laucnehd or not
     # the final 'grep -v sudo' is here to exclude the lines launched by sudo from the search : using sudo make 2 results be in the grep result : one with sudo and the other one with the command (but this second one is filtered thanks to its pid)
+    # the grep -v mprof is there to allow run of memory profiler
     if manager:
         #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
-        cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v update".format(id, STARTED_BY_MANAGER, my_pid)
+        cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v mprof | grep -v update".format(id, STARTED_BY_MANAGER, my_pid)
         print "is manager"
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
@@ -172,7 +198,7 @@ def is_already_launched(log, type, id, manager=True):
 def get_rest_url():
     """ Build and return the rest url
     """
-    cfg = Loader('rest')
+    cfg = Loader('admin')
     config = cfg.load()
     conf = dict(config[1])
     ### get REST ip and port
@@ -182,7 +208,7 @@ def get_rest_url():
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
 
-    return "http://{0}:{1}".format(ip, port)
+    return "http://{0}:{1}/rest".format(ip, port)
 
 
 def get_rest_doc_path():

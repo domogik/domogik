@@ -29,6 +29,7 @@ from domogik.scenario.actions.abstract import AbstractAction
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogikmq.pubsub.publisher import MQPub
 import zmq
+import traceback
 
 
 class ButlerAction(AbstractAction):
@@ -37,7 +38,7 @@ class ButlerAction(AbstractAction):
 
     def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log)
-        self.set_description("Make the butler say something.")
+        self.set_description(u"Make the butler say something.")
 
         ### Butler configuration elements
         try:
@@ -56,7 +57,7 @@ class ButlerAction(AbstractAction):
         self.pub = MQPub(self.zmq, self._mq_name)
 
     def do_action(self):
-        self._log.info("Make the butler say '{0}'. Media is '{1}', location is '{2}'".format(self._params['text'], self._params['media'], self._params['location']))
+        self._log.info(u"Make the butler say '{0}'. Media is '{1}', location is '{2}'".format(self._params['text'], self._params['media'], self._params['location']))
 
         # publish over MQ
         data =              {"media" : self._params['media'],

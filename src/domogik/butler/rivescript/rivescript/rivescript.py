@@ -2,7 +2,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2014 Noah Petherbridge
+# Copyright (c) 2015 Noah Petherbridge
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from __future__ import unicode_literals
+from six import text_type
 import sys
 import os
 import re
@@ -35,29 +37,71 @@ from . import __version__
 from . import python
 
 # Common regular expressions.
-re_equals  = re.compile('\s*=\s*')
-re_ws      = re.compile('\s+')
-re_objend  = re.compile('^\s*<\s*object')
-re_weight  = re.compile('\{weight=(\d+)\}')
-re_inherit = re.compile('\{inherits=(\d+)\}')
-re_wilds   = re.compile('[\s\*\#\_]+')
-re_nasties = re.compile('[^A-Za-z0-9 ]')
+class RE(object):
+    equals      = re.compile('\s*=\s*')
+    ws          = re.compile('\s+')
+    objend      = re.compile('^\s*<\s*object')
+    weight      = re.compile('\{weight=(\d+)\}')
+    inherit     = re.compile('\{inherits=(\d+)\}')
+    wilds       = re.compile('[\s\*\#\_]+')
+    nasties     = re.compile('[^A-Za-z0-9 ]')
+    crlf        = re.compile('<crlf>')
+    literal_w   = re.compile(r'\\w')
+    array       = re.compile(r'\@(.+?)\b')
+    def_syntax  = re.compile(r'^.+(?:\s+.+|)\s*=\s*.+?$')
+    name_syntax = re.compile(r'[^a-z0-9_\-\s]')
+    utf8_trig   = re.compile(r'[A-Z\\.]')
+    trig_syntax = re.compile(r'[^a-z0-9(\|)\[\]*_#@{}<>=\s]')
+    cond_syntax = re.compile(r'^.+?\s*(?:==|eq|!=|ne|<>|<|<=|>|>=)\s*.+?=>.+?$')
+    utf8_meta   = re.compile(r'[\\<>]')
+    utf8_punct  = re.compile(r'[.?,!;:@#$%^&*()]')
+    cond_split  = re.compile(r'\s*=>\s*')
+    cond_parse  = re.compile(r'^(.+?)\s+(==|eq|!=|ne|<>|<|<=|>|>=)\s+(.+?)$')
+    topic_tag   = re.compile(r'\{topic=(.+?)\}')
+    set_tag     = re.compile(r'<set (.+?)=(.+?)>')
+    bot_tag     = re.compile(r'<bot (.+?)>')
+    get_tag     = re.compile(r'<get (.+?)>')
+    star_tags   = re.compile(r'<star(\d+)>')
+    botstars    = re.compile(r'<botstar(\d+)>')
+    input_tags  = re.compile(r'<input([1-9])>')
+    reply_tags  = re.compile(r'<reply([1-9])>')
+    random_tags = re.compile(r'\{random\}(.+?)\{/random\}')
+    redir_tag   = re.compile(r'\{@(.+?)\}')
+    tag_search  = re.compile(r'<([^<]+?)>')
+    placeholder = re.compile(r'\x00(\d+)\x00')
+    zero_star   = re.compile(r'^\*$')
+    optionals   = re.compile(r'\[(.+?)\]')
 
 # Version of RiveScript we support.
 rs_version = 2.0
 
 # Exportable constants.
-RS_ERR_MATCH = "ERR: No Reply Matched"
-RS_ERR_REPLY = "ERR: No Reply Found"
+RS_ERR_MATCH = "[ERR: No reply matched]"
+RS_ERR_REPLY = "[ERR: No reply found]"
+RS_ERR_DEEP_RECURSION = "[ERR: Deep recursion detected]"
+RS_ERR_OBJECT = "[ERR: Error when executing Python object]"
+RS_ERR_OBJECT_HANDLER = "[ERR: No Object Handler]"
+RS_ERR_OBJECT_MISSING = "[ERR: Object Not Found]"
 
-### Patch for Domogik
+### Fritz - patch
+# old #
+# (nothing) #
+# new #
+import unicodedata
+
 DEFAULT_WEIGHT = 10
-print("/!\ Rivescript 1.06, patched for Domogik")
-### End of patch
+print("/!\ Rivescript 1.80, patched for Domogik purpose")
+### Fritz - patch end
 
-
-class RiveScript:
+class RiveScript(object):
     """A RiveScript interpreter for Python 2 and 3."""
+
+    # Concatenation mode characters.
+    _concat_modes = dict(
+        none="",
+        space=" ",
+        newline="\n",
+    )
 
     ############################################################################
     # Initialization and Utility Methods                                       #
@@ -72,26 +116,31 @@ str  log:    Specify a log file for debug output to go to (instead of STDOUT).
 int  depth:  Specify the recursion depth limit.
 bool utf8:   Enable UTF-8 support."""
         # Instance variables.
-        self._debug    = debug  # Debug mode
-        self._log      = log    # Debug log file
-        self._utf8     = utf8   # UTF-8 mode
-        self._strict   = strict # Strict mode
-        self._depth    = depth  # Recursion depth limit
-        self._gvars    = {}     # 'global' variables
-        self._bvars    = {}     # 'bot' variables
-        self._subs     = {}     # 'sub' variables
-        self._person   = {}     # 'person' variables
-        self._arrays   = {}     # 'array' variables
-        self._users    = {}     # 'user' variables
-        self._freeze   = {}     # frozen 'user' variables
-        self._includes = {}     # included topics
-        self._lineage  = {}     # inherited topics
-        self._handlers = {}     # Object handlers
-        self._objlangs = {}     # Languages of objects used
-        self._topics   = {}     # Main reply structure
-        self._thats    = {}     # %Previous reply structure
-        self._sorted   = {}     # Sorted buffers
-        self._syntax   = {}     # Syntax tracking (filenames & line no.'s)
+        self._debug    = debug   # Debug mode
+        self._log      = log     # Debug log file
+        self._utf8     = utf8    # UTF-8 mode
+        self._strict   = strict  # Strict mode
+        self._depth    = depth   # Recursion depth limit
+        self._gvars    = {}      # 'global' variables
+        self._bvars    = {}      # 'bot' variables
+        self._subs     = {}      # 'sub' variables
+        self._person   = {}      # 'person' variables
+        self._arrays   = {}      # 'array' variables
+        self._users    = {}      # 'user' variables
+        self._freeze   = {}      # frozen 'user' variables
+        self._includes = {}      # included topics
+        self._lineage  = {}      # inherited topics
+        self._handlers = {}      # Object handlers
+        self._objlangs = {}      # Languages of objects used
+        self._topics   = {}      # Main reply structure
+        self._thats    = {}      # %Previous reply structure
+        self._sorted   = {}      # Sorted buffers
+        self._syntax   = {}      # Syntax tracking (filenames & line no.'s)
+        self._regexc   = {       # Precomputed regexes for speed optimizations.
+            "trigger": {},
+            "subs":    {},
+            "person":  {},
+        }
 
         # "Current request" variables.
         self._current_user = None  # The current user ID.
@@ -105,7 +154,7 @@ bool utf8:   Enable UTF-8 support."""
     def VERSION(self=None):
         """Return the version number of the RiveScript library.
 
-This may be called as either a class method of a method of a RiveScript object."""
+This may be called as either a class method or a method of a RiveScript object."""
         return __version__
 
     def _say(self, message):
@@ -125,6 +174,13 @@ This may be called as either a class method of a method of a RiveScript object."
             print(header, message, "at", fname, "line", lineno)
         else:
             print(header, message)
+        ### fritz - patch
+        # old #
+        # (nothing)
+        # new #
+        if hasattr(self, "log"):
+            self.log.error(u"RS : {0}".format(message))
+        ### fritz - patch end
 
     ############################################################################
     # Loading and Parsing Methods                                              #
@@ -169,8 +225,11 @@ This may be called as either a class method of a method of a RiveScript object."
     def stream(self, code):
         """Stream in RiveScript source code dynamically.
 
-`code` should be an array of lines of RiveScript code."""
+        `code` can either be a string containing RiveScript code or an array
+        of lines of RiveScript code."""
         self._say("Streaming code.")
+        if type(code) in [str, text_type]:
+            code = code.split("\n")
         self._parse("stream()", code)
 
     def _parse(self, fname, code):
@@ -178,22 +237,26 @@ This may be called as either a class method of a method of a RiveScript object."
         self._say("Parsing code")
 
         # Track temporary variables.
-        topic   = 'random' # Default topic=random
-        lineno  = 0        # Line numbers for syntax tracking
-        comment = False    # In a multi-line comment
-        inobj   = False    # In an object
-        objname = ''       # The name of the object we're in
-        objlang = ''       # The programming language of the object
-        objbuf  = []       # Object contents buffer
-        ontrig  = ''       # The current trigger
-        repcnt  = 0        # Reply counter
-        concnt  = 0        # Condition counter
-        lastcmd = ''       # Last command code
-        isThat  = ''       # Is a %Previous trigger
+        topic   = 'random'  # Default topic=random
+        lineno  = 0         # Line numbers for syntax tracking
+        comment = False     # In a multi-line comment
+        inobj   = False     # In an object
+        objname = ''        # The name of the object we're in
+        objlang = ''        # The programming language of the object
+        objbuf  = []        # Object contents buffer
+        ontrig  = ''        # The current trigger
+        repcnt  = 0         # Reply counter
+        concnt  = 0         # Condition counter
+        isThat  = ''        # Is a %Previous trigger
+
+        # Local (file scoped) parser options.
+        local_options = dict(
+            concat="none",  # Concat mode for ^Continue command
+        )
 
         # Read each line.
         for lp, line in enumerate(code):
-            lineno = lineno + 1
+            lineno += 1
 
             self._say("Line: " + line + " (topic: " + topic + ") incomment: " + str(inobj))
             if len(line.strip()) == 0:  # Skip blank lines
@@ -201,7 +264,7 @@ This may be called as either a class method of a method of a RiveScript object."
 
             # In an object?
             if inobj:
-                if re.match(re_objend, line):
+                if re.match(RE.objend, line):
                     # End the object.
                     if len(objname):
                         # Call the object's handler.
@@ -227,7 +290,7 @@ This may be called as either a class method of a method of a RiveScript object."
             elif line[0] == '#':
                 self._warn("Using the # symbol for comments is deprecated", fname, lineno)
             elif line[:2] == '/*':  # Start of a multi-line comment.
-                if not '*/' in line:  # Cancel if the end is here too.
+                if '*/' not in line:  # Cancel if the end is here too.
                     comment = True
                 continue
             elif '*/' in line:
@@ -300,7 +363,9 @@ This may be called as either a class method of a method of a RiveScript object."
                     # end of the current line.
                     if cmd != '^' and lookCmd != '%':
                         if lookCmd == '^':
-                            line += lookahead
+                            line += self._concat_modes.get(
+                                local_options["concat"], ""
+                            ) + lookahead
                         else:
                             break
 
@@ -309,8 +374,8 @@ This may be called as either a class method of a method of a RiveScript object."
             # Handle the types of RiveScript commands.
             if cmd == '!':
                 # ! DEFINE
-                halves = re.split(re_equals, line, 2)
-                left = re.split(re_ws, halves[0].strip(), 2)
+                halves = re.split(RE.equals, line, 2)
+                left = re.split(RE.ws, halves[0].strip(), 2)
                 value, type, var = '', '', ''
                 if len(halves) == 2:
                     value = halves[1].strip()
@@ -321,7 +386,7 @@ This may be called as either a class method of a method of a RiveScript object."
 
                 # Remove 'fake' line breaks unless this is an array.
                 if type != 'array':
-                    value = re.sub(r'<crlf>', '', value)
+                    value = re.sub(RE.crlf, '', value)
 
                 # Handle version numbers.
                 if type == 'version':
@@ -343,7 +408,11 @@ This may be called as either a class method of a method of a RiveScript object."
                     continue
 
                 # Handle the rest of the types.
-                if type == 'global':
+                if type == 'local':
+                    # Local file-scoped parser options.
+                    self._say("\tSet parser option " + var + " = " + value)
+                    local_options[var] = value
+                elif type == 'global':
                     # 'Global' variables
                     self._say("\tSet global " + var + " = " + value)
 
@@ -403,11 +472,11 @@ This may be called as either a class method of a method of a RiveScript object."
                         if '|' in val:
                             fields.extend(val.split('|'))
                         else:
-                            fields.extend(re.split(re_ws, val))
+                            fields.extend(re.split(RE.ws, val))
 
                     # Convert any remaining '\s' escape codes into spaces.
                     for f in fields:
-                        f = f.replace(r'\s', ' ')
+                        f = f.replace('\s', ' ')
 
                     self._arrays[var] = fields
                 elif type == 'sub':
@@ -421,6 +490,9 @@ This may be called as either a class method of a method of a RiveScript object."
                             self._warn("Failed to delete missing substitution", fname, lineno)
                     else:
                         self._subs[var] = value
+
+                    # Precompile the regexp.
+                    self._precompile_substitution("subs", var)
                 elif type == 'person':
                     # Person Substitutions
                     self._say("\tPerson Substitution " + var + " => " + value)
@@ -432,11 +504,14 @@ This may be called as either a class method of a method of a RiveScript object."
                             self._warn("Failed to delete missing person substitution", fname, lineno)
                     else:
                         self._person[var] = value
+
+                    # Precompile the regexp.
+                    self._precompile_substitution("person", var)
                 else:
                     self._warn("Unknown definition type '" + type + "'", fname, lineno)
             elif cmd == '>':
                 # > LABEL
-                temp = re.split(re_ws, line)
+                temp = re.split(RE.ws, line)
                 type   = temp[0]
                 name   = ''
                 fields = []
@@ -468,11 +543,11 @@ This may be called as either a class method of a method of a RiveScript object."
                             elif mode != '':
                                 # This topic is either inherited or included.
                                 if mode == 'includes':
-                                    if not name in self._includes:
+                                    if name not in self._includes:
                                         self._includes[name] = {}
                                     self._includes[name][field] = 1
                                 else:
-                                    if not name in self._lineage:
+                                    if name not in self._lineage:
                                         self._lineage[name] = {}
                                     self._lineage[name][field] = 1
                 elif type == 'object':
@@ -527,6 +602,9 @@ This may be called as either a class method of a method of a RiveScript object."
                 ontrig = line
                 repcnt = 0
                 concnt = 0
+
+                # Pre-compile the trigger's regexp if possible.
+                self._precompile_regexp(ontrig)
             elif cmd == '-':
                 # - REPLY
                 if ontrig == '':
@@ -539,7 +617,7 @@ This may be called as either a class method of a method of a RiveScript object."
                 else:
                     self._topics[topic][ontrig]['reply'][repcnt] = line
                     self._syntax['topic'][topic][ontrig]['reply'][repcnt] = (fname, lineno)
-                repcnt = repcnt + 1
+                repcnt += 1
             elif cmd == '%':
                 # % PREVIOUS
                 pass  # This was handled above.
@@ -564,7 +642,7 @@ This may be called as either a class method of a method of a RiveScript object."
                 else:
                     self._topics[topic][ontrig]['condition'][concnt] = line
                     self._syntax['topic'][topic][ontrig]['condition'][concnt] = (fname, lineno)
-                concnt = concnt + 1
+                concnt += 1
             else:
                 self._warn("Unrecognized command \"" + cmd + "\"", fname, lineno)
                 continue
@@ -581,7 +659,7 @@ Returns a syntax error string on error; None otherwise."""
             #     ! type name = value
             #     OR
             #     ! type = value
-            match = re.match(r'^.+(?:\s+.+|)\s*=\s*.+?$', line)
+            match = re.match(RE.def_syntax, line)
             if not match:
                 return "Invalid format for !Definition line: must be '! type name = value' OR '! type = value'"
         elif cmd == '>':
@@ -593,13 +671,11 @@ Returns a syntax error string on error; None otherwise."""
             if parts[0] == "begin" and len(parts) > 1:
                 return "The 'begin' label takes no additional arguments, should be verbatim '> begin'"
             elif parts[0] == "topic":
-                rest = ' '.join(parts)
-                match = re.match(r'[^a-z0-9_\-\s]', line)
+                match = re.match(RE.name_syntax, line)
                 if match:
                     return "Topics should be lowercased and contain only numbers and letters"
             elif parts[0] == "object":
-                rest = ' '.join(parts)
-                match = re.match(r'[^A-Za-z0-9_\-\s]', line)
+                match = re.match(RE.name_syntax, line)
                 if match:
                     return "Objects can only contain numbers and letters"
         elif cmd == '+' or cmd == '%' or cmd == '@':
@@ -617,21 +693,21 @@ Returns a syntax error string on error; None otherwise."""
             # Count brackets.
             for char in line:
                 if char == '(':
-                    parens = parens + 1
+                    parens += 1
                 elif char == ')':
-                    parens = parens - 1
+                    parens -= 1
                 elif char == '[':
-                    square = square + 1
+                    square += 1
                 elif char == ']':
-                    square = square - 1
+                    square -= 1
                 elif char == '{':
-                    curly = curly + 1
+                    curly += 1
                 elif char == '}':
-                    curly = curly - 1
+                    curly -= 1
                 elif char == '<':
-                    angle = angle + 1
+                    angle += 1
                 elif char == '>':
-                    angle = angle - 1
+                    angle -= 1
 
             # Any mismatches?
             if parens != 0:
@@ -645,11 +721,11 @@ Returns a syntax error string on error; None otherwise."""
 
             # In UTF-8 mode, most symbols are allowed.
             if self._utf8:
-                match = re.match(r'[A-Z\\.]', line)
+                match = re.match(RE.utf8_trig, line)
                 if match:
                     return "Triggers can't contain uppercase letters, backslashes or dots in UTF-8 mode."
             else:
-                match = re.match(r'[^a-z0-9(\|)\[\]*_#@{}<>=\s]', line)
+                match = re.match(RE.trig_syntax, line)
                 if match:
                     return "Triggers may only contain lowercase letters, numbers, and these symbols: ( | ) [ ] * _ # @ { } < > ="
         elif cmd == '-' or cmd == '^' or cmd == '/':
@@ -660,7 +736,7 @@ Returns a syntax error string on error; None otherwise."""
             # * Condition
             #   Syntax for a conditional is as follows:
             #   * value symbol value => response
-            match = re.match(r'^.+?\s*(?:==|eq|!=|ne|<>|<|<=|>|>=)\s*.+?=>.+?$', line)
+            match = re.match(RE.cond_syntax, line)
             if not match:
                 return "Invalid format for !Condition: should be like '* value symbol value => response'"
 
@@ -705,14 +781,14 @@ Returns a syntax error string on error; None otherwise."""
 
         # Topic Triggers.
         for topic in self._topics:
-            dest = {} # Where to place the topic info
+            dest = {}  # Where to place the topic info
 
             if topic == "__begin__":
                 # Begin block.
                 dest = result["begin"]["triggers"]
             else:
                 # Normal topic.
-                if not topic in result["topic"]:
+                if topic not in result["topic"]:
                     result["topic"][topic] = {}
                 dest = result["topic"][topic]
 
@@ -722,14 +798,14 @@ Returns a syntax error string on error; None otherwise."""
 
         # %Previous's.
         for topic in self._thats:
-            dest = {} # Where to place the topic info
+            dest = {}  # Where to place the topic info
 
             if topic == "__begin__":
                 # Begin block.
                 dest = result["begin"]["that"]
             else:
                 # Normal topic.
-                if not topic in result["that"]:
+                if topic not in result["that"]:
                     result["that"][topic] = {}
                 dest = result["that"][topic]
 
@@ -783,7 +859,7 @@ Returns a syntax error string on error; None otherwise."""
             for var in sorted(deparsed["begin"][kind].keys()):
                 # Array types need to be separated by either spaces or pipes.
                 data = deparsed["begin"][kind][var]
-                if type(data) not in [str, unicode]:
+                if type(data) not in [str, text_type]:
                     needs_pipes = False
                     for test in data:
                         if " " in test:
@@ -817,11 +893,11 @@ Returns a syntax error string on error; None otherwise."""
         topics.extend(sorted(deparsed["topic"].keys()))
         done_random = False
         for topic in topics:
-            if not topic in deparsed["topic"]: continue
+            if topic not in deparsed["topic"]: continue
             if topic == "random" and done_random: continue
             if topic == "random": done_random = True
 
-            tagged = False # Used > topic tag
+            tagged = False  # Used > topic tag
 
             if topic != "random" or topic in deparsed["include"] or topic in deparsed["inherit"]:
                 tagged = True
@@ -908,7 +984,7 @@ Returns a syntax error string on error; None otherwise."""
             line = sep.join(buf)
             if len(line) > width:
                 # Need to word wrap!
-                words.insert(0, buf.pop()) # Undo
+                words.insert(0, buf.pop())  # Undo
                 lines.append(sep.join(buf))
                 buf = []
                 line = ""
@@ -931,29 +1007,29 @@ Returns a syntax error string on error; None otherwise."""
     def _initTT(self, toplevel, topic, trigger, what=''):
         """Initialize a Topic Tree data structure."""
         if toplevel == 'topics':
-            if not topic in self._topics:
+            if topic not in self._topics:
                 self._topics[topic] = {}
-            if not trigger in self._topics[topic]:
+            if trigger not in self._topics[topic]:
                 self._topics[topic][trigger]              = {}
                 self._topics[topic][trigger]['reply']     = {}
                 self._topics[topic][trigger]['condition'] = {}
                 self._topics[topic][trigger]['redirect']  = None
         elif toplevel == 'thats':
-            if not topic in self._thats:
+            if topic not in self._thats:
                 self._thats[topic] = {}
-            if not trigger in self._thats[topic]:
+            if trigger not in self._thats[topic]:
                 self._thats[topic][trigger] = {}
-            if not what in self._thats[topic][trigger]:
+            if what not in self._thats[topic][trigger]:
                 self._thats[topic][trigger][what] = {}
                 self._thats[topic][trigger][what]['reply']     = {}
                 self._thats[topic][trigger][what]['condition'] = {}
                 self._thats[topic][trigger][what]['redirect']  = {}
         elif toplevel == 'syntax':
-            if not what in self._syntax:
+            if what not in self._syntax:
                 self._syntax[what] = {}
-            if not topic in self._syntax[what]:
+            if topic not in self._syntax[what]:
                 self._syntax[what][topic] = {}
-            if not trigger in self._syntax[what][topic]:
+            if trigger not in self._syntax[what][topic]:
                 self._syntax[what][topic][trigger]              = {}
                 self._syntax[what][topic][trigger]['reply']     = {}
                 self._syntax[what][topic][trigger]['condition'] = {}
@@ -1009,7 +1085,7 @@ Returns a syntax error string on error; None otherwise."""
             running = self._sort_trigger_set(alltrig)
 
             # Save this topic's sorted list.
-            if not sortlvl in self._sorted:
+            if sortlvl not in self._sorted:
                 self._sorted[sortlvl] = {}
             self._sorted[sortlvl][topic] = running
 
@@ -1031,15 +1107,15 @@ Returns a syntax error string on error; None otherwise."""
         """Make a sorted list of triggers that correspond to %Previous groups."""
         self._say("Sorting reverse triggers for %Previous groups...")
 
-        if not "that_trig" in self._sorted:
+        if "that_trig" not in self._sorted:
             self._sorted["that_trig"] = {}
 
         for topic in self._thats:
-            if not topic in self._sorted["that_trig"]:
+            if topic not in self._sorted["that_trig"]:
                 self._sorted["that_trig"][topic] = {}
 
             for bottrig in self._thats[topic]:
-                if not bottrig in self._sorted["that_trig"][topic]:
+                if bottrig not in self._sorted["that_trig"][topic]:
                     self._sorted["that_trig"][topic][bottrig] = []
                 triggers = self._sort_trigger_set(self._thats[topic][bottrig].keys())
                 self._sorted["that_trig"][topic][bottrig] = triggers
@@ -1049,20 +1125,24 @@ Returns a syntax error string on error; None otherwise."""
 
         # Create a priority map.
         prior = {
-            ### Patch for Domogik : change default weight
+            ### fritz - patch
+            # old #
             # 0: []  # Default priority=0
+            # new #
             DEFAULT_WEIGHT: []  # Default priority
-            ### End of patch
+            ### fritz - patch end
         }
 
         for trig in triggers:
-            ### Patch for Domogik : change default weight
-            # match, weight = re.search(re_weight, trig), 0
-            match, weight = re.search(re_weight, trig), 10
-            ### End of patch
+            # fritz - patch
+            # old #
+            # match, weight = re.search(RE.weight, trig), 0
+            # new #
+            match, weight = re.search(RE.weight, trig), DEFAULT_WEIGHT
+            # fritz - patch end
             if match:
                 weight = int(match.group(1))
-            if not weight in prior:
+            if weight not in prior:
                 prior[weight] = []
 
             prior[weight].append(trig)
@@ -1078,7 +1158,7 @@ Returns a syntax error string on error; None otherwise."""
             # came form a topic which inherits another topic. Lower inherits
             # values mean higher priority on the stack.
             inherits = -1          # -1 means no {inherits} tag
-            highest_inherits = -1  # highest inheritence number seen
+            highest_inherits = -1  # highest inheritance number seen
 
             # Loop through and categorize these triggers.
             track = {
@@ -1089,19 +1169,19 @@ Returns a syntax error string on error; None otherwise."""
                 self._say("\t\tLooking at trigger: " + trig)
 
                 # See if it has an inherits tag.
-                match = re.search(re_inherit, trig)
+                match = re.search(RE.inherit, trig)
                 if match:
                     inherits = int(match.group(1))
                     if inherits > highest_inherits:
                         highest_inherits = inherits
                     self._say("\t\t\tTrigger belongs to a topic which inherits other topics: level=" + str(inherits))
-                    trig = re.sub(re_inherit, "", trig)
+                    trig = re.sub(RE.inherit, "", trig)
                 else:
                     inherits = -1
 
-                # If this is the first time we've seen this inheritence level,
+                # If this is the first time we've seen this inheritance level,
                 # initialize its track structure.
-                if not inherits in track:
+                if inherits not in track:
                     track[inherits] = self._init_sort_track()
 
                 # Start inspecting the trigger's contents.
@@ -1110,7 +1190,7 @@ Returns a syntax error string on error; None otherwise."""
                     cnt = self._word_count(trig)
                     self._say("\t\t\tHas a _ wildcard with " + str(cnt) + " words.")
                     if cnt > 1:
-                        if not cnt in track[inherits]['alpha']:
+                        if cnt not in track[inherits]['alpha']:
                             track[inherits]['alpha'][cnt] = []
                         track[inherits]['alpha'][cnt].append(trig)
                     else:
@@ -1120,7 +1200,7 @@ Returns a syntax error string on error; None otherwise."""
                     cnt = self._word_count(trig)
                     self._say("\t\t\tHas a # wildcard with " + str(cnt) + " words.")
                     if cnt > 1:
-                        if not cnt in track[inherits]['number']:
+                        if cnt not in track[inherits]['number']:
                             track[inherits]['number'][cnt] = []
                         track[inherits]['number'][cnt].append(trig)
                     else:
@@ -1130,7 +1210,7 @@ Returns a syntax error string on error; None otherwise."""
                     cnt = self._word_count(trig)
                     self._say("\t\t\tHas a * wildcard with " + str(cnt) + " words.")
                     if cnt > 1:
-                        if not cnt in track[inherits]['wild']:
+                        if cnt not in track[inherits]['wild']:
                             track[inherits]['wild'][cnt] = []
                         track[inherits]['wild'][cnt].append(trig)
                     else:
@@ -1139,14 +1219,14 @@ Returns a syntax error string on error; None otherwise."""
                     # Optionals included.
                     cnt = self._word_count(trig)
                     self._say("\t\t\tHas optionals and " + str(cnt) + " words.")
-                    if not cnt in track[inherits]['option']:
+                    if cnt not in track[inherits]['option']:
                         track[inherits]['option'][cnt] = []
                     track[inherits]['option'][cnt].append(trig)
                 else:
                     # Totally atomic.
                     cnt = self._word_count(trig)
                     self._say("\t\t\tTotally atomic and " + str(cnt) + " words.")
-                    if not cnt in track[inherits]['atomic']:
+                    if cnt not in track[inherits]['atomic']:
                         track[inherits]['atomic'][cnt] = []
                     track[inherits]['atomic'][cnt].append(trig)
 
@@ -1158,8 +1238,10 @@ Returns a syntax error string on error; None otherwise."""
             for ip in sorted(track.keys()):
                 self._say("ip=" + str(ip))
                 for kind in ['atomic', 'option', 'alpha', 'number', 'wild']:
-                    for i in sorted(track[ip][kind], reverse=True):
-                        running.extend(track[ip][kind][i])
+                    for wordcnt in sorted(track[ip][kind], reverse=True):
+                        # Triggers with a matching word count should be sorted
+                        # by length, descending.
+                        running.extend(sorted(track[ip][kind][wordcnt], key=len, reverse=True))
                 running.extend(sorted(track[ip]['under'], key=len, reverse=True))
                 running.extend(sorted(track[ip]['pound'], key=len, reverse=True))
                 running.extend(sorted(track[ip]['star'], key=len, reverse=True))
@@ -1172,7 +1254,7 @@ Returns a syntax error string on error; None otherwise."""
             return len(word2) - len(word1)
 
         # Initialize the list sort buffer.
-        if not "lists" in self._sorted:
+        if "lists" not in self._sorted:
             self._sorted["lists"] = {}
         self._sorted["lists"][name] = []
 
@@ -1183,7 +1265,7 @@ Returns a syntax error string on error; None otherwise."""
         for item in items:
             # Count the words.
             cword = self._word_count(item, all=True)
-            if not cword in track:
+            if cword not in track:
                 track[cword] = []
             track[cword].append(item)
 
@@ -1198,14 +1280,14 @@ Returns a syntax error string on error; None otherwise."""
     def _init_sort_track(self):
         """Returns a new dict for keeping track of triggers for sorting."""
         return {
-            'atomic': {}, # Sort by number of whole words
-            'option': {}, # Sort optionals by number of words
-            'alpha':  {}, # Sort alpha wildcards by no. of words
-            'number': {}, # Sort number wildcards by no. of words
-            'wild':   {}, # Sort wildcards by no. of words
-            'pound':  [], # Triggers of just #
-            'under':  [], # Triggers of just _
-            'star':   []  # Triggers of just *
+            'atomic': {},  # Sort by number of whole words
+            'option': {},  # Sort optionals by number of words
+            'alpha':  {},  # Sort alpha wildcards by no. of words
+            'number': {},  # Sort number wildcards by no. of words
+            'wild':   {},  # Sort wildcards by no. of words
+            'pound':  [],  # Triggers of just #
+            'under':  [],  # Triggers of just _
+            'star':   []   # Triggers of just *
         }
 
 
@@ -1304,7 +1386,7 @@ Equivalent to `! person` in RiveScript code. Set to None to delete."""
     def set_uservar(self, user, name, value):
         """Set a variable for a user."""
 
-        if not user in self._users:
+        if user not in self._users:
             self._users[user] = {"topic": "random"}
 
         self._users[user][name] = value
@@ -1459,7 +1541,7 @@ the value is unset at the end of the `reply()` method)."""
     # Reply Fetching Methods                                                   #
     ############################################################################
 
-    def reply(self, user, msg):
+    def reply(self, user, msg, errors_as_replies=True):
         """Fetch a reply from the RiveScript brain."""
         self._say("Get reply to [" + user + "] " + msg)
 
@@ -1473,20 +1555,30 @@ the value is unset at the end of the `reply()` method)."""
 
         # If the BEGIN block exists, consult it first.
         if "__begin__" in self._topics:
-            begin = self._getreply(user, 'request', context='begin')
+            begin = self._getreply(user, 'request', context='begin', ignore_object_errors=errors_as_replies)
 
             # Okay to continue?
             if '{ok}' in begin:
-                reply = self._getreply(user, msg)
-                begin = re.sub('{ok}', reply, begin)
+                try:
+                    reply = self._getreply(user, msg, ignore_object_errors=errors_as_replies)
+                except RiveScriptError as e:
+                    if not errors_as_replies:
+                        raise
+                    reply = e.error_message
+                begin = begin.replace('{ok}', reply)
 
             reply = begin
 
             # Run more tag substitutions.
-            reply = self._process_tags(user, msg, reply)
+            reply = self._process_tags(user, msg, reply, ignore_object_errors=errors_as_replies)
         else:
             # Just continue then.
-            reply = self._getreply(user, msg)
+            try:
+                reply = self._getreply(user, msg, ignore_object_errors=errors_as_replies)
+            except RiveScriptError as e:
+                if not errors_as_replies:
+                    raise
+                reply = e.error_message
 
         # Save their reply history.
         oldInput = self._users[user]['__history__']['input'][:8]
@@ -1517,24 +1609,29 @@ the value is unset at the end of the `reply()` method)."""
         # In UTF-8 mode, only strip metacharacters and HTML brackets
         # (to protect from obvious XSS attacks).
         if self._utf8:
-            msg = re.sub(r'[\\<>]', '', msg)
+            msg = re.sub(RE.utf8_meta, '', msg)
 
             # For the bot's reply, also strip common punctuation.
             if botreply:
-                msg = re.sub(r'[.?,!;:@#$%^&*()]', '', msg)
+                msg = re.sub(RE.utf8_punct, '', msg)
+
+            # fritz patch
+            # replace accented by non accented characters for latin languages
+            msg = remove_accents(msg) 
+            # fritz patch end
         else:
             # For everything else, strip all non-alphanumerics.
             msg = self._strip_nasties(msg)
 
         return msg
 
-    def _getreply(self, user, msg, context='normal', step=0):
+    def _getreply(self, user, msg, context='normal', step=0, ignore_object_errors=True):
         # Needed to sort replies?
-        if not 'topics' in self._sorted:
-            raise Exception("You forgot to call sort_replies()!")
+        if 'topics' not in self._sorted:
+            raise RepliesNotSortedError("You must call sort_replies() once you are done loading RiveScript documents")
 
         # Initialize the user's profile?
-        if not user in self._users:
+        if user not in self._users:
             self._users[user] = {'topic': 'random'}
 
         # Collect data on the user.
@@ -1544,20 +1641,20 @@ the value is unset at the end of the `reply()` method)."""
         reply     = ''
 
         # Avoid letting them fall into a missing topic.
-        if not topic in self._topics:
+        if topic not in self._topics:
             self._warn("User " + user + " was in an empty topic named '" + topic + "'")
             topic = self._users[user]['topic'] = 'random'
 
         # Avoid deep recursion.
         if step > self._depth:
-            return "ERR: Deep Recursion Detected"
+            raise DeepRecursionError
 
         # Are we in the BEGIN statement?
         if context == 'begin':
             topic = '__begin__'
 
         # Initialize this user's history.
-        if not '__history__' in self._users[user]:
+        if '__history__' not in self._users[user]:
             self._users[user]['__history__'] = {
                 'input': [
                     'undefined', 'undefined', 'undefined', 'undefined',
@@ -1572,10 +1669,10 @@ the value is unset at the end of the `reply()` method)."""
             }
 
         # More topic sanity checking.
-        if not topic in self._topics:
+        if topic not in self._topics:
             # This was handled before, which would mean topic=random and
             # it doesn't exist. Serious issue!
-            return "[ERR: No default topic 'random' was found!]"
+            raise NoDefaultRandomTopicError("no default topic 'random' was found")
 
         # Create a pointer for the matched data when we find it.
         matched        = None
@@ -1610,19 +1707,19 @@ the value is unset at the end of the `reply()` method)."""
                     # See if it's a match.
                     for trig in self._sorted["thats"][top]:
                         botside = self._reply_regexp(user, trig)
-                        self._say("Try to match lastReply (" + lastReply + ") to " + botside)
+                        self._say("Try to match lastReply (" + lastReply + ") to " + trig)
 
                         # Match??
-                        match = re.match(r'^' + botside + r'$', lastReply)
+                        match = re.match(botside, lastReply)
                         if match:
                             # Huzzah! See if OUR message is right too.
                             self._say("Bot side matched!")
                             thatstars = match.groups()
                             for subtrig in self._sorted["that_trig"][top][trig]:
                                 humanside = self._reply_regexp(user, subtrig)
-                                self._say("Now try to match " + msg + " to " + humanside)
+                                self._say("Now try to match " + msg + " to " + subtrig)
 
-                                match = re.match(r'^' + humanside + '$', msg)
+                                match = re.match(humanside, msg)
                                 if match:
                                     self._say("Found a match!")
                                     matched = self._thats[top][trig][subtrig]
@@ -1654,11 +1751,11 @@ the value is unset at the end of the `reply()` method)."""
                 if isAtomic:
                     # Only look for exact matches, no sense running atomic triggers
                     # through the regexp engine.
-                    if msg == regexp:
+                    if msg == trig:
                         isMatch = True
                 else:
                     # Non-atomic triggers always need the regexp.
-                    match = re.match(r'^' + regexp + r'$', msg)
+                    match = re.match(regexp, msg)
                     if match:
                         # The regexp matched!
                         isMatch = True
@@ -1671,9 +1768,9 @@ the value is unset at the end of the `reply()` method)."""
 
                     # We found a match, but what if the trigger we've matched
                     # doesn't belong to our topic? Find it!
-                    if not trig in self._topics[topic]:
+                    if trig not in self._topics[topic]:
                         # We have to find it.
-                        matched = self._find_trigger_by_inheritence(topic, trig)
+                        matched = self._find_trigger_by_inheritance(topic, trig)
                     else:
                         # We do have it!
                         matched = self._topics[topic][trig]
@@ -1691,16 +1788,17 @@ the value is unset at the end of the `reply()` method)."""
                 # See if there are any hard redirects.
                 if matched["redirect"]:
                     self._say("Redirecting us to " + matched["redirect"])
-                    redirect = self._process_tags(user, msg, matched["redirect"], stars, thatstars, step)
+                    redirect = self._process_tags(user, msg, matched["redirect"], stars, thatstars, step,
+                                                  ignore_object_errors)
                     self._say("Pretend user said: " + redirect)
-                    reply = self._getreply(user, redirect, step=(step + 1))
+                    reply = self._getreply(user, redirect, step=(step + 1), ignore_object_errors=ignore_object_errors)
                     break
 
                 # Check the conditionals.
                 for con in sorted(matched["condition"]):
-                    halves = re.split(r'\s*=>\s*', matched["condition"][con])
+                    halves = re.split(RE.cond_split, matched["condition"][con])
                     if halves and len(halves) == 2:
-                        condition = re.match(r'^(.+?)\s+(==|eq|!=|ne|<>|<|<=|>|>=)\s+(.+?)$', halves[0])
+                        condition = re.match(RE.cond_parse, halves[0])
                         if condition:
                             left     = condition.group(1)
                             eq       = condition.group(2)
@@ -1709,8 +1807,8 @@ the value is unset at the end of the `reply()` method)."""
                             self._say("Left: " + left + "; eq: " + eq + "; right: " + right + " => " + potreply)
 
                             # Process tags all around.
-                            left  = self._process_tags(user, msg, left, stars, thatstars, step)
-                            right = self._process_tags(user, msg, right, stars, thatstars, step)
+                            left  = self._process_tags(user, msg, left, stars, thatstars, step, ignore_object_errors)
+                            right = self._process_tags(user, msg, right, stars, thatstars, step, ignore_object_errors)
 
                             # Defaults?
                             if len(left) == 0:
@@ -1760,11 +1858,13 @@ the value is unset at the end of the `reply()` method)."""
                 bucket = []
                 for rep in sorted(matched["reply"]):
                     text = matched["reply"][rep]
-                    ### Patch for Domogik : change default weight
-                    #weight = 1
+                    ### fritz - patch
+                    # old #
+                    # weight = 1
+                    # new #
                     weight = DEFAULT_WEIGHT
-                    ### End of patch
-                    match  = re.match(re_weight, text)
+                    ### fritz - patch end
+                    match  = re.match(RE.weight, text)
                     if match:
                         weight = int(match.group(1))
                         if weight <= 0:
@@ -1779,9 +1879,9 @@ the value is unset at the end of the `reply()` method)."""
 
         # Still no reply?
         if not foundMatch:
-            reply = RS_ERR_MATCH
+            raise NoMatchError
         elif len(reply) == 0:
-            reply = RS_ERR_FOUND
+            raise NoReplyError
 
         self._say("Reply: " + reply)
 
@@ -1789,35 +1889,35 @@ the value is unset at the end of the `reply()` method)."""
         if context == "begin":
             # BEGIN blocks can only set topics and uservars. The rest happen
             # later!
-            reTopic = re.findall(r'\{topic=(.+?)\}', reply)
+            reTopic = re.findall(RE.topic_tag, reply)
             for match in reTopic:
                 self._say("Setting user's topic to " + match)
                 self._users[user]["topic"] = match
-                reply = re.sub(r'\{topic=' + re.escape(match) + r'\}', '', reply)
+                reply = reply.replace('{{topic={match}}}'.format(match=match), '')
 
-            reSet = re.findall('<set (.+?)=(.+?)>', reply)
+            reSet = re.findall(RE.set_tag, reply)
             for match in reSet:
                 self._say("Set uservar " + str(match[0]) + "=" + str(match[1]))
                 self._users[user][match[0]] = match[1]
-                reply = re.sub('<set ' + re.escape(match[0]) + '=' + re.escape(match[1]) + '>', '', reply)
+                reply = reply.replace('<set {key}={value}>'.format(key=match[0], value=match[1]), '')
         else:
             # Process more tags if not in BEGIN.
-            reply = self._process_tags(user, msg, reply, stars, thatstars, step)
+            reply = self._process_tags(user, msg, reply, stars, thatstars, step, ignore_object_errors)
 
         return reply
 
-    def _substitute(self, msg, list):
+    def _substitute(self, msg, kind):
         """Run a kind of substitution on a message."""
 
         # Safety checking.
-        if not 'lists' in self._sorted:
-            raise Exception("You forgot to call sort_replies()!")
-        if not list in self._sorted["lists"]:
-            raise Exception("You forgot to call sort_replies()!")
+        if 'lists' not in self._sorted:
+            raise RepliesNotSortedError("You must call sort_replies() once you are done loading RiveScript documents")
+        if kind not in self._sorted["lists"]:
+            raise RepliesNotSortedError("You must call sort_replies() once you are done loading RiveScript documents")
 
         # Get the substitution map.
         subs = None
-        if list == 'subs':
+        if kind == 'subs':
             subs = self._subs
         else:
             subs = self._person
@@ -1826,7 +1926,7 @@ the value is unset at the end of the `reply()` method)."""
         ph = []
         i  = 0
 
-        for pattern in self._sorted["lists"][list]:
+        for pattern in self._sorted["lists"][kind]:
             result = subs[pattern]
 
             # Make a placeholder.
@@ -1834,44 +1934,63 @@ the value is unset at the end of the `reply()` method)."""
             placeholder = "\x00%d\x00" % i
             i += 1
 
-            qm = re.escape(pattern)
-            msg = re.sub(r'^' + qm + "$", placeholder, msg)
-            msg = re.sub(r'^' + qm + r'(\W+)', placeholder + r'\1', msg)
-            msg = re.sub(r'(\W+)' + qm + r'(\W+)', r'\1' + placeholder + r'\2', msg)
-            msg = re.sub(r'(\W+)' + qm + r'$', r'\1' + placeholder, msg)
+            cache = self._regexc[kind][pattern]
+            msg = re.sub(cache["sub1"], placeholder, msg)
+            msg = re.sub(cache["sub2"], placeholder + r'\1', msg)
+            msg = re.sub(cache["sub3"], r'\1' + placeholder + r'\2', msg)
+            msg = re.sub(cache["sub4"], r'\1' + placeholder, msg)
 
-        placeholders = re.findall(r'\x00(\d+)\x00', msg)
+        placeholders = re.findall(RE.placeholder, msg)
         for match in placeholders:
             i = int(match)
             result = ph[i]
-            msg = re.sub(r'\x00' + match + r'\x00', result, msg)
+            msg = msg.replace('\x00' + match + '\x00', result)
 
         # Strip & return.
         return msg.strip()
 
+    def _precompile_substitution(self, kind, pattern):
+        """Pre-compile the regexp for a substitution pattern.
+
+        This will speed up the substitutions that happen at the beginning of
+        the reply fetching process. With the default brain, this took the
+        time for _substitute down from 0.08s to 0.02s"""
+        if pattern not in self._regexc[kind]:
+            qm = re.escape(pattern)
+            self._regexc[kind][pattern] = {
+                "qm": qm,
+                "sub1": re.compile(r'^' + qm + r'$'),
+                "sub2": re.compile(r'^' + qm + r'(\W+)'),
+                "sub3": re.compile(r'(\W+)' + qm + r'(\W+)'),
+                "sub4": re.compile(r'(\W+)' + qm + r'$'),
+            }
+
     def _reply_regexp(self, user, regexp):
         """Prepares a trigger for the regular expression engine."""
 
+        if regexp in self._regexc["trigger"]:
+            # Already compiled this one!
+            return self._regexc["trigger"][regexp]
+
         # If the trigger is simply '*' then the * there needs to become (.*?)
         # to match the blank string too.
-        regexp = re.sub(r'^\*$', r'<zerowidthstar>', regexp)
+        regexp = re.sub(RE.zero_star, r'<zerowidthstar>', regexp)
 
         # Simple replacements.
-        regexp = re.sub(r'\*', r'(.+?)', regexp)  # Convert * into (.+?)
-        regexp = re.sub(r'#', r'(\d+?)', regexp)  # Convert # into (\d+?)
-        regexp = re.sub(r'_', r'(\w+?)', regexp)  # Convert _ into (\w+?)
-        regexp = re.sub(r'\{weight=\d+\}', '', regexp) # Remove {weight} tags
-        regexp = re.sub(r'<zerowidthstar>', r'(.*?)', regexp)
+        regexp = regexp.replace('*', '(.+?)')   # Convert * into (.+?)
+        regexp = regexp.replace('#', '(\d+?)')  # Convert # into (\d+?)
+        regexp = regexp.replace('_', '(\w+?)')  # Convert _ into (\w+?)
+        regexp = re.sub(r'\{weight=\d+\}', '', regexp)  # Remove {weight} tags
+        regexp = regexp.replace('<zerowidthstar>', r'(.*?)')
 
         # Optionals.
-        optionals = re.findall(r'\[(.+?)\]', regexp)
+        optionals = re.findall(RE.optionals, regexp)
         for match in optionals:
             parts = match.split("|")
             new = []
             for p in parts:
-                p = r'\s*' + p + r'\s*'
+                p = r'(?:\\s|\\b)+{}(?:\\s|\\b)+'.format(p)
                 new.append(p)
-            new.append(r'\s*')
 
             # If this optional had a star or anything in it, make it
             # non-matching.
@@ -1880,13 +1999,14 @@ the value is unset at the end of the `reply()` method)."""
             pipes = re.sub(re.escape('(\d+?)'), '(?:\d+?)', pipes)
             pipes = re.sub(re.escape('([A-Za-z]+?)'), '(?:[A-Za-z]+?)', pipes)
 
-            regexp = re.sub(r'\s*\[' + re.escape(match) + '\]\s*', '(?:' + pipes + ')', regexp)
+            regexp = re.sub(r'\s*\[' + re.escape(match) + '\]\s*',
+                '(?:' + pipes + r'|(?:\\s|\\b))', regexp)
 
         # _ wildcards can't match numbers!
-        regexp = re.sub(r'\\w', r'[A-Za-z]', regexp)
+        regexp = re.sub(RE.literal_w, r'[A-Za-z]', regexp)
 
         # Filter in arrays.
-        arrays = re.findall(r'\@(.+?)\b', regexp)
+        arrays = re.findall(RE.array, regexp)
         for array in arrays:
             rep = ''
             if array in self._arrays:
@@ -1894,20 +2014,20 @@ the value is unset at the end of the `reply()` method)."""
             regexp = re.sub(r'\@' + re.escape(array) + r'\b', rep, regexp)
 
         # Filter in bot variables.
-        bvars = re.findall(r'<bot (.+?)>', regexp)
+        bvars = re.findall(RE.bot_tag, regexp)
         for var in bvars:
             rep = ''
             if var in self._bvars:
                 rep = self._strip_nasties(self._bvars[var])
-            regexp = re.sub(r'<bot ' + re.escape(var) + r'>', rep, regexp)
+            regexp = regexp.replace('<bot {var}>'.format(var=var), rep)
 
         # Filter in user variables.
-        uvars = re.findall(r'<get (.+?)>', regexp)
+        uvars = re.findall(RE.get_tag, regexp)
         for var in uvars:
             rep = ''
             if var in self._users[user]:
                 rep = self._strip_nasties(self._users[user][var])
-            regexp = re.sub(r'<get ' + re.escape(var) + r'>', rep, regexp)
+            regexp = regexp.replace('<get {var}>'.format(var=var), rep)
 
         # Filter in <input> and <reply> tags. This is a slow process, so only
         # do it if we have to!
@@ -1916,17 +2036,30 @@ the value is unset at the end of the `reply()` method)."""
                 tags = re.findall(r'<' + type + r'([0-9])>', regexp)
                 for index in tags:
                     rep = self._format_message(self._users[user]['__history__'][type][int(index) - 1])
-                    regexp = re.sub(r'<' + type + str(index) + r'>', rep, regexp)
-                regexp = re.sub(
-                    '<' + type + '>',
-                    self._format_message(self._users[user]['__history__'][type][0]),
-                    regexp
-                )
+                    regexp = regexp.replace('<{type}{index}>'.format(type=type, index=index), rep)
+                regexp = regexp.replace('<{type}>'.format(type=type),
+                                        self._format_message(self._users[user]['__history__'][type][0]))
                 # TODO: the Perl version doesn't do just <input>/<reply> in trigs!
 
-        return regexp
+        return re.compile(r'^' + regexp + r'$')
 
-    def _process_tags(self, user, msg, reply, st=[], bst=[], depth=0):
+    def _precompile_regexp(self, trigger):
+        """Precompile the regex for most triggers.
+
+        If the trigger is non-atomic, and doesn't include dynamic tags like
+        `<bot>`, `<get>`, `<input>/<reply>` or arrays, it can be precompiled
+        and save time when matching."""
+        if self._is_atomic(trigger):
+            return  # Don't need a regexp for atomic triggers.
+
+        # Check for dynamic tags.
+        for tag in ["@", "<bot", "<get", "<input", "<reply"]:
+            if tag in trigger:
+                return  # Can't precompile this trigger.
+
+        self._regexc["trigger"][trigger] = self._reply_regexp(None, trigger)
+
+    def _process_tags(self, user, msg, reply, st=[], bst=[], depth=0, ignore_object_errors=True):
         """Post process tags in a message."""
         stars = ['']
         stars.extend(st)
@@ -1938,53 +2071,55 @@ the value is unset at the end of the `reply()` method)."""
             botstars.append("undefined")
 
         # Tag shortcuts.
-        reply = re.sub('<person>', '{person}<star>{/person}', reply)
-        reply = re.sub('<@>', '{@<star>}', reply)
-        reply = re.sub('<formal>', '{formal}<star>{/formal}', reply)
-        reply = re.sub('<sentence>', '{sentence}<star>{/sentence}', reply)
-        reply = re.sub('<uppercase>', '{uppercase}<star>{/uppercase}', reply)
-        reply = re.sub('<lowercase>', '{lowercase}<star>{/lowercase}', reply)
+        reply = reply.replace('<person>', '{person}<star>{/person}')
+        reply = reply.replace('<@>', '{@<star>}')
+        reply = reply.replace('<formal>', '{formal}<star>{/formal}')
+        reply = reply.replace('<sentence>', '{sentence}<star>{/sentence}')
+        reply = reply.replace('<uppercase>', '{uppercase}<star>{/uppercase}')
+        reply = reply.replace('<lowercase>', '{lowercase}<star>{/lowercase}')
 
         # Weight and <star> tags.
-        reply = re.sub(r'\{weight=\d+\}', '', reply)  # Leftover {weight}s
+        reply = re.sub(RE.weight, '', reply)  # Leftover {weight}s
         if len(stars) > 0:
-            reply = re.sub('<star>', stars[1], reply)
-            reStars = re.findall(r'<star(\d+)>', reply)
+            reply = reply.replace('<star>', stars[1])
+            reStars = re.findall(RE.star_tags, reply)
             for match in reStars:
                 if int(match) < len(stars):
-                    reply = re.sub(r'<star' + match + '>', stars[int(match)], reply)
+                    reply = reply.replace('<star{match}>'.format(match=match), stars[int(match)])
         if len(botstars) > 0:
-            reply = re.sub('<botstar>', botstars[1], reply)
-            reStars = re.findall(r'<botstar(\d+)>', reply)
+            reply = reply.replace('<botstar>', botstars[1])
+            reStars = re.findall(RE.botstars, reply)
             for match in reStars:
                 if int(match) < len(botstars):
-                    reply = re.sub(r'<botstar' + match + '>', botstars[int(match)], reply)
+                    reply = reply.replace('<botstar{match}>'.format(match=match), botstars[int(match)])
 
         # <input> and <reply>
-        reply = re.sub('<input>', self._users[user]['__history__']['input'][0], reply)
-        reply = re.sub('<reply>', self._users[user]['__history__']['reply'][0], reply)
-        reInput = re.findall(r'<input([1-9])>', reply)
+        reply = reply.replace('<input>', self._users[user]['__history__']['input'][0])
+        reply = reply.replace('<reply>', self._users[user]['__history__']['reply'][0])
+        reInput = re.findall(RE.input_tags, reply)
         for match in reInput:
-            reply = re.sub(r'<input' + match + r'>', self._users[user]['__history__']['input'][int(match) - 1], reply)
-        reReply = re.findall(r'<reply([1-9])>', reply)
+            reply = reply.replace('<input{match}>'.format(match=match),
+                                  self._users[user]['__history__']['input'][int(match) - 1])
+        reReply = re.findall(RE.reply_tags, reply)
         for match in reReply:
-            reply = re.sub(r'<reply' + match + r'>', self._users[user]['__history__']['reply'][int(match) - 1], reply)
+            reply = reply.replace('<reply{match}>'.format(match=match),
+                                  self._users[user]['__history__']['reply'][int(match) - 1])
 
         # <id> and escape codes.
-        reply = re.sub(r'<id>', user, reply)
-        reply = re.sub(r'\\s', ' ', reply)
-        reply = re.sub(r'\\n', "\n", reply)
-        reply = re.sub(r'\\#', r'#', reply)
+        reply = reply.replace('<id>', user)
+        reply = reply.replace('\\s', ' ')
+        reply = reply.replace('\\n', "\n")
+        reply = reply.replace('\\#', '#')
 
         # Random bits.
-        reRandom = re.findall(r'\{random\}(.+?)\{/random\}', reply)
+        reRandom = re.findall(RE.random_tags, reply)
         for match in reRandom:
             output = ''
             if '|' in match:
                 output = random.choice(match.split('|'))
             else:
                 output = random.choice(match.split(' '))
-            reply = re.sub(r'\{random\}' + re.escape(match) + r'\{/random\}', output, reply)
+            reply = reply.replace('{{random}}{match}{{/random}}'.format(match=match), output)
 
         # Person Substitutions and String Formatting.
         for item in ['person', 'formal', 'sentence', 'uppercase',  'lowercase']:
@@ -1996,112 +2131,111 @@ the value is unset at the end of the `reply()` method)."""
                     output = self._substitute(match, "person")
                 else:
                     output = self._string_format(match, item)
-                reply = re.sub(r'\{' + item + r'\}' + re.escape(match) + '\{/' + item + r'\}', output, reply)
+                reply = reply.replace('{{{item}}}{match}{{/{item}}}'.format(item=item, match=match), output)
 
-        # Bot variables: set (TODO: Perl RS doesn't support this)
-        reBotSet = re.findall(r'<bot (.+?)=(.+?)>', reply)
-        for match in reBotSet:
-            self._say("Set bot variable " + str(match[0]) + "=" + str(match[1]))
-            self._bvars[match[0]] = match[1]
-            reply = re.sub(r'<bot ' + re.escape(match[0]) + '=' + re.escape(match[1]) + '>', '', reply)
+        # Handle all variable-related tags with an iterative regex approach,
+        # to allow for nesting of tags in arbitrary ways (think <set a=<get b>>)
+        # Dummy out the <call> tags first, because we don't handle them right
+        # here.
+        reply = reply.replace("<call>", "{__call__}")
+        reply = reply.replace("</call>", "{/__call__}")
+        while True:
+            # This regex will match a <tag> which contains no other tag inside
+            # it, i.e. in the case of <set a=<get b>> it will match <get b> but
+            # not the <set> tag, on the first pass. The second pass will get the
+            # <set> tag, and so on.
+            match = re.search(RE.tag_search, reply)
+            if not match: break  # No remaining tags!
 
-        # Bot variables: get
-        reBot = re.findall(r'<bot (.+?)>', reply)
-        for match in reBot:
-            val = 'undefined'
-            if match in self._bvars:
-                val = self._bvars[match]
-            reply = re.sub(r'<bot ' + re.escape(match) + '>', val, reply)
+            match = match.group(1)
+            parts  = match.split(" ", 1)
+            tag    = parts[0].lower()
+            data   = parts[1] if len(parts) > 1 else ""
+            insert = ""  # Result of the tag evaluation
 
-        # Global vars: set (TODO: Perl RS doesn't support this)
-        reEnvSet = re.findall(r'<env (.+?)=(.+?)>', reply)
-        for match in reEnvSet:
-            self._say("Set global variable " + str(match[0]) + "=" + str(match[1]))
-            self._gvars[match[0]] = match[1]
-            reply = re.sub(r'<env ' + re.escape(match[0]) + '=' + re.escape(match[1]) + '>', '', reply)
-
-        # Global vars
-        reEnv = re.findall(r'<env (.+?)>', reply)
-        for match in reEnv:
-            val = 'undefined'
-            if match in self._gvars:
-                val = self._gvars[match]
-            reply = re.sub(r'<env ' + re.escape(match) + '>', val, reply)
-
-        # Streaming code. DEPRECATED!
-        if '{!' in reply:
-            self._warn("Use of the {!...} tag is deprecated and not supported here.")
-
-        # Set user vars.
-        reSet = re.findall('<set (.+?)=(.+?)>', reply)
-        for match in reSet:
-            self._say("Set uservar " + str(match[0]) + "=" + str(match[1]))
-            self._users[user][match[0]] = match[1]
-            reply = re.sub('<set ' + re.escape(match[0]) + '=' + re.escape(match[1]) + '>', '', reply)
-
-        # Math tags.
-        for item in ['add', 'sub', 'mult', 'div']:
-            matcher = re.findall('<' + item + r' (.+?)=(.+?)>', reply)
-            for match in matcher:
-                var    = match[0]
-                value  = match[1]
-                output = ''
+            # Handle the tags.
+            if tag == "bot" or tag == "env":
+                # <bot> and <env> tags are similar.
+                target = self._bvars if tag == "bot" else self._gvars
+                if "=" in data:
+                    # Setting a bot/env variable.
+                    parts = data.split("=")
+                    self._say("Set " + tag + " variable " + text_type(parts[0]) + "=" + text_type(parts[1]))
+                    target[parts[0]] = parts[1]
+                else:
+                    # Getting a bot/env variable.
+                    insert = target.get(data, "undefined")
+            elif tag == "set":
+                # <set> user vars.
+                parts = data.split("=")
+                self._say("Set uservar " + text_type(parts[0]) + "=" + text_type(parts[1]))
+                self._users[user][parts[0]] = parts[1]
+            elif tag in ["add", "sub", "mult", "div"]:
+                # Math operator tags.
+                parts = data.split("=")
+                var   = parts[0]
+                value = parts[1]
 
                 # Sanity check the value.
                 try:
                     value = int(value)
-
-                    # So far so good, initialize this one?
-                    if not var in self._users[user]:
+                    if var not in self._users[user]:
+                        # Initialize it.
                         self._users[user][var] = 0
                 except:
-                    output = "[ERR: Math can't '" + item + "' non-numeric value '" + value + "']"
+                    insert = "[ERR: Math can't '{}' non-numeric value '{}']".format(tag, value)
 
                 # Attempt the operation.
                 try:
                     orig = int(self._users[user][var])
                     new  = 0
-                    if item == 'add':
+                    if tag == "add":
                         new = orig + value
-                    elif item == 'sub':
+                    elif tag == "sub":
                         new = orig - value
-                    elif item == 'mult':
+                    elif tag == "mult":
                         new = orig * value
-                    elif item == 'div':
+                    elif tag == "div":
                         new = orig / value
                     self._users[user][var] = new
                 except:
-                    output = "[ERR: Math couldn't '" + item + "' to value '" + self._users[user][var] + "']"
+                    insert = "[ERR: Math couldn't '{}' to value '{}']".format(tag, self._users[user][var])
+            elif tag == "get":
+                insert = self._users[user].get(data, "undefined")
+            else:
+                # Unrecognized tag.
+                insert = "\x00{}\x01".format(match)
 
-                reply = re.sub('<' + item + ' ' + re.escape(var) + '=' + re.escape(str(value)) + '>', output, reply)
+            reply = reply.replace("<{}>".format(match), insert)
 
-        # Get user vars.
-        reGet = re.findall(r'<get (.+?)>', reply)
-        for match in reGet:
-            output = 'undefined'
-            if match in self._users[user]:
-                output = self._users[user][match]
-            reply = re.sub('<get ' + re.escape(match) + '>', str(output), reply)
+        # Restore unrecognized tags.
+        reply = reply.replace("\x00", "<").replace("\x01", ">")
+
+        # Streaming code. DEPRECATED!
+        if '{!' in reply:
+            self._warn("Use of the {!...} tag is deprecated and not supported here.")
 
         # Topic setter.
-        reTopic = re.findall(r'\{topic=(.+?)\}', reply)
+        reTopic = re.findall(RE.topic_tag, reply)
         for match in reTopic:
             self._say("Setting user's topic to " + match)
             self._users[user]["topic"] = match
-            reply = re.sub(r'\{topic=' + re.escape(match) + r'\}', '', reply)
+            reply = reply.replace('{{topic={match}}}'.format(match=match), '')
 
         # Inline redirecter.
-        reRedir = re.findall(r'\{@(.+?)\}', reply)
+        reRedir = re.findall(RE.redir_tag, reply)
         for match in reRedir:
             self._say("Redirect to " + match)
             at = match.strip()
             subreply = self._getreply(user, at, step=(depth + 1))
-            reply = re.sub(r'\{@' + re.escape(match) + r'\}', subreply, reply)
+            reply = reply.replace('{{@{match}}}'.format(match=match), subreply)
 
         # Object caller.
+        reply = reply.replace("{__call__}", "<call>")
+        reply = reply.replace("{/__call__}", "</call>")
         reCall = re.findall(r'<call>(.+?)</call>', reply)
         for match in reCall:
-            parts  = re.split(re_ws, match)
+            parts  = re.split(RE.ws, match)
             output = ''
             obj    = parts[0]
             args   = []
@@ -2114,19 +2248,23 @@ the value is unset at the end of the `reply()` method)."""
                 lang = self._objlangs[obj]
                 if lang in self._handlers:
                     # We do.
-                    output = self._handlers[lang].call(self, obj, user, args)
+                    try:
+                        output = self._handlers[lang].call(self, obj, user, args)
+                    except python.PythonObjectError as e:
+                        self._warn(str(e))
+                        if not ignore_object_errors:
+                            raise ObjectError(str(e))
+                        output = RS_ERR_OBJECT
                 else:
-                    output = '[ERR: No Object Handler]'
+                    if not ignore_object_errors:
+                        raise ObjectError(RS_ERR_OBJECT_HANDLER)
+                    output = RS_ERR_OBJECT_HANDLER
             else:
-                output = '[ERR: Object Not Found]'
+                if not ignore_object_errors:
+                    raise ObjectError(RS_ERR_OBJECT_MISSING)
+                output = RS_ERR_OBJECT_MISSING
 
-            ### Patch for Domogik
-            #reply = re.sub('<call>' + re.escape(match) + r'</call>', output, reply)
-            try:
-                reply = re.sub('<call>' + re.escape(match) + r'</call>', output, reply)
-            except UnicodeDecodeError:
-                reply = "ERROR : an UnicodeDecodeError has been caught. You should check if your rivescript script use unicode strings like this : foo = u\"unicode string\""
-            ### End of patch
+            reply = reply.replace('<call>{match}</call>'.format(match=match), output)
 
         return reply
 
@@ -2142,19 +2280,19 @@ the value is unset at the end of the `reply()` method)."""
             return string.capwords(msg)
 
     ############################################################################
-    # Topic Inheritence Utility Methods                                        #
+    # Topic inheritance Utility Methods                                        #
     ############################################################################
 
-    def _topic_triggers(self, topic, triglvl, depth=0, inheritence=0, inherited=False):
+    def _topic_triggers(self, topic, triglvl, depth=0, inheritance=0, inherited=False):
         """Recursively scan a topic and return a list of all triggers."""
 
         # Break if we're in too deep.
         if depth > self._depth:
-            self._warn("Deep recursion while scanning topic inheritence")
+            self._warn("Deep recursion while scanning topic inheritance")
 
-        # Important info about the depth vs inheritence params to this function:
+        # Important info about the depth vs inheritance params to this function:
         # depth increments by 1 each time this function recursively calls itself.
-        # inheritence increments by 1 only when this topic inherits another
+        # inheritance increments by 1 only when this topic inherits another
         # topic.
         #
         # This way, '> topic alpha includes beta inherits gamma' will have this
@@ -2168,7 +2306,7 @@ the value is unset at the end of the `reply()` method)."""
         # to the triggers. This only applies when the top topic 'includes'
         # another topic.
         self._say("\tCollecting trigger list for topic " + topic + "(depth="
-            + str(depth) + "; inheritence=" + str(inheritence) + "; "
+            + str(depth) + "; inheritance=" + str(inheritance) + "; "
             + "inherited=" + str(inherited) + ")")
 
         # topic:   the name of the topic
@@ -2189,14 +2327,14 @@ the value is unset at the end of the `reply()` method)."""
             # Check every included topic.
             for includes in self._includes[topic]:
                 self._say("\t\tTopic " + topic + " includes " + includes)
-                triggers.extend(self._topic_triggers(includes, triglvl, (depth + 1), inheritence, True))
+                triggers.extend(self._topic_triggers(includes, triglvl, (depth + 1), inheritance, True))
 
         # Does this topic inherit others?
         if topic in self._lineage:
             # Check every inherited topic.
             for inherits in self._lineage[topic]:
                 self._say("\t\tTopic " + topic + " inherits " + inherits)
-                triggers.extend(self._topic_triggers(inherits, triglvl, (depth + 1), (inheritence + 1), False))
+                triggers.extend(self._topic_triggers(inherits, triglvl, (depth + 1), (inheritance + 1), False))
 
         # Collect the triggers for *this* topic. If this topic inherits any
         # other topics, it means that this topic's triggers have higher
@@ -2204,14 +2342,14 @@ the value is unset at the end of the `reply()` method)."""
         # {inherits} tag.
         if topic in self._lineage or inherited:
             for trigger in inThisTopic:
-                self._say("\t\tPrefixing trigger with {inherits=" + str(inheritence) + "}" + trigger)
-                triggers.append("{inherits=" + str(inheritence) + "}" + trigger)
+                self._say("\t\tPrefixing trigger with {inherits=" + str(inheritance) + "}" + trigger)
+                triggers.append("{inherits=" + str(inheritance) + "}" + trigger)
         else:
             triggers.extend(inThisTopic)
 
         return triggers
 
-    def _find_trigger_by_inheritence(self, topic, trig, depth=0):
+    def _find_trigger_by_inheritance(self, topic, trig, depth=0):
         """Locate the replies for a trigger in an inherited/included topic."""
 
         # This sub was called because the user matched a trigger from the sorted
@@ -2220,10 +2358,10 @@ the value is unset at the end of the `reply()` method)."""
 
         # Prevent recursion.
         if depth > self._depth:
-            self._warn("Deep recursion detected while following an inheritence trail!")
+            self._warn("Deep recursion detected while following an inheritance trail!")
             return None
 
-        # Inheritence is more important than inclusion: triggers in one topic can
+        # inheritance is more important than inclusion: triggers in one topic can
         # override those in an inherited topic.
         if topic in self._lineage:
             for inherits in sorted(self._lineage[topic]):
@@ -2233,7 +2371,7 @@ the value is unset at the end of the `reply()` method)."""
                     return self._topics[inherits][trig]
                 else:
                     # Check what THAT topic inherits from.
-                    match = self._find_trigger_by_inheritence(
+                    match = self._find_trigger_by_inheritance(
                         inherits, trig, (depth + 1)
                     )
                     if match:
@@ -2249,7 +2387,7 @@ the value is unset at the end of the `reply()` method)."""
                     return self._topics[includes][trig]
                 else:
                     # Check what THAT topic inherits from.
-                    match = self._find_trigger_by_inheritence(
+                    match = self._find_trigger_by_inheritance(
                         includes, trig, (depth + 1)
                     )
                     if match:
@@ -2294,7 +2432,7 @@ the value is unset at the end of the `reply()` method)."""
         # Atomic triggers don't contain any wildcards or parenthesis or anything
         # of the sort. We don't need to test the full character set, just left
         # brackets will do.
-        special = ['*', '#', '_', '(', '[', '<']
+        special = ['*', '#', '_', '(', '[', '<', '@']
         for char in special:
             if char in trigger:
                 return False
@@ -2305,9 +2443,9 @@ the value is unset at the end of the `reply()` method)."""
         """Count the words that aren't wildcards in a trigger."""
         words = []
         if all:
-            words = re.split(re_ws, trigger)
+            words = re.split(RE.ws, trigger)
         else:
-            words = re.split(re_wilds, trigger)
+            words = re.split(RE.wilds, trigger)
 
         wc = 0  # Word count
         for word in words:
@@ -2318,7 +2456,7 @@ the value is unset at the end of the `reply()` method)."""
 
     def _strip_nasties(self, s):
         """Formats a string for ASCII regex matching."""
-        s = re.sub(re_nasties, '', s)
+        s = re.sub(RE.nasties, '', s)
         return s
 
     def _dump(self):
@@ -2353,6 +2491,60 @@ the value is unset at the end of the `reply()` method)."""
 
         print("=== Syntax Tree ===")
         pp.pprint(self._syntax)
+
+
+################################################################################
+# Exception Classes                                                            #
+################################################################################
+
+class RiveScriptError(Exception):
+    """RiveScript base exception class"""
+    def __init__(self, error_message=None):
+        super(RiveScriptError, self).__init__(error_message)
+        self.error_message = error_message
+
+
+class NoMatchError(RiveScriptError):
+    """No reply could be matched"""
+    def __init__(self):
+        super(NoMatchError, self).__init__(RS_ERR_MATCH)
+
+
+class NoReplyError(RiveScriptError):
+    """No reply could be found"""
+    def __init__(self):
+        super(NoReplyError, self).__init__(RS_ERR_REPLY)
+
+
+class ObjectError(RiveScriptError):
+    """An error occurred when executing a Python object"""
+    def __init__(self, error_message=RS_ERR_OBJECT):
+        super(ObjectError, self).__init__(error_message)
+
+
+class DeepRecursionError(RiveScriptError):
+    """Prevented an infinite loop / deep recursion, unable to retrieve a reply for this message"""
+    def __init__(self):
+        super(DeepRecursionError, self).__init__(RS_ERR_DEEP_RECURSION)
+
+
+class NoDefaultRandomTopicError(Exception):
+    """No default topic 'random' could be found, critical error"""
+    pass
+
+
+class RepliesNotSortedError(Exception):
+    """sort_replies() was not called after the RiveScript documents were loaded, critical error"""
+    pass
+
+# fritz patch
+# old #
+# (nothing)
+# new #
+def remove_accents(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+# fritz patch end
 
 ################################################################################
 # Interactive Mode                                                             #

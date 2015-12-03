@@ -87,7 +87,9 @@ class ScenarioFrontend(Plugin):
                         'update': self._backend.update_scenario,
                         'delete': self._backend.del_scenario,
                         'get': self._backend.get_parsed_condition,
-                        'evaluate': self._backend.eval_condition
+                        'evaluate': self._backend.eval_condition,
+                        'enable': self._backend.enable_scenario,
+                        'disable': self._backend.disable_scenario
                     },
                     'action':
                     {

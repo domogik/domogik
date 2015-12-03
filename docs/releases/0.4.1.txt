@@ -32,7 +32,7 @@ The brain packages are related to the **butler** component : each brain package 
 New package type : interface
 ----------------------------
 
-An interface package is a wa to communicate with the butler. It can be for example :
+An interface package is a way to communicate with the butler. It can be for example :
 
 * voice control
 * voice responses

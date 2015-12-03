@@ -77,7 +77,7 @@ def check_domogik_is_running():
         else:
             print("component {0} is running".format(chk))
 
-    to_check = ['rest', 'xplgw', 'dbmgr', 'manager', 'admin', 'scenario']
+    to_check = ['xplgw', 'dbmgr', 'manager', 'admin', 'scenario']
     for chk in to_check:
         status = is_already_launched(None, "core", chk, False)
         if not status[0]:

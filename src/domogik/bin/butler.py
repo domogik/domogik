@@ -41,7 +41,7 @@ from threading import Thread
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import Plugin
-from domogik.butler.rivescript import RiveScript
+from domogik.butler.rivescript.rivescript import RiveScript
 from domogik.butler.brain import LEARN_FILE
 from domogik.butler.brain import STAR_FILE
 from domogik.butler.brain import clean_input
@@ -63,6 +63,7 @@ BRAIN_PKG_TYPES = ["brain", "plugin"]
 MINIMAL_BRAIN = "{0}/../butler/brain_minimal.rive".format(os.path.dirname(os.path.abspath(__file__)))
 RIVESCRIPT_DIR = "rs"
 RIVESCRIPT_EXTENSION = ".rive"
+BRAIN_BASE = "brain_base"
 
 FEATURE_TAG = "##feature##"
 SUGGEST_REGEXP = r'\/\* *##suggest##.*\n([\S\s]*?)\*\/'
@@ -152,6 +153,9 @@ class Butler(Plugin, MQAsyncSub):
         # shortcut to allow the core brain package to reload the brain for learning
         self.brain.reload_butler = self.reload
 
+        # shortcut to allow the core brain package to do logging
+        self.brain.log = self.log
+
 
         # history
         self.history = []
@@ -187,8 +191,12 @@ class Butler(Plugin, MQAsyncSub):
             @param msg : MQ req message
         """
         try:
+            ### discuss over Req/Rep (used by rest url)
+            if msg.get_action() == "butler.discuss.do":
+                self.log.info(u"Discuss request : {0}".format(msg))
+                self._mdp_reply_butler_discuss(msg)
             ### rivescript files detail
-            if msg.get_action() == "butler.scripts.get":
+            elif msg.get_action() == "butler.scripts.get":
                 self.log.info(u"Scripts request : {0}".format(msg))
                 self._mdp_reply_butler_scripts(msg)
             ### rivescript files detail
@@ -206,6 +214,42 @@ class Butler(Plugin, MQAsyncSub):
         except:
             self.log.error(u"Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
    
+
+    def _mdp_reply_butler_discuss(self, message):
+        """ Discuss over req/rep
+            this should not be called with a 10 seconds timeout...
+        """
+        # TODO : merge with the on_message function !!!
+
+        content = message.get_data()
+        self.log.info(u"Received message : {0}".format(content))
+
+        self.add_to_history("interface.input", content)
+        reply = self.process(content['text'])
+
+        # fill empty data
+        for elt in ['identity', 'media', 'location', 'sex', 'mood', 'reply_to']:
+            if elt not in content:
+                content[elt] = None
+
+        # publish over MQ
+        data =              {"media" : content['media'],
+                             "location" : content['location'],
+                             "sex" : self.butler_sex,
+                             "mood" : self.butler_mood,
+                             "reply_to" : content['source'],
+                             "identity" : self.butler_name,
+                             "text" : reply}
+        self.log.info(u"Send response over MQ : {0}".format(data))
+
+
+        msg = MQMessage()
+        msg.set_action('butler.discuss.result')
+        msg.set_data(data)
+        self.reply(msg.get())
+
+        self.add_to_history("interface.output", data)
+
 
     def _mdp_reply_butler_scripts(self, message):
         """ Send the raw content for the brain parts over the MQ
@@ -289,7 +333,14 @@ class Butler(Plugin, MQAsyncSub):
         try:
             list = []
             # first load the packages parts
-            for a_file in os.listdir(self.get_packages_directory()):
+            dir_list = os.listdir(self.get_packages_directory())
+
+            # first, make sure the brain_base package is loaded the first!!
+            if BRAIN_BASE in dir_list:
+                dir_list.remove(BRAIN_BASE)
+                dir_list = [BRAIN_BASE] + dir_list
+
+            for a_file in dir_list:
                 try:
                     pkg_type, name = a_file.split("_")
                 except ValueError:
@@ -392,6 +443,7 @@ class Butler(Plugin, MQAsyncSub):
         """ Process the input query by calling rivescript brain
             @param query : the text query
         """
+        reply = ""
         try:
             self.log.debug(u"Before transforming query : {0}".format(query))
             self.brain.raw_query = query
@@ -408,8 +460,6 @@ class Butler(Plugin, MQAsyncSub):
             return reply
         except:
             self.log.error(u"Error while processing query '{0}'. Error is : {1}".format(query, traceback.format_exc()))
-            self.log.error(reply)
-            self.log.error(type(reply))
             return "Error"
 
 
@@ -425,6 +475,9 @@ class Butler(Plugin, MQAsyncSub):
         """ When a message is received from the MQ (pub/sub)
         """
         if msgid == "interface.input":
+            # TODO :
+            # merge with the on_mdp_reply_butler_disscuss() function
+
             self.log.info(u"Received message : {0}".format(content))
 
             ### Get response from the brain

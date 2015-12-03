@@ -24,7 +24,7 @@ Plugin purpose
 
 Domogik manager
 - called with init.d script to start Domogik
-- launch rest, dbmgr and plugins
+- launch dbmgr and plugins
 - manage plugins (start, check for dead plugins) and maintains a list
 - give informations about plugins when requested
 
@@ -123,11 +123,6 @@ class Manager(XplPlugin):
                           dest="start_dbmgr", 
                           default=False, \
                           help="Start database manager if not already running.")
-        parser.add_argument("-r", 
-                          action="store_true", 
-                          dest="start_rest", 
-                          default=False, \
-                          help="Start rest if not already running.")
         parser.add_argument("-x", 
                           action="store_true", 
                           dest="start_xpl", 
@@ -151,7 +146,6 @@ class Manager(XplPlugin):
         self.log.info(u"Manager startup")
         self.log.info(u"Host : {0}".format(self.get_sanitized_hostname()))
         self.log.info(u"Start dbmgr : {0}".format(self.options.start_dbmgr))
-        self.log.info(u"Start rest : {0}".format(self.options.start_rest))
         self.log.info(u"Start xpl gateway : {0}".format(self.options.start_xpl))
         self.log.info(u"Start admin interface : {0}".format(self.options.start_admin))
         self.log.info(u"Start scenario manager : {0}".format(self.options.start_scenario))
@@ -206,11 +200,6 @@ class Manager(XplPlugin):
         if self.options.start_dbmgr:
             if not self._start_core_component("dbmgr"):
                 self.log.error(u"Unable to start dbmgr")
-
-        ### Start rest
-        if self.options.start_rest:
-            if not self._start_core_component("rest"):
-                self.log.error(u"Unable to start rest")
 
         ### Start xpl GW
         if self.options.start_xpl:
@@ -403,7 +392,7 @@ class Manager(XplPlugin):
 
     def _start_core_component(self, name):
         """ Start a core component
-            @param name : component name : dbmgr, rest
+            @param name : component name : dbmgr
         """
         self._inc_startup_lock()
         component = CoreComponent(name, self.get_sanitized_hostname(), self._clients, self.zmq)
@@ -843,7 +832,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
     def __init__(self, name, host, clients, zmq_context):
         """ Init a component
-            @param name : component name (dbmgr, rest)
+            @param name : component name (dbmgr)
             @param host : hostname
             @param clients : clients list 
             @param zmq_context : 0MQ context
@@ -932,8 +921,8 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         # to delete ?
         #pass
 
-        self.log.debug(u"Core : New pub message received {0}".format(msgid))
-        self.log.debug(u"{0}".format(content))
+        #self.log.debug(u"Core : New pub message received {0}".format(msgid))
+        #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
                 self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
@@ -1733,6 +1722,22 @@ class Clients():
         self._clients[client_id]['status'] = new_status
         self._clients_with_details[client_id]['status'] = new_status
         self.log.info(u"Status set : {0} => {1}".format(client_id, new_status))
+        # in case the client is dead, it means that it could have been killed or anything else. 
+        # so the client was not able to send itself the plugin.status message with status 'dead'...
+        # so the manager will do it for the client!
+        if new_status == STATUS_DEAD:
+            self.log.debug("Send plugin.status for client {0} and status = {1}....".format(client_id, STATUS_DEAD))
+            try:
+                package, host = client_id.split(".")
+                type, name = package.split("-")
+                self._pub.send_event('plugin.status', 
+                                     {"type" : type,
+                                      "name" : name,
+                                      "host" : host,
+                                      "event" : STATUS_DEAD})
+            except:
+                # bad data...
+                pass
         self.publish_update()
 
     def set_pid(self, client_id, pid):

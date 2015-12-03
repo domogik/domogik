@@ -39,9 +39,8 @@ class ShellAction(AbstractAction):
 
     def do_action(self):
         self._log.info("Execute the shell script {0}".format(self._params['shell_command']))
-        cmd = subprocess.Popen(self._params['shell_command'].split(), 
-                               shell = True,
-                               stdout = subprocess.PIPE)
+        cmd = subprocess.Popen(self._params['shell_command'].split(),
+                                stdout = subprocess.PIPE)
         stdout = cmd.communicate()[0]
         self._log.debug("Output for shell command {0} : \n{1}".format(self._params['shell_command'], stdout))
 
