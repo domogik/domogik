@@ -151,11 +151,6 @@ class Manager(XplPlugin):
         self.log.info(u"Start scenario manager : {0}".format(self.options.start_scenario))
         self.log.info(u"Start butler : {0}".format(self.options.start_butler))
 
-        ### create a Fifo to communicate with the init script
-        self.log.info(u"Create the fifo to communicate with the init script")
-        self._state_fifo = None
-        self._create_fifo()
-
         ### Read the configuration file
         try:
             cfg = Loader('domogik')
@@ -377,81 +372,16 @@ class Manager(XplPlugin):
             # wait before next check
             self._stop.wait(CHECK_FOR_NEW_PACKAGES_INTERVAL)
 
-
-    def _create_fifo(self):
-        """ Create the fifo
-        """
-        if os.path.exists("{0}/dmg-manager-state".format(FIFO_DIR)):
-            mode = os.stat("0}/dmg-manager-state".format(FIFO_DIR)).st_mode
-            if mode & stat.S_IFIFO == stat.S_IFIFO:
-                self._state_fifo = open("{0}/dmg-manager-state".format(FIFO_DIR),"w")    
-                self._startup_count = 0
-                self._startup_count_lock = Lock()
-                self._write_fifo("NONE","\n")
-
-
     def _start_core_component(self, name):
         """ Start a core component
             @param name : component name : dbmgr
         """
-        self._inc_startup_lock()
         component = CoreComponent(name, self.get_sanitized_hostname(), self._clients, self.zmq)
-        self._write_fifo("INFO", "Start {0}...".format(name))
         pid = component.start()
-        if pid != 0:
-            self._write_fifo("OK", "{0} started with pid {1}\n".format(name, pid))
-            self._dec_startup_lock()
-        else:
-            self._write_fifo("ERROR", "{0} failed to start. Please check logs".format(name))
+        if pid == 0:
             return False
-        return True
-
-
-    def _write_fifo(self, level, message):
-        """ Write the message into _state_fifo fifo, with ansi color
-        @param level : one of OK,INFO,WARN,ERROR,NONE
-        @param message : the message to write
-        """
-        if self._state_fifo == None:
-            return
-        colors = {
-            "OK" : '\033[92m',
-            "INFO" : '\033[94m',
-            "WARN" : '\033[93m',
-            "ERROR" : '\033[91m',
-            "ENDC" : '\033[0m'
-        }
-        if level not in colors.keys() and level != "NONE":
-            level = "INFO"
-        if not self._state_fifo.closed:
-            if level == "NONE":
-                self._state_fifo.write(message)
-            else:
-                self._state_fifo.write("{0}[{1}] {2} {3}".format(colors[level], level, message, colors["ENDC"]))
-            self._state_fifo.flush()
-    
-    def _inc_startup_lock(self):
-        """ Increment self._startup_count
-        """
-        if self._state_fifo == None:
-            return
-        self.log.info(u"lock++ acquire : {0}".format(self._startup_count))
-        self._startup_count_lock.acquire()
-        self._startup_count = self._startup_count + 1
-        self._startup_count_lock.release()
-        self.log.info(u"lock++ released: {0}".format(self._startup_count))
-    
-    def _dec_startup_lock(self):
-        """ Decrement self._startup_count
-        """
-        if self._state_fifo == None:
-            return
-        self.log.info(u"lock-- acquire : {0}".format(self._startup_count))
-        self._startup_count_lock.acquire()
-        self._startup_count = self._startup_count - 1
-        self._startup_count_lock.release()
-        self.log.info(u"lock-- released: {0}".format(self._startup_count))
-
+        else:
+            return True
 
     def _list_packages(self):
         """ List the packages available in the packages directory
