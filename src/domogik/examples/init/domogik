@@ -62,7 +62,7 @@ function start {
     else
         echo "Domogik xPL hub disabled. If Domogik failed to start, make sure you have a running hub"
     fi
-    start_daemon
+    start_manager
 }
 
 function start_xpl {
@@ -97,16 +97,6 @@ function start_xpl {
 }
 
 function start_manager {
-    [ -p ${PIDDIR}/dmg-manager-state ] && rm -f ${PIDDIR}/dmg-manager-state
-    mkfifo ${PIDDIR}/dmg-manager-state
-    chown ${DOMOGIK_USER}: ${PIDDIR}/dmg-manager-state
-    start_daemon
-    #Get the startup status
-    cat < ${PIDDIR}/dmg-manager-state
-    rm -f ${PIDDIR}/dmg-manager-state
-}
-
-function start_daemon {
     echo -n " * Starting Manager (with ${MANAGER_PARAMS}) ... "
     /bin/su - ${DOMOGIK_USER} -c "export PATH=/usr/sbin:${PATH} && ${NAME} ${MANAGER_PARAMS}" > /dev/null
     if [ $? -gt 0 ]; then

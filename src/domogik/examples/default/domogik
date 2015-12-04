@@ -9,7 +9,6 @@ DOMOGIK_USER=domogik
 # -x to start the xpl gw component (launch only on master host)
 # -s to start the scenario manager component (launch only on master host)
 # -b to start the butler component (launch only on master host)
-# -a to start the admin interface (launch only on master host)
 
 # Remember : Your domogik installation must have *one* and *only one*
 # instance of each manager running.
