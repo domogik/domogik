@@ -3,7 +3,7 @@
  * Visual Blocks Editor
  *
  * Copyright 2011 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 goog.provide('Blockly.ContextMenu');
 
 goog.require('goog.dom');
+goog.require('goog.events');
 goog.require('goog.style');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
@@ -42,9 +43,10 @@ Blockly.ContextMenu.currentBlock = null;
  * Construct the menu based on the list of options and show the menu.
  * @param {!Event} e Mouse event.
  * @param {!Array.<!Object>} options Array of menu options.
+ * @param {boolean} rtl True if RTL, false if LTR.
  */
-Blockly.ContextMenu.show = function(e, options) {
-  Blockly.WidgetDiv.show(Blockly.ContextMenu, null);
+Blockly.ContextMenu.show = function(e, options, rtl) {
+  Blockly.WidgetDiv.show(Blockly.ContextMenu, rtl, null);
   if (!options.length) {
     Blockly.ContextMenu.hide();
     return;
@@ -55,8 +57,10 @@ Blockly.ContextMenu.show = function(e, options) {
      callback: Blockly.MakeItSo}
   */
   var menu = new goog.ui.Menu();
+  menu.setRightToLeft(rtl);
   for (var x = 0, option; option = options[x]; x++) {
     var menuItem = new goog.ui.MenuItem(option.text);
+    menuItem.setRightToLeft(rtl);
     menu.addChild(menuItem, true);
     menuItem.setEnabled(option.enabled);
     if (option.enabled) {
@@ -87,7 +91,7 @@ Blockly.ContextMenu.show = function(e, options) {
     y -= menuSize.height;
   }
   // Flip menu horizontally if off the edge.
-  if (Blockly.RTL) {
+  if (rtl) {
     if (menuSize.width >= e.clientX) {
       x += menuSize.width;
     }
@@ -96,7 +100,7 @@ Blockly.ContextMenu.show = function(e, options) {
       x -= menuSize.width;
     }
   }
-  Blockly.WidgetDiv.position(x, y, windowSize, scrollOffset);
+  Blockly.WidgetDiv.position(x, y, windowSize, scrollOffset, rtl);
 
   menu.setAllowAutoFocus(true);
   // 1ms delay is required for focusing on context menus because some other
@@ -125,7 +129,7 @@ Blockly.ContextMenu.callbackFactory = function(block, xml) {
     var newBlock = Blockly.Xml.domToBlock(block.workspace, xml);
     // Move the new block next to the old block.
     var xy = block.getRelativeToSurfaceXY();
-    if (Blockly.RTL) {
+    if (block.RTL) {
       xy.x -= Blockly.SNAP_RADIUS;
     } else {
       xy.x += Blockly.SNAP_RADIUS;

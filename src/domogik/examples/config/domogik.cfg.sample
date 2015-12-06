@@ -22,13 +22,15 @@ pid_dir_path = /var/run/domogik/
 # Debug levels are debug, info, warning, error, critical
 log_level = debug
 
-# This parameter defines which interface the Domogik plugins should listen.
+# This parameter defines which interface the Domogik xPL plugins should listen for xPL
 # If you have only one computer to run the Domogik installation (of course, 
-# the one used to browse the interface is not important), you can leave it 
-# on 127.0.0.1, so that xPL won't polute your network. If you use more than 
-# one computer, you have to set it to your public interface IP. In this case, 
-# don't forget to update /etc/default/domogik : HUB_IFACE
-bind_interface = 127.0.0.1
+# the one used to browse the interface is not important), you can set it 
+# on 'lo', so that xPL won't polute your network. If you use more than 
+# one computer, you have to set it to your public interface, for example 'eth0'
+# Using '*' as value will use :
+# - lo if this is the only interface available
+# - the first interface found which is not 'lo' if you have several interfaces available
+bind_interface = lo
 
 # Don't touch it unless you really know what you are doing
 broadcast = 255.255.255.255
@@ -55,17 +57,20 @@ prefix = core
 #pool_recycle = 3600
 
 ###
-# REST section
+# Admin interface
 ###
-[rest]
-# REST is a plugin that allows all UI to get info in database or to discuss 
-# with xpl network.
-# REST is a HTTP server. Following parameters will indicate REST on which 
+[admin]
+# Admin is the component that handles 2 things:
+# 1- the admin UI
+# 2- the rest inetrface
+# its a HTTP server. Following parameters will indicate REST on which 
 # ip:port it will run
+# * means that it will be available on all network interfaces
 #interfaces = eth0, lo
 #interfaces = eth0
+#interfaces = *
 interfaces = lo
-port = 40405
+port = 40406
 # set to True if you want to use rest with ssl (https://....)
 use_ssl = False
 # if rest_use_ssl = True, set here path for ssl certificate/key
@@ -75,12 +80,17 @@ ssl_key =
 clean_json = False
 
 ###
-# Admin interface
+# Butler configuration
 ###
-[admin]
-interfaces = lo,eth0
-port = 40406
-use_ssl = False
-ssl_certificate =
-ssl_key =
+[butler]
+name = Aria
+lang = fr_FR
+# male/female
+sex = female
 
+
+###
+# Backup configuration
+###
+[backup]
+folder=/var/lib/domogik/backup/

@@ -38,8 +38,11 @@ import traceback
 
 from domogik.scenario.manager import ScenarioManager
 from domogik.xpl.common.plugin import Plugin
-from domogikmq.reqrep.worker import MQRep
+#from domogikmq.reqrep.worker import MQRep
 from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
+import zmq
+import time
 
 class ScenarioFrontend(Plugin):
     """ This class provides an interface to MQ system to allow Scenarii management.
@@ -47,6 +50,20 @@ class ScenarioFrontend(Plugin):
 
     def __init__(self):
         Plugin.__init__(self, name = 'scenario')
+        ### check that needed services are up on MQ side
+        cli = MQSyncReq(zmq.Context())
+        mq_services = None
+        while mq_services == None or 'xplgw' not in mq_services:
+            mq_services_raw = cli.rawrequest('mmi.services', '', timeout=10)
+            if mq_services_raw != None: 
+                mq_services = mq_services_raw[0].replace(" ", "").split(",")
+            self.log.info("Checking for MQ services : {0}".format(mq_services))
+            if mq_services == None or 'xplgw' not in mq_services:
+                self.log.debug("Needed MQ services not yet available : waiting")
+                time.sleep(3)
+        self.log.info("Needed MQ services available : continuing startup")
+
+        ### start the scenario stuff
         self._backend = ScenarioManager(self.log)
         self.add_stop_cb(self.end)
         self.add_stop_cb(self.shutdown)
@@ -67,9 +84,12 @@ class ScenarioFrontend(Plugin):
                     {
                         'list': self._backend.list_conditions,
                         'new': self._backend.create_scenario,
-                        'delete': self._backend.delete_scenario,
+                        'update': self._backend.update_scenario,
+                        'delete': self._backend.del_scenario,
                         'get': self._backend.get_parsed_condition,
-                        'evaluate': self._backend.eval_condition
+                        'evaluate': self._backend.eval_condition,
+                        'enable': self._backend.enable_scenario,
+                        'disable': self._backend.disable_scenario
                     },
                     'action':
                     {
@@ -92,7 +112,7 @@ class ScenarioFrontend(Plugin):
             self.log.error(u"Exception occured during message processing.")
             trace = str(traceback.format_exc())
             self.log.debug(trace)
-            self._mdp_reply(msg.get_action(), "error", {"details": trace})
+            self._mdp_reply(msg.get_action(), {"status": "errpr", "details": trace})
 
     def _mdp_reply(self, action, payload):
         msg = MQMessage()

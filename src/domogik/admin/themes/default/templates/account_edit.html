@@ -4,6 +4,14 @@
 {% block content %}
 <div class="container">
     <h2>{% trans %}Account Edit{% endtrans %}</h2>
+    <!-- disabled for 0.4.1
     {{ wtf.quick_form(form, add_submit=True) }}
+    -->
+    <div class="alert alert-success">
+      {% trans %}In Domogik 0.4.1, there is no way to change the administrator password. {% endtrans %}<br/>
+      {% trans %}Yes, this is a security issue if you open your Domogik admin to the whole internet. {% endtrans %}<br/>
+      {% trans %}And of course, yes, it will be improved in a future release ;). {% endtrans %}<br/>
+      {% trans %}For now, please DON'T OPEN access to your Domogik admin to the entire world!{% endtrans %}<br/>
+    </div>
 </div>
 {% endblock %}

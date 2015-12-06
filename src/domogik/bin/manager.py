@@ -24,7 +24,7 @@ Plugin purpose
 
 Domogik manager
 - called with init.d script to start Domogik
-- launch rest, dbmgr and plugins
+- launch dbmgr and plugins
 - manage plugins (start, check for dead plugins) and maintains a list
 - give informations about plugins when requested
 
@@ -113,16 +113,16 @@ class Manager(XplPlugin):
 
         ### Option parser
         parser = ArgumentParser()
+        parser.add_argument("-a", 
+                          action="store_true", 
+                          dest="start_admin", 
+                          default=False, \
+                          help="Start admin interface if not already running.")
         parser.add_argument("-d", 
                           action="store_true", 
                           dest="start_dbmgr", 
                           default=False, \
                           help="Start database manager if not already running.")
-        parser.add_argument("-r", 
-                          action="store_true", 
-                          dest="start_rest", 
-                          default=False, \
-                          help="Start rest if not already running.")
         parser.add_argument("-x", 
                           action="store_true", 
                           dest="start_xpl", 
@@ -133,7 +133,11 @@ class Manager(XplPlugin):
                           dest="start_scenario",
                           default=False, \
                           help="Start scenario manager if not already running.")
-        # TODO : add -E option for externals ?
+        parser.add_argument("-b",
+                          action="store_true",
+                          dest="start_butler",
+                          default=False, \
+                          help="Start butler if not already running.")
 
         ### Call the XplPlugin init  
         XplPlugin.__init__(self, name = 'manager', parser=parser, log_prefix = "", nohub=True)
@@ -142,14 +146,10 @@ class Manager(XplPlugin):
         self.log.info(u"Manager startup")
         self.log.info(u"Host : {0}".format(self.get_sanitized_hostname()))
         self.log.info(u"Start dbmgr : {0}".format(self.options.start_dbmgr))
-        self.log.info(u"Start rest : {0}".format(self.options.start_rest))
         self.log.info(u"Start xpl gateway : {0}".format(self.options.start_xpl))
+        self.log.info(u"Start admin interface : {0}".format(self.options.start_admin))
         self.log.info(u"Start scenario manager : {0}".format(self.options.start_scenario))
-
-        ### create a Fifo to communicate with the init script
-        self.log.info(u"Create the fifo to communicate with the init script")
-        self._state_fifo = None
-        self._create_fifo()
+        self.log.info(u"Start butler : {0}".format(self.options.start_butler))
 
         ### Read the configuration file
         try:
@@ -185,25 +185,36 @@ class Manager(XplPlugin):
         ### Create the plugins list
         self._plugins = {}
 
+        ### Create the brain parts list
+        self._brains = {}
+
+        ### Create the interfaces list
+        self._interfaces = {}
+
         ### Start the dbmgr
         if self.options.start_dbmgr:
             if not self._start_core_component("dbmgr"):
                 self.log.error(u"Unable to start dbmgr")
-
-        ### Start rest
-        if self.options.start_rest:
-            if not self._start_core_component("rest"):
-                self.log.error(u"Unable to start rest")
 
         ### Start xpl GW
         if self.options.start_xpl:
             if not self._start_core_component("xplgw"):
                 self.log.error(u"Unable to start xpl gateway")
 
+        ### Start admin
+        if self.options.start_admin:
+            if not self._start_core_component("admin"):
+                self.log.error(u"Unable to start admin interface")
+
         ### Start scenario
         if self.options.start_scenario:
             if not self._start_core_component("scenario"):
                 self.log.error(u"Unable to start scenario manager")
+
+        ### Start butler
+        if self.options.start_butler:
+            if not self._start_core_component("butler"):
+                self.log.error(u"Unable to start butler")
 
         ### Check for the available packages
         thr_check_available_packages = Thread(None,
@@ -298,6 +309,40 @@ class Manager(XplPlugin):
                             for device_type in self._packages[pkg_id].get_device_types():
                                 self.log.info(u"Register device type : {0}".format(device_type))
                                 self._device_types[device_type] = self._packages[pkg_id].get_json()
+
+                        ### type = brain
+                        elif type == "brain":
+                            if self._brains.has_key(name):
+                                self.log.debug(u"The brain '{0}' is already registered. Reloading its data".format(name))
+                                self._brains[name].reload_data()
+                            else:
+                                self.log.info(u"New brain available : {0}".format(name))
+                                self._brains[name] = Brain(name, 
+                                                           self.get_sanitized_hostname(), 
+                                                           self._clients, 
+                                                           self.get_libraries_directory(),
+                                                           self.get_packages_directory(),
+                                                           self.zmq,
+                                                           self.get_stop(),
+                                                           self.get_sanitized_hostname())
+
+                        ### type = interface
+                        elif type == "interface":
+                            if self._interfaces.has_key(name):
+                                self.log.debug(u"The interface '{0}' is already registered. Reloading its data".format(name))
+                                self._interfaces[name].reload_data()
+                            else:
+                                self.log.info(u"New interface available : {0}".format(name))
+                                self._interfaces[name] = Interface(name, 
+                                                           self.get_sanitized_hostname(), 
+                                                           self._clients, 
+                                                           self.get_libraries_directory(),
+                                                           self.get_packages_directory(),
+                                                           self.zmq,
+                                                           self.get_stop(),
+                                                           self.get_sanitized_hostname())
+                                # The automatic startup is handled in the Interface class in __init__
+
     
             # finally, check if some packages has been uninstalled/removed
             pkg_to_unregister = []
@@ -327,81 +372,16 @@ class Manager(XplPlugin):
             # wait before next check
             self._stop.wait(CHECK_FOR_NEW_PACKAGES_INTERVAL)
 
-
-    def _create_fifo(self):
-        """ Create the fifo
-        """
-        if os.path.exists("{0}/dmg-manager-state".format(FIFO_DIR)):
-            mode = os.stat("0}/dmg-manager-state".format(FIFO_DIR)).st_mode
-            if mode & stat.S_IFIFO == stat.S_IFIFO:
-                self._state_fifo = open("{0}/dmg-manager-state".format(FIFO_DIR),"w")    
-                self._startup_count = 0
-                self._startup_count_lock = Lock()
-                self._write_fifo("NONE","\n")
-
-
     def _start_core_component(self, name):
         """ Start a core component
-            @param name : component name : dbmgr, rest
+            @param name : component name : dbmgr
         """
-        self._inc_startup_lock()
         component = CoreComponent(name, self.get_sanitized_hostname(), self._clients, self.zmq)
-        self._write_fifo("INFO", "Start {0}...".format(name))
         pid = component.start()
-        if pid != 0:
-            self._write_fifo("OK", "{0} started with pid {1}\n".format(name, pid))
-            self._dec_startup_lock()
-        else:
-            self._write_fifo("ERROR", "{0} failed to start. Please check logs".format(name))
+        if pid == 0:
             return False
-        return True
-
-
-    def _write_fifo(self, level, message):
-        """ Write the message into _state_fifo fifo, with ansi color
-        @param level : one of OK,INFO,WARN,ERROR,NONE
-        @param message : the message to write
-        """
-        if self._state_fifo == None:
-            return
-        colors = {
-            "OK" : '\033[92m',
-            "INFO" : '\033[94m',
-            "WARN" : '\033[93m',
-            "ERROR" : '\033[91m',
-            "ENDC" : '\033[0m'
-        }
-        if level not in colors.keys() and level != "NONE":
-            level = "INFO"
-        if not self._state_fifo.closed:
-            if level == "NONE":
-                self._state_fifo.write(message)
-            else:
-                self._state_fifo.write("{0}[{1}] {2} {3}".format(colors[level], level, message, colors["ENDC"]))
-            self._state_fifo.flush()
-    
-    def _inc_startup_lock(self):
-        """ Increment self._startup_count
-        """
-        if self._state_fifo == None:
-            return
-        self.log.info(u"lock++ acquire : {0}".format(self._startup_count))
-        self._startup_count_lock.acquire()
-        self._startup_count = self._startup_count + 1
-        self._startup_count_lock.release()
-        self.log.info(u"lock++ released: {0}".format(self._startup_count))
-    
-    def _dec_startup_lock(self):
-        """ Decrement self._startup_count
-        """
-        if self._state_fifo == None:
-            return
-        self.log.info(u"lock-- acquire : {0}".format(self._startup_count))
-        self._startup_count_lock.acquire()
-        self._startup_count = self._startup_count - 1
-        self._startup_count_lock.release()
-        self.log.info(u"lock-- released: {0}".format(self._startup_count))
-
+        else:
+            return True
 
     def _list_packages(self):
         """ List the packages available in the packages directory
@@ -565,24 +545,32 @@ class Manager(XplPlugin):
             reason = "Plugin startup request : missing 'name' field"
             self.log.error(reason)
         else:
+            type = data.get_data()['type']
+            msg.add_data('type', type)
             name = data.get_data()['name']
             msg.add_data('name', name)
             host = data.get_data()['host']
             msg.add_data('host', host)
 
-            # try to start the plugin
+            # try to start the client
             try:
-                pid = self._plugins[name].start()
+                if type == "plugin":
+                    pid = self._plugins[name].start()
+                elif type == "interface":
+                    pid = self._interfaces[name].start()
+                else:
+                    pid = 0
+                    
                 if pid != 0:
                     status = True
                     reason = ""
                 else:
                     status = False
-                    reason = "Plugin '{0}' startup failed".format(name)
+                    reason = "{0} '{1}' startup failed".format(type, name)
             except KeyError:
                 # plugin doesn't exist 
                 status = False
-                reason = "Plugin '{0}' does not exist on this host".format(name)
+                reason = "{0} '{1}' does not exist on this host".format(type, name)
                 
         msg.add_data('status', status)
         msg.add_data('reason', reason)
@@ -702,6 +690,11 @@ class GenericComponent():
         log = logger.Logger('manager')
         self.log = log.get_logger('manager')
 
+        #TODEL ?#### config
+        #TODEL ?## used only in the function add_configuration_values_to_data()
+        #TODEL ?## elsewhere, this function is used : self.get_config("xxxx")
+        #TODEL ?#self._config = Query(self.zmq, self.log)
+
 
     def register_component(self):
         """ register the component as a client
@@ -735,6 +728,28 @@ class GenericComponent():
         self._clients.set_pid(self.client_id, pid)
 
 
+    def add_configuration_values_to_data(self):
+        """
+        """
+        # grab all the config elements for the plugin
+        config = self._config.query(self.type, self.name)
+        if config != None:
+            for key in config:
+                # filter on the 'configured' key
+                if key == 'configured':
+                    self.configured = True
+                    self.set_configured(True)
+                else:
+                    # check if the key exists in the plugin configuration
+                    key_found = False
+                    # search the key in the configuration json part
+                    for idx in range(len(self.data['configuration'])):
+                        if self.data['configuration'][idx]['key'] == key:
+                            key_found = True
+                            # key found : insert value in the json
+                            self.data['configuration'][idx]['value'] = config[key]
+                    if key_found == False:
+                        self.log.warning(u"A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.name, self.host))
 
 
 
@@ -747,7 +762,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
     def __init__(self, name, host, clients, zmq_context):
         """ Init a component
-            @param name : component name (dbmgr, rest)
+            @param name : component name (dbmgr)
             @param host : hostname
             @param clients : clients list 
             @param zmq_context : 0MQ context
@@ -758,7 +773,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         ### set the component type
         self.type = "core"
 
-        ### change the cilent id as 'core-....'
+        ### change the client id as 'core-....'
         self.client_id = "{0}-{1}.{2}".format("core", self.name, self.host)
 
         ### component data (empty)
@@ -783,7 +798,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         # notice that this test is not really needed as the plugin also test this in startup...
         # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
         # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
-        res, pid_list = is_already_launched(self.log, self.name)
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
         if res:
             return 0
 
@@ -834,14 +849,14 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
         # TODO : the below if seems useless as this is a core component and not a plugin !
         # to delete ?
-        pass
+        #pass
 
-        #self.log.debug(u"New pub message received {0}".format(msgid))
+        #self.log.debug(u"Core : New pub message received {0}".format(msgid))
         #self.log.debug(u"{0}".format(content))
-        #if msgid == "plugin.status":
-        #    if content["name"] == self.name and content["host"] == self.host:
-        #        self.log.info(u"New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
-        #        self.set_status(content["event"])
+        if msgid == "plugin.status":
+            if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
+                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.set_status(content["event"])
         #        # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
         #        if content["event"] == STATUS_STOP_REQUEST:
         #            self.log.info(u"The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
@@ -854,6 +869,96 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
 
 
+class Brain(GenericComponent, MQAsyncSub):
+    """ This helps to handle brains discovered on the host filesystem
+
+        Notice that this kind of packages is only data!
+        * the brain packages will never "run"
+        * they have no alive/stopped/dead/... status
+    """
+
+    def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
+        """ Init a plugin 
+            @param name : brain name (ipx800, onewire, ...)
+            @param host : hostname
+            @param clients : clients list 
+            @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
+            @param packages_directory : path in which are stored the packages : /var/lib/domogik/packages/
+            @param zmq_context : zmq context
+            @param stop : get_stop()
+            @param local_host : get_sanitized_hostname()
+        """
+        GenericComponent.__init__(self, name = name, host = host, clients = clients)
+        self.log.info(u"New brain : {0}".format(self.name))
+
+        ### change the client id as 'brain-....'
+        self.client_id = "{0}-{1}.{2}".format("brain", self.name, self.host)
+
+        ### check if the plugin is on he local host
+        self.local_plugin = True
+
+        ### set the component type
+        self.type = "brain"
+
+        ### zmq context
+        self.zmq = zmq_context
+
+        ### config
+        # used only in the function add_configuration_values_to_data()
+        # elsewhere, this function is used : self.get_config("xxxx")
+        self._config = Query(self.zmq, self.log)
+
+        ### set package path
+        self._packages_directory = packages_directory
+
+        ### get the plugin data (from the json file)
+        status = None
+        self.data = {}
+        self.fill_data()
+
+        #TO DEL ??#
+        self.configured = False
+
+        ### subscribe the the MQ for category = plugin and name = self.name
+        MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.configuration'])
+
+        ### register the plugin as a client
+        self.register_component()
+
+
+    def on_message(self, msgid, content):
+        """ when a message is received from the MQ 
+        """
+        self.log.debug(u"{0}".format(content))
+        if msgid == "plugin.configuration":
+            # TODO : rename plugin.configuration to client.configuration ?
+            #        as this is currently used by type=plugin, brain
+            self.add_configuration_values_to_data()
+            self._clients.publish_update()
+
+    def reload_data(self):
+        """ Just reload the client data
+        """
+        self.data = {}
+        self.fill_data()
+
+    def fill_data(self):
+        """ Fill the client data by reading the json file
+        """
+        try:
+            self.log.info(u"Brain {0} : read the json file".format(self.name))
+            pkg_json = PackageJson(pkg_type = "brain", name = self.name)
+            #we don't need to validate the json file as it has already be done in the check_avaiable_packages function
+            self.data = pkg_json.get_json()
+            self.add_configuration_values_to_data()
+        except PackageException as e:
+            self.log.error(u"Brain {0} : error while trying to read the json file".format(self.name))
+            self.log.error(u"Brain {0} : invalid json file".format(self.name))
+            self.log.error(u"Brain {0} : {1}".format(self.name, e.value))
+            self.set_status(STATUS_INVALID)
+            pass
+
+
 class Plugin(GenericComponent, MQAsyncSub):
     """ This helps to handle plugins discovered on the host filesystem
         The MQAsyncSub helps to set the status 
@@ -861,11 +966,17 @@ class Plugin(GenericComponent, MQAsyncSub):
         Notice that some actions can't be done if the plugin host is not the server host! :
         * check if a plugin has stopped and kill it if needed
         * start the plugin
+ 
+        Notice also that all brain parts are to be hosted on the master Domogik
+
+        TODO : create a parent class PythonClient
+               the classes Plugin, Interface and any other thant depends on python will inherit from it
+               as there are currently a lot of common code in Plugin and Interface classes
     """
 
     def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
         """ Init a plugin 
-            @param name : plugin name (ipx800, onewire, ...)
+            @param name : plugin name (core, datatype, ...)
             @param host : hostname
             @param clients : clients list 
             @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
@@ -915,7 +1026,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.fill_data()
 
         ### check if the plugin is configured (get key 'configured' in database over queryconfig)
-        configured = self._config.query(self.name, 'configured')
+        configured = self._config.query(self.type, self.name, 'configured')
         if configured == '1':
             configured = True
         if configured == True:
@@ -929,7 +1040,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         udev_rules = {}
         udev_dir = "{0}/{1}/udev_rules/".format(self._packages_directory, self.folder)
         
-        # parse all conversion files
+        # parse all udev files
         try:
             for udev_file in os.listdir(udev_dir): 
                 if udev_file.endswith(".rules"):
@@ -973,7 +1084,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status', 'plugin.configuration'])
 
         ### check if the plugin must be started on manager startup
-        startup = self._config.query(self.name, 'auto_startup')
+        startup = self._config.query(self.type, self.name, 'auto_startup')
         if startup == '1' or startup == 'Y':
             startup = True
         if startup == True:
@@ -993,8 +1104,8 @@ class Plugin(GenericComponent, MQAsyncSub):
         #self.log.debug(u"New pub message received {0}".format(msgid))
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
-            if content["name"] == self.name and content["host"] == self.host:
-                self.log.info(u"New status received from {0} on {1} : {2}".format(self.name, self.host, content["event"]))
+            if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
+                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
                 self.set_status(content["event"])
                 # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
                 if content["event"] == STATUS_STOP_REQUEST:
@@ -1006,6 +1117,8 @@ class Plugin(GenericComponent, MQAsyncSub):
                                                   {})
                     thr_check_if_stopped.start()
         elif msgid == "plugin.configuration":
+            # TODO : rename plugin.configuration to client.configuration ?
+            #        as this is currently used by type=plugin, brain
             self.add_configuration_values_to_data()
             self._clients.publish_update()
 
@@ -1032,28 +1145,29 @@ class Plugin(GenericComponent, MQAsyncSub):
             self.set_status(STATUS_INVALID)
             pass
 
-    def add_configuration_values_to_data(self):
-        """
-        """
-        # grab all the config elements for the plugin
-        config = self._config.query(self.name)
-        if config != None:
-            for key in config:
-                # filter on the 'configured' key
-                if key == 'configured':
-                    self.configured = True
-                    self.set_configured(True)
-                else:
-                    # check if the key exists in the plugin configuration
-                    key_found = False
-                    # search the key in the configuration json part
-                    for idx in range(len(self.data['configuration'])):
-                        if self.data['configuration'][idx]['key'] == key:
-                            key_found = True
-                            # key found : insert value in the json
-                            self.data['configuration'][idx]['value'] = config[key]
-                    if key_found == False:
-                        self.log.warning(u"A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.name, self.host))
+    # MOVED in the parent class because used also for brain, interface types
+    #def add_configuration_values_to_data(self):
+    #    """
+    #    """
+    #    # grab all the config elements for the plugin
+    #    config = self._config.query(self.name)
+    #    if config != None:
+    #        for key in config:
+    #            # filter on the 'configured' key
+    #            if key == 'configured':
+    #                self.configured = True
+    #                self.set_configured(True)
+    #            else:
+    #                # check if the key exists in the plugin configuration
+    #                key_found = False
+    #                # search the key in the configuration json part
+    #                for idx in range(len(self.data['configuration'])):
+    #                    if self.data['configuration'][idx]['key'] == key:
+    #                        key_found = True
+    #                        # key found : insert value in the json
+    #                        self.data['configuration'][idx]['value'] = config[key]
+    #                if key_found == False:
+    #                    self.log.warning(u"A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.name, self.host))
 
     def start(self):
         """ to call to start the plugin
@@ -1064,13 +1178,13 @@ class Plugin(GenericComponent, MQAsyncSub):
         # notice that this test is not really needed as the plugin also test this in startup...
         # but the plugin does it before the MQ is initiated, so the error message won't go overt the MQ.
         # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
-        res, pid_list = is_already_launched(self.log, self.name)
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
         if res:
             return 0
 
         ### Actions for test mode
-        test_mode = self._config.query(self.name, "test_mode")
-        test_option = self._config.query(self.name, "test_option")
+        test_mode = self._config.query(self.type, self.name, "test_mode")
+        test_option = self._config.query(self.type, self.name, "test_option")
         test_args = ""
         if test_mode == True: 
             self.log.info("The plugin {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))
@@ -1114,7 +1228,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         """
         self._stop.wait(WAIT_AFTER_STOP_REQUEST)
         self.log.debug("Check if the plugin {0} has stopped it self. Else there will be a bloodbath".format(self.name))
-        res, pid_list = is_already_launched(self.log, self.name)
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
         if res:
             for the_pid in pid_list:
                 self.log.info(u"Try to kill pid {0}...".format(the_pid))
@@ -1125,6 +1239,242 @@ class Plugin(GenericComponent, MQAsyncSub):
             self.log.info(u"The plugin {0} should be killed now (kill -9)".format(self.name))
         else:
             self.log.info(u"The plugin {0} has stopped itself properly.".format(self.name))
+
+
+class Interface(GenericComponent, MQAsyncSub):
+    """ This helps to handle interfaces discovered on the host filesystem
+        The MQAsyncSub helps to set the status 
+
+        Notice that some actions can't be done if the plugin host is not the server host! :
+        * check if a plugin has stopped and kill it if needed
+        * start the plugin
+ 
+    """
+
+    def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
+        """ Init an interface
+            @param name : interface name 
+            @param host : hostname
+            @param clients : clients list 
+            @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
+            @param packages_directory : path in which are stored the packages : /var/lib/domogik/packages/
+            @param zmq_context : zmq context
+            @param stop : get_stop()
+            @param local_host : get_sanitized_hostname()
+        """
+        GenericComponent.__init__(self, name = name, host = host, clients = clients)
+        self.log.info(u"New interface : {0}".format(self.name))
+
+        ### change the client id as 'interface-....'
+        self.client_id = "{0}-{1}.{2}".format("interface", self.name, self.host)
+
+        ### check if the interface is on he local host
+        if self.host == local_host:
+            self.local_interface = True
+        else:
+            self.local_interface = False
+
+        ### TODO : this will be to handle later : multi host (multihost)
+        # * how to find available interface on other hosts ?
+        # * how to start/stop interface on other hosts ?
+        # * ...
+        if self.local_interface == False:
+            self.log.error(u"Currently, the multi host feature for interfaces is not yet developped. This interface will not be registered")
+            return
+
+        ### set the component type
+        self.type = "interface"
+
+        ### set package path
+        self._packages_directory = packages_directory
+        self._libraries_directory = libraries_directory
+
+        ### zmq context
+        self.zmq = zmq_context
+
+        ### config
+        # used only in the function add_configuration_values_to_data()
+        # elsewhere, this function is used : self.get_config("xxxx")
+        self._config = Query(self.zmq, self.log)
+
+        ### get the interface data (from the json file)
+        status = None
+        self.data = {}
+        self.fill_data()
+
+        ### check if the interface is configured (get key 'configured' in database over queryconfig)
+        configured = self._config.query(self.type, self.name, 'configured')
+        if configured == '1':
+            configured = True
+        if configured == True:
+            self.configured = True
+        else:
+            self.configured = False
+
+        ### get udev rules informations
+        udev_rules = {}
+        udev_dir = "{0}/{1}/udev_rules/".format(self._packages_directory, self.folder)
+        
+        # parse all udev files
+        try:
+            for udev_file in os.listdir(udev_dir): 
+                if udev_file.endswith(".rules"):
+                    self.log.info("Udev rule discovered for '{0}' : {1}".format(self.client_id, udev_file))
+                    # read the content of the file
+                    with open ("{0}/{1}".format(udev_dir, udev_file), "r") as myfile:
+                        data = myfile.read()
+                        udev_rules[os.path.splitext(udev_file)[0]] = data
+        except OSError as err:
+            if err.errno == 2:
+                self.log.info("There is no udev rules file for '{0}'".format(self.client_id))
+            else:
+                self.log.error("Error while looking for udev rules for '{0}' : {1}".format(self.client_id, err))
+
+
+        # add in the data
+        self.data["udev_rules"] = udev_rules
+
+        # there is no conversion files
+
+        ### register the interface as a client
+        self.register_component()
+
+        ### subscribe the the MQ for category = interface and name = self.name
+        MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status', 'plugin.configuration'])
+
+        ### check if the interface must be started on manager startup
+        startup = self._config.query(self.type, self.name, 'auto_startup')
+        if startup == '1' or startup == 'Y':
+            startup = True
+        if startup == True:
+            self.log.info(u"Interface {0} configured to be started on manager startup. Starting...".format(name))
+            pid = self.start()
+            if pid:
+                self.log.info(u"Interface {0} started".format(name))
+            else:
+                self.log.error(u"Interface {0} failed to start".format(name))
+        else:
+            self.log.info(u"Interface {0} not configured to be started on manager startup.".format(name))
+
+
+    def on_message(self, msgid, content):
+        """ when a message is received from the MQ 
+        """
+        #self.log.debug(u"New pub message received {0}".format(msgid))
+        #self.log.debug(u"{0}".format(content))
+        if msgid == "plugin.status":
+            if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
+                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.set_status(content["event"])
+                # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
+                if content["event"] == STATUS_STOP_REQUEST:
+                    self.log.info(u"The interface '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
+                    thr_check_if_stopped = Thread(None,
+                                                  self._check_if_stopped,
+                                                  "check_if_{0}_is_stopped".format(self.name),
+                                                  (),
+                                                  {})
+                    thr_check_if_stopped.start()
+        elif msgid == "plugin.configuration":
+            self.add_configuration_values_to_data()
+            self._clients.publish_update()
+
+
+    def reload_data(self):
+        """ Just reload the client data
+        """
+        self.data = {}
+        self.fill_data()
+
+    def fill_data(self):
+        """ Fill the client data by reading the json file
+        """
+        try:
+            self.log.info(u"Interface {0} : read the json file".format(self.name))
+            pkg_json = PackageJson(pkg_type = "interface", name = self.name)
+            #we don't need to validate the json file as it has already be done in the check_avaiable_packages function
+            self.data = pkg_json.get_json()
+            self.add_configuration_values_to_data()
+        except PackageException as e:
+            self.log.error(u"Interface {0} : error while trying to read the json file".format(self.name))
+            self.log.error(u"Interface {0} : invalid json file".format(self.name))
+            self.log.error(u"Interface {0} : {1}".format(self.name, e.value))
+            self.set_status(STATUS_INVALID)
+            pass
+
+
+    def start(self):
+        """ to call to start the interface
+            @return : None if ko
+                      the pid if ok
+        """
+        ### Check if the interface is not already launched
+        # notice that this test is not really needed as the client also test this in startup...
+        # but the interface does it before the MQ is initiated, so the error message won't go overt the MQ.
+        # By doing it now, the error will go to the UI through the 'error' MQ messages (sended by self.log.error)
+
+        # TODO : add type in is_already_launched params!!!!!
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
+        if res:
+            return 0
+
+        ### Actions for test mode
+        test_mode = self._config.query(self.type, self.name, "test_mode")
+        test_option = self._config.query(self.type, self.name, "test_option")
+        test_args = ""
+        if test_mode == True: 
+            self.log.info("The interface {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))
+            test_args = "-T {0}".format(test_option)
+
+        ### Try to start the interface
+        self.log.info(u"Request to start interface : {0} {1}".format(self.name, test_args))
+        pid = self.exec_component(py_file = "{0}/{1}_{2}/bin/{3}.py {4}".format(self._packages_directory, self.type, self.name, self.name, test_args), \
+                                  env_pythonpath = self._libraries_directory)
+        pid = pid
+
+        # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way
+
+        self.set_pid(pid)
+        return pid
+
+
+    def exec_component(self, py_file, env_pythonpath = None):
+        """ to call to start a component
+            @param py_file : path to the .py file
+            @param env_pythonpath (optionnal): custom PYTHONPATH if needed (for packages it is needed)
+        """
+        ### Generate command
+        # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+        cmd = "{0} && ".format(STARTED_BY_MANAGER)
+        if env_pythonpath:
+            cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
+        cmd += "{0} {1}".format(PYTHON, py_file.strip())
+ 
+        ### Execute command
+        self.log.info(u"Execute command : {0}".format(cmd))
+        subp = Popen(cmd, 
+                     shell=True)
+        pid = subp.pid
+        subp.communicate()
+        return pid
+
+
+    def _check_if_stopped(self):
+        """ Check if the interface is stopped. If not, kill it
+        """
+        self._stop.wait(WAIT_AFTER_STOP_REQUEST)
+        self.log.debug("Check if the interface {0} has stopped it self. Else there will be a bloodbath".format(self.name))
+        res, pid_list = is_already_launched(self.log, self.type, self.name)
+        if res:
+            for the_pid in pid_list:
+                self.log.info(u"Try to kill pid {0}...".format(the_pid))
+                os.kill(int(the_pid), signal.SIGKILL)
+                # TODO : add one more check ?
+                # do a while loop over is_already.... ?
+                # update on 20/03/14 : it seems this is not needed currently
+            self.log.info(u"The interface {0} should be killed now (kill -9)".format(self.name))
+        else:
+            self.log.info(u"The interface {0} has stopped itself properly.".format(self.name))
 
 
 
@@ -1184,10 +1534,7 @@ class Clients():
         while not self._stop.isSet():
             now = time.time()
             for a_client in self._clients:
-                if self._clients[a_client]['type'] == 'core':
-                    continue
-
-                elif self._clients[a_client]['type'] == 'plugin':
+                if self._clients[a_client]['type'] in ['plugin', 'core', 'interface']:
                     # check if the client is dead only when the client is alive (or partially alive)
                     if self._clients[a_client]['status'] in (STATUS_STARTING, STATUS_ALIVE, STATUS_STOP_REQUEST):
                         delta = now - self._clients[a_client]['last_seen']
@@ -1305,6 +1652,22 @@ class Clients():
         self._clients[client_id]['status'] = new_status
         self._clients_with_details[client_id]['status'] = new_status
         self.log.info(u"Status set : {0} => {1}".format(client_id, new_status))
+        # in case the client is dead, it means that it could have been killed or anything else. 
+        # so the client was not able to send itself the plugin.status message with status 'dead'...
+        # so the manager will do it for the client!
+        if new_status == STATUS_DEAD:
+            self.log.debug("Send plugin.status for client {0} and status = {1}....".format(client_id, STATUS_DEAD))
+            try:
+                package, host = client_id.split(".")
+                type, name = package.split("-")
+                self._pub.send_event('plugin.status', 
+                                     {"type" : type,
+                                      "name" : name,
+                                      "host" : host,
+                                      "event" : STATUS_DEAD})
+            except:
+                # bad data...
+                pass
         self.publish_update()
 
     def set_pid(self, client_id, pid):

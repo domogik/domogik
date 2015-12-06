@@ -6,44 +6,60 @@
     <h2>{% trans %}Detected devices{% endtrans %}</h2>
     {% for dev in devices %}
       <div class="panel panel-default">
+        <!--
         <div class="panel-heading">
         <h3>{% trans %}Device type{% endtrans %} : {{ dev.data.device_type }} <small>{% trans %}Reference{% endtrans %} : {{ dev.data.reference }}</small></h3>
         </div>
+        -->
         <div class="panel-body">
   
-          <h4>{% trans %}Main parameters{% endtrans %}</h4>
+          <h3>{% trans %}Device informations{% endtrans %}</h3>
           <ul>
-          {% for a_param in dev.data['global'] %}
-            <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
-          {% endfor %}
+            <li><strong>{% trans %}Device type{% endtrans %} :</strong> {{ dev.data.device_type }}</li>
+            <li><strong>{% trans %}Reference{% endtrans %} :</strong> {{ dev.data.reference }}</li>
           </ul>
-  
-          <h4>{% trans %}xPL parameters{% endtrans %}</h4>
-          <ul>
-          {% for a_param in dev.data['xpl'] %}
-            <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
-          {% endfor %}
-          </ul>
-  
-          <h4>{% trans %}xPL command parameters{% endtrans %}</h4>
-          {% for item in dev.data['xpl_commands'] %}
-            <h5>{{ item }}</h5>
+
+          {% if dev.data['global']|length != 0 %}
+            <h3>{% trans %}Main parameters{% endtrans %}</h3>
             <ul>
-              {% for a_param in dev.data['xpl_commands'][item] %}
-                <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
-              {% endfor %}
-            <ul>
-          {% endfor %}
-  
-          <h4>{% trans %}xPL stat parameters{% endtrans %}</h4>
-          {% for item in dev.data['xpl_stats'] %}
-            <h5>{{ item }}</h5>
-            <ul>
-              {% for a_param in dev.data['xpl_stats'][item] %}
-                <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
-              {% endfor %}
+            {% for a_param in dev.data['global'] %}
+              <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+            {% endfor %}
             </ul>
-          {% endfor %}
+          {% endif %}
+  
+          {% if dev.data['xpl']|length != 0 %}
+            <h3>{% trans %}xPL parameters{% endtrans %}</h3>
+            <ul>
+            {% for a_param in dev.data['xpl'] %}
+              <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+  
+          {% if dev.data['xpl_commands']|length != 0 %}
+            <h3>{% trans %}xPL command parameters{% endtrans %}</h3>
+            {% for item in dev.data['xpl_commands'] %}
+              <h5>{{ item }}</h5>
+              <ul>
+                {% for a_param in dev.data['xpl_commands'][item] %}
+                  <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+                {% endfor %}
+              <ul>
+            {% endfor %}
+          {% endif %}
+  
+          {% if dev.data['xpl_stats']|length != 0 %}
+            <h3>{% trans %}xPL stat parameters{% endtrans %}</h3>
+            {% for item in dev.data['xpl_stats'] %}
+              <h5>{{ item }}</h5>
+              <ul>
+                {% for a_param in dev.data['xpl_stats'][item] %}
+                  <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+                {% endfor %}
+              </ul>
+            {% endfor %}
+          {% endif %}
         </div>
       </div>
     {% endfor %}

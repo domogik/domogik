@@ -38,9 +38,10 @@ Implements
 from domogik import __version__ as DMG_VERSION
 from domogik.common import logger
 from domogik.common.configloader import Loader
-from domogik.common.plugin import PACKAGES_DIR
+from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR
 from domogik.common.packagejson import PackageJson, PackageException
 from argparse import ArgumentParser
+from subprocess import Popen, PIPE
 import re
 import os
 import sys
@@ -54,6 +55,8 @@ import tempfile
 from distutils import version
 import time
 import hashlib
+import OpenSSL
+
 
 
 
@@ -99,6 +102,11 @@ class PackageInstaller():
                           "--remove", 
                           dest="uninstall", 
                           help="Remove (uninstall) a package. Example : plugin_rfxcom")
+        parser.add_argument("-d", 
+                          "--refresh-docs", 
+                          dest="refresh_docs", 
+                          action = "store_true",
+                          help="Refresh all packages documentations (usefull when you use the git sources")
         parser.add_argument("-H", 
                           "--hash", 
                           dest="hash", 
@@ -110,6 +118,7 @@ class PackageInstaller():
         config = cfg.load()
         conf = dict(config[1])
         self.pkg_path = os.path.join(conf['libraries_path'], PACKAGES_DIR)
+        self.resources_path = os.path.join(conf['libraries_path'], RESOURCES_DIR)
 
         # install a package
         if self.options.install:
@@ -128,6 +137,10 @@ class PackageInstaller():
                 self.install(self.options.upgrade, hash = self.options.hash, upgrade = True)
             else:
                 self.install(self.options.upgrade, hash = None, upgrade = True)
+
+        # refresh the docs
+        elif self.options.refresh_docs:
+            self.refresh_docs()
 
         # no choice : display the list of installed packages
         else:
@@ -198,8 +211,19 @@ class PackageInstaller():
         except: 
             self.log.error("Error while creating the symbolic link to install the package : {0}".format(traceback.format_exc()))
             return
-        self.log.info("Package installed!")
+
+        self.log.info("Generate the docummentation...")
+        self.build_doc(os.path.join(symlink_full, "docs"))
+
+        self.display_post_install_informations()
         
+    def display_post_install_informations(self):
+        self.log.info("")
+        self.log.info("Package installed!")
+        self.log.info("")
+        self.log.info("FOR NOW, AFTER INSTALLING A PACKAGE, YOU NEED TO RESTART DOMOGIK MANAGER !")
+        self.log.info("To do this, please do : ")
+        self.log.info("sudo /etc/init.d/domogik restart")
 
     def install_zip_file(self, path, hash, upgrade):
         """ Install the zip file
@@ -311,70 +335,89 @@ class PackageInstaller():
                 return
 
 
-        self.log.info("Package installed!")
+        self.log.info("Generate the docummentation...")
+        self.build_doc(os.path.join(pkg_folder, "docs"))
+        
+        self.display_post_install_informations()
 
 
     def download_from_url(self, url):
         """ Download a package from an url
         """
-        try:
-            self.log.info("Start downloading {0}".format(url))
-
-            #response = requests.get(url)
-
-
-            # create an empty temporary file
-            downloaded_file = tempfile.NamedTemporaryFile(delete = False).name
-
-            # process the download
-            with open(downloaded_file, "wb") as f:
-                response = requests.get(url, stream=STREAM)
-                total_length = response.headers.get('content-length')
-            
-                # check the http response code
-                if response.status_code != 200:
-                    self.log.error("Error while downloading the package : HTTP {0}".format(response.status_code))
-                    return None, None
-
-                # check the mime type
-                peek = response.iter_content(256).next()
-                mime = magic.from_buffer(peek, mime=True)
-                if mime not in ALLOWED_MIMES:
-                    self.log.error("The package downloaded has not a compliant mime type : {0}. The mime type should be one of these : {1}".format(mime, ALLOWED_MIMES))
-                    return None, None
-
-                # download
-                # if streaming is activated
-                if STREAM:
-                    if total_length is None: # no content length header
-                        f.write(response.content)
+        max_tries = 2
+        num_try = 1
+        do_again = True
+        # we do a loop because of the 'OpenSSL.SSL.ZeroReturnError' error... if you launch again manually, the second
+        # time it works.... (yeah, WTF!!!!)
+        while do_again == True:
+            do_again = False
+            try:
+                self.log.info("Start downloading {0}".format(url))
+    
+                #response = requests.get(url)
+    
+    
+                # create an empty temporary file
+                downloaded_file = tempfile.NamedTemporaryFile(delete = False).name
+    
+                # process the download
+                with open(downloaded_file, "wb") as f:
+                    response = requests.get(url, stream=STREAM)
+                    total_length = response.headers.get('content-length')
+                
+                    # check the http response code
+                    if response.status_code != 200:
+                        self.log.error("Error while downloading the package : HTTP {0}".format(response.status_code))
+                        return None, None
+    
+                    # check the mime type
+                    peek = response.iter_content(256).next()
+                    mime = magic.from_buffer(peek, mime=True)
+                    if mime not in ALLOWED_MIMES:
+                        self.log.error("The package downloaded has not a compliant mime type : {0}. The mime type should be one of these : {1}".format(mime, ALLOWED_MIMES))
+                        return None, None
+    
+                    # download
+                    # if streaming is activated
+                    if STREAM:
+                        if total_length is None: # no content length header
+                            f.write(response.content)
+                        else:
+                            dl = 0
+                            total_length = int(total_length)
+                            old_progress = 0
+                            for data in response.iter_content(chunk_size=1024):
+                                #self.log.info(dl)
+                                if data:
+                                    f.write(data)
+                                    f.flush()
+                                    dl += len(data)
+                                    
+                                    #progress = int(50 * dl / total_length)
+                                    #if progress - old_progress > 5 or progress >= 49:
+                                    #    old_progress = progress 
+                                    #    sys.stdout.write("\r[%s%s]" % ('=' * progress, ' ' * (50-progress)) )    
+                                    #    sys.stdout.flush()
+                            #sys.stdout.write("\n")
+                            os.fsync(f)
+                    # if no streaming
                     else:
-                        dl = 0
-                        total_length = int(total_length)
-                        old_progress = 0
-                        for data in response.iter_content(chunk_size=1024):
-                            #self.log.info(dl)
-                            if data:
-                                f.write(data)
-                                f.flush()
-                                dl += len(data)
-                                
-                                #progress = int(50 * dl / total_length)
-                                #if progress - old_progress > 5 or progress >= 49:
-                                #    old_progress = progress 
-                                #    sys.stdout.write("\r[{0}{1}]".format('=' * progress, ' ' * (50-progress)) )    
-                                #    sys.stdout.flush()
-                        #sys.stdout.write("\n")
-                        os.fsync(f)
-                # if no streaming
+                        f.write(response.content)
+            except OpenSSL.SSL.ZeroReturnError as exp:
+                self.log.error("Error while downloading the package : SSL handshaking failed")
+                self.log.error("Please try again")
+                if num_try == max_tries:
+                    raise
                 else:
-                    f.write(response.content)
-                    
-
-        except: 
-            self.log.error("Error while downloading the package : {0}".format(traceback.format_exc()))
-        self.log.info("Download finished")
-        return downloaded_file, mime
+                    do_again = True
+                    self.log.info("Retrying...")
+            except: 
+                self.log.error("Error while downloading the package : {0}".format(traceback.format_exc()))
+                raise
+            else:
+                self.log.info("Download finished")
+                return downloaded_file, mime
+            num_try += 1
 
     def uninstall(self, package):
         """ Uninstall a package
@@ -383,6 +426,11 @@ class PackageInstaller():
             - the package is a symlink : just delete it
             - the package is a folder : ask before deleting it
         """
+        # do some input checks
+        if package in [".", ".."]:
+            self.log.error("Bad package name : you should use the package name. Example : dmg_package -r plugin_diskfree")
+            return
+
         pkg_folder = os.path.join(self.pkg_path, package)
 
         # check if the package is a symlink
@@ -483,7 +531,7 @@ class PackageInstaller():
         """ check if it is already installed!
         """
         if os.path.isdir(os.path.join(self.pkg_path, install_name)):
-            self.log.error("The package '{0}' is already installed! Please uninstall it first".format(install_name))
+            self.log.error("The package '{0}' is already installed! Please use --upgrade instead of --install".format(install_name))
             return True
         return False
 
@@ -519,6 +567,38 @@ class PackageInstaller():
             zf.close()
         except:
             self.log.error("Error while creating the backup : {0}".format(traceback.format_exc()))
+
+    def build_doc(self, doc_path):
+        """ Build the doc with sphinx to access it from the admin
+            The doc will be built in ../build_doc related to the package doc folder
+        """
+        conf_py = os.path.join(self.resources_path, "sphinx/")
+        build_doc_dir = "../_build_doc"
+        makefile = os.path.join(self.resources_path, "sphinx/Makefile")
+        # -e if used to use environments vars
+        cmd = "cd {0} && export BUILDDIR={1} && export SPHINXOPTS='-c {2}' && make -e -f {3} html".format(doc_path, os.path.join(doc_path, build_doc_dir), conf_py, makefile)
+        subp = Popen(cmd, 
+                     shell=True,
+                     stdout=PIPE, stderr=PIPE)
+        subp.communicate()
+
+
+    def refresh_docs(self):
+        """ Rebuild the doc for all installeded packages
+        """
+        packages = os.listdir(self.pkg_path)
+        for a_package in packages:
+            # this is a directory
+            path = os.path.join(self.pkg_path, a_package)
+            if os.path.isdir(path):
+                try:
+                    self.log.info("Package {0} ".format(a_package))
+                    self.build_doc(os.path.join(path, "docs/"))
+                    self.log.info("\n\n")
+    
+                except:
+                    self.log.error("ERROR : {0}".format(traceback.format_exc()))
+    
 
 
 def main():

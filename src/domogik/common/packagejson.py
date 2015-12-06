@@ -36,9 +36,15 @@ PackageJson
 
 from domogik.common.configloader import Loader
 import traceback
-import urllib2
 import datetime
 import json
+try:
+    # python3
+    from urllib.request import urlopen
+except ImportError:
+    # python2
+    from urllib import urlopen
+
 #TODO : why this import fails ?
 #from domogik.xpl.common.plugin import PACKAGES_DIR
 PACKAGES_DIR = "domogik_packages"
@@ -82,15 +88,9 @@ class PackageJson():
                 config = cfg.load()
                 conf = dict(config[1])
 
-                if pkg_type == "plugin":
+                if pkg_type in ["plugin", "brain", "interface"]:
                     json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
                     icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
-                # TODO : reactivate later
-                #elif pkg_type == "external":
-                #    if 'package_path' in conf:
-                #        json_directory = "{0}/domogik_packages/externals/".format(conf['package_path'])
-                #    else:
-                #        json_directory = "{0}/{1}".format(conf['src_prefix'], "share/domogik/externals/")
                 else:
                     raise PackageException("Type '{0}' doesn't exists".format(pkg_type))
                 #json_file = "{0}/{1}.json".format(json_directory, name)
@@ -105,7 +105,7 @@ class PackageJson():
             elif url != None:
                 json_file = url
                 icon_file = None
-                json_data = urllib2.urlopen(json_file)
+                json_data = urlopen(json_file)
                 # TODO : there is an error here!!!!!
                 self.json = json.load(xml_data)
 
@@ -130,12 +130,12 @@ class PackageJson():
 
             # common configuration items
             # to add only for a plugin with identity>xpl_clients_only not set to True !
-            if not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
+            if self.json["identity"]["type"] in ["plugin", "interface"] and not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
                 auto_startup = {
                                    "default": False,
-                                   "description": "Automatically start the plugin at Domogik startup",
+                                   "description": "Automatically start the client at Domogik startup",
                                    "key": "auto_startup",
-                                   "name" : "Start the plugin with Domogik",
+                                   "name" : "Start the client with Domogik",
                                    "required": True,
                                    "type": "boolean"
                                }
@@ -263,8 +263,9 @@ class PackageJson():
                 raise PackageException("Commands part is NOT a dictionary!")
             for cmdid in self.json["commands"]:
                 cmd = self.json["commands"][cmdid]
-                expected = ['name', 'return_confirmation', 'parameters', 'xpl_command']
-                self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys())
+                expected = ['name', 'return_confirmation', 'parameters']
+                optional = ['xpl_command']
+                self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys(), optional)
                 # validate the params
                 expected = ['key', 'data_type', 'conversion']
                 if type(cmd['parameters']) != list:
@@ -272,7 +273,7 @@ class PackageJson():
                 for par in cmd['parameters']:
                     self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
                 # see that the xpl_command is defined
-                if cmd["xpl_command"] not in self.json["xpl_commands"].keys():
+                if "xpl_command" in cmd and cmd["xpl_command"] not in self.json["xpl_commands"].keys():
                     raise PackageException("xpl_command {0} defined in command {1} is not found".format(cmd["xpl_command"], cmdid))
 
             #validate the sensors

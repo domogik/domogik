@@ -25,6 +25,8 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @organization: Domogik
 """
 
+import logging
+
 
 class AbstractAction:
     """ This class provides base methods for the scenario actions.
@@ -49,12 +51,20 @@ class AbstractAction:
         - When Condition is evaluated to 'True', each action linked to it is called (do_action())
     """
 
-    def __init__(self, log=None):
+    def __init__(self, log=None, params=None):
         """ Create action's instance
         @param log : A logger instance
         @warn If you extend __init__, be sure that all parameters have a default value !
         """
-        self._log = log
+        if log == None:
+            # during MQ actions.list request, all classes are looked up and __init__ are called. But some__init__
+            # need self._log.* functions, so we use logging as logger to avoid crashes.
+            # indeed nothing will be logged in the log files, but this is not needed ass we just want the list of
+            # actions and not launch them
+            self._log = logging
+        else:
+            self._log = log
+      
         self._description = ''
 
     def destroy(self):
@@ -83,6 +93,9 @@ class AbstractAction:
         @param params : An extra Hash of parameters used by action, if we keep exemple inside `get_expected_entries`
         documentation, params could be {'mail': 'me@mybox.com'}
         """
+        # we need to remove type and id => its not needed here
+        del params['type']
+        del params['id']
         self._params = params
         pass
 

@@ -3,7 +3,7 @@
  * Visual Blocks Language
  *
  * Copyright 2012 Google Inc.
- * https://blockly.googlecode.com/
+ * https://developers.google.com/blockly/
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
  */
 'use strict';
 
-goog.provide('Blockly.JavaScript.text');
+goog.provide('Blockly.JavaScript.texts');
 
 goog.require('Blockly.JavaScript');
 
@@ -200,7 +200,8 @@ Blockly.JavaScript['text_changeCase'] = function(block) {
     // Title case is not a native JavaScript function.  Define one.
     var functionName = Blockly.JavaScript.provideFunction_(
         'text_toTitleCase',
-        [ 'function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ + '(str) {',
+        [ 'function ' +
+            Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ + '(str) {',
           '  return str.replace(/\\S+/g,',
           '      function(txt) {return txt[0].toUpperCase() + ' +
               'txt.substring(1).toLowerCase();});',
@@ -215,8 +216,8 @@ Blockly.JavaScript['text_changeCase'] = function(block) {
 Blockly.JavaScript['text_trim'] = function(block) {
   // Trim spaces.
   var OPERATORS = {
-    'LEFT': '.trimLeft()',
-    'RIGHT': '.trimRight()',
+    'LEFT': ".replace(/^[\\s\\xa0]+/, '')",
+    'RIGHT': ".replace(/[\\s\\xa0]+$/, '')",
     'BOTH': '.trim()'
   };
   var operator = OPERATORS[block.getFieldValue('MODE')];

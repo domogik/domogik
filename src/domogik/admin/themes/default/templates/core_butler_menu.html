@@ -1,0 +1,39 @@
+<div class="container">
+  <h1>
+    {% trans %}Butler{% endtrans %} <small>{{ clientid }}</small>
+  </h1>
+
+    <nav id="client-navbar" class="navbar navbar-default" role="navigation">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#client-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Butler</a>
+        </div>
+
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="client-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li {% if active == "home" %} class="active" {% endif %} >
+              <a href="/core/{{ clientid }}">{% trans %}Informations{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+            <li {% if active == "learn" %} class="active" {% endif %} >
+              <a href="/core/{{ clientid }}/butler_learn">{% trans %}Learned commands{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+            <li {% if active == "not_understood" %} class="active" {% endif %} >
+              <a href="/core/{{ clientid }}/butler_not_understood">{% trans %}Not understood queries{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
+</div>
+

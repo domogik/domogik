@@ -1,0 +1,51 @@
+=============
+Release 0.4.2
+=============
+
+Purpose
+=======
+
+This release is a fix release. It includes mainly some fixes related to the 0.4.1 release. It also include a few minor improvments.
+
+Related milestone : https://github.com/domogik/domogik/milestones/0.4.1%20users%20issues
+
+Here is the list of tickets included :
+
+* #140 - Error starting scenario.py with a first scenario create (bug)
+* #138 - Domogik-mq lock file issue with Domoweb duplicate
+* #137 - Error when creating new scenario (bug)
+* #136 - nohup file (enhancement)
+* #132 - Hooray, no orphans found on Rasp Pi B 512Mb
+* #131 - Clients are dead on raspberry pi B 512Mb (bug)
+* #130 - Problems when I want download a dmg package on Rasp Pi B 512 MB (bug)
+* #129 - Database : error not handled while creating some devices (bug)
+* #127 - Domogik installé, mais problème au lancement /.python-eggs
+* #125 - scenario url start with " (bug)
+* #124 - install : test config : add tests on ports for rest, admin, mq (enhancement)
+* #122 - Plugin onewire installation blocks Domogik starting (bug)
+* #121 - install : command line : in the doc, tell to use --no-create-database because of password (enhancement)
+* #118 - manager does not send plugin.status (bug)
+* #117 - domogik-mq : more log in forwarder logs ? (enhancement)
+* #116 - install : check if some errors happen during debian*sh script (enhancement)
+* #115 - 500 error when we try to access plugin 'brain details' (bug)
+* #114 - admin : display DT_Bool labels (enhancement)
+* #113 - admin : improve an error 500 message (bug)
+* #112 - install : better network interfaces handle (enhancement)
+* #111 - install : automatically create database if it does not exist (enhancement)
+* #110 - install : debian_packages_install.sh : remove python-argparse (bug)
+* #109 - admin : make clients status upgrade on clients page (enhancement)
+* #108 - admin : if all core components are dead, display a message (enhancement)
+* #107 - domogik-mq install (bug)
+* #106 - install : complete an error message (enhancement)
+* #105 - install : debian_packages_install.sh must be run as root (enhancement)
+* #104 - admin : remove the discover tour (bug)
+* #103 - Erreur affichage état plugin (bug)
+* #102 - Install : handle Raspbian (enhancement)
+* #101 - Install : domogik-mq need some prerequisites (bug)
+* #100 - Admin : for dt type display labels corresponding to values (enhancement)
+* #99 - Error with first dmg_package install (bug)
+* #98 - Error in Scenario comparaison value (bug)
+* #97 - Install : error: Couldn't find a setup script in /tmp/easy_install-CqWgOf/Flask-Themes2-0.1.4.linux-x86_64.tar.gz question
+* #87 - Allow scenario to have more than 2 actions (bug)
+
+The release includes also some minor fixes with no related tickets.

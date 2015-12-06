@@ -1,24 +1,6 @@
 <div class="container">
   <h1 id="client_name">
     {% trans %}Client{% endtrans %} {{ clientid }}
-    {% if client_detail %}
-<!--
-TODO : remove
-      {% if client_detail.type == "plugin" %}
-        <div class="btn-group pull-right">
-          <button type="button" class="btn btn-info dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
-            <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" role="menu">
-            <li><a id="start" href="#">Start</a></li>
-            <li><a id="stop" href="#">Stop</a></li>
-          </ul>
-        </div>
-      {% else %}
-        <small><span class="label label-info status status-label status-{{client_detail.status}}">{{client_detail.status}}</span> </small>
-      {% endif %}
--->
-    {% endif %}
   </h1>
 
     <nav id="client-navbar" class="navbar navbar-default" role="navigation">
@@ -37,6 +19,7 @@ TODO : remove
             {% if client_detail['data']['identity']['xpl_clients_only'] == False %}
             <div id="client-status" class="btn-group navbar-brand pull-right">
               <button type="button" class="btn btn-info btn-xs dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
+                <i class='fa'></i>
                 <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" role="menu">
@@ -46,9 +29,24 @@ TODO : remove
             </div>
             {% else %}
             {% endif %}
+          {% elif client_detail.type == "interface" %}
+            <div id="client-status" class="btn-group navbar-brand pull-right">
+              <button type="button" class="btn btn-info btn-xs dropdown-toggle status-label status-{{client_detail.status}}" data-toggle="dropdown" aria-expanded="false">
+                <span class="status">{{client_detail.status}}</span> <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a id="start" href="#">Start</a></li>
+                <li><a id="stop" href="#">Stop</a></li>
+              </ul>
+            </div>
+          {% elif client_detail.type == "brain" %}
+            <!-- TODO : improve layout -->
+            <div class="navbar-brand">
+              <span id="client-status" class="label label-info status status-label pull-right">{% trans %}n/a{% endtrans %}</span>
+            </div>
           {% else %}
             <!-- TODO : improve layout -->
-            <div class="navbar-brand"> 
+            <div class="navbar-brand">
               <span id="client-status" class="label label-info status status-label status-{{client_detail.status}} pull-right">{{client_detail.status}}</span>
             </div>
           {% endif %}
@@ -62,13 +60,34 @@ TODO : remove
               <a href="/client/{{ clientid }}">{% trans %}Informations{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
 
+            {% if client_detail.type == "plugin" or client_detail.type == "brain" or client_detail.type == "interface"%}
             <li {% if active == "config" %} class="active" {% endif %} >
               <a href="/client/{{ clientid }}/config">{% trans %}Configuration{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
+            {% endif %}
 
+            {% if client_detail.type == "plugin" %}
             <li {% if active == "devices" %} class="active" {% endif %} >
               <a href="/client/{{ clientid }}/dmg_devices/known">{% trans %}Domogik devices{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
+            {% endif %}
+
+            {% if client_detail.type == "plugin" or client_detail.type == "brain" %}
+            <li {% if active == "brain" %} class="active" {% endif %} >
+              <a href="/client/{{ clientid }}/brain">{% trans %}Brain details{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+            {% endif %}
+
+            <li {% if active == "advanced" %} class="active" {% endif %} >
+              <a href="/{{ client_detail.type }}_{{ client_detail.name}}/{{ clientid }}">{% trans %}Advanced{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+
+            {% if client_detail.type != "core" %}
+            <li {% if active == "doc" %} class="active" {% endif %} >
+              <a href="/client/{{ clientid }}/doc">{% trans %}Documentation{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
+            {% endif %}
+
 
           </ul>
         </div>
@@ -87,6 +106,7 @@ TODO : remove
                 if ( data.content['host'] == '{{client_detail.host}}' && '{{client_detail.package_id}}' == data.content['type'] + '-'+ data.content['name'] ) {
                 console.log(data.content['event']);
                     $('#client-status .status').text(data.content['event']);
+                    $('#client-status .fa').removeClass('fa-spinner fa-spin');
                     // for plugins, update the button classes
                     $('#client-status button').removeClass().addClass('btn btn-info btn-xs dropdown-toggle status-'+data.content['event']);
                     // for clients which are not plugins, update the label classes
@@ -100,85 +120,17 @@ TODO : remove
         {% if client_detail %}
         $("#start").click(function() {
             console.log("start request");
-            ws.send('{"action": "plugin.start.do", "data": {"name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
+            $('#client-status .fa').addClass('fa-spinner fa-spin');
+            ws.send('{"mq_request": "plugin.start.do", "data": {"type" : "{{ client_detail.type }}", "name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
             console.log("ws send done");
         });
         $("#stop").click(function() {
             console.log("stop request");
-            ws.send('{"dst": "plugin-{{ client_detail.name }}.{{ client_detail.host }}", "action": "plugin.stop.do", "data": {"name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
+            $('#client-status .fa').addClass('fa-spinner fa-spin');
+            ws.send('{"dst": "{{ client_detail.type }}-{{ client_detail.name }}.{{ client_detail.host }}", "mq_request": "plugin.stop.do", "data": {"type" : "{{ client_detail.type }}", "name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
             console.log("ws send done");
         });
         {% endif %}
-
-
-        {% if active == "home" %}
-            // Define the home client page tour!
-            var client_tour = {
-              id: "client_tour",
-              steps: [
-                {
-                  title: "{% trans %}Welcome to the client pages{% endtrans %}",
-                  content: "{% trans %}Thanks to this menu, you will be able to see informations about the client, to configure it and create some devices.{% endtrans %}",
-                  target: document.querySelector("#client-navbar"),
-                  placement: "bottom"
-                },
-                {
-                  title: "{% trans %}Check the client status{% endtrans %}",
-                  content: "{% trans %}This control shows you the current client status.{% endtrans %}",
-                  target: document.querySelector("#client-status"),
-                  placement: "bottom"
-                }
-              ],
-              onEnd: function() {
-                  $.cookie("admin_client_tour", "done", { expires: 3650 });
-              }
-            };
-
-            // Start the tour on demand
-            $('#start_client_tour').click(function() {
-                hopscotch.startTour(client_tour);
-            });
-
-            // Start the tour on first launch
-            do_client_tour = $.cookie("admin_client_tour")
-            if (do_client_tour != "done") {
-                hopscotch.startTour(client_tour);
-            }
-
-        {% elif active == "devices" %}
-            // Define the client devices tour!
-            var devices_tour = {
-              id: "devices_tour",
-              steps: [
-                {
-                  title: "{% trans %}Create Domogik devices{% endtrans %}",
-                  content: "{% trans %}Click on this button to start creating a new Domogik device. When it will be created, it will appear in a list below.{% endtrans %}",
-                  target: document.querySelector("#create-device"),
-                  placement: "bottom"
-                },
-                {
-                  title: "{% trans %}Let the client show you the new devices{% endtrans %}",
-                  content: "{% trans %}Some clients are able to detect new devices. When your client is running, you can click here to get the detected devices list.{% endtrans %}",
-                  target: document.querySelector("#detected-devices"),
-                  placement: "bottom"
-                }
-              ],
-              onEnd: function() {
-                  $.cookie("admin_devices_tour", "done", { expires: 3650 });
-              }
-            };
-
-            // Start the tour on demand
-            $('#start_devices_tour').click(function() {
-                hopscotch.startTour(devices_tour);
-            });
-
-            do_devices_tour = $.cookie("admin_devices_tour")
-            if (do_devices_tour != "done") {
-                hopscotch.startTour(devices_tour);
-            }
-        {% endif %}
-
     });
-    
+
     </script>

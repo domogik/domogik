@@ -2,31 +2,197 @@
 {% import theme("base/wtf.html") as wtf %}
 
 {% block content %}
-  <div id="blocklyDiv" style="position: absolute; top: 200px; left: 200px; height: 300px; width: 900px;"></div>
+<div class="container">
+  <h1>{% trans %}Scenario {% endtrans %}</h1>
+  <form id="scenario_form" method="post" role="form" class="form-horizontal">
+    <div class="form-inline">
+    {{ form.csrf_token }}
+    {{ form.sid }}
+    {{ form.sjson }}
+    <div id="scenario_title" class="xform-group">
+        {{ form.sname(class_="form-control input-lg") }}
+        <button type="submit" class="btn btn-info">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+          {% trans %}Save{% endtrans %}
+        </button>
+    <a class="btn btn-default" data-toggle="confirmation" data-placement="bottom" data-href="/scenario/del/{{ scenario_id }}">
+      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans %}Delete{% endtrans %}
+    </a>
+    <button id="help" type="button" class="btn btn-default"  data-toggle="modal" data-target="#help_modal">
+      <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {% trans %}Help{% endtrans %}
+    </button>
+    </div>
+    </div>
+  <div class="form-group">
+    <label class="control-label col-xs-3">{{ form.sdis.label }}</label>
+    <div class="col-xs-9">
+      {{ form.sdis() }}
+      <span class="help-block">{{ form.sdis.description }}</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-xs-3">{{ form.sdesc.label }}</label>
+    <div class="col-xs-9">
+      {{ form.sdesc() }}
+      <span class="help-block">{{ form.sdesc.description }}</span>
+    </div>
+  </div>
+  </form>
+
+  <!-- <pre>{{ jso }}</pre> -->
+  <div id="blocklyArea"></div>
+  <div id="blocklyDiv" style="position: absolute; width: 50%;"></div>
   <xml id="toolbox" style="display: none">
     <category name="Logic">
+        <block type="logic_compare"></block>
         <block type="logic_operation"></block>
         <block type="logic_negate"></block>
+        <block type="logic_boolean"></block>
     </category>
-    <category name="Tests">
+    <category name="Datatypes">
+        {% for d in datatypes %}
+            <block type="{{ d }}"></block>
+        {% endfor %}
+    </category>
+    <category name="Devices">
+        {% for dev_client in devices_per_clients %}
+            <category name="{{ dev_client }}">
+            {% for dev in devices_per_clients[dev_client] %}
+                <category name="{{ dev }}">
+                    {% if devices_per_clients[dev_client][dev]['sensors']|length > 0 %}
+                    <category name="Sensors">
+                    {% for sen_name in devices_per_clients[dev_client][dev]['sensors'] %}
+                        <block type="sensor.SensorTest.{{ devices_per_clients[dev_client][dev]['sensors'][sen_name] }}"></block>
+                    {% endfor %}
+                    </category>
+                    {% endif %}
+                    {% if devices_per_clients[dev_client][dev]['commands']|length > 0 %}
+                    <category name="Commands">
+                    {% for cmd_name in devices_per_clients[dev_client][dev]['commands'] %}
+                        <block type="command.CommandAction.{{ devices_per_clients[dev_client][dev]['commands'][cmd_name] }}"></block>
+                    {% endfor %}
+                    </category>
+                    {% endif %}
+                </category>
+            {% endfor %}
+            </category>
+        {% endfor %}
+    </category>
+    <category name="Other sensors">
         {% for t in tests %}
             <block type="{{ t }}"></block>
         {% endfor %}
     </category>
-    <category name="Actions">
+    <category name="Other commands">
         {% for a in actions %}
             <block type="{{ a }}"></block>
         {% endfor %}
     </category>
   </xml>
-  {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}  
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="help_modal" tabindex="-1" role="dialog" aria-labelledby="helpModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans %}Close{% endtrans %}</span></button>
+          <h4 class="modal-title" id="myModalLabel">{% trans %}Scenarios help{% endtrans %}</h4>
+        </div>
+        <div class="modal-body">
+
+          <div class="container">
+          <div class="row hide" data-step="1" data-title="Step 1">
+            <h5>{% trans %}The left menu{% endtrans %}</h5>
+            <p>{% trans %}The left menu contains all the blocks needed to build a scenario.{% endtrans %}</p>
+            <dl>
+              <dt><dfn>{% trans %}Logic {% endtrans %}</dfn></dt>
+              <dd>{% trans %}All logic blocks needed to do logic operations, comparisons, ...{% endtrans %}</dd>
+              <dt><dfn>{% trans %}Datatypes {% endtrans %}</dfn></dt>
+              <dd>{% trans %}The datatypes blocks are used to compare the devices sensors values to some values. Depending on a sensor datatype, the values to compare are not the same : on/off, open/close, a number, ... The datatypes blocks will help you to use the appropriate values.{% endtrans %}</dd>
+              <dt><dfn>{% trans %}Devices {% endtrans %}</dfn></dt>
+              <dd>{% trans %}This menu will list all the availables devices and their sensors and commands.{% endtrans %}</dd>
+              <dt><dfn>{% trans %}Other sensors {% endtrans %}</dfn></dt>
+              <dd>{% trans %}Some sensors not related to the devices.{% endtrans %}</dd>
+              <dt><dfn>{% trans %}Other commands {% endtrans %}</dfn></dt>
+              <dd>{% trans %}Some commands not related to the devices.{% endtrans %}</dd>
+            </dl>
+            <img class="img-responsive" src="/static/images/help/scenario/devices.png">
+	  </div>
+
+          <div class="row hide" data-step="2" data-title="Step 2">
+            <h5>{% trans %}Add a comparison operator{% endtrans %}</h5>
+            <p>{% trans %}To compare a device sensor to a value, add a comparison operator in the <strong>WHEN</strong> condition.{% endtrans %}</p>
+            <img class="img-responsive" src="/static/images/help/scenario/scenario_build_1.png">
+	  </div>
+
+          <div class="row hide" data-step="3" data-title="Step 3">
+            <h5>{% trans %}Choose a device sensor{% endtrans %}</h5>
+            <p>{% trans %}You will need to choose one or several devices sensors to use.{% endtrans %}</p>
+            <p>{% trans %}Each device can have several sensors. Each sensor has a datatype (<em>DT_xxx</em>). The datatype is important because it will help you to choose the appropriate datatype block for comparisons.{% endtrans %}</p>
+            <img class="img-responsive" src="/static/images/help/scenario/devices_sensors.png">
+	  </div>
+
+          <div class="row hide" data-step="4" data-title="Step 4">
+            <h5>{% trans %}Add the device sensor{% endtrans %}</h5>
+            <p>{% trans %}Add your device sensor to your scenario.{% endtrans %}</p>
+            <img class="img-responsive" src="/static/images/help/scenario/scenario_build_2.png">
+	  </div>
+
+          <div class="row hide" data-step="5" data-title="Step 5">
+            <h5>{% trans %}The datatypes{% endtrans %}</h5>
+            <p>{% trans %}Once your sensors are choosen, you will have use the related datatypes blocks for comparisons.{% endtrans %}</p>
+            <p>{% trans %}In the list of datatypes blocks, choose the appropriate ones.{% endtrans %}</p>
+            <img class="img-responsive" src="/static/images/help/scenario/datatype.png">
+	  </div>
+
+          <div class="row hide" data-step="6" data-title="Step 6">
+            <h5>{% trans %}Add the datatype{% endtrans %}</h5>
+            <p>{% trans %}Add the datatype block to your scenario.{% endtrans %}</p>
+            <img class="img-responsive" src="/static/images/help/scenario/scenario_build_3.png">
+	  </div>
+
+          <div class="row hide" data-step="7" data-title="Step 7">
+            <h5>{% trans %}The commands{% endtrans %}</h5>
+            <p>{% trans %}You can now choose a device command, for example to switch a light when the <strong>WHEN</strong> condition is ok.{% endtrans %}</p>
+            <p>{% trans %}But you can also use a command not related to a device.{% endtrans %}</p>
+            <img class="img-responsive" src="/static/images/help/scenario/devices_commands.png">
+	  </div>
+
+          <div class="row hide" data-step="8" data-title="Step 8">
+            <h5>{% trans %}Add the command{% endtrans %}</h5>
+            <p>{% trans %}Add the command to your scenario in the <strong>DO</strong> part.{% endtrans %}</p>
+            <img class="img-responsive" src="/static/images/help/scenario/scenario_build_4.png">
+            <p>{% trans %}Save your scenario and enjoy :).{% endtrans %}</p>
+	  </div>
+
+	  </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning js-btn-step" data-orientation="previous">Previous</button>
+	  <button type="button" class="btn btn-success js-btn-step" data-orientation="next">Next</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}OK, thanks{% endtrans %}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <script type="text/javascript" src="/static/libraries/blockly/blockly_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
-  <script type="text/javascript" src="/scenario/blocks/actions"></script>
-  <script type="text/javascript" src="/scenario/blocks/tests"></script>
+  <script type="text/javascript" src="/static/js/jquery-bootstrap-modal-steps.min.js"></script>
   <script type="text/javascript">
+    $('#help_modal').modalSteps();
+  </script>
+  <script type="text/javascript">
+    {{ blocks_js | safe }}
+  </script>
+  <script type="text/javascript">
+    var blocklyArea = document.getElementById('blocklyArea');
+    var blocklyDiv = document.getElementById('blocklyDiv');
+
     Blockly.Blocks['dom_condition'] = {
       init: function() {
         this.setColour(210);
@@ -36,29 +202,48 @@
         this.appendStatementInput('DO')
             .appendField('Do');
         this.setPreviousStatement(false);
-        this.setNextStatement(true);
+        this.setNextStatement(false);
         this.setDeletable(false);
         this.contextMenu = false;
         this.setInputsInline(false);
       }
     };
-    Blockly.inject(
-        document.getElementById('blocklyDiv'),
+    var workspace = Blockly.inject('blocklyDiv',
         {
-            path: '../../',
+            media: '../../static/libraries/blockly/media/',
             toolbox: document.getElementById('toolbox')
         }
     );
     function onchange() {
       $('#sjson').val( Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace()) );
     }
-    Blockly.addChangeListener(onchange);
-    //var json = JSON.parse('{"type":"dom_condition","id":"1","IF":{"type":"logic_operation","id":"10","OP":"AND","A":{"type":"cron.CronTest","id":"18","cron":"None"},"B":{"type":"textinpage.TextInPageTest","id":"22","urlpath":"None","text":"None"}},"DO":{"type":"log.LogAction","id":"28","message":"test"},"deletable":false}');
-    //var json = JSON.parse('{"type":"dom_condition","id":"1","deletable":false}');
-    {% autoescape false %}
-    var json = JSON.parse('{{ jso }}');
-    {% endautoescape %}
-    Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
+    workspace.addChangeListener(onchange);
+    $(document).ready(function() {
+        {% autoescape false %}
+        var json = JSON.parse('{{ jso }}');
+        {% endautoescape %}
+        Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
+    });
+
+    var onresize = function(e) {
+      // Compute the absolute coordinates and dimensions of blocklyArea.
+      var element = blocklyArea;
+      var x = 0;
+      var y = 0;
+      do {
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        element = element.offsetParent;
+      } while (element);
+      // Position blocklyDiv over blocklyArea.
+      blocklyDiv.style.left = x + 'px';
+      blocklyDiv.style.top = y + 'px';
+      blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+      blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+    };
+    window.addEventListener('resize', onresize, false);
+    onresize();
   </script>
  
+</div>
 {% endblock %}

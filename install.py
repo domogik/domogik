@@ -15,7 +15,8 @@ import argparse
 import shutil
 import logging
 import pkg_resources
-from subprocess import check_output, CalledProcessError
+from subprocess import Popen, PIPE, STDOUT
+from distutils import version
 
 
 BLUE = '\033[94m'
@@ -76,7 +77,6 @@ def build_file_list(user):
     d_files = [
         ('/etc/domogik', [user, 0o755], \
                 ['src/domogik/examples/config/domogik.cfg.sample', \
-                'src/domogik/examples/packages/sources.list', \
                 'src/domogik/xpl/hub/examples/config/xplhub.cfg.sample']),
         ('/var/cache/domogik', [user, None], []),
         ('/var/cache/domogik/pkg-cache', [user, None], []),
@@ -85,10 +85,14 @@ def build_file_list(user):
         ('/var/lib/domogik/domogik_packages', [user, None], \
                 ['src/domogik/common/__init__.py']),
         ('/var/lib/domogik/resources', [user, None], []),
+        ('/var/lib/domogik/resources/butler', [user, None], []),
         ('/var/lib/domogik/resources', [user, None], \
                 ['src/domogik/common/datatypes.json']),
-        ('/var/lock/domogik', [user, 0o755], []),
-        ('/var/log/domogik', [user, 0o755], []),
+        ('/var/lib/domogik/resources/sphinx', [user, None], \
+                ['docs/Makefile',
+                 'docs/conf-packages.py']),
+        ('/var/lock/domogik', [user, 0755], []),
+        ('/var/log/domogik', [user, 0755], []),
         ('/var/log/xplhub', [user, None], []),
     ]
 
@@ -155,6 +159,9 @@ def copy_files(user):
                     os.system('chown {0} {1}'.format(perm[0], dfname))
                 #if perm[1] != None:
                 #    os.system('chmod {0} {1}'.format(perm[1], dfname))
+
+        # rename files
+        os.rename('/var/lib/domogik/resources/sphinx/conf-packages.py', '/var/lib/domogik/resources/sphinx/conf.py')
     except:
         raise
 
@@ -188,9 +195,9 @@ def create_user(d_user, d_shell = "/bin/sh"):
 def is_domogik_advanced(advanced_mode, sect, key):
     advanced_keys = {
         'domogik': ['libraries_path', 'src_prefix', \
-                'log_dir_path', 'pid_dir_path', 'broadcast'],
-        'database': ['db_prefix', 'pool_recycle'],
-        'rest': ['rest_server_port', 'rest_use_ssl', 'rest_ssl_certificate'],
+                'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level'],
+        'database': ['prefix', 'pool_recycle'],
+        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json'],
     }
     if advanced_mode:
         return True
@@ -205,7 +212,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
 
 def is_xplhub_advanced(advanced_mode, sect, key):
     advanced_keys = {
-        'hub': ['log_dir_path', 'log_bandwidth', 'log_invalid_data'],
+        'hub': ['log_dir_path', 'log_bandwidth', 'log_invalid_data', 'log_level'],
     }
     if advanced_mode:
         return True
@@ -218,16 +225,20 @@ def is_xplhub_advanced(advanced_mode, sect, key):
             else:
                 return False
 
-def write_domogik_configfile(advanced_mode):
+def write_domogik_configfile(advanced_mode, intf):
     # read the sample config file
     newvalues = False
     config = configparser.RawConfigParser()
     config.read( ['/etc/domogik/domogik.cfg.sample'] )
+    itf = ['bind_interface', 'interfaces']
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            if is_domogik_advanced(advanced_mode, sect, item[0]):
-                print("Key {0} [{1}]: ".format(item[0], item[1])),
+            if item[0] in itf  and not advanced_mode:
+                config.set(sect, item[0], intf)
+                debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
+            elif is_domogik_advanced(advanced_mode, sect, item[0]):
+                print("- {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
                     # need to write it to config file
@@ -238,7 +249,7 @@ def write_domogik_configfile(advanced_mode):
         ok("Writing the config file")
         config.write(configfile)
 
-def write_xplhub_configfile(advanced_mode):
+def write_xplhub_configfile(advanced_mode, intf):
     # read the sample config file
     newvalues = False
     config = configparser.RawConfigParser()
@@ -246,8 +257,11 @@ def write_xplhub_configfile(advanced_mode):
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            if is_xplhub_advanced(advanced_mode, sect, item[0]):
-                print("Key {0} [{1}]: ".format(item[0], item[1])),
+            if item[0] == 'interfaces' and not advanced_mode:
+                config.set(sect, item[0], intf)
+                debug("Value {0} in xplhub.cfg set to {1}".format(item[0], intf))
+            elif is_xplhub_advanced(advanced_mode, sect, item[0]):
+                print("- {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
                     # need to write it to config file
@@ -304,7 +318,11 @@ def needupdate():
     # first check if there are already some config files
     if os.path.isfile("/etc/domogik/domogik.cfg") or \
        os.path.isfile("/etc/domogik/xplhub.cfg"):
-        print("Do you want to keep your current config files ? [Y/n]: "),
+        info("Configuration files")
+        # DEL # print("Please notice that Domogik 0.3.x configuration files are no more compliant with Domogik 0.4 :")
+        # DEL # print("- backup your Domogik 0.3 configuration files")
+        # DEL # print("- say 'n' to the question to recreate them from scratch")
+        print("Do you want to keep your current config files ? [Y/n]: ")
         new_value = sys.stdin.readline().rstrip('\n')
         if new_value == "y" or new_value == "Y" or new_value == '':
             debug("keeping curent config files")
@@ -314,28 +332,32 @@ def needupdate():
             return True
     return True
 
-# not used
-#def config(advanced, notest):
-#    try:
-#        am_i_root()
-#        if needupdate():
-#            write_configfile(advanced)
-#        if not notest:
-#            test_config()
-#    except:
-#        import traceback
-#        traceback.format_exc()
-#        fail(sys.exc_info())
-
 def update_default(user):
     info("Update /etc/default/domogik")
     os.system('sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER={0};" /etc/default/domogik'.format(user))
+
+def find_interface():
+    info("Trying to find an interface to listen on")
+    try:
+        import traceback
+        pkg_resources.get_distribution("domogik").activate()
+        from domogik.common.utils import get_interfaces, interface_has_ip
+        for intf in get_interfaces():
+            if intf == 'lo':
+                continue
+            if interface_has_ip(intf):
+                break
+    except:
+        fail("Trace: {0}".format(traceback.format_exc()))
+    else:
+        ok("Selected interface {0}".format(intf))
+    return intf
 
 def install():
     parser = argparse.ArgumentParser(description='Domogik installation.')
     parser.add_argument('--dist-packages', dest='dist_packages', action="store_true",
                    default=False, help='Try to use distribution packages instead of pip packages')
-    parser.add_argument('--create-database', dest='create_database', action="store_true",
+    parser.add_argument('--no-create-database', dest='no_create_database', action="store_true",
                    default=False, help='create and allow domogik to access to it, if it is not already created')
     parser.add_argument('--no-setup', dest='setup', action="store_true",
                    default=False, help='Don\'t install the python packages')
@@ -356,6 +378,8 @@ def install():
                    help="Set the domogik user")
     parser.add_argument("--user-shell", dest="user_shell",
                    help="Set the domogik user shell")
+    parser.add_argument('--advanced', dest='advanced_mode', action="store_true",
+                   default=False, help='Allow to configure all options in interactive mode')
 
     # generate dynamically all arguments for the various config files
     # notice that we MUST NOT have the same sections in the different files!
@@ -367,8 +391,8 @@ def install():
     add_arguments_for_config_file(parser, \
             "src/domogik/xpl/hub/examples/config/xplhub.cfg.sample")
 
-
     args = parser.parse_args()
+    print args
     try:
         # CHECK python version
         if sys.version_info < (2, 6):
@@ -389,6 +413,15 @@ def install():
                 fail("Please install Domogik MQ first! (https://github.com/domogik/domogik-mq)")
                 exit(0)
 
+        # Execute database fix for some 0.2/0.3 databases
+        #info("Process some database upgrade issues with previous releases")
+        #cmd = "sh ./src/domogik/install/db_fix_03.sh"
+        #p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        #lines_iterator = iter(p.stdout.readline, b"")
+        #for line in lines_iterator:
+        #    print(line)
+
+
         if args.dist_packages:
             dist_packages_install_script = ''
             #platform.dist() and platform.linux_distribution() 
@@ -403,11 +436,10 @@ def install():
             #elif os.system(' bash -c \'[ "`lsb_release -si`" == "Ubuntu" ]\'') == 0:
             elif dist == "Ubuntu":
                 dist_packages_install_script = './debian_packages_install.sh'
-            #elif os.system(' bash -c \'lsb_release -si 2>&1 | grep "ImportError"\'') == 0:
-            else:
-                raise OSError("The lsb_release tool can't be executed. Maybe it is not compliant with Python 3 on your system ?")
+            elif os.system(' bash -c \'[ "`lsb_release -si`" == "Raspbian" ]\'') == 0:
+                dist_packages_install_script = './debian_packages_install.sh'
             if dist_packages_install_script == '' :
-                raise OSError("The option --dist-packages is not implemented on this distribution. Please install the packages manually.")
+                raise OSError("The option --dist-packages is not implemented on this distribution. \nPlease install the packages manually.\n When packages have been installed, you can re reun the installation script without the --dist-packages option.")
             if os.system(dist_packages_install_script) != 0:
                 raise OSError("Cannot install packages correctly script '{0}'".format(dist_packages_install_script))
 
@@ -441,17 +473,26 @@ def install():
             write_domogik_configfile_from_command_line(args)
             info("Update the config file : /etc/domogik/xplhub.cfg")
             write_xplhub_configfile_from_command_line(args)
-
         else:
             if not args.config and needupdate():
+                # select the correct interface
+                intf = find_interface()
+                # update the config file
                 info("Update the config file : /etc/domogik/domogik.cfg")
-                write_domogik_configfile(False)
+                write_domogik_configfile(args.advanced_mode, intf)
                 info("Update the config file : /etc/domogik/xplhub.cfg")
-                write_xplhub_configfile(False)
-
+                write_xplhub_configfile(args.advanced_mode, intf)
 
         # upgrade db
         if not args.db:
+
+            # check if alembic version is at least 0.7.4. Else raise an error
+            from alembic import __version__ as alembic_version
+            if version.StrictVersion(alembic_version) < version.StrictVersion("0.7.4"):
+                fail("The 'alembic' version installed on this system ({0}) is not recent enough. Please install at least alembic >= 0.7.4".format(alembic_version))
+                exit(0)
+
+            # do db upgrade
             try:
                 import traceback
                 # we must activate the domogik module as setup.py is launched from install.py and just after we try 
@@ -462,7 +503,7 @@ def install():
                 print("Trace: {0}".format(traceback.format_exc()))
 
             dbi = DbInstall()
-            if args.create_database:
+            if not args.no_create_database:
                 dbi.create_db()
             dbi.install_or_upgrade_db(args.skip_database_backup)
 

@@ -40,6 +40,7 @@ Implements
 
 import datetime, hashlib, time
 import traceback
+import sys
 
 import json
 import sqlalchemy
@@ -221,10 +222,10 @@ class DbHelper():
         else:
             url = "{0}://".format(self.__db_config['type'])
         if self.__db_config['port'] != '':
-            url = "{0}{1}:{2}@{3}:{4}/{5}".format(url, self.__db_config['user'], self.__db_config['password'],
+            url = "%s%s:%s@%s:%s/%s?charset=utf8" % (url, self.__db_config['user'], self.__db_config['password'],
                                         self.__db_config['host'], self.__db_config['port'], self.__db_config['name'])
         else:
-            url = "{0}{1}:{2}@{3}/{4}".format(url, self.__db_config['user'], self.__db_config['password'],
+            url = "%s%s:%s@%s/%s?charset=utf8" % (url, self.__db_config['user'], self.__db_config['password'],
                                      self.__db_config['host'], self.__db_config['name'])
         return url
     
@@ -255,9 +256,10 @@ class DbHelper():
         """
         return self.__session.query(PluginConfig).all()
 
-    def list_plugin_config(self, pl_id, pl_hostname):
+    def list_plugin_config(self, pl_type, pl_id, pl_hostname):
         """Return all parameters of a plugin
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @return a list of PluginConfig objects
@@ -265,13 +267,15 @@ class DbHelper():
         """
         return self.__session.query(
                         PluginConfig
+                    ).filter_by(type=ucode(pl_type)
                     ).filter_by(id=ucode(pl_id)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).all()
 
-    def get_plugin_config(self, pl_id, pl_hostname, pl_key):
+    def get_plugin_config(self, pl_type, pl_id, pl_hostname, pl_key):
         """Return information about a plugin parameter
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key we want the value from
@@ -281,6 +285,7 @@ class DbHelper():
         try:
             ret = self.__session.query(
                         PluginConfig
+                    ).filter_by(type=ucode(pl_type)
                     ).filter_by(id=ucode(pl_id)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).filter_by(key=ucode(pl_key)
@@ -289,7 +294,7 @@ class DbHelper():
             self.log.debug(u"oups : {0}".format(traceback.format-exc()))
         return ret
 
-    def set_plugin_config(self, pl_id, pl_hostname, pl_key, pl_value):
+    def set_plugin_config(self, pl_type, pl_id, pl_hostname, pl_key, pl_value):
         """Add / update a plugin parameter
 
         @param pl_id : plugin id
@@ -303,11 +308,12 @@ class DbHelper():
         self.__session.expire_all()
         plugin_config = self.__session.query(
                                 PluginConfig
+                            ).filter_by(type=ucode(pl_type)
                             ).filter_by(id=ucode(pl_id)
                             ).filter_by(hostname=ucode(pl_hostname)
                             ).filter_by(key=ucode(pl_key)).first()
         if not plugin_config:
-            plugin_config = PluginConfig(id=pl_id, hostname=pl_hostname, key=pl_key, value=pl_value)
+            plugin_config = PluginConfig(type=pl_type, id=pl_id, hostname=pl_hostname, key=pl_key, value=pl_value)
         else:
             plugin_config.value = ucode(pl_value)
         self.__session.add(plugin_config)
@@ -317,9 +323,10 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
         return plugin_config
 
-    def del_plugin_config(self, pl_id, pl_hostname):
+    def del_plugin_config(self, pl_type, pl_id, pl_hostname):
         """Delete all parameters of a plugin config
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @return the deleted PluginConfig objects
@@ -329,6 +336,7 @@ class DbHelper():
         self.__session.expire_all()
         plugin_config_list = self.__session.query(
                                     PluginConfig
+                                ).filter_by(type=ucode(pl_type)
                                 ).filter_by(id=ucode(pl_id)
                                 ).filter_by(hostname=ucode(pl_hostname)).all()
         for plc in plugin_config_list:
@@ -339,9 +347,10 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
         return plugin_config_list
 
-    def del_plugin_config_key(self, pl_id, pl_hostname, pl_key):
+    def del_plugin_config_key(self, pl_type, pl_id, pl_hostname, pl_key):
         """Delete a key of a plugin config
 
+        @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key of the plugin config
@@ -352,6 +361,7 @@ class DbHelper():
         self.__session.expire_all()
         plugin_config = self.__session.query(
                                PluginConfig
+                           ).filter_by(type=ucode(pl_type)
                            ).filter_by(id=ucode(pl_id)
                            ).filter_by(hostname=ucode(pl_hostname)
                            ).filter_by(key=ucode(pl_key)).first()
@@ -370,9 +380,8 @@ class DbHelper():
         """Return a list of devices
         @return a list of Device objects (only the devices that are known by this realease)
         """
-        #return self.__session.query(Device).filter(Device.address==None).all()
         device_list = []
-        for device in self.__session.query(Device).filter(Device.address==None).all():
+        for device in self.__session.query(Device).all():
             device_list.append(self.get_device(device=device))
         return device_list
 
@@ -382,12 +391,6 @@ class DbHelper():
         for device in self.__session.query(Device).filter_by(client_id=p_id).all():
             device_list.append(self.get_device(device=device))
         return device_list
-
-    def list_old_devices(self):
-        """Return a list of devices
-        @return a list of Device objects (only the devices that are inot known by this realease)
-        """
-        return self.__session.query(Device).filter(Device.address!=None).all()
 
     def get_device_sql(self, d_id):
         return self.__session.query(Device).filter_by(id=d_id).first()
@@ -417,104 +420,122 @@ class DbHelper():
         # params
         json_device['parameters'] = {}
         for a_param in device.params:
-            json_param = { 'id': a_param.id,
-                           'key': a_param.key,
-                           'type': a_param.type,
-                           'value': a_param.value
-                           }
-            json_device['parameters'][a_param.key] = json_param
+            try:
+                json_param = { 'id': a_param.id,
+                               'key': a_param.key,
+                               'type': a_param.type,
+                               'value': a_param.value
+                               }
+                json_device['parameters'][a_param.key] = json_param
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
         
         # complete with sensors informations
         json_device['sensors'] = {}
         for a_sensor in device.sensors:
-            json_sensor = { 'id' : a_sensor.id,
-                            'name' : a_sensor.name,
-                            'incremental' : a_sensor.incremental,
-                            'formula' : a_sensor.formula,
-                            'data_type' : a_sensor.data_type,
-                            'conversion' : a_sensor.conversion, 
-                            'timeout' : a_sensor.timeout, 
-                            'last_value' : a_sensor.last_value, 
-                            'last_received' : a_sensor.last_received,
-                            'value_min' : a_sensor.value_min,
-                            'value_max' : a_sensor.value_max,
-                            'reference' : a_sensor.reference
-                          }
-            json_device['sensors'][a_sensor.reference] = json_sensor
+            try:
+                json_sensor = { 'id' : a_sensor.id,
+                                'name' : a_sensor.name,
+                                'incremental' : a_sensor.incremental,
+                                'formula' : a_sensor.formula,
+                                'data_type' : a_sensor.data_type,
+                                'conversion' : a_sensor.conversion, 
+                                'timeout' : a_sensor.timeout, 
+                                'last_value' : a_sensor.last_value, 
+                                'last_received' : a_sensor.last_received,
+                                'value_min' : a_sensor.value_min,
+                                'value_max' : a_sensor.value_max,
+                                'reference' : a_sensor.reference
+                              }
+                json_device['sensors'][a_sensor.reference] = json_sensor
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # complete with commands information
         json_device['commands'] = {}
         for a_cmd in device.commands:
-            json_command = {
-                    'id': a_cmd.id,
-                    'name': a_cmd.name,
-                    'return_confirmation': a_cmd.return_confirmation,
-                    'xpl_command' : a_cmd.xpl_command.json_id,
-                    'parameters': []
-                    }
-            for a_cmd_param in a_cmd.params:
-                json_command['parameters'].append({ 'key': a_cmd_param.key,
-                                                    'data_type': a_cmd_param.data_type,
-                                                    'conversion': a_cmd_param.conversion
-                                                })
-            json_device['commands'][a_cmd.reference] = json_command
+            try:
+                json_command = {
+                        'id': a_cmd.id,
+                        'name': a_cmd.name,
+                        'return_confirmation': a_cmd.return_confirmation,
+                        'parameters': []
+                        }
+                if a_cmd.xpl_command:
+                    json_command['xpl_command'] = a_cmd.xpl_command.json_id
+                for a_cmd_param in a_cmd.params:
+                    json_command['parameters'].append({ 'key': a_cmd_param.key,
+                                                        'data_type': a_cmd_param.data_type,
+                                                        'conversion': a_cmd_param.conversion
+                                                    })
+                json_device['commands'][a_cmd.reference] = json_command
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # complete for each xpl_stat information
         json_device['xpl_stats'] = {}
         for a_xplstat in device.xpl_stats:
-            json_xplstat = { 'id' : a_xplstat.id,
-                             'json_id' : a_xplstat.json_id,
-                             'name' : a_xplstat.name,
-                             'schema' : a_xplstat.schema,
-                             'parameters' : {
-                                'static' : [],
-                                'dynamic' : []
-                             }
-                           }
-            # and for each xpl_stat, add the parameters informations
-            # the loop is done twice : 
-            # - for the dynamic parameters
-            # - for the static parameters
-            for a_xplstat_param in a_xplstat.params:
-                if a_xplstat_param.static == False and a_xplstat_param.sensor_id is not None:
-                    if a_xplstat_param.sensor_id:
-                        for sen in device.sensors:
-                            if sen.id == a_xplstat_param.sensor_id:
-                                sensor_name = sen.reference
+            try:
+                json_xplstat = { 'id' : a_xplstat.id,
+                                 'json_id' : a_xplstat.json_id,
+                                 'name' : a_xplstat.name,
+                                 'schema' : a_xplstat.schema,
+                                 'parameters' : {
+                                    'static' : [],
+                                    'dynamic' : []
+                                 }
+                               }
+                # and for each xpl_stat, add the parameters informations
+                # the loop is done twice : 
+                # - for the dynamic parameters
+                # - for the static parameters
+                for a_xplstat_param in a_xplstat.params:
+                    if a_xplstat_param.static == False and a_xplstat_param.sensor_id is not None:
+                        if a_xplstat_param.sensor_id:
+                            for sen in device.sensors:
+                                if sen.id == a_xplstat_param.sensor_id:
+                                    sensor_name = sen.reference
+                        else:
+                            sensor_name = None
+                        json_xplstat['parameters']['dynamic'].append({ 'key' :  a_xplstat_param.key,
+                                                                       'ignore_values' :  a_xplstat_param.ignore_values,
+                                                                       'sensor_name': sensor_name
+                                                                    })
                     else:
-                        sensor_name = None
-                    json_xplstat['parameters']['dynamic'].append({ 'key' :  a_xplstat_param.key,
-                                                                   'ignore_values' :  a_xplstat_param.ignore_values,
-                                                                   'sensor_name': sensor_name
-                                                                })
-                else:
-                    json_xplstat['parameters']['static'].append({ 'key' :  a_xplstat_param.key,
-                                                                  'type' : a_xplstat_param.type,
-                                                                  'value' :  a_xplstat_param.value,
-                                                                })
-                 
-            json_device['xpl_stats'][a_xplstat.json_id] = json_xplstat
+                        json_xplstat['parameters']['static'].append({ 'key' :  a_xplstat_param.key,
+                                                                      'type' : a_xplstat_param.type,
+                                                                      'value' :  a_xplstat_param.value,
+                                                                    })
+                     
+                json_device['xpl_stats'][a_xplstat.json_id] = json_xplstat
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # xpl_commands
         json_device['xpl_commands'] = {}
         for a_xplcmd in device.xpl_commands:
-            json_xplcmd = { 'id': a_xplcmd.id,
-                            'name' : a_xplcmd.name,
-                            'schema' : a_xplcmd.schema,
-                            'xpl_stat_ack': a_xplcmd.stat.json_id,
-                            'parameters' : []
-                            }
-            for a_xplcmd_param in a_xplcmd.params:
-                json_xplcmd['parameters'].append({ 'key' :  a_xplcmd_param.key,
-                                                   'value' :  a_xplcmd_param.value
-                                                })
-            json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
+            try:
+                json_xplcmd = { 'id': a_xplcmd.id,
+                                'name' : a_xplcmd.name,
+                                'schema' : a_xplcmd.schema,
+                                'xpl_stat_ack': a_xplcmd.stat.json_id,
+                                'parameters' : []
+                                }
+                for a_xplcmd_param in a_xplcmd.params:
+                    json_xplcmd['parameters'].append({ 'key' :  a_xplcmd_param.key,
+                                                       'value' :  a_xplcmd_param.value
+                                                    })
+                json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
+            except:
+                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # global parameters
         return json_device
 
     def add_full_device(self, params, client_data):
         try:
+            #print params
+            #print json
             created_xpl_stats = {}
             created_xpl_cmd = {}
             created_sensors = {}
@@ -560,10 +581,15 @@ class DbHelper():
                 self.__session.add(sensor)
                 self.__session.flush()
                 created_sensors[a_sensor] = sensor.id
+                #print("CLIENT_DATA={0}".format(client_data))
+                #print("PARAMS={0}".format(params))
                 for a_stat in client_data['xpl_stats']:
                     stat = client_data['xpl_stats'][a_stat]
                     for param in stat['parameters']['dynamic']:
-                        if param['sensor'] == a_sensor:
+                        #print("A_STAT={0}".format(a_stat))
+                        #print("PARAM={0}".format(param))
+                        #print("A_SENSOR={0}".format(a_sensor))
+                        if param['sensor'] == a_sensor and a_stat in params['xpl_stats']:
                             stats_list.append(a_stat)
             
     
@@ -646,7 +672,7 @@ class DbHelper():
                     if p['xpl']:
                         for p2 in params['xpl']:
                             if p2['key'] == p['key']:
-                                print("P={0}   / P2={0}".format(p, p2))
+                                #print("P={0}   / P2={0}".format(p, p2))
                                 par = XplStatParam(xplstat_id = stat.id , \
                                           sensor_id = None, \
                                           key = p['key'], \
@@ -712,6 +738,7 @@ class DbHelper():
             self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
             for p2 in params['xpl_stats'][a_xplstat]:
                 if p2['key'] == a_parameter['key']:
+                    #print p2
                     if 'multiple' in p2:
                         mul = p2['multiple']
                     else:
@@ -843,8 +870,17 @@ class DbHelper():
                         newval = value
                         self.log.error("Failed to apply formula ({0}) to sensor ({1}): {2}".format(sensor.formula, sensor, exp))
                     value = newval
-                # only store stats if the value is different
-                if sensor.history_duplicate or (not sensor.history_duplicate and sensor.last_value is not str(value)):
+                ### only store stats if the value is different
+                # if duplicate == 1 we allow duplicate values
+                # else we skip if the new value has the same value as the last one in database
+                #
+                # TODO : maybe we could improve this part and do the following :
+                # if not duplicate
+                #     if new_value == last_value == before_last_value:
+                #         insert new_value
+                #         delete last_value
+                # so we would keep only the first and the last value of the N same values 
+                if (sensor.history_duplicate == 1) or (sensor.history_duplicate == 0 and str(sensor.last_value) != str(value)):
                     # handle history_round
                     # reduce device stats
                     if sensor.history_round > 0:
@@ -1722,9 +1758,9 @@ class DbHelper():
     def get_scenario_by_name(self, s_name):
         return self.__session.query(Scenario).filter(Scenario.name==s_name).first()
 
-    def add_scenario(self, name, json, disabled):
+    def add_scenario(self, name, json, disabled, desc):
         self.__session.expire_all()
-        scenario = Scenario(name=name, json=json, disabled=disabled)
+        scenario = Scenario(name=name, json=json, disabled=disabled, description=desc)
         self.__session.add(scenario)
         try:
             self.__session.commit()
@@ -1732,7 +1768,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
         return scenario
 
-    def update_scenario(self, s_id, name=None, json=None, disabled=None):
+    def update_scenario(self, s_id, name=None, json=None, disabled=None, description=None):
         self.__session.expire_all()
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is None:
@@ -1743,6 +1779,8 @@ class DbHelper():
             scenario.json = ucode(json)
         if disabled is not None:
             scenario.disabled = disabled
+        if description is not None:
+            scenario.description = description
         self.__session.add(scenario)
         try:
             self.__session.commit()
@@ -1780,7 +1818,7 @@ class DbHelper():
         self.__session.expire_all()
         config = self.__session.query(DeviceParam).filter_by(id=dc_id).first()
         if config is None:
-            self.__raise_dbhelper_exception("ScenarioUUID with id {0} couldn't be found".format(u_id))
+            self.__raise_dbhelper_exception("Global device param with id %s couldn't be found" % u_id)
         if key is not None:
             config.key = ucode(key)
         if value is not None:
@@ -1791,6 +1829,45 @@ class DbHelper():
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
         return config
+
+###################
+# Timeline
+###################
+    def get_timeline(self, device_id = None):
+        """ Get the history of the last events
+        """
+        if device_id:
+            return self.__session.query(
+                                    Device.name,
+                                    Device.id,
+                                    Device.client_id,
+                                    Sensor.name,
+                                    Sensor.data_type,
+                                    SensorHistory.sensor_id,
+                                    SensorHistory.date,
+                                    SensorHistory.value_str
+                             ) \
+                             .filter(Device.id == device_id) \
+                             .join(Sensor) \
+                             .join(SensorHistory) \
+                             .order_by(SensorHistory.date.desc()) \
+                             .limit(100)
+        else:
+            return self.__session.query(
+                                    Device.name,
+                                    Device.id,
+                                    Device.client_id,
+                                    Sensor.name,
+                                    Sensor.data_type,
+                                    SensorHistory.sensor_id,
+                                    SensorHistory.date,
+                                    SensorHistory.value_str
+                             ) \
+                             .join(Sensor) \
+                             .join(SensorHistory) \
+                             .order_by(SensorHistory.date.desc()) \
+                             .limit(100)
+
 
 ###################
 # helper functions

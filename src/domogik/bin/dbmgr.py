@@ -133,6 +133,9 @@ class DBConnector(Plugin, MQRep):
                 # device delete
                 elif msg.get_action() == "device.delete":
                     self._mdp_reply_devices_delete_result(msg)
+                # sensor history
+                elif msg.get_action() == "sensor_history.get":
+                    self._mdp_reply_sensor_history(msg)
         except:
             msg = "Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
@@ -149,9 +152,9 @@ class DBConnector(Plugin, MQRep):
             status = False
             reason = "Config request : missing 'type' field : {0}".format(data)
 
-        if msg_data['type'] != "plugin":
+        if msg_data['type'] not in ["plugin", "brain", "interface"]:
             status = False
-            reason = "Config request not available for type={0}".format(msg_data['type'])
+            reason = "Configuration request not available for type={0}".format(msg_data['type'])
 
         if 'name' not in msg_data:
             status = False
@@ -181,14 +184,14 @@ class DBConnector(Plugin, MQRep):
             msg.add_data('key', key)  # we let this here to display key or * depending on the case
             try:
                 if get_all_keys == True:
-                    config = self._db.list_plugin_config(name, host)
+                    config = self._db.list_plugin_config(type, name, host)
                     self.log.info(u"Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, config))
                     json_config = {}
                     for elt in config:
                         json_config[elt.key] = self.convert(elt.value)
                     msg.add_data('data', json_config)
                 else:
-                    value = self._fetch_techno_config(name, host, key)
+                    value = self._fetch_techno_config(name, type, host, key)
                     # temporary fix : should be done in a better way (on db side)
                     value = self.convert(value)
                     self.log.info(u"Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, value))
@@ -217,9 +220,9 @@ class DBConnector(Plugin, MQRep):
             status = False
             reason = "Config set : missing 'type' field : {0}".format(data)
 
-        if msg_data['type'] != "plugin":
+        if msg_data['type'] not in ["plugin", "brain", "interface"]:
             status = False
-            reason = "Config set not available for type={0}".format(msg_data['type'])
+            reason = "You are not able to configure items for type={0}".format(msg_data['type'])
 
         if 'name' not in msg_data:
             status = False
@@ -246,9 +249,9 @@ class DBConnector(Plugin, MQRep):
             msg.add_data('host', host)
             try: 
                 # we add a configured key set to true to tell the UIs and plugins that there are some configuration elements
-                self._db.set_plugin_config(name, host, "configured", True)
+                self._db.set_plugin_config(type, name, host, "configured", True)
                 for key in msg_data['data']:
-                    self._db.set_plugin_config(name, host, key, data[key])
+                    self._db.set_plugin_config(type, name, host, key, data[key])
                 self.publish_config_updated(type, name, host)
             except:
                 reason = "Error while setting configuration for '{0} {1} on {2}' : {3}".format(type, name, host, traceback.format_exc())
@@ -275,9 +278,9 @@ class DBConnector(Plugin, MQRep):
             status = False
             reason = "Config request : missing 'type' field : {0}".format(data)
 
-        if msg_data['type'] != "plugin":
+        if msg_data['type'] not in ["plugin", "brain", "interface"]:
             status = False
-            reason = "Config request not available for type={0}".format(msg_data['type'])
+            reason = "Configuration deletion not available for type={0}".format(msg_data['type'])
 
         if 'name' not in msg_data:
             status = False
@@ -298,7 +301,7 @@ class DBConnector(Plugin, MQRep):
             msg.add_data('name', name)
             msg.add_data('host', host)
             try:
-                self._db.del_plugin_config(name, host)
+                self._db.del_plugin_config(type, name, host)
                 self.log.info(u"Delete config for {0} {1}".format(type, name))
                 self.publish_config_updated(type, name, host)
             except:
@@ -313,7 +316,7 @@ class DBConnector(Plugin, MQRep):
         self.reply(msg.get())
 
 
-    def _fetch_techno_config(self, name, host, key):
+    def _fetch_techno_config(self, name, type, host, key):
         '''
         Fetch a plugin global config value in the database
         @param name : the plugin of the element
@@ -322,16 +325,17 @@ class DBConnector(Plugin, MQRep):
         '''
         try:
             try:
-                result = self._db.get_plugin_config(name, host, key)
+                result = self._db.get_plugin_config(type, name, host, key)
                 # tricky loop as workaround for a (sqlalchemy?) bug :
                 # sometimes the given result is for another plugin/key
                 # so while we don't get the good data, we loop
                 # This bug happens rarely
                 while result.id != name or \
+                   result.type != type or \
                    result.hostname != host or \
                    result.key != key:
-                    self.log.debug(u"Bad result : {0}/{1} != {2}/{3}".format(result.id, result.key, plugin, key))
-                    result = self._db.get_plugin_config(name, host, key)
+                    self.log.debug(u"Bad result : {0}-{1}/{2} != {3}/{4}".format(result.id, result.type, result.key, plugin, key))
+                    result = self._db.get_plugin_config(type, name, host, key)
                 val = result.value
                 if val == '':
                     val = "None"
@@ -349,6 +353,7 @@ class DBConnector(Plugin, MQRep):
         status = True
         reason = False
 
+        self.log.debug(u"Deleting device : {0}".format(data))
         try:
             did = data.get_data()['did']
             if did:
@@ -359,14 +364,17 @@ class DBConnector(Plugin, MQRep):
                     status = True 
             else:
                 status = False
-                reason = "Device delete failed"
+                reason = "There is no such device"
+                self.log.debug(reason)
             # delete done
         except DbHelperException as d:
             status = False
             reason = "Error while deleting device: {0}".format(d.value)
+            self.log.error(reason)
         except:
             status = False
             reason = "Error while deleting device: {0}".format(traceback.format_exc())
+            self.log.error(reason)
         # send the result
         msg = MQMessage()
         msg.set_action('device.delete.result')
@@ -505,13 +513,28 @@ class DBConnector(Plugin, MQRep):
                         result['xpl_commands'][xcmdn].append(param)
             # find the xplStats
             sensors = pjson['device_types'][dev_type_id]['sensors']
+            #print("SENSORS = {0}".format(sensors))
             for xstatn in pjson['xpl_stats']:
+                #print("XSTATN = {0}".format(xstatn))
                 xstat = pjson['xpl_stats'][xstatn]
                 for sparam in xstat['parameters']['dynamic']:
+                    #print("XSTATN = {0}, SPARAM = {1}".format(xstatn, sparam))
+                    #if 'sensor' in sparam and xstatn in sensors:
+                    # => This condition was used to fix a bug which occurs while creating complexe devices for rfxcom
+                    #    But is introduced a bug for the geoloc plugin...
+                    #    In fact we had to fix the rfxcom info.json file (open_close uses now rssi_open_close instead of
+                    #    rssi_lighting2
+                    #    So, this one is NOT the good one.
                     if 'sensor' in sparam:
+                    # => this condition was the original one restored to make the geoloc pluin ok for tests
+                    #    Strangely, there is no issue while using the admin (which uses only mq)
+                    #    but is sucks with test library which uses rest...
+                    #    This one is the good one
                         if sparam['sensor'] in sensors:
+                            #print("ADD") 
                             stats.append(xstatn)
             result['xpl_stats'] = {}
+            #print("STATS = {0}".format(stats))
             for xstatn in stats:
                 xstat = pjson['xpl_stats'][xstatn]
                 result['xpl_stats'][xstatn] = []
@@ -533,37 +556,84 @@ class DBConnector(Plugin, MQRep):
         status = True
 
         msg_data = data.get_data()
-        if 'type' not in msg_data:
-            status = False
-            reason = "Devices request : missing 'type' field : {0}".format(data)
 
-        if 'name' not in msg_data:
-            status = False
-            reason = "Devices request : missing 'name' field : {0}".format(data)
+        # request for all devices
+        if 'type' not in msg_data and \
+           'name' not in msg_data and \
+           'host' not in msg_data:
 
-        if 'host' not in msg_data:
-            status = False
-            reason = "Devices request : missing 'host' field : {0}".format(data)
-
-        if status == False:
-            self.log.error(reason)
-        else:
             reason = ""
-            type = msg_data['type']
-            #if type == "plugin":
-            #    type = DMG_VENDOR_ID
-            name = msg_data['name']
-            host = msg_data['host']
-            dev_list = self._db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
+            status = True
+            dev_list = self._db.list_devices()
+
+            dev_json = dev_list
+            msg.add_data('status', status)
+            msg.add_data('reason', reason)
+            msg.add_data('devices', dev_json)
+
+        # request for all devices of one client
+        else:
+            if 'type' not in msg_data:
+                status = False
+                reason = "Devices request : missing 'type' field : {0}".format(data)
+
+            if 'name' not in msg_data:
+                status = False
+                reason = "Devices request : missing 'name' field : {0}".format(data)
+
+            if 'host' not in msg_data:
+                status = False
+                reason = "Devices request : missing 'host' field : {0}".format(data)
+
+            if status == False:
+                self.log.error(reason)
+            else:
+                reason = ""
+                type = msg_data['type']
+                name = msg_data['name']
+                host = msg_data['host']
+                dev_list = self._db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
+
             #dev_json = json.dumps(dev_list, cls=domogik_encoder(), check_circular=False),
             dev_json = dev_list
-            print(dev_json)
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('type', type)
             msg.add_data('name', name)
             msg.add_data('host', host)
             msg.add_data('devices', dev_json)
+
+        self.reply(msg.get())
+
+    def _mdp_reply_sensor_history(self, data):
+        """ Reply to sensor_history.get MQ req
+            @param data : MQ req message
+
+            If no other param than the sensor id, return the last value
+        """
+        msg = MQMessage()
+        msg.set_action('sensor_history.result')
+        status = True
+        reason = ""
+
+        msg_data = data.get_data()
+
+        try:
+            sensor_id = msg_data['sensor_id']
+            history = self._db.list_sensor_history(sensor_id, 1)
+            if len(history) == 0:
+                last_value = None
+            else: 
+                last_value = self._db.list_sensor_history(sensor_id, 1)[0].value_str
+        except:
+            self.log.error("ERROR when getting sensor history for id = {0} : {1}".format(sensor_id, traceback.format_exc()))
+            reason = "ERROR : {0}".format(traceback.format_exc())
+            status = False
+
+        msg.add_data('status', status)
+        msg.add_data('reason', reason)
+        msg.add_data('sensor_id', sensor_id)
+        msg.add_data('values', [last_value])
 
         self.reply(msg.get())
 

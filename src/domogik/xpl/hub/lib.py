@@ -294,12 +294,12 @@ class UdpHub(DatagramProtocol):
         """
         ip_list = []
         for interface in interfaces():
-            if interface in self.allowed_interfaces:
+            if interface in self.allowed_interfaces or self.allowed_interfaces == ['*']:
                 try:
                     self.log.info(u"Interface {0} (selected!)".format(interface))
                     for link in ifaddresses(interface)[AF_INET]:
                         ip_list.append(link['addr'])
-                        self.log.info(u"- ip : {0}".format(link['addr']))
+                        self.log.info(u"- ip : {0} [BIND]".format(link['addr']))
                 except:
                     # Probably a non configured interface (wifi for example)
                     # Do nothing

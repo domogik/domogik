@@ -14,17 +14,25 @@ The **README.md** file should contain a quick description of the plugin, and inv
 
 The **.md** extension is for *Markdown* which is a text markup language. You can find `more information about Markdown on wikipedia <http://en.wikipedia.org/wiki/Markdown>`_
 
-You may create the file like this (assuming the plugin id is *myplugin*): ::
+You may create the file like this: ::
 
-    $ PLUGIN_ID=myplugin
-    $ echo "domogik-plugin-$PLUGIN_ID
-    =======================
+    $ echo " # Purpose
     
-    This is a plugin for Domogik : http://www.domogik.org
+    This is a package for Domogik : http://www.domogik.org
+    
+    Domogik is an open source home automation solution.
+    
+    # Documentation 
+    
+    You can find the documentation source in the **docs/** folder. When the package will be installed, the documentation will be available in the **Documentation** menu of the Domogik administration for this package.
+    You may also find online documentation for this plugin. You will be able to find the documentation url on http://repo-public.domogik.org/dashboard
+    
+    # Install the package
+    
+    To install this package on your Domogik system, you can go in this GitHub repository releases page and get the link to a release .zip file. Then you just have to do :
+    
+        dmg_package -i http://path.to/the/file.zip" > README.md
 
-    You can find the documentation source in the **docs/** folder and if this package is a candidate for the nightly builds, you may find the build documentation on http://domogik-plugin-$PLUGIN_ID.readthedocs.org/en/latest/" > README.md
-
-Please notice that the content of this file assume that you will use http://readthedocs.org to host your plugin documentation as the related part of the documentation will suggest you to do ;)
 
 
 

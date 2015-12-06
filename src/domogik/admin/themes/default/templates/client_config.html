@@ -8,7 +8,7 @@
     {% if form != None %}
       {{ wtf.quick_form(form, button_map={'submit_button': 'primary'}) }}
     {% else %}
-      <div class="alert alert-info">{% trans %}There is nothing to configure for this plugin.{% endtrans %}</div>
+      <div class="alert alert-info">{% trans %}There is nothing to configure for this client.{% endtrans %}</div>
     {% endif %}
 </div>
 {% endblock %}
