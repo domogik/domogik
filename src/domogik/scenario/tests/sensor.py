@@ -42,10 +42,23 @@ class SensorTest(AbstractTest):
         self.log = log
         self._db = DbHelper()
         self._res = None
+        self._dataType = None
+        self._dt_parent = None
+        # get info from db
         with self._db.session_scope():
             sensor = self._db.get_sensor(self._sensorId)
             if sensor is not None:
                 self._res = sensor.last_value
+                self._dataType = sensor.data_type
+        # find the parent dt type
+        if cond:
+            dt_parent = self._dataType
+            while 'parent' in cond.datatypes[dt_parent] and cond.datatypes[dt_parent]['parent'] != None:
+                dt_parent = cond.datatypes[dt_parent]['parent']
+            self._dt_parent = dt_parent
+        # set new val
+        self._res = self._convert(self._res)
+        # start the thread
         self._event = Event()
         self._fetch_thread = Thread(target=self._fetch,name="pollthread")
         self._fetch_thread.start()
@@ -56,11 +69,20 @@ class SensorTest(AbstractTest):
             with self._db.session_scope():
                 sensor = self._db.get_sensor(self._sensorId)
                 if sensor is not None:
-                    new = sensor.last_value
+                    new = self._convert(sensor.last_value)
             if self._res != new:
                 self._res = new
                 self._trigger(self)
             sleep(2)
+
+    def _convert(self, val):
+        if self._dt_parent == "DT_Number":
+            if val != None:
+                return float(val)
+            else:
+                return None
+        else:
+            return val
 
     def evaluate(self):
         """ Evaluate if the text appears in the content of the page referenced by url

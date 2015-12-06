@@ -12,69 +12,9 @@
     <li>{% trans %}Enjoy !{% endtrans %}</li>
   </ul>
 
-  <button class="btn btn-default" id="start_tour">{% trans %}Start the discover tour!{% endtrans %}</button>
-
   <p>&nbsp;</p>
   <p>If you find a bug or need an improvment which is not related to a package (plugin, etc), please <a href="https://github.com/domogik/domogik/issues">open a ticket on our tracker</a>.</p>
   <p>If you find a bug or need an improvment about a package, please open a ticket in the package related GitHub tracker.</p>
 
 </div>
-
-<script type="text/javascript">
-  $( document ).ready(function() {
-
-    // Define the tour!
-    var tour = {
-      id: "index_tour",
-      steps: [
-        {
-          title: "{% trans %}Welcome to the Domogik administration interface{% endtrans %}",
-          content: "{% trans %}This administration interface will help you to configure Domogik.{% endtrans %}",
-          target: "admin",
-          placement: "bottom"
-        },
-        {
-          title: "{% trans %}Install some clients and manage them{% endtrans %}",
-          content: "{% trans %}First, you will have to install some clients. Then, you will be able to manage them and create Domogik devices for these clients from this menu.{% endtrans %}",
-          target: document.querySelector("#clients"),
-          placement: "bottom"
-        },
-        {
-          title: "{% trans %}Orphan devices{% endtrans %}",
-          content: "{% trans %}The orphan devices are Domogik devices which related to an unknown client. You will find them here.{% endtrans %}",
-          target: document.querySelector("#orphans"),
-          placement: "bottom"
-        },
-        {
-          title: "{% trans %}Accounts management{% endtrans %}",
-          content: "{% trans %}You can manage Domogik accounts from this menu.{% endtrans %}",
-          target: document.querySelector("#auth"),
-          placement: "bottom"
-        },
-        {
-          title: "{% trans %}If you are a developper...{% endtrans %}",
-          content: "{% trans %}If you are an advanced user, you can find documentation about the REST and Message Queue Api of Domogik here.{% endtrans %}",
-          target: document.querySelector("#api"),
-          placement: "bottom"
-        }
-      ],
-      onEnd: function() {
-          $.cookie("admin_home_tour", "done", { expires: 3650 });
-      }
-    };
-
-    // Start the tour on first launch
-    do_tour = $.cookie("admin_home_tour")
-    if (do_tour != "done") {
-        hopscotch.startTour(tour);
-    }
-
-    // Start the tour on demand
-    $('#start_tour').click(function() {
-        hopscotch.startTour(tour);
-    });
-
-  });
-
-</script>
 {% endblock %}

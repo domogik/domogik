@@ -5,12 +5,24 @@ Standard installation
 If you are already a Domogik 0.3 user
 =====================================
 
-Domogik 0.4 database is really different from the 0.3 database. The process to migrate data from Domogik 0.3 to Domogik 0.4 is not fully guarantee yet. **Please do a backup of your domogik database before migrating from 0.3 to 0.4 !**.
+You must first install Domogik 0.4.2 release. Then, you will be able to upgrade to Domogik 0.5
 
-**If you come from Domogik 0.3, you can directly install Domogik 0.4.1.**
+Important notice about the 0.5 release
+======================================
 
-If you encounter any issue during the database upgrade, please come on our irc channel and request us some help!
+In the 0.5 release, the Rest component has been merger in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
 
+* use the admin port (40406) instead of the previous rest port (40404)
+* add */rest/* in front of all old Rest url. Example : */device/* become */rest/device/*.
+
+Some core butler functions interfaces have changd. **All brain packages must be upgrade to Domogik 0.5 compliant releases.**
+
+If you plan to install Domogik on a Raspberry pi
+================================================
+
+If you want to use a Raspberry pi A/B/B+, you should forget to install Domogik on it. Currently Domogik uses too much memory for these models.
+
+Domogik should work fine on a Raspberry pi 2 only.
 
 Installation
 ============
@@ -28,7 +40,18 @@ Some distributions may not include the **sudo** command as a default one. For De
 
 You can also simply logon as the **root** user and ignore the **sudo** part of the command for the commands that include a **sudo**.
 
-Dependencies
+The lsb_release command
+-----------------------
+
+Domogik installation script uses the ``lsb_release -si`` command to check which Linux distribution you are using. Some Linux distribution has not this package instlled by default. This is the case for **Raspbian** for example. 
+
+On all Debian-based distributions (Raspbian for example), please install the **lsb-release** package like this: ::
+
+    $ sudo apt-get install lsb-release
+
+On other distributions, please refer to your distribution documentation.
+
+Dependencies 
 ------------
 
 Check your Python version with the below command: ::
@@ -54,7 +77,7 @@ Here are the needed dependencies. depanding on your Linux distribution, they wil
 * SSL libraries : **libssl-dev**
 * Zero MQ librariy : **libzmq-dev >= 14.4**. With the 14.3 release of this library, the publish/subscribe feature will not work!
 * postgresql libraries : **libpq-dev, python-psycopg2**
-* various needed libraries : **python-mako, libffi-dev**
+* various needed libraries : **python-mako, libffi-dev, python-netifaces**
 * git : **git**
 * MySQL server : **mysql-server**
 * Sphinx and Sphinx theme : **python-sphinx, sphinx-better-theme**
@@ -68,19 +91,28 @@ The **install.py** script will install these dependencies for the following dist
 
 For all the other distributions, please install them manually.
 
+Dependencies to install manually
+********************************
+
+The **netifaces python library** can't be installed automatically. For now you will have to install it manually. Example for debian based distributions: ::
+
+    $ sudo apt-get install python2.7-dev
+    $ sudo pip install netifaces
+
+
 Mysql server
 ------------
 
 .. note::
     * If you have already a Mysql server installed, you will only have to create the Domogik database.
     * Please note that Domogik does not automatically install the mysql server.
-    * It is highly recommended to use the **innodb engine** (which can be enabled in /etc/mysql/my.cnf)
+    * If you choose to manually create the database, it is highly recommended to use the **innodb engine** (which can be enabled in /etc/mysql/my.cnf)
 
 Install the packages for mysql server: ::
 
     $ sudo apt-get install mysql-server
 
-Log on the mysql database as root user: ::
+During the installation, **Domogik will automatically create the database**, but if you want to create the database yourself, log on the mysql database as root user: ::
 
     $ mysql -u root -p
     Enter password: 
@@ -125,26 +157,22 @@ Download the packages
 Download Domogik-mq : ::
 
     $ cd /opt/dmg/
-    $ wget --content-disposition https://github.com/domogik/domogik-mq/archive/1.1.tar.gz
-    $ tar xvzf domogik-mq-1.1.tar.gz
-    $ ln -s domogik-mq-1.1 domogik-mq
+    $ git clone https://github.com/domogik/domogik-mq.git
     $ cd domogik-mq
 
 Download Domogik : ::
 
     $ cd /opt/dmg/
-    $ wget --content-disposition https://github.com/domogik/domogik/archive/0.4.1.tar.gz
-    $ tar xvzf domogik-0.4.1.tar.gz
-    $ ln -s domogik-0.4.1 domogik
+    $ git clone https://github.com/domogik/domogik.git
     $ cd domogik
 
 Install Domogik-mq
 ------------------
 
-::
+Run the *install.py* script : ::
 
     $ cd /opt/dmg/domogik-mq
-    $ sudo ./install.py
+    $ sudo ./install.py --dist-packages
 
 You will be requested to give some informations. ::
 
@@ -155,30 +183,13 @@ Give the system user you will use to install Domogik. You can use a dedicated us
 
     Install MQ as master (lib+daemon) or client (lib only) ? [M/s]:
 
-On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.4), on the main server, choose the default option and on the other servers, choose the client option. ::
-
-    [ Update /etc/default/domogik-mq ]
-    [ Update the config file : /etc/domogik/domogik-mq.cfg ]
-    [ Starting on section mq ]
-    Key log_dir_path [/var/log/domogik/]:
-    Key pid_dir_path [/var/run/domogik/]:
-
-Just keep the default values. ::
-
-    Key log_level [debug]:
-
-If you are installing Domogik as a developper, you may use the *debug* level. Else, please set up the *info* level. ::
-
-    Key ip [127.0.0.1]: 
-
-This is the ip address which will be used by Domogik Message Queue (MQ). You should set up the server ip address, for example *192.168.1.10*.
-
+The installation of Domogik MQ is now finished.
 
 
 Install Domogik 
 ---------------
 
-Since Domogik 0.4, there is no more *install.sh* file. Now you must use the *install.py*: ::
+Run the *install.py* script : ::
 
     $ cd /opt/dmg/domogik/
     $ sudo ./install.py --dist-packages
@@ -192,22 +203,13 @@ Give the system user you will use to install Domogik. You can use a dedicated us
 
     [ Update /etc/default/domogik ]
     Configuration files
-    Please notice that Domogik 0.3.x configuration files are no more compliant with Domogik 0.4 :
-    - backup your Domogik 0.3 configuration files
-    - say 'n' to the question to recreate them from scratch
     Do you want to keep your current config files ? [Y/n]:
 
-If you already have a Domogik installation, you could keep your configuration file. If you are **upgrading from a 0.3 release, please don't keep your current configuration file! The format is different**. If you are upgrading from a 0.4.0 release, you will just need to add some more lines at the end (more informations lower). ::
+If you already have a configuration file, you could keep it. But the **rest** section will not be used anymore (as Rest and Admin have been merged in the Admin component).
 
     [ Update the config file : /etc/domogik/domogik.cfg ]
-    [ Starting on section domogik ]
-    Key log_level [debug]:
 
-For this 0.4.1 release, you should keep the *debug* level. ::
-
-    Key bind_interface [127.0.0.1]: 
-
-This is the ip address which will be used by Domogik to send xPL messages. You should set up the server ip address, for example *192.168.1.10*. ::
+For this 0.4.2 release, you should keep the *debug* level. ::
 
     [ Starting on section database ]
     Key type [mysql]:
@@ -216,28 +218,10 @@ This is the ip address which will be used by Domogik to send xPL messages. You s
     Key port [3306]:
     Key name [domogik]: 
     Key host [127.0.0.1]:
-    Key prefix [core]:
 
 Set up the database credentials. I you created the database as defined in this page, you can keep the default values. ::
 
-    [ Starting on section rest ]
-    Key interfaces [lo]: 
-    Key port [40405]:
-    Key use_ssl [False]:
-    Key ssl_certificate []:
-    Key ssl_key []:
-    Key clean_json [False]:
-
-Set up your network inerface name (**eth0** in most cases) for the **interfaces** parameter. You should keep the default value for all the others. ::
-
-    [ Starting on section admin ]
-    Key interfaces [lo,eth0]:
-    Key port [40406]:
-    Key use_ssl [False]:
-    Key ssl_certificate []:
-    Key ssl_key []:
-
-If your default network interface is set in the **interfaces** default value, keep all the default values. ::
+You should keep the default values. ::
 
     [ Starting on section butler ]
     Key name [Aria]:
@@ -250,13 +234,6 @@ These are the information about the butler. If you are not a french user, set th
     Key folder [/var/lib/domogik/backup/]: /tmp/
 
 Set the folder you want to use to save Domogik backups. ::
-
-    [ Update the config file : /etc/domogik/xplhub.cfg ]
-    [ Starting on section hub ]
-    Key interfaces [lo]: 
-    Key log_level [error]:
-
-These options are used by the xPL hub. Set your default network interface name (*eth0* ?) as **interfaces**. ::
 
     [ Installing or upgrading the db ]
     ==> Creating backup
@@ -275,7 +252,7 @@ Set the backup file
 
 
 
-In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogik.cfg**, you will have to complete it with these lines for Domoik 0.4.1 : ::
+In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogik.cfg**, you will have to complete it with these lines for Domogik 0.4.2 : ::
 
     [butler]
     name = Aria
@@ -284,6 +261,10 @@ In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogi
     
     [backup]
     folder = /opt/dmg/backup
+
+And you will also have to replace the below line value (use a network interface name instead of an ip address). Example: ::
+
+    bind_interface = eth0
 
 Butler section : 
 
@@ -324,13 +305,15 @@ It will start :
 * The administration web interface
 
 .. note::
+    Domogik administration is available on http://<ip>:40406/ if you didn't change the port number.
+
     Default **login** and **password** are : 
 
     * login : admin
     * password : 123
 
-Set up the automatic backup
----------------------------
+Set up the automatic backup  and packages documentation automatic upgrade
+-------------------------------------------------------------------------
 
 If you want (and you should), you could configure a daily (or weekly) backup. Domogik provides a python backup script : **backup.py**. 
 
@@ -358,7 +341,7 @@ The default backup folder is **/var/lib/domogik/backup/**. You can change it in 
 Next step : domoweb, the web user interface
 -------------------------------------------
 
-Check in the Domoweb documentation.
+Check in the Domoweb documentation : http://docs.domogik.org/domoweb/
 
 It doesn't work?
 ----------------

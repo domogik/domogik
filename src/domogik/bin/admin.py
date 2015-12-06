@@ -62,6 +62,7 @@ from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.httpserver import HTTPServer
 from tornado.web import FallbackHandler, Application
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
+REST_API_VERSION = "0.8"
 
 ################################################################################
 
@@ -190,7 +191,10 @@ class Admin(Plugin):
                 self.use_ssl = conf_admin['use_ssl']
                 self.key_file = conf_admin['ssl_certificate']
                 self.cert_file = conf_admin['ssl_key']
-
+                if 'clean_json' in conf_admin:
+                    self.clean_json = conf_admin['clean_json']
+                else:
+                    self.clean_json = False
             except KeyError:
                 # default parameters
                 self.interfaces = server_interfaces
@@ -235,10 +239,15 @@ class Admin(Plugin):
         admin_app.zmq_context = self.zmq
         admin_app.db = DbHelper()
         admin_app.datatypes = self.datatypes
+        admin_app.clean_json = self.clean_json
+        admin_app.apiversion = REST_API_VERSION
+        admin_app.use_ssl = self.use_ssl
+        admin_app.hostname = self.get_sanitized_hostname()
+        admin_app.resources_directory = self.get_resources_directory()
         
 	tapp = Application([
-		(r"/ws", AdminWebSocket),
-        (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
+	    (r"/ws", AdminWebSocket),
+            (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
 	])
 
 	# create the server
@@ -253,12 +262,20 @@ class Admin(Plugin):
             self.http_server = HTTPServer(tapp)
 	# listen on the interfaces
 	if self.interfaces != "":
+            # value can be : lo, eth0, ...
+            # or also : '*' to catch all interfaces, whatever they are
 	    intf = self.interfaces.split(',')
-	    for ip in get_ip_for_interfaces(intf):
+            self.log.info("The admin will be available on the below addresses : ")
+            num_int = 0
+	    for ip in get_ip_for_interfaces(intf, log = self.log):
+                self.log.info(" - {0}:{1} [BIND]".format(ip, self.port))
 	        self.http_server.listen(int(self.port), address=ip)
+                num_int += 1
+            if num_int == 0:
+                self.log.error("The admin is not configured to use any working network interface! Please check configuration!!!!!!")
         else:
             self.http_server.bind(int(self.port))
-            self.http_server.start(1)
+            self.http_server.start(0)
         return
 
     def stop_http(self):

@@ -4,7 +4,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2014 Noah Petherbridge
+# Copyright (c) 2015 Noah Petherbridge
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,10 +25,10 @@
 # SOFTWARE.
 
 # Python 3 compat
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 __author__     = 'Noah Petherbridge'
-__copyright__  = 'Copyright 2013, Noah Petherbridge'
+__copyright__  = 'Copyright 2015, Noah Petherbridge'
 __credits__    = [
     'Noah Petherbridge',
     'dinever'
@@ -39,6 +39,7 @@ __status__     = 'Production'
 __docformat__  = 'plaintext'
 
 __all__      = ['rivescript']
-__version__  = '1.06'
+__version__  = '1.8.1'
 
-from .rivescript import RiveScript
+from .rivescript import RiveScript, RiveScriptError, NoMatchError, NoReplyError,\
+    ObjectError, DeepRecursionError, NoDefaultRandomTopicError, RepliesNotSortedError

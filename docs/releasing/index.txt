@@ -32,6 +32,7 @@ Before releasing
 * Check countdown website is ready
 * Check installation doc is up to date for Domogik, Domoweb
 * Upgrade version number in apidoc.json or MQ and rest
+* Upgrade REST api version if needed in ./src/domogik/bin/admin.py:REST_API_VERSION
 * Do we need a new MQ release ?
 
 

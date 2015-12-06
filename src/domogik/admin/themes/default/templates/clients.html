@@ -3,11 +3,9 @@
 {% block content %}
 <div class="container">
 
-
     <button type="button" id="install_a_plugin" class="btn btn-primary" data-toggle="modal" data-target="#install_instructions">
       <span class='glyphicon glyphicon-download-alt' aria-hidden='true'></span> {% trans %}Install a package{% endtrans %}
     </button>
-    <button class="btn btn-default" id="start_tour">{% trans %}Start the discover tour!{% endtrans %}</button>
     
     <!-- Modal -->
     <div class="modal fade" id="install_instructions" tabindex="-1" role="dialog" aria-labelledby="installInstructions" aria-hidden="true">
@@ -31,6 +29,10 @@
       </div>
     </div>
 
+
+    {% if msg_core_dead != None %}
+      <div class="alert alert-warning">{{ msg_core_dead | safe }}</div>
+    {% endif %}
 
     {% if clients|length > 0 %}
       {% for host in client_list_per_host_per_type %}
@@ -78,7 +80,7 @@
                 {% elif type == "brain" %}
                   <span class="label label-info status status-label pull-right">n/a</span>
                 {% else %}
-                  <span class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
+                  <span id="status-{{host}}-{{type}}-{{client_list_per_host_per_type[host][type][client].name}}" class="label label-info status status-label status-{{client_list_per_host_per_type[host][type][client].status}} pull-right">{{client_list_per_host_per_type[host][type][client].status}}</span>
                 {% endif %}
                 </a>
 
@@ -105,54 +107,20 @@
     {% else %}
         <div class="alert alert-warning">{% trans %}No clients found (even core components!): is Domogik manager running?{% endtrans %}</div>
     {% endif %}
-
 </div>
-
-
 <script type="text/javascript">
-  $( document ).ready(function() {
-
-    /************** tour *****************/
-    // Define the tour!
-    var tour = {
-      id: "clients_tour",
-      steps: [
-        {
-          title: "{% trans %}Find all the Domogik clients{% endtrans %}",
-          content: "{% trans %}You will find all the clients on all the servers handled by Domogik.{% endtrans %}",
-          target: "h1",
-          placement: "bottom"
-        },
-        {
-          title: "{% trans %}There are different type of clients{% endtrans %}",
-          content: "{% trans %}Domogik has different type of clients.{% endtrans %}<ul><li><strong>{% trans %}Core components{% endtrans %}</strong> : {% trans %}they are the main components of Domogik. You can't do nothing on these components from here. You can just check their status.{% endtrans %}</li><li><strong>{% trans %}Plugins{% endtrans %}</strong> : {% trans %}plugins are packages installed by yourself. You can configure them and create some devices.{% endtrans %}</li><li><strong>{% trans %}Brain parts{% endtrans %}</strong> : {% trans %}brain parts are packages installed by yourself. They are used by the butler which is the core components that helps you to communicate with Domogik.{% endtrans %}</li></ul>",
-          target: "h2",
-          placement: "bottom"
-        },
-        {
-          title: "{% trans %}You should now install some plugins{% endtrans %}",
-          content: "{% trans %}To be able to continue, you should now install some plugins.{% endtrans %}",
-          target: document.querySelector("#install_a_plugin"),
-          placement: "bottom"
+$( document ).ready(function() {
+    ws.onmessage = function(e) {
+        data = JSON.parse(e.data);
+        if (data.msgid == "plugin.status") {
+            msg = data.content;
+            el = '#status-'+msg['host']+'-'+msg['type']+'-'+msg['name'];
+            if ( $(el) ) {
+                $(el).text(msg['event']);
+                $(el).removeClass().addClass('label label-info status status-label status-'+msg['event']+' pull-right');
+            }
         }
-      ],
-      onEnd: function() {
-          $.cookie("admin_clients_tour", "done", { expires: 3650 });
-      }
-    };
-
-    // Start the tour on first launch
-    do_tour = $.cookie("admin_clients_tour")
-    if (do_tour != "done") {
-        hopscotch.startTour(tour);
     }
-
-    // Start the tour on demand
-    $('#start_tour').click(function() {
-        hopscotch.startTour(tour);
-    });
-
-  });
-
+});
 </script>
 {% endblock %}

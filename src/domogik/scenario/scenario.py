@@ -30,6 +30,7 @@ from exceptions import ValueError
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 import zmq
+import traceback
 
 class ScenarioInstance:
     """ This class provides base methods for the scenarios
@@ -79,11 +80,37 @@ class ScenarioInstance:
         self._disabled = disabled
 
         self.zmq = zmq.Context()
+        # datatypes
+        self.datatypes = {}
+        cli = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is not None:
+            res = res.get_data()
+            if 'datatypes' in res:
+                self.datatypes = res['datatypes']
 
         self._parsed_condition = None
         self._mapping = { 'test': {}, 'action': {} }
         if not self._disabled:
             self._instanciate()
+    
+    def enable(self):
+        if self._disabled:
+            self._disabled = False
+            self._instanciate()
+            return True
+        else:
+            return False
+
+    def disable(self):
+        if not self._disabled:
+            self._disabled = True
+            self._clean_instances()
+            return True
+        else:
+            return False
 
     def destroy(self):
         """ Cleanup the class
@@ -117,10 +144,13 @@ class ScenarioInstance:
             res = res.get_data()
             if 'datatypes' in res:
                 datatypes = res['datatypes']
-        # step 1 parse the "do" part
-        self.__parse_do_part(self._json['DO'])
-        # step 2 parse the "if" part        
-        self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
+        try:
+            # step 1 parse the "do" part
+            self.__parse_do_part(self._json['DO'])
+            # step 2 parse the "if" part        
+            self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
+        except:
+            raise
 
     def __parse_if_part(self, part, datatypes = None):
         # translate datatype to default blocks
@@ -144,7 +174,7 @@ class ScenarioInstance:
             else:
                 return "\"0\""
         elif part['type'] == 'math_number':
-            return "\"{0}\"".format(part['NUM'])
+            return "float(\"{0}\")".format(part['NUM'])
         elif part['type'] == 'text':
             return "\"{0}\"".format(part['TEXT'])
         elif part['type'] == 'math_arithmetic':
@@ -235,7 +265,8 @@ class ScenarioInstance:
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create action instance {0} with uuid {1}".format(inst, uuid))
             obj = cobj(log=self._log, params=params)
-            self._mapping['action'][uuid] = obj
+            index = "{0}-{1}".format(len(self._mapping['action']), uuid)
+            self._mapping['action'][index] = obj
             return (obj, uuid)
 
     def _get_uuid(self):
@@ -252,8 +283,11 @@ class ScenarioInstance:
         """ Call the needed actions for this scenario
         """
         print "CALLING actions"
-        for act in self._mapping['action']:
-            self._mapping['action'][act].do_action()
+        for act in sorted(self._mapping['action']):
+            try:
+                self._mapping['action'][act].do_action()
+            except:
+                self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
         print "END CALLING actions"
 
     def generic_trigger(self, test):

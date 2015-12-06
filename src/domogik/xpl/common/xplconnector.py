@@ -84,6 +84,7 @@ from domogik.xpl.common.xplmessage import XplMessage, FragmentedXplMessage
 from domogik.common.dmg_exceptions import XplMessageError
 import time
 import uuid
+from domogik.common.utils import get_ip_for_interfaces
 
 READ_NETWORK_TIMEOUT = 2
 STATUS_HBEAT_XPL = 5  # default hbeat interval in minutes
@@ -102,16 +103,17 @@ class Manager:
     # _network = None
     # _UDPSock = None
 
-    def __init__(self, ip=None, port=0, broadcast="255.255.255.255", plugin = None, nohub = False, source = None):
+    def __init__(self, interfaces_list=None, port=0, broadcast="255.255.255.255", plugin = None, nohub = False, source = None):
         """
         Create a new manager instance
-        @param ip : IP to listen to (default real ip address)
+        @param interfaces_list : interfaces to listen to (default real ip address)
         @param port : port to listen to (default 0)
         @param plugin : The plugin associated with this xpl instance
         @param nohub : Don't start the hub discovery
         """
-        if ip == None:
-            ip = self.get_sanitized_hostname()
+        if interfaces_list == None:
+            interfaces_list = '*'  # all interfaces
+
         self.p = plugin
         if source == None:
             source = "domogik-%s.%s" % (self.p.get_plugin_name(), self.p.get_sanitized_hostname())
@@ -127,8 +129,32 @@ class Manager:
         #Set broadcast flag
         self._UDPSock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         self._broadcast = broadcast
+
         #xPL plugins only needs to connect on local xPL Hub on localhost
-        addr = (ip, port)
+        addr_list = []
+        intf = interfaces_list.split(',')
+        self.p.log.info("Configured interface(s) : {0}".format(intf))
+        self.p.log.info("The xpl connection may be done on the below addresses (only one will be used): ")
+        num_int = 0
+        for ip in get_ip_for_interfaces(intf, log = self.p.log):
+            self.p.log.info(" - {0}:{1}".format(ip, port))
+            addr_list.append((ip, port))
+            num_int += 1
+        if num_int == 0:
+            self.p.log.error("The xpl plugin is not configured to use any working network interface! Please check configuration!!!!!!")
+        # if there is more than one interface available, skip lo and take the first one in the list
+        if len(addr_list) > 1:
+            for addr in addr_list:
+                if addr[0].split(".")[0] == "127":
+                    self.p.log.info("Several interfaces available : skipping 'lo'")
+                    continue
+                else:
+                    self.p.log.info("One interface selected : ip = {0}".format(addr[0]))
+                    self.p.log.info("Skipping the other ones. The full list was : {0}".format(addr_list))
+                    break
+        else:
+            addr = addr_list[0]
+
         #UID for the fragment management
         self._fragment_uid = 1
         self._sent_fragments_buffer = {}
@@ -138,12 +164,12 @@ class Manager:
         self._lock_send = threading.Semaphore()
         self._lock_list = threading.Semaphore()
 
-	# plugin status
+        # plugin status
         # 0 = strating (xpl hub discovery)
         # 1 = config (xpl config phase)
         # 2 = running (plugin ready for receiving xpl commands)
         self._status = 0
-	# status (starting, config, started)
+        # status (starting, config, started)
         self._lock_status = threading.Semaphore()
 
         # hbeat detected
@@ -154,12 +180,12 @@ class Manager:
         else:
             self._foundhub.clear()
 
-        # Try and bind to the base port
         try:
+            self.p.log.info("Binding to {0} [BIND]...".format(addr))
             self._UDPSock.bind(addr)
         except:
             # Something is already running on this port
-            self.p.log.error("Can't bind to the interface %s, port %i" % (ip, port))
+            self.p.log.error("Can't bind to the interface {0}, port {1}. Error is : {2}".format(ip, port, traceback.format_exc()))
             exit(1)
         else:
             self.p.add_stop_cb(self.leave)
@@ -197,6 +223,7 @@ class Manager:
             self.p.register_thread(self._network)
             self._network.start()
             self.p.log.debug("xPL thread started for %s " % self.p.get_plugin_name())
+
         # start hbeat discovery
         self.hub_discovery()
         self._foundhub.wait()

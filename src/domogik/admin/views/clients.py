@@ -20,13 +20,15 @@ except ImportError:
     from flask_babel import gettext, ngettext
     pass
 
-from domogik.common.sql_schema import Device, Sensor
+from domogik.common.sql_schema import Device, DeviceParam, Sensor
+from domogik.common.plugin import STATUS_DEAD
 from wtforms.ext.sqlalchemy.orm import model_form
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
 import re
 import json
+import traceback
 
 try:
     import html.parser
@@ -97,9 +99,15 @@ def clients():
     client_list = get_clients_list()
 
     client_list_per_host_per_type = OrderedDict()
+    num_core = 0
+    num_core_dead = 0
     for client in client_list:
         cli_type = client_list[client]['type']
         cli_host = client_list[client]['host']
+        if cli_type == "core":
+            num_core += 1
+            if client_list[client]['status'] == STATUS_DEAD:
+                num_core_dead += 1
 
         if cli_host not in client_list_per_host_per_type:
             client_list_per_host_per_type[cli_host] = {}
@@ -109,11 +117,22 @@ def clients():
 
         client_list_per_host_per_type[cli_host][cli_type][client] = client_list[client]
 
+    # if all the core clients are dead, there is an issue with MQ pub/sub (forwarder)
+    # so display a message
+    if num_core > 0 and num_core == num_core_dead:
+        msg_core_dead = "Ooups, it seems that you have an issue with your current configuration!<br>"
+        msg_core_dead += "The message queue is not working for PUB/SUB messages.<br>"
+        msg_core_dead += "This is related to the component MQ forwarder.<br>"
+        msg_core_dead += "The related configuration file is : /etc/domogik/domogik-mq.cfg.<br>"
+    else: 
+        msg_core_dead = None
+
     return render_template('clients.html',
         mactive="clients",
         overview_state="collapse",
         clients=client_list,
-        client_list_per_host_per_type=client_list_per_host_per_type)
+        client_list_per_host_per_type=client_list_per_host_per_type,
+        msg_core_dead = msg_core_dead)
 
 
 @app.route('/client/<client_id>')
@@ -146,7 +165,12 @@ def client_devices_known(client_id):
 
     # todo : grab from MQ ?
     with app.db.session_scope():
-        devices = app.db.list_devices_by_plugin(client_id)
+        try:
+            devices = app.db.list_devices_by_plugin(client_id)
+            error = None
+        except:
+            error = "Error while retrieving the devices list. Error is : {0}".format(traceback.format_exc())
+            devices = []
 
     # sort clients per device type
     devices_by_device_type_id = {}
@@ -163,8 +187,10 @@ def client_devices_known(client_id):
             clientid = client_id,
             mactive="clients",
             active = 'devices',
-            rest_url = get_rest_url(),
-            client_detail = detail)
+            #rest_url = get_rest_url(),
+            rest_url = request.url_root + "rest",
+            client_detail = detail,
+            error = error)
 
 
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
@@ -206,6 +232,57 @@ def client_sensor_edit(client_id, sensor_id):
                 mactive="clients",
                 active = 'devices',
                 sensor = sensor)
+
+@app.route('/client/<client_id>/global/edit/<dev_id>', methods=['GET', 'POST'])
+@login_required
+def client_global_edit(client_id, dev_id):
+    with app.db.session_scope():
+        dev = app.db.get_device(dev_id)
+        known_items = {}
+        class F(Form):
+            pass
+        for item in dev["parameters"]:
+            item = dev["parameters"][item]
+            default = item["value"]
+            arguments = [Required()]
+            # keep track of the known fields
+            known_items[item["key"]] = {u"id": item["id"], u"type": item["type"]}
+            # build the field
+            if item["type"] == "boolean":
+                if default == 'y' or default == 1 or default == True: # in db value stored in lowcase
+                    default = True
+                else:
+                    default = False
+                field = BooleanField(item["key"], [validators.optional()], default=default) # set to optional field due to WTForm BooleanField return no data for false value (HTML checkbox)
+            elif item["type"] == "integer":
+                field = IntegerField(item["key"], arguments, default=default)
+            elif item["type"] == "float":
+                field = DateTimeField(item["key"], arguments, default=default)
+            else:
+                # time, email, ipv4, ipv6, url
+                field = TextField(item["key"], arguments, default=default)
+            # add the field
+            setattr(F, "{0}-{1}".format(item["id"], item["key"]), field)
+        form = F()
+        if request.method == 'POST' and form.validate():
+            for key, item in known_items.iteritems():
+                val = getattr(form, "{0}-{1}".format(item["id"], key)).data
+                if item["type"] == "boolean":
+                    if val == False:
+                        val = 'n' # in db value stored in lowcase
+                    else:
+                        val = 'y' # in db value stored in lowcase
+                app.db.udpate_device_param(item["id"], value=val)
+            return redirect("/client/{0}/dmg_devices/known".format(client_id))
+            pass
+        else:
+                return render_template('client_global.html',
+                form = form,
+                clientid = client_id,
+                client_detail = get_client_detail(client_id),
+                mactive="clients",
+                active = 'devices',
+                device = dev)
 
 
 @app.route('/client/<client_id>/dmg_devices/detected')
@@ -492,8 +569,12 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         elif item["type"] == "choice":
             choices = []
             for key in sorted(item["choices"]):
-                choices.append((key, item["choices"][key]))
-            field = SelectField(name, [Required()], description=item["description"], choices=choices)
+                # TODO : test if this is only a list of values
+                #        or a dict ?
+                #        And handle/display them in the appropriate way 
+                #choices.append((key, item["choices"][key]))
+                choices.append((key, key))
+            field = SelectField(name, [Required()], description=item["description"], choices=choices, default=default)
         elif item["type"] == "password":
             field = PasswordField(name, [Required()], description=item["description"], default=default)
         else:
@@ -710,30 +791,32 @@ def get_brain_content(client_id):
         # we skip the learn file
         if client_id in ["learn", "not_understood"]:
             continue
+        if detail[client_id]:
+            for lang in detail[client_id]:
+                idx = 0
+                for file in detail[client_id][lang]:
+                    content = html_escape(detail[client_id][lang][file])
 
-        for lang in detail[client_id]:
-            idx = 0
-            for file in detail[client_id][lang]:
-                content = html_escape(detail[client_id][lang][file])
+                    # python objects
+                    idx += 1
+                    reg = re.compile(r"&gt; object", re.IGNORECASE)
+                    content = reg.sub("<button class='btn btn-info' onclick=\"$('#python_object_{0}').toggle();\"><span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span> python object</button><div class='python' id='python_object_{0}' style='display: none'>&gt; object".format(idx), content)
 
-                # python objects
-                idx += 1
-                reg = re.compile(r"&gt; object", re.IGNORECASE)
-                content = reg.sub("<button class='btn btn-info' onclick=\"$('#python_object_{0}').toggle();\"><span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span> python object</button><div class='python' id='python_object_{0}' style='display: none'>&gt; object".format(idx), content)
+                    reg = re.compile(r"&lt; object", re.IGNORECASE)
+                    content = reg.sub("&lt; object</div>", content)
 
-                reg = re.compile(r"&lt; object", re.IGNORECASE)
-                content = reg.sub("&lt; object</div>", content)
+                    # trigger
+                    reg = re.compile(r"\+(?P<trigger>.*)", re.IGNORECASE)
+                    content = reg.sub("<strong>+\g<trigger></strong>", content)
 
-                # trigger
-                reg = re.compile(r"\+(?P<trigger>.*)", re.IGNORECASE)
-                content = reg.sub("<strong>+\g<trigger></strong>", content)
-
-                # comments
-                reg = re.compile(r"//(?P<comment>.*)", re.IGNORECASE)
-                content = reg.sub("<em>//\g<comment></em>", content)
+                    # comments
+                    reg = re.compile(r"//(?P<comment>.*)", re.IGNORECASE)
+                    content = reg.sub("<em>//\g<comment></em>", content)
 
 
-                detail[client_id][lang][file] = content
+                    detail[client_id][lang][file] = content
+        else:
+            detail[client_id] = ""
     return detail
 
 
