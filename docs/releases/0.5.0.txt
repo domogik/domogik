@@ -70,3 +70,11 @@ Plugins : no xpl plugins
 It is now possible to create no xPl plugins.
 
 .. todo:: complete
+
+
+MQ and Rest API
+---------------
+
+Some outputs related to the **sensor history** MQ messages and REST requests have changed. These features were not really used until now.
+
+For this release, please avoid using the **sensor history** features, there may be still some improvments in the next release!

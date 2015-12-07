@@ -8,9 +8,30 @@ from flask import Response
 
 
 @app.route('/rest/sensorhistory/id/<int:sid>/latest')
+@app.route('/rest/sensorhistory/id/<int:sid>/latest/')
 @json_response
 @timeit
 def sensorHistory_latest(sid):
+    """
+    @api {get} /rest/sensorhistory/id/<id>/latest Retrieve the last stored value for a sensor
+    @apiName getSensorHistoryLatest
+    @apiGroup SensorHistory
+    @apiVersion 0.5.0
+
+    @apiParam {Number} id The id of the sensor we want to retrieve the history from
+
+    @apiSuccess {json} result The json representing the latest value
+    
+    @apiSampleRequest /rest/ensorhistory/id/3/latest
+
+    @apiSuccessExample Success-Response:
+        HTTTP/1.1 200 OK
+        [{"timestamp": 1449216514.0, "value_str": "0688459268", "value_num": 688459000.0}]
+
+    @apiErrorExample Error-Response:
+        HTTTP/1.1 404 Not Found
+    """
+
     """
     @api {get} /rest/sensorhistory/id/<id>/latest Retrieve the last stored value for a sensor
     @apiName getSensorHistoryLatest
@@ -49,6 +70,28 @@ def sensorHistory_last(sid, num):
     @api {get} /rest/sensorhistory/id/<id>/last/<num> Retrieve the last x number of stored value for a sensor
     @apiName getSensorHistoryLast
     @apiGroup SensorHistory
+    @apiVersion 0.5.0
+
+    @apiParam {Number} id The id of the sensor we want to retrieve the history from
+    @apiParam {Number} num The number of historys we want to retrieve
+
+    @apiSuccess {json} result The json representing the latest value
+
+    @apiSampleRequest /rest/sensorhistory/id/3/last/3
+
+    @apiSuccessExample Success-Response:
+        HTTTP/1.1 200 OK
+        [{"timestamp": 1449216514.0, "value_str": "0688459268", "value_num": 688459000.0}, {"timestamp": 1449181378.0, "value_str": "0688459268", "value_num": 688459000.0}, {"timestamp": 1449178485.0, "value_str": "0102030405", "value_num": 102030000.0}]
+
+    @apiErrorExample Error-Response:
+        HTTTP/1.1 404 Not Found
+    """
+
+    """
+    @api {get} /rest/sensorhistory/id/<id>/last/<num> Retrieve the last x number of stored value for a sensor
+    @apiName getSensorHistoryLast
+    @apiGroup SensorHistory
+    @apiVersion 0.4.1
 
     @apiParam {Number} id The id of the sensor we want to retrieve the history from
     @apiParam {Number} num The number of historys we want to retrieve
@@ -99,6 +142,7 @@ def sensorHistory_from(sid, ftime):
     @api {get} /rest/sensorhistory/id/<id>/from/<tstamp> Retrieve the history from a certain timestamp on
     @apiName getSensorHistoryFrom
     @apiGroup SensorHistory
+    @apiVersion 0.4.1
 
     @apiParam {Number} id The id of the sensor we want to retrieve the history from
     @apiParam {Number} tstamp The unixtimestamp from what time you want the history to start
@@ -149,6 +193,7 @@ def sensorHistory_from_to(sid, ftime, ttime):
     @api {get} /rest/sensorhistory/id/<id>/from/<tstampFrom>/to/<tstampTo> Retrieve the history between 2 timestamps
     @apiName getSensorHistoryFromTo
     @apiGroup SensorHistory
+    @apiVersion 0.4.1
 
     @apiParam {Number} id The id of the sensor we want to retrieve the history from
     @apiParam {Number} tstampFrom The unixtimestamp from what time you want the history to start
@@ -200,6 +245,7 @@ def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
     @api {get} /rest/sensorhistory/id/<id>/from/<tstampFrom>/to/<tstampTo>/interval/<interval>/selector/<selector> Retrieve the filtered and calculated history between 2 timestamps
     @apiName getSensorHistoryFilter
     @apiGroup SensorHistory
+    @apiVersion 0.4.1
 
     @apiParam {Number} id The id of the sensor we want to retrieve the history from
     @apiParam {Number} tstampFrom The unixtimestamp from what time you want the history to start
@@ -269,6 +315,7 @@ def sensorHistory_from_to_filter(sid, ftime, interval, selector):
     @api {get} /rest/sensorhistory/id/<id>/from/<tstampFrom>/interval/<interval>/selector/<selector> Retrieve the filtered and calculated history starting from a certain timestamp
     @apiName getSensorHistoryFilter2
     @apiGroup SensorHistory
+    @apiVersion 0.4.1
 
     @apiParam {Number} id The id of the sensor we want to retrieve the history from
     @apiParam {Number} tstampFrom The unixtimestamp from what time you want the history to start

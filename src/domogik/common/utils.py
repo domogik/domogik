@@ -41,6 +41,8 @@ import sys
 import re
 from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
 from domogik.common.configloader import Loader, CONFIG_FILE
+import datetime
+import time
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
@@ -257,3 +259,17 @@ def get_data_files_directory_for_plugin(plugin_name):
     conf_global = dict(config_global[1])
     return "{0}/{1}/plugin_{2}/data".format(conf_global['libraries_path'], "domogik_packages", plugin_name)
 
+
+def get_seconds_since_midnight():
+    now = datetime.datetime.now()
+    return (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+
+
+def get_midnight_timestamp():
+    ts = time.time()
+    return int(ts - get_seconds_since_midnight())
+
+
+if __name__ == "__main__":
+    print(get_seconds_since_midnight())
+    print(get_midnight_timestamp())

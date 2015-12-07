@@ -39,6 +39,7 @@ Implements
 """
 
 import datetime, hashlib, time
+from pytz import timezone
 import traceback
 import sys
 
@@ -964,11 +965,15 @@ class DbHelper():
         except:
             self.__raise_dbhelper_exception("Error when adding data to sensor history. Sensor id = {0}  | Value = {1}  | Date = {2}. Error is {3}".format(sid, value, date, traceback.format_exc()))
 
-    def list_sensor_history(self, sid, num=None):
-        if num is None:
-            return self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).all()
-        else:
-            return self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).limit(num).all()
+    def list_sensor_history(self, sid, num=100):
+        """ Max values per default : 100
+        """
+        values = []
+        for a_value in self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).limit(num).all():
+            values.append({"value_str" : a_value.value_str, 
+                           "value_num" : a_value.value_num, 
+                           "timestamp" : (a_value.date - datetime.datetime(1970, 1, 1)).total_seconds()})
+        return values
             
     def list_sensor_history_between(self, sid, frm, to=None):
         if to:
@@ -976,6 +981,17 @@ class DbHelper():
                 self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
         else:
             to = int(time.time())
+        values = []
+        for a_value in self.__session.query(SensorHistory
+                  ).filter(SensorHistory.sensor_id==sid
+                  ).filter(SensorHistory.date>=_datetime_string_from_tstamp(frm)
+                  ).filter(SensorHistory.date<=_datetime_string_from_tstamp(to)
+                  ).order_by(sqlalchemy.asc(SensorHistory.date)
+                  ).all():
+            values.append({"value_str" : a_value.value_str, 
+                           "value_num" : a_value.value_num, 
+                           "timestamp" : (a_value.date - datetime.datetime(1970, 1, 1)).total_seconds()})
+        return values
         return self.__session.query(SensorHistory
                   ).filter(SensorHistory.sensor_id==sid
                   ).filter(SensorHistory.date>=_datetime_string_from_tstamp(frm)
