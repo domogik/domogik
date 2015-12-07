@@ -616,24 +616,80 @@ class DBConnector(Plugin, MQRep):
         status = True
         reason = ""
 
+        ### process parameters
         msg_data = data.get_data()
-
-        try:
+        if 'sensor_id' in msg_data:
             sensor_id = msg_data['sensor_id']
-            history = self._db.list_sensor_history(sensor_id, 1)
-            if len(history) == 0:
-                last_value = None
-            else: 
-                last_value = self._db.list_sensor_history(sensor_id, 1)[0].value_str
-        except:
-            self.log.error("ERROR when getting sensor history for id = {0} : {1}".format(sensor_id, traceback.format_exc()))
-            reason = "ERROR : {0}".format(traceback.format_exc())
+        else:
+            reason = "ERROR when getting sensor history. No sensor_id declared in the message"
+            self.log.error(reason)
             status = False
+            sensor_id = None
+        if 'mode' in msg_data:
+            if msg_data['mode'] == "last":
+                mode = "last"
+            elif msg_data['mode'] == "period":
+                mode = "period"
+            else:
+                reason = "ERROR when getting sensor history. No valid type (last, from) declared in the message"
+                self.log.error(reason)
+                status = False
+                mode = None
+        else:
+            reason = "ERROR when getting sensor history. No type (last, from) declared in the message"
+            self.log.error(reason)
+            status = False
+            sensor_id = None
+
+        values = None
+
+        ### last N values
+        if mode == "last":
+            if 'number' in msg_data:
+                number = msg_data['number']
+            else:
+                number = 1
+
+            try:
+                history = self._db.list_sensor_history(sensor_id, number)
+                if len(history) == 0:
+                    values = None
+                else: 
+                    values = self._db.list_sensor_history(sensor_id, number)
+            except:
+                self.log.error("ERROR when getting sensor history for id = {0} : {1}".format(sensor_id, traceback.format_exc()))
+                reason = "ERROR : {0}".format(traceback.format_exc())
+                status = False
+
+        ### period
+        elif mode == "period":
+            if 'from' in msg_data:
+                frm = msg_data['from']
+            else:
+                reason = "ERROR when getting sensor history. No key 'from' defined for mode = 'period'!"
+                self.log.error(reason)
+                status = False
+                frm = None
+
+            if 'to' in msg_data:
+                to = msg_data['to']
+            else:
+                to = None
+
+            if frm != None and to == None:
+                values = self._db.list_sensor_history_between(sensor_id, frm)
+                print(values)
+
+            else:
+                # TODO
+                values = "TODO"
+        
 
         msg.add_data('status', status)
         msg.add_data('reason', reason)
         msg.add_data('sensor_id', sensor_id)
-        msg.add_data('values', [last_value])
+        msg.add_data('mode', mode)
+        msg.add_data('values', values)
 
         self.reply(msg.get())
 
