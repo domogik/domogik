@@ -110,20 +110,40 @@ def clean_input(data):
     return data
 
 
+#######################################################################
+# public API
+
 def get_sensor_value(log, user_locale, dt_type, device_name, sensor_reference = None):
-    value, date = get_sensor_value_and_date(log, user_locale, dt_type, device_name, sensor_reference)
+    value, _ = _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference)
     return value
 
-
-
 def get_sensor_value_and_date(log, user_locale, dt_type, device_name, sensor_reference = None):
+    value, date = _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference)
+    return value, date
+
+def get_sensor_last_values_since(log, user_locale, dt_type, device_name, sensor_reference = None, since = None):
+    data, _ = _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference, since)
+    return data
+
+# end of public API
+#######################################################################
+
+def _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference = None, since = None):
     """ If sensor_reference = None
             Search for a sensor matching the dt_type and the device name
         Else
             Search for a dedicated sensor matching the device_name
+
+        If since = None
+            return <last value>, <last value date as timestamp>
+        Else
+            return <dict of last values>, None
+
         @param dt_type : a domogik datatype : DT_Temperature, DT_Humidity, ...
         @param device_name : the device name
         @param sensor_reference : the sensor name
+        @param since : if not None, get all values with last_received > since
+                       else, get only the last value
     """
     if isinstance(device_name, list):
         device_name = ' '.join(device_name)
@@ -154,34 +174,57 @@ def get_sensor_value_and_date(log, user_locale, dt_type, device_name, sensor_ref
     ### corresponding sensor!
     # let's get the sensor value
 
-    the_value = the_sensor['last_value']
-    last_received = the_sensor['last_received']
-    log.info(u"The value is : {0}".format(the_value))
+    if since == None:
+        the_value = the_sensor['last_value']
+        last_received = the_sensor['last_received']
+        log.info(u"The value is : {0}".format(the_value))
+    
+        # do some checks to see if we should try to convert as a float or not
+        do_convert = True
+        if the_value != None and len(the_value) > 0:
+            # if a value is a number but starts with a "0", it should be some special value which is not intented to
+            # be converted
+            if the_value[0] == "0":
+                do_convert = False
+    
+        if do_convert:
+            try:
+                if len(user_locale.split(".")) > 1:     # fr_FR.UTF-8
+                    the_locale = "{0}".format(user_locale)
+                else:                                   # fr_FR
+                    the_locale = "{0}.UTF-8".format(user_locale)
+                #locale.setlocale(locale.LC_ALL, str("fr_FR.UTF-8"))
+                locale.setlocale(locale.LC_ALL, the_locale)
+                the_value = locale.format(u"%g", float(the_value))
+            except:
+                log.warning(u"Unable to format the value '{0}' as float/int with the locale '{1}'".format(the_value, the_locale))
+        return the_value, last_received
 
-    #print("A : {0}".format(is_float_and_not_int(1)))   
-    #print("A : {0}".format(is_float_and_not_int(11)))
-    #print("A : {0}".format(is_float_and_not_int(11.2)))
-
-    # do some checks to see if we should try to convert as a float or not
-    do_convert = True
-    if the_value != None and len(the_value) > 0:
-        # if a value is a number but starts with a "0", it should be some special value which is not intented to
-        # be converted
-        if the_value[0] == "0":
-            do_convert = False
-
-    if do_convert:
+    else:
         try:
-            if len(user_locale.split(".")) > 1:     # fr_FR.UTF-8
-                the_locale = "{0}".format(user_locale)
-            else:                                   # fr_FR
-                the_locale = "{0}.UTF-8".format(user_locale)
-            #locale.setlocale(locale.LC_ALL, str("fr_FR.UTF-8"))
-            locale.setlocale(locale.LC_ALL, the_locale)
-            the_value = locale.format(u"%g", float(the_value))
+            # TODO : call a MQ message to get the values since the given parameter
+            #        and then process
+            log.info(u"Request sensor history over MQ for sensor_id={0} since {1}".format(the_sensor['sensor_id'], since))
+            cli = MQSyncReq(zmq.Context())
+            msg = MQMessage()
+            msg.set_action('sensor_history.get')
+            msg.add_data('sensor_id', the_sensor['sensor_id'])
+            msg.add_data('mode', 'period')
+            msg.add_data('from', since)
+            res = cli.request('dbmgr', msg.get(), timeout=10).get()
+            if res == None:
+                log.info(u"No history for this sensor since '{0}'".format(since))
+                return None, None
+            res = json.loads(res[1])
+            if "values" in res:
+                values = res['values']
+            else:
+                values = None
+            log.info(u"The sensor history is : {0}".format(values))
+            return values, None
         except:
-            log.warning(u"Unable to format the value '{0}' as float/int with the locale '{1}'".format(the_value, the_locale))
-    return the_value, last_received
+            log.error(u"ERROR : {0}".format(traceback.format_exc()))
+            return None, None
     
 
 def is_float_and_not_int(x):
