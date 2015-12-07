@@ -74,7 +74,7 @@ setup(
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools',
           'sqlalchemy',
-          'alembic',
+          'alembic >= 0.7.4',
           'simplejson >= 1.9.2',
           'pyOpenSSL >= 0.10',
           'psutil >= 0.1.3',
