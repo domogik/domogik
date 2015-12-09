@@ -1,4 +1,4 @@
-from domogik.admin.application import app, json_response, timeit
+from domogik.admin.application import app, json_response
 from domogik.common.configloader import Loader
 import sys
 import os
@@ -9,7 +9,6 @@ import json
 
 @app.route('/rest/datatype')
 @json_response
-@timeit
 def api_datatype():
     """
     @api {get} /rest/datatype Retrieve all datatypes
