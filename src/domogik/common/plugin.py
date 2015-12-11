@@ -829,10 +829,10 @@ class Plugin(BasePlugin, MQRep):
                raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
-               os.mkdir(path, '0770')
+               os.mkdir(path, 0770)
                self.log.info(u"Create directory {0}.".format(path))
            except:
-               raise OSError("Can't create directory {0}.".format(path))
+               raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))
        # Commented because :
        # a write test is done for each call of this function. For a client with a html server (geoloc for example), it
        # can be an issue as this makes a lot of write for 'nothing' on the disk.
