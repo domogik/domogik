@@ -214,15 +214,26 @@ def client_sensor_edit(client_id, sensor_id):
                 store = 1
             else:
                 store = 0
-            app.db.update_sensor(sensor_id, \
-                     history_round=request.form['history_round'], \
-                     history_store=store, \
-                     history_max=request.form['history_max'], \
-                     history_expire=request.form['history_expire'],
-                     timeout=request.form['timeout'],
-                     formula=request.form['formula'])
-
-            flash(gettext("Changes saved"), "success")
+            cli = MQSyncReq(app.zmq_context)
+            msg = MQMessage()
+            msg.set_action('sensor.update')
+            msg.add_data('sid', sensor_id)
+            msg.add_data('history_round', request.form['history_round'])
+            msg.add_data('history_store', store)
+            msg.add_data('history_max', request.form['history_max'])
+            msg.add_data('history_expire', request.form['history_expire'])
+            msg.add_data('timeout', request.form['timeout'])
+            msg.add_data('formula', request.form['formula'])
+            res = cli.request('dbmgr', msg.get(), timeout=10)
+            if res is not None:
+                data = res.get_data()
+                if data["status"]:
+                    flash(gettext("Sensor update succesfully"), 'success')
+                else:
+                    flash(gettext("Senor update failed"), 'warning')
+                    flash(data["reason"], 'danger')
+            else:
+                flash(gettext("DbMgr did not respond on the sensor.update, check the logs"), 'danger')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
             pass
         else:

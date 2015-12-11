@@ -136,6 +136,9 @@ class DBConnector(Plugin, MQRep):
                 # device update
                 elif msg.get_action() == "device.update":
                     self._mdp_reply_devices_update_result(msg)
+                # sensor update
+                elif msg.get_action() == "sensor.update":
+                    self._mdp_reply_sensor_update_result(msg)
                 # sensor history
                 elif msg.get_action() == "sensor_history.get":
                     self._mdp_reply_sensor_history(msg)
@@ -381,6 +384,73 @@ class DBConnector(Plugin, MQRep):
         # send the result
         msg = MQMessage()
         msg.set_action('device.delete.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
+    def _mdp_reply_sensor_update_result(self, data):
+        status = True
+        reason = False
+
+        self.log.debug(u"Updating sensor : {0}".format(data))
+        try:
+            data = data.get_data()
+            if 'sid' in data:
+                sid = data['sid']
+                if 'history_round' not in data:
+                    hround = None
+                else:
+                    hround = data['history_round']
+                if 'history_store' not in data:
+                    hstore = None
+                else:
+                    hstore = data['history_store']
+                if 'history_max' not in data:
+                    hmax = None
+                else:
+                    hmax = data['history_max']
+                if 'history_expire' not in data:
+                    hexpire = None
+                else:
+                    hexpire = data['history_expire']
+                if 'timeout' not in data:
+                    timeout = None
+                else:
+                    timeout = data['timeout']
+                if 'formula' not in data:
+                    formula = None
+                else:
+                    formula = data['formula']
+                # do the update
+                res = self._db.update_sensor(sid, \
+                     history_round=hround, \
+                     history_store=hstore, \
+                     history_max=hmax, \
+                     history_expire=hexpire, \
+                     timeout=timeout, \
+                     formula=formula)
+                if not res:
+                    status = False
+                else:
+                    status = True 
+            else:
+                status = False
+                reason = "There is no such sensor"
+                self.log.debug(reason)
+            # delete done
+        except DbHelperException as d:
+            status = False
+            reason = "Error while updating sensor: {0}".format(d.value)
+            self.log.error(reason)
+        except:
+            status = False
+            reason = "Error while updating sensor: {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        # send the result
+        msg = MQMessage()
+        msg.set_action('sensor.update.result')
         msg.add_data('status', status)
         if reason:
             msg.add_data('reason', reason)
