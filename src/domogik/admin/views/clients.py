@@ -283,7 +283,21 @@ def client_global_edit(client_id, dev_id):
                         val = 'n' # in db value stored in lowcase
                     else:
                         val = 'y' # in db value stored in lowcase
-                app.db.udpate_device_param(item["id"], value=val)
+                cli = MQSyncReq(app.zmq_context)
+                msg = MQMessage()
+                msg.set_action('deviceparam.update')
+                msg.add_data('dpid', item["id"])
+                msg.add_data('value', val)
+                res = cli.request('dbmgr', msg.get(), timeout=10)
+                if res is not None:
+                    data = res.get_data()
+                    if data["status"]:
+                        flash(gettext("Param update succesfully"), 'success')
+                    else:
+                        flash(gettext("Param update failed"), 'warning')
+                        flash(data["reason"], 'danger')
+                else:
+                    flash(gettext("DbMgr did not respond on the deviceparam.update, check the logs"), 'danger')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
             pass
         else:

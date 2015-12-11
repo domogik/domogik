@@ -136,6 +136,9 @@ class DBConnector(Plugin, MQRep):
                 # device update
                 elif msg.get_action() == "device.update":
                     self._mdp_reply_devices_update_result(msg)
+                # deviceparam update
+                elif msg.get_action() == "deviceparam.update":
+                    self._mdp_reply_deviceparam_update_result(msg)
                 # sensor update
                 elif msg.get_action() == "sensor.update":
                     self._mdp_reply_sensor_update_result(msg)
@@ -451,6 +454,44 @@ class DBConnector(Plugin, MQRep):
         # send the result
         msg = MQMessage()
         msg.set_action('sensor.update.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
+    def _mdp_reply_deviceparam_update_result(self, data):
+        status = True
+        reason = False
+
+        self.log.debug(u"Updating device param : {0}".format(data))
+        try:
+            data = data.get_data()
+            if 'dpid' in data:
+                dpid = data['dpid']
+                val = data['value']
+                # do the update
+                res = self._db.udpate_device_param(dpid, value=val)
+                if not res:
+                    status = False
+                else:
+                    status = True 
+            else:
+                status = False
+                reason = "There is no such device param"
+                self.log.debug(reason)
+            # delete done
+        except DbHelperException as d:
+            status = False
+            reason = "Error while updating device param: {0}".format(d.value)
+            self.log.error(reason)
+        except:
+            status = False
+            reason = "Error while updating device param: {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        # send the result
+        msg = MQMessage()
+        msg.set_action('deviceparam.update.result')
         msg.add_data('status', status)
         if reason:
             msg.add_data('reason', reason)
