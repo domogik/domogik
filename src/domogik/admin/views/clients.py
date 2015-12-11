@@ -322,14 +322,23 @@ def client_devices_edit(client_id, did):
         form = MyForm(request.form, device)
 
         if request.method == 'POST' and form.validate():
-            # save it
-            app.db.update_device(did, \
-                    d_name=request.form['name'], \
-                    d_description=request.form['description'], \
-                    d_reference=request.form['reference'])
-            # message the suer
-            flash(gettext("Device saved"), 'success')
-            # redirect
+            cli = MQSyncReq(app.zmq_context)
+            msg = MQMessage()
+            msg.set_action('device.update')
+            msg.add_data('did', did)
+            msg.add_data('name', request.form['name'])
+            msg.add_data('description', request.form['description'])
+            msg.add_data('reference', request.form['reference'])
+            res = cli.request('dbmgr', msg.get(), timeout=10)
+            if res is not None:
+                data = res.get_data()
+                if data["status"]:
+                    flash(gettext("Device update succesfully"), 'success')
+                else:
+                    flash(gettext("Device update failed"), 'warning')
+                    flash(data["reason"], 'danger')
+            else:
+                flash(gettext("DbMgr did not respond on the device.update, check the logs"), 'danger')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
         else:
             return render_template('client_device_edit.html',
@@ -339,7 +348,6 @@ def client_devices_edit(client_id, did):
                 active = 'devices',
                 client_detail = detail,
                 )
-
 
 @app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required

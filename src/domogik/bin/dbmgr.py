@@ -133,6 +133,9 @@ class DBConnector(Plugin, MQRep):
                 # device delete
                 elif msg.get_action() == "device.delete":
                     self._mdp_reply_devices_delete_result(msg)
+                # device update
+                elif msg.get_action() == "device.update":
+                    self._mdp_reply_devices_update_result(msg)
                 # sensor history
                 elif msg.get_action() == "sensor_history.get":
                     self._mdp_reply_sensor_history(msg)
@@ -378,6 +381,58 @@ class DBConnector(Plugin, MQRep):
         # send the result
         msg = MQMessage()
         msg.set_action('device.delete.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
+    def _mdp_reply_devices_update_result(self, data):
+        status = True
+        reason = False
+
+        self.log.debug(u"Updating device : {0}".format(data))
+        try:
+            data = data.get_data()
+            if 'did' in data:
+                did = data['did']
+                if 'name' not in data:
+                    name = None
+                else:
+                    name = data['name']
+                if 'reference' not in data:
+                    ref = None
+                else:
+                    ref = data['reference']
+                if 'description' not in data:
+                    desc = None
+                else:
+                    desc = data['description']
+                # do the update
+                res = self._db.update_device(did, \
+                    d_name=name, \
+                    d_description=desc, \
+                    d_reference=ref)
+                if not res:
+                    status = False
+                else:
+                    status = True 
+            else:
+                status = False
+                reason = "There is no such device"
+                self.log.debug(reason)
+            # delete done
+        except DbHelperException as d:
+            status = False
+            reason = "Error while updating device: {0}".format(d.value)
+            self.log.error(reason)
+        except:
+            status = False
+            reason = "Error while updating device: {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        # send the result
+        msg = MQMessage()
+        msg.set_action('device.update.result')
         msg.add_data('status', status)
         if reason:
             msg.add_data('reason', reason)
