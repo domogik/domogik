@@ -395,12 +395,6 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        b = app.db.update_device(
-            did,
-            request.form.get('name'),
-            request.form.get('description'),
-            request.form.get('reference'),
-        )
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
         msg.set_action('device.update')
