@@ -47,7 +47,6 @@ from domogik.butler.brain import STAR_FILE
 from domogik.butler.brain import clean_input
 #from domogikmq.reqrep.worker import MQRep
 from domogikmq.message import MQMessage
-from domogikmq.pubsub.subscriber import MQAsyncSub
 from domogikmq.pubsub.publisher import MQPub
 #import zmq
 import os
@@ -72,7 +71,7 @@ SEX_MALE = "male"
 SEX_FEMALE = "female"
 SEX_ALLOWED = [SEX_MALE, SEX_FEMALE]
 
-class Butler(Plugin, MQAsyncSub):
+class Butler(Plugin):
     """ Butler component
 
         TODO : 
@@ -100,7 +99,7 @@ class Butler(Plugin, MQAsyncSub):
         self.pub = MQPub(self.zmq, self._mq_name)
 
         # subscribe the MQ for interfaces inputs
-        MQAsyncSub.__init__(self, self.zmq, self._name, ['interface.input'])
+        self.add_mq_sub('interface.input')
 
 
         ### Configuration elements

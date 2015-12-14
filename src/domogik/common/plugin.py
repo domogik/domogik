@@ -46,6 +46,7 @@ from domogik.common.queryconfig import Query
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.processinfo import ProcessInfo
 from domogikmq.pubsub.publisher import MQPub
+from domogikmq.pubsub.subscriber import MQAsyncSub
 from domogikmq.reqrep.worker import MQRep
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -87,7 +88,7 @@ DMG_VENDOR_ID = "domogik"
 TIME_BETWEEN_EACH_PROCESS_STATUS = 60
 
 
-class Plugin(BasePlugin, MQRep):
+class Plugin(BasePlugin, MQRep, MQAsyncSub):
     '''
     Global plugin class, manage signal handlers.
     This class shouldn't be used as-it but should be extended by no xPL plugin or by the class xPL plugin which will be used by the xPL plugins
@@ -144,6 +145,7 @@ class Plugin(BasePlugin, MQRep):
 
         # MQ publisher and REP
         self.zmq = zmq.Context()
+        self._mq_subscribe_list = [] 
         self._pub = MQPub(self.zmq, self._mq_name)
         self._set_status(STATUS_STARTING)
 
@@ -212,6 +214,8 @@ class Plugin(BasePlugin, MQRep):
         # init finished
         self.log.info(u"End init of the global client part")
 
+    def add_mq_sub(self, msg):
+        self._mq_subscribe_list.append(msg)
 
     def check_configured(self):
         """ For a client only
@@ -617,12 +621,17 @@ class Plugin(BasePlugin, MQRep):
         """
         if self.dont_run_ready == True:
             return
-
-        ### send client status : STATUS_ALIVE
+        
         # TODO : why the dbmgr has no self._name defined ???????
         # temporary set as unknown to avoir blocking bugs
         if not hasattr(self, '_name'):
             self._name = "unknown"
+
+        ### Subscribe to certain events
+        if len(self._mq_subscribe_list) > 0:
+            MQAsyncSub.__init__(self, self.zmq, self._name, self._mq_subscribe_list)
+
+        ### send client status : STATUS_ALIVE
         self._set_status(STATUS_ALIVE)
 
         ### Instantiate the MQ
@@ -631,7 +640,8 @@ class Plugin(BasePlugin, MQRep):
         if ioloopstart == 1:
             IOLoop.instance().start()
 
-
+    def on_message(self, msgid, content):
+        pass
 
     def on_mdp_request(self, msg):
         """ Handle Requests over MQ
