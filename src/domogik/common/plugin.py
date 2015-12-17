@@ -395,6 +395,34 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             return device_list
 
 
+    def get_commands(self, devices):
+        """ Return a dict : {"command_name1" : id1, "command_name2" : id2, ...}
+            @param devices : list of the devices. 
+                   This is the result of get_device_list(...)
+            @param device_id : the device id
+        """
+        res = {}
+        for a_device in devices:
+            res[a_device['id']] = {}
+            for a_command in a_device['commands']:
+                res[a_device['id']][a_command] = a_device['commands'][a_command]['id']
+        return res
+
+    def get_sensors(self, devices):
+        """ Return a dict : {"sensor_name1" : id1, "sensor_name2" : id2, ...}
+            @param devices : list of the devices. 
+                   This is the result of get_device_list(...)
+            @param device_id : the device id
+        """
+        res = {}
+        for a_device in devices:
+            res[a_device['id']] = {}
+            for a_sensor in a_device['sensors']:
+                res[a_device['id']][a_sensor] = a_device['sensors'][a_sensor]['id']
+        return res
+
+
+
     def device_detected(self, data):
         """ The clients developpers can call this function when a device is detected
             This function will check if a corresponding device exists and :
