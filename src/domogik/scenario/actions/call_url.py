@@ -59,8 +59,9 @@ class CallUrlAction(AbstractAction):
             url_args = url_elts.query.split("&")
             new_url_args = u""
             for arg in url_args:
-                key, value = arg.split("=")
-                new_url_args += u"{0}={1}&".format(quote(key), quote(value))
+                if args:
+                    key, value = arg.split("=")
+                    new_url_args += u"{0}={1}&".format(quote(key), quote(value))
             new_url = u"{0}://{1}{2}?{3}".format(url_elts.scheme,
                                                url_elts.netloc,
                                                url_elts.path,
