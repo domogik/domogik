@@ -230,6 +230,8 @@
                                         <th>{% trans %}REST url{% endtrans %}</th>
                                         <td>
                                           {% trans %}Urls{% endtrans %}:
+
+
                                           {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
                                             {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
                                             {% set url_0 = url_sample + "0" %}
@@ -243,6 +245,8 @@
                                               <a class="btn btn-primary" href="{{ url_0 }}">{{ datatypes[param.data_type]['labels']['0'] }} (0)</a> 
                                               <a class="btn btn-primary" href="{{ url_1 }}">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a> 
                                             </div>
+
+
                                           {% elif param.data_type == "DT_Trigger" or datatypes[param.data_type]['parent'] == "DT_Trigger" %} 
                                             {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
                                             <ul>
@@ -252,6 +256,25 @@
                                               <p>Test it :</p>
                                               <a class="btn btn-primary" href="{{ url_sample }}1">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a> 
                                             </div>
+
+
+                                          {% elif param.data_type == "DT_ColorRGBHexa" or datatypes[param.data_type]['parent'] == "DT_ColorRGBHexa" %} 
+                                            {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
+                                            <ul>
+                                              <li><strong>{% trans %}Black (off){% endtrans %}</strong> : {{ url_sample }}000000</li>
+                                              <li><strong>{% trans %}White{% endtrans %}</strong> : {{ url_sample }}ffffff</li>
+                                              <li><strong>{% trans %}Red{% endtrans %}</strong> : {{ url_sample }}ff0000</li>
+                                            </ul>
+                                            <div>
+                                              <p>Test it :</p>
+                                              <a class="btn btn-primary" href="{{ url_sample }}000000">{% trans %}Black (off){% endtrans %}</a>
+                                              <a class="btn btn-primary" href="{{ url_sample }}ffffff">{% trans %}White{% endtrans %}</a>
+                                              <a class="btn btn-primary" href="{{ url_sample }}ff0000">{% trans %}Red{% endtrans %}</a>
+                                              <a class="btn btn-primary" href="{{ url_sample }}00ff00">{% trans %}Green{% endtrans %}</a>
+                                              <a class="btn btn-primary" href="{{ url_sample }}0000ff">{% trans %}Blue{% endtrans %}</a>
+                                            </div>
+
+
                                           {% else %}
                                             {{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;key&gt;
                                           {% endif %}
@@ -260,6 +283,8 @@
                                       <tr>
                                         <th>{% trans %}Openremote usage{% endtrans %}</th>
                                         <td>
+
+
                                           {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
                                             <h5>{% trans %}Create the commands{% endtrans %}</h5>
                                             <p>
@@ -281,6 +306,8 @@
                                             <p>
                                               {% trans %}To create the switch, use the commands and the sensor created.{% endtrans %}
                                             </p>
+
+
                                           {% else %}
                                             <em>{% trans %}Not yet documented.{% endtrans %}</em>
                                           {% endif %}
