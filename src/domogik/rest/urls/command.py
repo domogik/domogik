@@ -12,17 +12,17 @@ from domogikmq.pubsub.subscriber import MQSyncSub
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 
-@urlHandler.route('/cmd/id/<int:cid>', methods=['GET'])
+@urlHandler.route('/cmd/id/<int:cid>?key', methods=['GET'])
 @json_response
 @timeit
 def api_ncommand(cid):
     """
-    @api {get} /cmd/id/<int:cid> Trigger a command
+    @api {get} /cmd/id/<int:cid>?Key Trigger a command
     @apiName getCommand
     @apiGroup Command
 
     @apiParam {Number} id The commandId to generate
-    @apiParam Key A key value pair for each command param
+    @apiParam Key A key value pair for each command param separate by & key1=value1&key2=value2
 
     @apiSuccessExample Success-Response:
         HTTTP/1.1 204 No Content 
