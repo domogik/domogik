@@ -99,6 +99,10 @@ The **netifaces python library** can't be installed automatically. For now you w
     $ sudo apt-get install python2.7-dev
     $ sudo pip install netifaces
 
+In minimum debian repo the package **sphinx-better-theme** does not exist::
+
+    $ sudo pip install sphinx-better-theme
+
 
 Mysql server
 ------------
