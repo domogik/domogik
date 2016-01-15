@@ -400,10 +400,20 @@ def scenario_blocks_js():
                                 param_format = u""
                             else:
                                 param_format = u"({0})".format(param_format)
-                        js_params += u"""
-                                        .appendField(new Blockly.FieldTextInput(""), "{0}")
-                                        .appendField("{1}");
-                                    """.format(param_key, param_format)
+
+                        # special cases
+                        if param_dt_type == "DT_ColorRGBHexa":
+                            js_params += u"""
+                                            .appendField(new Blockly.FieldColour(""), "{0}")
+                                            ;//.appendField("{1}");
+                                        """.format(param_key, param_format)
+
+                        # default case : text input field
+                        else:
+                            js_params += u"""
+                                            .appendField(new Blockly.FieldTextInput(""), "{0}")
+                                            .appendField("{1}");
+                                        """.format(param_key, param_format)
                 block_id = u"command.CommandAction.{0}".format(cmd_id)
                 block_description = u"{0}@{1}".format(name, client)
                 add = u"""Blockly.Blocks['{0}'] = {{
@@ -445,6 +455,12 @@ def scenario_blocks_js():
             output = "\"Number\""
             input = """
                      this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
+                    """
+        elif dt_parent == "DT_String" and dt_type == "DT_ColorRGBHexa":
+            color = 65
+            output = "\"null\""
+            input = """
+                     this.appendDummyInput().appendField(new Blockly.FieldColour(""), "COLOUR");
                     """
         else:
             color = 160
