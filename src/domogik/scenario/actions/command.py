@@ -39,11 +39,24 @@ class CommandAction(AbstractAction):
     def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log, params)
         self.log = log
-        self.set_description("Start a certain command")
+        self.set_description(u"Start a certain command")
         self._cmdId = params
 
     def do_action(self):
-        print self._params
+        self.log.info(u"Do an action...")
+
+        # live udate some values
+        self.log.debug(u"Preprocessing on parameters...")
+        self.log.debug(u"Parameters before processing : {0}".format(self._params))
+        for key in self._params:
+            if key == "color" and self._params[key].startswith("#"):
+                self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
+                self._params[key] = self._params[key][1:]
+
+        self.log.debug(u"Parameters after processing : {0}".format(self._params))
+        self.log.debug(u"Send action command over MQ...")
+
+        # do the command
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('cmd.send')
@@ -54,9 +67,10 @@ class CommandAction(AbstractAction):
         if res:
             data = res.get_data()
             if not data['status']:
-                self.log.error("Command sending to XPL gw failed: {0}".format(res))
+                self.log.error(u"Command sending to XPL gw failed: {0}".format(res))
         else:
-            self.log.error("XPL gw did not respond")
+            self.log.error(u"XPL gw did not respond")
+        self.log.debug(u"Action done")
 
     def get_expected_entries(self):
         return {
