@@ -144,6 +144,8 @@
                                           {% endif %}
                                           {% if sen.data_type == "DT_Bool" or datatypes[sen.data_type]['parent'] == "DT_Bool" %}
                                             <em>( {{ datatypes[sen.data_type]['labels'][sen.last_value] }} )</em>
+                                          {% elif sen.data_type == "DT_ColorRGBHexa" or datatypes[sen.data_type]['parent'] == "DT_ColorRGBHexa" %} 
+                                            <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sen.last_value}}"></span>
                                           {% endif %}
                                         {% else %}
                                           &nbsp;
