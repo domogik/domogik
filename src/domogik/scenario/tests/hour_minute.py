@@ -28,25 +28,25 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 from domogik.scenario.tests.abstract import AbstractTest
 from time import sleep
 
-class CronTest(AbstractTest):
-    """ Crontab test
+class HourMinuteTest(AbstractTest):
+    """ Simple test to check if the current time is HH:MM
     """
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
-        self.set_description("Trigger on a crontab rule")
-        self.add_parameter("cron", "cron.CronParameter")
+        self.set_description("Trigger at a given hour")
+        self.add_parameter("hour_minute", "hour_minute.HourMinuteParameter")
 
     def evaluate(self):
-        """ Evaluate if the text appears in the content of the page referenced by url
+        """ Evaluate if the time is the current one
         """
         params = self.get_raw_parameters()
-        crn = params["cron"]
-        if crn.evaluate() == None:
+        hm = params["hour_minute"]
+        if hm.evaluate() == None:
             return None
         else:
-            res = crn.evaluate()
-            self.log.debug("Evaluate {0} : {1}".format(crn, res))
+            res = hm.evaluate()
+            self.log.debug("Evaluate {0} : {1}".format(hm, res))
             return res
 
 
@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
-    TEST = CronTest(logging, trigger = mytrigger)
+    TEST = HourMinuteTest(logging, trigger = mytrigger)
     print(TEST)
     print("getting parameters")
     p = TEST.get_parameters()
@@ -69,8 +69,8 @@ if __name__ == "__main__":
     print("====")
     print("Trying to evaluate : {0}".format(TEST.evaluate()))
     print("====")
-    print("set data for parameters cron")
-    data = { "cron": { "cron" : "*/2 * * * *"} }
+    print("set data for parameters hour_minute")
+    data = { "hour_minute": { "hour" : 7}, "minute" : 23 }
     TEST.fill_parameters(data)
     sleep(5)
     print("Trying to evaluate : {0}".format(TEST.evaluate()))
