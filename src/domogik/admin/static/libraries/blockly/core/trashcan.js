@@ -42,20 +42,6 @@ Blockly.Trashcan = function(workspace) {
 };
 
 /**
- * URL of the sprite image.
- * @type {string}
- * @private
- */
-Blockly.Trashcan.prototype.SPRITE_URL_ = 'media/sprites.png';
-
-/**
- * URL of the lid image.
- * @type {string}
- * @private
- */
-Blockly.Trashcan.prototype.LID_URL_ = 'media/trashlid.png';
-
-/**
  * Width of both the trash can and lid images.
  * @type {number}
  * @private
@@ -67,28 +53,28 @@ Blockly.Trashcan.prototype.WIDTH_ = 47;
  * @type {number}
  * @private
  */
-Blockly.Trashcan.prototype.BODY_HEIGHT_ = 45;
+Blockly.Trashcan.prototype.BODY_HEIGHT_ = 44;
 
 /**
  * Height of the lid image.
  * @type {number}
  * @private
  */
-Blockly.Trashcan.prototype.LID_HEIGHT_ = 15;
+Blockly.Trashcan.prototype.LID_HEIGHT_ = 16;
 
 /**
  * Distance between trashcan and bottom edge of workspace.
  * @type {number}
  * @private
  */
-Blockly.Trashcan.prototype.MARGIN_BOTTOM_ = 35;
+Blockly.Trashcan.prototype.MARGIN_BOTTOM_ = 20;
 
 /**
  * Distance between trashcan and right edge of workspace.
  * @type {number}
  * @private
  */
-Blockly.Trashcan.prototype.MARGIN_SIDE_ = 35;
+Blockly.Trashcan.prototype.MARGIN_SIDE_ = 20;
 
 /**
  * Extent of hotspot on all sides beyond the size of the image.
@@ -193,15 +179,20 @@ Blockly.Trashcan.prototype.createDom = function() {
   this.svgLid_.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
       this.workspace_.options.pathToMedia + Blockly.SPRITE.url);
 
+  Blockly.bindEvent_(this.svgGroup_, 'mouseup', this, this.click);
   this.animateLid_();
   return this.svgGroup_;
 };
 
 /**
  * Initialize the trash can.
+ * @param {number} bottom Distance from workspace bottom to bottom of trashcan.
+ * @return {number} Distance from workspace bottom to the top of trashcan.
  */
-Blockly.Trashcan.prototype.init = function() {
+Blockly.Trashcan.prototype.init = function(bottom) {
+  this.bottom_ =  this.MARGIN_BOTTOM_ + bottom;
   this.setOpen_(false);
+  return this.bottom_ + this.BODY_HEIGHT_ + this.LID_HEIGHT_;
 };
 
 /**
@@ -228,13 +219,13 @@ Blockly.Trashcan.prototype.position = function() {
     return;
   }
   if (this.workspace_.RTL) {
-    this.left_ = this.MARGIN_SIDE_;
+    this.left_ = this.MARGIN_SIDE_ + Blockly.Scrollbar.scrollbarThickness;
   } else {
     this.left_ = metrics.viewWidth + metrics.absoluteLeft -
-        this.WIDTH_ - this.MARGIN_SIDE_;
+        this.WIDTH_ - this.MARGIN_SIDE_ - Blockly.Scrollbar.scrollbarThickness;
   }
   this.top_ = metrics.viewHeight + metrics.absoluteTop -
-      (this.BODY_HEIGHT_ + this.LID_HEIGHT_) - this.MARGIN_BOTTOM_;
+      (this.BODY_HEIGHT_ + this.LID_HEIGHT_) - this.bottom_;
   this.svgGroup_.setAttribute('transform',
       'translate(' + this.left_ + ',' + this.top_ + ')');
 };
@@ -244,7 +235,7 @@ Blockly.Trashcan.prototype.position = function() {
  * @return {goog.math.Rect} Rectangle in which to delete.
  */
 Blockly.Trashcan.prototype.getRect = function() {
-  var trashXY = Blockly.getSvgXY_(this.svgGroup_);
+  var trashXY = Blockly.getSvgXY_(this.svgGroup_, this.workspace_);
   return new goog.math.Rect(
       trashXY.x - this.MARGIN_HOTSPOT_,
       trashXY.y - this.MARGIN_HOTSPOT_,
@@ -275,8 +266,8 @@ Blockly.Trashcan.prototype.animateLid_ = function() {
   this.lidOpen_ = goog.math.clamp(this.lidOpen_, 0, 1);
   var lidAngle = this.lidOpen_ * 45;
   this.svgLid_.setAttribute('transform', 'rotate(' +
-      (this.workspace_.RTL ? -lidAngle : lidAngle) + ', ' +
-      (this.workspace_.RTL ? 4 : this.WIDTH_ - 4) + ', ' +
+      (this.workspace_.RTL ? -lidAngle : lidAngle) + ',' +
+      (this.workspace_.RTL ? 4 : this.WIDTH_ - 4) + ',' +
       (this.LID_HEIGHT_ - 2) + ')');
   var opacity = goog.math.lerp(0.4, 0.8, this.lidOpen_);
   this.svgGroup_.style.opacity = opacity;
@@ -291,4 +282,16 @@ Blockly.Trashcan.prototype.animateLid_ = function() {
  */
 Blockly.Trashcan.prototype.close = function() {
   this.setOpen_(false);
+};
+
+/**
+ * Inspect the contents of the trash.
+ */
+Blockly.Trashcan.prototype.click = function() {
+  var dx = this.workspace_.startScrollX - this.workspace_.scrollX;
+  var dy = this.workspace_.startScrollY - this.workspace_.scrollY;
+  if (Math.sqrt(dx * dx + dy * dy) > Blockly.DRAG_RADIUS) {
+    return;
+  }
+  console.log('TODO: Inspect trash.');
 };
