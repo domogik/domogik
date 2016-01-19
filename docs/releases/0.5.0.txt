@@ -46,6 +46,10 @@ Scenarios
 
 A help dialog has been added in the scenario page. It show with an example how to create a scenario.
 
+Action block for RGB commands have been improved with a color picker.
+
+Time blocks have been added to allow time comparison.
+
 Butler
 ------
 
