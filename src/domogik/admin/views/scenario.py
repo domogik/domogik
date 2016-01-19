@@ -225,7 +225,7 @@ def scenario_blocks_js():
         devices = []
 
 
-    ### Now start the javascript geenration
+    ### Now start the javascript generation
     js = ""
 
     ### tests
@@ -330,6 +330,9 @@ def scenario_blocks_js():
                     color = 20
                     output = "\"Boolean\""
                 elif dt_parent == "DT_Number":
+                    color = 65
+                    output = "\"Number\""
+                elif sen_dt == "DT_Time":
                     color = 65
                     output = "\"Number\""
                 else:
