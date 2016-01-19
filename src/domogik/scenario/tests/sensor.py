@@ -81,13 +81,28 @@ class SensorTest(AbstractTest):
                 return float(val)
             else:
                 return None
+        elif self._dataType == "DT_Time":
+            if val != None:
+                tmp = val.split(":")
+                if len(tmp) < 2:   # bad value
+                    return None
+                else:
+                    try:
+                        new =  int(tmp[0]) * 60 + int(tmp[1])
+                        #self.log.debug("DT_Time : convert '{0}' to '{1}'".format(val, new))
+                        return new
+                    except:
+                        self.log.debug("Error while converting DT_Time value in mminutes. Value='{0}'".format(val))
+                        return None
+            else:
+                return None
         else:
             return val
 
     def evaluate(self):
         """ Evaluate if the text appears in the content of the page referenced by url
         """
-        self.log.debug("SensorTest {0}: evaluate to {1}".format(self._sensorId, self._res)) 
+        self.log.debug("Evalute SensorTest '{0}' to '{1}'. Type is '{2}'".format(self._sensorId, self._res, type(self._res))) 
         return self._res
 
     def destroy(self):
