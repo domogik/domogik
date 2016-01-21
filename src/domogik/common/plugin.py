@@ -479,8 +479,21 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                 if a_device['device_type_id'] != data['device_type']:
                     continue
 
-                # handle "main" global parameters
-                # TODO ????
+                # handle "main" global parameters, check all global param from data, not from a_device.
+                # No need all global param of device_type in data value to find device.
+                found_global = True
+                if data['global'] != []:
+                    found_global = False
+                    fg = 0
+                    for found_param in data['global'] :
+                        #print ("found_param {0}".format(found_param))
+                        for dev_param in a_device['parameters'] :
+                            #print(a_device['parameters'][dev_param])
+                            if found_param['key'] == a_device['parameters'][dev_param]['key'] and found_param['value'] == a_device['parameters'][dev_param]['value']:
+                                    fg += 1
+                    if fg == len(data['global']) :
+                        found_global = True
+                        #print ("FOUND ALL GLOBAL")
 
                 # handle xpl global parameters
                 if data['xpl'] != []:
@@ -500,6 +513,12 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                                     found = True
                                     #print("FOUND")
                                     break
+                elif data['global'] != [] and found_global : # no xpl param in data so retreive global result if necessary.
+                    found = True
+
+                # Global and xpl must have a corresponding to device
+                if not found_global and found :
+                    found = False
 
                 # handle xpl specific parameters
                 if not found and data['xpl_stats'] != []:
