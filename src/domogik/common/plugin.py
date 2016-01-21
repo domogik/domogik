@@ -490,7 +490,8 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                         for dev_param in a_device['parameters'] :
                             #print(a_device['parameters'][dev_param])
                             if found_param['key'] == a_device['parameters'][dev_param]['key'] and found_param['value'] == a_device['parameters'][dev_param]['value']:
-                                    fg += 1
+                                fg += 1
+                                break;
                     if fg == len(data['global']) :
                         found_global = True
                         #print ("FOUND ALL GLOBAL")
