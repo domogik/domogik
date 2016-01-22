@@ -89,7 +89,7 @@ class Butler(Plugin):
                           default=False, \
                           help="Butler interactive mode (must be used WITH -f).")
 
-        Plugin.__init__(self, name = 'butler', parser = parser)
+        Plugin.__init__(self, name = 'butler', parser = parser, log_prefix='core_')
 
         ### MQ
         # MQ publisher

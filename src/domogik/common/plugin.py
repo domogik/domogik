@@ -100,7 +100,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
 
 
     def __init__(self, name, type = "plugin", stop_cb = None, is_manager = False, parser = None,
-                 daemonize = True, log_prefix = "", log_on_stdout = True, test = False):
+                 daemonize = True, log_prefix = "plugin_", log_on_stdout = True, test = False):
         '''
         Create Plugin instance, which defines system handlers
         @param name : The name of the current client

@@ -65,7 +65,7 @@ class DBConnector(Plugin, MQRep):
         '''
         Initialize database and xPL connection
         '''
-        Plugin.__init__(self, 'dbmgr')
+        Plugin.__init__(self, 'dbmgr', log_prefix='core_')
         # Already done in Plugin
         #MQRep.__init__(self, zmq.Context(), 'dbmgr')
         self.log.debug(u"Init database_manager instance")
