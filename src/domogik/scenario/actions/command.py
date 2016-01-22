@@ -42,13 +42,16 @@ class CommandAction(AbstractAction):
         self.set_description(u"Start a certain command")
         self._cmdId = params
 
-    def do_action(self):
+    def do_action(self, local_vars):
         self.log.info(u"Do an action...")
 
         # live udate some values
         self.log.debug(u"Preprocessing on parameters...")
         self.log.debug(u"Parameters before processing : {0}".format(self._params))
         for key in self._params:
+            # local variables
+            self._params[key] = self.process_local_vars(local_vars, self._params[key])
+
             if key == "color" and self._params[key].startswith("#"):
                 self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
                 self._params[key] = self._params[key][1:]

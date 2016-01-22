@@ -45,16 +45,15 @@ class CallUrlAction(AbstractAction):
         AbstractAction.__init__(self, log)
         self.set_description("Call an url.")
 
-    def do_action(self):
-        self._log.info(u"Calling url : {0}".format(self._params['url']))
-        try:
-            # TODO : encore only the args!
-            #        so, first, split url and then process it
-            #        p3 porting : http://docs.pythonsprints.com/python3_porting/py-porting.html
+    def do_action(self, local_vars):
+        url = self._params['url']
+        # local variables
+        url = self.process_local_vars(local_vars, url)
 
+        self._log.info(u"Calling url : {0}".format(url))
+        try:
             # encode url
-            url = self._params['url']
-            url = self._params['url'].encode('utf-8')
+            url = url.encode('utf-8')
             url_elts = urlparse(url)
             url_args = url_elts.query.split("&")
             new_url_args = u""

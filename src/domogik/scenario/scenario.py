@@ -282,13 +282,14 @@ class ScenarioInstance:
     def _call_actions(self):
         """ Call the needed actions for this scenario
         """
-        print("CALLING actions")
+        self._log.debug("CALLING actions")
+        local_vars = {"foo" : "bar"}
         for act in sorted(self._mapping['action']):
             try:
-                self._mapping['action'][act].do_action()
+                self._mapping['action'][act].do_action(local_vars)
             except:
                 self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
-        print("END CALLING actions")
+        self._log.debug("END CALLING actions")
 
     def generic_trigger(self, test):
         if test.get_condition():

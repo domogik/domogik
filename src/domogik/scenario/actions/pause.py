@@ -37,9 +37,16 @@ class PauseAction(AbstractAction):
         AbstractAction.__init__(self, log)
         self.set_description("Do a pause.")
 
-    def do_action(self):
-        self._log.info("Do a pause of {0} seconds".format(self._params['delay']))
-        time.sleep(int(self._params['delay']))
+    def do_action(self, local_vars):
+        delay = self._params['delay']
+        # local variables
+        delay = self.process_local_vars(local_vars, delay)
+
+        self._log.info("Do a pause of {0} seconds".format(delay))
+        try:
+            time.sleep(int(delay))
+        except:
+            self._log.error("Error while casting delay '{0}' to int value".format(delay))
 
     def get_expected_entries(self):
         return {'delay': {'type': 'integer',

@@ -267,6 +267,7 @@ def scenario_blocks_js():
     for act, params in scenario_actions.iteritems():
         if act == "command.CommandAction": continue
         p = []
+        inline = "false"  # default inline value
         jso = u""
         for par, parv in params['parameters'].iteritems():
             papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
@@ -280,6 +281,10 @@ def scenario_blocks_js():
                 jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
                 the_list = parv["values"]  # [[...], [...]]
                 papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
+            elif parv['type'] == 'external':
+                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                papp = u"{0}; this.appendValueInput(\'{1}\').setCheck(null);".format(papp, par)
+                inline = "true"
             else:
                 papp = u"{0};".format(papp)
             p.append(papp)
@@ -292,10 +297,10 @@ def scenario_blocks_js():
                     this.setPreviousStatement(true, "null");
                     this.setNextStatement(true, "null");
                     this.setTooltip("{2}");
-                    this.setInputsInline(false);
+                    this.setInputsInline({4});
                 }}
             }};
-            """.format(act, '\n'.join(p), params['description'], jso)
+            """.format(act, '\n'.join(p), params['description'], jso, inline)
         js = u'{0}\n\r{1}'.format(js, add)
 
 
