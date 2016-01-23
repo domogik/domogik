@@ -60,7 +60,7 @@ Then, in the plugin *lib* class, the way to detect a device can be different fro
 
 * the items about its address or parameters
 * its model or reference if possible
-* any other information that may be usefull during a device creation
+* any other information that may be useful during a device creation
 
 Then, for each of its feature, call the callback for the **device_detected()** function. Here is an example for the *rfxcom* plugin: ::
 

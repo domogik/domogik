@@ -2,7 +2,7 @@
 Package json file
 =================
 .. warning ::
-   This docmentation is only valid for json version 2 and up.
+   This documentation is only valid for json version 2 and up.
    To learn how to upgrade read the json file :doc:`upgrade <json_file_upgrade>` documentation
 
 .. |yes| image:: yes.png
@@ -10,7 +10,7 @@ Package json file
 
 Purpose
 =======
-The Json file describe the package and the features of the package. There is one common part which is the same for all packages type and some optionnal parts that depends on the package type.
+The Json file describe the package and the features of the package. There is one common part which is the same for all packages type and some optional parts that depends on the package type.
 
 .. warning ::
    In json, you must write *\\n* each time you want to create a newline in the data.
@@ -75,8 +75,8 @@ Description
     * version : package version.
     * domogik_min_version : minimum Domogik version required by the package.
     * description : package description.
-    * author : Name or surname of the developper.
-    * author_email : email the developper.
+    * author : Name or surname of the developer.
+    * author_email : email the developer.
     * documentation : link to the specification page.
     * changelog : changelog. For each version you must indicate the fixes/upgrades.
     * dependencies : table of dependencies needed by the package :
@@ -85,15 +85,15 @@ Description
 
         python : a python dependency (distutils2 format). Ex : 'pyserial (>=2.5)', 'foo (>1.0, <1.8)', ...
 
-        plugin : a Domogik plugin dependency : another plugin must run in order this one could be functionnal.
+        plugin : a Domogik plugin dependency : another plugin must run in order this one could be functional.
 
         other : another dependency (example : owfs for onewire, which need a manual installation).
 
   * files : list of the files included in the package.
 
-Optionnal parts
-===============
-You must add the following parts in the json file when developping a package.
+Optional parts
+==============
+You must add the following parts in the json file when developing a package.
 
 Technology
 ----------
@@ -172,7 +172,7 @@ These data will be inserted in database during the package installation.
 	* key : the xpl key for the message
         * description :  short description of this field
         * type : the value type for this field 
-        * depending on the type the are other posibilitys (like min_value, max_value, ....)
+        * depending on the type the are other possibilities (like min_value, max_value, ....)
 
 Configuration elements
 ----------------------
@@ -198,7 +198,7 @@ Example
                 "options": [],
                 "default": "False",
                 "description": "Automatically start plugin at Domogik startup",
-                "optionnal": "no",
+                "optional": "no",
             },
             ...
         ]
@@ -229,7 +229,7 @@ Description
   * options : if *type = enum*, list the available options in this table.
   * default : suggested value.
   * description : parameter short description.
-  * optionnal : *yes* or *no* : is the parameter optionnal or not ? It is used only for notification in the user interface.
+  * optional : *yes* or *no* : is the parameter optional or not ? It is used only for notification in the user interface.
 
 
 .. todo:: 
@@ -262,7 +262,7 @@ Description
 ***********
 
 * udev-rules : list of the suggested udev rules.
-  * description : short desciption of the rule. Indicate the related device model here.
+  * description : short description of the rule. Indicate the related device model here.
   * filename : suggested filename to use for the rule.
   * model : related device model.
   * rule : the udev rule.
@@ -429,7 +429,7 @@ TODO
 How to insert the data in database
 ==================================
 
-*This action is only for developpers!*
+*This action is only for developers!*
 
 If you want to manually insert the data of the json in the database, launch this command : ::
 

@@ -7,14 +7,14 @@ Overview
 ========
 
 All the released versions of the plugins can be available on the packages repository : http://repo-public.domogik.org
-The developper of a plugin just need to submit its plugin (more details in step 5).
+The developer of a plugin just need to submit its plugin (more details in step 5).
 
 We want to avoid alpha/beta/candidates versions for a plugin : 
 
-* it may be too heavy to handle for some developpers. 
+* it may be too heavy to handle for some developers.
 * it will fill the packages repository with non stable plugin releases.
 
-So, we want each developper to release a plugin version only when the plugin release in progress is finished (you will find a checklist of what is expected in the step 5). If some people wish to use a plugin under development, they just need to use the GitHub (or whatever else) repository (more details in the step 4). 
+So, we want each developer to release a plugin version only when the plugin release in progress is finished (you will find a checklist of what is expected in the step 5). If some people wish to use a plugin under development, they just need to use the GitHub (or whatever else) repository (more details in the step 4).
 
 Focus on the branches
 =====================
@@ -25,7 +25,7 @@ This branching model is inspired from the one here : http://nvie.com/posts/a-suc
 Basically :
 
 * the *master* branch contains the last stable release
-* the *develop* branch contains the release which is currently developped. It you have to do any upgrade or fix, you should do them in this branch.
+* the *develop* branch contains the release which is currently developed. It you have to do any upgrade or fix, you should do them in this branch.
 * when a stable release is ready (in the *develop* branch), you create a *tag* (and *version*) on the GitHub repository and then merge it into the master branch.
 
 Example for a new plugin
@@ -90,11 +90,11 @@ Step 3 - Develop the plugin
 You should stay on this step until a stable version of your plugin is not ready in the *develop* branch.
 Please don't forget that a stable version means:
 
-* the plugin is functionnal and stable
+* the plugin is functional and stable
 * the plugin code is clean
 * the info.json file is ok 
 * the documentation is written and handled by ReadTheDoc
-* if the plugin technology allows it, some tests have been written and are functionnal with Travis CI
+* if the plugin technology allows it, some tests have been written and are functional with Travis CI
 * ...
 
 You will find a complete checklist in a later step
@@ -114,7 +114,7 @@ A development version (which can be named as alpha/beta/candidate) will never be
 Go to the the packages repository and:
 
 * login with your GitHub account
-* Click on **Submit a pacckage**
+* Click on **Submit a package**
 * Fill the form:
 
   * Package url : the url to the zip of the *develop* branch. Example : https://github.com/fritz-smh/domogik-plugin-teleinfo/archive/develop.zip
@@ -128,7 +128,7 @@ Go to the the packages repository and:
 How to give some development releases to people who want to test ?
 ------------------------------------------------------------------
 
-The best way to test a plugin during the development phasis is to clone the repository.
+The best way to test a plugin during the development phase is to clone the repository.
 But you can also use the .zip file of the *develop* branch.
 
 Step 5 - Releasing a stable version

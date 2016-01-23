@@ -3,7 +3,7 @@ Brain packages development
 ==========================
 
 .. note::
-    If you think something is not clear or is missing in this documentation, please send an email to our developpers mailing list : *domogik-developers@lists.labs.libre-entreprise.org* and explain us clearly what is not clear or what could be added.
+    If you think something is not clear or is missing in this documentation, please send an email to our developers mailing list : *domogik-developers@lists.labs.libre-entreprise.org* and explain us clearly what is not clear or what could be added.
 
 General informations
 ====================

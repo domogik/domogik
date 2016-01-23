@@ -23,14 +23,14 @@ We choose to include REST services in the Admin component, so :
 * The REST service is now available on the same port as Domogik Administration (40406 per default).
 * The REST service urls will all start with */rest/*. Example : */device/* become */rest/device/*.
 
-This merge is a first step of a global performances improvment plan. Each release will include one improvment related to performances.
+This merge is a first step of a global performances improvement plan. Each release will include one improvement related to performances.
 
 REST Api version is upgraded to 0.8 (previously : 0.7)
 
 Rest service : new service to discuss with the butler
 -----------------------------------------------------
 
-A new service has been added to rest : **POST /rest/butler/discuss**. It allows to discuss with the butler over a Rest url. This service can be usefull to interact with the butler from scripts or alternate home automation systems.
+A new service has been added to rest : **POST /rest/butler/discuss**. It allows to discuss with the butler over a Rest url. This service can be useful to interact with the butler from scripts or alternate home automation systems.
 
 Install script upgrades
 -----------------------
@@ -76,7 +76,7 @@ For RGB devices, some dedicated tests buttons have been added.
 Admin : layout
 --------------
 
-Various layout improvments, especially for the client and devices configuration.
+Various layout improvements, especially for the client and devices configuration.
 
 Plugins : no xpl plugins
 ------------------------
@@ -91,7 +91,7 @@ MQ and Rest API
 
 Some outputs related to the **sensor history** MQ messages and REST requests have changed. These features were not really used until now.
 
-For this release, please avoid using the **sensor history** features, there may be still some improvments in the next release!
+For this release, please avoid using the **sensor history** features, there may be still some improvements in the next release!
 
 MQ
 --
@@ -102,4 +102,4 @@ Now, devices changes (new device, upgrades, etc) are published over MQ. User int
 Backup
 ------
 
-Backup script improvments.
+Backup script improvements.

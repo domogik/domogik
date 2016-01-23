@@ -10,7 +10,7 @@ In all cases, the version number must respect the `PEP 386 <http://www.python.or
 
 First release of the package
 ============================
-The first release of your package should be named **0.1**. The following releases should also be named *0.x* until the package is fully functionnal : then you will switch to **1.0** version number. You may want to use some alpha, beta or candidates releases like **1.0a1**, **1.0b3**, **1.0c1** before using the final *1.0* version number.
+The first release of your package should be named **0.1**. The following releases should also be named *0.x* until the package is fully functional : then you will switch to **1.0** version number. You may want to use some alpha, beta or candidates releases like **1.0a1**, **1.0b3**, **1.0c1** before using the final *1.0* version number.
 
 Next releases of the package
 ============================

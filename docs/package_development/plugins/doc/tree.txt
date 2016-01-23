@@ -4,8 +4,8 @@ Documentation tree
 
 Depending on the plugin, the documentation may be very big (this is the case for the plugin *ozwave* for example) or very small (this is the case for the plugin *diskfree* for example). So you won't create your documentation in the same way for all the plugins. In this chapter, we will give you only rules and recommendations.
 
-The mandatatory part
-====================
+The mandatory part
+==================
 
 Only 3 files are mandatory:
 
@@ -20,7 +20,7 @@ The **myplugin.txt** file is the main file for your plugin documentation. It wil
 
 The **changelog.txt** file will contain the history of your package. 
 
-The **dev.txt** will contain some technical informations for the developpers.
+The **dev.txt** will contain some technical informations for the developers.
 
 Example tree for a simple plugin
 ================================

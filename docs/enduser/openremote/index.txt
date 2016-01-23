@@ -38,7 +38,7 @@ As protocol you select HTTP and then it will ask you some extra pramaters accord
     * for domogik commands: <restURL>/cmd/id/<cmdID>?<params>. Ex: http://192.168.1.101:40405/cmd/id/1?level=1
     * These urls can be found in the admin interface below each device
 * HTTP Method: select GET
-* Polling intervale (for domogik sensors only): 1s
+* Polling interval (for domogik sensors only): 1s
 * JSONPath Expression (for domogik sensors only): $.last_value
 
 Examples
