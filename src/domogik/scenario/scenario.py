@@ -282,11 +282,15 @@ class ScenarioInstance:
     def _call_actions(self):
         """ Call the needed actions for this scenario
         """
-        self._log.debug("CALLING actions")
         local_vars = {"foo" : "bar"}
+        self._log.debug("CALLING actions. Local vars = '{0}'".format(local_vars))
+        idx = 0
         for act in sorted(self._mapping['action']):
+            idx += 1
             try:
+                self._log.debug("Before action n°{0}. Local vars = '{1}'".format(idx, local_vars))
                 self._mapping['action'][act].do_action(local_vars)
+                self._log.debug("After action n°{0}. Local vars = '{1}'".format(idx, local_vars))
             except:
                 self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
         self._log.debug("END CALLING actions")
