@@ -65,6 +65,8 @@ class CommandAction(AbstractAction):
         msg.set_action('cmd.send')
         msg.add_data('cmdid', self._cmdId)
         msg.add_data('cmdparams', self._params)
+
+        self.log.debug(u"Command id = '{0}', command params = '{1}'".format(self._cmdId, self._params)) 
         # do the request
         res = cli.request('xplgw', msg.get(), timeout=10)
         if res:
