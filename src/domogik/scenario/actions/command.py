@@ -48,15 +48,16 @@ class CommandAction(AbstractAction):
         # live udate some values
         self.log.debug(u"Preprocessing on parameters...")
         self.log.debug(u"Parameters before processing : {0}".format(self._params))
+        params = {}
         for key in self._params:
             # local variables
-            self._params[key] = self.process_local_vars(local_vars, self._params[key])
+            params[key] = self.process_local_vars(local_vars, self._params[key])
 
-            if key == "color" and self._params[key].startswith("#"):
+            if key == "color" and params[key].startswith("#"):
                 self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
-                self._params[key] = self._params[key][1:]
+                params[key] = params[key][1:]
 
-        self.log.debug(u"Parameters after processing : {0}".format(self._params))
+        self.log.debug(u"Parameters after processing : {0}".format(params))
         self.log.debug(u"Send action command over MQ...")
 
         # do the command
@@ -64,9 +65,9 @@ class CommandAction(AbstractAction):
         msg = MQMessage()
         msg.set_action('cmd.send')
         msg.add_data('cmdid', self._cmdId)
-        msg.add_data('cmdparams', self._params)
+        msg.add_data('cmdparams', params)
 
-        self.log.debug(u"Command id = '{0}', command params = '{1}'".format(self._cmdId, self._params)) 
+        self.log.debug(u"Command id = '{0}', command params = '{1}'".format(self._cmdId, params)) 
         # do the request
         res = cli.request('xplgw', msg.get(), timeout=10)
         if res:
