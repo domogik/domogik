@@ -70,7 +70,7 @@ class SetVariableAction(AbstractAction):
 
     def get_expected_entries(self):
         return {'name': {'type': 'string',
-                            'description': 'variable',
+                            'description': 'local variable',
                             'default': ''},
                 'value': {'type': 'external',
                             'description': 'to',
