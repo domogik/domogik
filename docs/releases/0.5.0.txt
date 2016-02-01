@@ -85,6 +85,11 @@ It is now possible to create no xPl plugins.
 
 .. todo:: complete
 
+Plugins : new datatype : DT_Battery
+-----------------------------------
+
+A new datatype is introduced in this release : **DT_Battery**. It is similar to DT_Scaling  : the unit is % and the values are between 0 and 100. The aim of this datatype is to allow to group all devices battery sensors on a single view to help the users to manage their devices batteries.
+
 
 MQ and Rest API
 ---------------
