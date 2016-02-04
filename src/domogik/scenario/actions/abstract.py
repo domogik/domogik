@@ -138,10 +138,10 @@ class AbstractAction:
         # local variables
         try:
             for a_var in local_vars:
-                print("=> {0}".format(a_var))
+                print(u"=> {0}".format(a_var))
                 input = input.replace(u"{{{{{0}}}}}".format(a_var), local_vars[a_var])
                 print(input)
         except:
-            self._log.error("Error while replacing local variables '{0}' in '{1}'. Error is : {2}".format(local_vars, input, traceback.format_exc()))
+            self._log.error(u"Error while replacing local variables '{0}' in '{1}'. Error is : {2}".format(local_vars, input, traceback.format_exc()))
         return input
 
