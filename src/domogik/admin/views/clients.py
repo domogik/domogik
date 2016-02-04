@@ -117,6 +117,11 @@ def clients():
 
         client_list_per_host_per_type[cli_host][cli_type][client] = client_list[client]
 
+    
+    # sorting
+    client_list_per_host_per_type = json.dumps(client_list_per_host_per_type, sort_keys=True)
+    client_list_per_host_per_type = json.loads(client_list_per_host_per_type, object_pairs_hook=OrderedDict)
+
     # if all the core clients are dead, there is an issue with MQ pub/sub (forwarder)
     # so display a message
     if num_core > 0 and num_core == num_core_dead:
@@ -172,13 +177,28 @@ def client_devices_known(client_id):
             error = "Error while retrieving the devices list. Error is : {0}".format(traceback.format_exc())
             devices = []
 
-    # sort clients per device type
+    # first sort by device name
+    devices = sorted(devices, key=itemgetter("name"))
+    print(detail['data']['device_types'])
+    #    device_types_list[key] = data["device_types"][key]
+
+    # group clients per device type
     devices_by_device_type_id = {}
     for dev in devices:
-        if dev['device_type_id'] in devices_by_device_type_id:
-            devices_by_device_type_id[dev['device_type_id']].append(dev)
+        try:
+            device_type_name = detail['data']['device_types'][dev['device_type_id']]['name']
+        except KeyError:
+            print("Warning : the device type '{0}' does not exist anymore in the installed package release. Device type name set as the existing id in database".format(dev['device_type_id']))
+            device_type_name = dev['device_type_id']
+        print(device_type_name)
+        if device_type_name in devices_by_device_type_id:
+            devices_by_device_type_id[device_type_name].append(dev)
         else:
-            devices_by_device_type_id[dev['device_type_id']] = [dev]
+            devices_by_device_type_id[device_type_name] = [dev]
+
+    # sorting
+    devices_by_device_type_id = json.dumps(devices_by_device_type_id, sort_keys=True)
+    devices_by_device_type_id = json.loads(devices_by_device_type_id, object_pairs_hook=OrderedDict)
 
     return render_template('client_devices.html',
             datatypes = app.datatypes,
@@ -502,10 +522,16 @@ def client_devices_new(client_id):
     detail = get_client_detail(client_id)
     data = detail['data']
 
+    # devices type list
     device_types_keys = sorted(data["device_types"])
     device_types_list = OrderedDict()
     for key in device_types_keys:
         device_types_list[key] = data["device_types"][key]
+
+    # sorting
+    # TODO
+
+    # products list
     products = {}
     products_per_type = OrderedDict()
     if "products" in data:
@@ -818,6 +844,10 @@ def get_brain_content(client_id):
             detail[client_id] = None
     else:
         detail = {}
+ 
+    # sorting
+    detail = json.dumps(detail, sort_keys=True)
+    detail = json.loads(detail, object_pairs_hook=OrderedDict)
 
     # do a post processing on content to add html inside
     for client_id in detail:

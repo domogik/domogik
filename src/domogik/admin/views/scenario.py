@@ -25,6 +25,8 @@ try:
 except ImportError:
     from urllib.parse import quote
 import traceback
+from operator import itemgetter
+from collections import OrderedDict
 
 @app.route('/scenario')
 @login_required
@@ -40,6 +42,7 @@ def scenario():
             res = res['result']
             for scen in res:
                 scenarios.append(scen)
+    scenarios = sorted(scenarios, key=itemgetter("name"))
     return render_template('scenario.html',
         scenarios = scenarios,
         mactive = u"scenario")
@@ -491,6 +494,14 @@ def scenario_blocks_js():
         js = u'{0}\n\r{1}'.format(js, add)
                 
 
+    # do some sorting
+
+    devices_per_clients = json.dumps(devices_per_clients, sort_keys=True)
+    devices_per_clients = json.loads(devices_per_clients, object_pairs_hook=OrderedDict)
+    tests = sorted(tests)
+    actions = sorted(actions)
+
+    # return values
     return js, tests, actions, devices_per_clients, used_datatypes
 
 
