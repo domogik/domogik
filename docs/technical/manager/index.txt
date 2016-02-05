@@ -15,7 +15,7 @@ You can call it with the **dmg_manager** command.
 Design
 ======
 
-The plugins manager is a xPL plugin (heritates of *domogik.xpl.common.plugin.XplPlugin*).
+The plugins manager is a xPL plugin (inherited of *domogik.xpl.common.plugin.XplPlugin*).
 When it starts, it connects to the xPL network and wait for messages.
 
 Depending on the options passed at startup, it will be able to start: ::

@@ -43,7 +43,7 @@ One parameter is automatically added by Domogik to your configuration parameters
             "type": "boolean"
         }
 
-This element allows the user to enable a plugin to be started on Domogik startup (usefull during a server reboot).
+This element allows the user to enable a plugin to be started on Domogik startup (useful during a server reboot).
 
 Description
 ===========
@@ -52,13 +52,13 @@ Each item has several properties:
 
 * **key** : the configuration key. This is used to store the value in database. The key must be lower case, limited to 255 characters. The only separator allowed in the *underscore*. This won't be displayed on the user interface.
 * **name** : a human readable equivalent of the **key**. This wil be displayed on the user interface.
-* **description** : the configuration item description. If the item type is an interger, a float or something like this, you must specify the unity (minutes, seconds, ...) in the description.
+* **description** : the configuration item description. If the item type is an integer, a float or something like this, you must specify the unity (minutes, seconds, ...) in the description.
 * **type** : the configuration item type. You will find more informations below.
 * **default** : the default value. If the configuration item is not set in database, this default value will be used by the plugin.
 * **required** : is the configuration of this item required to run the plugin ? On the user interface, you may not be able to start a plugin if all the *required = true* items are not filled. If the *required* key doesn't exist, we assume that the item is required and *required = true*.
-* **...** : some addtionnal and optionnal parameters depending on the **type**. You will find more informations below.
+* **...** : some additional and optional parameters depending on the **type**. You will find more informations below.
 
-Notice aboue special values
+Notice above special values
 ---------------------------
 
 In json format, you need to use for the boolean type :

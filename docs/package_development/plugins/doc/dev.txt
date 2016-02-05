@@ -1,6 +1,6 @@
-===================
-Doc for developpers
-===================
+==================
+Doc for developers
+==================
 
 You must create a documentation part about the plugin development. In this part, you must at least:
 

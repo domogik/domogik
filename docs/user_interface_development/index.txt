@@ -1,6 +1,6 @@
-============================
-Developping a user interface
-============================
+===========================
+Developing a user interface
+===========================
 
 What should a user interface for Domogik do ?
 =============================================

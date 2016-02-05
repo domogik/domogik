@@ -40,10 +40,10 @@ The next step is to run the statsUpgrade.py script in the domogik root folder. T
 it asks a couple of questions about what device to upgrade and where to upgrade to.
 
 The steps taken (by the script):
-* Ask the old device to uprgade
+* Ask the old device to upgrade
 * Ask the old stats key to upgrade
 * Request the new device
-* Request the sensor to transfere the stats to
+* Request the sensor to transfer the stats to
 * Do it
 
 In the last step you will need to enter 'YES I AM SURE' and once this is entered the uprgade will happen for the select old device and stats key.
@@ -128,7 +128,7 @@ Example
     Select Action: 22
     
     ====================================================================================
-    Upgrade with the folowing info
+    Upgrade with the following info
     Old device:      teleinfo(15)
     Old stats key:   iinst
     New device:      Teleinfo(175)
@@ -136,7 +136,7 @@ Example
     
     WARNING:
     By typing YES below this will start the upgrade process, after the process
-    the upgraded stats keys will be DELETED from the core_device_stats sql tabel.
+    the upgraded stats keys will be DELETED from the core_device_stats sql table.
     This process can not be reversed, it is advised to make a backup of your
     datatabse before starting this process
     

@@ -10,9 +10,9 @@ The dedicated administration pages are available in Domogik administration on a 
 How it works
 ============
 
-On startup, Domogik administration will look for each installed client if there is an **admin/** folder. If so, the content of this folder will be handled by Flask to be available from the admnistration.
+On startup, Domogik administration will look for each installed client if there is an **admin/** folder. If so, the content of this folder will be handled by Flask to be available from the administration.
 
-So, you just need to fillan **admin/** folder in the root of your package repository.
+So, you just need to fill an **admin/** folder in the root of your package repository.
 
 Create a simple page (diskfree example)
 =======================================

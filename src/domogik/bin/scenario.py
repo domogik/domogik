@@ -49,7 +49,7 @@ class ScenarioFrontend(Plugin):
     """
 
     def __init__(self):
-        Plugin.__init__(self, name = 'scenario')
+        Plugin.__init__(self, name = 'scenario', log_prefix='core_')
         ### check that needed services are up on MQ side
         cli = MQSyncReq(zmq.Context())
         mq_services = None

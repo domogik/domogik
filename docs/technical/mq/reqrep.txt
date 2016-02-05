@@ -23,7 +23,7 @@ There are 2 clients provided, an async and a sync client
 Async
 -----
 
-The async object is supposed to be used as an extension of another class, the on_mdp_message methode can then be overloaded.
+The async object is supposed to be used as an extension of another class, the on_mdp_message method can then be overloaded.
 
 Sync
 ----
@@ -56,7 +56,7 @@ MQRep.init(self, zmq.Context(), 'dbmgr')
 the first argument is the zmq context
 the second argument is the workers name
 
-then you can override the on_mdp_request methode
+then you can override the on_mdp_request method
 def on_mdp_request(self, msg)
 the msg argument is an object of type MQMessage
 

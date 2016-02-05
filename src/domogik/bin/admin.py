@@ -174,7 +174,7 @@ class Admin(Plugin):
             @param server_port :  port of HTTP server
         """
 
-        Plugin.__init__(self, name = 'admin')
+        Plugin.__init__(self, name = 'admin', log_prefix='core_')
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())

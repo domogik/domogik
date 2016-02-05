@@ -3,14 +3,14 @@ Conversion functions
 ====================
 
 Domogik is using a fixed data format (`Data types <data_types/index>`) to store sensor data in the database and to generate the xpl commands. Some hardware can not work directly with this data format and need some sort of conversions.
-For the above purpose Domogik introduced Conversion functions, these are verry simple python functions that input a value and need to return a single value. These python functions are called in 2 places inside Domogik.
-1- During xpl command generation: The input value is comming from REST or MQ and is then placed inside the transmitted XPL message.
-2- During stat receival: The incomming xpl value is used as the parameter of the conversion function and the return value is stored in the database.
+For the above purpose Domogik introduced Conversion functions, these are very simple python functions that input a value and need to return a single value. These python functions are called in 2 places inside Domogik.
+1- During xpl command generation: The input value is coming from REST or MQ and is then placed inside the transmitted XPL message.
+2- During stat receival: The incoming xpl value is used as the parameter of the conversion function and the return value is stored in the database.
 
 Limitations
 ===========
 
-Because the conversion code is using eval() the conversion code in the file should be verry simple. There should be no comments in the file and there should only be one function per conversion file. See the example below.
+Because the conversion code is using eval() the conversion code in the file should be very simple. There should be no comments in the file and there should only be one function per conversion file. See the example below.
 
 Example
 =======
@@ -40,4 +40,4 @@ This conversion function is used by a sensor, defined in the *info.json* file: :
         },
         ...
 
-So, each time a value is catched by *xplgw* for such a sensor, it will be translated thanks to the conversion function to the appropriate value.
+So, each time a value is caught by *xplgw* for such a sensor, it will be translated thanks to the conversion function to the appropriate value.

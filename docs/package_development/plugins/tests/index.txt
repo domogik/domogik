@@ -13,7 +13,7 @@ Some libraries have been created in the Domogik project to help you to create th
 * configure, start, stop and do some basic checks on the plugin
 * help you to test xPL dialogs
 
-**Be carefull : executing the tests may delete your existing devices and so you can loose some data!!!!**
+**Be careful : executing the tests may delete your existing devices and so you can loose some data!!!!**
 
 When should the tests be launched ?
 ===================================
@@ -26,9 +26,9 @@ File tree
 The following files are mandatory for the tests: ::
 
     tests/
-      # the 0* files are just helpers for the developpers
-      001_configure.py     # this python file is used by the developpers to quickly configure the plugin 
-      002_create_device.py # this python file is used by the developpers to quickly create some test devices
+      # the 0* files are just helpers for the developers
+      001_configure.py     # this python file is used by the developers to quickly configure the plugin
+      002_create_device.py # this python file is used by the developers to quickly create some test devices
 
       # all the other files are related to the plugin tests
       tests.json          # this is a file which describe all the test files. It is used for tests automation
@@ -218,8 +218,8 @@ Here is an example of a dummy test which is always good: ::
         def test_0100_dummy(self):
             self.assertTrue(True)
 
-Usefull functions
------------------
+Useful functions
+----------------
 
 The following  functions can be used for your tests.
 
@@ -465,7 +465,7 @@ Here are the actions that can be done in the main part:
 
 * launch some common tests related to the plugin stopping process. The first one will check that the plugin sends hbeat messages and can take several minutes! The second one will try to stop the plugin and check if the plugin can be stopped. Example: ::
 
-        # do some tests comon to all the plugins
+        # do some tests common to all the plugins
         suite.addTest(DiskfreeTestCase("test_9900_hbeat", xpl_plugin, name, cfg))
         suite.addTest(DiskfreeTestCase("test_9990_stop_the_plugin", xpl_plugin, name, cfg))
 
@@ -513,7 +513,7 @@ Then, in the test file, add the following configuration elements in the *main pa
         cfg['test_mode'] = True
         cfg['test_option'] = "{0}/tests_hchp_data.json".format(test_folder)
 
-These are configuration options which will be handled by the plugin itself. The first one will activate the mock and the second one will give the json file which describe the fake device comportement.
+These are configuration options which will be handled by the plugin itself. The first one will activate the mock and the second one will give the json file which describe the fake device behavior.
 
 Of course, the plugin will need to be adapted to handle these options and the serial mock!
 
@@ -599,7 +599,7 @@ Now you will have to create the json file. This json file is made of 3 parts: ::
 .. note ::
     Currently, the **responses** part is not yet implemented
 
-The **history** part will contain some data comming from the fake real device. All history elements are played only one time, in the order they are defined in the json file. Then, when the history if finished, the **loop** part will be processed forever.
+The **history** part will contain some data coming from the fake real device. All history elements are played only one time, in the order they are defined in the json file. Then, when the history if finished, the **loop** part will be processed forever.
 
 Here is an example for the **history** part: ::
 
@@ -627,7 +627,7 @@ Here is an example for the **history** part: ::
 
 As you can see in the example, each history step is made of 3 parts:
 
-* description : a small description of the step. It will be used for display, but it is mainly used for the developper information.
+* description : a small description of the step. It will be used for display, but it is mainly used for the developer information.
 * action : the type of the action. 
 
   * action = "data" : send a string on the fake serial device

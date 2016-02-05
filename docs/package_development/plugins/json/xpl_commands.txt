@@ -5,7 +5,7 @@ info.json for plugins - xpl_commands section
 Purpose
 =======
 
-The xpl_comand section will describe all xPL messages that must be sent by Domogik to trigger an action in the plugin.
+The xpl_command section will describe all xPL messages that must be sent by Domogik to trigger an action in the plugin.
 
 Example
 =======
