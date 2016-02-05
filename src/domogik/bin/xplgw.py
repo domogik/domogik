@@ -59,7 +59,7 @@ class XplManager(XplPlugin):
     def __init__(self):
         """ Initiate DbHelper, Logs and config
         """
-        XplPlugin.__init__(self, 'xplgw', log_prefix="")
+        XplPlugin.__init__(self, 'xplgw', log_prefix="core_")
         self.add_mq_sub('client.conversion')
         self.add_mq_sub('client.list')
         self.add_mq_sub('client.sensor')
