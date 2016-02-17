@@ -12,7 +12,7 @@ except ImportError:
 from wtforms import TextField, HiddenField, validators, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField, \
             DateField, DateTimeField, FloatField, PasswordField
-from wtforms.validators import Required
+from wtforms.validators import Required, InputRequired
 from flask_login import login_required
 try:
     from flask.ext.babel import gettext, ngettext
@@ -275,7 +275,7 @@ def client_global_edit(client_id, dev_id):
         for item in dev["parameters"]:
             item = dev["parameters"][item]
             default = item["value"]
-            arguments = [Required()]
+            arguments = [InputRequired()]
             # keep track of the known fields
             known_items[item["key"]] = {u"id": item["id"], u"type": item["type"]}
             # build the field
@@ -431,7 +431,7 @@ def client_config(client_id):
         known_items[item["key"]] = item["type"]
         # handle required
         if item["required"] == "yes":
-            arguments = [Required()]
+            arguments = [InputRequired()]
         else:
             arguments = []
         # fill in the field
@@ -616,15 +616,15 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 default = True
             else:
                 default = False
-            field = BooleanField(name, [Required()], description=item["description"], default=default)
+            field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "integer":
-            field = IntegerField(name, [Required()], description=item["description"], default=default)
+            field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "date":
-            field = DateField(name, [Required()], description=item["description"], default=default)
+            field = DateField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "datetime":
-            field = DateTimeField(name, [Required()], description=item["description"], default=default)
+            field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "float":
-            field = DateTimeField(name, [Required()], description=item["description"], default=default)
+            field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "choice":
             choices = []
             for key in sorted(item["choices"]):
