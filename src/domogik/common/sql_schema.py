@@ -106,7 +106,7 @@ class Device(Base):
     __tablename__ = '%s_device' % _db_prefix
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode(30), nullable=False)
+    name = Column(Unicode(128), nullable=False)
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
     device_type_id = Column(Unicode(80), nullable=False, index=True)
