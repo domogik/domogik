@@ -114,22 +114,29 @@ class Publisher(MQAsyncSub):
         pub = MQPub(ctx, 'admin')
         while True:
             message = yield self.MQmessages.get()
-            jsons = json.loads(message)
-            # req/rep
-            if 'mq_request' in jsons and 'data' in jsons:
-                msg = MQMessage()
-                msg.set_action(str(jsons['mq_request']))
-                msg.set_data(jsons['data'])
-                print("REQ : {0}".format(msg.get()))
-                if 'dst' in jsons:
-                    print cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
-                else:
-                    print cli.request('manager', msg.get(), timeout=10).get()
-            # pub
-            elif 'mq_publish' in jsons and 'data' in jsons:
-                print("Publish : {0}".format(jsons['data']))
-                pub.send_event(jsons['mq_publish'],
-                                    jsons['data'])
+            self.sendToMQ(cli, pub, message)
+    
+    def sendToMQ(self, cli, pub, message):
+        jsons = json.loads(message)
+        # req/rep
+        if 'mq_request' in jsons and 'data' in jsons:
+            msg = MQMessage()
+            msg.set_action(str(jsons['mq_request']))
+            msg.set_data(jsons['data'])
+            print("REQ : {0}".format(msg.get()))
+            if 'dst' in jsons:
+                dst = str(jsons['dst'])
+            else:
+                dst = 'manager'
+            res = cli.request(dst, msg.get(), timeout=10)
+            if res:
+                print res.get()
+        # pub
+        elif 'mq_publish' in jsons and 'data' in jsons:
+            print("Publish : {0}".format(jsons['data']))
+            pub.send_event(jsons['mq_publish'],
+                            jsons['data'])
+
 
 
 class Subscription(WebSocketHandler):
