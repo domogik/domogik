@@ -83,7 +83,10 @@ class Publisher(MQAsyncSub):
 
     def deregister(self, subscriber):
         """Stop publishing to a subscriber."""
-        self.subscribers.remove(subscriber)
+        try:
+            self.subscribers.remove(subscriber)
+        except:
+            pass
 
     @gen.coroutine
     def on_message(self, did, msg):
