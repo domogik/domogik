@@ -94,32 +94,25 @@ class Publisher(MQAsyncSub):
         yield self.WSmessages.put({"msgid": did, "content": msg})
 
     @gen.coroutine
-    def submit(self, message):
-        """Submit a new message to publish to subscribers."""
-        yield self.WSmessages.put(message)
-
-    @gen.coroutine
     def publishToWS(self):
         while True:
             message = yield self.WSmessages.get()
             if len(self.subscribers) > 0:
-                print("Pushing MQ message {} to {} WS subscribers...".format(
-                    message, len(self.subscribers)))
+                print("Pushing MQ message to {} WS subscribers...".format(len(self.subscribers)))
                 yield [subscriber.submit(message) for subscriber in self.subscribers]
 
     @gen.coroutine
     def publishToMQ(self):
-        ctx = zmq.Context()
-        cli = MQSyncReq(ctx)
-        pub = MQPub(ctx, 'admin')
         while True:
             message = yield self.MQmessages.get()
-            self.sendToMQ(cli, pub, message)
+            self.sendToMQ(message)
     
-    def sendToMQ(self, cli, pub, message):
+    def sendToMQ(self, message):
+        ctx = zmq.Context()
         jsons = json.loads(message)
         # req/rep
         if 'mq_request' in jsons and 'data' in jsons:
+            cli = MQSyncReq(ctx)
             msg = MQMessage()
             msg.set_action(str(jsons['mq_request']))
             msg.set_data(jsons['data'])
@@ -134,6 +127,7 @@ class Publisher(MQAsyncSub):
         # pub
         elif 'mq_publish' in jsons and 'data' in jsons:
             print("Publish : {0}".format(jsons['data']))
+            pub = MQPub(ctx, 'admin-ws')
             pub.send_event(jsons['mq_publish'],
                             jsons['data'])
 
@@ -165,9 +159,9 @@ class Subscription(WebSocketHandler):
 
     @gen.coroutine
     def run(self):
+        """ Empty the queue of messages to send to the WS """
         while not self.finished:
             message = yield self.messages.get()
-            #print("New MQ message: " + str(message))
             self.send(message)
 
     def send(self, message):
@@ -177,6 +171,8 @@ class Subscription(WebSocketHandler):
             self._close()
     
     def on_message(self, content):
+        """ reciev message from websocket and send to MQ """
+        print("WS to MQ")
         self.publisher.MQmessages.put(content)
 
 class Admin(Plugin):
