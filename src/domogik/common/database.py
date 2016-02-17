@@ -871,60 +871,59 @@ class DbHelper():
                         newval = value
                         self.log.error("Failed to apply formula ({0}) to sensor ({1}): {2}".format(sensor.formula, sensor, exp))
                     value = newval
-                ### only store stats if the value is different
-                # if duplicate == 1 we allow duplicate values
-                # else we skip if the new value has the same value as the last one in database
-                #
-                # TODO : maybe we could improve this part and do the following :
-                # if not duplicate
-                #     if new_value == last_value == before_last_value:
-                #         insert new_value
-                #         delete last_value
-                # so we would keep only the first and the last value of the N same values 
-                if (sensor.history_duplicate == 1) or (sensor.history_duplicate == 0 and str(sensor.last_value) != str(value)):
-                    # handle history_round
-                    # reduce device stats
-                    if sensor.history_round > 0:
-                        last = self.__session.query(SensorHistory) \
-                            .filter(SensorHistory.sensor_id == sid) \
-                            .order_by(SensorHistory.date.desc()) \
-                            .limit(2) \
-                            .all()
-                        last.reverse()
-                        if last and len(last) == 2:
-                            delta = abs(float(last[0].value_num) - float(last[1].value_num))
-                            if delta < sensor.history_round:
-                                delta0 = abs(float(value) - float(last[0].value_num))
-                                delta1 = abs(float(value) - float(last[1].value_num))
-                                if delta0 < sensor.history_round \
-                                        and delta1 < sensor.history_round:
-                                    self.__session.query(SensorHistory) \
-                                        .filter(SensorHistory.id == last[1].id) \
-                                        .delete()
-                    # insert new recored in core_sensor_history
-                    # store the history value if requested
-                    if sensor.history_store:
-                        h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
-                        self.__session.add(h)
-                    sensor.last_received = date
-                    sensor.last_value = ucode(value)
-                    try:
-                        val = float(value)
-                    except ValueError:
-                        pass
-                    except TypeError:
-                        pass
-                    else:
-                        # update min/max
-                        if sensor.value_min > val:
-                            sensor.value_min = val
-                        if sensor.value_max < val:
-                            sensor.value_max = val
-                    self.__session.add(sensor)
-                    try:
-                        self.__session.commit()
-                    except Exception as sql_exception:
-                        self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                if sensor.history_round > 0:
+                    last = self.__session.query(SensorHistory) \
+                        .filter(SensorHistory.sensor_id == sid) \
+                        .order_by(SensorHistory.date.desc()) \
+                        .limit(2) \
+                        .all()
+                    last.reverse()
+                    if last and len(last) == 2:
+                        delta = abs(float(last[0].value_num) - float(last[1].value_num))
+                        if delta < sensor.history_round:
+                            delta0 = abs(float(value) - float(last[0].value_num))
+                            delta1 = abs(float(value) - float(last[1].value_num))
+                            if delta0 < sensor.history_round \
+                                    and delta1 < sensor.history_round:
+                                self.__session.query(SensorHistory) \
+                                    .filter(SensorHistory.id == last[1].id) \
+                                    .delete()
+                # insert new recored in core_sensor_history
+                # store the history value if requested
+                if sensor.history_store:
+                    if sensor.history_duplicate == 0 and sensor.last_value == str(value):
+                        toDel = self.__session.query(SensorHistory) \
+                                .filter(SensorHistory.sensor_id==sensor.id) \
+                                .order_by(SensorHistory.date.desc()) \
+                                .limit(1) \
+                                .one()
+                        self.__session.delete(toDel)
+                        try:
+                            self.__session.commit()
+                        except Exception as sql_exception:
+                            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                    # finally store the value
+                    h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
+                    self.__session.add(h)
+                sensor.last_received = date
+                sensor.last_value = ucode(value)
+                try:
+                    val = float(value)
+                except ValueError:
+                    pass
+                except TypeError:
+                    pass
+                else:
+                    # update min/max
+                    if sensor.value_min > val:
+                        sensor.value_min = val
+                    if sensor.value_max < val:
+                        sensor.value_max = val
+                self.__session.add(sensor)
+                try:
+                    self.__session.commit()
+                except Exception as sql_exception:
+                    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
                 # handle the max value
                 if sensor.history_max > 0:
                     count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor.id).count()
