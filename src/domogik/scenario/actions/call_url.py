@@ -65,6 +65,8 @@ class CallUrlAction(AbstractAction):
                                                url_elts.netloc,
                                                url_elts.path,
                                                new_url_args)
+            if new_url.endswith('?'):
+                new_url = new_url[:-1]
             # call url
             self._log.debug(u"Calling url (transformed) : {0}".format(new_url))
             html = urlopen(new_url)
