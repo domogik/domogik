@@ -124,6 +124,8 @@ class Publisher(MQAsyncSub):
             res = cli.request(dst, msg.get(), timeout=10)
             if res:
                 print res.get()
+            cli.shutdown()
+            del cli
         # pub
         elif 'mq_publish' in jsons and 'data' in jsons:
             print("Publish : {0}".format(jsons['data']))
