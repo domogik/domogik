@@ -62,6 +62,7 @@ def timeline_generic(the_device_id = None):
                                       "date" : previous_date.date(),
                                       "time" : previous_date.time(),
                                       "device_name" : previous_device_name,
+                                      "device_id" : previous_device_id,
                                       "client" : previous_client,
                                       "sensors_changes" : sensors_changes_for_the_device
                                     })
@@ -89,6 +90,7 @@ def timeline_generic(the_device_id = None):
     return render_template('timeline.html',
         mactive="timeline",
         device_name=the_device_name,
-        timeline=timeline
+        timeline=timeline,
+        datatypes = datatypes
         )
 

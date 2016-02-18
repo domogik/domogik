@@ -3,7 +3,7 @@ Plugins development
 ===================
 
 .. note::
-    If you think something is not clear or is missing in this documentation, please send an email to our developpers mailing list : *domogik-developers@lists.labs.libre-entreprise.org* and explain us clearly what is not clear or what could be added.
+    If you think something is not clear or is missing in this documentation, please send an email to our developers mailing list : *domogik-developers@lists.labs.libre-entreprise.org* and explain us clearly what is not clear or what could be added.
 
 General informations
 ====================
@@ -89,7 +89,7 @@ Python part
 
 :doc:`See workflow, step 3 <workflow>`
 
-After creating a start script (used only by the developpers), you will now create the python part of your plugin. 
+After creating a start script (used only by the developers), you will now create the python part of your plugin.
 
 * :doc:`start.sh file <start_file/index>`
 * Python part
@@ -140,7 +140,7 @@ The documentation is a part important of a plugin! If it is not enough clear, th
   * :doc:`Doc tree <doc/tree>`
   * :doc:`How to write the documentation in *ReST* format (which is used by *sphinx*) <doc/sphinx>`
   * :doc:`What should contain the documentation ? <doc/content>`
-  * :doc:`The developpers part <doc/dev>`
+  * :doc:`The developers part <doc/dev>`
   * :doc:`Make your documentation published on ReadTheDocs.org <doc/readthedoc>`
 
 Tests
@@ -160,7 +160,7 @@ Your plugin is ready ? Make some users test it
 
 :doc:`See workflow, step 4 <workflow>`
 
-Now, your plugin may be functionnal, documented and the tests are automated. It is time to release a version! But before, you should make some people test your plugin!
+Now, your plugin may be functional, documented and the tests are automated. It is time to release a version! But before, you should make some people test your plugin!
 
 * :doc:`Release your plugin by following the step 4 of the workflow <workflow>`
 

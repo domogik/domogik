@@ -140,7 +140,7 @@ class Manager(XplPlugin):
                           help="Start butler if not already running.")
 
         ### Call the XplPlugin init  
-        XplPlugin.__init__(self, name = 'manager', parser=parser, log_prefix = "", nohub=True)
+        XplPlugin.__init__(self, name = 'manager', parser=parser, log_prefix = "core_", nohub=True)
 
         ### Logger
         self.log.info(u"Manager startup")

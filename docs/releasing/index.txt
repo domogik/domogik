@@ -15,7 +15,7 @@ There are two main branches in Domogik/Domoweb/Domodroid sources :
 
 Each release is a **tag** created from the **develop** branch. When the tag is about a *final* release (not a alpha/beta/candidate), this tag will be merged in the **master** branch.
 
-Each improvment or fix on Domogik/Domoweb/Domodroid must be implemented in a dedicated branch! The dedicated branch can be merged into **develop** only when developments are finished, documentation is up to date and all tests are passing.
+Each improvement or fix on Domogik/Domoweb/Domodroid must be implemented in a dedicated branch! The dedicated branch can be merged into **develop** only when developments are finished, documentation is up to date and all tests are passing.
 
 We basically follow the main lines of this `git branching model <http://nvie.com/posts/a-successful-git-branching-model/>`_
 
@@ -123,9 +123,9 @@ Website
 Prepare the next release
 ========================
 
-Each improvment must be developed in a dieicated branch. For the example, let's call this branch **wip** (work in progress).
+Each improvement must be developed in a dedicated branch. For the example, let's call this branch **wip** (work in progress).
 
-When the **wip** branch is ready (development finished and tested, documentation, written), the branch can be mergerd in the **develop** branch to be included in the next stable release. Here are the steps to follow : 
+When the **wip** branch is ready (development finished and tested, documentation, written), the branch can be merged in the **develop** branch to be included in the next stable release. Here are the steps to follow :
 
 * in your **wip** branch, do a ``git merge develop`` to merge **develop** in **wip**. Then, do some tests in your **wip** branch to check if all is still ok. 
 * go on the **develop** branch : ``git checkout develop`` and do the merge from **wip** into **develop** : ``git merge wip``. Do again some tests to see if all is ok.

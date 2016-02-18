@@ -104,7 +104,7 @@
             {% if client_detail %}
             if (data.msgid == "plugin.status") {
                 if ( data.content['host'] == '{{client_detail.host}}' && '{{client_detail.package_id}}' == data.content['type'] + '-'+ data.content['name'] ) {
-                console.log(data.content['event']);
+                    console.log(data.content['event']);
                     $('#client-status .status').text(data.content['event']);
                     $('#client-status .fa').removeClass('fa-spinner fa-spin');
                     // for plugins, update the button classes

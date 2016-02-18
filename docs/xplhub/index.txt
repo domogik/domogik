@@ -28,7 +28,7 @@ Configuration file
 ******************
 
 The configuration file is **/etc/domogik/xplhub**. All the configuration items are related to the logs. The content of this file is enough to understand how to tune it.
-The default configuration is enough for all end users. Only the developpers may need to increase the logs verbosity.
+The default configuration is enough for all end users. Only the developers may need to increase the logs verbosity.
 
 Log files
 *********

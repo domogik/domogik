@@ -49,6 +49,9 @@
         <block type="logic_negate"></block>
         <block type="logic_boolean"></block>
     </category>
+    <category name="Maths">
+        <block type="math_arithmetic"></block>
+    </category>
     <category name="Datatypes">
         {% for d in datatypes %}
             <block type="{{ d }}"></block>
@@ -211,7 +214,14 @@
     var workspace = Blockly.inject('blocklyDiv',
         {
             media: '../../static/libraries/blockly/media/',
-            toolbox: document.getElementById('toolbox')
+            toolbox: document.getElementById('toolbox'),
+            zoom:
+                {controls: true,
+                 wheel: true,
+                 startScale: 1.0,
+                 maxScale: 3,
+                 minScale: 0.3,
+                 scaleSpeed: 1.2}
         }
     );
     function onchange() {

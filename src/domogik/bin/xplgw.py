@@ -37,10 +37,8 @@ from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.database import DbHelper
 from domogik.xpl.common.xplmessage import XplMessage, XplMessageError
 from domogikmq.pubsub.publisher import MQPub
-from domogikmq.pubsub.subscriber import MQSyncSub
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
-from domogikmq.pubsub.subscriber import MQAsyncSub
 import time
 import traceback
 import calendar
@@ -54,17 +52,17 @@ from uuid import uuid4
 CMDTIMEOUT = 5
 
 ################################################################################
-class XplManager(XplPlugin, MQAsyncSub):
+class XplManager(XplPlugin):
     """ Statistics manager
     """
 
     def __init__(self):
         """ Initiate DbHelper, Logs and config
         """
-        XplPlugin.__init__(self, 'xplgw', log_prefix="")
-        MQAsyncSub.__init__(\
-            self, self.zmq, 'xplgw', \
-            ['client.conversion', 'client.list', 'client.sensor'])
+        XplPlugin.__init__(self, 'xplgw', log_prefix="core_")
+        self.add_mq_sub('client.conversion')
+        self.add_mq_sub('client.list')
+        self.add_mq_sub('client.sensor')
 
         self.log.info(u"XPL manager initialisation...")
         self._db = DbHelper()
@@ -126,6 +124,7 @@ class XplManager(XplPlugin, MQAsyncSub):
         """ Method called on a subscribed message
         """
         try:
+            XplPlugin.on_message(self, msgid, content)
             if msgid == 'client.conversion':
                 self._parse_conversions(content)
             elif msgid == 'client.list':
@@ -586,9 +585,9 @@ class XplManager(XplPlugin, MQAsyncSub):
                         self._log.info( \
                                 u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}) with value '{4}' after conversion." \
                                 .format(dev['name'], dev['id'], sen.name, sen.id, value))
-                        # do the store
                         try:
-                            self._db.add_sensor_history(\
+                            # do the store
+                            value = self._db.add_sensor_history(\
                                     senid, \
                                     value, \
                                     current_date)

@@ -15,7 +15,7 @@ First don't forget to :
 
 * check the log files for errors
 * check the process status 
-* check if services are availables
+* check if services are available
 * check if xPL is working fine
 
 Check the log files
@@ -85,8 +85,8 @@ Assuming the Domogik user is *domogik*, do the following checks:
 
     If one component is not up, check its log files. If the component is *rest*, *dbmgr* or *xplgw* and you find no logs, check in the *manager* logs.
 
-Check if services are availables
---------------------------------
+Check if services are available
+-------------------------------
 
 You can use the following command on your server to check all ports where a service is listening. Notice that Domogik uses by default ports in 404xx range. ::
 
@@ -124,7 +124,7 @@ You should have the following lines: ::
     2013-12-06 14:12:23,438 domogik-xplgw INFO HUB discovery > Received HBEAT echo, HUB detected
     2013-12-06 14:12:23,438 domogik-xplgw INFO HUB discovery > hub found, configuration in progress
 
-If the following lines appears always, it means that the xPL hub is not found. So you should check your configurationor network access (firewall, ...): ::
+If the following lines appears always, it means that the xPL hub is not found. So you should check your configuration or network access (firewall, ...): ::
 
     2013-12-06 14:12:23,435 domogik-xplgw INFO HUB discovery > starting
     2013-12-06 14:13:33,436 domogik-xplgw INFO HUB discovery > looking for the hub. I hope there is one hub, Domogik won't work without the hub!
@@ -167,7 +167,7 @@ xPL Hub doesn't start (C version)
 Error
 *****
 
-When manualy launching the xPL Hub, you get: ::
+When manually launching the xPL Hub, you get: ::
 
     $ ./xPL_Hub                                                                       
     bash: ./xPL_Hub: Aucun fichier ou dossier de ce type

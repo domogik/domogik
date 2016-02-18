@@ -8,7 +8,7 @@ source /home/travis/virtualenv/python2.7/bin/activate
 #sleep 10
 /etc/init.d/domogik start
 sleep 10
-cat /var/log/domogik/manager.log
+cat /var/log/domogik/core_manager.log
 
 # for some plugins tests, the conversion functions may need to be imported, so we need the following line
 export PYTHONPATH=/var/lib/domogik

@@ -51,19 +51,19 @@ Each item has several properties:
 * **data_type** : the data type used for this sensor
 * **incremental** : if set to True, store the difference between the last value and the current value, check the incremental section for more info.
 * **timeout** : this is just an information which could be used by user interfaces to notify if a value is too old (this may indicate that the sensor is down/offline/broken. This is a value in *seconds*. If the value is 0, then we consider there is no issue if the last value is very old. 
-* **conversion** : if not an empty string, what conversion function to call before storing the value in the db, the function should return the data in the format acording to the data_type. More informations in the :doc:`conversion chapter </package_development/plugins/conversion/index>`.
+* **conversion** : if not an empty string, what conversion function to call before storing the value in the db, the function should return the data in the format according to the data_type. More informations in the :doc:`conversion chapter </package_development/plugins/conversion/index>`.
 * **history** : some extra parameters that can be used to define what to store in the history table
     * **store** : can be True or False, if True the values will be stored in the sensor_history table
-    * **max** : max number of records that will be stored in the history table, if 0 the max number is infinate.
-    * **expire** : how long the history needs to be kept, if 0 the stats will bekept forever. Its counted in days, so a value of 10 means keep the history for 10 days.
-    * **round_value** : a number that will be used for the reduced stats storage. This will only be evaluated if tstore is True
+    * **max** : max number of records that will be stored in the history table, if 0 the max number is infinite.
+    * **expire** : how long the history needs to be kept, if 0 the stats will be kept forever. Its counted in days, so a value of 10 means keep the history for 10 days.
+    * **round_value** : a number that will be used for the reduced stats storage. This will only be evaluated if store is True
     * **duplicate** : if set to true, duplicate values following each other will be stored, if set to false this will not happen
 
 .. note::
     The values in the subsection history can be adapted after sensor creation, the changes will be visible in the sensor_history table once a new value is stored for that sensor.
 
 .. note::
-    If a sensor is set as incremental its not a good idea to set round_value to anythign different then 0. This could result in corrupt data in the sensor_history table.
+    If a sensor is set as incremental its not a good idea to set round_value to anything different then 0. This could result in corrupt data in the sensor_history table.
 
 What happens if a sensor value needs to be store
 ================================================
@@ -84,7 +84,7 @@ A couple of steps are taken during sensor lookups, they are described below:
 
 Incremental explanation
 =======================
-The parameter is used for sensors like a kWH sensor, these sensors typically send over an absolute value, if we would store this value we would just get a climing chart, so the charts would not be representative. To solve this we intruduced the incremental sensor type.
+The parameter is used for sensors like a kWH sensor, these sensors typically send over an absolute value, if we would store this value we would just get a climing chart, so the charts would not be representative. To solve this we introduced the incremental sensor type.
 
 This means that only the difference between the last stored value will be stored, to explain it exactly w'll work with an example.
 
@@ -96,10 +96,10 @@ For a sensor that has incremental set tue, the following values are received:
 5. 16
 6. 18
 
-So on the receival of the first value, incremental will just keep this value in memory, so it can calculate the diffrence on the next received values.
+So on the receival of the first value, incremental will just keep this value in memory, so it can calculate the difference on the next received values.
 
 On step 2 we will store the difference between the value received on step 1 and the one received in step 2, so we will store 1.
-The same happens on all the next steps. As a result we will get the folowing stored values:
+The same happens on all the next steps. As a result we will get the following stored values:
 1. 0
 2. 1
 3. 1
@@ -114,7 +114,7 @@ Round Value explanation
 The round value is used to reduce the number of stored history values.
 
 As an example why this would be needed:
-Some device can collect data every 10 seconds, in 24 hours, the device can collect 8640 items a day. If we have 10 such a devices it would result in 86400 items a day or 2678400 items a week. This would be to much data and is not usefull. To solve this problem we introduced the round_value key. Basically the round_value key will delete values that fall within a predefined range. An example explains this the best:
+Some device can collect data every 10 seconds, in 24 hours, the device can collect 8640 items a day. If we have 10 such a devices it would result in 86400 items a day or 2678400 items a week. This would be to much data and is not useful. To solve this problem we introduced the round_value key. Basically the round_value key will delete values that fall within a predefined range. An example explains this the best:
 
 Below is a list of received values from a sensor:
 1. 10
@@ -127,17 +127,17 @@ Below is a list of received values from a sensor:
 8. 19
 9. 20
 
-So lets see wath will happend if round_value is set to 2:
+So lets see what will happen if round_value is set to 2:
 
 On step 1 and 2 the round value will do nothing as it needs at least 2 stored values to work.
 On step 3 the round value will do its first action, it will see that the difference between value from step 1 is smaller or equal to round_value key, meaning that it will delete the value received in step 2.
-On setp 4 it will kick in action again, at this point the data in the table is the folowing
+On step 4 it will kick in action again, at this point the data in the table is the following
 * 10
 * 12
 The received value is 9, as the round_value is set to 2, it will not delete anything.
 The same happend is step 5 and 6.
 On step 7 the difference is again <= round_value, so the value received in step 6 is deleted.
-So if we see whta data we will ahve after value 9 is received:
+So if we see what data we will have after value 9 is received:
 
 * 10
 * 12
@@ -148,17 +148,17 @@ So if we see whta data we will ahve after value 9 is received:
 
 In this example this will save use 66% of storage space, so for the example in the beginning of this section we will go from 2678400 items a week to 1767744 items a week.
 
-For this sytem to work its verry important that the round_value is set to a logical number for that type of sensor.
+For this system to work its very important that the round_value is set to a logical number for that type of sensor.
 
 Formula Field
 =============
 
-This is a field that is NOT in the json, but its a sensor parameter. This means it can be udpated after sensor creation.
+This is a field that is NOT in the json, but its a sensor parameter. This means it can be updated after sensor creation.
 With the formula field you can apply a formula to a value that will be stored. The formula calculation is one of the last steps in the sensor history storage.
 
-The formula needs an input parameter and thats the value comming from XPL. To use this value in you formula use **VALUE** string, it will be replaced before the formula is applied.
+The formula needs an input parameter and thats the value coming from XPL. To use this value in you formula use **VALUE** string, it will be replaced before the formula is applied.
 
 example: **VALUE** - 5
 This will store the received XPL value - 5
 
-If the formula is not a valid formula (means it can not be evalled) the exception is logged in the db_api.log and the original value will be stored in the DB
+If the formula is not a valid formula (means it can not be evaluated) the exception is logged in the db_api.log and the original value will be stored in the DB

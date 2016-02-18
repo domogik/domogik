@@ -26,6 +26,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 import logging
+import traceback
 
 
 class AbstractAction:
@@ -132,3 +133,13 @@ class AbstractAction:
         @return a Hash of expected parameters, or {} if no parameters are needed
         """
         return {}
+
+    def process_local_vars(self, local_vars, input):
+        # local variables
+        try:
+            for a_var in local_vars:
+                input = input.replace(u"{{{{{0}}}}}".format(a_var), local_vars[a_var])
+        except:
+            self._log.error(u"Error while replacing local variables '{0}' in '{1}'. Error is : {2}".format(local_vars, input, traceback.format_exc()))
+        return input
+

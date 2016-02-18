@@ -34,7 +34,18 @@ def orphans():
 @app.route('/orphans/delete/<did>')
 @login_required
 def orphans_delete(did):
-    with app.db.session_scope():
-        app.db.del_device(did)
-    flash(gettext("Device deleted"), "success")
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device.delete')
+    msg.set_data({'did': did})
+    res = cli.request('dbmgr', msg.get(), timeout=10)
+    if res is not None:
+        data = res.get_data()
+        if data["status"]:
+            flash(gettext("Device deleted succesfully"), 'success')
+        else:
+            flash(gettext("Device deleted failed"), 'warning')
+            flash(data["reason"], 'danger')
+    else:
+        flash(gettext("DbMgr did not respond on the device.delete, check the logs"), 'danger')
     return redirect("/orphans")

@@ -57,6 +57,8 @@ import random
 import uuid
 from threading import Thread, Lock
 zmq.eventloop.ioloop.install()
+from tornado import gen
+from tornado.queues import Queue
 from tornado.wsgi import WSGIContainer
 from tornado.ioloop import IOLoop, PeriodicCallback 
 from tornado.httpserver import HTTPServer
@@ -66,99 +68,114 @@ REST_API_VERSION = "0.8"
 
 ################################################################################
 
-### web sockets cleanup
-# this is used to list all webscokets
-# example : [{'open': True, 'ws': <domogik.bin.admin.AdminWebSocket object at 0x7f9568f09bd0>}, {'open': True, 'ws': <domogik.bin.admin.AdminWebSocket object at 0x7f9568f17710>}]
-# a timer will check for ws with open == False and destroy them
-#
-# this is needed as the MQASyncSub uses also the on_message function and a socket, so the object is not destroyed as usual :(
-class WSList():
+
+class Publisher(MQAsyncSub):
+    """Handles new data to be passed on to subscribers."""
     def __init__(self):
-        self.web_sockets = []
-    
-    def add(self, data):
-        self.web_sockets.append(data)
+        self.WSmessages = Queue()
+        self.MQmessages = Queue()
+        self.sub = MQAsyncSub.__init__(self, zmq.Context(), 'admin', [])
+        self.subscribers = set()
 
-    def list(self):
-        return self.web_sockets
+    def register(self, subscriber):
+        """Register a new subscriber."""
+        self.subscribers.add(subscriber)
 
-    def delete(self, id):
-        for ws in self.web_sockets:
-            if ws['id'] == id:
-                self.web_sockets.remove(ws)
-
-ws_list = WSList()
-
-class AdminWebSocket(WebSocketHandler, MQAsyncSub):
-    #clients = set()
-
-    def __init__(self, application, request, **kwargs):
-        WebSocketHandler.__init__(self, application, request, **kwargs)
-        self.io_loop = IOLoop.instance()
-        self.pub = MQPub(zmq.Context(), 'admin')
-
-    def open(self):
-        self.id = uuid.uuid4()
-        MQAsyncSub.__init__(self, zmq.Context(), 'admin', [])
-        # Ping to make sure the agent is alive.
-        self.io_loop.add_timeout(datetime.timedelta(seconds=random.randint(5,30)), self.send_ping)
-        global ws_list
-        ws_list.add({"id" : self.id, "ws" : self, "open" : True})
-
-    def on_connection_timeout(self):
-        self.close()
-
-    def send_ping(self):
+    def deregister(self, subscriber):
+        """Stop publishing to a subscriber."""
         try:
-            self.ping("a")
-            self.ping_timeout = self.io_loop.add_timeout(datetime.timedelta(minutes=1), self.on_connection_timeout)
-        except Exception as ex:
+            self.subscribers.remove(subscriber)
+        except:
             pass
 
-    def on_pong(self, data):
-        if hasattr(self, "ping_timeout"):
-            self.io_loop.remove_timeout(self.ping_timeout)
-            # Wait 5 seconds before pinging again.
-            self.io_loop.add_timeout(datetime.timedelta(seconds=5), self.send_ping)
+    @gen.coroutine
+    def on_message(self, did, msg):
+        """Receive message from MQ sub and send to WS."""
+        yield self.WSmessages.put({"msgid": did, "content": msg})
+
+    @gen.coroutine
+    def publishToWS(self):
+        while True:
+            message = yield self.WSmessages.get()
+            if len(self.subscribers) > 0:
+                print("Pushing MQ message to {} WS subscribers...".format(len(self.subscribers)))
+                yield [subscriber.submit(message) for subscriber in self.subscribers]
+
+    @gen.coroutine
+    def publishToMQ(self):
+        while True:
+            message = yield self.MQmessages.get()
+            self.sendToMQ(message)
+    
+    def sendToMQ(self, message):
+        ctx = zmq.Context()
+        jsons = json.loads(message)
+        # req/rep
+        if 'mq_request' in jsons and 'data' in jsons:
+            cli = MQSyncReq(ctx)
+            msg = MQMessage()
+            msg.set_action(str(jsons['mq_request']))
+            msg.set_data(jsons['data'])
+            print("REQ : {0}".format(msg.get()))
+            if 'dst' in jsons:
+                dst = str(jsons['dst'])
+            else:
+                dst = 'manager'
+            res = cli.request(dst, msg.get(), timeout=10)
+            if res:
+                print res.get()
+            cli.shutdown()
+            del cli
+        # pub
+        elif 'mq_publish' in jsons and 'data' in jsons:
+            print("Publish : {0}".format(jsons['data']))
+            pub = MQPub(ctx, 'admin-ws')
+            pub.send_event(jsons['mq_publish'],
+                            jsons['data'])
+
+
+
+class Subscription(WebSocketHandler):
+    """Websocket for subscribers."""
+    def initialize(self, publisher):
+        self.publisher = publisher
+        self.messages = Queue()
+        self.finished = False
+
+    def open(self):
+        print("New subscriber.")
+        self.publisher.register(self)
+        self.run()
 
     def on_close(self):
-        global ws_list
-        ws_list.delete(self.id)
+        self._close()        
 
-    def on_message(self, msg, content=None):
-        #print(ws_list.list())
-        """ This function is quite tricky
-            It is called by both WebSocketHandler and MQASyncSub...
-        """
+    def _close(self):
+        print("Subscriber left.")
+        self.publisher.deregister(self)
+        self.finished = True
+
+    @gen.coroutine
+    def submit(self, message):
+        yield self.messages.put(message)
+
+    @gen.coroutine
+    def run(self):
+        """ Empty the queue of messages to send to the WS """
+        while not self.finished:
+            message = yield self.messages.get()
+            self.send(message)
+
+    def send(self, message):
         try:
-            ### websocket message (from the web)
-            # there are the mesages send by the administration javascript part thanks to the ws.send(...) function
-            if not content:
-                jsons = json.loads(msg)
-                # req/rep
-                if 'mq_request' in jsons and 'data' in jsons:
-                    cli = MQSyncReq(zmq.Context())
-                    msg = MQMessage()
-                    msg.set_action(str(jsons['mq_request']))
-                    msg.set_data(jsons['data'])
-                    if 'dst' in jsons:
-                        cli.request(str(jsons['dst']), msg.get(), timeout=10).get()
-                    else:
-                        cli.request('manager', msg.get(), timeout=10).get()
-                # pub
-                elif 'mq_publish' in jsons and 'data' in jsons:
-                    print("Publish : {0}".format(jsons['data']))
-                    self.pub.send_event(jsons['mq_publish'],
-                                        jsons['data'])
-            ### MQ message (from domogik)
-            # these are the published messages which are received here
-            else:
-                try:
-                    self.write_message({"msgid": msg, "content": content})
-                except WebSocketClosedError:
-                    self.close()
-        except:
-            print("Error : {0}".format(traceback.format_exc()))
+            self.write_message(message)
+        except WebSocketClosedError:
+            self._close()
+    
+    def on_message(self, content):
+        """ reciev message from websocket and send to MQ """
+        print("WS to MQ")
+        self.publisher.MQmessages.put(content)
 
 class Admin(Plugin):
     """ Admin Server 
@@ -174,7 +191,7 @@ class Admin(Plugin):
             @param server_port :  port of HTTP server
         """
 
-        Plugin.__init__(self, name = 'admin')
+        Plugin.__init__(self, name = 'admin', log_prefix='core_')
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
@@ -229,6 +246,7 @@ class Admin(Plugin):
         except :
             self.log.error(u"%s" % self.get_exception())
 
+    @gen.coroutine
     def start_http(self):
         """ Start HTTP Server
         """
@@ -245,8 +263,10 @@ class Admin(Plugin):
         admin_app.hostname = self.get_sanitized_hostname()
         admin_app.resources_directory = self.get_resources_directory()
         
+        publisher = Publisher()
+        #fromws = Fws()
 	tapp = Application([
-	    (r"/ws", AdminWebSocket),
+	    (r"/ws", Subscription, dict(publisher=publisher)),
             (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
 	])
 
@@ -276,7 +296,7 @@ class Admin(Plugin):
         else:
             self.http_server.bind(int(self.port))
             self.http_server.start(0)
-        return
+        yield [publisher.publishToMQ(), publisher.publishToWS()]
 
     def stop_http(self):
         """ Stop HTTP Server
@@ -304,30 +324,9 @@ class Admin(Plugin):
         my_exception =  str(traceback.format_exc()).replace('"', "'")
         return my_exception
 
-
-def clean_websockets():
-    global ws_list
-
-    while True:
-        time.sleep(5)
-        print("Start cleaning websockets...")
-        print(ws_list.list())
-        #for a_ws in web_sockets:
-        #    print(a_ws)
-        #    if a_ws["open"] == False:
-        #        print("Closing {0}".format(a_ws['id']))
-
 def main():
     ''' Called by the easyinstall mapping script
     '''
-    # launch the cleanup process
-    thr_cleanup = Thread(None,
-                         clean_websockets,
-                         "clean_ws",
-                         (),
-                         {})
-    #thr_cleanup.start()
-
     # launch the admin
     Admin('lo', '40406')
 

@@ -63,6 +63,8 @@ class sensorAPI(MethodView):
         @apiParam (data) {Boolean} store If set the history for this sensor will be stored in sensorhistory
         @apiParam (data) {Number} max The maximum number of items kept in the sensor-history table for thie sensor, 0= infinite number
         @apiParam (data) {Number} expire The maximum age (in seconds) entries are kept in the sensor-history
+        @apiParam (data) {Number} timeout The mximum timeout we should have between 2 updates
+        @apiParam (data) {String} formula The formula that needs to be applied 
 
         @apiSuccess {json} result The json representation of the updated sensor
 
@@ -92,13 +94,26 @@ class sensorAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        dbr = app.db.update_sensor(\
-            id, \
-            history_round=request.form.get('round'), \
-            history_store=request.form.get('store'), \
-            history_max=request.form.get('max'), \
-            history_expire=request.form.get('expire') \
-            )
-        return 200, dbr
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('sensor.update')
+        msg.add_data('sid', id)
+        msg.add_data('history_round', request.get['round'])
+        msg.add_data('history_store', request.get['store'])
+        msg.add_data('history_max', request.get['max'])
+        msg.add_data('history_expire', request.get['expire'])
+        msg.add_data('timeout', request.get['timeout'])
+        msg.add_data('formula', request.get['formula'])
+        res = cli.request('dbmgr', msg.get(), timeout=10)
+        if res is not None:
+            data = res.get_data()
+            if data["status"]:
+                return 201, data["result"]
+            else:
+                return 500, data["reason"]
+        else:
+            return 500, "DbMgr did not respond on the sensor.update, check the logs"
+        return 200, app.db.get_device(did)
+
 
 register_api(sensorAPI, 'sensor_api', '/rest/sensor/', pk='id')

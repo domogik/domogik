@@ -128,7 +128,8 @@
             "DT_MByte",
             "DT_GByte",
             "DT_pH",
-            "DT_Chlorine"
+            "DT_Chlorine",
+            "DT_Battery"
         ]
     },
     "DT_Scaling": {
@@ -408,6 +409,13 @@
         "min": null,
         "max": null,
         "unit": "mg/l",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Battery": {
+        "min": 0,
+        "max": 100,
+        "unit": "%",
         "parent": "DT_Number",
         "childs": []
     },

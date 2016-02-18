@@ -5,7 +5,7 @@ Sensors
 A sensor is used to store data received from the xpl network inside the database, this data can then be used to generate charts and display the evolution of some data.
 
 The data stored in the database is linked to a certain `Domogik datatype <package_development/plugins/data_types/index>`.
-This datatype is used to interprete the data and to display the correct unit.
+This datatype is used to interpret the data and to display the correct unit.
 
 A sensor can have different types:
     * **absolute**: store the value as its received
@@ -32,7 +32,7 @@ If we then create a calculated sensor with the below formula we can store the pr
         result = value * 0,11
         return result
 
-The above function wil return the value to store, note this function can contain any python code you want, but there are some rules to folow:
+The above function wil return the value to store, note this function can contain any python code you want, but there are some rules to follow:
     * the function name is always 'calculate'
     * it has one input parameter named 'value'
     * it has one return parameter, a float

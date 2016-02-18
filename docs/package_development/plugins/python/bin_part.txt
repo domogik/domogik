@@ -25,11 +25,11 @@ This file is the gateway between the library and Domogik. Basically it will:
 
 Depending on your plugin, more actions may be done:
 
-* after getting the configuration, get the devices list from the database (over the MQ). This is needed when the plugin can't know the devices addresses, for example a yeather plugin don't know in which town you live, so it will check the yeather for already created devices.
+* after getting the configuration, get the devices list from the database (over the MQ). This is needed when the plugin can't know the devices addresses, for example a weather plugin don't know in which town you live, so it will check the weather for already created devices.
 * register a newly detected device. For example, if a new sensor is plugged on your onewire network or if you add a new temperature sensor compliant with RFXCOM devices, the related plugins (*onewire* and *rfxcom*) will be able to detect the new devices, and if the device is not known, it will be registered, so a notification will be send to the user interfaces over MQ.
 
-XplPlugin and its usefull functions
-===================================
+XplPlugin and its useful functions
+==================================
 
 ..todo ::
     overview
@@ -40,8 +40,8 @@ Helper function
 * register_helper(action, help_string, callback)
 * publish_helper(key, data)
 
-Hidden but usefull features
----------------------------
+Hidden but useful features
+--------------------------
 
 ..todo ::
     check plugin not laucnhed, status, ...
@@ -95,7 +95,7 @@ First, you need to put a header in the file. Here is a template: ::
     -  __init__()
     -  a_function()
     
-    @author: The developper name <the.developper@email.com>
+    @author: The developer name <the.developer@email.com>
     @copyright: (C) 2007-2013 Domogik project
     @license: GPL(v3)
     @organization: Domogik
@@ -123,7 +123,7 @@ Then, you need to import some libraries needed by the plugin. Example: ::
 
 Some import lines are mandatory: ::
 
-    from domogik.xpl.common.plugin import XplPlugin # this one is needed as all the xPL plugins extends from the class XplPlugin. This class will provide you some usefull functions to get the configuration parameters values, ...
+    from domogik.xpl.common.plugin import XplPlugin # this one is needed as all the xPL plugins extends from the class XplPlugin. This class will provide you some useful functions to get the configuration parameters values, ...
     from domogik.xpl.common.xplmessage import XplMessage # this one is needed to create a xPL message.
 
 Then, you have to import your plugin library objects (here for the plugin diskfree we import a class): ::
@@ -184,7 +184,7 @@ Focus on the configuration
 The plugin global configuration
 -------------------------------
 
-If you except the mandatory *auto_startup* key, a plugin can have no configuration elements and another one can have multimple configuration elements. A plugin without configuration elements can be started without any configuration from the user (but maybe the user will need to create some devices, we will see this later). But for plugins with some configuration elements, the plugin developper may want to check that the plugin has been configured before the plugin can start!
+If you except the mandatory *auto_startup* key, a plugin can have no configuration elements and another one can have multiple configuration elements. A plugin without configuration elements can be started without any configuration from the user (but maybe the user will need to create some devices, we will see this later). But for plugins with some configuration elements, the plugin developer may want to check that the plugin has been configured before the plugin can start!
 This can be done by calling the function *``self.check_configured()``* and check its return value: ::
 
     # check if the plugin is configured. If not, this will stop the plugin and log an error
@@ -225,7 +225,7 @@ Then, you can make a look on the device list and for each device get its paramet
         except:
             # if there is an error, log it
             self.log.error(traceback.format_exc())
-            # if the error is something blocking (a hardware gateway unavailable for exemple), you may want the plugin to stop. 
+            # if the error is something blocking (a hardware gateway unavailable for example), you may want the plugin to stop.
             # if so, uncomment the following lines
             #self.force_leave()
             #return
@@ -252,7 +252,7 @@ Here is an example from the *diskfree* plugin: ::
             # get the interval between each check for the sensor 'get_total_space' of the device. The configuration key is 'interval'
             interval = self.get_parameter_for_feature(a_device, "xpl_stats", "get_total_space", "interval")
 
-            self.log.info("Start monitoring totel space for '%s'" % path)
+            self.log.info("Start monitoring total space for '%s'" % path)
             # start a thread
             # the thread must be named to be explicit in the logs 
             thr_name = "{0}-{1}".format(a_device['name'], "get_total_space")
@@ -272,7 +272,7 @@ Here is an example from the *diskfree* plugin: ::
         except:
             # if there is an error, log it
             self.log.error(traceback.format_exc())
-            # we don't quit plugin if an error occured
+            # we don't quit plugin if an error occurred
             # a disk can have been unmounted for a while
             #self.force_leave()
             #return
@@ -313,7 +313,7 @@ The error messages are to be used to log all critical or blocking points. You mu
 Warning
 -------
 
-The warning messages are to be used to log the small errors (with no real impact : for example an incorrect value is read from a sensor but it may happen as the technology is not 100% reliable) or some strange behavious that are not blocking points
+The warning messages are to be used to log the small errors (with no real impact : for example an incorrect value is read from a sensor but it may happen as the technology is not 100% reliable) or some strange behaviour that are not blocking points
 
 Info
 ----
@@ -432,7 +432,7 @@ Then, you can create your thread. Example: ::
             thr_name = "a_name_for_my_thread"
             # create the thread
             my_thread = threading.Thread(None,
-                                          my_object.the_fonction,
+                                          my_object.the_function,
                                           thr_name,
                                           (arg1, arg2,),
                                           {})

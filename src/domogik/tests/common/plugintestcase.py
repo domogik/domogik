@@ -56,8 +56,9 @@ class PluginTestCase(TemplateTestCase):
             @param name : name of the plugin we are testing
             @param configuration : dict containing the plugin configuration
         """
-        #super(self.__class__, self).__init__(testname)
+        #super(PluginTestCase, self).__init__(testname)
         super(PluginTestCase, self).__init__(testname)
+        #TemplateTestCase.__init__(self)
         self.myxpl = xpl_plugin.myxpl
         self.name = name
         self.configuration = configuration

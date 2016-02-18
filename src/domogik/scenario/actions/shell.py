@@ -37,12 +37,16 @@ class ShellAction(AbstractAction):
         AbstractAction.__init__(self, log)
         self.set_description("Execute a shell command.")
 
-    def do_action(self):
-        self._log.info("Execute the shell script {0}".format(self._params['shell_command']))
-        cmd = subprocess.Popen(self._params['shell_command'].split(),
+    def do_action(self, local_vars):
+        shell_command = self._params['shell_command']
+        # local variables
+        shell_command = self.process_local_vars(local_vars, shell_command)
+
+        self._log.info("Execute the shell script {0}".format(shell_command))
+        cmd = subprocess.Popen(shell_command.split(),
                                 stdout = subprocess.PIPE)
         stdout = cmd.communicate()[0]
-        self._log.debug("Output for shell command {0} : \n{1}".format(self._params['shell_command'], stdout))
+        self._log.debug("Output for shell command {0} : \n{1}".format(shell_command, stdout))
 
     def get_expected_entries(self):
         return {'shell_command': {'type': 'string',
