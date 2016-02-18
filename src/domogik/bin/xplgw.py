@@ -585,9 +585,9 @@ class XplManager(XplPlugin):
                         self._log.info( \
                                 u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}) with value '{4}' after conversion." \
                                 .format(dev['name'], dev['id'], sen.name, sen.id, value))
-                        # do the store
                         try:
-                            self._db.add_sensor_history(\
+                            # do the store
+                            value = self._db.add_sensor_history(\
                                     senid, \
                                     value, \
                                     current_date)
