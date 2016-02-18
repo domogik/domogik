@@ -34,8 +34,8 @@ How do I find the command id ?
 
 To find the *command id* of a device command, you first need to :doc:`query the /device url <device>` and parse the *commands* part.
 
-I am a user interface developper and I don't understand the values to use for the parameters in the url options!
-================================================================================================================
+I am a user interface developer and I don't understand the values to use for the parameters in the url options!
+===============================================================================================================
 
 To help you to understand with real examples, or to check you are building your **/cmd** urls in the correct way, you can go in *Domogik admin* and check the details of a device. You will see all the **/cmd** available urls for the commands and all **/sensor** available urls for the sensors.
 
@@ -137,7 +137,7 @@ Examples
 .. todo::
     Add more examples
 
-The folowiong data is in the DB:
+The following data is in the DB:
 
 Device
 ------
@@ -184,7 +184,7 @@ Xpl command param
     key = address
     value = 12
 
-Now if we call the '/cmd/10/level/100 we will generate the folowing xpl command: ::
+Now if we call the '/cmd/10/level/100 we will generate the following xpl command: ::
     
     lighting.device {
         level = 100

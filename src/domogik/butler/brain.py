@@ -128,7 +128,7 @@ def get_sensor_last_values_since(log, user_locale, dt_type, device_name, sensor_
 # end of public API
 #######################################################################
 
-def _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference = None, since = None):
+def _get_sensor_data(log, user_locale, dt_type_list, device_name, sensor_reference = None, since = None):
     """ If sensor_reference = None
             Search for a sensor matching the dt_type and the device name
         Else
@@ -139,23 +139,26 @@ def _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference = 
         Else
             return <dict of last values>, None
 
-        @param dt_type : a domogik datatype : DT_Temperature, DT_Humidity, ...
+        @param dt_type_list : a list of domogik datatype : DT_Temperature, DT_Humidity, ...
         @param device_name : the device name
         @param sensor_reference : the sensor name
         @param since : if not None, get all values with last_received > since
                        else, get only the last value
     """
+    # if several datatype have been provided
+    dt_type_list = dt_type_list.split("|")
+       
     if isinstance(device_name, list):
         device_name = ' '.join(device_name)
     log.info(u"Device name = {0}".format(device_name))
-    #log.info(u"Datatype = {0}".format(dt_type))
+    log.info(u"Datatype(s) = {0}".format(dt_type_list))
 
     ### search for all devices of the appropriate dt_type 
     if sensor_reference:
         check_preferences = False
     else:
         check_preferences = True
-    candidates = get_sensors_for_datatype(dt_type, check_preferences, log)
+    candidates = get_sensors_for_datatype(dt_type_list, check_preferences, log)
     log.info(u"Candidates for the appropriate datatype : {0}".format(candidates))
 
     if sensor_reference:
@@ -177,7 +180,7 @@ def _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference = 
     if since == None:
         the_value = the_sensor['last_value']
         last_received = the_sensor['last_received']
-        log.info(u"The value is : {0}".format(the_value))
+        log.info(u"The value is : '{0}'".format(the_value))
     
         # do some checks to see if we should try to convert as a float or not
         do_convert = True
@@ -237,7 +240,7 @@ def is_float_and_not_int(x):
         return a == b
 
 
-def get_sensors_for_datatype(dt_type, check_preferences = True, log = None):
+def get_sensors_for_datatype(dt_type_list, check_preferences = True, log = None):
     """ Find the matching devices and features
     """
 
@@ -271,7 +274,7 @@ def get_sensors_for_datatype(dt_type, check_preferences = True, log = None):
             # search in all sensors
             candidates_for_this_device = {}
             for a_sensor in a_device["sensors"]:
-                if a_device["sensors"][a_sensor]["data_type"] == dt_type:
+                if a_device["sensors"][a_sensor]["data_type"] in dt_type_list:
                     #print(a_device["sensors"][a_sensor])
                     candidates_for_this_device[a_sensor] = {"device_name" : a_device["name"],
                                                             "device_id" : a_device["id"],
@@ -286,9 +289,10 @@ def get_sensors_for_datatype(dt_type, check_preferences = True, log = None):
                 package = a_device["client_id"].split(".")[0]
                 #print(u"Check for preferences for the package '{0}'....".format(package))
                 if preferences.has_key(package): 
-                    if preferences[package].has_key(dt_type):
-                        log.info(u"Preferences found for datatype '{0}' : sensor '{1}'".format(dt_type, preferences[package][dt_type]))
-                        candidates.append(candidates_for_this_device[preferences[package][dt_type]])
+                    for a_dt_type in dt_type_list:
+                        if preferences[package].has_key(a_dt_type):
+                            log.info(u"Preferences found for datatype '{0}' : sensor '{1}'".format(a_dt_type, preferences[package][a_dt_type]))
+                            candidates.append(candidates_for_this_device[preferences[package][a_dt_type]])
                 else:
                     # yes we have only one entry, but we need to get the value related to the key...
                     # so we use a for to get the unique key here and so get only the value
@@ -367,8 +371,11 @@ def learn(rs_code, comment = None):
     with open(LEARN_FILE, "a") as file:
         file.write(utf8_data + "\n\n") 
 
-def trigger_bool_command(log, user_locale, dt_type, device, value):
+def do_command(log, user_locale, dt_type_list, device, value):
     try:
+        # if several datatype have been provided
+        dt_type_list = dt_type_list.split("|")
+       
         device_name = device.lower()
         log.info(u"Device name = {0}".format(device_name))
         cli = MQSyncReq(zmq.Context())
@@ -383,7 +390,7 @@ def trigger_bool_command(log, user_locale, dt_type, device, value):
                 for a_command in a_device['commands']:
                     pid = 0
                     for a_param in a_device['commands'][a_command]['parameters']:
-                        if a_param['data_type'] == dt_type:
+                        if a_param['data_type'] in dt_type_list:
                             found = [a_device, a_command, pid]
                             break
                         pid = pid + 1
@@ -391,15 +398,36 @@ def trigger_bool_command(log, user_locale, dt_type, device, value):
                         continue
                         cid = cid + 1
                     break
+        print("F={0}".format(found))
         if found:
             dev = found[0]
             cid = found[1]
             pid = found[2]
+            dt_type = dev['commands'][cid]['parameters'][pid]['data_type']
+            print(dt_type)
             cli = MQSyncReq(zmq.Context())
             msg = MQMessage()
             msg.set_action('cmd.send')
             msg.add_data('cmdid', dev['commands'][cid]['id'])
-            msg.add_data('cmdparams', {dev['commands'][cid]['parameters'][pid]['key'] : value})
+ 
+            # special case : for DT_Trigger, the value is always 1
+            if dt_type == "DT_Trigger":
+                msg.add_data('cmdparams', {dev['commands'][cid]['parameters'][pid]['key'] : 1})
+
+            # special case : for DT_ColorRGBHexa, some values has to be translated
+            # 1 = on => white = ffffff
+            # 0 = off => black = 000000
+            elif dt_type == "DT_ColorRGBHexa":
+                if str(value) == "1":
+                    value = "ffffff"
+                elif str(value) == "0":
+                    value = "000000"
+                msg.add_data('cmdparams', {dev['commands'][cid]['parameters'][pid]['key'] : value})
+
+            # classic case
+            else:
+                msg.add_data('cmdparams', {dev['commands'][cid]['parameters'][pid]['key'] : value})
+
             return cli.request('xplgw', msg.get(), timeout=10).get()
         else:
             return None

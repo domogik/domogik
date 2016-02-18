@@ -36,8 +36,12 @@ class LogAction(AbstractAction):
         AbstractAction.__init__(self, log)
         self.set_description("Log a message in the scenario component logs.")
 
-    def do_action(self):
-        self._log.info("{0}".format(self._params['message']))
+    def do_action(self, local_vars):
+        message = self._params['message']
+        # local variables
+        message = self.process_local_vars(local_vars, message)
+
+        self._log.info("{0}".format(message))
 
     def get_expected_entries(self):
         return {'message': {'type': 'string',

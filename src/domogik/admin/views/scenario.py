@@ -25,6 +25,8 @@ try:
 except ImportError:
     from urllib.parse import quote
 import traceback
+from operator import itemgetter
+from collections import OrderedDict
 
 @app.route('/scenario')
 @login_required
@@ -40,6 +42,7 @@ def scenario():
             res = res['result']
             for scen in res:
                 scenarios.append(scen)
+    scenarios = sorted(scenarios, key=itemgetter("name"))
     return render_template('scenario.html',
         scenarios = scenarios,
         mactive = u"scenario")
@@ -225,7 +228,7 @@ def scenario_blocks_js():
         devices = []
 
 
-    ### Now start the javascript geenration
+    ### Now start the javascript generation
     js = ""
 
     ### tests
@@ -267,6 +270,7 @@ def scenario_blocks_js():
     for act, params in scenario_actions.iteritems():
         if act == "command.CommandAction": continue
         p = []
+        inline = "false"  # default inline value
         jso = u""
         for par, parv in params['parameters'].iteritems():
             papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
@@ -280,6 +284,10 @@ def scenario_blocks_js():
                 jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
                 the_list = parv["values"]  # [[...], [...]]
                 papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
+            elif parv['type'] == 'external':
+                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                papp = u"{0}; this.appendValueInput(\'{1}\').setCheck(null);".format(papp, par)
+                inline = "true"
             else:
                 papp = u"{0};".format(papp)
             p.append(papp)
@@ -292,10 +300,10 @@ def scenario_blocks_js():
                     this.setPreviousStatement(true, "null");
                     this.setNextStatement(true, "null");
                     this.setTooltip("{2}");
-                    this.setInputsInline(false);
+                    this.setInputsInline({4});
                 }}
             }};
-            """.format(act, '\n'.join(p), params['description'], jso)
+            """.format(act, '\n'.join(p), params['description'], jso, inline)
         js = u'{0}\n\r{1}'.format(js, add)
 
 
@@ -330,6 +338,9 @@ def scenario_blocks_js():
                     color = 20
                     output = "\"Boolean\""
                 elif dt_parent == "DT_Number":
+                    color = 65
+                    output = "\"Number\""
+                elif sen_dt == "DT_Time":
                     color = 65
                     output = "\"Number\""
                 else:
@@ -400,10 +411,20 @@ def scenario_blocks_js():
                                 param_format = u""
                             else:
                                 param_format = u"({0})".format(param_format)
-                        js_params += u"""
-                                        .appendField(new Blockly.FieldTextInput(""), "{0}")
-                                        .appendField("{1}");
-                                    """.format(param_key, param_format)
+
+                        # special cases
+                        if param_dt_type == "DT_ColorRGBHexa":
+                            js_params += u"""
+                                            .appendField(new Blockly.FieldColour(""), "{0}")
+                                            ;//.appendField("{1}");
+                                        """.format(param_key, param_format)
+
+                        # default case : text input field
+                        else:
+                            js_params += u"""
+                                            .appendField(new Blockly.FieldTextInput(""), "{0}")
+                                            .appendField("{1}");
+                                        """.format(param_key, param_format)
                 block_id = u"command.CommandAction.{0}".format(cmd_id)
                 block_description = u"{0}@{1}".format(name, client)
                 add = u"""Blockly.Blocks['{0}'] = {{
@@ -446,6 +467,12 @@ def scenario_blocks_js():
             input = """
                      this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
                     """
+        elif dt_parent == "DT_String" and dt_type == "DT_ColorRGBHexa":
+            color = 65
+            output = "\"null\""
+            input = """
+                     this.appendDummyInput().appendField(new Blockly.FieldColour(""), "COLOUR");
+                    """
         else:
             color = 160
             output = "\"null\""
@@ -467,6 +494,14 @@ def scenario_blocks_js():
         js = u'{0}\n\r{1}'.format(js, add)
                 
 
+    # do some sorting
+
+    devices_per_clients = json.dumps(devices_per_clients, sort_keys=True)
+    devices_per_clients = json.loads(devices_per_clients, object_pairs_hook=OrderedDict)
+    tests = sorted(tests)
+    actions = sorted(actions)
+
+    # return values
     return js, tests, actions, devices_per_clients, used_datatypes
 
 

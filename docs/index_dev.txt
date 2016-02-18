@@ -1,6 +1,6 @@
-=======================================
-Technical and developpers documentation
-=======================================
+======================================
+Technical and developers documentation
+======================================
 
 Technical Documentation
 =======================

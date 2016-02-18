@@ -395,12 +395,22 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        b = app.db.update_device(
-            did,
-            request.form.get('name'),
-            request.form.get('description'),
-            request.form.get('reference'),
-        )
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('device.update')
+        msg.add_data('did', did)
+        msg.add_data('name', request.form['name'])
+        msg.add_data('description', request.form['description'])
+        msg.add_data('reference', request.form['reference'])
+        res = cli.request('dbmgr', msg.get(), timeout=10)
+        if res is not None:
+            data = res.get_data()
+            if data["status"]:
+                return 201, data["result"]
+            else:
+                return 500, data["reason"]
+        else:
+            return 500, "DbMgr did not respond on the device.update, check the logs"
         return 200, app.db.get_device(did)
 
 register_api(deviceAPI, 'device', '/rest/device/', pk='did', pk_type='int')

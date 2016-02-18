@@ -21,6 +21,6 @@ If the device can be used for various use cases, you should choose a parent type
 Notice about widgets
 ====================
 
-A widget should handle both the parent and child type to be compliant with most of the plugins : an on/off light widget whould handle both *DT_Bool* and *DT_Switch*.
+A widget should handle both the parent and child type to be compliant with most of the plugins : an on/off light widget would handle both *DT_Bool* and *DT_Switch*.
 
 

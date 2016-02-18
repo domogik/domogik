@@ -5,12 +5,12 @@ Release 0.3.0
 New features 
 ============
 
-The big changes in this release target the *house*, *area* and *room* concepts. The organization of the house was too restrictive and was exclusively managed on the Domogik side in the previous releases. From now on, each user interface will display on its own the features provided by Domogik. Domoweb chose widgets to achieve this. They will be organized in a hierarchichal layout of generic pages : therefore according to your choice a page can be an area (ground floor, floor...) a theme (lights, webcam...). *Pages are ordered in a tree* : a page can have a sub-page and so on. So you can organize your house layout exactly how you like it.
-This choice allow each developper to be independant from Domoweb evolutions and to suggest its own structure. Please notice that the Domodroid release compatible with Domogik 0.2 and 0.3 has two features : with Domogik 0.2 the previous structure is used whereas with Domogik 0.3 items are right now ordered by usage (an evolution is planned to have a more funny organization).
+The big changes in this release target the *house*, *area* and *room* concepts. The organization of the house was too restrictive and was exclusively managed on the Domogik side in the previous releases. From now on, each user interface will display on its own the features provided by Domogik. Domoweb chose widgets to achieve this. They will be organized in a hierarchical layout of generic pages : therefore according to your choice a page can be an area (ground floor, floor...) a theme (lights, webcam...). *Pages are ordered in a tree* : a page can have a sub-page and so on. So you can organize your house layout exactly how you like it.
+This choice allow each developer to be independant from Domoweb evolutions and to suggest its own structure. Please notice that the Domodroid release compatible with Domogik 0.2 and 0.3 has two features : with Domogik 0.2 the previous structure is used whereas with Domogik 0.3 items are right now ordered by usage (an evolution is planned to have a more funny organization).
 
 The big work on Domogik side was to remove all the code related to areas and rooms management.
 
-Let's have now a look to the new interface and how thoses pages are looking like.
+Let's have now a look to the new interface and how those pages are looking like.
 
 The main screen 
 ---------------

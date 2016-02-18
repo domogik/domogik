@@ -15,7 +15,7 @@ In the 0.5 release, the Rest component has been merger in the Admin component. I
 * use the admin port (40406) instead of the previous rest port (40404)
 * add */rest/* in front of all old Rest url. Example : */device/* become */rest/device/*.
 
-Some core butler functions interfaces have changd. **All brain packages must be upgrade to Domogik 0.5 compliant releases.**
+Some core butler functions interfaces have changed. **All brain packages must be upgrade to Domogik 0.5 compliant releases.**
 
 If you plan to install Domogik on a Raspberry pi
 ================================================
@@ -71,11 +71,11 @@ If you don't already have Python 2.7 or above (you have it if you are running a 
         $ sudo apt-get install python2.7
         $ sudo ln -sf /usr/bin/python2.7 /usr/bin/python
 
-Here are the needed dependencies. depanding on your Linux distribution, they will be installed autmatically Debian, Ubuntu) or not.
+Here are the needed dependencies. depanding on your Linux distribution, they will be installed automatically Debian, Ubuntu) or not.
 
 * the development packages, pip and setuptools : **python2.7-dev, python-pip, python-setuptools**
 * SSL libraries : **libssl-dev**
-* Zero MQ librariy : **libzmq-dev >= 14.4**. With the 14.3 release of this library, the publish/subscribe feature will not work!
+* Zero MQ library : **libzmq-dev >= 14.4**. With the 14.3 release of this library, the publish/subscribe feature will not work!
 * postgresql libraries : **libpq-dev, python-psycopg2**
 * various needed libraries : **python-mako, libffi-dev, python-netifaces**
 * git : **git**
@@ -98,6 +98,10 @@ The **netifaces python library** can't be installed automatically. For now you w
 
     $ sudo apt-get install python2.7-dev
     $ sudo pip install netifaces
+
+In minimum debian repo the package **sphinx-better-theme** does not exist::
+
+    $ sudo pip install sphinx-better-theme
 
 
 Mysql server
@@ -130,7 +134,7 @@ Download Domogik components
     The following commands assume that you are using the **/opt/dmg/** folder as the root folder for Domogik. And so Domogik will be installed in the */opt/dmg/domogik/* folder.
     If you choose another folder, please keep in mind the below points:
 
-    * You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be carefull if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
+    * You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be careful if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
     * Don't download Domogik sources directly in */root* or */*
     * The folder path must also not contains any spaces in its name!
 
@@ -181,7 +185,7 @@ You will be requested to give some informations. ::
     [ Create domogik-mq user ]
     As what user should domogik-mq run? [domogik]: 
 
-Give the system user you will use to install Domogik. You can use a dedicated user named *domogik* if you want. I would suggest you to use your personnal user if you are not familiar with users and related permissions on Linux. ::
+Give the system user you will use to install Domogik. You can use a dedicated user named *domogik* if you want. I would suggest you to use your personal user if you are not familiar with users and related permissions on Linux. ::
 
     Install MQ as master (lib+daemon) or client (lib only) ? [M/s]:
 
@@ -200,7 +204,7 @@ You will be requested to give some informations. ::
     [ Create domogik user ]
     As what user should domogik run? [domogik]: 
 
-Give the system user you will use to install Domogik. You can use a dedicated user named *domogik* if you want. I would suggest you to use your personnal user if you are not familiar with users and related permissions on Linux. ::
+Give the system user you will use to install Domogik. You can use a dedicated user named *domogik* if you want. I would suggest you to use your personal user if you are not familiar with users and related permissions on Linux. ::
 
     [ Update /etc/default/domogik ]
     Configuration files
@@ -327,7 +331,7 @@ And add at the end the below lines: ::
     # Domogik backup each night at 1:00
     0 1 * * * /opt/dmg/domogik/backup.py > /var/log/domogik/backup-$(date "+\%Y\%m\%d_\%H\%M").log 2>&1
     # Domogik : regenerate packages documentation each hour
-    0 * * * * /opt/dmg/domogik/src/domogik/bin/package.py >> /var/log/domogik/refresh_docs_pkg-$(date "+\%Y\%m\%d").log 2>&1
+    0 * * * * /opt/dmg/domogik/src/domogik/bin/package.py -d >> /var/log/domogik/refresh_docs_pkg-$(date "+\%Y\%m\%d").log 2>&1
 
 The default backup folder is **/var/lib/domogik/backup/**. You can change it in the file **/etc/domogik/domogik.cfg** in the section **[backup]**. Example: ::
 

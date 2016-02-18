@@ -10,13 +10,13 @@ In Domogik 0.4.x the packages installation can only be done from the command lin
 
 There are 3 ways to install a package from the command line:
 
-* install from an existing directory on your server. This will happen mainly for developpers which use git repositories for example. In this case, a symbolic link will be created to link the folder.
+* install from an existing directory on your server. This will happen mainly for developers which use git repositories for example. In this case, a symbolic link will be created to link the folder.
 * install from a zip file on your server. 
 * install from an online file.
 
-Notice that in all cases, the package name will be created thanks to the **info.json** file included in the package. So you can have folders or zip files with stranges names like *master.zip*, *foo.zip*, ...
+Notice that in all cases, the package name will be created thanks to the **info.json** file included in the package. So you can have folders or zip files with strange names like *master.zip*, *foo.zip*, ...
 
-Durin the package installation, the documentation will be built to be available from Domogik administration.
+During the package installation, the documentation will be built to be available from Domogik administration.
 
 For now, **after installing a package, you should restart Domogik!** : ::
 
@@ -52,7 +52,7 @@ When you will uninstall such a package, a backup of the folder will be done and 
 Install from an online zip
 --------------------------
 
-Just launch the **dmg_package** tool with the **--install** option and the url of zip file path as parameter. This is very usefull to install a package from a git repository of a developper. Example: ::
+Just launch the **dmg_package** tool with the **--install** option and the url of zip file path as parameter. This is very useful to install a package from a git repository of a developer. Example: ::
 
     $ dmg_package --install https://github.com/Cereal2nd/domogik-plugin-onewire/archive/master.zip
     2013-11-22 23:04:53,348 domogik-package INFO Start downloading https://github.com/Cereal2nd/domogik-plugin-onewire/archive/master.zip

@@ -6,7 +6,7 @@ Purpose
 =======
 
 These types are used to validate the input (on the ui) for certain fields.
-An example configuration parameters, command paramaters, ....
+An example configuration parameters, command parameters, ....
 
 Known Field Types
 =================
@@ -22,7 +22,7 @@ Wil result in a text input field
 optional parameters:
    * max_length : integer
    * min_length : integer
-   * mask_str : regexp to validatethe string
+   * mask_str : regexp to validate the string
    * multiline : boolean
 
 Password
@@ -32,7 +32,7 @@ Wil result in a password input field
 optional parameters:
    * max_length : integer
    * min_length : integer
-   * mask_str : regexp to validatethe string
+   * mask_str : regexp to validate the string
 
 Choice
 ------

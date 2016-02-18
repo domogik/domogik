@@ -89,7 +89,7 @@ setup(
           'Flask-Login',
           'Flask-Babel',
           'Flask-Themes2',
-          'tornado >= 3.2',
+          'tornado >= 4.2',
           'requests >= 0.12.1',
           magic,
           'pyzmq >= 2.2.0',

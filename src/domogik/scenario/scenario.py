@@ -244,7 +244,7 @@ class ScenarioInstance:
         uuid = self._get_uuid()
         if itype == 'test':
             try:
-                print inst
+                print(inst)
                 mod, clas, param = inst.split('.')
             except ValueError as err:
                 mod, clas = inst.split('.')
@@ -282,13 +282,18 @@ class ScenarioInstance:
     def _call_actions(self):
         """ Call the needed actions for this scenario
         """
-        print "CALLING actions"
+        local_vars = {"foo" : "bar"}
+        self._log.debug("CALLING actions. Local vars = '{0}'".format(local_vars))
+        idx = 0
         for act in sorted(self._mapping['action']):
+            idx += 1
             try:
-                self._mapping['action'][act].do_action()
+                self._log.debug("Before action n°{0}. Local vars = '{1}'".format(idx, local_vars))
+                self._mapping['action'][act].do_action(local_vars)
+                self._log.debug("After action n°{0}. Local vars = '{1}'".format(idx, local_vars))
             except:
                 self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
-        print "END CALLING actions"
+        self._log.debug("END CALLING actions")
 
     def generic_trigger(self, test):
         if test.get_condition():
@@ -309,6 +314,6 @@ if __name__ == "__main__":
         {"type":"dom_condition","id":"1","IF":{"type":"textinpage.TextInPageTest","id":"5","url.urlpath":"http://cereal.sinners.be/test","url.interval":"10","text.text":"foo"},"deletable":false}
         """
     s = ScenarioInstance(logging, 10, "name", json.loads(jsons))
-    print s._parsed_condition
-    print s._mapping
-    print s.eval_condition()
+    print(s._parsed_condition)
+    print(s._mapping)
+    print(s.eval_condition())

@@ -7,8 +7,8 @@ Purpose
 
 The xplgw component (xPL gateway) is the gateway between Domogik and xPL world. This component is listening the xPL network for sensor values and send xPL commands over xPL when needed.
 
-How are sensor values catched ?
-===============================
+How are sensor values caught ?
+==============================
 
 For each device feature a listener is created based on the content of the tables *core_xplstat* and *core_xplstat_param*. When the listener catch a message, it will extract the values from it, apply some transformations (history cleanup, round, ...) and store them in database.
 :doc:`Some conversions may be applied depending on the device features </package_development/plugins/conversion/index>`.

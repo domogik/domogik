@@ -56,17 +56,26 @@ class ButlerAction(AbstractAction):
         self.zmq = zmq.Context()
         self.pub = MQPub(self.zmq, self._mq_name)
 
-    def do_action(self):
-        self._log.info(u"Make the butler say '{0}'. Media is '{1}', location is '{2}'".format(self._params['text'], self._params['media'], self._params['location']))
+    def do_action(self, local_vars):
+        media = self._params['media']
+        location = self._params['location']
+        text = self._params['text']
+
+        # local variables
+        media = self.process_local_vars(local_vars, media)
+        location = self.process_local_vars(local_vars, location)
+        text = self.process_local_vars(local_vars, text)
+
+        self._log.info(u"Make the butler say '{0}'. Media is '{1}', location is '{2}'".format(text, media, location))
 
         # publish over MQ
-        data =              {"media" : self._params['media'],
-                             "location" : self._params['location'],
+        data =              {"media" : media,
+                             "location" : location,
                              "sex" : self.butler_sex,
                              "mood" : None,
                              "reply_to" : None,
                              "identity" : self.butler_name,
-                             "text" : self._params['text']}
+                             "text" : text}
         self.pub.send_event('interface.output',
                             data)
 

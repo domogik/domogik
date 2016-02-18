@@ -33,7 +33,7 @@ Part of the json sample
                         "key": "key2_devicetype",
                         "description": "A short description",
                         "type": "integer",
-                        "max_value": 255,                               # depending on the type the are other posibilitys
+                        "max_value": 255,                               # depending on the type the are other possibilities
                         "min_value": 0,
                         "xpl": True                                     # if the params is in the xpl messages : True. For example, an interval will not be in a xpl message
                         "default": "A default value"                    # optionally a default value for this parameter
@@ -52,7 +52,7 @@ Part of the json sample
                        "key": "key1_cmd_one",                           # key copied to the xpl messages, this a dynamic key that can be set in each Xpl message (dynamic)
                                                                         # key appears in the xpl as : {key1_cmd_two : dynamic value}
                        "data_type": "DT_Switch",                        # link to Domogik Type of Data used by widgets in UI.
-                       "conversion": "from_DT_Switch_to_level"          # if needed define proper conversion fuction in file <plugindirectory>/conversion/<fooplugin>.py
+                       "conversion": "from_DT_Switch_to_level"          # if needed define proper conversion function in file <plugindirectory>/conversion/<fooplugin>.py
                                                                         # conversion have utility when hard device receive a particular scale or data type who are not directly compatible with Domogik Types
                    }
                ],
@@ -187,7 +187,7 @@ Part of the json sample
                         {
                              "key": "dynamic_key1_xpl_xplstat_one",     # key appears in the xpl as : {dynamic_key1_xpl_xplstat_one : dynamic value}
                              "ignore_values": "",
-                             "sensor": "sensor_one"                     # link to sensor type to set Domogik Data Type and optinal conversion
+                             "sensor": "sensor_one"                     # link to sensor type to set Domogik Data Type and optimal conversion
                         },
                         {
                              "key": "dynamic_key2_xpl_xplstat_one",

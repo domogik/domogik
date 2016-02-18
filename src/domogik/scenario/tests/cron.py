@@ -29,7 +29,7 @@ from domogik.scenario.tests.abstract import AbstractTest
 from time import sleep
 
 class CronTest(AbstractTest):
-    """ Simple test to check if a word is contained in an url
+    """ Crontab test
     """
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):

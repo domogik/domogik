@@ -101,7 +101,7 @@ error:
 
     data = {msg: "string describing the error"}
  
-action ok, no content returnd:
+action ok, no content returned:
 
     code = 204
 

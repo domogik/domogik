@@ -216,6 +216,10 @@ class ScenarioManager:
             res = self._conditions[name].eval_condition()
             return {'name': name, 'result': res}
 
+    # TODO : is this function used ???????
+    # TODO : is this function used ???????
+    # TODO : is this function used ???????
+    # TODO : is this function used ???????
     def trigger_actions(self, name):
         """ Trigger that will be called when a condition evaluates to True
         """

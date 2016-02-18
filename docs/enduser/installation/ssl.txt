@@ -31,7 +31,7 @@ If you followed the above steps you will have the 2 needed files, <hostname>.key
 Configure REST
 --------------
 
-To configure rest to use ssl we need to adapt the /etc/domogik/domogik.cfg file, there are 2 importent keys for this
+To configure rest to use ssl we need to adapt the /etc/domogik/domogik.cfg file, there are 2 important keys for this
 
 * ssl_certificate = should point to the .crt file
 * ssl_key = should point to the .key file
