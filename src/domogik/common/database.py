@@ -39,7 +39,8 @@ Implements
 """
 
 import datetime, hashlib, time
-from pytz import timezone
+from pytz import utc, timezone
+from time import mktime
 import traceback
 import sys
 
@@ -973,8 +974,8 @@ class DbHelper():
         values = []
         for a_value in self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).limit(num).all():
             values.append({"value_str" : a_value.value_str, 
-                           "value_num" : a_value.value_num, 
-                           "timestamp" : (a_value.date - datetime.datetime(1970, 1, 1)).total_seconds()})
+                           "value_num" : a_value.value_num,
+                           "timestamp" : int(mktime(utc.localize(a_value.date).utctimetuple())) })
         return values
             
     def list_sensor_history_between(self, sid, frm, to=None):
@@ -992,7 +993,7 @@ class DbHelper():
                   ).all():
             values.append({"value_str" : a_value.value_str, 
                            "value_num" : a_value.value_num, 
-                           "timestamp" : (a_value.date - datetime.datetime(1970, 1, 1)).total_seconds()})
+                           "timestamp" : int(mktime(utc.localize(a_value.date).utctimetuple())) })
         return values
         return self.__session.query(SensorHistory
                   ).filter(SensorHistory.sensor_id==sid
