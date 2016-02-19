@@ -122,7 +122,7 @@ def scenario_edit(id):
         pass
     else:
         # Get the javascript for all blocks and data to build blockly categories
-        blocks_js, tests, actions, devices_per_clients, used_datatypes = scenario_blocks_js()
+        blocks_js, tests, actions, devices_per_clients, used_datatypes, scenarios = scenario_blocks_js()
 
         # ouput
         return render_template('scenario_edit.html',
@@ -132,16 +132,11 @@ def scenario_edit(id):
             blocks_js = blocks_js,
             actions = actions,
             tests = tests,
+            scenarios = scenarios,
             devices_per_clients = devices_per_clients,
             datatypes = used_datatypes,
             jso = jso,
             scenario_id = id)
-
-
-
-
-
-
 
 def scenario_blocks_js():
     """
@@ -152,6 +147,20 @@ def scenario_blocks_js():
     """
 
     ### first, do all MQ related calls
+
+    # scenarios
+    scenarios = {}
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('scenario.list')
+    res = cli.request('scenario', msg.get(), timeout=10)
+    if res is not None:
+        res = res.get_data()
+        if 'result' in res:
+            scenarios = res['result']
+    else:
+        print("Error : no scenarios found!")
+        scenarios = {}
 
     # scenarios tests (cron, text in page, ...)
     scenario_tests = {}
@@ -490,17 +499,36 @@ def scenario_blocks_js():
                 }};
                 """.format(dt_type, color, output, input)
         js = u'{0}\n\r{1}'.format(js, add)
-                
+        
+    # add the scenario enable/disable block
+    for scen in scenarios:
+        for endis in ['Enable', 'Disable']:
+            print scen
+            print scen['cid']
+            block_id = "scenario.{0}.{1}".format(endis, scen['cid'])
+            block_description = "{0} scenario {1}".format(endis, scen['name'])
+            add = u"""Blockly.Blocks['{0}'] = {{
+                    init: function() {{
+                        this.setHelpUrl('');
+                        this.setColour(160);
+                        this.appendDummyInput().appendField("{1}");
+                        this.setPreviousStatement(true, "null");
+                        this.setNextStatement(true, "null");
+                        this.setTooltip("{1}");
+                    }}
+                }};
+                """.format(block_id, block_description)
+            js = u'{0}\n\r{1}'.format(js, add)
+
 
     # do some sorting
-
     devices_per_clients = json.dumps(devices_per_clients, sort_keys=True)
     devices_per_clients = json.loads(devices_per_clients, object_pairs_hook=OrderedDict)
     tests = sorted(tests)
     actions = sorted(actions)
 
     # return values
-    return js, tests, actions, devices_per_clients, used_datatypes
+    return js, tests, actions, devices_per_clients, used_datatypes, scenarios
 
 
 

@@ -81,6 +81,14 @@
             </category>
         {% endfor %}
     </category>
+    <category name="Scenarios">
+        {% for scen in scenarios %}
+            <category name="{{ scen['name'] }}">
+                <block type="scenario.Enable.{{ scen.cid }}"></block>
+                <block type="scenario.Disable.{{ scen.cid }}"></block>
+            </category>
+        {% endfor %}
+    </category>
     <category name="Other sensors">
         {% for t in tests %}
             <block type="{{ t }}"></block>
