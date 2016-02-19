@@ -50,6 +50,7 @@ class CommandAction(AbstractAction):
         self.log.debug(u"Parameters before processing : {0}".format(self._params))
         params = {}
         for key in self._params:
+            self.log.debug(u"Preprocess for param : key={0}, value={1}".format(key, self._params[key]))
             # local variables
             params[key] = self.process_local_vars(local_vars, self._params[key])
 
