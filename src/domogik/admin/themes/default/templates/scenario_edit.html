@@ -84,8 +84,7 @@
     <category name="Scenarios">
         {% for scen in scenarios %}
             <category name="{{ scen['name'] }}">
-                <block type="scenario.Enable.{{ scen.cid }}"></block>
-                <block type="scenario.Disable.{{ scen.cid }}"></block>
+                <block type="scenario.endis.{{ scen.cid }}"></block>
             </category>
         {% endfor %}
     </category>

@@ -502,23 +502,23 @@ def scenario_blocks_js():
         
     # add the scenario enable/disable block
     for scen in scenarios:
-        for endis in ['Enable', 'Disable']:
-            print scen
-            print scen['cid']
-            block_id = "scenario.{0}.{1}".format(endis, scen['cid'])
-            block_description = "{0} scenario {1}".format(endis, scen['name'])
-            add = u"""Blockly.Blocks['{0}'] = {{
-                    init: function() {{
-                        this.setHelpUrl('');
-                        this.setColour(160);
-                        this.appendDummyInput().appendField("{1}");
-                        this.setPreviousStatement(true, "null");
-                        this.setNextStatement(true, "null");
-                        this.setTooltip("{1}");
-                    }}
-                }};
-                """.format(block_id, block_description)
-            js = u'{0}\n\r{1}'.format(js, add)
+        block_id = "scenario.endis.{0}".format(scen['cid'])
+        block_description = "Enable/Disable scenario"
+        add = u"""Blockly.Blocks['{0}'] = {{
+                init: function() {{
+                    this.setColour(5);
+                    this.appendDummyInput().appendField("{1}");
+                    this.appendDummyInput().appendField("Scenario : {2}");
+                    this.appendDummyInput().appendField("- action : ")
+                                .appendField(new Blockly.FieldDropdown([['Enable', '1'],['Disable', '0']]), "action");
+                    this.setPreviousStatement(true, "null");
+                    this.setNextStatement(true, "null");
+                    this.setInputsInline(false);
+                    this.setTooltip("{1}");
+                }}
+            }};
+            """.format(block_id, block_description, scen['name'])
+        js = u'{0}\n\r{1}'.format(js, add)
 
 
     # do some sorting
