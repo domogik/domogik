@@ -826,16 +826,25 @@ class DbHelper():
         
         # check if this device i used in a scenario
         llist = []
+        fdo = False
         for sen in self.get_sensor_by_device_id(d_id):
-            llist.append(Scenario.json.like(u'%sensor.SensorTest.{0}%'.format(sen.id)))
+            llist.append(Scenario.json.like(u'%sensor.SensorTest.{0}"%'.format(sen.id)))
+            fdo = True
         for cmd in self.get_command_by_device_id(d_id):
-            llist.append(Scenario.json.like(u'%command.CommandAction.{0}%'.format(cmd.id)))
-        scens = self.__session.query(Scenario).filter( or_(*llist) ).count()
-        if scens > 0:
-            self.__raise_dbhelper_exception("Can not delete device with id {0}, its sensors or commands are used in a scenario".format(d_id))
+            llist.append(Scenario.json.like(u'%command.CommandAction.{0}"%'.format(cmd.id)))
+            fdo = True
+        if fdo:
+            scens = self.__session.query(Scenario).filter( or_(*llist) ).all()
+            if len(scens) > 0:
+                tmp = []
+                for x in scens:
+                    tmp.append(x.name)
+                self.__raise_dbhelper_exception("Can not delete device with id {0}, its sensors or commands are used in the following scenarios: {1}".format(d_id, ", ".join(tmp)))
+                del tmp
+            del scens
         del llist
-        del scens
-    
+        del fdo
+        
         # delete sensor history data
         ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
         meta = MetaData(bind=DbHelper.__engine)
