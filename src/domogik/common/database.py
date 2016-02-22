@@ -905,17 +905,21 @@ class DbHelper():
                 # insert new recored in core_sensor_history
                 # store the history value if requested
                 if sensor.history_store:
-                    if sensor.history_duplicate == 0 and sensor.last_value == str(value):
-                        toDel = self.__session.query(SensorHistory) \
+                    if sensor.history_duplicate == 0:
+                        # get last 2 values
+                        vals = self.__session.query(SensorHistory) \
                                 .filter(SensorHistory.sensor_id==sensor.id) \
                                 .order_by(SensorHistory.date.desc()) \
-                                .limit(1) \
-                                .one()
-                        self.__session.delete(toDel)
-                        try:
-                            self.__session.commit()
-                        except Exception as sql_exception:
-                            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                                .limit(2) \
+                                .all()
+                        # vals[0] => last stored value
+                        # vals[1] => last-1 stored value
+                        if len(vals) == 2 and vals[0].value_str == vals[1].value_str == str(value):
+                            self.__session.delete(vals[0])
+                            try:
+                                self.__session.commit()
+                            except Exception as sql_exception:
+                                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
                     # finally store the value
                     h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
                     self.__session.add(h)
