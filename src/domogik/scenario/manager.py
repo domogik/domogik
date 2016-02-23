@@ -353,7 +353,7 @@ class ScenarioManager:
                 self.log.info(u"Scenario test : id '{0}' doesn't exist".format(cid))
                 return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
             else:
-                self._instances[int(cid)]['instance'].test_actions():
+                self._instances[int(cid)]['instance'].test_actions()
                 self.log.info(u"Scenario {0} actions called".format(cid))
                 return {'status': 'OK', 'msg': u"Scenario {0} actions called".format(cid)}
         except:
