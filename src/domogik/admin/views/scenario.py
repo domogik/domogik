@@ -122,7 +122,7 @@ def scenario_edit(id):
         pass
     else:
         # Get the javascript for all blocks and data to build blockly categories
-        blocks_js, tests, actions, devices_per_clients, used_datatypes, scenarios = scenario_blocks_js()
+        blocks_js, tests, actions, devices_per_clients, used_datatypes = scenario_blocks_js()
 
         # ouput
         return render_template('scenario_edit.html',
@@ -132,7 +132,6 @@ def scenario_edit(id):
             blocks_js = blocks_js,
             actions = actions,
             tests = tests,
-            scenarios = scenarios,
             devices_per_clients = devices_per_clients,
             datatypes = used_datatypes,
             jso = jso,
@@ -148,19 +147,20 @@ def scenario_blocks_js():
 
     ### first, do all MQ related calls
 
+    # CODE for #85
     # scenarios
-    scenarios = {}
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('scenario.list')
-    res = cli.request('scenario', msg.get(), timeout=10)
-    if res is not None:
-        res = res.get_data()
-        if 'result' in res:
-            scenarios = res['result']
-    else:
-        print("Error : no scenarios found!")
-        scenarios = {}
+    #scenarios = {}
+    #cli = MQSyncReq(app.zmq_context)
+    #msg = MQMessage()
+    #msg.set_action('scenario.list')
+    #res = cli.request('scenario', msg.get(), timeout=10)
+    #if res is not None:
+    #    res = res.get_data()
+    #    if 'result' in res:
+    #        scenarios = res['result']
+    #else:
+    #    print("Error : no scenarios found!")
+    #    scenarios = {}
 
     # scenarios tests (cron, text in page, ...)
     scenario_tests = {}
@@ -200,6 +200,7 @@ def scenario_blocks_js():
 
     actions = scenario_actions.keys()
     try:
+        actions.remove(u'scenario.endis')
         actions.remove(u'command.CommandAction')
     except ValueError:
         pass
@@ -500,25 +501,25 @@ def scenario_blocks_js():
                 """.format(dt_type, color, output, input)
         js = u'{0}\n\r{1}'.format(js, add)
         
+    # CODE for #85
     # add the scenario enable/disable block
-    for scen in scenarios:
-        block_id = "scenario.endis.{0}".format(scen['cid'])
-        block_description = "Enable/Disable scenario"
-        add = u"""Blockly.Blocks['{0}'] = {{
-                init: function() {{
-                    this.setColour(5);
-                    this.appendDummyInput().appendField("{1}");
-                    this.appendDummyInput().appendField("Scenario : {2}");
-                    this.appendDummyInput().appendField("- action : ")
-                                .appendField(new Blockly.FieldDropdown([['Enable', '1'],['Disable', '0']]), "action");
-                    this.setPreviousStatement(true, "null");
-                    this.setNextStatement(true, "null");
-                    this.setInputsInline(false);
-                    this.setTooltip("{1}");
-                }}
-            }};
-            """.format(block_id, block_description, scen['name'])
-        js = u'{0}\n\r{1}'.format(js, add)
+    #for scen in scenarios:
+    #    for endis in ['Enable', 'Disable']:
+    #        block_id = "scenario.{1}.{0}".format(scen['cid'], endis)
+    #        block_description = "{0} scenario".format(endis)
+    #        add = u"""Blockly.Blocks['{0}'] = {{
+    #                init: function() {{
+    #                    this.setColour(5);
+    #                    this.appendDummyInput().appendField("{1}");
+    #                    this.appendDummyInput().appendField("Scenario : {2}");
+    #                    this.setPreviousStatement(true, "null");
+    #                    this.setNextStatement(true, "null");
+    #                    this.setInputsInline(false);
+    #                    this.setTooltip("{1}");
+    #                }}
+    #            }};
+    #            """.format(block_id, block_description, scen['name'])
+    #        js = u'{0}\n\r{1}'.format(js, add)
 
 
     # do some sorting
@@ -528,7 +529,7 @@ def scenario_blocks_js():
     actions = sorted(actions)
 
     # return values
-    return js, tests, actions, devices_per_clients, used_datatypes, scenarios
+    return js, tests, actions, devices_per_clients, used_datatypes
 
 
 
