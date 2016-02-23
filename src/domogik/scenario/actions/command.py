@@ -33,7 +33,7 @@ import json
 import traceback
 
 class CommandAction(AbstractAction):
-    """ Simple action that log something in scenario logfile
+    """ Simple action that calls a device command
     """
 
     def __init__(self, log=None, params=None):
@@ -50,7 +50,7 @@ class CommandAction(AbstractAction):
         self.log.debug(u"Parameters before processing : {0}".format(self._params))
         params = {}
         for key in self._params:
-            self.log.debug(u"Preprocess for param : key={0}, value={1}".format(key, self._params[key]))
+            self.log.debug(u"Preprocess for param : key={0}, typeofvalue={1}, value={2}".format(key, type(self._params[key]), self._params[key]))
             # local variables
             params[key] = self.process_local_vars(local_vars, self._params[key])
 
