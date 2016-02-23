@@ -89,7 +89,8 @@ class ScenarioFrontend(Plugin):
                         'get': self._backend.get_parsed_condition,
                         'evaluate': self._backend.eval_condition,
                         'enable': self._backend.enable_scenario,
-                        'disable': self._backend.disable_scenario
+                        'disable': self._backend.disable_scenario,
+                        'test': self._backend.test_scenario
                     },
                     'action':
                     {

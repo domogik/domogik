@@ -307,6 +307,10 @@ class ScenarioInstance:
         else:
             test.evaluate()
 
+    def test_actions(self):
+        self._call_actions()
+
+
 if __name__ == "__main__":
     import logging
     import json
