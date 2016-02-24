@@ -282,18 +282,19 @@ class ScenarioInstance:
     def _call_actions(self):
         """ Call the needed actions for this scenario
         """
-        local_vars = {"foo" : "bar"}
-        self._log.debug("CALLING actions. Local vars = '{0}'".format(local_vars))
+        local_vars = {}
+        #self._log.debug("CALLING actions. Local vars = '{0}'".format(local_vars))
         idx = 0
         for act in sorted(self._mapping['action']):
             idx += 1
             try:
-                self._log.debug("Before action n°{0}. Local vars = '{1}'".format(idx, local_vars))
+                #self._log.debug("Before action n°{0}. Local vars = '{1}'".format(idx, local_vars))
+                self._log.info(u"== Do action n°{0} :".format(idx))
                 self._mapping['action'][act].do_action(local_vars)
-                self._log.debug("After action n°{0}. Local vars = '{1}'".format(idx, local_vars))
+                #self._log.debug("After action n°{0}. Local vars = '{1}'".format(idx, local_vars))
             except:
                 self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
-        self._log.debug("END CALLING actions")
+        #self._log.debug("END CALLING actions")
 
     def generic_trigger(self, test):
         if test.get_condition():
@@ -301,9 +302,12 @@ class ScenarioInstance:
             if cond.get_parsed_condition() is None:
                 return
             st = cond.eval_condition()
-            self._log.info(u"Condition {0} evaluated to {1}".format(self._name, st))
+            self._log.debug(u"Scenario '{0}' evaluated to '{1}'".format(self._name, st))
             if st:
+                self._log.info(u"==== Scenario triggered! ====")
+                self._log.info(u"Scenario triggered : {0}".format(self._name))
                 self._call_actions()
+                self._log.info(u"=============================")
         else:
             test.evaluate()
 
