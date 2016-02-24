@@ -59,9 +59,14 @@ def scenario_del(id):
     return redirect(u"/scenario")
     pass
 
+@app.route('/scenario/clone/<id>', methods=['GET', 'POST'])
 @app.route('/scenario/edit/<id>', methods=['GET', 'POST'])
 @login_required
 def scenario_edit(id):
+    if str(request.path).find('/clone/') > -1:
+        clone = True
+    else:
+        clone = False
     default_json = '{"type":"dom_condition","id":"1","deletable":false}'
     # laod the json
     if int(id) == 0:
@@ -77,6 +82,9 @@ def scenario_edit(id):
             name = scen.name
             desc = scen.description
             jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'").replace('"', '\\"')
+            if clone:
+                id = 0
+                name = u""
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
