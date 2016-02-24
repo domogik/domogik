@@ -347,6 +347,20 @@ class ScenarioManager:
             self.log.error(msg)
             return {'status': 'ERROR', 'msg': msg}
 
+    def test_scenario(self, cid):
+        try:
+            if cid == '' or int(cid) not in self._instances.keys():
+                self.log.info(u"Scenario test : id '{0}' doesn't exist".format(cid))
+                return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
+            else:
+                self._instances[int(cid)]['instance'].test_actions()
+                self.log.info(u"Scenario {0} actions called".format(cid))
+                return {'status': 'OK', 'msg': u"Scenario {0} actions called".format(cid)}
+        except:
+            msg = u"Error while calling actions for scenario id='{0}'. Error is : {1}".format(cid, traceback.format_exc())
+            self.log.error(msg)
+            return {'status': 'ERROR', 'msg': msg}
+
     def __return_list_of_classes(self, package):
         """ Return the list of module/classes in a package
         @param package : a reference to the package that need to be explored

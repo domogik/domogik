@@ -27,16 +27,18 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.scenario.tests.abstract import AbstractTest
 from domogik.common.database import DbHelper
+from domogikmq.pubsub.subscriber import MQAsyncSub
 from time import sleep
-from threading import Thread, Event
+import zmq
 
-class SensorTest(AbstractTest):
+class SensorTest(AbstractTest, MQAsyncSub):
     """ Sensor test
     # params == the sensorId to check the value for
     """
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
+        self.sub = MQAsyncSub.__init__(self, zmq.Context(), 'scenario-sensor', ['device-stats'])
         self._sensorId = params
         self.set_description("Check The value for a sensor with id {0}".format(self._sensorId))
         self.log = log
@@ -44,7 +46,7 @@ class SensorTest(AbstractTest):
         self._res = None
         self._dataType = None
         self._dt_parent = None
-        # get info from db
+        # get initital info from db
         with self._db.session_scope():
             sensor = self._db.get_sensor(self._sensorId)
             if sensor is not None:
@@ -58,22 +60,14 @@ class SensorTest(AbstractTest):
             self._dt_parent = dt_parent
         # set new val
         self._res = self._convert(self._res)
-        # start the thread
-        self._event = Event()
-        self._fetch_thread = Thread(target=self._fetch,name="pollthread")
-        self._fetch_thread.start()
 
-    def _fetch(self):
-        while not self._event.is_set():
-            new = None
-            with self._db.session_scope():
-                sensor = self._db.get_sensor(self._sensorId)
-                if sensor is not None:
-                    new = self._convert(sensor.last_value)
-            if self._res != new:
-                self._res = new
-                self._trigger(self)
-            sleep(2)
+    def on_message(self, did, msg):
+        """Receive message from MQ sub"""
+        if self._sensorId:
+            if 'sensor_id' in msg:
+                if int(msg['sensor_id']) == int(self._sensorId):
+                    self._res = self._convert(msg['stored_value'])
+                    self._trigger(self)
 
     def _convert(self, val):
         if self._dt_parent == "DT_Number":
@@ -108,8 +102,6 @@ class SensorTest(AbstractTest):
     def destroy(self):
         """ Destroy fetch thread
         """
-        self._event.set()
-        self._fetch_thread.join()
         AbstractTest.destroy(self)
 
 if __name__ == "__main__":
@@ -117,7 +109,6 @@ if __name__ == "__main__":
 
     def mytrigger(test):
         print "Trigger called by test %s, refreshing state" % test
-        st = TEST.evaluate()
         print "state is %s" % st
 
     ### create logger
@@ -151,7 +142,7 @@ if __name__ == "__main__":
 
     logger.info("==== Evaluate with parameters values that does not match ====")
     logger.debug("Set values")
-    data = { "sensor": { "sensor_id" : 1072 },
+    data = { "sensor": { "sensor_id" : 2 },
              "value":  { "text" : "on" }
     }
     logger.debug("Set parameters values")

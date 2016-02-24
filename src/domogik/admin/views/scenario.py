@@ -59,9 +59,14 @@ def scenario_del(id):
     return redirect(u"/scenario")
     pass
 
+@app.route('/scenario/clone/<id>', methods=['GET', 'POST'])
 @app.route('/scenario/edit/<id>', methods=['GET', 'POST'])
 @login_required
 def scenario_edit(id):
+    if str(request.path).find('/clone/') > -1:
+        clone = True
+    else:
+        clone = False
     default_json = '{"type":"dom_condition","id":"1","deletable":false}'
     # laod the json
     if int(id) == 0:
@@ -77,6 +82,9 @@ def scenario_edit(id):
             name = scen.name
             desc = scen.description
             jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'").replace('"', '\\"')
+            if clone:
+                id = 0
+                name = u""
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
@@ -137,12 +145,6 @@ def scenario_edit(id):
             jso = jso,
             scenario_id = id)
 
-
-
-
-
-
-
 def scenario_blocks_js():
     """
         Generate all the dynamic Blockly blocs : tests, commands, devices sensors and commands, datatype
@@ -152,6 +154,21 @@ def scenario_blocks_js():
     """
 
     ### first, do all MQ related calls
+
+    # CODE for #85
+    # scenarios
+    #scenarios = {}
+    #cli = MQSyncReq(app.zmq_context)
+    #msg = MQMessage()
+    #msg.set_action('scenario.list')
+    #res = cli.request('scenario', msg.get(), timeout=10)
+    #if res is not None:
+    #    res = res.get_data()
+    #    if 'result' in res:
+    #        scenarios = res['result']
+    #else:
+    #    print("Error : no scenarios found!")
+    #    scenarios = {}
 
     # scenarios tests (cron, text in page, ...)
     scenario_tests = {}
@@ -172,8 +189,7 @@ def scenario_blocks_js():
     try:
         tests.remove(u'sensor.SensorTest')
     except ValueError:
-        # in case the list is empty because of another issue...
-        print("Errror : can't remove sensor.SensorTest from tests. Error is : {0}".format(traceback.format_exc()))
+        pass
 
     # scenarios actions (log, call url, ...)
     scenario_actions = {}
@@ -192,10 +208,10 @@ def scenario_blocks_js():
 
     actions = scenario_actions.keys()
     try:
+        actions.remove(u'scenario.endis')
         actions.remove(u'command.CommandAction')
     except ValueError:
-        # in case the list is empty because of another issue...
-        print("Errror : can't remove command.CommandAction from actions. Error is : {0}".format(traceback.format_exc()))
+        pass
 
     # datatypes
     datatypes = {}
@@ -387,7 +403,7 @@ def scenario_blocks_js():
                     #else:
                     #    color = 160
                     #    output = "\"null\""
-                    js_params = u"""
+                    js_params += u"""
                                     this.appendDummyInput().appendField("- {0} : ")
                                 """.format(param_key)
                     list_options = None
@@ -492,10 +508,29 @@ def scenario_blocks_js():
                 }};
                 """.format(dt_type, color, output, input)
         js = u'{0}\n\r{1}'.format(js, add)
-                
+        
+    # CODE for #85
+    # add the scenario enable/disable block
+    #for scen in scenarios:
+    #    for endis in ['Enable', 'Disable']:
+    #        block_id = "scenario.{1}.{0}".format(scen['cid'], endis)
+    #        block_description = "{0} scenario".format(endis)
+    #        add = u"""Blockly.Blocks['{0}'] = {{
+    #                init: function() {{
+    #                    this.setColour(5);
+    #                    this.appendDummyInput().appendField("{1}");
+    #                    this.appendDummyInput().appendField("Scenario : {2}");
+    #                    this.setPreviousStatement(true, "null");
+    #                    this.setNextStatement(true, "null");
+    #                    this.setInputsInline(false);
+    #                    this.setTooltip("{1}");
+    #                }}
+    #            }};
+    #            """.format(block_id, block_description, scen['name'])
+    #        js = u'{0}\n\r{1}'.format(js, add)
+
 
     # do some sorting
-
     devices_per_clients = json.dumps(devices_per_clients, sort_keys=True)
     devices_per_clients = json.loads(devices_per_clients, object_pairs_hook=OrderedDict)
     tests = sorted(tests)

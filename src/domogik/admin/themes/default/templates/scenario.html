@@ -6,16 +6,20 @@
     <a id="start" class="btn btn-info" href="/scenario/edit/0">{% trans %}Create a new scenario{% endtrans%}</a>
     <p></p>
     {% if scenarios|length > 0 %}
-      <ul class="list-group">
+      <div class="list-group">
         {% for data in scenarios %}
-          <li class="list-group-item">
+          <div class="list-group-item">
             <a href="/scenario/edit/{{ data.cid }}">
               <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
               {{ data.name }}
             </a>
-          </li>
+            <a href="/scenario/clone/{{ data.cid }}" class="pull-right">
+              <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
+              Clone
+            </a>
+          </div>
         {% endfor %}
-      </ul>
+      </div>
     {% else %}
       <div class="alert alert-warning">{% trans %}There is no scenario yet{% endtrans %}</div>
     {% endif %}

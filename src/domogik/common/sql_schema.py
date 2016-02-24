@@ -338,12 +338,12 @@ class Sensor(Base):
     conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(32), nullable=True)
     last_received = Column(Integer, nullable=True)
-    value_min = Column(Float, nullable=True)
-    value_max = Column(Float, nullable=True)
+    value_min = Column(Float(53), nullable=True)
+    value_max = Column(Float(53), nullable=True)
     history_store = Column(Boolean, nullable=False)
     history_max = Column(Integer, nullable=True)
     history_expire = Column(Integer, nullable=True)
-    history_round = Column(Float, nullable=True)
+    history_round = Column(Float(53), nullable=True)
     history_duplicate = Column(Boolean, nullable=False)
     timeout = Column(Integer, nullable=True, default=0)
 
@@ -384,9 +384,9 @@ class SensorHistory(Base):
     id = Column(Integer, primary_key=True) 
     sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
-    value_num = Column(Float, nullable=True)
+    value_num = Column(Float(53), nullable=True)
     value_str = Column(Unicode(32), nullable=False)
-    original_value_num = Column(Float, nullable=True)
+    original_value_num = Column(Float(53), nullable=True)
 
     def __init__(self, sensor_id, date, value, orig_value):
         self.sensor_id = sensor_id

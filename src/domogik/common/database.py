@@ -39,7 +39,8 @@ Implements
 """
 
 import datetime, hashlib, time
-from pytz import timezone
+from pytz import utc, timezone
+from time import mktime
 import traceback
 import sys
 
@@ -823,6 +824,27 @@ class DbHelper():
         if device is None:
             self.__raise_dbhelper_exception("Device with id %s couldn't be found" % d_id)
         
+        # check if this device i used in a scenario
+        llist = []
+        fdo = False
+        for sen in self.get_sensor_by_device_id(d_id):
+            llist.append(Scenario.json.like(u'%sensor.SensorTest.{0}"%'.format(sen.id)))
+            fdo = True
+        for cmd in self.get_command_by_device_id(d_id):
+            llist.append(Scenario.json.like(u'%command.CommandAction.{0}"%'.format(cmd.id)))
+            fdo = True
+        if fdo:
+            scens = self.__session.query(Scenario).filter( or_(*llist) ).all()
+            if len(scens) > 0:
+                tmp = []
+                for x in scens:
+                    tmp.append(x.name)
+                self.__raise_dbhelper_exception("Can not delete device with id {0}, its sensors or commands are used in the following scenarios: {1}".format(d_id, ", ".join(tmp)))
+                del tmp
+            del scens
+        del llist
+        del fdo
+        
         # delete sensor history data
         ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
         meta = MetaData(bind=DbHelper.__engine)
@@ -892,17 +914,21 @@ class DbHelper():
                 # insert new recored in core_sensor_history
                 # store the history value if requested
                 if sensor.history_store:
-                    if sensor.history_duplicate == 0 and sensor.last_value == str(value):
-                        toDel = self.__session.query(SensorHistory) \
+                    if sensor.history_duplicate == 0:
+                        # get last 2 values
+                        vals = self.__session.query(SensorHistory) \
                                 .filter(SensorHistory.sensor_id==sensor.id) \
                                 .order_by(SensorHistory.date.desc()) \
-                                .limit(1) \
-                                .one()
-                        self.__session.delete(toDel)
-                        try:
-                            self.__session.commit()
-                        except Exception as sql_exception:
-                            self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
+                                .limit(2) \
+                                .all()
+                        # vals[0] => last stored value
+                        # vals[1] => last-1 stored value
+                        if len(vals) == 2 and vals[0].value_str == vals[1].value_str == str(value):
+                            self.__session.delete(vals[0])
+                            try:
+                                self.__session.commit()
+                            except Exception as sql_exception:
+                                self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
                     # finally store the value
                     h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
                     self.__session.add(h)
@@ -973,8 +999,8 @@ class DbHelper():
         values = []
         for a_value in self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).limit(num).all():
             values.append({"value_str" : a_value.value_str, 
-                           "value_num" : a_value.value_num, 
-                           "timestamp" : (a_value.date - datetime.datetime(1970, 1, 1)).total_seconds()})
+                           "value_num" : a_value.value_num,
+                           "timestamp" : int(mktime(utc.localize(a_value.date).utctimetuple())) })
         return values
             
     def list_sensor_history_between(self, sid, frm, to=None):
@@ -992,7 +1018,7 @@ class DbHelper():
                   ).all():
             values.append({"value_str" : a_value.value_str, 
                            "value_num" : a_value.value_num, 
-                           "timestamp" : (a_value.date - datetime.datetime(1970, 1, 1)).total_seconds()})
+                           "timestamp" : int(mktime(utc.localize(a_value.date).utctimetuple())) })
         return values
         return self.__session.query(SensorHistory
                   ).filter(SensorHistory.sensor_id==sid
