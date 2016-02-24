@@ -78,6 +78,8 @@ ssl_certificate =
 ssl_key =
 # if set to True, this will result in a nicely formatted json
 clean_json = False
+# if set to True, all the /rest/ urls need basic authentication
+rest_auth = False
 
 ###
 # Butler configuration

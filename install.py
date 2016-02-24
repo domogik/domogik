@@ -192,7 +192,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
         'domogik': ['libraries_path', 'src_prefix', \
                 'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level'],
         'database': ['prefix', 'pool_recycle'],
-        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json'],
+        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth'],
     }
     if advanced_mode:
         return True

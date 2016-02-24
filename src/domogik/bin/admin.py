@@ -212,6 +212,10 @@ class Admin(Plugin):
                     self.clean_json = conf_admin['clean_json']
                 else:
                     self.clean_json = False
+                if 'rest_auth'in conf_admin:
+                    self.rest_auth = conf_admin['rest_auth']
+                else:
+                    self.rest_auth = False
             except KeyError:
                 # default parameters
                 self.interfaces = server_interfaces
@@ -258,6 +262,7 @@ class Admin(Plugin):
         admin_app.db = DbHelper()
         admin_app.datatypes = self.datatypes
         admin_app.clean_json = self.clean_json
+        admin_app.rest_auth = self.rest_auth
         admin_app.apiversion = REST_API_VERSION
         admin_app.use_ssl = self.use_ssl
         admin_app.hostname = self.get_sanitized_hostname()

@@ -88,7 +88,6 @@ def write_access_log_after(response):
 @app.before_request
 def write_acces_log_before():
     if str(request.path).startswith('/rest/'):
-        print "OPEN"
         app.db.open_session()
     app.json_stop_at = []
     app.logger.info('http request for {0} received'.format(request.path))

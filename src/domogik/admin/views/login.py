@@ -33,7 +33,7 @@ def rediret_to_login():
 
 @login_manager.request_loader
 def load_user_from_request(request):
-    if str(request.path).startswith('/rest/'):
+    if app.rest_auth and str(request.path).startswith('/rest/'):
         auth = request.authorization
         if not auth:
             return None
