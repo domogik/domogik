@@ -8,15 +8,17 @@
     {% if scenarios|length > 0 %}
       <div class="list-group">
         {% for data in scenarios %}
-          <div class="list-group-item">
+          <div class="list-group-item clearfix">
             <a href="/scenario/edit/{{ data.cid }}">
               <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
               {{ data.name }}
             </a>
-            <a href="/scenario/clone/{{ data.cid }}" class="pull-right">
+            <span class="pull-right">
+            <a href="/scenario/clone/{{ data.cid }}" class="btn btn-default btn-xs">
               <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
-              Clone
+              {% trans %}Clone{% endtrans %}
             </a>
+            </span>
           </div>
         {% endfor %}
       </div>
