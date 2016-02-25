@@ -33,20 +33,22 @@ def rediret_to_login():
 
 @login_manager.request_loader
 def load_user_from_request(request):
+    print "HERE"
+    print app.rest_auth
     if app.rest_auth and str(request.path).startswith('/rest/'):
         auth = request.authorization
         if not auth:
             return None
         else:
-            if app.HTTPDigestAuth.authenticate(auth, 'me'):
-                user = app.db.get_user_account_by_login(auth.username)
-                app.db.detach(user)
-                if user.is_admin:
-                    return user
+            with app.db.session_scope():
+                if app.db.authenticate(auth.username, auth.password):
+                    user = app.db.get_user_account_by_login(auth.username)
+                    if user.is_admin:
+                        return user
+                    else:
+                        return None
                 else:
-                    return None
-            else:
-                return None
+                        return None
     else:
         return None
 

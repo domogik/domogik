@@ -1,6 +1,5 @@
 from domogik.common.utils import get_packages_directory, get_libraries_directory
 from domogik.common.jsondata import domogik_encoder
-from domogik.admin.authdigest import HTTPDigestAuth
 from functools import wraps
 import json
 import sys
@@ -56,7 +55,6 @@ app.config['SECRET_KEY'] = 'devkey'
 app.config['RECAPTCHA_PUBLIC_KEY'] = \
 '6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
 app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Paris'
-app.HTTPDigestAuth = HTTPDigestAuth(realm="Domogik Rest interface")
 
 # jinja 2 filters
 def format_babel_datetime(value, format='medium'):
@@ -137,17 +135,9 @@ def json_response(action_func):
             rcode = 204
             rdata = None
         # do the actual return
-        if rcode == 401:
+        if app.rest_auth and rcode == 401:
             resp = Response(status=401)
-            nonce, opaque = app.HTTPDigestAuth.authenticate_header()
-            resp.www_authenticate.set_digest(
-                    realm = "Domogik REST inetrface",
-                    nonce = nonce,
-                    qop = 'auth',
-                    opaque = opaque,
-                    algorithm = 'MD5',
-                    stale = False
-                )
+            resp.www_authenticate.set_basic(realm = "Domogik REST inetrface" )
             return resp
         else:
             if type(app.json_stop_at) is not list:
