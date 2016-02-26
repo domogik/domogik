@@ -102,8 +102,7 @@ def build_file_list(user):
     if os.path.exists('/etc/logrotate.d'):
         debug("Found a directory for the logrotate script: /etc/logrotate.d")
         d_files.append(('/etc/logrotate.d', ['root', None], \
-                ['src/domogik/examples/logrotate/domogik', \
-                'src/domogik/xpl/hub/examples/logrotate/xplhub']))
+                ['src/domogik/xpl/hub/examples/logrotate/xplhub']))
 
     if os.path.exists('/etc/init.d'):
         debug("Init script path is /etc/init.d")
@@ -190,7 +189,8 @@ def create_user(d_user, d_shell = "/bin/sh"):
 def is_domogik_advanced(advanced_mode, sect, key):
     advanced_keys = {
         'domogik': ['libraries_path', 'src_prefix', \
-                'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level'],
+                'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level', \ 
+                'log_when', 'log_interval', 'log_backup_count'],
         'database': ['prefix', 'pool_recycle'],
         'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth'],
     }
