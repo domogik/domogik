@@ -304,10 +304,9 @@ def write_xplhub_configfile_from_command_line(args):
                 newvalues = True
             debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
-    if newvalues:
-        with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
-            ok("Writing the config file")
-            config.write(configfile)
+    with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
+        ok("Writing the config file")
+        config.write(configfile)
 
 def needupdate():
     # first check if there are already some config files
