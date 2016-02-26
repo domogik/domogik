@@ -86,7 +86,7 @@ setup(
           'Twisted >= 12.0.0',
           'Flask >= 0.8',
           'Flask-WTF >= 0.6',
-          'Flask-Login',
+          'Flask-Login >= 0.3.2',
           'Flask-Babel',
           'Flask-Themes2',
           'tornado >= 4.2',
