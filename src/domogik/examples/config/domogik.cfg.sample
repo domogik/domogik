@@ -24,7 +24,7 @@ log_level = debug
 
 # info about the values
 # https://docs.python.org/2/library/logging.handlers.html#timedrotatingfilehandler
-log_when = 'D'
+log_when = D
 log_interval = 1
 log_backup_count = 10
 
