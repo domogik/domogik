@@ -136,18 +136,20 @@ class ScenarioManager:
             return {'name': name, 'data': parsed}
 
     def update_scenario(self, cid, name, json_input, dis, desc):
-        if int(cid) != 0:
+        cid = int(cid)
+        if cid != 0:
             self.del_scenario(cid, False)
         return self.create_scenario(name, json_input, cid, dis, desc, True)
 
     def del_scenario(self, cid, doDB=True):
         try:
-            if cid == '' or int(cid) not in self._instances.keys():
+            cid = int(cid)
+            if cid == 0 or cid not in self._instances.keys():
                 self.log.info(u"Scenario deletion : id '{0}' doesn't exist".format(cid))
                 return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
             else:
-                self._instances[int(cid)]['instance'].destroy()
-                del(self._instances[int(cid)])
+                self._instances[cid]['instance'].destroy()
+                del(self._instances[cid])
                 if doDB:
                     with self._db.session_scope():
                         self._db.del_scenario(cid)

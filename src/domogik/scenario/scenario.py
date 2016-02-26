@@ -120,9 +120,11 @@ class ScenarioInstance:
     def _clean_instances(self):
         for (uid, item) in self._mapping['action'].items():
             item.destroy()
+            del item
         self._mapping['action'] = {}
         for (uid, item) in self._mapping['test'].items():
             item.destroy()
+            del item
         self._mapping['test'] = {}
 
     def update(self, json):
@@ -233,8 +235,12 @@ class ScenarioInstance:
         """
         if self._parsed_condition is None:
             return None
-        res = eval(self._parsed_condition)
-        self._log.debug("_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, eval(self._parsed_condition)))
+        try:
+            res = eval(self._parsed_condition)
+        except:
+            return None
+            pass
+        self._log.debug("_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, res))
         if res:
             return True
         else:
@@ -302,12 +308,13 @@ class ScenarioInstance:
             if cond.get_parsed_condition() is None:
                 return
             st = cond.eval_condition()
-            self._log.debug(u"Scenario '{0}' evaluated to '{1}'".format(self._name, st))
-            if st:
-                self._log.info(u"======== Scenario triggered! ========")
-                self._log.info(u"Scenario triggered : {0}".format(self._name))
-                self._call_actions()
-                self._log.info(u"=====================================")
+            if st is not None:
+                self._log.debug(u"Scenario '{0}' evaluated to '{1}'".format(self._name, st))
+                if st:
+                    self._log.info(u"======== Scenario triggered! ========")
+                    self._log.info(u"Scenario triggered : {0}".format(self._name))
+                    self._call_actions()
+                    self._log.info(u"=====================================")
         else:
             test.evaluate()
 
