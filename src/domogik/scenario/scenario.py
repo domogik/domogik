@@ -29,8 +29,10 @@ import uuid
 from exceptions import ValueError
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
+from domogik.common.logger import Logger
 import zmq
 import traceback
+import logging
 
 class ScenarioInstance:
     """ This class provides base methods for the scenarios
@@ -74,8 +76,8 @@ class ScenarioInstance:
         @param dbid : The id of this scenario in the db
         @param json : The json describing the scenario
         """
-        self._log = log
         self._name = name
+        self._log = log.getChild(name)
         self._json = json
         self._disabled = disabled
 
