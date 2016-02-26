@@ -186,7 +186,7 @@ class ScenarioManager:
         # db storage
         if int(ocid) == 0:
             with self._db.session_scope():
-                scen = self._db.add_scenario(name, json_input, dis, desc)
+                scen = self._db.add_scenario(name, json_input, dis, desc, False)
                 cid = scen.id
         elif update:
             with self._db.session_scope():

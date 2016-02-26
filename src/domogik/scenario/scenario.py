@@ -80,6 +80,7 @@ class ScenarioInstance:
         self._log = log.getChild(unicode(name))
         self._json = json
         self._disabled = disabled
+        self._state = False
 
         self.zmq = zmq.Context()
         # datatypes
@@ -312,7 +313,9 @@ class ScenarioInstance:
             st = cond.eval_condition()
             if st is not None:
                 self._log.debug(u"Scenario '{0}' evaluated to '{1}'".format(self._name, st))
-                if st:
+                if self._state != st:
+                    self._state = st
+                    # TODO udpate state in the db
                     self._log.info(u"======== Scenario triggered! ========")
                     self._log.info(u"Scenario triggered : {0}".format(self._name))
                     self._call_actions()
