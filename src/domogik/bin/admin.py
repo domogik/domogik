@@ -108,32 +108,33 @@ class Publisher(MQAsyncSub):
             self.sendToMQ(message)
     
     def sendToMQ(self, message):
-        ctx = zmq.Context()
-        jsons = json.loads(message)
-        # req/rep
-        if 'mq_request' in jsons and 'data' in jsons:
-            cli = MQSyncReq(ctx)
-            msg = MQMessage()
-            msg.set_action(str(jsons['mq_request']))
-            msg.set_data(jsons['data'])
-            print("REQ : {0}".format(msg.get()))
-            if 'dst' in jsons:
-                dst = str(jsons['dst'])
-            else:
-                dst = 'manager'
-            res = cli.request(dst, msg.get(), timeout=10)
-            if res:
-                print res.get()
-            cli.shutdown()
-            del cli
-        # pub
-        elif 'mq_publish' in jsons and 'data' in jsons:
-            print("Publish : {0}".format(jsons['data']))
-            pub = MQPub(ctx, 'admin-ws')
-            pub.send_event(jsons['mq_publish'],
-                            jsons['data'])
-
-
+        try:
+            ctx = zmq.Context()
+            jsons = json.loads(message)
+            # req/rep
+            if 'mq_request' in jsons and 'data' in jsons:
+                cli = MQSyncReq(ctx)
+                msg = MQMessage()
+                msg.set_action(str(jsons['mq_request']))
+                msg.set_data(jsons['data'])
+                print("REQ : {0}".format(msg.get()))
+                if 'dst' in jsons:
+                    dst = str(jsons['dst'])
+                else:
+                    dst = 'manager'
+                res = cli.request(dst, msg.get(), timeout=10)
+                if res:
+                    print res.get()
+                cli.shutdown()
+                del cli
+            # pub
+            elif 'mq_publish' in jsons and 'data' in jsons:
+                print("Publish : {0}".format(jsons['data']))
+                pub = MQPub(ctx, 'admin-ws')
+                pub.send_event(jsons['mq_publish'],
+                                jsons['data'])
+        except Exception as e:
+            print("Error sending mq message: {0}".format(e))
 
 class Subscription(WebSocketHandler):
     """Websocket for subscribers."""
@@ -174,7 +175,7 @@ class Subscription(WebSocketHandler):
     
     def on_message(self, content):
         """ reciev message from websocket and send to MQ """
-        print("WS to MQ")
+        print("WS to MQ: {0}".format(content))
         self.publisher.MQmessages.put(content)
 
 class Admin(Plugin):

@@ -34,7 +34,7 @@
     $( document ).ready(function() {
         $(".testactions").click(function() {
             console.log("testa ctions request");
-            ws.send('{"dst": "scenario", "mq_request": "scenario.test_actions", "data": {cid" : "'+ $(this).attr("data-cid") + '"}}');
+            ws.send('{"dst": "scenario", "mq_request": "scenario.test", "data": {"cid" : "'+ $(this).attr("data-cid") + '"}}');
             console.log("ws send done");
         });
     });
