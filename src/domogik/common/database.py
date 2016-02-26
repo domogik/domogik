@@ -1801,9 +1801,9 @@ class DbHelper():
     def get_scenario_by_name(self, s_name):
         return self.__session.query(Scenario).filter(Scenario.name==s_name).first()
 
-    def add_scenario(self, name, json, disabled, desc):
+    def add_scenario(self, name, json, disabled, desc, state):
         self.__session.expire_all()
-        scenario = Scenario(name=name, json=json, disabled=disabled, description=desc)
+        scenario = Scenario(name=name, json=json, disabled=disabled, description=desc, state=state)
         self.__session.add(scenario)
         try:
             self.__session.commit()
@@ -1811,7 +1811,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return scenario
 
-    def update_scenario(self, s_id, name=None, json=None, disabled=None, description=None):
+    def update_scenario(self, s_id, name=None, json=None, disabled=None, description=None, state=None):
         self.__session.expire_all()
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is None:
@@ -1824,6 +1824,8 @@ class DbHelper():
             scenario.disabled = disabled
         if description is not None:
             scenario.description = description
+        if state is not None:
+            scenario.state = state
         self.__session.add(scenario)
         try:
             self.__session.commit()
