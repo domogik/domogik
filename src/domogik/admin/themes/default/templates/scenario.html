@@ -14,10 +14,14 @@
               {{ data.name }}
             </a>
             <span class="pull-right">
-            <a href="/scenario/clone/{{ data.cid }}" class="btn btn-default btn-xs">
-              <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
-              {% trans %}Clone{% endtrans %}
-            </a>
+                <a class="btn btn-default btn-xs testactions" data-cid="{{ data.cid }}">
+                  <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+                  {% trans %}Test actions{% endtrans %}
+                </a>
+                <a href="/scenario/clone/{{ data.cid }}" class="btn btn-default btn-xs">
+                  <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
+                  {% trans %}Clone{% endtrans %}
+                </a>
             </span>
           </div>
         {% endfor %}
@@ -26,4 +30,13 @@
       <div class="alert alert-warning">{% trans %}There is no scenario yet{% endtrans %}</div>
     {% endif %}
 </div>
+<script type="text/javascript">
+    $( document ).ready(function() {
+        $(".testactions").click(function() {
+            console.log("testa ctions request");
+            ws.send('{"dst": "scenario", "mq_request": "scenario.test_actions", "data": {cid" : "'+ $(this).attr("data-cid") + '"}}');
+            console.log("ws send done");
+        });
+    });
+</script>
 {% endblock %}
