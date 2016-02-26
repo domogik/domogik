@@ -39,6 +39,7 @@ Implements
 """
 
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import sys
 from domogik.common.configloader import Loader
 
@@ -94,7 +95,7 @@ class Logger():
             # log to file
             my_logger.propagate = 0
             if not my_logger.handlers:
-                hdlr = logging.handlers.TimedRotatingFileHandler(filename, \
+                hdlr = TimedRotatingFileHandler(filename, \
                         when=config['log_when'], interval=config['log_interval'], \
                         backupCount=config['log_backup_count'])
                 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
