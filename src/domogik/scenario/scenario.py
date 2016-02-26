@@ -304,15 +304,18 @@ class ScenarioInstance:
             st = cond.eval_condition()
             self._log.debug(u"Scenario '{0}' evaluated to '{1}'".format(self._name, st))
             if st:
-                self._log.info(u"==== Scenario triggered! ====")
+                self._log.info(u"======== Scenario triggered! ========")
                 self._log.info(u"Scenario triggered : {0}".format(self._name))
                 self._call_actions()
-                self._log.info(u"=============================")
+                self._log.info(u"=====================================")
         else:
             test.evaluate()
 
     def test_actions(self):
+        self._log.info(u"==== Scenario triggered by test request! ====")
+        self._log.info(u"Scenario triggered : {0}".format(self._name))
         self._call_actions()
+        self._log.info(u"=============================================")
 
 
 if __name__ == "__main__":
