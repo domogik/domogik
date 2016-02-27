@@ -70,7 +70,7 @@ class ScenarioInstance:
     }
     """
 
-    def __init__(self, log, dbid, name, json, disabled):
+    def __init__(self, log, dbid, name, json, disabled, state, db):
         """ Create the instance
         @param log : A logger instance
         @param dbid : The id of this scenario in the db
@@ -80,7 +80,9 @@ class ScenarioInstance:
         self._log = log.getChild(unicode(name))
         self._json = json
         self._disabled = disabled
-        self._state = False
+        self._state = state
+        self._dbid = dbid
+        self._db = db
 
         self.zmq = zmq.Context()
         # datatypes
@@ -315,11 +317,16 @@ class ScenarioInstance:
                 self._log.debug(u"Scenario '{0}' evaluated to '{1}'".format(self._name, st))
                 if self._state != st:
                     self._state = st
-                    # TODO udpate state in the db
-                    self._log.info(u"======== Scenario triggered! ========")
-                    self._log.info(u"Scenario triggered : {0}".format(self._name))
-                    self._call_actions()
-                    self._log.info(u"=====================================")
+                    self._log.debug(u"Updating state")
+                    with self._db.session_scope():
+                        self._db.update_scenario(self._dbid, state=st)
+                    if st:
+                        self._log.info(u"======== Scenario triggered! ========")
+                        self._log.info(u"Scenario triggered : {0}".format(self._name))
+                        self._call_actions()
+                        self._log.info(u"=====================================")
+                else:
+                    self._log.debug(u"State is the same as before, so skipping actions")
         else:
             test.evaluate()
 

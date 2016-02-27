@@ -116,7 +116,7 @@ class ScenarioManager:
         """
         with self._db.session_scope():
             for scenario in self._db.list_scenario():
-                self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description)
+                self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description, scenario.state)
 
     def shutdown(self):
         """ Callback to shut down all parameters
@@ -137,9 +137,11 @@ class ScenarioManager:
 
     def update_scenario(self, cid, name, json_input, dis, desc):
         cid = int(cid)
+        # TODO get the current state and store it
+        state = True
         if cid != 0:
             self.del_scenario(cid, False)
-        return self.create_scenario(name, json_input, cid, dis, desc, True)
+        return self.create_scenario(name, json_input, cid, dis, desc, state)
 
     def del_scenario(self, cid, doDB=True):
         try:
@@ -159,7 +161,7 @@ class ScenarioManager:
             self.log.error(msg)
             return {'status': 'ERROR', 'msg': msg}
 
-    def create_scenario(self, name, json_input, cid=0, dis=False, desc=None, update=False):
+    def create_scenario(self, name, json_input, cid=0, dis=False, desc=None, state=False, update=False):
         """ Create a Scenario from the provided json.
         @param name : A name for the condition instance
         @param json_input : JSON representation of the condition
@@ -194,7 +196,7 @@ class ScenarioManager:
 
         # create the condition itself
         try:
-            scen = ScenarioInstance(self.log, cid, name, payload, dis)
+            scen = ScenarioInstance(self.log, cid, name, payload, dis, state, self._db)
             self._instances[cid] = {'name': name, 'json': payload, 'instance': scen } 
             self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
             self._instances[cid]['instance'].eval_condition()
@@ -217,23 +219,6 @@ class ScenarioManager:
         else:
             res = self._conditions[name].eval_condition()
             return {'name': name, 'result': res}
-
-    # TODO : is this function used ???????
-    # TODO : is this function used ???????
-    # TODO : is this function used ???????
-    # TODO : is this function used ???????
-    def trigger_actions(self, name):
-        """ Trigger that will be called when a condition evaluates to True
-        """
-        if name not in self._conditions_actions \
-                or name not in self._conditions:
-            raise KeyError('no key %s in one of the _conditions tables table' % name)
-        else:
-            for action in self._conditions_actions[name]:
-                self._actions_mapping[action].do_action( \
-                        self._conditions[name], \
-                        self._conditions[name].get_mapping() \
-                        )
 
     def list_actions(self):
         """ Return the list of actions
@@ -289,21 +274,6 @@ class ScenarioManager:
             res[name] = {"parameters": params,
                          "description": inst.get_description()}
         return res
-        #for name, cls in tests:
-        #    self.log.debug("- {0}".format(name))
-        #    inst = cls(log = self.log)
-        #    res[name] = []
-        #    for p, i in inst.get_parameters().iteritems():
-        #        for param, info in i['expected'].iteritems():
-        #            res[name].append({
-        #                    "name": "{0}.{1}".format(p, param),
-        #                    "description": info['description'],
-        #                    "type": info['type'],
-        #                    "values": info['values'],
-        #                    "filters": info['filters'],
-        #                })
-        #    inst.destroy()
-        #return res
 
     def list_conditions(self):
         """ Return the list of conditions as JSON
