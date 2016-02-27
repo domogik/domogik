@@ -59,6 +59,16 @@
           <span class="help-block">{% trans %}Set a number that will be used for the reduced stats storage. This will be evaluated only if you choose to store the history. More informations about the configuration of this option is available in the online documentation.{% endtrans %}</span>
         </div>
       </div>
+     {% if allow_data_type %}
+     <div class="form-group ">
+        <label class="control-label col-xs-3">{% trans %}Data Type{% endtrans %}</label>
+        <div class="col-xs-9">
+          {{ form.data_type() }} 
+          <span class="help-block">{% trans %}Select a child datat_type for this sensor, this will help the UI to select the correct widget.{% endtrans %}</span>
+        </div>
+      </div>
+      {% endif %}
+
       <div class="form-group">
         <div class="col-xs-offset-3 col-xs-9">
         <input type="submit" value="validate" class="btn btn-primary">

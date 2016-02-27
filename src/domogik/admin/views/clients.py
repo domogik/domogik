@@ -218,13 +218,19 @@ def client_devices_known(client_id):
 def client_sensor_edit(client_id, sensor_id):
     with app.db.session_scope():
         sensor = app.db.get_sensor(sensor_id)
+        exclude=['core_device', 'name', 'reference', \
+                'incremental', 'conversion', \
+                'last_value', 'last_received', 'history_duplicate', \
+                'value_min', 'value_max']
+        if sensor.data_type == "SELECT":
+            allow_data_type = True
+        else:
+            exclude.append('data_type')
+            allow_data_type = False
         MyForm = model_form(Sensor, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
-                        exclude=['core_device', 'name', 'reference', \
-                                'incremental', 'data_type', 'conversion', \
-                                'last_value', 'last_received', 'history_duplicate', \
-                                'value_min', 'value_max'])
+                        exclude=exclude)
         #MyForm.history_duplicate.kwargs['validators'] = []
         MyForm.history_store.kwargs['validators'] = []
         form = MyForm(request.form, sensor)
@@ -262,6 +268,7 @@ def client_sensor_edit(client_id, sensor_id):
                 clientid = client_id,
                 mactive="clients",
                 active = 'devices',
+                allow_data_type = allow_data_type,
                 sensor = sensor)
 
 @app.route('/client/<client_id>/global/edit/<dev_id>', methods=['GET', 'POST'])
