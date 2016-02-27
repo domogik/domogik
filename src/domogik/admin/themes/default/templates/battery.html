@@ -33,6 +33,8 @@
     height: 20%%;
     width: 100%;
     background-color: #fff;
+    color: #ffffff;
+    text-align: center;
 }
 
 
@@ -71,8 +73,14 @@
         {% for elt in sensors %}
             <h3>{{ elt.device_name }} - {{ elt.name }} <small>({{ elt.client_id }})</small></h3>
             <div class="battery">
-              <div class="level" style="height: {{ 100 - elt.last_value }}%">
-              </div>
+              {% if elt.last_value is none %}  
+                <div class="level" style="height: 0%">
+                  ?
+                </div>
+              {% else %}
+                <div class="level" style="height: {{ 100 - elt.last_value }}%">
+                </div>
+              {% endif %}
             </div>
             <ul class="battery-informations">
               <li><strong>{% trans %}Value : </strong>{% endtrans %}{{ elt.last_value }}%</li>

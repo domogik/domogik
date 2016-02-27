@@ -34,8 +34,12 @@ def battery():
         for item in data:
             if item.data_type == "DT_Battery":
                 dev = app.db.get_device(item.device_id)
+                try:
+                    last_value = int(item.last_value)
+                except:
+                    last_value = None
                 sensors.append({"name" : item.name,
-                                "last_value" : int(item.last_value),
+                                "last_value" : last_value,
                                 "last_received" : item.last_received,
                                 "device_id" : item.device_id,
                                 "device_name" : dev['name'],
