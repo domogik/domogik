@@ -114,9 +114,12 @@ class ScenarioManager:
         """ Loads all scenarios from the db
         for each scenario call the create_scenario method
         """
-        with self._db.session_scope():
-            for scenario in self._db.list_scenario():
-                self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description, scenario.state)
+        try:
+            with self._db.session_scope():
+                for scenario in self._db.list_scenario():
+                    self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description, scenario.state)
+        except:
+            self.log.error(u"Error while loading the scenarios! The error is : {0}".format(traceback.format_exc()))
 
     def shutdown(self):
         """ Callback to shut down all parameters
