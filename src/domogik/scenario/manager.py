@@ -141,7 +141,7 @@ class ScenarioManager:
         state = True
         if cid != 0:
             self.del_scenario(cid, False)
-        return self.create_scenario(name, json_input, cid, dis, desc, state)
+        return self.create_scenario(name, json_input, cid, dis, desc, state, True)
 
     def del_scenario(self, cid, doDB=True):
         try:
@@ -197,7 +197,7 @@ class ScenarioManager:
         # create the condition itself
         try:
             scen = ScenarioInstance(self.log, cid, name, payload, dis, state, self._db)
-            self._instances[cid] = {'name': name, 'json': payload, 'instance': scen } 
+            self._instances[cid] = {'name': name, 'json': payload, 'instance': scen, 'disabled': dis } 
             self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
             self._instances[cid]['instance'].eval_condition()
         except Exception as e:  
@@ -280,7 +280,8 @@ class ScenarioManager:
         """
         ret = []
         for cid, inst in self._instances.iteritems():
-            ret.append({'cid': cid, 'name': inst['name'], 'json': inst['json']})
+            print inst
+            ret.append({'cid': cid, 'name': inst['name'], 'json': inst['json'], 'disabled': inst['disabled']})
         return ret
 
     def enable_scenario(self, cid):
@@ -290,6 +291,7 @@ class ScenarioManager:
                 return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
             else:
                 if self._instances[int(cid)]['instance'].enable():
+                    self._instances[int(cid)]['disabled'] = False
                     # TODO persistent?
                     self.log.info(u"Scenario {0} enabled".format(cid))
                     return {'status': 'OK', 'msg': u"Scenario {0} enabled".format(cid)}
@@ -308,6 +310,7 @@ class ScenarioManager:
                 return {'status': 'ERROR', 'msg': u"Scenario {0} doesn't exist".format(cid)}
             else:
                 if self._instances[int(cid)]['instance'].disable():
+                    self._instances[int(cid)]['disabled'] = True
                     # TODO persistent?
                     self.log.info(u"Scenario {0} disabled".format(cid))
                     return {'status': 'OK', 'msg': u"Scenario {0} disabled".format(cid)}
