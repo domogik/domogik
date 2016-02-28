@@ -157,6 +157,7 @@ class ScenarioInstance:
             # step 2 parse the "if" part        
             self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
         except:
+            print self._json
             raise
 
     def __parse_if_part(self, part, datatypes = None):

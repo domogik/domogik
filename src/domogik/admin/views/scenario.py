@@ -41,6 +41,10 @@ def scenario():
         if 'result' in res:
             res = res['result']
             for scen in res:
+                if scen['disabled']:
+                    scen['endis'] = 'Disabled'
+                else:
+                    scen['endis'] = 'Enabled'
                 scenarios.append(scen)
     scenarios = sorted(scenarios, key=itemgetter("name"))
     return render_template('scenario.html',
@@ -58,6 +62,31 @@ def scenario_del(id):
     flash(gettext(u"Scenario deleted"), u"success")
     return redirect(u"/scenario")
     pass
+
+@app.route('/scenario/enable/<id>')
+@login_required
+def scenario_enable(id):
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('scenario.enable')
+    msg.add_data('cid', id)
+    res = cli.request('scenario', msg.get(), timeout=10)
+    flash(gettext(u"Scenario enabled"), u"success")
+    return redirect(u"/scenario")
+    pass
+
+@app.route('/scenario/disable/<id>')
+@login_required
+def scenario_disable(id):
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('scenario.disable')
+    msg.add_data('cid', id)
+    res = cli.request('scenario', msg.get(), timeout=10)
+    flash(gettext(u"Scenario disabled"), u"success")
+    return redirect(u"/scenario")
+    pass
+
 
 @app.route('/scenario/clone/<id>', methods=['GET', 'POST'])
 @app.route('/scenario/edit/<id>', methods=['GET', 'POST'])
