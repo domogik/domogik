@@ -1,4 +1,4 @@
-from domogik.admin.application import app, json_response, timeit
+from domogik.admin.application import app, json_response
 import sys
 import os
 import domogik
@@ -8,10 +8,11 @@ from flask import Response, request
 from domogikmq.message import MQMessage
 from domogikmq.reqrep.client import MQSyncReq
 import traceback
+from flask_login import login_required
 
 @app.route('/rest/butler/discuss', methods=['POST'])
 @json_response
-@timeit
+@login_required
 def api_butler_discuss():
     """
     @api {post} /butler/discuss Discuss with the butler

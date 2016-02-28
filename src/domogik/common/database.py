@@ -1394,6 +1394,11 @@ class DbHelper():
                                  p_birthdate=datetime.date(1900, 1, 1))
         user_account = self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
                                      a_is_admin=True)
+
+        person = self.add_person(p_first_name='Rest', p_last_name='Anonymous', 
+                                 p_birthdate=datetime.date(1900, 1, 1))
+        user_account = self.add_user_account(a_login='Anonymous', a_password='Anonymous', a_person_id=person.id, 
+                                     a_is_admin=False)
         #try:
         #    self.__session.commit()
         #except Exception as sql_exception:

@@ -1,9 +1,10 @@
-from domogik.admin.application import app, json_response, timeit, register_api
+from domogik.admin.application import app, json_response, register_api
 from flask import request
 from flask.views import MethodView
+from flask_login import login_required
 
 class sensorAPI(MethodView):
-    decorators = [json_response, timeit]
+    decorators = [login_required, json_response]
 
     def get(self, id):
         """

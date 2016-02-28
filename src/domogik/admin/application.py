@@ -135,7 +135,7 @@ def json_response(action_func):
             rcode = 204
             rdata = None
         # do the actual return
-        if app.rest_auth and rcode == 401:
+        if app.rest_auth == "True" and rcode == 401:
             resp = Response(status=401)
             resp.www_authenticate.set_basic(realm = "Domogik REST inetrface" )
             return resp
