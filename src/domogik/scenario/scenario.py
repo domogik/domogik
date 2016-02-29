@@ -157,7 +157,6 @@ class ScenarioInstance:
             # step 2 parse the "if" part        
             self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
         except:
-            print self._json
             raise
 
     def __parse_if_part(self, part, datatypes = None):
@@ -222,7 +221,7 @@ class ScenarioInstance:
 
     def __parse_do_part(self, part):
         action = self._create_instance(part['type'], 'action')
-        action[0].do_init(part)
+        action[0].do_init(part.copy())
         if 'NEXT' in part:
             self.__parse_do_part(part['NEXT'])
 
