@@ -92,7 +92,7 @@ class PackageJson():
                     json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
                     icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
                 else:
-                    raise PackageException("Type '%s' doesn't exists" % pkg_type)
+                    raise PackageException("Type '{0}' doesn't exists".format(pkg_type))
                 #json_file = "%s/%s.json" % (json_directory, name)
 
                 self.json = json.load(open(json_file))
@@ -118,7 +118,7 @@ class PackageJson():
 
             ### complete json
             # identity data
-            self.json["identity"]["package_id"] = "%s-%s" % (self.json["identity"]["type"],
+            self.json["identity"]["package_id"] = "{0}-{1}".format(self.json["identity"]["type"],
                                                            self.json["identity"]["name"])
             self.json["identity"]["icon_file"] = icon_file
 
@@ -150,7 +150,7 @@ class PackageJson():
         except PackageException as exp:
             raise PackageException(exp.value)
         except:
-            raise PackageException("Error reading json file : %s : %s" % (json_file, str(traceback.format_exc())))
+            raise PackageException("Error reading json file : {0} : {1}".format(json_file, str(traceback.format_exc())))
 
 
     #def cache_xml(self, cache_folder, url, repo_url, priority):
@@ -372,17 +372,17 @@ class PackageJson():
         """ Display xml data in a fine way
         """
         print(u"---- Package informations -------------------------------")
-        print(u"Type                : %s" % self.json["identity"]["type"])
-        print(u"Name                : %s" % self.json["identity"]["name"])
-        print(u"Package id          : %s" % self.json["identity"]["package_id"])
-        print(u"Version             : %s" % self.json["identity"]["version"])
-        print(u"Tags                : %s" % self.json["identity"]["tags"])
-        print(u"Link for doc        : %s" % self.json["identity"]["documentation"])
-        print(u"Description         : %s" % self.json["identity"]["description"])
-        print(u"Changelog           : %s" % self.json["identity"]["changelog"])
-        print(u"Author              : %s" % self.json["identity"]["author"])
-        print(u"Author's email      : %s" % self.json["identity"]["author_email"])
-        print(u"Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
+        print(u"Type                : {0}".format(self.json["identity"]["type"]))
+        print(u"Name                : {0}".format(self.json["identity"]["name"]))
+        print(u"Package id          : {0}".format(self.json["identity"]["package_id"]))
+        print(u"Version             : {0}".format(self.json["identity"]["version"]))
+        print(u"Tags                : {0}".format(self.json["identity"]["tags"]))
+        print(u"Link for doc        : {0}".format(self.json["identity"]["documentation"]))
+        print(u"Description         : {0}".format(self.json["identity"]["description"]))
+        print(u"Changelog           : {0}".format(self.json["identity"]["changelog"]))
+        print(u"Author              : {0}".format(self.json["identity"]["author"]))
+        print(u"Author's email      : {0}".format(self.json["identity"]["author_email"]))
+        print(u"Domogik min version : {0}".format(self.json["identity"]["domogik_min_version"]))
         print(u"---------------------------------------------------------")
 
     def find_xplstats_for_device_type(self, devtype):
@@ -407,7 +407,7 @@ def set_nightly_version(path):
     """
     my_json = json.load(open(path))
     # suffix the version with .devYYYYMMDD
-    suffix = ".dev%s" % datetime.datetime.now().strftime('%Y%m%d')
+    suffix = ".dev{0}".format(datetime.datetime.now().strftime('%Y%m%d'))
     my_json["identity"]["version"] += suffix
     my_file = open(path, "w")
     my_file.write(json.dumps(my_json))
