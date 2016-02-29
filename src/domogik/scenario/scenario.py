@@ -76,7 +76,7 @@ class ScenarioInstance:
         @param json : The json describing the scenario
         """
         self._name = name
-        self._log = log.getChild(unicode(name))
+        self._log = log.getChild(u"{0}".format(name)))
         self._json = json
         self._disabled = disabled
         self._state = state
@@ -244,7 +244,7 @@ class ScenarioInstance:
         except:
             return None
             pass
-        self._log.debug("_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, res))
+        self._log.debug(u"_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, res))
         if res:
             return True
         else:
@@ -312,7 +312,7 @@ class ScenarioInstance:
                 return
             st = cond.eval_condition()
             if st is not None:
-                self._log.debug(u"Scenario '{0}' evaluated to '{1}' with trigegr mode set to {2}".format(self._name, st, self._trigger))
+                self._log.debug(u"Scenario '{0}' evaluated to '{1}' with trigger mode set to {2}".format(self._name, st, self._trigger))
                 if self._trigger == 'hysteresis':
                     if self._state != st:
                         self._state = st
