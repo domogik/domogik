@@ -323,7 +323,8 @@ class ScenarioInstance:
                     else:
                         self._log.debug(u"State is the same as before, so skipping actions")
                 # Trigger the actions
-                if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
+                #if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
+                if st and (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st):
                     self._log.info(u"======== Scenario triggered! ========")
                     self._log.info(u"Scenario triggered : {0}".format(self._name))
                     self._call_actions()
