@@ -37,6 +37,14 @@
       <span class="help-block">{{ form.sdesc.description }}</span>
     </div>
   </div>
+  <div class="form-group">
+    <label class="control-label col-xs-3">{{ form.strigger.label }}</label>
+    <div class="col-xs-9">
+      {{ form.strigger() }}
+      <span class="help-block">{{ form.strigger.description }}</span>
+    </div>
+  </div>
+
   </form>
 
   <!-- <pre>{{ jso }}</pre> -->

@@ -107,6 +107,7 @@ class ScenarioFrontend(Plugin):
                     if msg.get_data() == {}:
                         payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()
                     else:
+                        print msg.get_data()
                         payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
                     self._mdp_reply(msg.get_action(), payload)
         except:

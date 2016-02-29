@@ -69,8 +69,7 @@ class ScenarioInstance:
         "deletable": false
     }
     """
-
-    def __init__(self, log, dbid, name, json, disabled, state, db):
+    def __init__(self, log, dbid, name, json, disabled, trigger, state, db):
         """ Create the instance
         @param log : A logger instance
         @param dbid : The id of this scenario in the db
@@ -81,6 +80,7 @@ class ScenarioInstance:
         self._json = json
         self._disabled = disabled
         self._state = state
+        self._trigger = trigger
         self._dbid = dbid
         self._db = db
 
@@ -167,7 +167,6 @@ class ScenarioInstance:
             while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                 dt_parent = datatypes[dt_parent]['parent']
             # translate
-            print("PARENT={0}".format(dt_parent))
             if dt_parent == "DT_Bool":
                 part['type'] = "logic_boolean"
             elif dt_parent == "DT_Number":
@@ -255,7 +254,6 @@ class ScenarioInstance:
         uuid = self._get_uuid()
         if itype == 'test':
             try:
-                print(inst)
                 mod, clas, param = inst.split('.')
             except ValueError as err:
                 mod, clas = inst.split('.')
@@ -314,19 +312,21 @@ class ScenarioInstance:
                 return
             st = cond.eval_condition()
             if st is not None:
-                self._log.debug(u"Scenario '{0}' evaluated to '{1}'".format(self._name, st))
-                if self._state != st:
-                    self._state = st
-                    self._log.debug(u"Updating state")
-                    with self._db.session_scope():
-                        self._db.update_scenario(self._dbid, state=st)
-                    if st:
-                        self._log.info(u"======== Scenario triggered! ========")
-                        self._log.info(u"Scenario triggered : {0}".format(self._name))
-                        self._call_actions()
-                        self._log.info(u"=====================================")
-                else:
-                    self._log.debug(u"State is the same as before, so skipping actions")
+                self._log.debug(u"Scenario '{0}' evaluated to '{1}' with trigegr mode set to {2}".format(self._name, st, self._trigger))
+                if self._trigger == 'hysteresis':
+                    if self._state != st:
+                        self._state = st
+                        self._log.debug(u"Updating state")
+                        with self._db.session_scope():
+                            self._db.update_scenario(self._dbid, state=st)
+                    else:
+                        self._log.debug(u"State is the same as before, so skipping actions")
+                # Trigger the actions
+                if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
+                    self._log.info(u"======== Scenario triggered! ========")
+                    self._log.info(u"Scenario triggered : {0}".format(self._name))
+                    self._call_actions()
+                    self._log.info(u"=====================================")
         else:
             test.evaluate()
 

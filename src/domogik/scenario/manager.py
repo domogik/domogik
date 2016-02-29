@@ -117,7 +117,7 @@ class ScenarioManager:
         try:
             with self._db.session_scope():
                 for scenario in self._db.list_scenario():
-                    self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description, scenario.state)
+                    self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description, scenario.state, scenario.trigger_mode)
         except:
             self.log.error(u"Error while loading the scenarios! The error is : {0}".format(traceback.format_exc()))
 
@@ -138,13 +138,13 @@ class ScenarioManager:
             parsed = self._conditions[name].get_parsed_condition()
             return {'name': name, 'data': parsed}
 
-    def update_scenario(self, cid, name, json_input, dis, desc):
+    def update_scenario(self, cid, name, json_input, dis, desc, tmode):
         cid = int(cid)
         # TODO get the current state and store it
         state = True
         if cid != 0:
             self.del_scenario(cid, False)
-        return self.create_scenario(name, json_input, cid, dis, desc, state, True)
+        return self.create_scenario(name, json_input, cid, dis, desc, state, tmode, True)
 
     def del_scenario(self, cid, doDB=True):
         try:
@@ -164,7 +164,7 @@ class ScenarioManager:
             self.log.error(msg)
             return {'status': 'ERROR', 'msg': msg}
 
-    def create_scenario(self, name, json_input, cid=0, dis=False, desc=None, state=False, update=False):
+    def create_scenario(self, name, json_input, cid=0, dis=False, desc=None, state=False, tmode='always', update=False):
         """ Create a Scenario from the provided json.
         @param name : A name for the condition instance
         @param json_input : JSON representation of the condition
@@ -191,15 +191,15 @@ class ScenarioManager:
         # db storage
         if int(ocid) == 0:
             with self._db.session_scope():
-                scen = self._db.add_scenario(name, json_input, dis, desc, False)
+                scen = self._db.add_scenario(name, json_input, dis, desc, tmode, False)
                 cid = scen.id
         elif update:
             with self._db.session_scope():
-                self._db.update_scenario(cid, name, json_input, dis, desc)
+                self._db.update_scenario(cid, name, json_input, dis, desc, tmode=tmode)
 
         # create the condition itself
         try:
-            scen = ScenarioInstance(self.log, cid, name, payload, dis, state, self._db)
+            scen = ScenarioInstance(self.log, cid, name, payload, dis, tmode, state, self._db)
             self._instances[cid] = {'name': name, 'json': payload, 'instance': scen, 'disabled': dis } 
             self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
             self._instances[cid]['instance'].eval_condition()
@@ -283,7 +283,6 @@ class ScenarioManager:
         """
         ret = []
         for cid, inst in self._instances.iteritems():
-            print inst
             ret.append({'cid': cid, 'name': inst['name'], 'json': inst['json'], 'disabled': inst['disabled']})
         return ret
 
