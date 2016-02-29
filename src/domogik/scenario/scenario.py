@@ -76,7 +76,7 @@ class ScenarioInstance:
         @param json : The json describing the scenario
         """
         self._name = name
-        self._log = log.getChild(u"{0}".format(name)))
+        self._log = log.getChild(u"{0}".format(name))
         self._json = json
         self._disabled = disabled
         self._state = state
