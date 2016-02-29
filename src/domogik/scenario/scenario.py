@@ -30,6 +30,7 @@ from exceptions import ValueError
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from domogik.common.logger import Logger
+from domogik.common.utils import remove_accents
 import zmq
 import traceback
 import logging
@@ -76,7 +77,7 @@ class ScenarioInstance:
         @param json : The json describing the scenario
         """
         self._name = name
-        self._log = log.getChild(u"{0}".format(name))
+        self._log = log.getChild(remove_accents(name))
         self._json = json
         self._disabled = disabled
         self._state = state

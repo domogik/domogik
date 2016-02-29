@@ -43,6 +43,7 @@ from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
 from domogik.common.configloader import Loader, CONFIG_FILE
 import datetime
 import time
+import unicodedata
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
@@ -265,6 +266,11 @@ def get_midnight_timestamp():
     ts = time.time()
     return int(ts - get_seconds_since_midnight())
 
+def remove_accents(input_str):
+    """ Remove accents in utf-8 strings
+    """
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 if __name__ == "__main__":
     print(get_seconds_since_midnight())
