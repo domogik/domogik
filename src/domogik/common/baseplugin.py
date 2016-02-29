@@ -72,7 +72,7 @@ class BasePlugin():
         dmg_user = Default.get("DOMOGIK_USER")
         logname = pwd.getpwuid(os.getuid())[0]
         if dmg_user != logname:
-            print(u"ERROR : this Domogik part must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : %s" % dmg_user)
+            print(u"ERROR : this Domogik part must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : {0}".format(dmg_user))
             sys.exit(1)
 
         if name is not None:
@@ -181,7 +181,7 @@ class BasePlugin():
             if not  t.isAlive():
                 self._threads.remove(t)
         if thread in self._threads:
-            self.log.info(u"Try to register a thread twice :" % thread)
+            self.log.info(u"Try to register a thread twice: {0}".format(thread))
         else:
             self._lock_add_thread.acquire()
             self._threads.append(thread)
@@ -208,9 +208,9 @@ class BasePlugin():
         @param timer : the timer to add
         '''
         if timer in self._timers:
-            self.log.info(u"Try to register a timer twice : %s" % timer)
+            self.log.info(u"Try to register a timer twice : {0}".format(timer))
         else:
-            self.log.debug('New timer registered : %s' % timer)
+            self.log.debug('New timer registered : {0}'.format(timer))
             self._lock_add_timer.acquire()
             self._timers.append(timer)
             self._lock_add_timer.release()
@@ -221,7 +221,7 @@ class BasePlugin():
         Should be the last action of each timer
         @param timer : the timer to remove
         '''
-        self.log.debug('ASk for timer unregister : %s' % timer)
+        self.log.debug('ASk for timer unregister : {0}'.format(timer))
         self._lock_add_timer.acquire()
         if timer in self._timers:
             self.log.debug('Unregister timer')
