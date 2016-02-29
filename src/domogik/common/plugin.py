@@ -935,9 +935,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
     def __del__(self):
         if hasattr(self, "log"):
             self.log.debug(u"__del__ Single client")
-            self.log.debug(u"the stack is :")
-            for elt in inspect.stack():
-                self.log.debug(u"    {0}".format(elt))
+            #self.log.debug(u"the stack is :")
+            #for elt in inspect.stack():
+            #    self.log.debug(u"    {0}".format(elt))
             # we guess that if no "log" is defined, the client has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
@@ -949,9 +949,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if hasattr(self, "log"):
             self.log.debug(u"force_leave called")
             #self.log.debug(u"the stack is : {0}".format(inspect.stack()))
-            self.log.debug(u"the stack is :")
-            for elt in inspect.stack():
-                self.log.debug(u"    {0}".format(elt))
+            #self.log.debug(u"the stack is :")
+            #for elt in inspect.stack():
+            #    self.log.debug(u"    {0}".format(elt))
 
         if return_code != None:
             self.set_return_code(return_code)

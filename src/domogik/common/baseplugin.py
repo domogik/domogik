@@ -287,9 +287,9 @@ class BasePlugin():
             # delete the file
             # delete also in /etc/init.d/domogik start|stop ???
             self.log.debug("Delete the file {0}".format(self.return_code_filename))
-            self.log.debug(u"the stack is :")
-            for elt in inspect.stack():
-                self.log.debug(u"    {0}".format(elt))
+            #self.log.debug(u"the stack is :")
+            #for elt in inspect.stack():
+            #    self.log.debug(u"    {0}".format(elt))
             os.unlink(self.return_code_filename)
         except:
             self.log.error("Error while deleting the file '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))
