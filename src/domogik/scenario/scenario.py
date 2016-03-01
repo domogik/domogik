@@ -314,7 +314,8 @@ class ScenarioInstance:
             st = cond.eval_condition()
             if st is not None:
                 self._log.debug(u"Scenario '{0}' evaluated to '{1}' with trigger mode set to {2}".format(self._name, st, self._trigger))
-                if self._trigger == 'hysteresis':
+                if self._trigger == 'Hysteresis':
+                    self._log.debug(u"Scenario '{0}' previously evaluated to '{1}'".format(self._name, self._state))
                     if self._state != st:
                         self._state = st
                         self._log.debug(u"Updating state")
