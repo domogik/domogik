@@ -23,12 +23,14 @@ except ImportError:
 from domogik.common.sql_schema import Device, DeviceParam, Sensor
 from domogik.common.plugin import STATUS_DEAD
 from wtforms.ext.sqlalchemy.orm import model_form
+from wtforms.widgets import Select
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
 import re
 import json
 import traceback
+import operator
 
 try:
     import html.parser
@@ -46,6 +48,16 @@ html_escape_table = {
     ">": "&gt;",
     "<": "&lt;",
     }
+
+class ChoicesSelect(Select):
+    def __init__(self, multiple=False, choices=()):
+        self.choices = choices
+        super(ChoicesSelect, self).__init__(multiple)
+
+    def __call__(self, field, **kwargs):
+        field.iter_choices = lambda: ((val, label, val == field.default) 
+                                      for val, label in self.choices)
+        return super(ChoicesSelect, self).__call__(field, **kwargs)
 
 def html_escape(text):
     """Produce entities within text."""
@@ -179,7 +191,6 @@ def client_devices_known(client_id):
 
     # first sort by device name
     devices = sorted(devices, key=itemgetter("name"))
-    print(detail['data']['device_types'])
     #    device_types_list[key] = data["device_types"][key]
 
     # group clients per device type
@@ -190,7 +201,6 @@ def client_devices_known(client_id):
         except KeyError:
             print("Warning : the device type '{0}' does not exist anymore in the installed package release. Device type name set as the existing id in database".format(dev['device_type_id']))
             device_type_name = dev['device_type_id']
-        print(device_type_name)
         if device_type_name in devices_by_device_type_id:
             devices_by_device_type_id[device_type_name].append(dev)
         else:
@@ -216,21 +226,38 @@ def client_devices_known(client_id):
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
 @login_required
 def client_sensor_edit(client_id, sensor_id):
+    if app.datatypes == {}:
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is not None:
+            app.datatypes = res.get_data()['datatypes']
+        else:
+            app.datatypes = {}
+
     with app.db.session_scope():
         sensor = app.db.get_sensor(sensor_id)
         exclude=['core_device', 'name', 'reference', \
                 'incremental', 'conversion', \
                 'last_value', 'last_received', 'history_duplicate', \
                 'value_min', 'value_max']
-        if sensor.data_type == "SELECT":
+        cdata_type = app.datatypes[sensor.data_type]
+        if 'childs'in cdata_type and len(cdata_type['childs']) > 0:
             allow_data_type = True
+            lst = cdata_type['childs']
+            lst.append(sensor.data_type)
+            tmp = dict(zip(lst, lst))
+            tmps = sorted(tmp.items(), key=operator.itemgetter(1))
+            field_args = field_args={ 'data_type': { 'widget': ChoicesSelect(choices=tmps) } }
         else:
             exclude.append('data_type')
             allow_data_type = False
+            field_args = {}
         MyForm = model_form(Sensor, \
                         base_class=Form, \
                         db_session=app.db.get_session(),
-                        exclude=exclude)
+                        exclude=exclude, field_args=field_args)
         #MyForm.history_duplicate.kwargs['validators'] = []
         MyForm.history_store.kwargs['validators'] = []
         form = MyForm(request.form, sensor)
