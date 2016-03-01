@@ -396,7 +396,7 @@ class PackageInstaller():
                                     #progress = int(50 * dl / total_length)
                                     #if progress - old_progress > 5 or progress >= 49:
                                     #    old_progress = progress 
-                                    #    sys.stdout.write("\r[%s%s]" % ('=' * progress, ' ' * (50-progress)) )    
+                                    #    sys.stdout.write("\r[{0}{1}]".format('=' * progress, ' ' * (50-progress)) )    
                                     #    sys.stdout.flush()
                             #sys.stdout.write("\n")
                             os.fsync(f)
