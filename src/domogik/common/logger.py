@@ -89,7 +89,7 @@ class Logger():
                         "'error','critical'. Check your config.")
 
             if domogik_prefix:
-                my_logger = logging.getLogger('domogik-%s' % component_name)
+                my_logger = logging.getLogger('domogik-{0}'.format(component_name))
             else:
                 my_logger = logging.getLogger(component_name)
             # log to file

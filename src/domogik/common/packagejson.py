@@ -93,7 +93,7 @@ class PackageJson():
                     icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
                 else:
                     raise PackageException("Type '{0}' doesn't exists".format(pkg_type))
-                #json_file = "%s/%s.json" % (json_directory, name)
+                #json_file = "{0}/{1}.json".format(json_directory, name)
 
                 self.json = json.load(open(json_file))
 
@@ -167,7 +167,7 @@ class PackageJson():
     #    new_elt.setAttribute("priority", priority)
     #    new_elt.setAttribute("source", repo_url)
     #    top_elt.appendChild(new_elt)
-    #    cache_file = open("%s/%s" % (cache_folder, self.json_filename), "w") 
+    #    cache_file = open("{0}/{1}".format(cache_folder, self.json_filename), "w") 
     #    cache_file.write(self.xml_content.toxml().encode("utf-8"))
     #    cache_file.close()
 
@@ -180,7 +180,7 @@ class PackageJson():
     #    new_elt = self.xml_content.createElementNS(None, 'repository')
     #    new_elt.setAttribute("source", source)
     #    top_elt.appendChild(new_elt)
-    #    my_file = open("%s" % (self.info_file), "w") 
+    #    my_file = open("{0}".format(self.info_file), "w") 
     #    my_file.write(self.xml_content.toxml().encode("utf-8"))
     #    my_file.close()
 

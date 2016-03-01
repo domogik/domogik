@@ -224,10 +224,10 @@ class DbHelper():
         else:
             url = "{0}://".format(self.__db_config['type'])
         if self.__db_config['port'] != '':
-            url = "%s%s:%s@%s:%s/%s?charset=utf8" % (url, self.__db_config['user'], self.__db_config['password'],
+            url = "{0}{1}:{2}@{3}:{4}/{5}?charset=utf8".format(url, self.__db_config['user'], self.__db_config['password'],
                                         self.__db_config['host'], self.__db_config['port'], self.__db_config['name'])
         else:
-            url = "%s%s:%s@%s/%s?charset=utf8" % (url, self.__db_config['user'], self.__db_config['password'],
+            url = "{0}{1}:{2}@{3}/{4}?charset=utf8".format(url, self.__db_config['user'], self.__db_config['password'],
                                      self.__db_config['host'], self.__db_config['name'])
         return url
     
@@ -1358,10 +1358,6 @@ class DbHelper():
                                  p_birthdate=datetime.date(1900, 1, 1))
         user_account = self.add_user_account(a_login='Anonymous', a_password='Anonymous', a_person_id=person.id, 
                                      a_is_admin=False)
-        #try:
-        #    self.__session.commit()
-        #except Exception as sql_exception:
-        #    self.__raise_dbhelper_exception("SQL exception (commit) : %s" % sql_exception, True)
         return user_account
 
     def del_user_account(self, a_id):

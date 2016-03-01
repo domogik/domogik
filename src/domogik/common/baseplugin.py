@@ -143,7 +143,7 @@ class BasePlugin():
             ctx = DaemonContext()
             ctx.files_preserve = l.get_fds([name])
             ctx.open()
-            self.log.info(u"Daemonize plugin %s" % name)
+            self.log.info(u"Daemonize plugin {0}".format(name))
             self.is_daemon = True
         else:
             #l = logger.Logger(name)
@@ -175,7 +175,7 @@ class BasePlugin():
         Should be called by each thread at start
         @param thread : the thread to add
         '''
-        # self.log.debug('New thread registered : %s' % thread)
+        # self.log.debug('New thread registered : {0}'.format(thread))
         #Remove all stopped thread from the list
         for t in self._threads:
             if not  t.isAlive():
