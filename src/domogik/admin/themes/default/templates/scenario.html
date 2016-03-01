@@ -14,15 +14,20 @@
               {{ data.name }}
             </a>
             <span class="pull-right">
-                <button type="button" class="btn btn-info btn-xs dropdown-toggle status-label" data-toggle="dropdown" aria-expanded="false">
-                    <i class='fa'></i>
-                    <span class="status">{{ data.endis }}</span> <span class="caret"></span>
-                </button>
+                {% if data.disabled %}
+                    <button type="button" class="btn btn-warning btn-xs dropdown-toggle status-label" data-toggle="dropdown" aria-expanded="false">
+                        <span class="status">{{ data.endis }}</span> <span class="caret"></span>
+                    </button>
+                {% else %}
+                    <button type="button" class="btn btn-info btn-xs dropdown-toggle status-label" data-toggle="dropdown" aria-expanded="false">
+                        <span class="status">{{ data.endis }}</span> <span class="caret"></span>
+                    </button>
+                {% endif %}
                 <ul class="dropdown-menu" role="menu">
                     {% if data.disabled %}
-                    <li><a href="/scenario/enable/{{ data.cid }}">Enable</a></li>
+                        <li><a href="/scenario/enable/{{ data.cid }}">Enable</a></li>
                     {% else %}
-                    <li><a href="/scenario/disable/{{ data.cid }}">Disable</a></li>
+                        <li><a href="/scenario/disable/{{ data.cid }}">Disable</a></li>
                     {% endif %}
                 </ul>                                                                                                           
                 <a class="btn btn-default btn-xs testactions" data-cid="{{ data.cid }}">

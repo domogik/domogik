@@ -30,6 +30,7 @@ from exceptions import ValueError
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from domogik.common.logger import Logger
+from domogik.common.utils import remove_accents
 import zmq
 import traceback
 import logging
@@ -76,7 +77,7 @@ class ScenarioInstance:
         @param json : The json describing the scenario
         """
         self._name = name
-        self._log = log.getChild(u"{0}".format(name))
+        self._log = log.getChild(remove_accents(name))
         self._json = json
         self._disabled = disabled
         self._state = state
@@ -322,7 +323,8 @@ class ScenarioInstance:
                     else:
                         self._log.debug(u"State is the same as before, so skipping actions")
                 # Trigger the actions
-                if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
+                #if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
+                if st and (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st):
                     self._log.info(u"======== Scenario triggered! ========")
                     self._log.info(u"Scenario triggered : {0}".format(self._name))
                     self._call_actions()
