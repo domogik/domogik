@@ -321,11 +321,16 @@ class ScenarioInstance:
                         self._log.debug(u"Updating state")
                         with self._db.session_scope():
                             self._db.update_scenario(self._dbid, state=st)
+                        self._log.info(u"======== Scenario triggered! ========")
+                        self._log.info(u"Scenario triggered : {0}".format(self._name))
+                        self._call_actions()
+                        self._log.info(u"=====================================")
                     else:
                         self._log.debug(u"State is the same as before, so skipping actions")
                 # Trigger the actions
                 #if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
-                if st and (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st):
+                #if st and (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st):
+                if st and (self._trigger == 'Always'):
                     self._log.info(u"======== Scenario triggered! ========")
                     self._log.info(u"Scenario triggered : {0}".format(self._name))
                     self._call_actions()
