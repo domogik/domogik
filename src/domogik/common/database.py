@@ -1474,7 +1474,8 @@ class DbHelper():
 
     def update_sensor(self, sid, history_round=None, \
             history_store=None, history_max=None, \
-            history_expire=None, timeout=None, formula=None):
+            history_expire=None, timeout=None, \
+            formula=None, data_type=None):
         sensor = self.__session.query(Sensor).filter_by(id=sid).first()
         if sensor is None:
             self.__raise_dbhelper_exception("Sensor with id {0} couldn't be found".format(sid))
@@ -1490,6 +1491,8 @@ class DbHelper():
             sensor.timeout = timeout
         if formula is not None:
             sensor.formula = formula
+        if data_type is not None:
+            sensor.data_type = data_type
         self.__session.add(sensor)
         self._do_commit()
         return sensor

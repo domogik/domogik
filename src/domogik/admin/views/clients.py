@@ -23,7 +23,7 @@ except ImportError:
 from domogik.common.sql_schema import Device, DeviceParam, Sensor
 from domogik.common.plugin import STATUS_DEAD
 from wtforms.ext.sqlalchemy.orm import model_form
-from wtforms.widgets import Select
+from wtforms.widgets import TextArea
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
@@ -48,16 +48,6 @@ html_escape_table = {
     ">": "&gt;",
     "<": "&lt;",
     }
-
-class ChoicesSelect(Select):
-    def __init__(self, multiple=False, choices=()):
-        self.choices = choices
-        super(ChoicesSelect, self).__init__(multiple)
-
-    def __call__(self, field, **kwargs):
-        field.iter_choices = lambda: ((val, label, val == field.default) 
-                                      for val, label in self.choices)
-        return super(ChoicesSelect, self).__call__(field, **kwargs)
 
 def html_escape(text):
     """Produce entities within text."""
@@ -238,10 +228,6 @@ def client_sensor_edit(client_id, sensor_id):
 
     with app.db.session_scope():
         sensor = app.db.get_sensor(sensor_id)
-        exclude=['core_device', 'name', 'reference', \
-                'incremental', 'conversion', \
-                'last_value', 'last_received', 'history_duplicate', \
-                'value_min', 'value_max']
         cdata_type = app.datatypes[sensor.data_type]
         if 'childs'in cdata_type and len(cdata_type['childs']) > 0:
             allow_data_type = True
@@ -249,18 +235,22 @@ def client_sensor_edit(client_id, sensor_id):
             lst.append(sensor.data_type)
             tmp = dict(zip(lst, lst))
             tmps = sorted(tmp.items(), key=operator.itemgetter(1))
-            field_args = field_args={ 'data_type': { 'widget': ChoicesSelect(choices=tmps) } }
         else:
-            exclude.append('data_type')
             allow_data_type = False
-            field_args = {}
-        MyForm = model_form(Sensor, \
-                        base_class=Form, \
-                        db_session=app.db.get_session(),
-                        exclude=exclude, field_args=field_args)
-        #MyForm.history_duplicate.kwargs['validators'] = []
-        MyForm.history_store.kwargs['validators'] = []
-        form = MyForm(request.form, sensor)
+        class F(Form):
+            timeout = TextField("Timeout", default=sensor.timeout)
+            formula = TextField("Formula", default=sensor.formula, widget=TextArea())
+            history_store = BooleanField("History Store", default=sensor.history_store)
+            history_expire = TextField("History Expire", default=sensor.history_expire)
+            history_round = TextField("History_round", default=sensor.history_round)
+            history_max = TextField("History_max", default=sensor.history_max)
+            pass
+        # TODO add fiel
+        if allow_data_type:
+            field = SelectField("Data_type", default=sensor.data_type, choices=tmps)
+            setattr(F, 'data_type', field)
+
+        form = F()
 
         if request.method == 'POST' and form.validate():
             if request.form['history_store'] == 'y':
@@ -277,6 +267,8 @@ def client_sensor_edit(client_id, sensor_id):
             msg.add_data('history_expire', request.form['history_expire'])
             msg.add_data('timeout', request.form['timeout'])
             msg.add_data('formula', request.form['formula'])
+            if allow_data_type:
+                msg.add_data('data_type', request.form['data_type'])
             res = cli.request('dbmgr', msg.get(), timeout=10)
             if res is not None:
                 data = res.get_data()
