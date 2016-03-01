@@ -18,7 +18,7 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from domogik.common import sql_schema
-target_metadata = sql_schema.Base.metadata
+target_metadata = sql_schema.DomogikBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
