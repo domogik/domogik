@@ -294,7 +294,7 @@ class PackageInstaller():
             self.log.info("Extract the zip file {0} as {1}".format(path, pkg_folder))
             try:
                 os.mkdir(pkg_folder)
-            except OSError, e:
+            except OSError as e:
                 if e.errno != 17:
                     raise
             except:
@@ -315,7 +315,7 @@ class PackageInstaller():
                         try:
                             new_folder = os.path.join(pkg_folder, dirname)
                             os.mkdir(new_folder)
-                        except OSError, e:
+                        except OSError as e:
                             if e.errno != 17:
                                 raise
                         except:
