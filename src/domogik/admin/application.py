@@ -116,8 +116,6 @@ def json_response(action_func):
     @wraps(action_func)
     def create_json_response(*args, **kwargs):
         ret = action_func(*args, **kwargs)
-        print args
-        print kwargs
         # if list is 2 entries long
         if (type(ret) is list or type(ret) is tuple):
             if len(ret) == 2:

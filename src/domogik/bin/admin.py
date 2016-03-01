@@ -199,14 +199,14 @@ class Admin(Plugin):
                 # default parameters
                 self.interfaces = server_interfaces
                 self.port = server_port
-		self.use_ssl = False
-		self.key_file = ""
-		self.cert_file = ""
+                self.use_ssl = False
+                self.key_file = ""
+                self.cert_file = ""
                 self.clean_json = False
                 self.log.error("Error while reading configuration for section [admin] : using default values instead")
             self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
-	    
-	    # get all datatypes
+            
+            # get all datatypes
             cli = MQSyncReq(self.zmq)
             msg = MQMessage()
             msg.set_action('datatype.get')
@@ -245,10 +245,10 @@ class Admin(Plugin):
         admin_app.hostname = self.get_sanitized_hostname()
         admin_app.resources_directory = self.get_resources_directory()
         
-	tapp = Application([
-	    (r"/ws", AdminWebSocket),
+        tapp = Application([
+            (r"/ws", AdminWebSocket),
             (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
-	])
+            ])
 
         # create the server
         # for ssl, extra parameter to HTTPServier init
@@ -260,16 +260,16 @@ class Admin(Plugin):
             self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
             self.http_server = HTTPServer(tapp)
-	# listen on the interfaces
-	if self.interfaces != "":
+        # listen on the interfaces
+        if self.interfaces != "":
             # value can be : lo, eth0, ...
             # or also : '*' to catch all interfaces, whatever they are
-	    intf = self.interfaces.split(',')
+            intf = self.interfaces.split(',')
             self.log.info("The admin will be available on the below addresses : ")
             num_int = 0
-	    for ip in get_ip_for_interfaces(intf, log = self.log):
+            for ip in get_ip_for_interfaces(intf, log = self.log):
                 self.log.info(" - {0}:{1} [BIND]".format(ip, self.port))
-	        self.http_server.listen(int(self.port), address=ip)
+                self.http_server.listen(int(self.port), address=ip)
                 num_int += 1
             if num_int == 0:
                 self.log.error("The admin is not configured to use any working network interface! Please check configuration!!!!!!")
