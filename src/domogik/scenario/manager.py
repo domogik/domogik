@@ -43,7 +43,10 @@ import domogik.scenario.parameters as s_p
 import domogik.scenario.actions as s_a
 from domogik.common.database import DbHelper
 from domogik.scenario.scenario import ScenarioInstance
-from exceptions import KeyError
+try:
+    from exceptions import KeyError
+except:
+    pass
 import traceback
 
 
@@ -133,7 +136,7 @@ class ScenarioManager:
         @return {'name':name, 'data': parsed_condition} or raise Exception
         """
         if name not in self._conditions:
-            raise KeyError('no key %s in conditions table' % name)
+            raise KeyError('no key {0} in conditions table'.format(name))
         else:
             parsed = self._conditions[name].get_parsed_condition()
             return {'name': name, 'data': parsed}
@@ -218,7 +221,7 @@ class ScenarioManager:
         @return {'name':name, 'result': evaluation result} or raise Exception
         """
         if name not in self._conditions:
-            raise KeyError('no key %s in conditions table' % name)
+            raise KeyError('no key {0} in conditions table'.format(name))
         else:
             res = self._conditions[name].eval_condition()
             return {'name': name, 'result': res}
@@ -370,5 +373,5 @@ if __name__ == "__main__":
             {"type":"dom_condition","id":"1","IF":{"type":"textinpage.TextInPageTest","id":"5","url.urlpath":"http://cereal.sinners.be/test","url.interval":"10","text.text":"foo"},"deletable":false, "DO":{} }
                     """
     c = s.create_scenario("name", jsons)
-    print "    - condition created : %s" % c
-    print "    - list of instances : %s" % s.list_conditions()
+    print("    - condition created : {0}".format(c))
+    print("    - list of instances : {0}".format(s.list_conditions()))

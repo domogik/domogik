@@ -26,7 +26,10 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 import uuid
-from exceptions import ValueError
+try:
+    from exceptions import ValueError
+except:
+    pass
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from domogik.common.logger import Logger

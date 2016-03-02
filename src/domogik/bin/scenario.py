@@ -56,7 +56,7 @@ class ScenarioFrontend(Plugin):
         while mq_services == None or 'xplgw' not in mq_services:
             mq_services_raw = cli.rawrequest('mmi.services', '', timeout=10)
             if mq_services_raw != None: 
-                mq_services = mq_services_raw[0].replace(" ", "").split(",")
+                mq_services = str(mq_services_raw[0]).replace(" ", "").split(",")
             self.log.info("Checking for MQ services : {0}".format(mq_services))
             if mq_services == None or 'xplgw' not in mq_services:
                 self.log.debug("Needed MQ services not yet available : waiting")
@@ -107,7 +107,7 @@ class ScenarioFrontend(Plugin):
                     if msg.get_data() == {}:
                         payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()
                     else:
-                        print msg.get_data()
+                        print(msg.get_data())
                         payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
                     self._mdp_reply(msg.get_action(), payload)
         except:

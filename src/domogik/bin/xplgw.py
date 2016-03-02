@@ -44,7 +44,10 @@ import traceback
 import calendar
 import zmq
 import json
-import Queue
+try:
+    import Queue as queue
+except:
+    import queue
 import threading
 from uuid import uuid4
 
@@ -73,9 +76,9 @@ class XplManager(XplPlugin):
         self._db_sensors = {}
         self._db_xplstats = {}
         # queue to store the message that needs to be ahndled for sensor checking
-        self._sensor_queue = Queue.Queue()
+        self._sensor_queue = queue.Queue()
         # queue to handle the sensor storage
-        self._sensor_store_queue = Queue.Queue()
+        self._sensor_store_queue = queue.Queue()
         # all command handling params
         # _lock => to be sure to be thread safe
         # _dict => uuid to xplstat translationg
