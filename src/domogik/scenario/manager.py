@@ -267,8 +267,8 @@ class ScenarioManager:
             inst = cls(log = self.log)
 
             params = []
-            for p, i in inst.get_parameters().iteritems():
-                for param, info in i['expected'].iteritems():
+            for p, i in inst.get_parameters().items():
+                for param, info in i['expected'].items():
                     params.append({
                             "name": "{0}.{1}".format(p, param),
                             "description": info['description'],
@@ -285,7 +285,7 @@ class ScenarioManager:
         """ Return the list of conditions as JSON
         """
         ret = []
-        for cid, inst in self._instances.iteritems():
+        for cid, inst in self._instances.items():
             ret.append({'cid': cid, 'name': inst['name'], 'json': inst['json'], 'disabled': inst['disabled']})
         return ret
 
@@ -297,7 +297,8 @@ class ScenarioManager:
             else:
                 if self._instances[int(cid)]['instance'].enable():
                     self._instances[int(cid)]['disabled'] = False
-                    # TODO persistent?
+                    with self._db.session_scope():
+                        self._db.update_scenario(cid, disabled=False)
                     self.log.info(u"Scenario {0} enabled".format(cid))
                     return {'status': 'OK', 'msg': u"Scenario {0} enabled".format(cid)}
                 else:
@@ -316,7 +317,8 @@ class ScenarioManager:
             else:
                 if self._instances[int(cid)]['instance'].disable():
                     self._instances[int(cid)]['disabled'] = True
-                    # TODO persistent?
+                    with self._db.session_scope():
+                        self._db.update_scenario(cid, disabled=True)
                     self.log.info(u"Scenario {0} disabled".format(cid))
                     return {'status': 'OK', 'msg': u"Scenario {0} disabled".format(cid)}
                 else:
