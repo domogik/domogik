@@ -444,7 +444,7 @@ def find_checks(argument_name):
     """
     checks = []
     function_type = type(find_checks)
-    for name, function in globals().iteritems():
+    for name, function in globals().items():
         if type(function) is function_type:
             args = inspect.getargspec(function)[0]
             if len(args) >= 1 and args[0].startswith(argument_name):

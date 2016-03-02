@@ -322,7 +322,7 @@ def client_global_edit(client_id, dev_id):
             setattr(F, "{0}-{1}".format(item["id"], item["key"]), field)
         form = F()
         if request.method == 'POST' and form.validate():
-            for key, item in known_items.iteritems():
+            for key, item in known_items.items():
                 val = getattr(form, "{0}-{1}".format(item["id"], key)).data
                 if item["type"] == "boolean":
                     if val == False:
@@ -506,7 +506,7 @@ def client_config(client_id):
     if request.method == 'POST' and form.validate():
         # build the requested config set
         data = {}
-        for key, typ in known_items.iteritems():
+        for key, typ in known_items.items():
             val = getattr(form, key).data
             if typ == "boolean":
                 if val == False:

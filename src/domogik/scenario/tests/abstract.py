@@ -135,7 +135,7 @@ class AbstractTest:
         Note that this exception has to be raised by the Parameter
         """
         params = {}
-        for name, val in data.iteritems():
+        for name, val in data.items():
             param = name.split('.')
             if len(param) == 2:
                 paramn = param[0]
@@ -144,7 +144,7 @@ class AbstractTest:
                     if paramn not in params:
                         params[paramn] = []
                     params[paramn].append({param: val})
-        for test, param in params.iteritems():
+        for test, param in params.items():
             self._parameters[test].fill(param)            
 
     def add_parameter(self, name, classname):
