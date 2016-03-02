@@ -19,7 +19,7 @@ The following components will be installed :
 * a MySQL server with a fresh database (not persisted!)
 * Domogik-MQ 1.3
 * Domogik in the last release of the develop branch
-* Domogik in the last release of the develop branch
+* Domoweb in the last release of the develop branch
 * A few packages : plugin diskfree, plugin weather, brain base (for the butler), ... They are not configured!
 
 All will be started automatically and available on :
