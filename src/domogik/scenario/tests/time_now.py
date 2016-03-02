@@ -71,7 +71,7 @@ if __name__ == "__main__":
     def mytrigger(test):
         print("Trigger called by test {0}, refreshing state".format(test))
         st = TEST.evaluate()
-        print "state is %s" % st
+        print("state is {0}".format(st))
 
     FORMAT = "%(asctime)-15s %(message)s"
     logging.basicConfig(format=FORMAT)
