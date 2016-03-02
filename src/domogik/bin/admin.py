@@ -124,7 +124,7 @@ class Publisher(MQAsyncSub):
                     dst = 'manager'
                 res = cli.request(dst, msg.get(), timeout=10)
                 if res:
-                    print res.get()
+                    print(res.get())
                 cli.shutdown()
                 del cli
             # pub
@@ -196,8 +196,7 @@ class Admin(Plugin):
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : {0}".format(locale.getdefaultlocale()))
-
-	try:
+        try:
             try:
                 # admin config
                 cfg_admin = Loader('admin')
@@ -221,9 +220,9 @@ class Admin(Plugin):
                 # default parameters
                 self.interfaces = server_interfaces
                 self.port = server_port
-		self.use_ssl = False
-		self.key_file = ""
-		self.cert_file = ""
+                self.use_ssl = False
+                self.key_file = ""
+                self.cert_file = ""
                 self.clean_json = False
                 self.log.error("Error while reading configuration for section [admin] : using default values instead")
             self.log.info(u"Configuration : interfaces:port = {0}:{1}".format(self.interfaces, self.port))
@@ -242,7 +241,7 @@ class Admin(Plugin):
             self.log.info(u"Admin Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
-	    self.start_http()
+            self.start_http()
             # calls the tornado.ioloop.instance().start()
             
             ### Component is ready
@@ -270,11 +269,10 @@ class Admin(Plugin):
         admin_app.resources_directory = self.get_resources_directory()
         
         publisher = Publisher()
-        #fromws = Fws()
-	tapp = Application([
-	    (r"/ws", Subscription, dict(publisher=publisher)),
+        tapp = Application([
+            (r"/ws", Subscription, dict(publisher=publisher)),
             (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
-	])
+            ])
 
 	# create the server
         # for ssl, extra parameter to HTTPServier init
@@ -283,19 +281,19 @@ class Admin(Plugin):
                  "certfile": self.cert_file,
                  "keyfile": self.key_file,
             }
-	    self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
+            self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
             self.http_server = HTTPServer(tapp)
 	# listen on the interfaces
-	if self.interfaces != "":
+        if self.interfaces != "":
             # value can be : lo, eth0, ...
             # or also : '*' to catch all interfaces, whatever they are
-	    intf = self.interfaces.split(',')
+            intf = self.interfaces.split(',')
             self.log.info("The admin will be available on the below addresses : ")
             num_int = 0
-	    for ip in get_ip_for_interfaces(intf, log = self.log):
+            for ip in get_ip_for_interfaces(intf, log = self.log):
                 self.log.info(" - {0}:{1} [BIND]".format(ip, self.port))
-	        self.http_server.listen(int(self.port), address=ip)
+                self.http_server.listen(int(self.port), address=ip)
                 num_int += 1
             if num_int == 0:
                 self.log.error("The admin is not configured to use any working network interface! Please check configuration!!!!!!")
