@@ -28,6 +28,9 @@ All will be started automatically and available on :
 
 The ip should be your docker host ip (on most configurations).
 
+The **password** for the users **root** and ** domogik** is : **domopass**
+
+
 Enjoy ;)
 
 When is the container updated ?
