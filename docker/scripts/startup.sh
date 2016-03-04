@@ -36,15 +36,15 @@ echo ""
 # display BIND informations
 #grep BIND /var/log/domogik/*
 
-# configure some packages and create some devices if the related file exists
-su - domogik -c "[ -f /opt/dmg/post_install.py ] && /opt/dmg/post_install.py
+# configure some packages and create some devices if the related script exists
+su - domogik -c "[ -f /opt/dmg/post_install.py ] && /opt/dmg/post_install.py"
 
 # display ready to use message
 echo "  *****************"
 echo "  * Domogik is up *"
 echo "  *****************"
 
-# run a bash to allow working in the container
+# run a bash
 /bin/bash
 
 # run an eternal loop

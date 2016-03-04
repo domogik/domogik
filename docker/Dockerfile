@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:jessie
 MAINTAINER Fritz SMH <fritz.smh@gmail.com>
 
 ### Configuration #################################
@@ -40,7 +40,8 @@ RUN apt-get install -y \
     telnet \
     wget \
     openssh-server \
-    screen    
+    screen \
+    dos2unix    
 
 ### Minimum requirements
 RUN apt-get install -y \
@@ -143,7 +144,7 @@ RUN pip install npyscreen \
 
 
 ### Expose ports
-EXPOSE 40406 40404 
+EXPOSE 40406 40404 22
 
 
 ### Volumes
@@ -159,4 +160,5 @@ VOLUME /var/lib/domogik/
 COPY scripts/startup.sh /opt/startup.sh
 RUN chmod a+x /opt/startup.sh
 CMD ["/bin/bash", "/opt/startup.sh"]
+
 
