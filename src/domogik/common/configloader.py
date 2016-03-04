@@ -49,6 +49,8 @@ except ImportError:
 import threading
 import time
 import fcntl
+import codecs
+import chardet
 
 
 CONFIG_FILE = "/etc/domogik/domogik.cfg"
@@ -97,9 +99,25 @@ class Loader():
 
         # read config file
         self.config = configparser.ConfigParser()
-        cfg_file = open(self.cfile)
-        self.config.readfp(cfg_file)
-        cfg_file.close()
+
+        # find the configuration file encoding (default will be ascii, but depending on characters in the butler name it could be different!)
+        tmp = open(self.cfile).read()
+        encoding = chardet.detect(tmp)['encoding']
+        # sample result of detect() :
+        #{'confidence': 0.9275988341086866, 'encoding': 'ISO-8859-2'}
+
+        #cfg_file = codecs.open(self.cfile, "r", encoding)
+        #self.config.readfp(cfg_file)
+        #cfg_file.close()
+
+        # python 3.2+
+        try:
+            self.config.read(self.cfile, encoding = encoding)
+        # python < 3.2
+        except TypeError:
+            cfg_file = codecs.open(self.cfile, "r", encoding)
+            self.config.readfp(cfg_file)
+            cfg_file.close()
 
         # release the file lock
         fcntl.lockf(file, fcntl.LOCK_UN)
