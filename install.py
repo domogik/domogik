@@ -517,9 +517,9 @@ def install():
                 dbi.create_db()
             dbi.install_or_upgrade_db(args.skip_database_backup)
 
-        # change permissions to some files created as root during the installation to the domogik user
-        os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
-        os.chown("/var/lock/domogik/config.lock", user_entry.pw_uid, -1)
+            # change permissions to some files created as root during the installation to the domogik user
+            os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
+            os.chown("/var/lock/domogik/config.lock", user_entry.pw_uid, -1)
 
 
         if not args.test:
