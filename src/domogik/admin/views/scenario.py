@@ -103,7 +103,7 @@ def scenario_edit(id):
         jso = default_json
         dis = 0
         desc = None
-        trigger = u"Always"
+        trigger = u"Hysteresis"
     else:
         with app.db.session_scope():
             scen = app.db.get_scenario(id)
