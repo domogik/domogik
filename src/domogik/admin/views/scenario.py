@@ -221,6 +221,7 @@ def scenario_blocks_js():
     tests = scenario_tests.keys()
     try:
         tests.remove(u'sensor.SensorTest')
+        tests.remove(u'sensor.SensorChangedTest')
     except ValueError:
         pass
 
@@ -283,11 +284,21 @@ def scenario_blocks_js():
     js = ""
 
     ### tests
+    print(u"ITEMS={0}".format(scenario_tests.items()))
+
+    # Check if there are some errors in the python tests files
+    # TODO : Improve error handling
+    for key, value in scenario_tests.items():
+        if key == "status":
+            print(u"Error : {0}".format(scenario_tests.items()))
+
     for test, params in scenario_tests.items():
         if test == "sensor.SensorTest": continue
+        if test == "sensor.SensorChangedTest": continue
         p = []
         jso = u""
         #for parv in params:
+        print(u"TEST={0}".format(test))
         for parv in params['parameters']:
             par = parv['name']
             papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
@@ -368,9 +379,10 @@ def scenario_blocks_js():
                 devices_per_clients[client] = {}
             devices_per_clients[client][name] = {}
             devices_per_clients[client][name]['sensors'] = {}
+            devices_per_clients[client][name]['sensors_changed'] = {}
             devices_per_clients[client][name]['commands'] = {}
     
-            ### sensors blocks
+            ### sensors values blocks
             for sen in dev['sensors']:
                 p = u""
                 jso = u""
@@ -404,6 +416,34 @@ def scenario_blocks_js():
                                 this.setColour({5});
                                 this.appendDummyInput().appendField("{2}");
                                 this.appendDummyInput().appendField("Sensor : {1} ({6})");
+                                this.appendDummyInput().appendField("Value.");
+                                this.setOutput(true, {4});
+                                this.setInputsInline(false);
+                                this.setTooltip("{2}"); 
+                            }}
+                        }};
+                        """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
+                js = u'{0}\n\r{1}'.format(js, add)
+    
+            ### sensors changes blocks
+            for sen in dev['sensors']:
+                p = u""
+                jso = u""
+                sen_id = dev['sensors'][sen]['id']
+                sen_name = dev['sensors'][sen]['name']
+                devices_per_clients[client][name]['sensors_changed'][sen_name] = sen_id
+                # determ the output type
+                color = 20
+                output = "\"Boolean\""
+
+                block_id = u"sensor.SensorChangedTest.{0}".format(sen_id)
+                block_description = u"{0}@{1}".format(name, client)
+                add = u"""Blockly.Blocks['{0}'] = {{
+                            init: function() {{
+                                this.setColour({5});
+                                this.appendDummyInput().appendField("{2}");
+                                this.appendDummyInput().appendField("Sensor : {1}");
+                                this.appendDummyInput().appendField("Value changes.");
                                 this.setOutput(true, {4});
                                 this.setInputsInline(false);
                                 this.setTooltip("{2}"); 

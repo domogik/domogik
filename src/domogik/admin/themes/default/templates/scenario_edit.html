@@ -71,9 +71,14 @@
             {% for dev in devices_per_clients[dev_client] %}
                 <category name="{{ dev }}">
                     {% if devices_per_clients[dev_client][dev]['sensors']|length > 0 %}
-                    <category name="Sensors">
+                    <category name="Sensors values">
                     {% for sen_name in devices_per_clients[dev_client][dev]['sensors'] %}
                         <block type="sensor.SensorTest.{{ devices_per_clients[dev_client][dev]['sensors'][sen_name] }}"></block>
+                    {% endfor %}
+                    </category>
+                    <category name="Raise if sensors change">
+                    {% for sen_name in devices_per_clients[dev_client][dev]['sensors_changed'] %}
+                        <block type="sensor.SensorChangedTest.{{ devices_per_clients[dev_client][dev]['sensors_changed'][sen_name] }}"></block>
                     {% endfor %}
                     </category>
                     {% endif %}
