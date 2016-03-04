@@ -13,4 +13,4 @@ pip install docutils
 #pip install python-daemon==2.0.2
 #pip install netifaces
 sudo apt-get install python-netifaces
-sudo pip install chardet
+pip install chardet
