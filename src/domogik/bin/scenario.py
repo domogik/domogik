@@ -98,7 +98,6 @@ class ScenarioFrontend(Plugin):
                     }
                 }
         try:
-	    print(type(msg.get_action()))
             if msg.get_action().split('.')[0] not in mapping.keys():
                 self._mdp_reply(msg.get_action(), {"status" : "error", "details": "{0} not in {1}".format(msg.get_action().split('.')[0], mapping.keys())})
             else:
