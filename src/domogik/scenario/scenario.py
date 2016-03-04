@@ -248,7 +248,7 @@ class ScenarioInstance:
         except:
             return None
             pass
-        self._log.debug(u"_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, res))
+        #self._log.debug(u"_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, res))
         if res:
             return True
         else:
