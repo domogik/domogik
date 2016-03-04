@@ -242,10 +242,12 @@ def scenario_blocks_js():
     actions = scenario_actions.keys()
     try:
         actions.remove(u'scenario.endis')
+    except ValueError:
+        pass
+    try:
         actions.remove(u'command.CommandAction')
     except ValueError:
         pass
-
     # datatypes
     datatypes = {}
     used_datatypes = []
