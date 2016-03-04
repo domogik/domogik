@@ -33,12 +33,14 @@ ENV domoweb_release=develop
 RUN apt-get update 
 
 
-### Tools not mandatory for Domogik but usefull for tests/debug
+### Tools not mandatory for Domogik but usefull for tests/debug/development
 
 RUN apt-get install -y \
     vim  \
     telnet \
-    wget    
+    wget \
+    openssh-server \
+    screen    
 
 ### Minimum requirements
 RUN apt-get install -y \
@@ -157,5 +159,4 @@ VOLUME /var/lib/domogik/
 COPY scripts/startup.sh /opt/startup.sh
 RUN chmod a+x /opt/startup.sh
 CMD ["/bin/bash", "/opt/startup.sh"]
-
 
