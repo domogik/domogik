@@ -1,7 +1,9 @@
-# first, start mysql
+# start ssh server (dev purpose) if installed
+[ -f /etc/init.d/ssh ] && /etc/init.d/ssh start
+
+# start mysql
 /usr/bin/mysqld_safe > /dev/null 2>&1 &
 
-# wait a bit to be sure all is up. TODO : make a loop to check ports are open to be sure
 echo "Wait for mysql to be up"
 ready=no
 while [ $ready == "no" ] ; do
@@ -17,7 +19,6 @@ echo ""
 # start Domogik 
 /etc/init.d/domogik start
 
-# wait a bit to be sure all is up. TODO : make a loop to check ports are open to be sure
 echo "Wait for Domogik to be up"
 ready=no
 while [ $ready == "no" ] ; do

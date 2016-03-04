@@ -7,6 +7,9 @@ ENV domogik_release=develop
 ENV domogikmq_release=1.3
 ENV domoweb_release=develop
 
+ENV ROOT_PASSWORD=domopass
+ENV DOMOGIK_PASSWORD=domopass
+
 ###################################################
 #
 ### How to...
@@ -71,6 +74,9 @@ RUN useradd -M domogik \
  && mkdir -p /opt/dmg \
  && chown domogik:domogik /opt/dmg
  
+### Change passwords
+echo "root:$ROOT_PASSWORD" | chpasswd
+echo "domogik:$DOMOGIK_PASSWORD" | chpasswd
  
 ### Deploy the sources
 
