@@ -19,8 +19,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-@author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2009 Domogik project
+@author: Cereal
+@copyright: (C) 2007-2016 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -58,7 +58,7 @@ class SensorTest(AbstractTest, MQAsyncSub):
             while 'parent' in cond.datatypes[dt_parent] and cond.datatypes[dt_parent]['parent'] != None:
                 dt_parent = cond.datatypes[dt_parent]['parent']
             self._dt_parent = dt_parent
-        # set new val
+        # set the current (last) value
         self._res = self._convert(self._res)
 
     def on_message(self, did, msg):
@@ -94,7 +94,7 @@ class SensorTest(AbstractTest, MQAsyncSub):
             return val
 
     def evaluate(self):
-        """ Evaluate if the text appears in the content of the page referenced by url
+        """ Evaluate the sensor value
         """
         self.log.debug("Evalute SensorTest '{0}' to '{1}'. Type is '{2}'".format(self._sensorId, self._res, type(self._res))) 
         return self._res
