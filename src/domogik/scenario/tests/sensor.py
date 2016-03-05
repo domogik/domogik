@@ -117,7 +117,7 @@ class SensorChangedTest(AbstractSensorTest):
     """
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
-        AbstractTest.__init__(self, log, trigger, cond, params)
+        AbstractSensorTest.__init__(self, log, trigger, cond, params)
         self._old_res = self._res
 
     def handle_message(self, did, msg):

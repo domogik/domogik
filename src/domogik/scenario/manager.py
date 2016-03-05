@@ -241,10 +241,11 @@ class ScenarioManager:
         res = {}
         actions = self.__return_list_of_classes(s_a)
         for name, cls in actions:
-            self.log.debug("- {0}".format(name))
-            inst = cls()
-            res[name] = {"parameters": inst.get_expected_entries(),
-                         "description": inst.get_description()}
+            if 'abstract' not in name.lower():
+                self.log.debug("- {0}".format(name))
+                inst = cls()
+                res[name] = {"parameters": inst.get_expected_entries(),
+                             "description": inst.get_description()}
         return res
 
     def list_tests(self):
@@ -263,22 +264,23 @@ class ScenarioManager:
         tests = self.__return_list_of_classes(s_t)
 
         for name, cls in tests:
-            self.log.debug("- {0}".format(name))
-            inst = cls(log = self.log)
+            if 'abstract' not in name.lower():
+                self.log.debug("- {0}".format(name))
+                inst = cls(log = self.log)
 
-            params = []
-            for p, i in inst.get_parameters().items():
-                for param, info in i['expected'].items():
-                    params.append({
-                            "name": "{0}.{1}".format(p, param),
-                            "description": info['description'],
-                            "type": info['type'],
-                            "values": info['values'],
-                            "filters": info['filters'],
-                        })
+                params = []
+                for p, i in inst.get_parameters().items():
+                    for param, info in i['expected'].items():
+                        params.append({
+                                "name": "{0}.{1}".format(p, param),
+                                "description": info['description'],
+                                "type": info['type'],
+                                "values": info['values'],
+                                "filters": info['filters'],
+                            })
 
-            res[name] = {"parameters": params,
-                         "description": inst.get_description()}
+                res[name] = {"parameters": params,
+                             "description": inst.get_description()}
         return res
 
     def list_conditions(self):
