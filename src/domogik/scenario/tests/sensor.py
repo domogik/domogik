@@ -31,16 +31,12 @@ from domogikmq.pubsub.subscriber import MQAsyncSub
 from time import sleep
 import zmq
 
-class SensorTest(AbstractTest, MQAsyncSub):
-    """ Sensor test : evaluate a sensor value when it changes
-    # params == the sensorId to check the value for
-    """
-
+class AbstractSensorTest(AbstractTest, MQAsyncSub):
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
         self.sub = MQAsyncSub.__init__(self, zmq.Context(), 'scenario-sensor', ['device-stats'])
         self._sensorId = params
-        self.set_description("Check the value for a sensor with id {0}".format(self._sensorId))
+        self.set_description("Check if value/date changes for a sensor with id {0}".format(self._sensorId))
         self.log = log
         self._db = DbHelper()
         self._res = None
@@ -58,18 +54,32 @@ class SensorTest(AbstractTest, MQAsyncSub):
             while 'parent' in cond.datatypes[dt_parent] and cond.datatypes[dt_parent]['parent'] != None:
                 dt_parent = cond.datatypes[dt_parent]['parent']
             self._dt_parent = dt_parent
-        # set the current (last) value
-        self._res = self._convert(self._res)
 
-
+    def destroy(self):
+        """ Destroy fetch thread
+        """
+        AbstractTest.destroy(self)
 
     def on_message(self, did, msg):
         """Receive message from MQ sub"""
         if self._sensorId:
             if 'sensor_id' in msg:
                 if int(msg['sensor_id']) == int(self._sensorId):
-                    self._res = self._convert(msg['stored_value'])
-                    self._trigger(self)
+                    self.handle_message(did, msg)
+
+
+class SensorTest(AbstractSensorTest):
+    """ Sensor test : evaluate a sensor value when it changes
+    # params == the sensorId to check the value for
+    """
+
+    def __init__(self, log = None, trigger = None, cond = None, params = None):
+        AbstractSensorTest.__init__(self, log, trigger, cond, params)
+        self._res = self._convert(self._res)
+
+    def handle_message(self, did, msg):
+        self._res = self._convert(msg['stored_value'])
+        self._trigger(self)
 
     def _convert(self, val):
         if self._dt_parent == "DT_Number":
@@ -101,61 +111,27 @@ class SensorTest(AbstractTest, MQAsyncSub):
         self.log.debug("Evaluate SensorTest '{0}' to '{1}'. Type is '{2}'".format(self._sensorId, self._res, type(self._res))) 
         return self._res
 
-    def destroy(self):
-        """ Destroy fetch thread
-        """
-        AbstractTest.destroy(self)
-
-
-
-
-
-class SensorChangedTest(AbstractTest, MQAsyncSub):
+class SensorChangedTest(AbstractSensorTest):
     """ Sensor test : raise True when the value/date change
     # params == the sensorId to check the value for
     """
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
-        self.sub = MQAsyncSub.__init__(self, zmq.Context(), 'scenario-sensor', ['device-stats'])
-        self._sensorId = params
-        self.set_description("Check if value/date changes for a sensor with id {0}".format(self._sensorId))
-        self.log = log
-        self._db = DbHelper()
-        self._res = None
-        # get initital info from db
-        with self._db.session_scope():
-            sensor = self._db.get_sensor(self._sensorId)
-            if sensor is not None:
-                self._res = sensor.last_value
-                self._dataType = sensor.data_type
-
         self._old_res = self._res
 
-    def on_message(self, did, msg):
-        """Receive message from MQ sub"""
-        if self._sensorId:
-            if 'sensor_id' in msg:
-                if int(msg['sensor_id']) == int(self._sensorId):
-                    self._res = msg['stored_value']
-                    # Trigger only if the value changed
-                    if self._res != self._old_res:
-                        self._trigger(self)
-                    self._old_res = self._res
+    def handle_message(self, did, msg):
+        self._res = msg['stored_value']
+        # Trigger only if the value changed
+        if self._res != self._old_res:
+            self._trigger(self)
+        self._old_res = self._res
 
     def evaluate(self):
         """ Evaluate the sensor value
         """
         self.log.debug("Evaluate SensorChangedTest '{0}' : value changed. Return True.".format(self._sensorId, self._res)) 
         return True
-
-    def destroy(self):
-        """ Destroy fetch thread
-        """
-        AbstractTest.destroy(self)
-
-
-
 
 
 if __name__ == "__main__":
