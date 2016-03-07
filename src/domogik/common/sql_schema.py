@@ -296,7 +296,7 @@ class Sensor(DomogikBase):
     formula = Column(UnicodeText(), nullable=True) 
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
-    last_value = Column(Unicode(32), nullable=True)
+    last_value = Column(Unicode(255), nullable=True)
     last_received = Column(Integer, nullable=True)
     value_min = Column(Float(53), nullable=True)
     value_max = Column(Float(53), nullable=True)
@@ -335,7 +335,7 @@ class SensorHistory(DomogikBase):
     sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
     value_num = Column(Float(53), nullable=True)
-    value_str = Column(Unicode(32), nullable=False)
+    value_str = Column(Unicode(255), nullable=False)
     original_value_num = Column(Float(53), nullable=True)
 
     def __init__(self, sensor_id, date, value, orig_value):
