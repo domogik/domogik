@@ -183,7 +183,7 @@ class ScenarioInstance:
         # parse it
         if part['type'] == 'controls_if':
             # handle all Ifx and dox
-            for ipart, val in part.items():
+            for ipart, val in sorted(part.items()):
                 if ipart.startswith('IF'):
                     num = int(ipart.replace('IF', ''))
                     if num == 0:
@@ -197,9 +197,11 @@ class ScenarioInstance:
                     retlist.append("{0} {1}:\r\n{2} ".format(st, ifp, dop))
             # handle ELSE
             if 'ELSE' in part:
-                retlist.append(seld.__parse_part(part['ELSE'], (level+1)) )
+                retlist.append(self.__parse_part(part['ELSE'], (level+1)) )
         elif part['type'] == 'variables_set':
             retlist.append("{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level)))
+        elif part['type'] == 'variables_get':
+            retlist.append("{0}".format(part['VAR']))
         elif part['type'] == 'logic_boolean':
             if part['BOOL'] in ("TRUE", "1", 1, True):
                 retlist.append("\"1\"")
@@ -209,6 +211,17 @@ class ScenarioInstance:
             retlist.append("float(\"{0}\")".format(part['NUM']))
         elif part['type'] == 'text':
             retlist.append("\"{0}\"".format(part['TEXT']))
+        elif part['type'] == 'text_join':
+            reslst = []
+            for ipart, val in sorted(part.items()):
+                if ipart.startswith('ADD'):
+                    addp = self.__parse_part(part[ipart], level)
+                    reslst.append("{0}".format(addp))
+            retlist.append("{0}".format(" + ".join(reslst)))
+        elif part['type'] == 'text_length':
+            retlist.append("len({0})".format(self.__parse_part(part['VALUE'], level)))
+        elif part['type'] == 'text_isEmpty':
+            retlist.append("not len({0})".format(self.__parse_part(part['VALUE'], level)))
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
                 compare = "+"
@@ -239,9 +252,21 @@ class ScenarioInstance:
             retlist.append("( {0} {1} {2} )".format(self.__parse_part(part['A'], (level+1)), part['OP'].lower(), self.__parse_part(part['B'], (level+1))))
         elif part['type'] == 'logic_negate':
             retlist.append("not {0}".format(self.__parse_part(part['BOOL'], (level+1))))
+
         elif part['type'].endswith('Action'):
             act = self._create_instance(part['type'], 'action')
-            act[0].do_init(part.copy())
+            # How to pass the arguments on action call instead on action create
+            print part
+            data = {}
+            for p, v in part.items():
+                if p not in ['id','type', 'NEXT']:
+                    if 'type' in v:
+                        print "+++++++++++++"
+                        print self.__parse_part(v, 0)
+                        data[p] = self.__parse_part(v, 0)
+                    else:
+                        data[p] = v
+            retlist.append("self._mapping['action']['{0}'].do_init({1})\r\n".format(act[1], data))
             retlist.append("self._mapping['action']['{0}'].do_action({{}})\r\n".format(act[1]))
         else:
             test = self._create_instance(part['type'], 'test')

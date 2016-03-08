@@ -95,8 +95,8 @@ class AbstractAction:
         documentation, params could be {'mail': 'me@mybox.com'}
         """
         # we need to remove type and id => its not needed here
-        del params['type']
-        del params['id']
+        # del params['type']
+        # del params['id']
         self._params = params
         pass
 

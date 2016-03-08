@@ -332,26 +332,23 @@ def scenario_blocks_js():
     for act, params in scenario_actions.items():
         if act == "command.CommandAction": continue
         p = []
-        inline = "false"  # default inline value
         jso = u""
         for par, parv in params['parameters'].items():
-            papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
+            papp = u"this.appendValueInput(\"{0}\").setAlign(Blockly.ALIGN_RIGHT)".format(par)
+            papp += u".appendField(\"{0}\")".format(parv['description'])
             if parv['type'] == 'string':
-                jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
-                papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
+                papp += ".setCheck(\"String\")"
             elif parv['type'] == 'integer':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
+                papp += ".setCheck(\"Number\")"
             elif parv['type'] == 'list':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                the_list = parv["values"]  # [[...], [...]]
-                papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
-            elif parv['type'] == 'external':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                papp = u"{0}; this.appendValueInput(\'{1}\').setCheck(null);".format(papp, par)
-                inline = "true"
+                papp += ".setCheck(\"Array\")"
+            #elif parv['type'] == 'external':
+                #jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                #papp = u"{0}; this.appendValueInput(\'{1}\').setCheck(null);".format(papp, par)
+            #    inline = "true"
             else:
-                papp = u"{0};".format(papp)
+                papp += ".setCheck(\"Any\")"
+                papp += u";"
             p.append(papp)
         add = u"""Blockly.Blocks['{0}'] = {{
                 init: function() {{
@@ -362,10 +359,9 @@ def scenario_blocks_js():
                     this.setPreviousStatement(true, "null");
                     this.setNextStatement(true, "null");
                     this.setTooltip("{2}");
-                    this.setInputsInline({4});
                 }}
             }};
-            """.format(act, '\n'.join(p), params['description'], jso, inline)
+            """.format(act, '\n'.join(p), params['description'])
         js = u'{0}\n\r{1}'.format(js, add)
 
 
