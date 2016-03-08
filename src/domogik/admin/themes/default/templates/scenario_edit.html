@@ -52,6 +52,7 @@
   <div id="blocklyDiv" style="position: absolute; width: 50%;"></div>
   <xml id="toolbox" style="display: none">
     <category name="Logic">
+        <block type="controls_if"></block>
         <block type="logic_compare"></block>
         <block type="logic_operation"></block>
         <block type="logic_negate"></block>
@@ -60,6 +61,7 @@
     <category name="Maths">
         <block type="math_arithmetic"></block>
     </category>
+    <category name="Variables" custom="VARIABLE"></category>
     <category name="Datatypes">
         {% for d in datatypes %}
             <block type="{{ d }}"></block>
@@ -219,7 +221,6 @@
             .appendField('Do');
         this.setPreviousStatement(false);
         this.setNextStatement(false);
-        this.setDeletable(false);
         this.contextMenu = false;
         this.setInputsInline(false);
       }

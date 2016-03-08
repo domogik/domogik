@@ -37,6 +37,7 @@ from domogik.common.utils import remove_accents
 import zmq
 import traceback
 import logging
+import ast
 
 class ScenarioInstance:
     """ This class provides base methods for the scenarios
@@ -101,6 +102,7 @@ class ScenarioInstance:
                 self.datatypes = res['datatypes']
 
         self._parsed_condition = None
+        self._compiled_condition = None
         self._mapping = { 'test': {}, 'action': {} }
         if not self._disabled:
             self._instanciate()
@@ -145,31 +147,32 @@ class ScenarioInstance:
     def _instanciate(self):
         """ parse the json and load all needed components
         """
-        ## get the datatypes
-        cli = MQSyncReq(self.zmq)
-        msg = MQMessage()
-        msg.set_action('datatype.get')
-        res = cli.request('manager', msg.get(), timeout=10)
-        datatypes = None
-        if res is not None:
-            res = res.get_data()
-            if 'datatypes' in res:
-                datatypes = res['datatypes']
         try:
-            # step 1 parse the "do" part
-            self.__parse_do_part(self._json['DO'])
-            # step 2 parse the "if" part        
-            self._parsed_condition = self.__parse_if_part(self._json['IF'], datatypes)
+            self._parsed_condition = self.__parse_part(self._json)
+            print self._parsed_condition
+            tmp = ast.parse(self._parsed_condition)
+            self._compiled_condition = compile(tmp, "Scenario {0}".format(self._name), 'exec')
         except:
             raise
 
-    def __parse_if_part(self, part, datatypes = None):
+    def __parse_part(self, part, level=0):
+        # Do not handle disabled blocks
+        if 'disabled'in part and part['disabled'] == 'true':
+            return None
+        retlist = []
+        if part['type'] == 'dom_condition':
+            # Rename IF to If0
+            part['IF0'] = part.pop('IF')
+            # Rename DO to Do0
+            part['DO0'] = part.pop('DO')
+            # rename dom_condition to logic_if
+            part['type'] = 'controls_if'
         # translate datatype to default blocks
         if part['type'][0:3] == 'DT_':
             # find the parent
             dt_parent = part['type']
-            while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
-                dt_parent = datatypes[dt_parent]['parent']
+            while 'parent' in self.datatypes[dt_parent] and self.datatypes[dt_parent]['parent'] != None:
+                dt_parent = self.datatypes[dt_parent]['parent']
             # translate
             if dt_parent == "DT_Bool":
                 part['type'] = "logic_boolean"
@@ -178,15 +181,34 @@ class ScenarioInstance:
             elif dt_parent == "DT_String":
                 part['type'] = "text"
         # parse it
-        if part['type'] == 'logic_boolean':
+        if part['type'] == 'controls_if':
+            # handle all Ifx and dox
+            for ipart, val in part.items():
+                if ipart.startswith('IF'):
+                    num = int(ipart.replace('IF', ''))
+                    if num == 0:
+                        st = "if"
+                    else:
+                        st = "elif"
+                    # if stays at the same lvl
+                    ifp = self.__parse_part(part["IF{0}".format(num)], level)
+                    # do is a level deeper
+                    dop = self.__parse_part(part["DO{0}".format(num)], (level+1))
+                    retlist.append("{0} {1}:\r\n{2} ".format(st, ifp, dop))
+            # handle ELSE
+            if 'ELSE' in part:
+                retlist.append(seld.__parse_part(part['ELSE'], (level+1)) )
+        elif part['type'] == 'variables_set':
+            retlist.append("{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level)))
+        elif part['type'] == 'logic_boolean':
             if part['BOOL'] in ("TRUE", "1", 1, True):
-                return "\"1\""
+                retlist.append("\"1\"")
             else:
-                return "\"0\""
+                retlist.append("\"0\"")
         elif part['type'] == 'math_number':
-            return "float(\"{0}\")".format(part['NUM'])
+            retlist.append("float(\"{0}\")".format(part['NUM']))
         elif part['type'] == 'text':
-            return "\"{0}\"".format(part['TEXT'])
+            retlist.append("\"{0}\"".format(part['TEXT']))
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
                 compare = "+"
@@ -198,7 +220,7 @@ class ScenarioInstance:
                 compare = "/"
             elif part['OP'].lower() == "power":
                 compare = "^"
-            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A'], datatypes), compare, self.__parse_if_part(part['B'], datatypes))
+            retlist.append("( {0} {1} {2} )".format(self.__parse_part(part['A'], (level+1)), compare, self.__parse_part(part['B'], (level+1))))
         elif part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
                 compare = "=="
@@ -212,21 +234,33 @@ class ScenarioInstance:
                 compare = ">"
             elif part['OP'].lower() == "gte":
                 compare = ">="
-            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A'], datatypes), compare, self.__parse_if_part(part['B'], datatypes))
+            retlist.append("( {0} {1} {2} )".format(self.__parse_part(part['A'], (level+1)), compare, self.__parse_part(part['B'], (level+1))))
         elif part['type'] == 'logic_operation':
-            return "( {0} {1} {2} )".format(self.__parse_if_part(part['A'], datatypes), part['OP'].lower(), self.__parse_if_part(part['B'], datatypes))
+            retlist.append("( {0} {1} {2} )".format(self.__parse_part(part['A'], (level+1)), part['OP'].lower(), self.__parse_part(part['B'], (level+1))))
         elif part['type'] == 'logic_negate':
-            return "not {0}".format(self.__parse_if_part(part['BOOL']))
+            retlist.append("not {0}".format(self.__parse_part(part['BOOL'], (level+1))))
+        elif part['type'].endswith('Action'):
+            act = self._create_instance(part['type'], 'action')
+            act[0].do_init(part.copy())
+            retlist.append("self._mapping['action']['{0}'].do_action({{}})\r\n".format(act[1]))
         else:
             test = self._create_instance(part['type'], 'test')
             test[0].fill_parameters(part)
-            return "self._mapping['test']['{0}'].evaluate()".format(test[1])
-
-    def __parse_do_part(self, part):
-        action = self._create_instance(part['type'], 'action')
-        action[0].do_init(part.copy())
-        if 'NEXT' in part:
-            self.__parse_do_part(part['NEXT'])
+            retlist.append("self._mapping['test']['{0}'].evaluate()".format(test[1]))
+        # handle the NEXT
+        if 'NEXT'in part:
+            # next means keep at the same lvl
+            # do a hack for multiple actions
+            # TODO make this nicer
+            if part['type'].endswith('Action'):
+                lvl = level-1
+            else:
+                lvl = level
+            retlist.append("{0}".format(self.__parse_part(part['NEXT'], lvl)))
+        res = ""
+        for ret in retlist:
+            res += "{0}{1}".format("   " * level, ret)
+        return res
 
     def get_parsed_condition(self):
         """Returns the parsed condition
@@ -244,15 +278,16 @@ class ScenarioInstance:
         if self._parsed_condition is None:
             return None
         try:
-            res = eval(self._parsed_condition)
-        except:
-            return None
-            pass
+            print self._parsed_condition
+            exec(self._compiled_condition)
+            #res = True
+        except Exception as a:
+            raise
         #self._log.debug(u"_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, res))
-        if res:
-            return True
-        else:
-            return False
+        #if res:
+        #    return True
+        #else:
+        #    return False
 
     def _create_instance(self, inst, itype):
         uuid = self._get_uuid()
@@ -280,7 +315,7 @@ class ScenarioInstance:
             obj = cobj(log=self._log, params=params)
             index = "{0}-{1}".format(len(self._mapping['action']), uuid)
             self._mapping['action'][index] = obj
-            return (obj, uuid)
+            return (obj, index)
 
     def _get_uuid(self):
         """ Return some random uuid
@@ -295,18 +330,18 @@ class ScenarioInstance:
     def _call_actions(self):
         """ Call the needed actions for this scenario
         """
-        local_vars = {}
+        #local_vars = {}
         #self._log.debug("CALLING actions. Local vars = '{0}'".format(local_vars))
-        idx = 0
-        for act in sorted(self._mapping['action']):
-            idx += 1
-            try:
-                #self._log.debug("Before action n°{0}. Local vars = '{1}'".format(idx, local_vars))
-                self._log.info(u"== Do action n°{0} :".format(idx))
-                self._mapping['action'][act].do_action(local_vars)
-                #self._log.debug("After action n°{0}. Local vars = '{1}'".format(idx, local_vars))
-            except:
-                self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
+        #idx = 0
+        #for act in sorted(self._mapping['action']):
+        #    idx += 1
+        #    try:
+        #        #self._log.debug("Before action n°{0}. Local vars = '{1}'".format(idx, local_vars))
+        #        self._log.info(u"== Do action n°{0} :".format(idx))
+        #        self._mapping['action'][act].do_action(local_vars)
+        #        #self._log.debug("After action n°{0}. Local vars = '{1}'".format(idx, local_vars))
+        #    except:
+        #        self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
         #self._log.debug("END CALLING actions")
 
     def generic_trigger(self, test):
@@ -315,29 +350,29 @@ class ScenarioInstance:
             if cond.get_parsed_condition() is None:
                 return
             st = cond.eval_condition()
-            if st is not None:
-                self._log.debug(u"Scenario '{0}' evaluated to '{1}' with trigger mode set to {2}".format(self._name, st, self._trigger))
-                if self._trigger == 'Hysteresis':
-                    self._log.debug(u"Scenario '{0}' previously evaluated to '{1}'".format(self._name, self._state))
-                    if self._state != st:
-                        self._state = st
-                        self._log.debug(u"Updating state")
-                        with self._db.session_scope():
-                            self._db.update_scenario(self._dbid, state=st)
-                        self._log.info(u"======== Scenario triggered! ========")
-                        self._log.info(u"Scenario triggered : {0}".format(self._name))
-                        self._call_actions()
-                        self._log.info(u"=====================================")
-                    else:
-                        self._log.debug(u"State is the same as before, so skipping actions")
-                # Trigger the actions
-                #if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
-                #if st and (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st):
-                if st and (self._trigger == 'Always'):
-                    self._log.info(u"======== Scenario triggered! ========")
-                    self._log.info(u"Scenario triggered : {0}".format(self._name))
-                    self._call_actions()
-                    self._log.info(u"=====================================")
+            #if st is not None:
+            #    self._log.debug(u"Scenario '{0}' evaluated to '{1}' with trigger mode set to {2}".format(self._name, st, self._trigger))
+            #    if self._trigger == 'Hysteresis':
+            #        self._log.debug(u"Scenario '{0}' previously evaluated to '{1}'".format(self._name, self._state))
+            #        if self._state != st:
+            #            self._state = st
+            #            self._log.debug(u"Updating state")
+            #            with self._db.session_scope():
+            #                self._db.update_scenario(self._dbid, state=st)
+            #            self._log.info(u"======== Scenario triggered! ========")
+            #            self._log.info(u"Scenario triggered : {0}".format(self._name))
+            #            self._call_actions()
+            #            self._log.info(u"=====================================")
+            #        else:
+            #            self._log.debug(u"State is the same as before, so skipping actions")
+            #    # Trigger the actions
+            #    #if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
+            #    #if st and (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st):
+            #    if st and (self._trigger == 'Always'):
+            #        self._log.info(u"======== Scenario triggered! ========")
+            #        self._log.info(u"Scenario triggered : {0}".format(self._name))
+            #        self._call_actions()
+            #        self._log.info(u"=====================================")
         else:
             test.evaluate()
 

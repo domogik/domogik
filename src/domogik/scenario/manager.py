@@ -186,11 +186,11 @@ class ScenarioManager:
             self.log.error(u"Error is : {0}".format(tracebeck.format_exc()))
             return {'status': 'ERROR', 'msg': 'invallid json'}
 
-        if 'IF' not in payload.keys() \
-                or 'DO' not in payload.keys():
-            msg = u"the json for the scenario does not contain condition or actions for scenario {0}".format(name)
-            self.log.error(msg)
-            return {'status': 'ERROR', 'msg': msg}
+        #if 'IF' not in payload.keys():
+        #        or 'DO' not in payload.keys():
+        #    msg = u"the json for the scenario does not contain condition or actions for scenario {0}".format(name)
+        #    self.log.error(msg)
+        #    return {'status': 'ERROR', 'msg': msg}
         # db storage
         if int(ocid) == 0:
             with self._db.session_scope():
@@ -204,7 +204,7 @@ class ScenarioManager:
         try:
             scen = ScenarioInstance(self.log, cid, name, payload, dis, tmode, state, self._db)
             self._instances[cid] = {'name': name, 'json': payload, 'instance': scen, 'disabled': dis } 
-            self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
+            self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload))
             self._instances[cid]['instance'].eval_condition()
         except Exception as e:  
             if int(ocid) == 0:

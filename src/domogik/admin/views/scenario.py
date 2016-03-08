@@ -100,7 +100,7 @@ def scenario_edit(id):
     # laod the json
     if int(id) == 0:
         name = u""
-        jso = default_json
+        jso = u""
         dis = 0
         desc = None
         trigger = u"Hysteresis"
