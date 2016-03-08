@@ -216,8 +216,8 @@ class ScenarioInstance:
             for ipart, val in sorted(part.items()):
                 if ipart.startswith('ADD'):
                     addp = self.__parse_part(part[ipart], level)
-                    reslst.append("{0}".format(addp))
-            retlist.append("{0}".format(" + ".join(reslst)))
+                    reslst.append("str({0})".format(addp))
+            retlist.append(" + ".join(reslst))
         elif part['type'] == 'text_length':
             retlist.append("len({0})".format(self.__parse_part(part['VALUE'], level)))
         elif part['type'] == 'text_isEmpty':
@@ -256,17 +256,14 @@ class ScenarioInstance:
         elif part['type'].endswith('Action'):
             act = self._create_instance(part['type'], 'action')
             # How to pass the arguments on action call instead on action create
-            print part
             data = {}
             for p, v in part.items():
-                if p not in ['id','type', 'NEXT']:
+                if p not in ['id', 'type', 'NEXT']:
                     if 'type' in v:
-                        print "+++++++++++++"
-                        print self.__parse_part(v, 0)
-                        data[p] = self.__parse_part(v, 0)
+                        v2 = ( self.__parse_part(v, 0) )
                     else:
-                        data[p] = v
-            retlist.append("self._mapping['action']['{0}'].do_init({1})\r\n".format(act[1], data))
+                        v2 = "\"{0}\"".format(v)
+                    retlist.append("self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2))
             retlist.append("self._mapping['action']['{0}'].do_action({{}})\r\n".format(act[1]))
         else:
             test = self._create_instance(part['type'], 'test')

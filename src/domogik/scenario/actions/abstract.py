@@ -67,6 +67,7 @@ class AbstractAction:
             self._log = log
       
         self._description = ''
+        self._params = {}
 
     def destroy(self):
         pass
@@ -99,6 +100,9 @@ class AbstractAction:
         # del params['id']
         self._params = params
         pass
+
+    def set_param(self, param, val):
+        self._params[param] = val
 
     def do_action(self, condition, tests):
         """ This is the most important method of this class. It does nothing by default and *must*
