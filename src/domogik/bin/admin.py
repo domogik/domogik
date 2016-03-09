@@ -267,6 +267,7 @@ class Admin(Plugin):
         admin_app.use_ssl = self.use_ssl
         admin_app.hostname = self.get_sanitized_hostname()
         admin_app.resources_directory = self.get_resources_directory()
+        admin_app.packages_directory = self.get_packages_directory()
         
         publisher = Publisher()
         tapp = Application([
