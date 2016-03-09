@@ -96,11 +96,11 @@ def scenario_edit(id):
         clone = True
     else:
         clone = False
-    default_json = '{"type":"dom_condition","id":"1","deletable":false}'
+    default_json = '{"type":"variables_set","id":"O0m`5bU60^5C/p?Y3hG4","VAR":"item","NEXT":{"type":"controls_if","id":"CXeRaH*|O;%(XRY0~0(d","DO0":{"type":"controls_if","id":"rHqaxARKXc~-?2t?XGi`","DO0":{"type":"controls_if","id":"1=Dsf8:?GKoOYPp[n7.H","M_elseCount":1},"M_elseifCount":1,"M_elseCount":1},"M_elseifCount":4,"M_elseCount":1,"NEXT":{"type":"variables_set","id":"XQupJ!JPc9plkdN1uD,1","VAR":"item"}}}'
     # laod the json
     if int(id) == 0:
         name = u""
-        jso = u""
+        jso = default_json
         dis = 0
         desc = None
         trigger = u"Hysteresis"

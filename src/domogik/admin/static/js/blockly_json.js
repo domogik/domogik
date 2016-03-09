@@ -62,7 +62,15 @@ Blockly.JSON.blockToJson = function(block) {
   if (!block.isEditable()) {
     element['editable'] = false;
   }
-
+  if ( block.elseifCount_ ) {
+    element['M_elseifCount'] = block.elseifCount_
+  }
+  if ( block.elseCount_ ) {
+    element['M_elseCount'] = block.elseCount_
+  }
+  if ( block.itemCount_ ) {
+    element['M_itemCount'] = block.itemCount_
+  }
   var nextBlock = block.getNextBlock();
   if (nextBlock) {
     element['NEXT']= Blockly.JSON.blockToJson(nextBlock);
@@ -111,7 +119,7 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
     block.fill(workspace, prototypeName);
     block.parent_ = parentBlock;
   } else {
-    block = Blockly.Block.obtain(workspace, prototypeName);
+    block = workspace.newBlock( prototypeName);
   }
   if (!block.svg_) {
     block.initSvg();
@@ -137,9 +145,31 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
   if (editable) {
     block.setEditable(editable == 'true');
   }
+  var collapsed = jsonBlock['collapsed'];
+  if (collapsed) {
+    block.setCollapsed(collapsed == 'true');
+  }
+
+  // handle mutations
+  if ( block.domToMutation) {
+      var mut = document.createElement('div');
+      if ( jsonBlock['M_elseifCount'] ) {
+        mut.setAttribute('elseif', jsonBlock['M_elseifCount'])
+      }
+      if ( jsonBlock['M_elseCount'] ) {
+        mut.setAttribute('else', jsonBlock['M_elseCount'])
+      }
+      if ( jsonBlock['M_itemCount'] ) {
+        mut.setAttribute('items', jsonBlock['M_itemCount'])
+      }
+      block.domToMutation(mut);
+  }
+
+  if(block.afterRender) {
+    block.afterRender();
+  }
 
   var blockChild = null;
-
   for(var key in jsonBlock) {
     if (['id', 'type'].indexOf(key) == -1) {
       var jsonChild = jsonBlock[key];
@@ -185,14 +215,8 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
     }
   }
 
-  var collapsed = jsonBlock['collapsed'];
-  if (collapsed) {
-    block.setCollapsed(collapsed == 'true');
-  }
-  var next = block.getNextBlock();
+  var next = block.nextConnection && block.nextConnection.targetBlock();
   if (next) {
-    // Next block in a stack needs to square off its corners.
-    // Rendering a child will render its parent.
     next.render();
   } else {
     block.render();
