@@ -192,36 +192,38 @@ class ScenarioInstance:
                         st = "elif"
                     # if stays at the same lvl
                     ifp = self.__parse_part(part["IF{0}".format(num)], level)
+                    retlist.append( pyObj("{0} {1}:\r\n".format(st, ifp), level) )
                     # do is a level deeper
                     dop = self.__parse_part(part["DO{0}".format(num)], (level+1))
-                    retlist.append("{0} {1}:\r\n{2} ".format(st, ifp, dop))
+                    retlist.append( pyObj(dop, level) )
             # handle ELSE
             if 'ELSE' in part:
-                retlist.append(self.__parse_part(part['ELSE'], (level+1)) )
+                retlist.append( pyObj("else:\r\n", level) )
+                retlist.append( pyObj(self.__parse_part(part['ELSE'], (level+1)), (level)) )
         elif part['type'] == 'variables_set':
-            retlist.append("{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level)))
+            retlist.append( pyObj("{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level))) )
         elif part['type'] == 'variables_get':
-            retlist.append("{0}".format(part['VAR']))
+            retlist.append( pyObj("{0}".format(part['VAR'])) )
         elif part['type'] == 'logic_boolean':
             if part['BOOL'] in ("TRUE", "1", 1, True):
-                retlist.append("\"1\"")
+                retlist.append( pyObj("\"1\"") )
             else:
-                retlist.append("\"0\"")
+                retlist.append( pyObj("\"0\"") )
         elif part['type'] == 'math_number':
-            retlist.append("float(\"{0}\")".format(part['NUM']))
+            retlist.append( pyObj("float(\"{0}\")".format(part['NUM'])) )
         elif part['type'] == 'text':
-            retlist.append("\"{0}\"".format(part['TEXT']))
+            retlist.append( pyObj("\"{0}\"".format(part['TEXT'])) )
         elif part['type'] == 'text_join':
             reslst = []
             for ipart, val in sorted(part.items()):
                 if ipart.startswith('ADD'):
                     addp = self.__parse_part(part[ipart], level)
                     reslst.append("str({0})".format(addp))
-            retlist.append(" + ".join(reslst))
+            retlist.append( pyObj(" + ".join(reslst)) )
         elif part['type'] == 'text_length':
-            retlist.append("len({0})".format(self.__parse_part(part['VALUE'], level)))
+            retlist.append( pyObj("len({0})".format(self.__parse_part(part['VALUE'], level))) )
         elif part['type'] == 'text_isEmpty':
-            retlist.append("not len({0})".format(self.__parse_part(part['VALUE'], level)))
+            retlist.append( pyObj("not len({0})".format(self.__parse_part(part['VALUE'], level))) )
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
                 compare = "+"
@@ -233,7 +235,7 @@ class ScenarioInstance:
                 compare = "/"
             elif part['OP'].lower() == "power":
                 compare = "^"
-            retlist.append("( {0} {1} {2} )".format(self.__parse_part(part['A'], (level+1)), compare, self.__parse_part(part['B'], (level+1))))
+            retlist.append( pyObj("( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
         elif part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
                 compare = "=="
@@ -247,12 +249,11 @@ class ScenarioInstance:
                 compare = ">"
             elif part['OP'].lower() == "gte":
                 compare = ">="
-            retlist.append("( {0} {1} {2} )".format(self.__parse_part(part['A'], (level+1)), compare, self.__parse_part(part['B'], (level+1))))
+            retlist.append( pyObj("( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
         elif part['type'] == 'logic_operation':
-            retlist.append("( {0} {1} {2} )".format(self.__parse_part(part['A'], (level+1)), part['OP'].lower(), self.__parse_part(part['B'], (level+1))))
+            retlist.append( pyObj("( {0} {1} {2} )".format(self.__parse_part(part['A'], level), part['OP'].lower(), self.__parse_part(part['B'], level))) )
         elif part['type'] == 'logic_negate':
-            retlist.append("not {0}".format(self.__parse_part(part['BOOL'], (level+1))))
-
+            retlist.append( pyObj("not {0}".format(self.__parse_part(part['BOOL'], level))) )
         elif part['type'].endswith('Action'):
             act = self._create_instance(part['type'], 'action')
             # How to pass the arguments on action call instead on action create
@@ -263,26 +264,19 @@ class ScenarioInstance:
                         v2 = ( self.__parse_part(v, 0) )
                     else:
                         v2 = "\"{0}\"".format(v)
-                    retlist.append("self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2))
-            retlist.append("self._mapping['action']['{0}'].do_action({{}})\r\n".format(act[1]))
+                    retlist.append( pyObj("self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2), level-1) )
+            retlist.append( pyObj("self._mapping['action']['{0}'].do_action({{}})\r\n".format(act[1]), level) )
         else:
             test = self._create_instance(part['type'], 'test')
             test[0].fill_parameters(part)
-            retlist.append("self._mapping['test']['{0}'].evaluate()".format(test[1]))
+            retlist.append( pyObj("self._mapping['test']['{0}'].evaluate()".format(test[1])))
         # handle the NEXT
         if 'NEXT'in part:
-            # next means keep at the same lvl
-            # do a hack for multiple actions
-            # TODO make this nicer
-            if part['type'].endswith('Action'):
-                lvl = level-1
-            else:
-                lvl = level
-            retlist.append("{0}".format(self.__parse_part(part['NEXT'], lvl)))
+            retlist.append( pyObj("{0}".format(self.__parse_part(part['NEXT'], level))) )
         res = ""
         for ret in retlist:
-            res += "{0}{1}".format("   " * level, ret)
-        return res
+            res += str(ret)
+        return str(res)
 
     def get_parsed_condition(self):
         """Returns the parsed condition
@@ -404,6 +398,17 @@ class ScenarioInstance:
         self._call_actions()
         self._log.info(u"=============================================")
 
+class pyObj:
+    def __init__(self, data, lvl=None):
+        self.data = data
+        self.lvl = lvl
+
+    def __repr__(self):
+        if self.lvl:
+            ident = "    " * self.lvl
+        else:
+            ident = ""
+        return "{0}{1}".format(ident, self.data)
 
 if __name__ == "__main__":
     import logging
