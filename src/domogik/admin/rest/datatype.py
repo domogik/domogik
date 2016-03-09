@@ -1,5 +1,5 @@
 from domogik.admin.application import app, json_response
-from domogik.common.configloader import Loader
+#from domogik.common.configloader import Loader
 import sys
 import os
 import domogik
@@ -50,9 +50,9 @@ def api_datatype():
             ...
         }
     """
-    cfg = Loader('domogik')
-    config = cfg.load()
-    conf = dict(config[1])
+    #cfg = Loader('domogik')
+    #config = cfg.load()
+    #conf = dict(config[1])
     json_file = "{0}/datatypes.json".format(app.resources_directory)
     data = json.load(open(json_file))
 
