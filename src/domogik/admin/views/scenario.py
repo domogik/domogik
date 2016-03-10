@@ -297,35 +297,44 @@ def scenario_blocks_js():
         if test == "sensor.SensorChangedTest": continue
         p = []
         jso = u""
-        #for parv in params:
-        print(u"TEST={0}".format(test))
-        for parv in params['parameters']:
-            par = parv['name']
-            papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
-            if parv['type'] == 'string':
-                jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
-                papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
-            elif parv['type'] == 'integer':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
-            elif parv['type'] == 'list':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                the_list = parv["values"]  # [[...], [...]]
-                papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
-            p.append(papp)
-        add = u"""Blockly.Blocks['{0}'] = {{
-                    init: function() {{
-                        this.setColour(160);
-                        this.appendDummyInput().appendField("{2}");
-                        {1}
-                        this.setOutput(true);
-                        this.setInputsInline(false);
-                        this.setTooltip("{2}"); 
-                        this.contextMenu = false;
-                    }}
-                }};
-                """.format(test, '\n'.join(p), params['description'], jso)
-        js = u'{0}\n\r{1}'.format(js, add)
+        if params['json'] != "":
+            add = u"""Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            {1}
+                        }}
+                    }};
+                    """.format(test, params['json'])
+            js = u'{0}\n\r{1}'.format(js, add)
+        else:
+            #for parv in params:
+            print(u"TEST={0}".format(test))
+            for parv in params['parameters']:
+                par = parv['name']
+                papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
+                if parv['type'] == 'string':
+                    jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
+                    papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
+                elif parv['type'] == 'integer':
+                    jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                    papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
+                elif parv['type'] == 'list':
+                    jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                    the_list = parv["values"]  # [[...], [...]]
+                    papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
+                p.append(papp)
+            add = u"""Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            this.setColour(160);
+                            this.appendDummyInput().appendField("{2}");
+                            {1}
+                            this.setOutput(true);
+                            this.setInputsInline(false);
+                            this.setTooltip("{2}"); 
+                            this.contextMenu = false;
+                        }}
+                    }};
+                    """.format(test, '\n'.join(p), params['description'], jso)
+            js = u'{0}\n\r{1}'.format(js, add)
 
 
     ### actions

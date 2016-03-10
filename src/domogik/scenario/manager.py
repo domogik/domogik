@@ -280,6 +280,7 @@ class ScenarioManager:
                             })
 
                 res[name] = {"parameters": params,
+                             "blockly": inst.get_blockly(),
                              "description": inst.get_description()}
         return res
 

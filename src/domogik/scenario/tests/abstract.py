@@ -181,3 +181,6 @@ class AbstractTest:
         """
         raise NotImplementedError
 
+    def get_blockly(self):
+        return ""
+
