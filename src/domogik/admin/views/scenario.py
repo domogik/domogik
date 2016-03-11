@@ -96,7 +96,7 @@ def scenario_edit(id):
         clone = True
     else:
         clone = False
-    default_json = '{"type":"variables_set","id":"O0m`5bU60^5C/p?Y3hG4","VAR":"item","NEXT":{"type":"controls_if","id":"CXeRaH*|O;%(XRY0~0(d","DO0":{"type":"controls_if","id":"rHqaxARKXc~-?2t?XGi`","DO0":{"type":"controls_if","id":"1=Dsf8:?GKoOYPp[n7.H","M_elseCount":1},"M_elseifCount":1,"M_elseCount":1},"M_elseifCount":4,"M_elseCount":1,"NEXT":{"type":"variables_set","id":"XQupJ!JPc9plkdN1uD,1","VAR":"item"}}}'
+    default_json = '{"type":"controls_if","id":"CXeRaH*|O;%(XRY0~0(d"}'
     # laod the json
     if int(id) == 0:
         name = u""
@@ -297,13 +297,13 @@ def scenario_blocks_js():
         if test == "sensor.SensorChangedTest": continue
         p = []
         jso = u""
-        if params['json'] != "":
+        if params['blockly'] != "":
             add = u"""Blockly.Blocks['{0}'] = {{
                         init: function() {{
                             {1}
                         }}
                     }};
-                    """.format(test, params['json'])
+                    """.format(test, params['blockly'])
             js = u'{0}\n\r{1}'.format(js, add)
         else:
             #for parv in params:
@@ -463,6 +463,7 @@ def scenario_blocks_js():
                 jso = u""
                 cmd_id = dev['commands'][cmd]['id']
                 cmd_name = dev['commands'][cmd]['name']
+                print cmd_name
                 devices_per_clients[client][name]['commands'][cmd_name] = cmd_id
                 color = 1;
                 # parse the parameters
@@ -474,6 +475,7 @@ def scenario_blocks_js():
                     dt_parent = param_dt_type
                     while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                         dt_parent = datatypes[dt_parent]['parent']
+                    print param_dt_type
                     #if dt_parent == "DT_Bool":
                     #    color = 20
                     #    output = "\"Boolean\""

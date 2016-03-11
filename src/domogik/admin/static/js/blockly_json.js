@@ -63,13 +63,13 @@ Blockly.JSON.blockToJson = function(block) {
     element['editable'] = false;
   }
   if ( block.elseifCount_ ) {
-    element['M_elseifCount'] = block.elseifCount_
+    element['elseifCount'] = block.elseifCount_
   }
   if ( block.elseCount_ ) {
-    element['M_elseCount'] = block.elseCount_
+    element['elseCount'] = block.elseCount_
   }
   if ( block.itemCount_ ) {
-    element['M_itemCount'] = block.itemCount_
+    element['itemCount'] = block.itemCount_
   }
   var nextBlock = block.getNextBlock();
   if (nextBlock) {
@@ -153,14 +153,14 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
   // handle mutations
   if ( block.domToMutation) {
       var mut = document.createElement('div');
-      if ( jsonBlock['M_elseifCount'] ) {
-        mut.setAttribute('elseif', jsonBlock['M_elseifCount'])
+      if ( jsonBlock['elseifCount'] ) {
+        mut.setAttribute('elseif', jsonBlock['elseifCount'])
       }
-      if ( jsonBlock['M_elseCount'] ) {
-        mut.setAttribute('else', jsonBlock['M_elseCount'])
+      if ( jsonBlock['elseCount'] ) {
+        mut.setAttribute('else', jsonBlock['elseCount'])
       }
-      if ( jsonBlock['M_itemCount'] ) {
-        mut.setAttribute('items', jsonBlock['M_itemCount'])
+      if ( jsonBlock['itemCount'] ) {
+        mut.setAttribute('items', jsonBlock['itemCount'])
       }
       block.domToMutation(mut);
   }

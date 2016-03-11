@@ -34,7 +34,7 @@ class Hysteresis(AbstractTest):
 
     def __init__(self, log = None, trigger = None, cond=None, params=None):
         AbstractTest.__init__(self, log, trigger, cond, params)
-        self.set_description("Triiger mode hysteresis")
+        self.set_description("Trigger mode hysteresis")
         # TODO get the saved scenario and stor in last_state
         # TODO add a param for this
 

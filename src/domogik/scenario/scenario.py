@@ -156,10 +156,18 @@ class ScenarioInstance:
             raise
 
     def __parse_part(self, part, level=0):
+        """Parse the json code and generate a python string that can be evaluated
+        indentation needs to be done on the following objects:
+        - do of an if part
+        - else items of an if part
+        - get/set variables
+        """
         # Do not handle disabled blocks
         if 'disabled'in part and part['disabled'] == 'true':
             return None
+        # build the return list
         retlist = []
+        # handle the old dom_condition block
         if part['type'] == 'dom_condition':
             # Rename IF to If0
             part['IF0'] = part.pop('IF')
@@ -180,7 +188,7 @@ class ScenarioInstance:
                 part['type'] = "math_number"
             elif dt_parent == "DT_String":
                 part['type'] = "text"
-        # parse it
+        # parse the blocks
         if part['type'] == 'controls_if':
             # handle all Ifx and dox
             for ipart, val in sorted(part.items()):
@@ -200,19 +208,25 @@ class ScenarioInstance:
             if 'ELSE' in part:
                 retlist.append( pyObj("else:\r\n", level) )
                 retlist.append( pyObj(self.__parse_part(part['ELSE'], (level+1)), (level)) )
+        # Set a local variable
         elif part['type'] == 'variables_set':
-            retlist.append( pyObj("{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level))) )
+            retlist.append( pyObj("{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level)), level) )
+        # get a local variable
         elif part['type'] == 'variables_get':
-            retlist.append( pyObj("{0}".format(part['VAR'])) )
+            retlist.append( pyObj("{0}".format(part['VAR']), level) )
+        # True and False block
         elif part['type'] == 'logic_boolean':
             if part['BOOL'] in ("TRUE", "1", 1, True):
                 retlist.append( pyObj("\"1\"") )
             else:
                 retlist.append( pyObj("\"0\"") )
+        # a simple static number
         elif part['type'] == 'math_number':
             retlist.append( pyObj("float(\"{0}\")".format(part['NUM'])) )
+        # a simple text string
         elif part['type'] == 'text':
             retlist.append( pyObj("\"{0}\"".format(part['TEXT'])) )
+        # a block to join multiple text parts
         elif part['type'] == 'text_join':
             reslst = []
             for ipart, val in sorted(part.items()):
@@ -220,10 +234,13 @@ class ScenarioInstance:
                     addp = self.__parse_part(part[ipart], level)
                     reslst.append("str({0})".format(addp))
             retlist.append( pyObj(" + ".join(reslst)) )
+        # get the length of a string
         elif part['type'] == 'text_length':
             retlist.append( pyObj("len({0})".format(self.__parse_part(part['VALUE'], level))) )
+        # is the string empty
         elif part['type'] == 'text_isEmpty':
             retlist.append( pyObj("not len({0})".format(self.__parse_part(part['VALUE'], level))) )
+        # do a calculation on 2 numbers
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
                 compare = "+"
@@ -236,6 +253,7 @@ class ScenarioInstance:
             elif part['OP'].lower() == "power":
                 compare = "^"
             retlist.append( pyObj("( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
+        # logically compare 2 items
         elif part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
                 compare = "=="
@@ -250,32 +268,39 @@ class ScenarioInstance:
             elif part['OP'].lower() == "gte":
                 compare = ">="
             retlist.append( pyObj("( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
+        # logical operate (and, or, not)
         elif part['type'] == 'logic_operation':
             retlist.append( pyObj("( {0} {1} {2} )".format(self.__parse_part(part['A'], level), part['OP'].lower(), self.__parse_part(part['B'], level))) )
+        # a not function
         elif part['type'] == 'logic_negate':
             retlist.append( pyObj("not {0}".format(self.__parse_part(part['BOOL'], level))) )
+        # apply an action
         elif part['type'].endswith('Action'):
             act = self._create_instance(part['type'], 'action')
-            # How to pass the arguments on action call instead on action create
-            data = {}
             for p, v in part.items():
                 if p not in ['id', 'type', 'NEXT']:
                     if 'type' in v:
                         v2 = ( self.__parse_part(v, 0) )
                     else:
                         v2 = "\"{0}\"".format(v)
-                    retlist.append( pyObj("self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2), level-1) )
+                    retlist.append( pyObj("self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2), level) )
             retlist.append( pyObj("self._mapping['action']['{0}'].do_action({{}})\r\n".format(act[1]), level) )
+        # if we end up here we should be a test case
         else:
             test = self._create_instance(part['type'], 'test')
             test[0].fill_parameters(part)
-            retlist.append( pyObj("self._mapping['test']['{0}'].evaluate()".format(test[1])))
-        # handle the NEXT
+            if part['type'] == "trigger.Hysteresis":
+                retlist.append( pyObj("self._mapping['test']['{0}'].evaluate()".format(test[1]), level) )
+            else:
+                retlist.append( pyObj("self._mapping['test']['{0}'].evaluate()".format(test[1])) )
+        # handle the NEXT, so we can stack blocks
         if 'NEXT'in part:
             retlist.append( pyObj("{0}".format(self.__parse_part(part['NEXT'], level))) )
-        res = ""
+        # build the output string
+        res = u""
         for ret in retlist:
-            res += str(ret)
+            res += u"{0}".format(str(ret))
+        # return the python string
         return str(res)
 
     def get_parsed_condition(self):
@@ -296,14 +321,8 @@ class ScenarioInstance:
         try:
             print self._parsed_condition
             exec(self._compiled_condition)
-            #res = True
         except Exception as a:
             raise
-        #self._log.debug(u"_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, res))
-        #if res:
-        #    return True
-        #else:
-        #    return False
 
     def _create_instance(self, inst, itype):
         uuid = self._get_uuid()
@@ -346,19 +365,7 @@ class ScenarioInstance:
     def _call_actions(self):
         """ Call the needed actions for this scenario
         """
-        #local_vars = {}
-        #self._log.debug("CALLING actions. Local vars = '{0}'".format(local_vars))
-        #idx = 0
-        #for act in sorted(self._mapping['action']):
-        #    idx += 1
-        #    try:
-        #        #self._log.debug("Before action n°{0}. Local vars = '{1}'".format(idx, local_vars))
-        #        self._log.info(u"== Do action n°{0} :".format(idx))
-        #        self._mapping['action'][act].do_action(local_vars)
-        #        #self._log.debug("After action n°{0}. Local vars = '{1}'".format(idx, local_vars))
-        #    except:
-        #        self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
-        #self._log.debug("END CALLING actions")
+        pass
 
     def generic_trigger(self, test):
         if test.get_condition():
@@ -366,29 +373,6 @@ class ScenarioInstance:
             if cond.get_parsed_condition() is None:
                 return
             st = cond.eval_condition()
-            #if st is not None:
-            #    self._log.debug(u"Scenario '{0}' evaluated to '{1}' with trigger mode set to {2}".format(self._name, st, self._trigger))
-            #    if self._trigger == 'Hysteresis':
-            #        self._log.debug(u"Scenario '{0}' previously evaluated to '{1}'".format(self._name, self._state))
-            #        if self._state != st:
-            #            self._state = st
-            #            self._log.debug(u"Updating state")
-            #            with self._db.session_scope():
-            #                self._db.update_scenario(self._dbid, state=st)
-            #            self._log.info(u"======== Scenario triggered! ========")
-            #            self._log.info(u"Scenario triggered : {0}".format(self._name))
-            #            self._call_actions()
-            #            self._log.info(u"=====================================")
-            #        else:
-            #            self._log.debug(u"State is the same as before, so skipping actions")
-            #    # Trigger the actions
-            #    #if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
-            #    #if st and (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st):
-            #    if st and (self._trigger == 'Always'):
-            #        self._log.info(u"======== Scenario triggered! ========")
-            #        self._log.info(u"Scenario triggered : {0}".format(self._name))
-            #        self._call_actions()
-            #        self._log.info(u"=====================================")
         else:
             test.evaluate()
 
@@ -399,16 +383,20 @@ class ScenarioInstance:
         self._log.info(u"=============================================")
 
 class pyObj:
+    """
+    A simple object to fix the indentation in the generated python code
+    """
     def __init__(self, data, lvl=None):
         self.data = data
         self.lvl = lvl
 
     def __repr__(self):
-        if self.lvl:
-            ident = "    " * self.lvl
-        else:
-            ident = ""
-        return "{0}{1}".format(ident, self.data)
+        """
+        If lvl is set, indent that many times
+        """
+        ident = ("    " * self.lvl) if self.lvl else ""
+        result = [u"{0}{1}".format(ident, line) for line in self.data.splitlines(True)]
+        return "".join(result)
 
 if __name__ == "__main__":
     import logging
