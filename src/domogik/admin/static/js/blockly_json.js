@@ -86,6 +86,7 @@ Blockly.JSON.blockToJson = function(block) {
  */
 Blockly.JSON.jsonToWorkspace = function(workspace, json) {
   Blockly.JSON.jsonToBlock(workspace, json);
+  Blockly.fireUiEvent(window, 'resize');
 };
 
 /**
@@ -163,6 +164,9 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
         mut.setAttribute('items', jsonBlock['itemCount'])
       }
       block.domToMutation(mut);
+      if (block.nitSvg) {
+        block.initSvg();
+      }
   }
 
   if(block.afterRender) {
@@ -214,7 +218,9 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
       }
     }
   }
-
+  if (block.validate) {
+    block.validate();
+  }
   var next = block.nextConnection && block.nextConnection.targetBlock();
   if (next) {
     next.render();

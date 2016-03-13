@@ -167,6 +167,7 @@ class ScenarioInstance:
             return None
         # build the return list
         retlist = []
+        nlevel = False
         # handle the old dom_condition block
         if part['type'] == 'dom_condition':
             # Rename IF to If0
@@ -279,7 +280,9 @@ class ScenarioInstance:
             test = self._create_instance(part['type'], 'test')
             test[0].fill_parameters(part)
             retlist.append( pyObj(u"if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
+            nlevel = level 
             level = level + 1
+            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['Run'], level))) )
         # apply an action
         elif part['type'].endswith('Action'):
             act = self._create_instance(part['type'], 'action')
@@ -298,7 +301,9 @@ class ScenarioInstance:
             retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate()".format(test[1])) )
         # handle the NEXT, so we can stack blocks
         if 'NEXT'in part:
-            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['NEXT'], level))) )
+            if nlevel:
+                set 
+            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['NEXT'], level if not nlevel else nlevel))) )
         # build the output string
         res = u""
         for ret in retlist:
