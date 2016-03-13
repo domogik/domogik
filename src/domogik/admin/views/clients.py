@@ -679,15 +679,15 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 default = True
             else:
                 default = False
-            field = BooleanField(name, [Required()], description=item["description"], default=default)
+            field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "integer":
-            field = IntegerField(name, [Required()], description=item["description"], default=default)
+            field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "date":
             field = DateField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "datetime":
             field = DateTimeField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "float":
-            field = DateTimeField(name, [Required()], description=item["description"], default=default)
+            field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "choice":
             choices = []
             for key in sorted(item["choices"]):
@@ -712,15 +712,15 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                     default = True
                 else:
                     default = False
-                field = BooleanField(name, [Required()], description=item["description"], default=default)
+                field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "integer":
-                field = IntegerField(name, [Required()], description=item["description"], default=default)
+                field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "date":
                 field = DateField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "datetime":
                 field = DateTimeField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [Required()], description=item["description"], default=default)
+                field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "choice":
                 choices = []
                 for key in sorted(item["choices"]):
@@ -751,10 +751,10 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                     default = True
                 else:
                     default = False
-                field = BooleanField(name, [validators.Required(gettext("This value is required"))], \
+                field = BooleanField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "integer":
-                field = IntegerField(name, [validators.Required(gettext("This value is required"))], \
+                field = IntegerField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "date":
                 field = DateField(name, [validators.Required(gettext("This value is required"))], \
@@ -763,7 +763,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 field = DateTimeField(name, [validators.Required(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [validators.Required(gettext("This value is required"))], \
+                field = DateTimeField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "choice":
                 choices = []
