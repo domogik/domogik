@@ -85,8 +85,30 @@ Blockly.JSON.blockToJson = function(block) {
  * @param {!Element} JSON.
  */
 Blockly.JSON.jsonToWorkspace = function(workspace, json) {
-  Blockly.JSON.jsonToBlock(workspace, json);
-  Blockly.fireUiEvent(window, 'resize');
+  Blockly.Events.disable();
+  var topBlock = Blockly.JSON.jsonToBlock(workspace, json);
+  if (workspace.rendered) {
+    topBlock.setConnectionsHidden(true);
+    var blocks = topBlock.getDescendants();
+    for (var i = blocks.length - 1; i >= 0; i--) {
+      blocks[i].initSvg();
+    }
+    for (var i = blocks.length - 1; i >= 0; i--) {
+      blocks[i].render(false);
+    }
+    setTimeout(function() {
+      if (topBlock.workspace) {  // Check that the block hasn't been deleted.
+        topBlock.setConnectionsHidden(false);
+      }
+    }, 1);
+    topBlock.updateDisabled();
+    Blockly.fireUiEvent(window, 'resize');
+  }
+  Blockly.Events.enable();
+  if (Blockly.Events.isEnabled() && !topBlock.isShadow()) {
+    Blockly.Events.fire(new Blockly.Events.Create(topBlock));
+  }
+  return topBlock;
 };
 
 /**
@@ -94,34 +116,16 @@ Blockly.JSON.jsonToWorkspace = function(workspace, json) {
  * workspace.
  * @param {!Blockly.Workspace} workspace The workspace.
  * @param {!Element} JSON block element.
- * @param {boolean=} opt_reuseBlock Optional arg indicating whether to
- *     reinitialize an existing block.
  * @return {!Blockly.Block} The root block created.
  * @private
  */
-Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
+Blockly.JSON.jsonToBlock = function(workspace, jsonBlock) {
   var block = null;
   var prototypeName = jsonBlock['type'];
   if (!prototypeName) {
     throw 'Block type unspecified: \n';
   }
-  var id = jsonBlock['id'];
-  if (opt_reuseBlock && id) {
-    block = Blockly.Block.getById(id, workspace);
-    if (!block) {
-      throw 'Couldn\'t get Block with id: ' + id;
-    }
-    var parentBlock = block.getParent();
-    // If we've already filled this block then we will dispose of it and then
-    // re-fill it.
-    if (block.workspace) {
-      block.dispose(true, false, true);
-    }
-    block.fill(workspace, prototypeName);
-    block.parent_ = parentBlock;
-  } else {
-    block = workspace.newBlock( prototypeName);
-  }
+  block = workspace.newBlock( prototypeName);
   if (!block.svg_) {
     block.initSvg();
   }
@@ -164,13 +168,6 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
         mut.setAttribute('items', jsonBlock['itemCount'])
       }
       block.domToMutation(mut);
-      if (block.nitSvg) {
-        block.initSvg();
-      }
-  }
-
-  if(block.afterRender) {
-    block.afterRender();
   }
 
   var blockChild = null;
@@ -182,16 +179,15 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
         switch (typeof(jsonChild)) {
           case 'string':
           case 'boolean':
-              block.setFieldValue(jsonChild, key);
+            console.log(jsonChild);
+            block.setFieldValue(jsonChild, key);
             break;
           case 'object':
-            blockChild = Blockly.JSON.jsonToBlock(workspace, jsonChild,
-                  opt_reuseBlock);
+            blockChild = Blockly.JSON.jsonToBlock(workspace, jsonChild);
             if (key == 'NEXT') {
               if (!block.nextConnection) {
                 throw 'Next statement does not exist.';
               } else if (block.nextConnection.targetConnection) {
-                // This could happen if there is more than one XML 'next' tag.
                 throw 'Next statement is already connected.';
               }
               if (!blockChild.previousConnection) {
@@ -199,7 +195,7 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
               }
               block.nextConnection.connect(blockChild.previousConnection);
             } else {
-            input = block.getInput(key);
+              input = block.getInput(key);
               if (!input) {
                 throw 'Input ' + key + ' does not exist in block ' + prototypeName;
               }
@@ -217,6 +213,9 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock, opt_reuseBlock) {
         }
       }
     }
+  }
+  if(block.afterRender) {
+    block.afterRender();
   }
   if (block.validate) {
     block.validate();
