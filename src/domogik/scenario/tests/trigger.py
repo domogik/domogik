@@ -46,6 +46,6 @@ class Hysteresis(AbstractTest):
     def get_blockly(self):
         return """this.appendDummyInput()
                 .appendField("Trigger mode hysteresis");
-                this.appendStatementInput("Run").setCheck(null);
+                this.appendStatementInput("NEXT").setCheck(null);
                 this.setPreviousStatement(true);
                 this.setNextStatement(true);"""

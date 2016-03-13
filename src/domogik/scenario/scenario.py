@@ -274,6 +274,12 @@ class ScenarioInstance:
         # a not function
         elif part['type'] == 'logic_negate':
             retlist.append( pyObj("not {0}".format(self.__parse_part(part['BOOL'], level))) )
+        # handle hysteresis
+        elif part['type'] == "trigger.Hysteresis":
+            test = self._create_instance(part['type'], 'test')
+            test[0].fill_parameters(part)
+            retlist.append( pyObj("if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
+            level = level + 1
         # apply an action
         elif part['type'].endswith('Action'):
             act = self._create_instance(part['type'], 'action')
@@ -289,10 +295,7 @@ class ScenarioInstance:
         else:
             test = self._create_instance(part['type'], 'test')
             test[0].fill_parameters(part)
-            if part['type'] == "trigger.Hysteresis":
-                retlist.append( pyObj("self._mapping['test']['{0}'].evaluate()".format(test[1]), level) )
-            else:
-                retlist.append( pyObj("self._mapping['test']['{0}'].evaluate()".format(test[1])) )
+            retlist.append( pyObj("self._mapping['test']['{0}'].evaluate()".format(test[1])) )
         # handle the NEXT, so we can stack blocks
         if 'NEXT'in part:
             retlist.append( pyObj("{0}".format(self.__parse_part(part['NEXT'], level))) )
