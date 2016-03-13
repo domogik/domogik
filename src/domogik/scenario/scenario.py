@@ -151,7 +151,7 @@ class ScenarioInstance:
             self._parsed_condition = self.__parse_part(self._json)
             print self._parsed_condition
             tmp = ast.parse(self._parsed_condition)
-            self._compiled_condition = compile(tmp, "Scenario {0}".format(self._name), 'exec')
+            self._compiled_condition = compile(tmp, u"Scenario {0}".format(self._name), 'exec')
         except:
             raise
 
@@ -200,20 +200,20 @@ class ScenarioInstance:
                         st = "elif"
                     # if stays at the same lvl
                     ifp = self.__parse_part(part["IF{0}".format(num)], level)
-                    retlist.append( pyObj("{0} {1}:\r\n".format(st, ifp), level) )
+                    retlist.append( pyObj(u"{0} {1}:\r\n".format(st, ifp), level) )
                     # do is a level deeper
                     dop = self.__parse_part(part["DO{0}".format(num)], (level+1))
                     retlist.append( pyObj(dop, level) )
             # handle ELSE
             if 'ELSE' in part:
-                retlist.append( pyObj("else:\r\n", level) )
+                retlist.append( pyObj(u"else:\r\n", level) )
                 retlist.append( pyObj(self.__parse_part(part['ELSE'], (level+1)), (level)) )
         # Set a local variable
         elif part['type'] == 'variables_set':
-            retlist.append( pyObj("{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level)), level) )
+            retlist.append( pyObj(u"{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level)), level) )
         # get a local variable
         elif part['type'] == 'variables_get':
-            retlist.append( pyObj("{0}".format(part['VAR']), level) )
+            retlist.append( pyObj(u"{0}".format(part['VAR']), level) )
         # True and False block
         elif part['type'] == 'logic_boolean':
             if part['BOOL'] in ("TRUE", "1", 1, True):
@@ -225,21 +225,21 @@ class ScenarioInstance:
             retlist.append( pyObj("float(\"{0}\")".format(part['NUM'])) )
         # a simple text string
         elif part['type'] == 'text':
-            retlist.append( pyObj("\"{0}\"".format(part['TEXT'])) )
+            retlist.append( pyObj(u"\"{0}\"".format(part['TEXT'])) )
         # a block to join multiple text parts
         elif part['type'] == 'text_join':
             reslst = []
             for ipart, val in sorted(part.items()):
                 if ipart.startswith('ADD'):
                     addp = self.__parse_part(part[ipart], level)
-                    reslst.append("str({0})".format(addp))
-            retlist.append( pyObj(" + ".join(reslst)) )
+                    reslst.append(u"str({0})".format(addp))
+            retlist.append( pyObj(u" + ".join(reslst)) )
         # get the length of a string
         elif part['type'] == 'text_length':
-            retlist.append( pyObj("len({0})".format(self.__parse_part(part['VALUE'], level))) )
+            retlist.append( pyObj(u"len({0})".format(self.__parse_part(part['VALUE'], level))) )
         # is the string empty
         elif part['type'] == 'text_isEmpty':
-            retlist.append( pyObj("not len({0})".format(self.__parse_part(part['VALUE'], level))) )
+            retlist.append( pyObj(u"not len({0})".format(self.__parse_part(part['VALUE'], level))) )
         # do a calculation on 2 numbers
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
@@ -252,7 +252,7 @@ class ScenarioInstance:
                 compare = "/"
             elif part['OP'].lower() == "power":
                 compare = "^"
-            retlist.append( pyObj("( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
+            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
         # logically compare 2 items
         elif part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
@@ -267,13 +267,13 @@ class ScenarioInstance:
                 compare = ">"
             elif part['OP'].lower() == "gte":
                 compare = ">="
-            retlist.append( pyObj("( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
+            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
         # logical operate (and, or, not)
         elif part['type'] == 'logic_operation':
-            retlist.append( pyObj("( {0} {1} {2} )".format(self.__parse_part(part['A'], level), part['OP'].lower(), self.__parse_part(part['B'], level))) )
+            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level), part['OP'].lower(), self.__parse_part(part['B'], level))) )
         # a not function
         elif part['type'] == 'logic_negate':
-            retlist.append( pyObj("not {0}".format(self.__parse_part(part['BOOL'], level))) )
+            retlist.append( pyObj(u"not {0}".format(self.__parse_part(part['BOOL'], level))) )
         # apply an action
         elif part['type'].endswith('Action'):
             act = self._create_instance(part['type'], 'action')
@@ -282,20 +282,20 @@ class ScenarioInstance:
                     if 'type' in v:
                         v2 = ( self.__parse_part(v, 0) )
                     else:
-                        v2 = "\"{0}\"".format(v)
-                    retlist.append( pyObj("self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2), level) )
-            retlist.append( pyObj("self._mapping['action']['{0}'].do_action({{}})\r\n".format(act[1]), level) )
+                        v2 = u"\"{0}\"".format(v)
+                    retlist.append( pyObj(u"self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2), level) )
+            retlist.append( pyObj(u"self._mapping['action']['{0}'].do_action({{}})\r\n".format(act[1]), level) )
         # if we end up here we should be a test case
         else:
             test = self._create_instance(part['type'], 'test')
             test[0].fill_parameters(part)
             if part['type'] == "trigger.Hysteresis":
-                retlist.append( pyObj("self._mapping['test']['{0}'].evaluate()".format(test[1]), level) )
+                retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate()".format(test[1]), level) )
             else:
-                retlist.append( pyObj("self._mapping['test']['{0}'].evaluate()".format(test[1])) )
+                retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate()".format(test[1])) )
         # handle the NEXT, so we can stack blocks
         if 'NEXT'in part:
-            retlist.append( pyObj("{0}".format(self.__parse_part(part['NEXT'], level))) )
+            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['NEXT'], level))) )
         # build the output string
         res = u""
         for ret in retlist:
@@ -308,7 +308,7 @@ class ScenarioInstance:
         @return None if parse_condition as never called with a valid condition else the parsed condition
         """
         if self._parsed_condition is None:
-            self._log.debug("get_parsed_condition called but parsed_condition is empty, try to parse condition first")
+            self._log.debug(u"get_parsed_condition called but parsed_condition is empty, try to parse condition first")
         return self._parsed_condition
 
     def eval_condition(self):
@@ -348,7 +348,7 @@ class ScenarioInstance:
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create action instance {0} with uuid {1}".format(inst, uuid))
             obj = cobj(log=self._log, params=params)
-            index = "{0}-{1}".format(len(self._mapping['action']), uuid)
+            index = u"{0}-{1}".format(len(self._mapping['action']), uuid)
             self._mapping['action'][index] = obj
             return (obj, index)
 
@@ -394,9 +394,9 @@ class pyObj:
         """
         If lvl is set, indent that many times
         """
-        ident = ("    " * self.lvl) if self.lvl else ""
+        ident = (u"    " * self.lvl) if self.lvl else ""
         result = [u"{0}{1}".format(ident, line) for line in self.data.splitlines(True)]
-        return "".join(result)
+        return u"".join(result)
 
 if __name__ == "__main__":
     import logging
