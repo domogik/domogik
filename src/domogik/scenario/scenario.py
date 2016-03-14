@@ -301,8 +301,6 @@ class ScenarioInstance:
             retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate()".format(test[1])) )
         # handle the NEXT, so we can stack blocks
         if 'NEXT'in part:
-            if nlevel:
-                set 
             retlist.append( pyObj(u"{0}".format(self.__parse_part(part['NEXT'], level if not nlevel else nlevel))) )
         # build the output string
         res = u""
