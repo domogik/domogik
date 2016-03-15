@@ -27,6 +27,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.scenario.actions.abstract import AbstractAction
 from domogik.common.configloader import Loader, CONFIG_FILE
+from domogik.common.utils import ucode
 from domogikmq.pubsub.publisher import MQPub
 import zmq
 import traceback
@@ -62,9 +63,9 @@ class ButlerAction(AbstractAction):
         text = self._params['text']
 
         # local variables
-        media = self.process_local_vars(local_vars, media)
-        location = self.process_local_vars(local_vars, location)
-        text = self.process_local_vars(local_vars, text)
+        media = ucode(self.process_local_vars(local_vars, media))
+        location = ucode(self.process_local_vars(local_vars, location))
+        text = ucode(self.process_local_vars(local_vars, text))
 
         self._log.info(u"Make the butler say '{0}'. Media is '{1}', location is '{2}'".format(text, media, location))
 

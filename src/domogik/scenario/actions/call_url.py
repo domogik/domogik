@@ -26,6 +26,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.actions.abstract import AbstractAction
+from domogik.common.utils import ucode
 import traceback
 try:
     # python3
@@ -49,6 +50,7 @@ class CallUrlAction(AbstractAction):
         url = self._params['url']
         # local variables
         url = self.process_local_vars(local_vars, url)
+        url = ucode(url)
 
         self._log.info(u"Calling url : {0}".format(url))
         try:
