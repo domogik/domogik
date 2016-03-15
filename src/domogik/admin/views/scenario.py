@@ -103,7 +103,6 @@ def scenario_edit(id):
         jso = default_json
         dis = 0
         desc = None
-        trigger = u"Hysteresis"
     else:
         with app.db.session_scope():
             scen = app.db.get_scenario(id)
@@ -111,7 +110,6 @@ def scenario_edit(id):
             dis = scen.disabled
             name = scen.name
             desc = scen.description
-            trigger = scen.trigger_mode
             jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'").replace('"', '\\"')
             if clone:
                 id = 0
@@ -122,7 +120,6 @@ def scenario_edit(id):
         sname = TextField("Name", default=name, description=u"Scenario name")
         sdis = BooleanField("Disable", default=dis, description=u"Disabling a scenario avoid to delete it if you temporary want it not to run")
         sdesc = TextAreaField("Description", default=desc)
-        strigger = SelectField("Trigger Mode", choices=[('Always','Always'), ('Hysteresis', 'Hysteresis')], default=trigger, description=u"Sets the mode when the actions are run")
         sjson = HiddenField("json")
         submit = SubmitField(u"Send")
         pass
@@ -139,7 +136,6 @@ def scenario_edit(id):
         msg.add_data('json_input', form.sjson.data)
         msg.add_data('cid', form.sid.data)
         msg.add_data('dis', form.sdis.data)
-        msg.add_data('tmode', form.strigger.data)
         msg.add_data('desc', form.sdesc.data)
         res = cli.request('scenario', msg.get(), timeout=10)
         if res:

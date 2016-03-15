@@ -1714,7 +1714,7 @@ class DbHelper():
         self._do_commit()
         return scenario
 
-    def update_scenario(self, s_id, name=None, json=None, disabled=None, description=None, state=None, tmode=None):
+    def update_scenario(self, s_id, name=None, json=None, disabled=None, description=None, state=None):
         self.__session.expire_all()
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is None:
@@ -1729,8 +1729,6 @@ class DbHelper():
             scenario.description = description
         if state is not None:
             scenario.state = state
-        if tmode is not None:
-            scenario.trigger_mode = tmode
         self.__session.add(scenario)
         self._do_commit()
         return scenario

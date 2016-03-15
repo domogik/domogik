@@ -74,7 +74,7 @@ class ScenarioInstance:
         "deletable": false
     }
     """
-    def __init__(self, log, dbid, name, json, disabled, trigger, state, db):
+    def __init__(self, log, dbid, name, json, disabled, state, db):
         """ Create the instance
         @param log : A logger instance
         @param dbid : The id of this scenario in the db
@@ -85,7 +85,6 @@ class ScenarioInstance:
         self._json = json
         self._disabled = disabled
         self._state = state
-        self._trigger = trigger
         self._dbid = dbid
         self._db = db
 
@@ -388,12 +387,6 @@ class ScenarioInstance:
             st = cond.eval_condition()
         else:
             test.evaluate()
-
-    def test_actions(self):
-        self._log.info(u"==== Scenario triggered by test request! ====")
-        self._log.info(u"Scenario triggered : {0}".format(self._name))
-        self._call_actions()
-        self._log.info(u"=============================================")
 
 class pyObj:
     """

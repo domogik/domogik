@@ -451,15 +451,13 @@ class Scenario(DomogikBase):
     json = Column(UnicodeText(), nullable=False)
     disabled = Column(Boolean, nullable=False, default=False)
     description = Column(Text, nullable=True)
-    trigger_mode = Column(Enum('Always', 'Hysteresis'), nullable=False, default='Always')
-    state = Column(Boolean, nullable=False, default=False)
+    state = Column(Unicode(32), nullable=False, default=False)
 
-    def __init__(self, name, json, disabled=False, description=None, trigger_mode=None, state=None):
+    def __init__(self, name, json, disabled=False, description=None, state=None):
         self.name = ucode(name)
         self.json = ucode(json)
         self.disabled = disabled
         self.description = description
-        self.trigger_mode = trigger_mode
         self.state = state
 
     @staticmethod
