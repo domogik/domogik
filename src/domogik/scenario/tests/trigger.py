@@ -35,13 +35,21 @@ class Hysteresis(AbstractTest):
     def __init__(self, log = None, trigger = None, cond=None, params=None):
         AbstractTest.__init__(self, log, trigger, cond, params)
         self.set_description("Trigger mode hysteresis")
-        # TODO get the saved scenario and stor in last_state
-        # TODO add a param for this
+        # my block id, will be the inetrnal id for this actions block
+        self.add_parameter("id", "trigger.idParameter")
+        # keep track of the condition
+        self._cond = cond
 
     def evaluate(self):
         """ Evaluate if the actions should be triggered or not
         """
-        return True
+        p = self.get_raw_parameters()
+        # if the current state is not the same
+        if p['id'].evaluate() != self._cond.state():
+            self._cond.state(p['id'].evaluate())
+            return True
+        else:
+            return False
 
     def get_blockly(self):
         return """this.appendDummyInput()

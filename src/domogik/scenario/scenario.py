@@ -123,6 +123,13 @@ class ScenarioInstance:
         else:
             return False
 
+    def state(self, new=None):
+        if new:
+            self._state = new
+            return True
+        else:
+            return self._state
+
     def destroy(self):
         """ Cleanup the class
         """
@@ -278,7 +285,7 @@ class ScenarioInstance:
         # handle hysteresis
         elif part['type'] == "trigger.Hysteresis":
             test = self._create_instance(part['type'], 'test')
-            test[0].fill_parameters(part)
+            test[0].fill_parameters({"id.id": part['id']})
             retlist.append( pyObj(u"if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
             nlevel = level 
             level = level + 1
