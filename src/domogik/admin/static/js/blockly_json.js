@@ -125,7 +125,12 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock) {
   if (!prototypeName) {
     throw 'Block type unspecified: \n';
   }
+  var id = jsonBlock['id'];
+  if (!id) {
+    throw 'Block id unspecified: \n';
+  }
   block = workspace.newBlock( prototypeName);
+  block.id = jsonBlock['id'];
   if (!block.svg_) {
     block.initSvg();
   }
