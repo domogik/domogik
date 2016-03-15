@@ -184,7 +184,6 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock) {
         switch (typeof(jsonChild)) {
           case 'string':
           case 'boolean':
-            console.log(jsonChild);
             block.setFieldValue(jsonChild, key);
             break;
           case 'object':
