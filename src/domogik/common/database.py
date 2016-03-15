@@ -1707,9 +1707,9 @@ class DbHelper():
     def get_scenario_by_name(self, s_name):
         return self.__session.query(Scenario).filter(Scenario.name==s_name).first()
 
-    def add_scenario(self, name, json, disabled, desc, tmode, state):
+    def add_scenario(self, name, json, disabled, desc, state):
         self.__session.expire_all()
-        scenario = Scenario(name=name, json=json, disabled=disabled, description=desc, state=state, trigger_mode=tmode)
+        scenario = Scenario(name=name, json=json, disabled=disabled, description=desc, state=state)
         self.__session.add(scenario)
         self._do_commit()
         return scenario
