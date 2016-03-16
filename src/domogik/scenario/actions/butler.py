@@ -27,6 +27,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.scenario.actions.abstract import AbstractAction
 from domogik.common.configloader import Loader, CONFIG_FILE
+from domogik.common.utils import ucode
 from domogikmq.pubsub.publisher import MQPub
 import zmq
 import traceback

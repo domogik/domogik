@@ -157,7 +157,7 @@ class ScenarioInstance:
             self._parsed_condition = self.__parse_part(self._json)
             print self._parsed_condition
             tmp = ast.parse(self._parsed_condition)
-            self._compiled_condition = compile(tmp, u"Scenario {0}".format(self._name), 'exec')
+            self._compiled_condition = compile(tmp, "Scenario {0}".format(remove_accents(self._name)), 'exec')
         except:
             raise
 
@@ -311,9 +311,11 @@ class ScenarioInstance:
         # build the output string
         res = u""
         for ret in retlist:
-            res += u"{0}".format(str(ret))
+            #res += u"{0}".format(str(ret))
+            res += u"{0}".format(ret)
         # return the python string
-        return str(res)
+        #return str(res)
+        return res
 
     def get_parsed_condition(self):
         """Returns the parsed condition

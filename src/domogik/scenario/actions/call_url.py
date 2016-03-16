@@ -26,6 +26,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.actions.abstract import AbstractAction
+from domogik.common.utils import ucode
 import traceback
 try:
     # python3
