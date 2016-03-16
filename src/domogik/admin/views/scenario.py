@@ -459,7 +459,6 @@ def scenario_blocks_js():
                 jso = u""
                 cmd_id = dev['commands'][cmd]['id']
                 cmd_name = dev['commands'][cmd]['name']
-                print cmd_name
                 devices_per_clients[client][name]['commands'][cmd_name] = cmd_id
                 color = 1;
                 # parse the parameters
@@ -471,54 +470,40 @@ def scenario_blocks_js():
                     dt_parent = param_dt_type
                     while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                         dt_parent = datatypes[dt_parent]['parent']
-                    print param_dt_type
-                    #if dt_parent == "DT_Bool":
-                    #    color = 20
-                    #    output = "\"Boolean\""
-                    #elif dt_parent == "DT_Number":
-                    #    color = 65
-                    #    output = "\"Number\""
-                    #else:
-                    #    color = 160
-                    #    output = "\"null\""
-                    js_params += u"""
-                                    this.appendDummyInput().appendField("- {0} : ")
-                                """.format(param_key)
+                    # Build the format
+                    param_format = u""
+                    if 'format' in datatypes[param_dt_type]:
+                        param_format = datatypes[param_dt_type]['format']
+                        if param_format is not None:
+                            param_format = u"({0})".format(param_format)
+                    # Try to build a fieldDropDown list
                     list_options = None
                     if "labels" in datatypes[param_dt_type]:
                         list_options = datatypes[param_dt_type]['labels']
                     if "values" in datatypes[param_dt_type]:
                         list_options = datatypes[param_dt_type]['values']
+                    # start building the inputs
                     if list_options != None:
                         js_list_options = u"["
                         for opt in list_options:
                             js_list_options += u"['{0}', '{1}'],".format(list_options[opt], opt)
                         js_list_options += u"]"
-                        js_params += u"""
-                                        .appendField(new Blockly.FieldDropdown({0}), "{1}");
-                                    """.format(js_list_options, param_key)
-                    else: 
-                        param_format = u""
-                        if 'format' in datatypes[param_dt_type]:
-                            param_format = datatypes[param_dt_type]['format']
-                            if param_format == None:
-                                param_format = u""
-                            else:
-                                param_format = u"({0})".format(param_format)
-
-                        # special cases
-                        if param_dt_type == "DT_ColorRGBHexa":
-                            js_params += u"""
-                                            .appendField(new Blockly.FieldColour(""), "{0}")
-                                            ;//.appendField("{1}");
-                                        """.format(param_key, param_format)
-
+                        js_params += u"""this.appendDummyInput().setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ")
+                                        .appendField(new Blockly.FieldDropdown({1}), "{0}");
+                                    """.format(param_key, js_list_options)
+                    elif param_dt_type == "DT_ColorRGBHexa":
+                        # Color RGB Hexa
+                        js_params += u"""this.appendDummyInput().setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ")
+                                        .appendField(new Blockly.FieldColour(""), "{0}")
+                                    """.format(param_key)
+                    elif dt_parent == "DT_Number":
+                        # numebr input
+                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck("Number");
+                                    """.format(param_key)
+                    else:
                         # default case : text input field
-                        else:
-                            js_params += u"""
-                                            .appendField(new Blockly.FieldTextInput(""), "{0}")
-                                            .appendField("{1}");
-                                        """.format(param_key, param_format)
+                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck("String");
+                                    """.format(param_key)
                 block_id = u"command.CommandAction.{0}".format(cmd_id)
                 block_description = u"{0}@{1}".format(name, client)
                 add = u"""Blockly.Blocks['{0}'] = {{
@@ -526,7 +511,6 @@ def scenario_blocks_js():
                                 this.setColour({5});
                                 this.appendDummyInput().appendField("{2}");
                                 this.appendDummyInput().appendField("Command : {1}");
-                                this.appendDummyInput().appendField("Parameters : ");
                                 {6}
                                 this.setPreviousStatement(true, "null");
                                 this.setNextStatement(true, "null");
