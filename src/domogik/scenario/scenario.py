@@ -290,7 +290,7 @@ class ScenarioInstance:
             level = level + 1
             retlist.append( pyObj(u"{0}".format(self.__parse_part(part['Run'], level))) )
         # apply an action
-        elif part['type'].endswith('Action'):
+        elif "Action" in part['type']:
             act = self._create_instance(part['type'], 'action')
             for p, v in part.items():
                 if p not in ['id', 'type', 'NEXT']:
