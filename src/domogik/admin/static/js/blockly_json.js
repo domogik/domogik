@@ -1,12 +1,5 @@
 'use strict';
-
 goog.provide('Blockly.JSON');
-
-/**
- * Encode a block tree as JSON.
- * @param {!Object} workspace The SVG workspace.
- * @return {!Element} JSON object.
- */
 Blockly.JSON.workspaceToJson = function(workspace) {
   var blocks = workspace.getTopBlocks(true);
   if (blocks[0]) {
@@ -14,13 +7,6 @@ Blockly.JSON.workspaceToJson = function(workspace) {
   }
   return JSON.stringify(json);
 };
-
-/**
- * Encode a block subtree as JSON.
- * @param {!Blockly.Block} block The root block to encode.
- * @return {!Element} Tree of JSON object.
- * @private
- */
 Blockly.JSON.blockToJson = function(block) {
   var element = {};
   element['type'] = block.type;
@@ -44,46 +30,21 @@ Blockly.JSON.blockToJson = function(block) {
       }
     }
   }
-  if (hasValues) {
-    element['inline'] = block.inputsInline;
-  }
-  if (block.isCollapsed()) {
-    element['collapsed'] = true;
-  }
-  if (block.disabled) {
-    element['disabled'] = true;
-  }
-  if (!block.isDeletable()) {
-    element['deletable'] = false;
-  }
-  if (!block.isMovable()) {
-    element['movable'] = false;
-  }
-  if (!block.isEditable()) {
-    element['editable'] = false;
-  }
-  if ( block.elseifCount_ ) {
-    element['elseifCount'] = block.elseifCount_
-  }
-  if ( block.elseCount_ ) {
-    element['elseCount'] = block.elseCount_
-  }
-  if ( block.itemCount_ ) {
-    element['itemCount'] = block.itemCount_
-  }
+  if (hasValues) { element['inline'] = block.inputsInline; }
+  if (block.isCollapsed()) { element['collapsed'] = true; }
+  if (block.disabled) { element['disabled'] = true; }
+  if (!block.isDeletable()) { element['deletable'] = false; }
+  if (!block.isMovable()) { element['movable'] = false; }
+  if (!block.isEditable()) { element['editable'] = false; }
+  if ( block.elseifCount_ ) { element['elseifCount'] = block.elseifCount_ }
+  if ( block.elseCount_ ) { element['elseCount'] = block.elseCount_ }
+  if ( block.itemCount_ ) { element['itemCount'] = block.itemCount_ }
   var nextBlock = block.getNextBlock();
   if (nextBlock) {
     element['NEXT']= Blockly.JSON.blockToJson(nextBlock);
   }
-
   return element;
 };
-
-/**
- * Decode an JSON Object and create blocks on the workspace.
- * @param {!Blockly.Workspace} workspace The SVG workspace.
- * @param {!Element} JSON.
- */
 Blockly.JSON.jsonToWorkspace = function(workspace, json) {
   Blockly.Events.disable();
   var topBlock = Blockly.JSON.jsonToBlock(workspace, json);
@@ -110,56 +71,27 @@ Blockly.JSON.jsonToWorkspace = function(workspace, json) {
   }
   return topBlock;
 };
-
-/**
- * Decode an JSON block tag and create a block (and possibly sub blocks) on the
- * workspace.
- * @param {!Blockly.Workspace} workspace The workspace.
- * @param {!Element} JSON block element.
- * @return {!Blockly.Block} The root block created.
- * @private
- */
 Blockly.JSON.jsonToBlock = function(workspace, jsonBlock) {
   var block = null;
   var prototypeName = jsonBlock['type'];
-  if (!prototypeName) {
-    throw 'Block type unspecified: \n';
-  }
   var id = jsonBlock['id'];
-  if (!id) {
-    throw 'Block id unspecified: \n';
-  }
+  if (!prototypeName) { throw 'Block type unspecified: \n'; }
+  if (!id) { throw 'Block id unspecified: \n'; }
   block = workspace.newBlock( prototypeName);
   block.id = jsonBlock['id'];
-  if (!block.svg_) {
-    block.initSvg();
-  }
-
+  if (!block.svg_) { block.initSvg(); }
   var inline = jsonBlock['inline'];
-  if (inline) {
-    block.setInputsInline(inline == 'true');
-  }
+  if (inline) { block.setInputsInline(inline == 'true'); }
   var disabled = jsonBlock['disabled'];
-  if (disabled) {
-    block.setDisabled(disabled == 'true');
-  }
+  if (disabled) { block.setDisabled(disabled == 'true'); }
   var deletable = jsonBlock['deletable'];
-  if (deletable) {
-    block.setDeletable(deletable == 'true');
-  }
+  if (deletable) { block.setDeletable(deletable == 'true'); }
   var movable = jsonBlock['movable'];
-  if (movable) {
-    block.setMovable(movable == 'true');
-  }
+  if (movable) { block.setMovable(movable == 'true'); }
   var editable = jsonBlock['editable'];
-  if (editable) {
-    block.setEditable(editable == 'true');
-  }
+  if (editable) { block.setEditable(editable == 'true'); }
   var collapsed = jsonBlock['collapsed'];
-  if (collapsed) {
-    block.setCollapsed(collapsed == 'true');
-  }
-
+  if (collapsed) { block.setCollapsed(collapsed == 'true'); }
   // handle mutations
   if ( block.domToMutation) {
       var mut = document.createElement('div');
@@ -218,12 +150,8 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock) {
       }
     }
   }
-  if(block.afterRender) {
-    block.afterRender();
-  }
-  if (block.validate) {
-    block.validate();
-  }
+  if(block.afterRender) { block.afterRender(); }
+  if (block.validate) { block.validate(); }
   var next = block.nextConnection && block.nextConnection.targetBlock();
   if (next) {
     next.render();
