@@ -45,10 +45,8 @@ class CallUrlAction(AbstractAction):
         AbstractAction.__init__(self, log)
         self.set_description("Call an url.")
 
-    def do_action(self, local_vars):
+    def do_action(self):
         url = self._params['url']
-        # local variables
-        url = self.process_local_vars(local_vars, url)
 
         self._log.info(u"Calling url : {0}".format(url))
         try:

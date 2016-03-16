@@ -39,6 +39,7 @@ class Hysteresis(AbstractTest):
         self.add_parameter("id", "trigger.idParameter")
         # keep track of the condition
         self._cond = cond
+        self._log = log
 
     def evaluate(self):
         """ Evaluate if the actions should be triggered or not
@@ -49,6 +50,7 @@ class Hysteresis(AbstractTest):
             self._cond.state(p['id'].evaluate())
             return True
         else:
+            self._log.debug("Hysteresis applied, do not trigger actions")
             return False
 
     def get_blockly(self):

@@ -299,7 +299,7 @@ class ScenarioInstance:
                     else:
                         v2 = u"\"{0}\"".format(v)
                     retlist.append( pyObj(u"self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2), level) )
-            retlist.append( pyObj(u"self._mapping['action']['{0}'].do_action({{}})\r\n".format(act[1]), level) )
+            retlist.append( pyObj(u"self._mapping['action']['{0}'].do_action()\r\n".format(act[1]), level) )
         # if we end up here we should be a test case
         else:
             test = self._create_instance(part['type'], 'test')
@@ -331,7 +331,6 @@ class ScenarioInstance:
         if self._parsed_condition is None:
             return None
         try:
-            print self._parsed_condition
             exec(self._compiled_condition)
         except Exception as a:
             raise

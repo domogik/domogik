@@ -42,7 +42,6 @@ class idParameter(AbstractParameter):
         """ Return string, or none if no string entered yet
         """
         p = self.get_parameters()
-        print p
         if "id" in p:
             return p["id"]
         else:
