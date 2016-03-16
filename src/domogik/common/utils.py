@@ -115,8 +115,14 @@ def ucode(my_string):
 
     """
     if my_string is not None:
+        #print("ucode : {0}".format(type(my_string)))
         if type(my_string) == unicode:
-            return my_string
+            try:
+                # the following line is here to test if an Unicode error would occur...
+                foo = "bar{0}".format(my_string)
+                return my_string
+            except UnicodeEncodeError:
+                return my_string.encode('utf8')
         elif not type(my_string) == str:
             return str(my_string).decode("utf-8")
         else:
