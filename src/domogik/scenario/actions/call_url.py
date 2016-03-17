@@ -49,10 +49,10 @@ class CallUrlAction(AbstractAction):
     def do_action(self):
         url = self._params['url']
 
-        self._log.info(u"Calling url : {0}".format(url))
+        self._log.info(u"Calling url : {0}".format(ucode(url)))
         try:
             # encode url
-            url = url.encode('utf-8')
+            url = ucode(url).encode('utf-8')
             url_elts = urlparse(url)
             url_args = url_elts.query.split("&")
             new_url_args = u""
