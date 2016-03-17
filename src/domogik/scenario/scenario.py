@@ -125,6 +125,8 @@ class ScenarioInstance:
     def state(self, new=None):
         if new:
             self._state = new
+            with self._db.session_scope():
+                self._db.update_scenario(self._dbid, state=new)
             return True
         else:
             return self._state
