@@ -247,7 +247,7 @@ def scenario_blocks_js():
         pass
     # datatypes
     datatypes = {}
-    used_datatypes = []
+    used_datatypes = {}
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('datatype.get')
@@ -268,8 +268,6 @@ def scenario_blocks_js():
     if res is not None:
         res = res.get_data()
         if 'devices' in res:
-            # create a list of the used datatypes in sensors to build only these datatype blocks
-            used_datatypes = []
             devices = res['devices']
     else:
         print("Error : no devices found!")
@@ -392,12 +390,16 @@ def scenario_blocks_js():
                 devices_per_clients[client][name]['sensors'][sen_name] = sen_id
                 # determ the output type
                 sen_dt = dev['sensors'][sen]['data_type'] 
-                if sen_dt not in used_datatypes:
-                    used_datatypes.append(sen_dt)
-                dt_parent = sen_dt
                 # First, determine the parent type (DT_Number, DT_Bool, ...)
+                dt_parent = sen_dt
                 while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                     dt_parent = datatypes[dt_parent]['parent']
+                # store it in the used
+                if dt_parent not in used_datatypes:
+                    used_datatypes[dt_parent] = []
+                if sen_dt not in used_datatypes[dt_parent]:
+                    used_datatypes[dt_parent].append(sen_dt)
+                # create the block
                 if dt_parent == "DT_Bool":
                     color = 20
                     output = "\"Boolean\""
@@ -470,6 +472,10 @@ def scenario_blocks_js():
                     dt_parent = param_dt_type
                     while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                         dt_parent = datatypes[dt_parent]['parent']
+                    if dt_parent not in used_datatypes:
+                        used_datatypes[dt_parent] = []
+                    if param_dt_type not in used_datatypes[dt_parent]:
+                        used_datatypes[dt_parent].append(param_dt_type)
                     # Build the format
                     param_format = u""
                     if 'format' in datatypes[param_dt_type]:
@@ -524,52 +530,50 @@ def scenario_blocks_js():
             print("ERROR while looking on a device : {0}".format(traceback.format_exc()))
 
     #### datatypes
-    for dt_type in used_datatypes:
-        dt_parent = dt_type
-        # First, determine the parent type (DT_Number, DT_Bool, ...)
-        while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
-            dt_parent = datatypes[dt_parent]['parent']
-        if dt_parent == "DT_Bool":
-            color = 20
-            output = "\"Boolean\""
-            opt = "["
-            for lab in datatypes[dt_type]['labels']:
-                opt += u"['{0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
-            opt += "]"
-            input = """
-                     this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "BOOL");
-                    """.format(opt)
-        elif dt_parent == "DT_Number":
-            color = 65
-            output = "\"Number\""
-            input = """
-                     this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
-                    """
-        elif dt_parent == "DT_String" and dt_type == "DT_ColorRGBHexa":
-            color = 65
-            output = "\"null\""
-            input = """
-                     this.appendDummyInput().appendField(new Blockly.FieldColour(""), "COLOUR");
-                    """
-        else:
-            color = 160
-            output = "\"null\""
-            input = """
-                     this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
-                    """
+    for dt_parent, dt_types in used_datatypes.items():
+        for dt_type in dt_types:
+            print "{0} => {1}".format(dt_parent, dt_type)
+            if dt_parent == "DT_Bool":
+                color = 20
+                output = "\"Boolean\""
+                opt = "["
+                for lab in datatypes[dt_type]['labels']:
+                    opt += u"['{0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
+                opt += "]"
+                input = """
+                         this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "BOOL");
+                        """.format(opt)
+            elif dt_parent == "DT_Number":
+                color = 65
+                output = "\"Number\""
+                input = """
+                         this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
+                        """
+            elif dt_parent == "DT_String" and dt_type == "DT_ColorRGBHexa":
+                color = 65
+                output = "\"null\""
+                input = """
+                         this.appendDummyInput().appendField(new Blockly.FieldColour(""), "COLOUR");
+                        """
+            else:
+                color = 160
+                output = "\"null\""
+                input = """
+                         this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
+                        """
 
-        add = """Blockly.Blocks['{0}'] = {{
-                    init: function() {{
-                        this.setColour({1});
-                        this.appendDummyInput().appendField("{0}");
-                        {3}
-                        this.setTooltip("{0}"); 
-                        this.setOutput(true, {2});
-                        this.setInputsInline(false);
-                    }}
-                }};
-                """.format(dt_type, color, output, input)
-        js = u'{0}\n\r{1}'.format(js, add)
+            add = """Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            this.setColour({1});
+                            this.appendDummyInput().appendField("{0}");
+                            {3}
+                            this.setTooltip("{0}"); 
+                            this.setOutput(true, {2});
+                            this.setInputsInline(false);
+                        }}
+                    }};
+                    """.format(dt_type, color, output, input)
+            js = u'{0}\n\r{1}'.format(js, add)
         
     # CODE for #85
     # add the scenario enable/disable block

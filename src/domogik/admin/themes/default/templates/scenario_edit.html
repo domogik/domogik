@@ -49,22 +49,26 @@
         <block type="logic_compare"></block>
         <block type="logic_operation"></block>
         <block type="logic_negate"></block>
-        <block type="logic_boolean"></block>
-    </category>
-    <category name="Maths">
         <block type="math_arithmetic"></block>
+    </category>
+    <category name="Constants">
+        <block type="logic_boolean"></block>
         <block type="math_number"></block>
+        <block type="text"></block>
     </category>
     <category name="Variables" custom="VARIABLE"></category>
     <category name="Text">
-        <block type="text"></block>
         <block type="text_join"></block>
         <block type="text_length"></block>
         <block type="text_isEmpty"></block>
     </category>
     <category name="Datatypes">
-        {% for d in datatypes %}
-            <block type="{{ d }}"></block>
+        {% for p, ds in datatypes.items() %}
+            <category name="{{ p }}">
+            {% for d in ds %}
+                <block type="{{ d }}"></block>
+            {% endfor %}
+            </category>
         {% endfor %}
     </category>
     <category name="Devices">
