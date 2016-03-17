@@ -51,7 +51,7 @@ class CommandAction(AbstractAction):
         params = {}
         for key in self._params:
             self.log.debug(u"Preprocess for param : key={0}, typeofvalue={1}, value={2}".format(key, type(self._params[key]), self._params[key]))
-
+            params[key] = self._params[key]
             if key == "color" and params[key].startswith("#"):
                 self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
                 params[key] = params[key][1:]
