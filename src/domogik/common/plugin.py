@@ -906,6 +906,25 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
        #    raise IOError("Can't create a file in directory {0}.".format(path))
        return path
 
+    def get_publish_files_directory(self):
+       """
+       Return the directory where a plugin can store files to be published over rest api : /rest/publish/<client type>/<client name>/<file>
+       If the directory doesn't exist, try to create it.
+       After that, try to create a file inside it.
+       If something goes wrong, generate an explicit exception.
+       """
+       path = "{0}/{1}/{2}_{3}/publish/".format(self.libraries_directory, PACKAGES_DIR, self._type, self._name)
+       if os.path.exists(path):
+           if not os.access(path, os.W_OK & os.X_OK):
+               raise OSError("Can't write in directory {0}".format(path))
+       else:
+           try:
+               os.mkdir(path, 770)
+               self.log.info(u"Create directory {0}.".format(path))
+           except:
+               raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))
+       return path
+
     def register_helper(self, action, help_string, callback):
         if action not in self.helpers:
             self.helpers[action] = {'call': callback, 'help': help_string}

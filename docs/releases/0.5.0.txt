@@ -32,6 +32,11 @@ Rest service : new service to discuss with the butler
 
 A new service has been added to rest : **POST /rest/butler/discuss**. It allows to discuss with the butler over a Rest url. This service can be useful to interact with the butler from scripts or alternate home automation systems.
 
+Rest service : new service to access content published by some packages
+-----------------------------------------------------------------------
+
+A new service has been added to rest : **GET /rest/publish/<client type>/<client name>/<data path>**. It allows to access to content published by some packages. For example, videos registered when a motion is detected by a camera.
+
 Install script upgrades
 -----------------------
 

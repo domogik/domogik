@@ -605,5 +605,13 @@
         "format": "(N|S) DD MM SS.s,(E|W) DD MM SS.s",
         "parent": "DT_String",
         "childs": []
+    },
+    "DT_Video": {
+        "childs": ["DT_VideoMjpeg"]
+    },
+    "DT_VideoMjpeg": {
+        "format": "",
+        "parent": "DT_Video",
+        "childs": []
     }
 }

@@ -55,6 +55,7 @@ from subprocess import Popen, PIPE
 import time
 import re
 import sys
+from domogik.common.utils import ucode
 
 
 
@@ -544,7 +545,7 @@ class Butler(Plugin):
             reply = self.process(msg)
 
             # let Nestor answer in the chat
-            print(u"{0} > {1}".format(self.butler_name, reply))
+            print("{0} > {1}".format(ucode(self.butler_name), ucode(reply)))
 
             # let Nestor speak
             #tts = u"espeak -p 40 -s 140 -v mb/mb-fr1 \"{0}\" | mbrola /usr/share/mbrola/fr1/fr1 - -.au | aplay".format(reply)

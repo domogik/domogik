@@ -75,8 +75,8 @@ RUN useradd -M domogik \
  && chown domogik:domogik /opt/dmg
  
 ### Change passwords
-echo "root:$ROOT_PASSWORD" | chpasswd
-echo "domogik:$DOMOGIK_PASSWORD" | chpasswd
+RUN echo "root:$ROOT_PASSWORD" | chpasswd \
+ && echo "domogik:$DOMOGIK_PASSWORD" | chpasswd
  
 ### Deploy the sources
 
@@ -148,6 +148,9 @@ RUN su - domogik -c "dmg_package -i http://github.com/fritz-smh/domogik-plugin-g
 RUN pip install npyscreen \
  && su - domogik -c "dmg_package -i http://github.com/fritz-smh/domogik-interface-chat/archive/develop.zip"
 
+
+### Cleanup
+RUN apt-get clean
 
 ### Expose ports
 EXPOSE 40406 40404 22

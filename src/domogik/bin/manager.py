@@ -495,7 +495,11 @@ class Manager(XplPlugin):
 
 
         json_file = "{0}/datatypes.json".format(self.get_resources_directory())
-        data = json.load(open(json_file))
+        data = None
+        try:
+            data = json.load(open(json_file))
+        except:
+            self.log.error("Error while reading datatypes json file '{0}'. Error is : {1}".format(json_file, traceback.format_exc()))
         msg.add_data("datatypes", data)
         self.reply(msg.get())
 
