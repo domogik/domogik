@@ -76,9 +76,11 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock) {
   var prototypeName = jsonBlock['type'];
   var id = jsonBlock['id'];
   if (!prototypeName) { throw 'Block type unspecified: \n'; }
-  if (!id) { throw 'Block id unspecified: \n'; }
-  block = workspace.newBlock( prototypeName);
-  block.id = jsonBlock['id'];
+  if (!id) { 
+      block = workspace.newBlock( prototypeName);
+  } else {
+      block = workspace.newBlock( prototypeName, jsonBlock['id']);
+  }
   if (!block.svg_) { block.initSvg(); }
   var inline = jsonBlock['inline'];
   if (inline) { block.setInputsInline(inline == 'true'); }
