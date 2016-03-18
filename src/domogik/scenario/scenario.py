@@ -157,7 +157,6 @@ class ScenarioInstance:
         """
         try:
             self._parsed_condition = self.__parse_part(self._json)
-            print self._parsed_condition
             tmp = ast.parse(self._parsed_condition)
             self._compiled_condition = compile(tmp, "Scenario {0}".format(remove_accents(self._name)), 'exec')
         except:
@@ -332,7 +331,7 @@ class ScenarioInstance:
         @raise ValueError if no parsed condition is avaiable
         @return a boolean representing result of evaluation
         """
-        if self._parsed_condition is None:
+        if self._compiled_condition is None:
             return None
         try:
             exec(self._compiled_condition)
@@ -403,6 +402,7 @@ class pyObj:
         """
         If lvl is set, indent that many times
         """
+        print self.lvl
         ident = (u"    " * self.lvl) if self.lvl else ""
         result = [u"{0}{1}".format(ident, line) for line in self.data.splitlines(True)]
         return u"".join(result)
