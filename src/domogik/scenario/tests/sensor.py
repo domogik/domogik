@@ -19,32 +19,30 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-@author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2009 Domogik project
+@author: Cereal
+@copyright: (C) 2007-2016 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
 
 from domogik.scenario.tests.abstract import AbstractTest
 from domogik.common.database import DbHelper
+from domogikmq.pubsub.subscriber import MQAsyncSub
 from time import sleep
-from threading import Thread, Event
+import zmq
 
-class SensorTest(AbstractTest):
-    """ Sensor test
-    # params == the sensorId to check the value for
-    """
-
+class AbstractSensorTest(AbstractTest, MQAsyncSub):
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
+        self.sub = MQAsyncSub.__init__(self, zmq.Context(), 'scenario-sensor', ['device-stats'])
         self._sensorId = params
-        self.set_description("Check The value for a sensor with id {0}".format(self._sensorId))
+        self.set_description("Check if value/date changes for a sensor with id {0}".format(self._sensorId))
         self.log = log
         self._db = DbHelper()
         self._res = None
         self._dataType = None
         self._dt_parent = None
-        # get info from db
+        # get initital info from db
         with self._db.session_scope():
             sensor = self._db.get_sensor(self._sensorId)
             if sensor is not None:
@@ -56,24 +54,32 @@ class SensorTest(AbstractTest):
             while 'parent' in cond.datatypes[dt_parent] and cond.datatypes[dt_parent]['parent'] != None:
                 dt_parent = cond.datatypes[dt_parent]['parent']
             self._dt_parent = dt_parent
-        # set new val
-        self._res = self._convert(self._res)
-        # start the thread
-        self._event = Event()
-        self._fetch_thread = Thread(target=self._fetch,name="pollthread")
-        self._fetch_thread.start()
 
-    def _fetch(self):
-        while not self._event.is_set():
-            new = None
-            with self._db.session_scope():
-                sensor = self._db.get_sensor(self._sensorId)
-                if sensor is not None:
-                    new = self._convert(sensor.last_value)
-            if self._res != new:
-                self._res = new
-                self._trigger(self)
-            sleep(2)
+    def destroy(self):
+        """ Destroy fetch thread
+        """
+        AbstractTest.destroy(self)
+
+    def on_message(self, did, msg):
+        """Receive message from MQ sub"""
+        if self._sensorId:
+            if 'sensor_id' in msg:
+                if int(msg['sensor_id']) == int(self._sensorId):
+                    self.handle_message(did, msg)
+
+
+class SensorTest(AbstractSensorTest):
+    """ Sensor test : evaluate a sensor value when it changes
+    # params == the sensorId to check the value for
+    """
+
+    def __init__(self, log = None, trigger = None, cond = None, params = None):
+        AbstractSensorTest.__init__(self, log, trigger, cond, params)
+        self._res = self._convert(self._res)
+
+    def handle_message(self, did, msg):
+        self._res = self._convert(msg['stored_value'])
+        self._trigger(self)
 
     def _convert(self, val):
         if self._dt_parent == "DT_Number":
@@ -100,25 +106,40 @@ class SensorTest(AbstractTest):
             return val
 
     def evaluate(self):
-        """ Evaluate if the text appears in the content of the page referenced by url
+        """ Evaluate the sensor value
         """
-        self.log.debug("Evalute SensorTest '{0}' to '{1}'. Type is '{2}'".format(self._sensorId, self._res, type(self._res))) 
+        self.log.debug("Evaluate SensorTest '{0}' to '{1}'. Type is '{2}'".format(self._sensorId, self._res, type(self._res))) 
         return self._res
 
-    def destroy(self):
-        """ Destroy fetch thread
+class SensorChangedTest(AbstractSensorTest):
+    """ Sensor test : raise True when the value/date change
+    # params == the sensorId to check the value for
+    """
+
+    def __init__(self, log = None, trigger = None, cond = None, params = None):
+        AbstractSensorTest.__init__(self, log, trigger, cond, params)
+        self._old_res = self._res
+
+    def handle_message(self, did, msg):
+        self._res = msg['stored_value']
+        # Trigger only if the value changed
+        if self._res != self._old_res:
+            self._trigger(self)
+        self._old_res = self._res
+
+    def evaluate(self):
+        """ Evaluate the sensor value
         """
-        self._event.set()
-        self._fetch_thread.join()
-        AbstractTest.destroy(self)
+        self.log.debug("Evaluate SensorChangedTest '{0}' : value changed. Return True.".format(self._sensorId, self._res)) 
+        return True
+
 
 if __name__ == "__main__":
     import logging
 
     def mytrigger(test):
-        print "Trigger called by test %s, refreshing state" % test
-        st = TEST.evaluate()
-        print "state is %s" % st
+        print("Trigger called by test {0}, refreshing state".format(test))
+        print("state is {0}".format(st))
 
     ### create logger
     FORMAT = "%(asctime)-15s %(message)s"
@@ -151,7 +172,7 @@ if __name__ == "__main__":
 
     logger.info("==== Evaluate with parameters values that does not match ====")
     logger.debug("Set values")
-    data = { "sensor": { "sensor_id" : 1072 },
+    data = { "sensor": { "sensor_id" : 2 },
              "value":  { "text" : "on" }
     }
     logger.debug("Set parameters values")
@@ -161,7 +182,7 @@ if __name__ == "__main__":
     st.evaluate()
 
     ######### TODO : finish the below part 
-    print "updating with good text"
+    print("updating with good text")
     data = { "url": { "urlpath" : "http://people.dunnewind.net/maxence/domogik/test.txt",
                     "interval": "5"
     },
@@ -169,10 +190,10 @@ if __name__ == "__main__":
         "text" : "randomtext"
     }
     }
-    print "===="
+    print("====")
     TEST.fill_parameters(data)
-    print "===="
-    print "I sleep 5s"
+    print("====")
+    print("I sleep 5s")
     sleep(5)
-    print "Trying to evaluate : %s" % TEST.evaluate()
+    print("Trying to evaluate : {0}".format(TEST.evaluate()))
     TEST.destroy()

@@ -639,7 +639,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self.log.info(u"Check if there are pictures for the defined products")
         ok = True
         ok_product = None
-        if self.json_data.has_key('products'):
+        if 'products' in self.json_data:
             for product in self.json_data['products']:
                 ok_product = False
                 for ext in PRODUCTS_PICTURES_EXTENSIONS:
@@ -884,7 +884,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
-               os.mkdir(path, 0770)
+               os.mkdir(path, 770)
                self.log.info(u"Create directory {0}.".format(path))
            except:
                raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))
@@ -904,6 +904,25 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
        #    os.remove(filename)
        #except :
        #    raise IOError("Can't create a file in directory {0}.".format(path))
+       return path
+
+    def get_publish_files_directory(self):
+       """
+       Return the directory where a plugin can store files to be published over rest api : /rest/publish/<client type>/<client name>/<file>
+       If the directory doesn't exist, try to create it.
+       After that, try to create a file inside it.
+       If something goes wrong, generate an explicit exception.
+       """
+       path = "{0}/{1}/{2}_{3}/publish/".format(self.libraries_directory, PACKAGES_DIR, self._type, self._name)
+       if os.path.exists(path):
+           if not os.access(path, os.W_OK & os.X_OK):
+               raise OSError("Can't write in directory {0}".format(path))
+       else:
+           try:
+               os.mkdir(path, 770)
+               self.log.info(u"Create directory {0}.".format(path))
+           except:
+               raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))
        return path
 
     def register_helper(self, action, help_string, callback):
@@ -935,9 +954,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
     def __del__(self):
         if hasattr(self, "log"):
             self.log.debug(u"__del__ Single client")
-            self.log.debug(u"the stack is :")
-            for elt in inspect.stack():
-                self.log.debug(u"    {0}".format(elt))
+            #self.log.debug(u"the stack is :")
+            #for elt in inspect.stack():
+            #    self.log.debug(u"    {0}".format(elt))
             # we guess that if no "log" is defined, the client has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
@@ -949,9 +968,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if hasattr(self, "log"):
             self.log.debug(u"force_leave called")
             #self.log.debug(u"the stack is : {0}".format(inspect.stack()))
-            self.log.debug(u"the stack is :")
-            for elt in inspect.stack():
-                self.log.debug(u"    {0}".format(elt))
+            #self.log.debug(u"the stack is :")
+            #for elt in inspect.stack():
+            #    self.log.debug(u"    {0}".format(elt))
 
         if return_code != None:
             self.set_return_code(return_code)

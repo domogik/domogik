@@ -60,7 +60,7 @@ class OrderedDict(DictMixin):
                 length = len(items[i])
                 if length != 2:
                     raise ValueError('dictionary update sequence element '
-                        '#%d has length %d; 2 is required' % (i, length))
+                        '{0} has length {1}; 2 is required'.format(i, length))
                 self._keys.append(items[i][0])
                 self._data[items[i][0]] = items[i][1]
         if kwdata:
@@ -85,7 +85,7 @@ class OrderedDict(DictMixin):
     def __repr__(self):
         result = []
         for key in self._keys:
-            result.append('(%s, %s)' % (repr(key), repr(self._data[key])))
+            result.append('({0}, {1})'.format(repr(key), repr(self._data[key])))
         return ''.join(['OrderedDict', '([', ', '.join(result), '])'])
 
     def _merge_keys(self, keys):

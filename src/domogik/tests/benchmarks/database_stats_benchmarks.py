@@ -226,7 +226,7 @@ if __name__ == "__main__":
             sys.exit(2)
         if stats_filter:
             run_stats_filter(filter_list)
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         print(u"Wrong arguments supplied : %s" % str(err))
         usage(sys.argv[0])
         sys.exit(2)

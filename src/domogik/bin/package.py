@@ -294,7 +294,7 @@ class PackageInstaller():
             self.log.info("Extract the zip file {0} as {1}".format(path, pkg_folder))
             try:
                 os.mkdir(pkg_folder)
-            except OSError, e:
+            except OSError as e:
                 if e.errno != 17:
                     raise
             except:
@@ -315,7 +315,7 @@ class PackageInstaller():
                         try:
                             new_folder = os.path.join(pkg_folder, dirname)
                             os.mkdir(new_folder)
-                        except OSError, e:
+                        except OSError as e:
                             if e.errno != 17:
                                 raise
                         except:
@@ -396,7 +396,7 @@ class PackageInstaller():
                                     #progress = int(50 * dl / total_length)
                                     #if progress - old_progress > 5 or progress >= 49:
                                     #    old_progress = progress 
-                                    #    sys.stdout.write("\r[%s%s]" % ('=' * progress, ' ' * (50-progress)) )    
+                                    #    sys.stdout.write("\r[{0}{1}]".format('=' * progress, ' ' * (50-progress)) )    
                                     #    sys.stdout.flush()
                             #sys.stdout.write("\n")
                             os.fsync(f)

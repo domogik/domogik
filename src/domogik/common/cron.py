@@ -333,7 +333,7 @@ class CronExpression(object):
                 if value >= minmax[0] and value <= minmax[1]:
                     return set((value,))
                 else:
-                    raise ValueError("Invalid bounds: \"%s\"" % parse)
+                    raise ValueError("Invalid bounds: \"{0}\"".format(parse))
             elif '-' in parse or '/' in parse:
                 divide = parse.split('/')
                 subrange = divide[0]
@@ -345,12 +345,12 @@ class CronExpression(object):
                     # Example: a-b
                     prefix, suffix = [int(n) for n in subrange.split('-')]
                     if prefix < minmax[0] or suffix > minmax[1]:
-                        raise ValueError("Invalid bounds: \"%s\"" % parse)
+                        raise ValueError("Invalid bounds: \"{0}\"".format(parse))
                 elif subrange == '*':
                     # Include all values with the given range
                     prefix, suffix = minmax
                 else:
-                    raise ValueError("Unrecognized symbol: \"%s\"" % subrange)
+                    raise ValueError("Unrecognized symbol: \"{0}\"".format(subrange))
     
                 if prefix < suffix:
                     # Example: 7-10
@@ -368,27 +368,27 @@ class CronExpression(object):
 
 if __name__ == "__main__":
     job = CronExpression("@fullmoon")
-    print job
-    print job.check_trigger_now()
-    print ""
+    print(job)
+    print(job.check_trigger_now())
+    print("")
     job = CronExpression("@dawn")
-    print job
-    print job.check_trigger_now()
-    print ""
+    print(job)
+    print(job.check_trigger_now())
+    print("")
     job = CronExpression("@equinox")
-    print job
-    print job.check_trigger_now()
-    print ""
-    #print job.check_trigger((2010, 11, 17, 0, 0))
+    print(job)
+    print(job.check_trigger_now())
+    print("")
+    #print(job.check_trigger((2010, 11, 17, 0, 0)))
     job = CronExpression("0 0 * * 1-5/2 find /var/log -delete")
-    print job
-    print job.check_trigger_now()
-    print job.check_trigger((2010, 11, 17, 0, 0))
-    print job.check_trigger((2012, 12, 21, 0 , 0))
-    print ""
+    print(job)
+    print(job.check_trigger_now())
+    print(job.check_trigger((2010, 11, 17, 0, 0)))
+    print(job.check_trigger((2012, 12, 21, 0 , 0)))
+    print("")
     job = CronExpression("@midnight Feed 'it'", (2010, 5, 1, 7, 0, -6))
-    print job
-    print job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6)
-    print job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6)
-    print job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6)
-    print ""
+    print(job)
+    print(job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6))
+    print(job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6))
+    print(job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6))
+    print("")

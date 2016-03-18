@@ -24,8 +24,10 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @license: GPL(v3)
 @organization: Domogik
 """
-
-from exceptions import IndexError, NotImplementedError, AttributeError
+try:
+    from exceptions import IndexError, NotImplementedError, AttributeError
+except:
+    pass
 
 class AbstractTest:
     """ This class provides base methods for the scenario tests
@@ -87,7 +89,7 @@ class AbstractTest:
         """ Callback called by a parameter when the fill() method is called
         Basically, it only calls the underlying ttrigger if exists
         """
-        self.log.warning("Trigger %s called by parameter %s" % (self._trigger, param))
+        self.log.warning("Trigger {0} called by parameter {1}".format(self._trigger, param))
         if self._trigger != None:
             self._trigger(self)
 
@@ -133,7 +135,7 @@ class AbstractTest:
         Note that this exception has to be raised by the Parameter
         """
         params = {}
-        for name, val in data.iteritems():
+        for name, val in data.items():
             param = name.split('.')
             if len(param) == 2:
                 paramn = param[0]
@@ -142,7 +144,7 @@ class AbstractTest:
                     if paramn not in params:
                         params[paramn] = []
                     params[paramn].append({param: val})
-        for test, param in params.iteritems():
+        for test, param in params.items():
             self._parameters[test].fill(param)            
 
     def add_parameter(self, name, classname):
@@ -157,7 +159,7 @@ class AbstractTest:
             raise AttributeError("A parameter instance already exists with this name")
         modonly = classname.split('.')[0]
         classonly = classname.split('.')[1]
-        module_name = "domogik.scenario.parameters.%s" % modonly
+        module_name = "domogik.scenario.parameters.{0}".format(modonly)
         #This may raise ImportError
         cname = getattr(__import__(module_name, fromlist = [modonly]), classonly)
         p = cname(log=self.log, trigger=self.cb_trigger)

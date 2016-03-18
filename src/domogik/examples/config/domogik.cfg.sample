@@ -22,6 +22,12 @@ pid_dir_path = /var/run/domogik/
 # Debug levels are debug, info, warning, error, critical
 log_level = debug
 
+# info about the values
+# https://docs.python.org/2/library/logging.handlers.html#timedrotatingfilehandler
+log_when = D
+log_interval = 1
+log_backup_count = 10
+
 # This parameter defines which interface the Domogik xPL plugins should listen for xPL
 # If you have only one computer to run the Domogik installation (of course, 
 # the one used to browse the interface is not important), you can set it 
@@ -78,6 +84,8 @@ ssl_certificate =
 ssl_key =
 # if set to True, this will result in a nicely formatted json
 clean_json = False
+# if set to True, all the /rest/ urls need basic authentication
+rest_auth = False
 
 ###
 # Butler configuration

@@ -793,7 +793,7 @@ Returns a syntax error string on error; None otherwise."""
                 dest = result["topic"][topic]
 
             # Copy the triggers.
-            for trig, data in self._topics[topic].iteritems():
+            for trig, data in self._topics[topic].items():
                 dest[trig] = self._copy_trigger(trig, data)
 
         # %Previous's.
@@ -810,16 +810,16 @@ Returns a syntax error string on error; None otherwise."""
                 dest = result["that"][topic]
 
             # The "that" structure is backwards: bot reply, then trigger, then info.
-            for previous, pdata in self._thats[topic].iteritems():
-                for trig, data in pdata.iteritems():
+            for previous, pdata in self._thats[topic].items():
+                for trig, data in pdata.items():
                     dest[trig] = self._copy_trigger(trig, data, previous)
 
         # Inherits/Includes.
-        for topic, data in self._lineage.iteritems():
+        for topic, data in self._lineage.items():
             result["inherit"][topic] = []
             for inherit in data:
                 result["inherit"][topic].append(inherit)
-        for topic, data in self._includes.iteritems():
+        for topic, data in self._includes.items():
             result["include"][topic] = []
             for include in data:
                 result["include"][topic].append(include)

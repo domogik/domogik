@@ -72,7 +72,7 @@ class BasePlugin():
         dmg_user = Default.get("DOMOGIK_USER")
         logname = pwd.getpwuid(os.getuid())[0]
         if dmg_user != logname:
-            print(u"ERROR : this Domogik part must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : %s" % dmg_user)
+            print(u"ERROR : this Domogik part must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : {0}".format(dmg_user))
             sys.exit(1)
 
         if name is not None:
@@ -143,7 +143,7 @@ class BasePlugin():
             ctx = DaemonContext()
             ctx.files_preserve = l.get_fds([name])
             ctx.open()
-            self.log.info(u"Daemonize plugin %s" % name)
+            self.log.info(u"Daemonize plugin {0}".format(name))
             self.is_daemon = True
         else:
             #l = logger.Logger(name)
@@ -175,13 +175,13 @@ class BasePlugin():
         Should be called by each thread at start
         @param thread : the thread to add
         '''
-        # self.log.debug('New thread registered : %s' % thread)
+        # self.log.debug('New thread registered : {0}'.format(thread))
         #Remove all stopped thread from the list
         for t in self._threads:
             if not  t.isAlive():
                 self._threads.remove(t)
         if thread in self._threads:
-            self.log.info(u"Try to register a thread twice :" % thread)
+            self.log.info(u"Try to register a thread twice: {0}".format(thread))
         else:
             self._lock_add_thread.acquire()
             self._threads.append(thread)
@@ -208,9 +208,9 @@ class BasePlugin():
         @param timer : the timer to add
         '''
         if timer in self._timers:
-            self.log.info(u"Try to register a timer twice : %s" % timer)
+            self.log.info(u"Try to register a timer twice : {0}".format(timer))
         else:
-            self.log.debug('New timer registered : %s' % timer)
+            self.log.debug('New timer registered : {0}'.format(timer))
             self._lock_add_timer.acquire()
             self._timers.append(timer)
             self._lock_add_timer.release()
@@ -221,7 +221,7 @@ class BasePlugin():
         Should be the last action of each timer
         @param timer : the timer to remove
         '''
-        self.log.debug('ASk for timer unregister : %s' % timer)
+        self.log.debug('ASk for timer unregister : {0}'.format(timer))
         self._lock_add_timer.acquire()
         if timer in self._timers:
             self.log.debug('Unregister timer')
@@ -287,9 +287,9 @@ class BasePlugin():
             # delete the file
             # delete also in /etc/init.d/domogik start|stop ???
             self.log.debug("Delete the file {0}".format(self.return_code_filename))
-            self.log.debug(u"the stack is :")
-            for elt in inspect.stack():
-                self.log.debug(u"    {0}".format(elt))
+            #self.log.debug(u"the stack is :")
+            #for elt in inspect.stack():
+            #    self.log.debug(u"    {0}".format(elt))
             os.unlink(self.return_code_filename)
         except:
             self.log.error("Error while deleting the file '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))

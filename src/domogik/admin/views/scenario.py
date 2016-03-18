@@ -41,6 +41,10 @@ def scenario():
         if 'result' in res:
             res = res['result']
             for scen in res:
+                if scen['disabled']:
+                    scen['endis'] = 'Disabled'
+                else:
+                    scen['endis'] = 'Enabled'
                 scenarios.append(scen)
     scenarios = sorted(scenarios, key=itemgetter("name"))
     return render_template('scenario.html',
@@ -59,9 +63,39 @@ def scenario_del(id):
     return redirect(u"/scenario")
     pass
 
+@app.route('/scenario/enable/<id>')
+@login_required
+def scenario_enable(id):
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('scenario.enable')
+    msg.add_data('cid', id)
+    res = cli.request('scenario', msg.get(), timeout=10)
+    flash(gettext(u"Scenario enabled"), u"success")
+    return redirect(u"/scenario")
+    pass
+
+@app.route('/scenario/disable/<id>')
+@login_required
+def scenario_disable(id):
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('scenario.disable')
+    msg.add_data('cid', id)
+    res = cli.request('scenario', msg.get(), timeout=10)
+    flash(gettext(u"Scenario disabled"), u"success")
+    return redirect(u"/scenario")
+    pass
+
+
+@app.route('/scenario/clone/<id>', methods=['GET', 'POST'])
 @app.route('/scenario/edit/<id>', methods=['GET', 'POST'])
 @login_required
 def scenario_edit(id):
+    if str(request.path).find('/clone/') > -1:
+        clone = True
+    else:
+        clone = False
     default_json = '{"type":"dom_condition","id":"1","deletable":false}'
     # laod the json
     if int(id) == 0:
@@ -69,6 +103,7 @@ def scenario_edit(id):
         jso = default_json
         dis = 0
         desc = None
+        trigger = u"Hysteresis"
     else:
         with app.db.session_scope():
             scen = app.db.get_scenario(id)
@@ -76,13 +111,18 @@ def scenario_edit(id):
             dis = scen.disabled
             name = scen.name
             desc = scen.description
+            trigger = scen.trigger_mode
             jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'").replace('"', '\\"')
+            if clone:
+                id = 0
+                name = u""
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
         sname = TextField("Name", default=name, description=u"Scenario name")
         sdis = BooleanField("Disable", default=dis, description=u"Disabling a scenario avoid to delete it if you temporary want it not to run")
         sdesc = TextAreaField("Description", default=desc)
+        strigger = SelectField("Trigger Mode", choices=[('Always','Always'), ('Hysteresis', 'Hysteresis')], default=trigger, description=u"Sets the mode when the actions are run")
         sjson = HiddenField("json")
         submit = SubmitField(u"Send")
         pass
@@ -99,6 +139,7 @@ def scenario_edit(id):
         msg.add_data('json_input', form.sjson.data)
         msg.add_data('cid', form.sid.data)
         msg.add_data('dis', form.sdis.data)
+        msg.add_data('tmode', form.strigger.data)
         msg.add_data('desc', form.sdesc.data)
         res = cli.request('scenario', msg.get(), timeout=10)
         if res:
@@ -137,12 +178,6 @@ def scenario_edit(id):
             jso = jso,
             scenario_id = id)
 
-
-
-
-
-
-
 def scenario_blocks_js():
     """
         Generate all the dynamic Blockly blocs : tests, commands, devices sensors and commands, datatype
@@ -152,6 +187,21 @@ def scenario_blocks_js():
     """
 
     ### first, do all MQ related calls
+
+    # CODE for #85
+    # scenarios
+    #scenarios = {}
+    #cli = MQSyncReq(app.zmq_context)
+    #msg = MQMessage()
+    #msg.set_action('scenario.list')
+    #res = cli.request('scenario', msg.get(), timeout=10)
+    #if res is not None:
+    #    res = res.get_data()
+    #    if 'result' in res:
+    #        scenarios = res['result']
+    #else:
+    #    print("Error : no scenarios found!")
+    #    scenarios = {}
 
     # scenarios tests (cron, text in page, ...)
     scenario_tests = {}
@@ -171,9 +221,9 @@ def scenario_blocks_js():
     tests = scenario_tests.keys()
     try:
         tests.remove(u'sensor.SensorTest')
+        tests.remove(u'sensor.SensorChangedTest')
     except ValueError:
-        # in case the list is empty because of another issue...
-        print("Errror : can't remove sensor.SensorTest from tests. Error is : {0}".format(traceback.format_exc()))
+        pass
 
     # scenarios actions (log, call url, ...)
     scenario_actions = {}
@@ -192,11 +242,13 @@ def scenario_blocks_js():
 
     actions = scenario_actions.keys()
     try:
+        actions.remove(u'scenario.endis')
+    except ValueError:
+        pass
+    try:
         actions.remove(u'command.CommandAction')
     except ValueError:
-        # in case the list is empty because of another issue...
-        print("Errror : can't remove command.CommandAction from actions. Error is : {0}".format(traceback.format_exc()))
-
+        pass
     # datatypes
     datatypes = {}
     used_datatypes = []
@@ -232,11 +284,21 @@ def scenario_blocks_js():
     js = ""
 
     ### tests
-    for test, params in scenario_tests.iteritems():
+    print(u"ITEMS={0}".format(scenario_tests.items()))
+
+    # Check if there are some errors in the python tests files
+    # TODO : Improve error handling
+    for key, value in scenario_tests.items():
+        if key == "status":
+            print(u"Error : {0}".format(scenario_tests.items()))
+
+    for test, params in scenario_tests.items():
         if test == "sensor.SensorTest": continue
+        if test == "sensor.SensorChangedTest": continue
         p = []
         jso = u""
         #for parv in params:
+        print(u"TEST={0}".format(test))
         for parv in params['parameters']:
             par = parv['name']
             papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
@@ -267,12 +329,12 @@ def scenario_blocks_js():
 
 
     ### actions
-    for act, params in scenario_actions.iteritems():
+    for act, params in scenario_actions.items():
         if act == "command.CommandAction": continue
         p = []
         inline = "false"  # default inline value
         jso = u""
-        for par, parv in params['parameters'].iteritems():
+        for par, parv in params['parameters'].items():
             papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
             if parv['type'] == 'string':
                 jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
@@ -317,9 +379,10 @@ def scenario_blocks_js():
                 devices_per_clients[client] = {}
             devices_per_clients[client][name] = {}
             devices_per_clients[client][name]['sensors'] = {}
+            devices_per_clients[client][name]['sensors_changed'] = {}
             devices_per_clients[client][name]['commands'] = {}
     
-            ### sensors blocks
+            ### sensors values blocks
             for sen in dev['sensors']:
                 p = u""
                 jso = u""
@@ -353,6 +416,34 @@ def scenario_blocks_js():
                                 this.setColour({5});
                                 this.appendDummyInput().appendField("{2}");
                                 this.appendDummyInput().appendField("Sensor : {1} ({6})");
+                                this.appendDummyInput().appendField("Value.");
+                                this.setOutput(true, {4});
+                                this.setInputsInline(false);
+                                this.setTooltip("{2}"); 
+                            }}
+                        }};
+                        """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
+                js = u'{0}\n\r{1}'.format(js, add)
+    
+            ### sensors changes blocks
+            for sen in dev['sensors']:
+                p = u""
+                jso = u""
+                sen_id = dev['sensors'][sen]['id']
+                sen_name = dev['sensors'][sen]['name']
+                devices_per_clients[client][name]['sensors_changed'][sen_name] = sen_id
+                # determ the output type
+                color = 20
+                output = "\"Boolean\""
+
+                block_id = u"sensor.SensorChangedTest.{0}".format(sen_id)
+                block_description = u"{0}@{1}".format(name, client)
+                add = u"""Blockly.Blocks['{0}'] = {{
+                            init: function() {{
+                                this.setColour({5});
+                                this.appendDummyInput().appendField("{2}");
+                                this.appendDummyInput().appendField("Sensor : {1}");
+                                this.appendDummyInput().appendField("Value changes.");
                                 this.setOutput(true, {4});
                                 this.setInputsInline(false);
                                 this.setTooltip("{2}"); 
@@ -387,7 +478,7 @@ def scenario_blocks_js():
                     #else:
                     #    color = 160
                     #    output = "\"null\""
-                    js_params = u"""
+                    js_params += u"""
                                     this.appendDummyInput().appendField("- {0} : ")
                                 """.format(param_key)
                     list_options = None
@@ -492,10 +583,29 @@ def scenario_blocks_js():
                 }};
                 """.format(dt_type, color, output, input)
         js = u'{0}\n\r{1}'.format(js, add)
-                
+        
+    # CODE for #85
+    # add the scenario enable/disable block
+    #for scen in scenarios:
+    #    for endis in ['Enable', 'Disable']:
+    #        block_id = "scenario.{1}.{0}".format(scen['cid'], endis)
+    #        block_description = "{0} scenario".format(endis)
+    #        add = u"""Blockly.Blocks['{0}'] = {{
+    #                init: function() {{
+    #                    this.setColour(5);
+    #                    this.appendDummyInput().appendField("{1}");
+    #                    this.appendDummyInput().appendField("Scenario : {2}");
+    #                    this.setPreviousStatement(true, "null");
+    #                    this.setNextStatement(true, "null");
+    #                    this.setInputsInline(false);
+    #                    this.setTooltip("{1}");
+    #                }}
+    #            }};
+    #            """.format(block_id, block_description, scen['name'])
+    #        js = u'{0}\n\r{1}'.format(js, add)
+
 
     # do some sorting
-
     devices_per_clients = json.dumps(devices_per_clients, sort_keys=True)
     devices_per_clients = json.loads(devices_per_clients, object_pairs_hook=OrderedDict)
     tests = sorted(tests)

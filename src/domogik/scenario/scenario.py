@@ -26,11 +26,17 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 import uuid
-from exceptions import ValueError
+try:
+    from exceptions import ValueError
+except:
+    pass
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
+from domogik.common.logger import Logger
+from domogik.common.utils import remove_accents
 import zmq
 import traceback
+import logging
 
 class ScenarioInstance:
     """ This class provides base methods for the scenarios
@@ -67,17 +73,20 @@ class ScenarioInstance:
         "deletable": false
     }
     """
-
-    def __init__(self, log, dbid, name, json, disabled):
+    def __init__(self, log, dbid, name, json, disabled, trigger, state, db):
         """ Create the instance
         @param log : A logger instance
         @param dbid : The id of this scenario in the db
         @param json : The json describing the scenario
         """
-        self._log = log
         self._name = name
+        self._log = log.getChild(remove_accents(name))
         self._json = json
         self._disabled = disabled
+        self._state = state
+        self._trigger = trigger
+        self._dbid = dbid
+        self._db = db
 
         self.zmq = zmq.Context()
         # datatypes
@@ -120,9 +129,11 @@ class ScenarioInstance:
     def _clean_instances(self):
         for (uid, item) in self._mapping['action'].items():
             item.destroy()
+            del item
         self._mapping['action'] = {}
         for (uid, item) in self._mapping['test'].items():
             item.destroy()
+            del item
         self._mapping['test'] = {}
 
     def update(self, json):
@@ -160,7 +171,6 @@ class ScenarioInstance:
             while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                 dt_parent = datatypes[dt_parent]['parent']
             # translate
-            print("PARENT={0}".format(dt_parent))
             if dt_parent == "DT_Bool":
                 part['type'] = "logic_boolean"
             elif dt_parent == "DT_Number":
@@ -214,7 +224,7 @@ class ScenarioInstance:
 
     def __parse_do_part(self, part):
         action = self._create_instance(part['type'], 'action')
-        action[0].do_init(part)
+        action[0].do_init(part.copy())
         if 'NEXT' in part:
             self.__parse_do_part(part['NEXT'])
 
@@ -233,8 +243,12 @@ class ScenarioInstance:
         """
         if self._parsed_condition is None:
             return None
-        res = eval(self._parsed_condition)
-        self._log.debug("_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, eval(self._parsed_condition)))
+        try:
+            res = eval(self._parsed_condition)
+        except:
+            return None
+            pass
+        #self._log.debug(u"_parsed condition is : {0}, eval is {1}".format(self._parsed_condition, res))
         if res:
             return True
         else:
@@ -244,7 +258,6 @@ class ScenarioInstance:
         uuid = self._get_uuid()
         if itype == 'test':
             try:
-                print(inst)
                 mod, clas, param = inst.split('.')
             except ValueError as err:
                 mod, clas = inst.split('.')
@@ -282,18 +295,19 @@ class ScenarioInstance:
     def _call_actions(self):
         """ Call the needed actions for this scenario
         """
-        local_vars = {"foo" : "bar"}
-        self._log.debug("CALLING actions. Local vars = '{0}'".format(local_vars))
+        local_vars = {}
+        #self._log.debug("CALLING actions. Local vars = '{0}'".format(local_vars))
         idx = 0
         for act in sorted(self._mapping['action']):
             idx += 1
             try:
-                self._log.debug("Before action n°{0}. Local vars = '{1}'".format(idx, local_vars))
+                #self._log.debug("Before action n°{0}. Local vars = '{1}'".format(idx, local_vars))
+                self._log.info(u"== Do action n°{0} :".format(idx))
                 self._mapping['action'][act].do_action(local_vars)
-                self._log.debug("After action n°{0}. Local vars = '{1}'".format(idx, local_vars))
+                #self._log.debug("After action n°{0}. Local vars = '{1}'".format(idx, local_vars))
             except:
                 self._log.error("Error while executing action : {0}".format(traceback.format_exc()))
-        self._log.debug("END CALLING actions")
+        #self._log.debug("END CALLING actions")
 
     def generic_trigger(self, test):
         if test.get_condition():
@@ -301,11 +315,38 @@ class ScenarioInstance:
             if cond.get_parsed_condition() is None:
                 return
             st = cond.eval_condition()
-            self._log.info(u"Condition {0} evaluated to {1}".format(self._name, st))
-            if st:
-                self._call_actions()
+            if st is not None:
+                self._log.debug(u"Scenario '{0}' evaluated to '{1}' with trigger mode set to {2}".format(self._name, st, self._trigger))
+                if self._trigger == 'Hysteresis':
+                    self._log.debug(u"Scenario '{0}' previously evaluated to '{1}'".format(self._name, self._state))
+                    if self._state != st:
+                        self._state = st
+                        self._log.debug(u"Updating state")
+                        with self._db.session_scope():
+                            self._db.update_scenario(self._dbid, state=st)
+                        self._log.info(u"======== Scenario triggered! ========")
+                        self._log.info(u"Scenario triggered : {0}".format(self._name))
+                        self._call_actions()
+                        self._log.info(u"=====================================")
+                    else:
+                        self._log.debug(u"State is the same as before, so skipping actions")
+                # Trigger the actions
+                #if (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st and st):
+                #if st and (self._trigger == 'Always') or (self._trigger == 'Hysteresis' and self._state != st):
+                if st and (self._trigger == 'Always'):
+                    self._log.info(u"======== Scenario triggered! ========")
+                    self._log.info(u"Scenario triggered : {0}".format(self._name))
+                    self._call_actions()
+                    self._log.info(u"=====================================")
         else:
             test.evaluate()
+
+    def test_actions(self):
+        self._log.info(u"==== Scenario triggered by test request! ====")
+        self._log.info(u"Scenario triggered : {0}".format(self._name))
+        self._call_actions()
+        self._log.info(u"=============================================")
+
 
 if __name__ == "__main__":
     import logging

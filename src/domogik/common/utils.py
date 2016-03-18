@@ -43,6 +43,7 @@ from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
 from domogik.common.configloader import Loader, CONFIG_FILE
 import datetime
 import time
+import unicodedata
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
@@ -114,8 +115,14 @@ def ucode(my_string):
 
     """
     if my_string is not None:
+        #print("ucode : {0}".format(type(my_string)))
         if type(my_string) == unicode:
-            return my_string
+            try:
+                # the following line is here to test if an Unicode error would occur...
+                foo = "bar{0}".format(my_string)
+                return my_string
+            except UnicodeEncodeError:
+                return my_string.encode('utf8')
         elif not type(my_string) == str:
             return str(my_string).decode("utf-8")
         else:
@@ -166,7 +173,6 @@ def is_already_launched(log, type, id, manager=True):
     if manager:
         #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
         cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v mprof | grep -v update".format(id, STARTED_BY_MANAGER, my_pid)
-        print "is manager"
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
     # the grep python is needed to avoid a client to not start because someone is editing the client with vi :)
@@ -266,6 +272,11 @@ def get_midnight_timestamp():
     ts = time.time()
     return int(ts - get_seconds_since_midnight())
 
+def remove_accents(input_str):
+    """ Remove accents in utf-8 strings
+    """
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 if __name__ == "__main__":
     print(get_seconds_since_midnight())

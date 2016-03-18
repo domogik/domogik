@@ -431,6 +431,10 @@ class DBConnector(Plugin, MQRep):
                     formula = None
                 else:
                     formula = data['formula']
+                if 'data_type' not in data:
+                    data_type = None
+                else:
+                    data_type = data['data_type']
                 # do the update
                 res = self._db.update_sensor(sid, \
                      history_round=hround, \
@@ -438,7 +442,8 @@ class DBConnector(Plugin, MQRep):
                      history_max=hmax, \
                      history_expire=hexpire, \
                      timeout=timeout, \
-                     formula=formula)
+                     formula=formula, \
+                     data_type=data_type)
                 if not res:
                     status = False
                 else:

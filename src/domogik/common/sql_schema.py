@@ -52,9 +52,6 @@ from sqlalchemy.orm import relation, backref, relationship
 from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
 
-Base = declarative_base()
-metadata = Base.metadata
-
 _cfg = Loader('database')
 _config = None
 # TODO : if no need
@@ -64,11 +61,19 @@ _config = None
 _config = _cfg.load()
 _db_prefix = dict(_config[1])['prefix']
 
+class RepresentableBase(object):
+    def __repr__(self):
+        items = ("{0}='{1}'".format(k, v) for k, v in self.__dict__.items() if not k.startswith('_'))
+        return "<{0}: {1}>".format(self.__class__.__name__, ', '.join(items))
+
+DomogikBase = declarative_base(cls=RepresentableBase)
+metadata = DomogikBase.metadata
+
 # Define objects
-class PluginConfig(Base):
+class PluginConfig(DomogikBase):
     """Configuration for a plugin (x10, plcbus, ...)"""
 
-    __tablename__ = '%s_plugin_config' % _db_prefix
+    __tablename__ = '{0}_plugin_config'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Unicode(30), primary_key=True)
     type = Column(Unicode(30), primary_key=True, default=u'plugin')
@@ -91,19 +96,14 @@ class PluginConfig(Base):
         self.key = ucode(key)
         self.value = ucode(value)
 
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<PluginConfig(id=%s, type=%s, hostname=%s, (%s, %s))>" % (self.id, self.type, self.hostname, self.key, self.value)
-
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return PluginConfig.__tablename__
 
-class Device(Base):
+class Device(DomogikBase):
     """Device"""
 
-    __tablename__ = '%s_device' % _db_prefix
+    __tablename__ = '{0}_device'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(128), nullable=False)
@@ -136,26 +136,17 @@ class Device(Base):
         self.client_version = ucode(client_version)
         self.description = ucode(description)
 
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<Device(id=%s, name='%s', desc='%s', ref='%s', type='%s', client='%s', client_version='%s', commands=%s, sensors=%s, xplcommands=%s, xplstats=%s)>"\
-               % (self.id, self.name, self.description, self.reference,\
-                  self.device_type_id, self.client_id, self.client_version, \
-                  self.commands, \
-                  self.sensors, self.xpl_commands, self.xpl_stats)
-
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return Device.__tablename__
 
-class DeviceParam(Base):
+class DeviceParam(DomogikBase):
     """Device config, some config parameters that are only accessable over the mq, or inside domogik, these have nothin todo with xpl"""
 
-    __tablename__ = '%s_device_param' % _db_prefix
+    __tablename__ = '{0}_device_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
@@ -173,20 +164,14 @@ class DeviceParam(Base):
         self.value = ucode(value)
         self.type = ucode(type)
 
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<DeviceParam(id={0}, device_id={1}, key='{2}', value='{3}', type='{4}')>"\
-               .format(self.id, self.device_id, self.key, self.value, self.type)\
-
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
-        return Device.__tablename__
+        return DeviceParam.__tablename__
 
-class Person(Base):
+class Person(DomogikBase):
     """Persons registered in the app"""
 
-    __tablename__ = '%s_person' % _db_prefix
+    __tablename__ = '{0}_person'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     first_name = Column(Unicode(20), nullable=False)
@@ -206,26 +191,19 @@ class Person(Base):
         self.last_name = ucode(last_name)
         self.birthdate = birthdate
 
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<Person(id=%s, first_name='%s', last_name='%s', birthdate='%s')>"\
-               % (self.id, self.first_name, self.last_name, self.birthdate)
-
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return Person.__tablename__
 
-
-class UserAccount(Base):
+class UserAccount(DomogikBase):
     """User account for persons : it is only used by the UI"""
 
-    __tablename__ = '%s_user_account' % _db_prefix
+    __tablename__ = '{0}_user_account'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
     login = Column(Unicode(20), nullable=False, unique=True)
     password = Column("password", Unicode(255), nullable=False)
-    person_id = Column(Integer, ForeignKey('%s.id' % Person.get_tablename()))
+    person_id = Column(Integer, ForeignKey('{0}.id'.format(Person.get_tablename())))
     person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
     skin_used = Column(Unicode(80), nullable=False, default=Unicode('default'))
@@ -250,10 +228,6 @@ class UserAccount(Base):
         """Set a password for the user"""
         self.password = ucode(password)
 
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<UserAccount(id=%s, login='%s', is_admin=%s, person=%s, skin=%s)>"\
-               % (self.id, self.login, self.is_admin, self.person, self.skin_used)
    # Flask-Login integration
     def is_authenticated(self):
         return True
@@ -267,17 +241,15 @@ class UserAccount(Base):
     def __unicode__(self):
         return self.login
 
-
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return UserAccount.__tablename__
 
-class Command(Base):
-    __tablename__ = '%s_command' % _db_prefix
+class Command(DomogikBase):
+    __tablename__ = '{0}_command'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True) 
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255), nullable=False)
     reference = Column(Unicode(64))
     return_confirmation = Column(Boolean, nullable=False)
@@ -289,21 +261,15 @@ class Command(Base):
         self.name = ucode(name)
         self.return_confirmation = return_confirmation
         self.reference = ucode(reference)
-   
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<Command(id=%s device_id=%s reference='%s' name='%s' return_confirmation=%s params=%s xpl_command=%s)>"\
-               % (self.id, self.device_id, self.reference, self.name, self.return_confirmation, self.params, self.xpl_command)
 
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return Command.__tablename__
 
-class CommandParam(Base):
-    __tablename__ = '%s_command_param' % _db_prefix
+class CommandParam(DomogikBase):
+    __tablename__ = '{0}_command_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
+    cmd_id = Column(Integer, ForeignKey('{0}.id'.format(Command.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement='ignore_fk')
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
@@ -314,36 +280,30 @@ class CommandParam(Base):
         self.key = ucode(key)
         self.data_type = ucode(data_type)
         self.conversion = ucode(conversion)
-   
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<CommandParam(cmd_id=%s key='%s' data_type='%s' conversion='%s')>"\
-               % (self.cmd_id, self.key, self.data_type, self.conversion)
 
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
-        return CommandParams.__tablename__
+        return CommandParam.__tablename__
 
-class Sensor(Base):
-    __tablename__ = '%s_sensor' % _db_prefix
+class Sensor(DomogikBase):
+    __tablename__ = '{0}_sensor'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True) 
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     incremental = Column(Boolean, nullable=False)
     formula = Column(UnicodeText(), nullable=True) 
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
-    last_value = Column(Unicode(32), nullable=True)
+    last_value = Column(Unicode(255), nullable=True)
     last_received = Column(Integer, nullable=True)
-    value_min = Column(Float, nullable=True)
-    value_max = Column(Float, nullable=True)
+    value_min = Column(Float(53), nullable=True)
+    value_max = Column(Float(53), nullable=True)
     history_store = Column(Boolean, nullable=False)
     history_max = Column(Integer, nullable=True)
     history_expire = Column(Integer, nullable=True)
-    history_round = Column(Float, nullable=True)
+    history_round = Column(Float(53), nullable=True)
     history_duplicate = Column(Boolean, nullable=False)
     timeout = Column(Integer, nullable=True, default=0)
 
@@ -363,30 +323,20 @@ class Sensor(Base):
         self.timeout = timeout
         self.value_min = None
         self.value_max = None
-   
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<Sensor(id=%s device_id=%s reference='%s' incremental=%s name='%s' data_type='%s' conversion='%s' h_store=%s h_max=%s h_expire=%s h_round=%s h_duplicate=%s min=%s max=%s timeout=%s formula='%s')>"\
-               % (self.id, self.device_id, self.reference, self.incremental, \
-                   self.name, self.data_type, self.conversion, \
-                   self.history_store, self.history_max, self.history_expire, \
-                   self.history_round, self.history_duplicate, \
-                   self.value_min, self.value_max, self.timeout, self.formula)
 
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return Sensor.__tablename__
 
-class SensorHistory(Base):
-    __tablename__ = '%s_sensor_history' % _db_prefix
+class SensorHistory(DomogikBase):
+    __tablename__ = '{0}_sensor_history'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True) 
-    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=False, index=True)
+    sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
-    value_num = Column(Float, nullable=True)
-    value_str = Column(Unicode(32), nullable=False)
-    original_value_num = Column(Float, nullable=True)
+    value_num = Column(Float(53), nullable=True)
+    value_str = Column(Unicode(255), nullable=False)
+    original_value_num = Column(Float(53), nullable=True)
 
     def __init__(self, sensor_id, date, value, orig_value):
         self.sensor_id = sensor_id
@@ -400,21 +350,15 @@ class SensorHistory(Base):
             pass
         self.value_str = ucode(value)
 
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<SensorHistory(sensor_id=%s date=%s value_str='%s' value_num=%s orig_value_num=%s)>"\
-               % (self.sensor_id, self.date, self.value_str, self.value_num, self.original_value_num)
-
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return SensorHistory.__tablename__
 
-class XplStat(Base):
-    __tablename__ = '%s_xplstat' % _db_prefix
+class XplStat(DomogikBase):
+    __tablename__ = '{0}_xplstat'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
     name = Column(Unicode(64), nullable=False)
     schema = Column(Unicode(32), nullable=False)
@@ -425,27 +369,20 @@ class XplStat(Base):
         self.name = ucode(name)
         self.schema = ucode(schema)
         self.json_id = ucode(json_id)
-   
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<XplStat(id=%s device_id=%s name='%s' schema='%s' params=%s json_id=%s)>"\
-               % (self.id, self.device_id, self.name, self.schema, self.params, self.json_id)
 
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return XplStat.__tablename__
 
-
-class XplStatParam(Base):
-    __tablename__ = '%s_xplstat_param' % _db_prefix
+class XplStatParam(DomogikBase):
+    __tablename__ = '{0}_xplstat_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    xplstat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
+    xplstat_id = Column(Integer, ForeignKey('{0}.id'.format(XplStat.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
     multiple = Column(Unicode(1), nullable=True)
     static = Column(Boolean, nullable=True)
-    sensor_id = Column(Integer, ForeignKey('%s.id' % Sensor.get_tablename(), ondelete="cascade"), nullable=True) 
+    sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=True) 
     ignore_values = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
@@ -459,28 +396,21 @@ class XplStatParam(Base):
         self.ignore_values = ucode(ignore_values)
         self.type = ucode(type)
         self.multiple = ucode(multiple)
-    
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<XplStatParam(stat_id=%s key='%s' value='%s' multi='%s' static=%s sensor_id=%s ignore='%s' type='%s')>"\
-               % (self.xplstat_id, self.key, self.value, self.multiple, self.static, self.sensor_id, self.ignore_values, self.type)
 
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return XplStatParam.__tablename__
 
-
-class XplCommand(Base):
-    __tablename__ = '%s_xplcommand' % _db_prefix
+class XplCommand(DomogikBase):
+    __tablename__ = '{0}_xplcommand'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True)
-    device_id = Column(Integer, ForeignKey('%s.id' % Device.get_tablename(), ondelete="cascade"), nullable=False)
-    cmd_id = Column(Integer, ForeignKey('%s.id' % Command.get_tablename(), ondelete="cascade"), nullable=False)
+    device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
+    cmd_id = Column(Integer, ForeignKey('{0}.id'.format(Command.get_tablename()), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
     name = Column(Unicode(64), nullable=False)
     schema = Column(Unicode(32), nullable=False)
-    stat_id = Column(Integer, ForeignKey('%s.id' % XplStat.get_tablename(), ondelete="cascade"), nullable=True)
+    stat_id = Column(Integer, ForeignKey('{0}.id'.format(XplStat.get_tablename()), ondelete="cascade"), nullable=True)
     stat = relation("XplStat", backref=__tablename__, cascade="all")
     params = relationship("XplCommandParam", backref=__tablename__, cascade="all", passive_deletes=True)
 
@@ -491,22 +421,15 @@ class XplCommand(Base):
         self.schema = ucode(schema)
         self.stat_id = stat_id
         self.json_id = json_id
-    
-    def __repr__(self):
-       """Return an internal representation of the class"""
-       return "<XplCommand(id=%s device_id=%s cmd_id=%s name='%s' json_id='%s' schema='%s' stat=%s params=%s)>"\
-               % (self.id, self.device_id, self.cmd_id, self.name, self.json_id, self.schema, self.stat, self.params)
 
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return XplCommand.__tablename__
 
-
-class XplCommandParam(Base):
-    __tablename__ = '%s_xplcommand_param' % _db_prefix
+class XplCommandParam(DomogikBase):
+    __tablename__ = '{0}_xplcommand_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    xplcmd_id = Column(Integer, ForeignKey('%s.id' % XplCommand.get_tablename(), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
+    xplcmd_id = Column(Integer, ForeignKey('{0}.id'.format(XplCommand.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
     UniqueConstraint('xplcmd_id', 'key', name='uix_1')
@@ -515,38 +438,30 @@ class XplCommandParam(Base):
         self.xplcmd_id = cmd_id
         self.key = ucode(key)
         self.value = ucode(value)
-    
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<XplCommandParam(cmd_id=%s key='%s' value='%s')>"\
-               % (self.xplcmd_id, self.key, self.value)
 
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return XplCommandParam.__tablename__
 
-class Scenario(Base):
-    __tablename__ = '%s_scenario' % _db_prefix
+class Scenario(DomogikBase):
+    __tablename__ = '{0}_scenario'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     name = Column(Unicode(32), nullable=False, autoincrement=False)
     json = Column(UnicodeText(), nullable=False)
     disabled = Column(Boolean, nullable=False, default=False)
     description = Column(Text, nullable=True)
+    trigger_mode = Column(Enum('Always', 'Hysteresis'), nullable=False, default='Always')
+    state = Column(Boolean, nullable=False, default=False)
 
-    def __init__(self, name, json, disabled=False, description=None):
+    def __init__(self, name, json, disabled=False, description=None, trigger_mode=None, state=None):
         self.name = ucode(name)
         self.json = ucode(json)
         self.disabled = disabled
         self.description = description
-
-    def __repr__(self):
-        """Return an internal representation of the class"""
-        return "<Scenario(id=%s name='%s' json='%s' disabled=%s)>"\
-               % (self.id, self.name, self.json, self.disabled)
+        self.trigger_mode = trigger_mode
+        self.state = state
 
     @staticmethod
     def get_tablename():
-        """Return the table name associated to the class"""
         return Scenario.__tablename__

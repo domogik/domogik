@@ -108,32 +108,33 @@ class Publisher(MQAsyncSub):
             self.sendToMQ(message)
     
     def sendToMQ(self, message):
-        ctx = zmq.Context()
-        jsons = json.loads(message)
-        # req/rep
-        if 'mq_request' in jsons and 'data' in jsons:
-            cli = MQSyncReq(ctx)
-            msg = MQMessage()
-            msg.set_action(str(jsons['mq_request']))
-            msg.set_data(jsons['data'])
-            print("REQ : {0}".format(msg.get()))
-            if 'dst' in jsons:
-                dst = str(jsons['dst'])
-            else:
-                dst = 'manager'
-            res = cli.request(dst, msg.get(), timeout=10)
-            if res:
-                print res.get()
-            cli.shutdown()
-            del cli
-        # pub
-        elif 'mq_publish' in jsons and 'data' in jsons:
-            print("Publish : {0}".format(jsons['data']))
-            pub = MQPub(ctx, 'admin-ws')
-            pub.send_event(jsons['mq_publish'],
-                            jsons['data'])
-
-
+        try:
+            ctx = zmq.Context()
+            jsons = json.loads(message)
+            # req/rep
+            if 'mq_request' in jsons and 'data' in jsons:
+                cli = MQSyncReq(ctx)
+                msg = MQMessage()
+                msg.set_action(str(jsons['mq_request']))
+                msg.set_data(jsons['data'])
+                print("REQ : {0}".format(msg.get()))
+                if 'dst' in jsons:
+                    dst = str(jsons['dst'])
+                else:
+                    dst = 'manager'
+                res = cli.request(dst, msg.get(), timeout=10)
+                if res:
+                    print(res.get())
+                cli.shutdown()
+                del cli
+            # pub
+            elif 'mq_publish' in jsons and 'data' in jsons:
+                print("Publish : {0}".format(jsons['data']))
+                pub = MQPub(ctx, 'admin-ws')
+                pub.send_event(jsons['mq_publish'],
+                                jsons['data'])
+        except Exception as e:
+            print("Error sending mq message: {0}".format(e))
 
 class Subscription(WebSocketHandler):
     """Websocket for subscribers."""
@@ -174,7 +175,7 @@ class Subscription(WebSocketHandler):
     
     def on_message(self, content):
         """ reciev message from websocket and send to MQ """
-        print("WS to MQ")
+        print("WS to MQ: {0}".format(content))
         self.publisher.MQmessages.put(content)
 
 class Admin(Plugin):
@@ -194,9 +195,8 @@ class Admin(Plugin):
         Plugin.__init__(self, name = 'admin', log_prefix='core_')
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
-        self.log.debug(u"locale : %s %s" % locale.getdefaultlocale())
-
-	try:
+        self.log.debug(u"locale : {0}".format(locale.getdefaultlocale()))
+        try:
             try:
                 # admin config
                 cfg_admin = Loader('admin')
@@ -212,16 +212,20 @@ class Admin(Plugin):
                     self.clean_json = conf_admin['clean_json']
                 else:
                     self.clean_json = False
+                if 'rest_auth'in conf_admin:
+                    self.rest_auth = conf_admin['rest_auth']
+                else:
+                    self.rest_auth = False
             except KeyError:
                 # default parameters
                 self.interfaces = server_interfaces
                 self.port = server_port
-		self.use_ssl = False
-		self.key_file = ""
-		self.cert_file = ""
+                self.use_ssl = False
+                self.key_file = ""
+                self.cert_file = ""
                 self.clean_json = False
                 self.log.error("Error while reading configuration for section [admin] : using default values instead")
-            self.log.info(u"Configuration : interfaces:port = %s:%s" % (self.interfaces, self.port))
+            self.log.info(u"Configuration : interfaces:port = {0}:{1}".format(self.interfaces, self.port))
 	    
 	    # get all datatypes
             cli = MQSyncReq(self.zmq)
@@ -237,20 +241,20 @@ class Admin(Plugin):
             self.log.info(u"Admin Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
-	    self.start_http()
+            self.start_http()
             # calls the tornado.ioloop.instance().start()
             
             ### Component is ready
             self.ready(0)
             IOLoop.instance().start()
         except :
-            self.log.error(u"%s" % self.get_exception())
+            self.log.error(u"{0}".format(self.get_exception()))
 
     @gen.coroutine
     def start_http(self):
         """ Start HTTP Server
         """
-        self.log.info(u"Start HTTP Server on %s:%s..." % (self.interfaces, self.port))
+        self.log.info(u"Start HTTP Server on {0}:{1}...".format(self.interfaces, self.port))
         # logger
         for log in self.log.handlers:
             admin_app.logger.addHandler(log)
@@ -258,17 +262,18 @@ class Admin(Plugin):
         admin_app.db = DbHelper()
         admin_app.datatypes = self.datatypes
         admin_app.clean_json = self.clean_json
+        admin_app.rest_auth = self.rest_auth
         admin_app.apiversion = REST_API_VERSION
         admin_app.use_ssl = self.use_ssl
         admin_app.hostname = self.get_sanitized_hostname()
         admin_app.resources_directory = self.get_resources_directory()
+        admin_app.packages_directory = self.get_packages_directory()
         
         publisher = Publisher()
-        #fromws = Fws()
-	tapp = Application([
-	    (r"/ws", Subscription, dict(publisher=publisher)),
+        tapp = Application([
+            (r"/ws", Subscription, dict(publisher=publisher)),
             (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
-	])
+            ])
 
 	# create the server
         # for ssl, extra parameter to HTTPServier init
@@ -277,19 +282,19 @@ class Admin(Plugin):
                  "certfile": self.cert_file,
                  "keyfile": self.key_file,
             }
-	    self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
+            self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
             self.http_server = HTTPServer(tapp)
 	# listen on the interfaces
-	if self.interfaces != "":
+        if self.interfaces != "":
             # value can be : lo, eth0, ...
             # or also : '*' to catch all interfaces, whatever they are
-	    intf = self.interfaces.split(',')
+            intf = self.interfaces.split(',')
             self.log.info("The admin will be available on the below addresses : ")
             num_int = 0
-	    for ip in get_ip_for_interfaces(intf, log = self.log):
+            for ip in get_ip_for_interfaces(intf, log = self.log):
                 self.log.info(" - {0}:{1} [BIND]".format(ip, self.port))
-	        self.http_server.listen(int(self.port), address=ip)
+                self.http_server.listen(int(self.port), address=ip)
                 num_int += 1
             if num_int == 0:
                 self.log.error("The admin is not configured to use any working network interface! Please check configuration!!!!!!")

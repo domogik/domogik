@@ -55,6 +55,7 @@ from subprocess import Popen, PIPE
 import time
 import re
 import sys
+from domogik.common.utils import ucode
 
 
 
@@ -135,10 +136,10 @@ class Butler(Plugin):
 
         # Configure bot variables
         # all must be lower case....
-        self.log.info("Configuring name and sex : {0}, {1}".format(self.butler_name.lower(), self.butler_sex.lower()))
-        self.brain.set_variable("name", self.butler_name.lower())
-        self.brain.set_variable("fullname", self.butler_name.lower())
-        self.brain.set_variable("sex", self.butler_sex.lower())
+        self.log.info(u"Configuring name and sex : {0}, {1}".format(self.butler_name.lower(), self.butler_sex.lower()))
+        self.brain.set_variable(u"name", self.butler_name.lower())
+        self.brain.set_variable(u"fullname", self.butler_name.lower())
+        self.brain.set_variable(u"sex", self.butler_sex.lower())
 
         # set the PYTHONPATH
         sys.path.append(self.get_libraries_directory())
@@ -159,8 +160,10 @@ class Butler(Plugin):
         # history
         self.history = []
 
-        print(u"*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
-        print(u"You may type /quit to let {0} have a break".format(self.butler_name))
+        self.log.info(u"*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
+
+        # for chat more only
+        #self.log.info(u"You may type /quit to let {0} have a break".format(self.butler_name))
 
 
         ### Interactive mode
@@ -223,7 +226,7 @@ class Butler(Plugin):
         content = message.get_data()
         self.log.info(u"Received message : {0}".format(content))
 
-        self.add_to_history("interface.input", content)
+        self.add_to_history(u"interface.input", content)
         reply = self.process(content['text'])
 
         # fill empty data
@@ -247,7 +250,7 @@ class Butler(Plugin):
         msg.set_data(data)
         self.reply(msg.get())
 
-        self.add_to_history("interface.output", data)
+        self.add_to_history(u"interface.output", data)
 
 
     def _mdp_reply_butler_scripts(self, message):
@@ -261,8 +264,8 @@ class Butler(Plugin):
 
         msg = MQMessage()
         msg.set_action('butler.scripts.result')
-        msg.add_data("learn", self.learn_content)
-        msg.add_data("not_understood", self.not_understood_content)
+        msg.add_data(u"learn", self.learn_content)
+        msg.add_data(u"not_understood", self.not_understood_content)
         for client_id in self.brain_content:
             msg.add_data(client_id, self.brain_content[client_id])
         self.reply(msg.get())
@@ -288,7 +291,7 @@ class Butler(Plugin):
         """
         msg = MQMessage()
         msg.set_action('butler.history.result')
-        msg.add_data("history", self.history)
+        msg.add_data(u"history", self.history)
         self.reply(msg.get())
 
 
@@ -297,7 +300,7 @@ class Butler(Plugin):
         """
         msg = MQMessage()
         msg.set_action('butler.features.result')
-        msg.add_data("features", self.butler_features)
+        msg.add_data(u"features", self.butler_features)
         self.reply(msg.get())
 
 
@@ -486,7 +489,7 @@ class Butler(Plugin):
             # 20s : reply "It takes already 20s for processing, I cancel the request" and kill the thread
             #reply = self.brain.reply(self.user_name, content['text'])
 
-            self.add_to_history("interface.input", content)
+            self.add_to_history(u"interface.input", content)
             reply = self.process(content['text'])
 
             ### Prepare response for the MQ
@@ -518,7 +521,7 @@ class Butler(Plugin):
             self.log.info(u"Send response over MQ : {0}".format(data))
             self.pub.send_event('interface.output',
                                 data)
-            self.add_to_history("interface.output", data)
+            self.add_to_history(u"interface.output", data)
 
 
     def run_chat(self):
@@ -542,7 +545,7 @@ class Butler(Plugin):
             reply = self.process(msg)
 
             # let Nestor answer in the chat
-            print(u"{0} > {1}".format(self.butler_name, reply))
+            print("{0} > {1}".format(ucode(self.butler_name), ucode(reply)))
 
             # let Nestor speak
             #tts = u"espeak -p 40 -s 140 -v mb/mb-fr1 \"{0}\" | mbrola /usr/share/mbrola/fr1/fr1 - -.au | aplay".format(reply)

@@ -236,7 +236,7 @@ class AbstractParameter:
         """
         for entry in params:
             #print("ENTRY={0}".format(entry))
-            for name, val in entry.iteritems():
+            for name, val in entry.items():
                 if name in self._expected:
                     #print("NAME={0}".format(name))
                     #print("VAL={0}".format(val))

@@ -22,7 +22,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 Plugin purpose
 ==============
 
-This plugin manages scenarii, it provides MQ interface
+This library is part of the butler
 
 Implements
 ==========

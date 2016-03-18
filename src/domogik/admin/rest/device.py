@@ -7,10 +7,11 @@ import copy
 import json
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
+from flask_login import login_required
 
 @app.route('/rest/device/params/<client_id>/<dev_type_id>', methods=['GET'])
 @json_response
-@timeit
+@login_required
 def device_params(client_id, dev_type_id):
     """
     @api {get} /rest/device/params/<clientId>/<device_type> Retrieve the needed parameter for creating a device
@@ -80,7 +81,7 @@ def device_params(client_id, dev_type_id):
     return 200, result
 
 class deviceAPI(MethodView):
-    decorators = [json_response, timeit]
+    decorators = [login_required, json_response]
 
     def get(self, did):
         """
@@ -166,10 +167,12 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
+        app.db.open_session()
         if did != None:
             b = app.db.get_device(did)
         else:
             b = app.db.list_devices()
+        app.db.close_session()
         if b == None:
             return 404, b
         else:

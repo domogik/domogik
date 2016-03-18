@@ -23,12 +23,14 @@ except ImportError:
 from domogik.common.sql_schema import Device, DeviceParam, Sensor
 from domogik.common.plugin import STATUS_DEAD
 from wtforms.ext.sqlalchemy.orm import model_form
+from wtforms.widgets import TextArea
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
 import re
 import json
 import traceback
+import operator
 
 try:
     import html.parser
@@ -179,7 +181,6 @@ def client_devices_known(client_id):
 
     # first sort by device name
     devices = sorted(devices, key=itemgetter("name"))
-    print(detail['data']['device_types'])
     #    device_types_list[key] = data["device_types"][key]
 
     # group clients per device type
@@ -190,7 +191,6 @@ def client_devices_known(client_id):
         except KeyError:
             print("Warning : the device type '{0}' does not exist anymore in the installed package release. Device type name set as the existing id in database".format(dev['device_type_id']))
             device_type_name = dev['device_type_id']
-        print(device_type_name)
         if device_type_name in devices_by_device_type_id:
             devices_by_device_type_id[device_type_name].append(dev)
         else:
@@ -216,18 +216,41 @@ def client_devices_known(client_id):
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
 @login_required
 def client_sensor_edit(client_id, sensor_id):
+    if app.datatypes == {}:
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is not None:
+            app.datatypes = res.get_data()['datatypes']
+        else:
+            app.datatypes = {}
+
     with app.db.session_scope():
         sensor = app.db.get_sensor(sensor_id)
-        MyForm = model_form(Sensor, \
-                        base_class=Form, \
-                        db_session=app.db.get_session(),
-                        exclude=['core_device', 'name', 'reference', \
-                                'incremental', 'data_type', 'conversion', \
-                                'last_value', 'last_received', 'history_duplicate', \
-                                'value_min', 'value_max'])
-        #MyForm.history_duplicate.kwargs['validators'] = []
-        MyForm.history_store.kwargs['validators'] = []
-        form = MyForm(request.form, sensor)
+        cdata_type = app.datatypes[sensor.data_type]
+        if 'childs'in cdata_type and len(cdata_type['childs']) > 0:
+            allow_data_type = True
+            lst = cdata_type['childs']
+            lst.append(sensor.data_type)
+            tmp = dict(zip(lst, lst))
+            tmps = sorted(tmp.items(), key=operator.itemgetter(1))
+        else:
+            allow_data_type = False
+        class F(Form):
+            timeout = TextField("Timeout", default=sensor.timeout)
+            formula = TextField("Formula", default=sensor.formula, widget=TextArea())
+            history_store = BooleanField("History Store", default=sensor.history_store)
+            history_expire = TextField("History Expire", default=sensor.history_expire)
+            history_round = TextField("History_round", default=sensor.history_round)
+            history_max = TextField("History_max", default=sensor.history_max)
+            pass
+        # TODO add fiel
+        if allow_data_type:
+            field = SelectField("Data_type", default=sensor.data_type, choices=tmps)
+            setattr(F, 'data_type', field)
+
+        form = F()
 
         if request.method == 'POST' and form.validate():
             if request.form['history_store'] == 'y':
@@ -244,6 +267,8 @@ def client_sensor_edit(client_id, sensor_id):
             msg.add_data('history_expire', request.form['history_expire'])
             msg.add_data('timeout', request.form['timeout'])
             msg.add_data('formula', request.form['formula'])
+            if allow_data_type:
+                msg.add_data('data_type', request.form['data_type'])
             res = cli.request('dbmgr', msg.get(), timeout=10)
             if res is not None:
                 data = res.get_data()
@@ -262,6 +287,7 @@ def client_sensor_edit(client_id, sensor_id):
                 clientid = client_id,
                 mactive="clients",
                 active = 'devices',
+                allow_data_type = allow_data_type,
                 sensor = sensor)
 
 @app.route('/client/<client_id>/global/edit/<dev_id>', methods=['GET', 'POST'])
@@ -296,7 +322,7 @@ def client_global_edit(client_id, dev_id):
             setattr(F, "{0}-{1}".format(item["id"], item["key"]), field)
         form = F()
         if request.method == 'POST' and form.validate():
-            for key, item in known_items.iteritems():
+            for key, item in known_items.items():
                 val = getattr(form, "{0}-{1}".format(item["id"], key)).data
                 if item["type"] == "boolean":
                     if val == False:
@@ -480,7 +506,7 @@ def client_config(client_id):
     if request.method == 'POST' and form.validate():
         # build the requested config set
         data = {}
-        for key, typ in known_items.iteritems():
+        for key, typ in known_items.items():
             val = getattr(form, key).data
             if typ == "boolean":
                 if val == False:
@@ -653,15 +679,15 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 default = True
             else:
                 default = False
-            field = BooleanField(name, [Required()], description=item["description"], default=default)
+            field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "integer":
-            field = IntegerField(name, [Required()], description=item["description"], default=default)
+            field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "date":
             field = DateField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "datetime":
             field = DateTimeField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "float":
-            field = DateTimeField(name, [Required()], description=item["description"], default=default)
+            field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "choice":
             choices = []
             for key in sorted(item["choices"]):
@@ -686,15 +712,15 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                     default = True
                 else:
                     default = False
-                field = BooleanField(name, [Required()], description=item["description"], default=default)
+                field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "integer":
-                field = IntegerField(name, [Required()], description=item["description"], default=default)
+                field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "date":
                 field = DateField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "datetime":
                 field = DateTimeField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [Required()], description=item["description"], default=default)
+                field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "choice":
                 choices = []
                 for key in sorted(item["choices"]):
@@ -725,10 +751,10 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                     default = True
                 else:
                     default = False
-                field = BooleanField(name, [validators.Required(gettext("This value is required"))], \
+                field = BooleanField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "integer":
-                field = IntegerField(name, [validators.Required(gettext("This value is required"))], \
+                field = IntegerField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "date":
                 field = DateField(name, [validators.Required(gettext("This value is required"))], \
@@ -737,7 +763,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 field = DateTimeField(name, [validators.Required(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [validators.Required(gettext("This value is required"))], \
+                field = DateTimeField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "choice":
                 choices = []
