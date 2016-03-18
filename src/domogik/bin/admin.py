@@ -72,9 +72,11 @@ REST_API_VERSION = "0.8"
 class Publisher(MQAsyncSub):
     """Handles new data to be passed on to subscribers."""
     def __init__(self):
+        self.ctx = zmq.Context()
         self.WSmessages = Queue()
         self.MQmessages = Queue()
-        self.sub = MQAsyncSub.__init__(self, zmq.Context(), 'admin', [])
+        self.sub = MQAsyncSub.__init__(self, self.ctx, 'admin', [])
+        self.pub = MQPub(self.ctx, 'admin-ws')
         self.subscribers = set()
 
     def register(self, subscriber):
@@ -130,8 +132,7 @@ class Publisher(MQAsyncSub):
             # pub
             elif 'mq_publish' in jsons and 'data' in jsons:
                 print("Publish : {0}".format(jsons['data']))
-                pub = MQPub(ctx, 'admin-ws')
-                pub.send_event(jsons['mq_publish'],
+                self.pub.send_event(jsons['mq_publish'],
                                 jsons['data'])
         except Exception as e:
             print("Error sending mq message: {0}".format(e))
