@@ -90,11 +90,14 @@ It is now possible to create no xPl plugins.
 
 .. todo:: complete
 
-Plugins : new datatype : DT_Battery
------------------------------------
+Plugins : new datatypes : DT_Battery, DT_Motion, DT_Video, DT_VideoMjpeg
+------------------------------------------------------------------------
 
-A new datatype is introduced in this release : **DT_Battery**. It is similar to DT_Scaling  : the unit is % and the values are between 0 and 100. The aim of this datatype is to allow to group all devices battery sensors on a single view to help the users to manage their devices batteries.
+The **DT_Battery** it is similar to DT_Scaling  : the unit is % and the values are between 0 and 100. The aim of this datatype is to allow to group all devices battery sensors on a single view to help the users to manage their devices batteries.
 
+The **DT_Motion** is a boolean datatype to use for motion sensors. 
+
+The **DT_Video** datatype should not be used directly but will be the parent datatype for all kind of video related datatypes. Currently, it has only one child : **DT_VideoMjpeg**. The **DT_VideoMjpeg** should be used to store Mjpeg video streams url in sensors.
 
 MQ and Rest API
 ---------------
