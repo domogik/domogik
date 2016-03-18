@@ -44,7 +44,8 @@ RUN apt-get install -y \
     wget \
     openssh-server \
     screen \
-    dos2unix    
+    dos2unix \
+    tcpdump
 
 ### Minimum requirements
 RUN apt-get install -y \

@@ -376,6 +376,15 @@ def scenario_blocks_js():
             name = dev['name']
             if client not in devices_per_clients:
                 devices_per_clients[client] = {}
+
+            # if another device with the same name exists, add a suffix to display all of them
+            newname = name
+            idx = 1
+            while newname in devices_per_clients[client]:
+                newname = u"{0} ({1})".format(name, idx)
+                idx += 1
+            name = newname
+
             devices_per_clients[client][name] = {}
             devices_per_clients[client][name]['sensors'] = {}
             devices_per_clients[client][name]['sensors_changed'] = {}

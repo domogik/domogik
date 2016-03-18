@@ -18,7 +18,8 @@
             "DT_UpDown",
             "DT_OpenClose",
             "DT_Start",
-            "DT_State"
+            "DT_State",
+            "DT_Motion"
         ]
     },
     "DT_Switch": {
@@ -81,6 +82,14 @@
         "labels": {
             "0": "Inactive",
             "1": "Active"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
+    "DT_Motion": {
+        "labels": {
+            "0": "No motion",
+            "1": "Motion"
         },
         "parent": "DT_Bool",
         "childs": []
