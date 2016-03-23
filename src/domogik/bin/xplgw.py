@@ -143,13 +143,15 @@ class XplManager(XplPlugin):
         and store it eventually in the db
         """
         tim = calendar.timegm(time.gmtime())
+        self.log.debug(u"New message (from MQ) > start to store each of the sensors in the store queue...")
         for sensorid in content:
             data = {}
             data['sensor_id'] = sensorid
             data['time'] = tim
             data['value'] = content[sensorid]
             self._sensor_store_queue.put(data)
-        self.log.debug(u"Adding new message to the sensorStoreQueue, current length = {0}".format(self._sensor_store_queue.qsize()))
+            self.log.debug(u"New message (from MQ) > message for sensor_id='{0}' added to the store queue, current length = {1}".format(sensorid, self._sensor_store_queue.qsize()))
+        self.log.debug(u"New message (from MQ) > storing in the store queue finished")
 
     def _load_client_to_xpl_target(self):
         """ Request the client conversion info
@@ -369,9 +371,9 @@ class XplManager(XplPlugin):
         item["msg"] = pkt
         item["received_datetime"] = calendar.timegm(time.gmtime())
         item["clientId"] = next((cli for cli, xpl in self.client_xpl_map.items() if xpl == pkt.source), None)
+        self.log.debug(u"New message (from xPL) > start storing in the sensor queue...")
         self._sensor_queue.put(item)
-        self.log.debug(u"Adding new message to the sensorQueue, current length = {0}".format(self._sensor_queue.qsize()))
-        #self.log.debug(u"Adding new message to the sensorQueue, current length = {0}, message = {1}".format(self._sensor_queue.qsize(), pkt))
+        self.log.debug(u"New message (from xPL) > storing in the sensor queue finished, current length = {0}".format(self._sensor_queue.qsize()))
         self._cmd_lock_p.acquire()
         # only do this when we have outstanding commands
         if len(self._cmd_dict) > 0:
@@ -511,7 +513,8 @@ class XplManager(XplPlugin):
             while True:
                 try:
                     item = self._queue.get()
-                    self._log.debug(u"Getting item from the sensorQueue, current length = {0}".format(self._queue.qsize()))
+                    #self._log.debug(u"Getting item from the sensor queue, current length = {0}".format(self._queue.qsize()))
+                    self._log.debug(u"Getting item from the sensor queue, current length = {0}, item = '{1}'".format(self._queue.qsize(), item))
                     # if clientid is none, we don't know this sender so ignore
                     # TODO check temp disabled until external members are working
                     #if item["clientId"] is not None:
@@ -536,8 +539,8 @@ class XplManager(XplPlugin):
                                         data['sensor_id'] = storeparam.sensor_id
                                         data['time'] = current_date
                                         data['value'] = value
+                                        self._log.debug(u"Adding new message to the store queue, current length = {0}".format(self._queue_store.qsize()))
                                         self._queue_store.put(data)
-                                        self._log.debug(u"Adding new message to the sensorStoreQueue, current length = {0}".format(self._queue_store.qsize()))
                                     else:
                                         self._log.debug(u"Don't need to store this value")
                 except Queue.Empty:
@@ -549,7 +552,7 @@ class XplManager(XplPlugin):
     class _SensorStoreThread(threading.Thread):
         """ SensorStoreThread class
         Thread that will handle the sensorStore queue
-        every item in this queue should eb stored in the db
+        every item in this queue should be stored in the db
         - conversion will happend
         - formula applying
         - rounding
@@ -569,13 +572,17 @@ class XplManager(XplPlugin):
                 try:
                     store = True
                     item = self._queue.get()
-                    self._log.debug(u"Getting item from the sensorStoreQueue, current length = {0}".format(self._queue.qsize()))
+                    #self._log.debug(u"Getting item from the store queue, current length = {0}".format(self._queue.qsize()))
+                    self._log.debug(u"Getting item from the store queue, current length = {0}, item = '{1}'".format(self._queue.qsize(), item))
                     # handle ignore
                     value = item['value']
                     senid = item['sensor_id']
                     current_date = item['time']
                     # get the sensor and dev
+                    # TODO : DEBUG - LOG TO REMOVE
+                    self._log.debug(u"DEBUG - BEFORE THE with self._db.session_scope()")
                     with self._db.session_scope():
+                        self._log.debug(u"DEBUG - BEGINNING OF THE with self._db.session_scope()")
                         sen = self._db.get_sensor(senid)
                         dev = self._db.get_device(sen.device_id)
                         # check if we need a conversion
