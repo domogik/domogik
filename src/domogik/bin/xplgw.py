@@ -543,7 +543,7 @@ class XplManager(XplPlugin):
                                         self._queue_store.put(data)
                                     else:
                                         self._log.debug(u"Don't need to store this value")
-                except Queue.Empty:
+                except queue.Empty:
                     # nothing in the queue, sleep for 1 second
                     time.sleep(1)
                 except Exception as exp:
@@ -609,7 +609,7 @@ class XplManager(XplPlugin):
                                   "stored_value" : value})
                         except Exception as exp:
                             self._log.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
-                except Queue.Empty:
+                except queue.Empty:
                     # nothing in the queue, sleep for 1 second
                     time.sleep(1)
                 except Exception as exp:
