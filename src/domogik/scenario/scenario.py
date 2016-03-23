@@ -349,6 +349,7 @@ class ScenarioInstance:
         try:
             exec(self._compiled_condition)
         except Exception as a:
+            self._log.error(u"Error while evaluating condition '{0}'. Error is : {1}".format(self._compiled_condition, traceback.format_exc()))
             raise
 
     def _create_instance(self, inst, itype):
