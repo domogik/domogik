@@ -334,6 +334,7 @@ class ScenarioInstance:
         if self._compiled_condition is None:
             return None
         try:
+            print self._parsed_condition
             exec(self._compiled_condition)
         except Exception as a:
             raise
