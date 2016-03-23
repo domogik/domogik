@@ -157,17 +157,24 @@ class ScenarioInstance:
         """
         try:
             self._parsed_condition = self.__parse_part(self._json)
+            self._log.debug(u"Scenario '{0}' python generated code : \n{1}".format(remove_accents(self._name), self._parsed_condition))
+            # this line is to decomment only for debug purpose
+            # it will display the evaluated if conditions
+            # but so, it will evaluate all sensors, so it may trigger some scenarios on startup in double
+            #self._log.debug(u"Now, the python code evaluated is : \n{0}".format(self.__parse_part(self._json, debug = True)))
             tmp = ast.parse(self._parsed_condition)
             self._compiled_condition = compile(tmp, "Scenario {0}".format(remove_accents(self._name)), 'exec')
         except:
             raise
 
-    def __parse_part(self, part, level=0):
+    def __parse_part(self, part, level=0, debug=False):
         """Parse the json code and generate a python string that can be evaluated
         indentation needs to be done on the following objects:
         - do of an if part
         - else items of an if part
         - get/set variables
+        If debug=False, generate the python code for the scenario
+        Else, generate a python code evaluated for debugging
         """
         # Do not handle disabled blocks
         if 'disabled'in part and part['disabled'] == 'true':
@@ -207,27 +214,27 @@ class ScenarioInstance:
                     else:
                         st = "elif"
                     # if stays at the same lvl
-                    ifp = self.__parse_part(part["IF{0}".format(num)], level)
+                    ifp = self.__parse_part(part["IF{0}".format(num)], level, debug)
                     retlist.append( pyObj(u"{0} {1}:\r\n".format(st, ifp), level) )
                     # do is a level deeper
-                    dop = self.__parse_part(part["DO{0}".format(num)], (level+1))
+                    dop = self.__parse_part(part["DO{0}".format(num)], (level+1), debug)
                     retlist.append( pyObj(dop, level) )
             # handle ELSE
             if 'ELSE' in part:
                 retlist.append( pyObj(u"else:\r\n", level) )
-                retlist.append( pyObj(self.__parse_part(part['ELSE'], (level+1)), (level)) )
+                retlist.append( pyObj(self.__parse_part(part['ELSE'], (level+1), debug), (level)) )
         # Set a local variable
         elif part['type'] == 'variables_set':
-            retlist.append( pyObj(u"{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level)), level) )
+            retlist.append( pyObj(u"{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level, debug)), level) )
         # get a local variable
         elif part['type'] == 'variables_get':
             retlist.append( pyObj(u"{0}".format(part['VAR']), level) )
         # True and False block
         elif part['type'] == 'logic_boolean':
             if part['BOOL'] in ("TRUE", "1", 1, True):
-                retlist.append( pyObj("\"1\"") )
+                retlist.append( pyObj("True") )
             else:
-                retlist.append( pyObj("\"0\"") )
+                retlist.append( pyObj("False") )
         # a simple static number
         elif part['type'] == 'math_number':
             retlist.append( pyObj("float(\"{0}\")".format(part['NUM'])) )
@@ -239,15 +246,15 @@ class ScenarioInstance:
             reslst = []
             for ipart, val in sorted(part.items()):
                 if ipart.startswith('ADD'):
-                    addp = self.__parse_part(part[ipart], level)
+                    addp = self.__parse_part(part[ipart], level, debug)
                     reslst.append(u"str({0})".format(addp))
             retlist.append( pyObj(u" + ".join(reslst)) )
         # get the length of a string
         elif part['type'] == 'text_length':
-            retlist.append( pyObj(u"len({0})".format(self.__parse_part(part['VALUE'], level))) )
+            retlist.append( pyObj(u"len({0})".format(self.__parse_part(part['VALUE'], level, debug))) )
         # is the string empty
         elif part['type'] == 'text_isEmpty':
-            retlist.append( pyObj(u"not len({0})".format(self.__parse_part(part['VALUE'], level))) )
+            retlist.append( pyObj(u"not len({0})".format(self.__parse_part(part['VALUE'], level, debug))) )
         # do a calculation on 2 numbers
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
@@ -260,7 +267,7 @@ class ScenarioInstance:
                 compare = "/"
             elif part['OP'].lower() == "power":
                 compare = "^"
-            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
+            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level, debug), compare, self.__parse_part(part['B'], level, debug))) )
         # logically compare 2 items
         elif part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
@@ -275,28 +282,31 @@ class ScenarioInstance:
                 compare = ">"
             elif part['OP'].lower() == "gte":
                 compare = ">="
-            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level), compare, self.__parse_part(part['B'], level))) )
+            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level, debug), compare, self.__parse_part(part['B'], level, debug))) )
         # logical operate (and, or, not)
         elif part['type'] == 'logic_operation':
-            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level), part['OP'].lower(), self.__parse_part(part['B'], level))) )
+            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level, debug), part['OP'].lower(), self.__parse_part(part['B'], level, debug))) )
         # a not function
         elif part['type'] == 'logic_negate':
-            retlist.append( pyObj(u"not {0}".format(self.__parse_part(part['BOOL'], level))) )
+            retlist.append( pyObj(u"not {0}".format(self.__parse_part(part['BOOL'], level, debug))) )
         # handle hysteresis
         elif part['type'] == "trigger.Hysteresis":
             test = self._create_instance(part['type'], 'test')
             test[0].fill_parameters({"id.id": part['id']})
-            retlist.append( pyObj(u"if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
+            if debug == False:
+                retlist.append( pyObj(u"if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
+            else:
+                retlist.append( eval(u"if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
             nlevel = level 
             level = level + 1
-            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['Run'], level))) )
+            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['Run'], level, debug))) )
         # apply an action
         elif "Action" in part['type']:
             act = self._create_instance(part['type'], 'action')
             for p, v in part.items():
                 if p not in ['id', 'type', 'NEXT']:
                     if 'type' in v:
-                        v2 = ( self.__parse_part(v, 0) )
+                        v2 = ( self.__parse_part(v, 0, debug) )
                     else:
                         v2 = u"\"{0}\"".format(v)
                     retlist.append( pyObj(u"self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2), level) )
@@ -305,10 +315,13 @@ class ScenarioInstance:
         else:
             test = self._create_instance(part['type'], 'test')
             test[0].fill_parameters(part)
-            retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate()".format(test[1])) )
+            if debug == False:
+                retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate()".format(test[1])) )
+            else:
+                retlist.append( eval(u"self._mapping['test']['{0}'].evaluate()".format(test[1])) )
         # handle the NEXT, so we can stack blocks
         if 'NEXT'in part:
-            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['NEXT'], level if not nlevel else nlevel))) )
+            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['NEXT'], level if not nlevel else nlevel, debug))) )
         # build the output string
         res = u""
         for ret in retlist:
@@ -402,7 +415,6 @@ class pyObj:
         """
         If lvl is set, indent that many times
         """
-        print self.lvl
         ident = (u"    " * self.lvl) if self.lvl else ""
         result = [u"{0}{1}".format(ident, line) for line in self.data.splitlines(True)]
         return u"".join(result)

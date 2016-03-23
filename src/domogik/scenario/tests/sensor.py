@@ -68,14 +68,17 @@ class AbstractSensorTest(AbstractTest, MQAsyncSub):
                     self.handle_message(did, msg)
 
 
+
 class SensorTest(AbstractSensorTest):
-    """ Sensor test : evaluate a sensor value when it changes
+    """ Sensor test : evaluate a sensor 
     # params == the sensorId to check the value for
     """
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractSensorTest.__init__(self, log, trigger, cond, params)
+        self.add_parameter("usage", "sensor_usage.SensorUsageParameter")
         self._res = self._convert(self._res)
+        self._res_old = self._res
 
     def handle_message(self, did, msg):
         self._res = self._convert(msg['stored_value'])
@@ -87,6 +90,11 @@ class SensorTest(AbstractSensorTest):
                 return float(val)
             else:
                 return None
+        elif self._dt_parent == "DT_Bool":
+            if val == "1":
+                return True
+            else:
+                return False
         elif self._dataType == "DT_Time":
             if val != None:
                 tmp = val.split(":")
@@ -108,92 +116,26 @@ class SensorTest(AbstractSensorTest):
     def evaluate(self):
         """ Evaluate the sensor value
         """
-        self.log.debug("Evaluate SensorTest '{0}' to '{1}'. Type is '{2}'".format(self._sensorId, self._res, type(self._res))) 
-        return self._res
+        p = self.get_raw_parameters()
+        u = p["usage"]
+        usage = u.evaluate()
 
-class SensorChangedTest(AbstractSensorTest):
-    """ Sensor test : raise True when the value/date change
-    # params == the sensorId to check the value for
-    """
-
-    def __init__(self, log = None, trigger = None, cond = None, params = None):
-        AbstractSensorTest.__init__(self, log, trigger, cond, params)
-        self._old_res = self._res
-
-    def handle_message(self, did, msg):
-        self._res = msg['stored_value']
-        # Trigger only if the value changed
-        if self._res != self._old_res:
-            self._trigger(self)
-        self._old_res = self._res
-
-    def evaluate(self):
-        """ Evaluate the sensor value
-        """
-        self.log.debug("Evaluate SensorChangedTest '{0}' : value changed. Return True.".format(self._sensorId, self._res)) 
-        return True
+        if usage == "value":
+            self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, self._res, type(self._res))) 
+            return self._res
+        elif usage == "trigger_on_change":
+            if self._res != self._res_old:
+                has_changed = True
+            else:
+                has_changed = False
+            self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, has_changed, type(has_changed))) 
+            return has_changed
+        elif usage == "trigger_on_all":
+            self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, True, type(True))) 
+            return True
+        else:
+            self.log.error(u"Bad usage used for sensorTest! Usage choosed ='{0}'".format(usage))
+            return None
 
 
-if __name__ == "__main__":
-    import logging
 
-    def mytrigger(test):
-        print("Trigger called by test {0}, refreshing state".format(test))
-        print("state is {0}".format(st))
-
-    ### create logger
-    FORMAT = "%(asctime)-15s %(message)s"
-
-    logger = logging.getLogger('simple_example')
-    logger.setLevel(logging.DEBUG)
-
-    # create console handler and set level to debug
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-
-    # create formatter
-    formatter = logging.Formatter(FORMAT)
-
-    # add formatter to ch
-    ch.setFormatter(formatter)
-
-    # add ch to logger
-    logger.addHandler(ch)
-
-    logger.info("------------------")
-
-
-    ### test the class
-    st = SensorTest(logger, trigger = mytrigger)
-    p = st.get_parameters()
-
-    logger.info("==== Evaluate without parameters values ====")
-    st.evaluate()
-
-    logger.info("==== Evaluate with parameters values that does not match ====")
-    logger.debug("Set values")
-    data = { "sensor": { "sensor_id" : 2 },
-             "value":  { "text" : "on" }
-    }
-    logger.debug("Set parameters values")
-    st.fill_parameters(data)
-    logger.debug("I sleep 5s")
-
-    st.evaluate()
-
-    ######### TODO : finish the below part 
-    print("updating with good text")
-    data = { "url": { "urlpath" : "http://people.dunnewind.net/maxence/domogik/test.txt",
-                    "interval": "5"
-    },
-    "text": {
-        "text" : "randomtext"
-    }
-    }
-    print("====")
-    TEST.fill_parameters(data)
-    print("====")
-    print("I sleep 5s")
-    sleep(5)
-    print("Trying to evaluate : {0}".format(TEST.evaluate()))
-    TEST.destroy()

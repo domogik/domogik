@@ -217,7 +217,6 @@ def scenario_blocks_js():
     tests = scenario_tests.keys()
     try:
         tests.remove(u'sensor.SensorTest')
-        tests.remove(u'sensor.SensorChangedTest')
     except ValueError:
         pass
 
@@ -288,7 +287,6 @@ def scenario_blocks_js():
 
     for test, params in scenario_tests.items():
         if test == "sensor.SensorTest": continue
-        if test == "sensor.SensorChangedTest": continue
         p = []
         jso = u""
         if params['blockly'] != "":
@@ -387,10 +385,19 @@ def scenario_blocks_js():
 
             devices_per_clients[client][name] = {}
             devices_per_clients[client][name]['sensors'] = {}
-            devices_per_clients[client][name]['sensors_changed'] = {}
             devices_per_clients[client][name]['commands'] = {}
     
-            ### sensors values blocks
+            ### sensors blocks
+            # first, get the parameters
+            sensor_usage = []
+            for test, sensor_params in scenario_tests.items():
+                if test == "sensor.SensorTest": 
+                    for buf in sensor_params["parameters"]:
+                        if buf["name"] == "usage.usage":
+                            sensor_usage = buf["values"]
+                    break
+
+            # then, build the blocks
             for sen in dev['sensors']:
                 p = u""
                 jso = u""
@@ -421,6 +428,13 @@ def scenario_blocks_js():
                 else:
                     color = 160
                     output = "\"null\""
+
+                ### Generate parameters
+                the_list = sensor_usage
+                papp = u"this.appendDummyInput().appendField(\"Mode \").appendField(new Blockly.FieldDropdown({0}), '{1}');".format(json.dumps(the_list), "usage.usage");
+
+
+                ### Create the block
                 block_id = u"sensor.SensorTest.{0}".format(sen_id)
                 block_description = u"{0}@{1}".format(name, client)
                 add = u"""Blockly.Blocks['{0}'] = {{
@@ -428,40 +442,13 @@ def scenario_blocks_js():
                                 this.setColour({5});
                                 this.appendDummyInput().appendField("{2}");
                                 this.appendDummyInput().appendField("Sensor : {1} ({6})");
-                                this.appendDummyInput().appendField("Value.");
+                                {7}
                                 this.setOutput(true, {4});
                                 this.setInputsInline(false);
                                 this.setTooltip("{2}"); 
                             }}
                         }};
-                        """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
-                js = u'{0}\n\r{1}'.format(js, add)
-    
-            ### sensors changes blocks
-            for sen in dev['sensors']:
-                p = u""
-                jso = u""
-                sen_id = dev['sensors'][sen]['id']
-                sen_name = dev['sensors'][sen]['name']
-                devices_per_clients[client][name]['sensors_changed'][sen_name] = sen_id
-                # determ the output type
-                color = 20
-                output = "\"Boolean\""
-
-                block_id = u"sensor.SensorChangedTest.{0}".format(sen_id)
-                block_description = u"{0}@{1}".format(name, client)
-                add = u"""Blockly.Blocks['{0}'] = {{
-                            init: function() {{
-                                this.setColour({5});
-                                this.appendDummyInput().appendField("{2}");
-                                this.appendDummyInput().appendField("Sensor : {1}");
-                                this.appendDummyInput().appendField("Value changes.");
-                                this.setOutput(true, {4});
-                                this.setInputsInline(false);
-                                this.setTooltip("{2}"); 
-                            }}
-                        }};
-                        """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
+                        """.format(block_id, sen_name, block_description, jso, output, color, sen_dt, papp)
                 js = u'{0}\n\r{1}'.format(js, add)
     
             ### commands blocks
