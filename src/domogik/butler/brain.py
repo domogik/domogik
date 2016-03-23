@@ -385,7 +385,7 @@ def do_command(log, user_locale, dt_type_list, device, value):
         devices = json.loads(str_devices)['devices']
         found = None
         for a_device in devices:
-            if a_device['name'].lower() == device_name:
+            if clean_input(a_device['name']) == clean_input(device_name):
                 cid = 0
                 for a_command in a_device['commands']:
                     pid = 0
@@ -398,7 +398,7 @@ def do_command(log, user_locale, dt_type_list, device, value):
                         continue
                         cid = cid + 1
                     break
-        print("F={0}".format(found))
+        #print("F={0}".format(found))
         if found:
             dev = found[0]
             cid = found[1]
