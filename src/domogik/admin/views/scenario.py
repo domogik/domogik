@@ -443,7 +443,7 @@ def scenario_blocks_js():
                                 this.appendDummyInput().appendField("{2}");
                                 this.appendDummyInput().appendField("Sensor : {1} ({6})");
                                 {7}
-                                this.setOutput(true, {4});
+                                this.setOutput(true); /*, {4}); */
                                 this.setInputsInline(false);
                                 this.setTooltip("{2}"); 
                             }}
