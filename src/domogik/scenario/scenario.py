@@ -367,7 +367,6 @@ class ScenarioInstance:
             # To avoid triggering a scenario N times if it uses N times the same test, we register the used tests
             # and use a dummy trigger (which does nothing) for tests 2...N and the generic_trigger for the test 1
             if inst in self._test_instances:
-                uuid = self._test_instances[inst]
                 trigger = self._dummy
             else:
                 self._test_instances[inst] = uuid
