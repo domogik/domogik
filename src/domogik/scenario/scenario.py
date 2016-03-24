@@ -87,6 +87,7 @@ class ScenarioInstance:
         self._state = state
         self._dbid = dbid
         self._db = db
+        self._test_instances = {}  # list of test instances already processes. This is used to avoid triggering N time a scenario if there is N time the same test in it
 
         self.zmq = zmq.Context()
         # datatypes
@@ -210,7 +211,8 @@ class ScenarioInstance:
                 if ipart.startswith('IF'):
                     num = int(ipart.replace('IF', ''))
                     if num == 0:
-                        st = "if"
+                        st = "print('---- Start evaluating ----')\nif"
+                        #st = "if"
                     else:
                         st = "elif"
                     # if stays at the same lvl
@@ -344,6 +346,7 @@ class ScenarioInstance:
         @raise ValueError if no parsed condition is avaiable
         @return a boolean representing result of evaluation
         """
+        self._log.debug(u"Eval the condition!")
         if self._compiled_condition is None:
             return None
         try:
@@ -352,9 +355,23 @@ class ScenarioInstance:
             self._log.error(u"Error while evaluating condition '{0}'. Error is : {1}".format(self._compiled_condition, traceback.format_exc()))
             raise
 
+    def _dummy(self, foo):
+        """ Dummy function to avoid calling self.generic_trigger() when not needed
+            See _create_instance for more details
+        """
+        pass
+
     def _create_instance(self, inst, itype):
         uuid = self._get_uuid()
         if itype == 'test':
+            # To avoid triggering a scenario N times if it uses N times the same test, we register the used tests
+            # and use a dummy trigger (which does nothing) for tests 2...N and the generic_trigger for the test 1
+            if inst in self._test_instances:
+                uuid = self._test_instances[inst]
+                trigger = self._dummy
+            else:
+                self._test_instances[inst] = uuid
+                trigger = self.generic_trigger
             try:
                 mod, clas, param = inst.split('.')
             except ValueError as err:
@@ -363,7 +380,8 @@ class ScenarioInstance:
             module_name = "domogik.scenario.tests.{0}".format(mod)
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create test instance {0} with uuid {1}".format(inst, uuid))
-            obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self, params=param)
+            #obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self, params=param)
+            obj = cobj(log=self._log, trigger=trigger, cond=self, params=param)
             self._mapping['test'][uuid] = obj
             return (obj, uuid)
         elif itype == 'action':
@@ -396,13 +414,14 @@ class ScenarioInstance:
         pass
 
     def generic_trigger(self, test):
-        if test.get_condition():
-            cond = test.get_condition()
-            if cond.get_parsed_condition() is None:
-                return
-            st = cond.eval_condition()
-        else:
-            test.evaluate()
+        self.eval_condition()
+        #if test.get_condition():
+        #    cond = test.get_condition()
+        #    if cond.get_parsed_condition() is None:
+        #        return
+        #    st = cond.eval_condition()
+        #else:
+        #    test.evaluate()
 
 class pyObj:
     """
