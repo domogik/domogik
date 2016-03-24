@@ -51,7 +51,8 @@ class TimeNow(AbstractTest):
         while not self._event.is_set():
             now = time.time()
             self._res = int((now - get_midnight_timestamp())/60)
-            self._trigger(self)
+            if self._trigger != None:
+                self._trigger(self)
             self._event.wait(60)
 
     def evaluate(self):
