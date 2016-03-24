@@ -78,7 +78,7 @@ class SensorTest(AbstractSensorTest):
         AbstractSensorTest.__init__(self, log, trigger, cond, params)
         self.add_parameter("usage", "sensor_usage.SensorUsageParameter")
         self._res = self._convert(self._res)
-        self._res_old = self._res
+        self._res_old = None
 
     def handle_message(self, did, msg):
         self._res = self._convert(msg['stored_value'])
@@ -124,15 +124,18 @@ class SensorTest(AbstractSensorTest):
             self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, self._res, type(self._res))) 
             return self._res
         elif usage == "trigger_on_change":
-            if self._res != self._res_old:
+            if self._res_old != None and self._res != self._res_old:   # not sensor startup or sensor value changed
                 has_changed = True
             else:
                 has_changed = False
             self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, has_changed, type(has_changed))) 
             return has_changed
         elif usage == "trigger_on_all":
-            self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, True, type(True))) 
-            return True
+            if self._res_old != None:   # not sensor startup
+                self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, True, type(True))) 
+                return True
+            else:    # init of the sensor block
+                return False
         else:
             self.log.error(u"Bad usage used for sensorTest! Usage choosed ='{0}'".format(usage))
             return None
