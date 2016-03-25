@@ -34,12 +34,13 @@ from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from domogik.common.logger import Logger
 from domogik.common.utils import remove_accents
+from domogikmq.pubsub.subscriber import MQAsyncSub
 import zmq
 import traceback
 import logging
 import ast
 
-class ScenarioInstance:
+class ScenarioInstance(MQAsyncSub):
     """ This class provides base methods for the scenarios
     The scenario json looks like:
     {
@@ -87,6 +88,8 @@ class ScenarioInstance:
         self._state = state
         self._dbid = dbid
         self._db = db
+        self._sub = None # If not None, then a asyncSubSCriber
+        self._subList = []  # A list that keeps all messages that we need to subScribe to
         self._test_instances = {}  # list of test instances already processes. This is used to avoid triggering N time a scenario if there is N time the same test in it
 
         self.zmq = zmq.Context()
@@ -146,6 +149,9 @@ class ScenarioInstance:
             item.destroy()
             del item
         self._mapping['test'] = {}
+        self._test_instances = {}
+        self._sub = None
+        self._subList = []
 
     def update(self, json):
         # cleanpu the instances
@@ -165,6 +171,8 @@ class ScenarioInstance:
             #self._log.debug(u"Now, the python code evaluated is : \n{0}".format(self.__parse_part(self._json, debug = True)))
             tmp = ast.parse(self._parsed_condition)
             self._compiled_condition = compile(tmp, "Scenario {0}".format(remove_accents(self._name)), 'exec')
+            if len(self._subList) > 0:
+                self._sub = MQAsyncSub.__init__(self, zmq.Context(), 'scenario-sensor', set(self._subList))
         except:
             raise
 
@@ -355,6 +363,10 @@ class ScenarioInstance:
             self._log.error(u"Error while evaluating condition '{0}'. Error is : {1}".format(self._compiled_condition, traceback.format_exc()))
             raise
 
+    def on_message(self, did, msg):
+        for (uid, item) in self._mapping['test'].items():
+            item.on_message(did, msg)
+
     def _dummy(self, foo):
         """ Dummy function to avoid calling self.generic_trigger() when not needed
             See _create_instance for more details
@@ -381,6 +393,7 @@ class ScenarioInstance:
             self._log.debug(u"Create test instance {0} with uuid {1}".format(inst, uuid))
             #obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self, params=param)
             obj = cobj(log=self._log, trigger=trigger, cond=self, params=param)
+            self._subList = self._subList + obj.get_subMessages()
             self._mapping['test'][uuid] = obj
             return (obj, uuid)
         elif itype == 'action':

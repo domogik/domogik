@@ -27,14 +27,13 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.scenario.tests.abstract import AbstractTest
 from domogik.common.database import DbHelper
-from domogikmq.pubsub.subscriber import MQAsyncSub
 from time import sleep
 import zmq
 
-class AbstractSensorTest(AbstractTest, MQAsyncSub):
+class AbstractSensorTest(AbstractTest):
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
-        self.sub = MQAsyncSub.__init__(self, zmq.Context(), 'scenario-sensor', ['device-stats'])
+        self._subMessages.append( 'device-stats' )
         self._sensorId = params
         self.set_description("Check if value/date changes for a sensor with id {0}".format(self._sensorId))
         self.log = log

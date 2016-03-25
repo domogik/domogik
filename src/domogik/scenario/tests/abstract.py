@@ -56,6 +56,10 @@ class AbstractTest:
         self._description = None
         self._cond = cond
         self._params = params
+        self._subMessages = []
+
+    def get_subMessages(self):
+        return self._subMessages
 
     def set_description(self, description):
         """ Update the description of the test
@@ -183,4 +187,7 @@ class AbstractTest:
 
     def get_blockly(self):
         return ""
+
+    def on_message(self, did, msg):
+        pass
 
