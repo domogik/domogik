@@ -170,7 +170,7 @@ class ScenarioInstance(MQAsyncSub):
             # but so, it will evaluate all sensors, so it may trigger some scenarios on startup in double
             #self._log.debug(u"Now, the python code evaluated is : \n{0}".format(self.__parse_part(self._json, debug = True)))
             tmp = ast.parse(self._parsed_condition)
-            self._compiled_condition = compile(tmp, "Scenario {0}".format(remove_accents(self._name)), 'exec')
+            self._compiled_condition = compile(tmp, u"Scenario {0}".format(remove_accents(self._name)), 'exec')
             if len(self._subList) > 0:
                 self._sub = MQAsyncSub.__init__(self, zmq.Context(), 'scenario-sensor', set(self._subList))
         except:
