@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-                                                                           
 """
 @api {SUB} device-changed Subscribe to device changes
-@apiVersion 0.4.0
+@apiVersion 0.5.0
 @apiName device-changed
 @apiGroup Client
 @apiDescription Subscribe to newly stored device stats
