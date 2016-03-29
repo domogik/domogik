@@ -188,8 +188,10 @@
                                       <td><a href="{{ sensor_url }}">{{ sensor_url }}</a></td>
                                     </tr>
                                     <tr>
-                                      <th>{% trans %}Openremote usage{% endtrans %}</th>
+                                      <th>{% trans %}Openremote{% endtrans %}</th>
                                       <td>
+                                        <a href="#openremote{{ sen.id }}" data-toggle="collapse">{% trans %}Usage{% endtrans %}</a>
+                                        <div id="openremote{{ sen.id }}" class="collapse">
                                         <h5>{% trans %}Create the command{% endtrans %}</h5>
                                         <p>
                                           <em>{% trans %}To create a sensor, you need to create a command which will grab the value.{% endtrans %}</em>
@@ -224,6 +226,7 @@
                                             </tbody>
                                           </table>
                                         {% endif %}
+                                        </div>
                                       </td>
                                     </tr>
                                   </tbody>
@@ -309,10 +312,11 @@
                                         </td>
                                       </tr>
                                       <tr>
-                                        <th>{% trans %}Openremote usage{% endtrans %}</th>
+                                        <th>{% trans %}Openremote{% endtrans %}</th>
                                         <td>
 
-
+                                            <a href="#openremote{{ cmd.id }}" data-toggle="collapse">{% trans %}Usage{% endtrans %}</a>
+                                            <div id="openremote{{ cmd.id }}" class="collapse">
                                           {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
                                             <h5>{% trans %}Create the commands{% endtrans %}</h5>
                                             <p>
@@ -339,6 +343,7 @@
                                           {% else %}
                                             <em>{% trans %}Not yet documented.{% endtrans %}</em>
                                           {% endif %}
+                                            </div>
                                         </td>
                                       </tr>
                                     </tbody>
