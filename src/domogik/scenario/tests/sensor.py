@@ -27,7 +27,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.scenario.tests.abstract import AbstractTest
 from domogik.common.database import DbHelper
-from time import sleep
+from time import sleep, time
 import zmq
 
 class AbstractSensorTest(AbstractTest):
@@ -77,9 +77,12 @@ class SensorTest(AbstractSensorTest):
         AbstractSensorTest.__init__(self, log, trigger, cond, params)
         self.add_parameter("usage", "sensor_usage.SensorUsageParameter")
         self._res = self._convert(self._res)
+        self._time = time()
         self._res_old = None
+        self._time_old = None
 
     def handle_message(self, did, msg):
+        self._time = time()
         self._res = self._convert(msg['stored_value'])
         self._trigger(self)
 
@@ -121,6 +124,8 @@ class SensorTest(AbstractSensorTest):
 
         if usage == "value":
             self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, self._res, type(self._res))) 
+            self._res_old = self._res
+            self._time_old = self._time
             return self._res
         elif usage == "trigger_on_change":
             if self._res_old != None and self._res != self._res_old:   # not sensor startup or sensor value changed
@@ -128,12 +133,20 @@ class SensorTest(AbstractSensorTest):
             else:
                 has_changed = False
             self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, has_changed, type(has_changed))) 
+            self._res_old = self._res
+            self._time_old = self._time
             return has_changed
         elif usage == "trigger_on_all":
-            if self._res_old != None:   # not sensor startup
+            #print("R vs Ro : {0} vs {1}".format(self._res, self._res_old))
+            #print("T vs To : {0} vs {1}".format(self._time, self._time_old))
+            if self._res_old != None and ((self._res != self._res_old) or (self._time != self._time_old)):   # not sensor startup or sensor value changed or date changed
                 self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, True, type(True))) 
+                self._res_old = self._res
+                self._time_old = self._time
                 return True
             else:    # init of the sensor block
+                self._res_old = self._res
+                self._time_old = self._time
                 return False
         else:
             self.log.error(u"Bad usage used for sensorTest! Usage choosed ='{0}'".format(usage))
