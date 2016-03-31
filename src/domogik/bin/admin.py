@@ -100,7 +100,7 @@ class Publisher(MQAsyncSub):
         while True:
             message = yield self.WSmessages.get()
             if len(self.subscribers) > 0:
-                print("Pushing MQ message to {} WS subscribers...".format(len(self.subscribers)))
+                print(u"Pushing MQ message to {} WS subscribers...".format(len(self.subscribers)))
                 yield [subscriber.submit(message) for subscriber in self.subscribers]
 
     @gen.coroutine
@@ -119,7 +119,7 @@ class Publisher(MQAsyncSub):
                 msg = MQMessage()
                 msg.set_action(str(jsons['mq_request']))
                 msg.set_data(jsons['data'])
-                print("REQ : {0}".format(msg.get()))
+                print(u"REQ : {0}".format(msg.get()))
                 if 'dst' in jsons:
                     dst = str(jsons['dst'])
                 else:
@@ -131,11 +131,10 @@ class Publisher(MQAsyncSub):
                 del cli
             # pub
             elif 'mq_publish' in jsons and 'data' in jsons:
-                print("Publish : {0}".format(jsons['data']))
                 self.pub.send_event(jsons['mq_publish'],
                                 jsons['data'])
         except Exception as e:
-            print("Error sending mq message: {0}".format(e))
+            print(u"Error sending mq message: {0}".format(e))
 
 class Subscription(WebSocketHandler):
     """Websocket for subscribers."""
@@ -176,7 +175,7 @@ class Subscription(WebSocketHandler):
     
     def on_message(self, content):
         """ reciev message from websocket and send to MQ """
-        print("WS to MQ: {0}".format(content))
+        print(u"WS to MQ: {0}".format(content))
         self.publisher.MQmessages.put(content)
 
 class Admin(Plugin):

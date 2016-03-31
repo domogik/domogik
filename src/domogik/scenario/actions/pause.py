@@ -37,10 +37,8 @@ class PauseAction(AbstractAction):
         AbstractAction.__init__(self, log)
         self.set_description("Do a pause.")
 
-    def do_action(self, local_vars):
+    def do_action(self):
         delay = self._params['delay']
-        # local variables
-        delay = self.process_local_vars(local_vars, delay)
 
         self._log.info("Do a pause of {0} seconds".format(delay))
         try:

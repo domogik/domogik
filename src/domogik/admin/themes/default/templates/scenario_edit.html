@@ -18,9 +18,11 @@
     <a class="btn btn-default" data-toggle="confirmation" data-placement="bottom" data-href="/scenario/del/{{ scenario_id }}">
       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans %}Delete{% endtrans %}
     </a>
+<!-- TEMPORARY DISABLED
     <button id="help" type="button" class="btn btn-default"  data-toggle="modal" data-target="#help_modal">
       <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {% trans %}Help{% endtrans %}
     </button>
+-->
     </div>
     </div>
   <div class="form-group">
@@ -37,13 +39,6 @@
       <span class="help-block">{{ form.sdesc.description }}</span>
     </div>
   </div>
-  <div class="form-group">
-    <label class="control-label col-xs-3">{{ form.strigger.label }}</label>
-    <div class="col-xs-9">
-      {{ form.strigger() }}
-      <span class="help-block">{{ form.strigger.description }}</span>
-    </div>
-  </div>
 
   </form>
 
@@ -52,17 +47,31 @@
   <div id="blocklyDiv" style="position: absolute; width: 50%;"></div>
   <xml id="toolbox" style="display: none">
     <category name="Logic">
+        <block type="controls_if"></block>
         <block type="logic_compare"></block>
+        <block type="trigger.Hysteresis"></block>
         <block type="logic_operation"></block>
         <block type="logic_negate"></block>
-        <block type="logic_boolean"></block>
-    </category>
-    <category name="Maths">
         <block type="math_arithmetic"></block>
     </category>
+    <category name="Constants">
+        <block type="logic_boolean"></block>
+        <block type="math_number"></block>
+        <block type="text"></block>
+    </category>
+    <category name="Variables" custom="VARIABLE"></category>
+    <category name="Text">
+        <block type="text_join"></block>
+        <block type="text_length"></block>
+        <block type="text_isEmpty"></block>
+    </category>
     <category name="Datatypes">
-        {% for d in datatypes %}
-            <block type="{{ d }}"></block>
+        {% for p, ds in datatypes.items() %}
+            <category name="{{ p }}">
+            {% for d in ds %}
+                <block type="{{ d }}"></block>
+            {% endfor %}
+            </category>
         {% endfor %}
     </category>
     <category name="Devices">
@@ -71,14 +80,9 @@
             {% for dev in devices_per_clients[dev_client] %}
                 <category name="{{ dev }}">
                     {% if devices_per_clients[dev_client][dev]['sensors']|length > 0 %}
-                    <category name="Sensors values">
+                    <category name="Sensors">
                     {% for sen_name in devices_per_clients[dev_client][dev]['sensors'] %}
                         <block type="sensor.SensorTest.{{ devices_per_clients[dev_client][dev]['sensors'][sen_name] }}"></block>
-                    {% endfor %}
-                    </category>
-                    <category name="Raise if sensors change">
-                    {% for sen_name in devices_per_clients[dev_client][dev]['sensors_changed'] %}
-                        <block type="sensor.SensorChangedTest.{{ devices_per_clients[dev_client][dev]['sensors_changed'][sen_name] }}"></block>
                     {% endfor %}
                     </category>
                     {% endif %}
@@ -96,7 +100,9 @@
     </category>
     <category name="Other sensors">
         {% for t in tests %}
-            <block type="{{ t }}"></block>
+            {% if t != "trigger.Hysteresis" %}
+                <block type="{{ t }}"></block>
+            {% endif %}
         {% endfor %}
     </category>
     <category name="Other commands">
@@ -219,7 +225,6 @@
             .appendField('Do');
         this.setPreviousStatement(false);
         this.setNextStatement(false);
-        this.setDeletable(false);
         this.contextMenu = false;
         this.setInputsInline(false);
       }
@@ -230,10 +235,10 @@
             toolbox: document.getElementById('toolbox'),
             zoom:
                 {controls: true,
-                 wheel: true,
+                 wheel: false,
                  startScale: 1.0,
-                 maxScale: 3,
-                 minScale: 0.3,
+                 maxScale: 1.5,
+                 minScale: 0.5,
                  scaleSpeed: 1.2}
         }
     );

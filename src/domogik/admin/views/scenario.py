@@ -96,14 +96,13 @@ def scenario_edit(id):
         clone = True
     else:
         clone = False
-    default_json = '{"type":"dom_condition","id":"1","deletable":false}'
+    default_json = '{"type":"controls_if","id":"CXeRaH*|O;%(XRY0~0(d"}'
     # laod the json
     if int(id) == 0:
         name = u""
         jso = default_json
         dis = 0
         desc = None
-        trigger = u"Hysteresis"
     else:
         with app.db.session_scope():
             scen = app.db.get_scenario(id)
@@ -111,7 +110,6 @@ def scenario_edit(id):
             dis = scen.disabled
             name = scen.name
             desc = scen.description
-            trigger = scen.trigger_mode
             jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'").replace('"', '\\"')
             if clone:
                 id = 0
@@ -122,7 +120,6 @@ def scenario_edit(id):
         sname = TextField("Name", default=name, description=u"Scenario name")
         sdis = BooleanField("Disable", default=dis, description=u"Disabling a scenario avoid to delete it if you temporary want it not to run")
         sdesc = TextAreaField("Description", default=desc)
-        strigger = SelectField("Trigger Mode", choices=[('Always','Always'), ('Hysteresis', 'Hysteresis')], default=trigger, description=u"Sets the mode when the actions are run")
         sjson = HiddenField("json")
         submit = SubmitField(u"Send")
         pass
@@ -139,7 +136,6 @@ def scenario_edit(id):
         msg.add_data('json_input', form.sjson.data)
         msg.add_data('cid', form.sid.data)
         msg.add_data('dis', form.sdis.data)
-        msg.add_data('tmode', form.strigger.data)
         msg.add_data('desc', form.sdesc.data)
         res = cli.request('scenario', msg.get(), timeout=10)
         if res:
@@ -221,7 +217,6 @@ def scenario_blocks_js():
     tests = scenario_tests.keys()
     try:
         tests.remove(u'sensor.SensorTest')
-        tests.remove(u'sensor.SensorChangedTest')
     except ValueError:
         pass
 
@@ -251,7 +246,7 @@ def scenario_blocks_js():
         pass
     # datatypes
     datatypes = {}
-    used_datatypes = []
+    used_datatypes = {}
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('datatype.get')
@@ -272,8 +267,6 @@ def scenario_blocks_js():
     if res is not None:
         res = res.get_data()
         if 'devices' in res:
-            # create a list of the used datatypes in sensors to build only these datatype blocks
-            used_datatypes = []
             devices = res['devices']
     else:
         print("Error : no devices found!")
@@ -294,64 +287,69 @@ def scenario_blocks_js():
 
     for test, params in scenario_tests.items():
         if test == "sensor.SensorTest": continue
-        if test == "sensor.SensorChangedTest": continue
         p = []
         jso = u""
-        #for parv in params:
-        print(u"TEST={0}".format(test))
-        for parv in params['parameters']:
-            par = parv['name']
-            papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
-            if parv['type'] == 'string':
-                jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
-                papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
-            elif parv['type'] == 'integer':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
-            elif parv['type'] == 'list':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                the_list = parv["values"]  # [[...], [...]]
-                papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
-            p.append(papp)
-        add = u"""Blockly.Blocks['{0}'] = {{
-                    init: function() {{
-                        this.setColour(160);
-                        this.appendDummyInput().appendField("{2}");
-                        {1}
-                        this.setOutput(true);
-                        this.setInputsInline(false);
-                        this.setTooltip("{2}"); 
-                        this.contextMenu = false;
-                    }}
-                }};
-                """.format(test, '\n'.join(p), params['description'], jso)
-        js = u'{0}\n\r{1}'.format(js, add)
+        if params['blockly'] != "":
+            add = u"""Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            {1}
+                        }}
+                    }};
+                    """.format(test, params['blockly'])
+            js = u'{0}\n\r{1}'.format(js, add)
+        else:
+            #for parv in params:
+            print(u"TEST={0}".format(test))
+            for parv in params['parameters']:
+                par = parv['name']
+                papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
+                if parv['type'] == 'string':
+                    jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
+                    papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
+                elif parv['type'] == 'integer':
+                    jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                    papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
+                elif parv['type'] == 'list':
+                    jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                    the_list = parv["values"]  # [[...], [...]]
+                    papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
+                p.append(papp)
+            add = u"""Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            this.setColour(160);
+                            this.appendDummyInput().appendField("{2}");
+                            {1}
+                            this.setOutput(true);
+                            this.setInputsInline(false);
+                            this.setTooltip("{2}"); 
+                            this.contextMenu = false;
+                        }}
+                    }};
+                    """.format(test, '\n'.join(p), params['description'], jso)
+            js = u'{0}\n\r{1}'.format(js, add)
 
 
     ### actions
     for act, params in scenario_actions.items():
         if act == "command.CommandAction": continue
         p = []
-        inline = "false"  # default inline value
         jso = u""
         for par, parv in params['parameters'].items():
-            papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
+            papp = u"this.appendValueInput(\"{0}\").setAlign(Blockly.ALIGN_RIGHT)".format(par)
+            papp += u".appendField(\"{0}\")".format(parv['description'])
             if parv['type'] == 'string':
-                jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
-                papp = "{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
+                papp += ".setCheck(\"String\")"
             elif parv['type'] == 'integer':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, parv['default'],par)
+                papp += ".setCheck(\"Number\")"
             elif parv['type'] == 'list':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                the_list = parv["values"]  # [[...], [...]]
-                papp = u"{0}.appendField(new Blockly.FieldDropdown({1}), '{2}');".format(papp, json.dumps(the_list), par)
-            elif parv['type'] == 'external':
-                jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
-                papp = u"{0}; this.appendValueInput(\'{1}\').setCheck(null);".format(papp, par)
-                inline = "true"
+                papp += ".setCheck(\"Array\")"
+            #elif parv['type'] == 'external':
+                #jso = u'{0}, "{1}": \'+ block.getFieldValue(\'{1}\') + \' '.format(jso, par)
+                #papp = u"{0}; this.appendValueInput(\'{1}\').setCheck(null);".format(papp, par)
+            #    inline = "true"
             else:
-                papp = u"{0};".format(papp)
+                papp += ".setCheck(\"Any\")"
+                papp += u";"
             p.append(papp)
         add = u"""Blockly.Blocks['{0}'] = {{
                 init: function() {{
@@ -362,10 +360,9 @@ def scenario_blocks_js():
                     this.setPreviousStatement(true, "null");
                     this.setNextStatement(true, "null");
                     this.setTooltip("{2}");
-                    this.setInputsInline({4});
                 }}
             }};
-            """.format(act, '\n'.join(p), params['description'], jso, inline)
+            """.format(act, '\n'.join(p), params['description'])
         js = u'{0}\n\r{1}'.format(js, add)
 
 
@@ -388,10 +385,19 @@ def scenario_blocks_js():
 
             devices_per_clients[client][name] = {}
             devices_per_clients[client][name]['sensors'] = {}
-            devices_per_clients[client][name]['sensors_changed'] = {}
             devices_per_clients[client][name]['commands'] = {}
     
-            ### sensors values blocks
+            ### sensors blocks
+            # first, get the parameters
+            sensor_usage = []
+            for test, sensor_params in scenario_tests.items():
+                if test == "sensor.SensorTest": 
+                    for buf in sensor_params["parameters"]:
+                        if buf["name"] == "usage.usage":
+                            sensor_usage = buf["values"]
+                    break
+
+            # then, build the blocks
             for sen in dev['sensors']:
                 p = u""
                 jso = u""
@@ -400,12 +406,16 @@ def scenario_blocks_js():
                 devices_per_clients[client][name]['sensors'][sen_name] = sen_id
                 # determ the output type
                 sen_dt = dev['sensors'][sen]['data_type'] 
-                if sen_dt not in used_datatypes:
-                    used_datatypes.append(sen_dt)
-                dt_parent = sen_dt
                 # First, determine the parent type (DT_Number, DT_Bool, ...)
+                dt_parent = sen_dt
                 while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                     dt_parent = datatypes[dt_parent]['parent']
+                # store it in the used
+                if dt_parent not in used_datatypes:
+                    used_datatypes[dt_parent] = []
+                if sen_dt not in used_datatypes[dt_parent]:
+                    used_datatypes[dt_parent].append(sen_dt)
+                # create the block
                 if dt_parent == "DT_Bool":
                     color = 20
                     output = "\"Boolean\""
@@ -418,6 +428,13 @@ def scenario_blocks_js():
                 else:
                     color = 160
                     output = "\"null\""
+
+                ### Generate parameters
+                the_list = sensor_usage
+                papp = u"this.appendDummyInput().appendField(\"Mode \").appendField(new Blockly.FieldDropdown({0}), '{1}');".format(json.dumps(the_list), "usage.usage");
+
+
+                ### Create the block
                 block_id = u"sensor.SensorTest.{0}".format(sen_id)
                 block_description = u"{0}@{1}".format(name, client)
                 add = u"""Blockly.Blocks['{0}'] = {{
@@ -425,40 +442,13 @@ def scenario_blocks_js():
                                 this.setColour({5});
                                 this.appendDummyInput().appendField("{2}");
                                 this.appendDummyInput().appendField("Sensor : {1} ({6})");
-                                this.appendDummyInput().appendField("Value.");
-                                this.setOutput(true, {4});
+                                {7}
+                                this.setOutput(true); /*, {4}); */
                                 this.setInputsInline(false);
                                 this.setTooltip("{2}"); 
                             }}
                         }};
-                        """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
-                js = u'{0}\n\r{1}'.format(js, add)
-    
-            ### sensors changes blocks
-            for sen in dev['sensors']:
-                p = u""
-                jso = u""
-                sen_id = dev['sensors'][sen]['id']
-                sen_name = dev['sensors'][sen]['name']
-                devices_per_clients[client][name]['sensors_changed'][sen_name] = sen_id
-                # determ the output type
-                color = 20
-                output = "\"Boolean\""
-
-                block_id = u"sensor.SensorChangedTest.{0}".format(sen_id)
-                block_description = u"{0}@{1}".format(name, client)
-                add = u"""Blockly.Blocks['{0}'] = {{
-                            init: function() {{
-                                this.setColour({5});
-                                this.appendDummyInput().appendField("{2}");
-                                this.appendDummyInput().appendField("Sensor : {1}");
-                                this.appendDummyInput().appendField("Value changes.");
-                                this.setOutput(true, {4});
-                                this.setInputsInline(false);
-                                this.setTooltip("{2}"); 
-                            }}
-                        }};
-                        """.format(block_id, sen_name, block_description, jso, output, color, sen_dt)
+                        """.format(block_id, sen_name, block_description, jso, output, color, sen_dt, papp)
                 js = u'{0}\n\r{1}'.format(js, add)
     
             ### commands blocks
@@ -478,53 +468,44 @@ def scenario_blocks_js():
                     dt_parent = param_dt_type
                     while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                         dt_parent = datatypes[dt_parent]['parent']
-                    #if dt_parent == "DT_Bool":
-                    #    color = 20
-                    #    output = "\"Boolean\""
-                    #elif dt_parent == "DT_Number":
-                    #    color = 65
-                    #    output = "\"Number\""
-                    #else:
-                    #    color = 160
-                    #    output = "\"null\""
-                    js_params += u"""
-                                    this.appendDummyInput().appendField("- {0} : ")
-                                """.format(param_key)
+                    if dt_parent not in used_datatypes:
+                        used_datatypes[dt_parent] = []
+                    if param_dt_type not in used_datatypes[dt_parent]:
+                        used_datatypes[dt_parent].append(param_dt_type)
+                    # Build the format
+                    param_format = u""
+                    if 'format' in datatypes[param_dt_type]:
+                        param_format = datatypes[param_dt_type]['format']
+                        if param_format is not None:
+                            param_format = u"({0})".format(param_format)
+                    # Try to build a fieldDropDown list
                     list_options = None
                     if "labels" in datatypes[param_dt_type]:
                         list_options = datatypes[param_dt_type]['labels']
                     if "values" in datatypes[param_dt_type]:
                         list_options = datatypes[param_dt_type]['values']
+                    # start building the inputs
                     if list_options != None:
                         js_list_options = u"["
                         for opt in list_options:
                             js_list_options += u"['{0}', '{1}'],".format(list_options[opt], opt)
                         js_list_options += u"]"
-                        js_params += u"""
-                                        .appendField(new Blockly.FieldDropdown({0}), "{1}");
-                                    """.format(js_list_options, param_key)
-                    else: 
-                        param_format = u""
-                        if 'format' in datatypes[param_dt_type]:
-                            param_format = datatypes[param_dt_type]['format']
-                            if param_format == None:
-                                param_format = u""
-                            else:
-                                param_format = u"({0})".format(param_format)
-
-                        # special cases
-                        if param_dt_type == "DT_ColorRGBHexa":
-                            js_params += u"""
-                                            .appendField(new Blockly.FieldColour(""), "{0}")
-                                            ;//.appendField("{1}");
-                                        """.format(param_key, param_format)
-
+                        js_params += u"""this.appendDummyInput().setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ")
+                                        .appendField(new Blockly.FieldDropdown({1}), "{0}");
+                                    """.format(param_key, js_list_options)
+                    elif param_dt_type == "DT_ColorRGBHexa":
+                        # Color RGB Hexa
+                        js_params += u"""this.appendDummyInput().setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ")
+                                        .appendField(new Blockly.FieldColour(""), "{0}")
+                                    """.format(param_key)
+                    elif dt_parent == "DT_Number":
+                        # numebr input
+                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck("Number");
+                                    """.format(param_key)
+                    else:
                         # default case : text input field
-                        else:
-                            js_params += u"""
-                                            .appendField(new Blockly.FieldTextInput(""), "{0}")
-                                            .appendField("{1}");
-                                        """.format(param_key, param_format)
+                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck("String");
+                                    """.format(param_key)
                 block_id = u"command.CommandAction.{0}".format(cmd_id)
                 block_description = u"{0}@{1}".format(name, client)
                 add = u"""Blockly.Blocks['{0}'] = {{
@@ -532,7 +513,6 @@ def scenario_blocks_js():
                                 this.setColour({5});
                                 this.appendDummyInput().appendField("{2}");
                                 this.appendDummyInput().appendField("Command : {1}");
-                                this.appendDummyInput().appendField("Parameters : ");
                                 {6}
                                 this.setPreviousStatement(true, "null");
                                 this.setNextStatement(true, "null");
@@ -546,52 +526,50 @@ def scenario_blocks_js():
             print("ERROR while looking on a device : {0}".format(traceback.format_exc()))
 
     #### datatypes
-    for dt_type in used_datatypes:
-        dt_parent = dt_type
-        # First, determine the parent type (DT_Number, DT_Bool, ...)
-        while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
-            dt_parent = datatypes[dt_parent]['parent']
-        if dt_parent == "DT_Bool":
-            color = 20
-            output = "\"Boolean\""
-            opt = "["
-            for lab in datatypes[dt_type]['labels']:
-                opt += u"['{0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
-            opt += "]"
-            input = """
-                     this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "BOOL");
-                    """.format(opt)
-        elif dt_parent == "DT_Number":
-            color = 65
-            output = "\"Number\""
-            input = """
-                     this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
-                    """
-        elif dt_parent == "DT_String" and dt_type == "DT_ColorRGBHexa":
-            color = 65
-            output = "\"null\""
-            input = """
-                     this.appendDummyInput().appendField(new Blockly.FieldColour(""), "COLOUR");
-                    """
-        else:
-            color = 160
-            output = "\"null\""
-            input = """
-                     this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
-                    """
+    for dt_parent, dt_types in used_datatypes.items():
+        for dt_type in dt_types:
+            print "{0} => {1}".format(dt_parent, dt_type)
+            if dt_parent == "DT_Bool":
+                color = 20
+                output = "\"Boolean\""
+                opt = "["
+                for lab in datatypes[dt_type]['labels']:
+                    opt += u"['{0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
+                opt += "]"
+                input = """
+                         this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "BOOL");
+                        """.format(opt)
+            elif dt_parent == "DT_Number":
+                color = 65
+                output = "\"Number\""
+                input = """
+                         this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
+                        """
+            elif dt_parent == "DT_String" and dt_type == "DT_ColorRGBHexa":
+                color = 65
+                output = "\"null\""
+                input = """
+                         this.appendDummyInput().appendField(new Blockly.FieldColour(""), "COLOUR");
+                        """
+            else:
+                color = 160
+                output = "\"null\""
+                input = """
+                         this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
+                        """
 
-        add = """Blockly.Blocks['{0}'] = {{
-                    init: function() {{
-                        this.setColour({1});
-                        this.appendDummyInput().appendField("{0}");
-                        {3}
-                        this.setTooltip("{0}"); 
-                        this.setOutput(true, {2});
-                        this.setInputsInline(false);
-                    }}
-                }};
-                """.format(dt_type, color, output, input)
-        js = u'{0}\n\r{1}'.format(js, add)
+            add = """Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            this.setColour({1});
+                            this.appendDummyInput().appendField("{0}");
+                            {3}
+                            this.setTooltip("{0}"); 
+                            this.setOutput(true, {2});
+                            this.setInputsInline(false);
+                        }}
+                    }};
+                    """.format(dt_type, color, output, input)
+            js = u'{0}\n\r{1}'.format(js, add)
         
     # CODE for #85
     # add the scenario enable/disable block

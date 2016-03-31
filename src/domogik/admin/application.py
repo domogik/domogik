@@ -77,7 +77,7 @@ app.jinja_env.filters['sortid'] = sort_by_id
 def write_access_log_after(response):
     app.logger.debug(' => response status code: {0}'.format(response.status_code))
     app.logger.debug(' => response content_type: {0}'.format(response.content_type))
-    #app.logger.debug(' => response data: {0}'.format(response.response))
+    app.logger.debug(' => response data: {0}'.format(response.response))
     return response
 
 @app.before_request
@@ -132,7 +132,7 @@ def json_response(action_func):
         # do the actual return
         if app.rest_auth == "True" and rcode == 401:
             resp = Response(status=401)
-            resp.www_authenticate.set_basic(realm = "Domogik REST inetrface" )
+            resp.www_authenticate.set_basic(realm = "Domogik REST interface" )
             return resp
         else:
             if type(app.json_stop_at) is not list:
@@ -146,6 +146,60 @@ def json_response(action_func):
                 resp = None
             return Response(
                 response=resp,
+                status=rcode,
+                content_type='application/json'
+            )
+    return create_json_response
+
+# jsonp reponse handler decorator  for jquery requests
+# the url handlers funictions can return
+def jsonp_response(action_func):
+    @wraps(action_func)
+    def create_json_response(*args, **kwargs):
+        ret = action_func(*args, **kwargs)
+        # if list is 3 entries long
+        # - http code
+        # - json data
+        # - callback name
+        if (type(ret) is list or type(ret) is tuple):
+            if len(ret) == 3:
+                # return httpcode data
+                #  code = httpcode
+                #  data = data
+                #  callback = callback
+                rcode = ret[0]
+                rdata = ret[1]
+                rcallback = ret[2]
+            else:
+                # return errorStr
+                #  code = 400
+                #  data = {msg: <errorStr>}
+                rcode = 400
+                rdata = {error: ret[0]}
+        else:
+            # just return
+            # code = 204 = No content
+            # data = empty
+            rcode = 204
+            rdata = None
+            rcallback = None
+        # do the actual return
+        if app.rest_auth == "True" and rcode == 401:
+            resp = Response(status=401)
+            resp.www_authenticate.set_basic(realm = "Domogik REST interface" )
+            return resp
+        else:
+            if type(app.json_stop_at) is not list:
+                app.json_stop_at = []
+            if rdata:
+                if app.clean_json == "False":
+                    resp = json.dumps(rdata, cls=domogik_encoder(stop_at=app.json_stop_at), check_circular=False)
+                else:
+                    resp = json.dumps(rdata, cls=domogik_encoder(stop_at=app.json_stop_at), check_circular=False, indent=4, sort_keys=True)
+            else:
+                resp = None
+            return Response(
+                response=u"{0}({1})".format(rcallback, resp),
                 status=rcode,
                 content_type='application/json'
             )

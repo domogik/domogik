@@ -36,10 +36,8 @@ class LogAction(AbstractAction):
         AbstractAction.__init__(self, log)
         self.set_description("Log a message in the scenario component logs.")
 
-    def do_action(self, local_vars):
+    def do_action(self):
         message = self._params['message']
-        # local variables
-        message = self.process_local_vars(local_vars, message)
 
         self._log.info("{0}".format(message))
 

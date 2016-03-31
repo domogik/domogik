@@ -170,7 +170,7 @@
                                             <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sen.last_value}}"></span>
                                           {% elif sen.data_type == "DT_VideoMjpeg" %} 
                                             <div>
-                                              <img style="max-width: 100%" src="{{sen.last_value}}"/>
+                                              <img style="max-width: 80%" src="{{sen.last_value}}"/>
                                             </div>
                                           {% endif %}
                                         {% else %}
@@ -305,6 +305,33 @@
                                               <a class="btn btn-primary" href="{{ url_sample }}0000ff">{% trans %}Blue{% endtrans %}</a>
                                             </div>
 
+                                          {% elif param.data_type == "DT_String" %}
+                                            {{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;key&gt;
+                                            {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
+                                            <div class="input-group">
+                                              <input class="form-control" type="text" placeholder="{% trans %}Some string...{% endtrans %}" class="form-control" name="cmd{{ cmd.id }}Input" id="cmd{{ cmd.id }}Input"></input>
+                                              <span class="input-group-btn">
+                                                <button id="cmd{{ cmd.id }}Button" class="btn btn-primary">{% trans %}Send{% endtrans %}</button>
+                                              </span>
+                                            </div>
+                                            <script type="text/javascript">
+                                              $('#cmd{{ cmd.id }}Button').click(function() {
+                                                $.ajax({
+                                                      url: '{{ url_sample}}'+$('#cmd{{ cmd.id }}Input').val(),
+                                                      data: {
+                                                         format: 'json'
+                                                      },
+                                                      error: function(xhr, status, error) {
+                                                         var err = eval("(" + xhr.responseText + ")");
+                                                         alert("{% trans %}An error occured while sending the command. Maybe the client did not respond to the command. Please check the client is alive or the client logs.{% endtrans %}");
+                                                      },
+                                                      // dataType: 'jsonp',
+                                                      success: function(data) {
+                                                      },
+                                                      type: 'GET'
+                                                   });
+                                              });
+                                            </script>
 
                                           {% else %}
                                             {{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;key&gt;
