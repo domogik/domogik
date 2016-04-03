@@ -342,8 +342,8 @@
                                         <th>{% trans %}Openremote{% endtrans %}</th>
                                         <td>
 
-                                            <a href="#openremote{{ cmd.id }}" data-toggle="collapse">{% trans %}Usage{% endtrans %}</a>
-                                            <div id="openremote{{ cmd.id }}" class="collapse">
+                                            <a href="#openremote{{ cmd.id }}{{param.key}}" data-toggle="collapse">{% trans %}Usage{% endtrans %}</a>
+                                            <div id="openremote{{ cmd.id }}{{param.key}}" class="collapse">
                                           {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
                                             <h5>{% trans %}Create the commands{% endtrans %}</h5>
                                             <p>
