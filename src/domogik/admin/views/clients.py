@@ -119,7 +119,7 @@ def clients():
 
         client_list_per_host_per_type[cli_host][cli_type][client] = client_list[client]
 
-    
+
     # sorting
     client_list_per_host_per_type = json.dumps(client_list_per_host_per_type, sort_keys=True)
     client_list_per_host_per_type = json.loads(client_list_per_host_per_type, object_pairs_hook=OrderedDict)
@@ -131,7 +131,7 @@ def clients():
         msg_core_dead += "The message queue is not working for PUB/SUB messages.<br>"
         msg_core_dead += "This is related to the component MQ forwarder.<br>"
         msg_core_dead += "The related configuration file is : /etc/domogik/domogik-mq.cfg.<br>"
-    else: 
+    else:
         msg_core_dead = None
 
     return render_template('clients.html',
@@ -614,8 +614,12 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     # dynamically generate the wtfform
     class F(Form):
         name = TextField("Device name", [Required()], description=gettext("The display name for this device"))
-        description = TextField("Description", description=gettext("A description for this device"))
-        reference = TextField("Reference", description=gettext("A reference for this device"))
+        try: default = request.args.get('Description')
+        except: default = None
+        description = TextField("Description", description=gettext("A description for this device"), default=default)
+        try: default = request.args.get('Reference')
+        except: default = None
+        reference = TextField("Reference", description=gettext("A reference for this device"), default=default)
         pass
     # Form for the Global part
     class F_global(Form):
@@ -634,7 +638,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     for item in params["global"]:
         # build the field
         name = "{0}".format(item["key"])
-        default = None
+        try: default = request.args.get(name)
+        except: default = None
         if 'default' in item:
             default = item['default']
         if item["type"] == "boolean":
@@ -656,7 +661,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             if type(item["choices"]) == list:
                 for key in sorted(item["choices"]):
                     choices.append((key, key))
-            else:  
+            else:
                 for key in sorted(item["choices"]):
                     choices.append((key, item["choices"][key]))
             field = SelectField(name, [Required()], description=item["description"], choices=choices, default=default)
@@ -671,7 +676,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     for item in params["xpl"]:
         # build the field
         name = "{0}".format(item["key"])
-        default = None
+        try: default = request.args.get(name)
+        except: default = None
         if 'default' in item:
             default = item['default']
         if item["type"] == "boolean":
@@ -704,7 +710,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         for item in params["xpl_commands"][cmd]:
             # build the field
             name = "{0} - {1}".format(cmd, item["key"])
-            default = None
+            try: default = request.args.get(name)
+            except: default = None
             if 'default' in item:
                 default = item['default']
             if item["type"] == "boolean":
@@ -738,7 +745,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         for item in params["xpl_stats"][cmd]:
             # build the field
             name = "{0} - {1}".format(cmd, item["key"])
-            default = None
+            try: default = request.args.get(name)
+            except: default = None
             if 'default' in item:
                 default = item['default']
             desc = item["description"]
@@ -870,7 +878,7 @@ def get_brain_content(client_id):
             detail[client_id] = None
     else:
         detail = {}
- 
+
     # sorting
     detail = json.dumps(detail, sort_keys=True)
     detail = json.loads(detail, object_pairs_hook=OrderedDict)
@@ -979,7 +987,7 @@ def core(client_id):
         return render_template('core_butler.html',
                 loop = {'index': 1},
                 clientid = client_id,
-                client_list = client_list, 
+                client_list = client_list,
                 history = map(json.dumps, history),
                 brain = brain,
                 mactive="clients",
