@@ -39,6 +39,7 @@ import zmq
 import traceback
 import logging
 import ast
+from domogik.common.utils import ucode
 
 class ScenarioInstance(MQAsyncSub):
     """ This class provides base methods for the scenarios
@@ -82,7 +83,15 @@ class ScenarioInstance(MQAsyncSub):
         @param json : The json describing the scenario
         """
         self._name = name
-        self._log = log.getChild(remove_accents(name))
+        
+        # TODO : fix for Russian names for example
+        #self._log = log.getChild(remove_accents(name))
+        try:
+            self._log = log.getChild(ucode(remove_accents(name)).encode('utf-8'))
+        except UnicodeDecodeError:
+            self._log = log.getChild("SCENARIO")
+            self._log.warning("The scenario name encountered an unicode error while trying to set the log line header with the scenario name. The scenario name will not be put in the log line. It will be replaced by 'SCENARIO'")
+
         self._json = json
         self._disabled = disabled
         self._state = state
@@ -170,7 +179,10 @@ class ScenarioInstance(MQAsyncSub):
             # but so, it will evaluate all sensors, so it may trigger some scenarios on startup in double
             #self._log.debug(u"Now, the python code evaluated is : \n{0}".format(self.__parse_part(self._json, debug = True)))
             tmp = ast.parse(self._parsed_condition)
-            self._compiled_condition = compile(tmp, u"Scenario {0}".format(remove_accents(self._name)), 'exec')
+            #self._compiled_condition = compile(tmp, "Scenario {0}".format(remove_accents(self._name)), 'exec')
+            buf = remove_accents(self._name)
+            buf = ucode(buf)
+            self._compiled_condition = compile(tmp, "Scenario {0}".format(buf), 'exec')
             if len(self._subList) > 0:
                 self._sub = MQAsyncSub.__init__(self, zmq.Context(), 'scenario-sensor', set(self._subList))
         except:
