@@ -61,6 +61,11 @@ class AbstractTest:
     def get_subMessages(self):
         return self._subMessages
 
+    def set_trigger(self, trigger):
+        """ Update the trigger callback
+        """
+        self._trigger = trigger
+
     def set_description(self, description):
         """ Update the description of the test
         This description will be usefull to help user to understand what the test does
