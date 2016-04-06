@@ -64,6 +64,7 @@ class AbstractSensorTest(AbstractTest):
         if self._sensorId:
             if 'sensor_id' in msg:
                 if int(msg['sensor_id']) == int(self._sensorId):
+                    self.log.debug("SensorTest : received MQ message : {0}".format(msg))
                     self.handle_message(did, msg)
 
 
@@ -84,6 +85,7 @@ class SensorTest(AbstractSensorTest):
     def handle_message(self, did, msg):
         self._time = time()
         self._res = self._convert(msg['stored_value'])
+        self.log.debug("SensorTest : Trigger!")
         self._trigger(self)
 
     def _convert(self, val):
