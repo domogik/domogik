@@ -77,6 +77,11 @@ New section : timeline
 
 A timeline has been added to the Administration. It displays the last sensors changes on a timeline. You can also see each device timeline.
 
+New section : batteries
+-----------------------
+
+A page dedicated to the battery sensors is added. In this page you can see all the batteray sensors of all your devices.
+
 Devices management
 ------------------
 
@@ -140,6 +145,34 @@ REST : new service to access content published by some packages (experimental)
 **Warning : this service is still a beta. It may change in the next release!** We are still testing how to use this in the best way.
 
 A new service has been added to rest : **GET /rest/publish/<client type>/<client name>/<data path>**. It allows to access to content published by some packages. For example, videos registered when a motion is detected by a camera.
+
+Domoweb
+=======
+
+Domoweb, the user web interface includes also a lot of improvments!
+
+* New widgets : 
+
+  * Control RGB lights.
+  * Mjpeg camera.
+  * Navigation button to display another section.
+  * List of the last inbound calls.
+  * Basic rolling shutters command.
+  * Display a simple string sensor.
+  * Gauge widget
+  * Trigger widget
+
+* Widgets improvments :
+
+  * Various improvments to allow a better color configuration of the widgets.
+  * The trigger and switch command widgets can have customized labels.
+
+* Butler page (click on the top right button to access it from all sections). SSL activation and Chrome usage are required to use this new page.
+
+* Direct access to a section : you can add a section name or id at the end of the url to display directly this section. For example : http://ip:40404/Kitchen
+
+* SSL support. Just execute the **ssl_activate.sh** script to use ssl on Domoweb.
+
 
 Backup
 ======
