@@ -11,7 +11,7 @@ except ImportError:
     pass
 from wtforms import TextField, HiddenField, validators, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField, \
-            DateField, DateTimeField, FloatField, PasswordField
+            DateField, DateTimeField, FloatField, PasswordField, RadioField
 from wtforms.validators import Required, InputRequired
 from flask_login import login_required
 try:
@@ -638,16 +638,28 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     for item in params["global"]:
         # build the field
         name = "{0}".format(item["key"])
-        try: default = request.args.get(name)
-        except: default = None
+        try: 
+            default = request.args.get(name)
+        except: 
+            if item["type"] == "boolean":
+                default = Fase
+            else:
+                default = None
         if 'default' in item:
             default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
-                default = True
+                #default = True
+                default = 'y'
             else:
-                default = False
-            field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
+                #default = False
+                default = 'n'
+            #field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
+            #field = BooleanField(name, [], description=item["description"], default=default)
+            field = RadioField( name, 
+                                [validators.Required()], description=item["description"],
+                                choices=[('y', 'Yes'), ('n', 'No')], default=default
+                              )
         elif item["type"] == "integer":
             field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "date":
@@ -682,10 +694,17 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
-                default = True
+                #default = True
+                default = 'y'
             else:
-                default = False
-            field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
+                #default = False
+                default = 'n'
+            #field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
+            #field = BooleanField(name, [], description=item["description"], default=default)
+            field = RadioField( name,
+                                [validators.Required()], description=item["description"],
+                                choices=[('y', 'Yes'), ('n', 'No')], default=default
+                              )
         elif item["type"] == "integer":
             field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "date":
@@ -716,10 +735,17 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 default = item['default']
             if item["type"] == "boolean":
                 if default == 'Y' or default == 1 or default == True:
-                    default = True
+                    #default = True
+                    default = 'y'
                 else:
-                    default = False
-                field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
+                    #default = False
+                    default = 'n'
+                #field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
+                #field = BooleanField(name, [], description=item["description"], default=default)
+                field = RadioField( name,
+                                    [validators.Required()], description=item["description"],
+                                    choices=[('y', 'Yes'), ('n', 'No')], default=default
+                                  )
             elif item["type"] == "integer":
                 field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "date":
@@ -756,11 +782,19 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 item['type'] = "string"
             if item["type"] == "boolean":
                 if default == 'Y' or default == 1 or default == True:
-                    default = True
+                    #default = True
+                    default = 'y'
                 else:
-                    default = False
-                field = BooleanField(name, [validators.InputRequired(gettext("This value is required"))], \
-                        description=desc, default=default)
+                    #default = False
+                    default = 'n'
+                #field = BooleanField(name, [validators.InputRequired(gettext("This value is required"))], \
+                #        description=desc, default=default)
+                #field = BooleanField(name, [], \
+                #        description=desc, default=default)
+                field = RadioField( name,
+                                    [validators.Required()], description=item["description"],
+                                    choices=[('y', 'Yes'), ('n', 'No')], default=default
+                                  )
             elif item["type"] == "integer":
                 field = IntegerField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
@@ -795,12 +829,15 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     form_xpl_command = F_xpl_command()
     form_xpl_stat = F_xpl_stat()
 
+    print("request.method={0} / form.validate={1}".format(request.method, form.validate()))
     if request.method == 'POST' and form.validate():
+        print(u"FORM={0}".format(request.form))
         # aprams hold the stucture,
         # append a vlaue key everywhere with the value submitted
         # or fill in the key
         params['client_id'] = client_id
         for item in request.form:
+            print(u"ITEM={0} ({1})".format(item, request.form.get(item)))
             if item in ["name", "reference", "description"]:
                 # handle the global things
                 params[item] = request.form.get(item)

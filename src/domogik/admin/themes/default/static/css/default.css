@@ -351,6 +351,13 @@ h5 {
     text-decoration: none;
 }
 
+/* form */
+.form-group ul {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+
 /*** forms ***/
 
 input {
