@@ -27,7 +27,11 @@
 
        <script type="text/javascript">
 	 if ("WebSocket" in window) {
-		var ws=new WebSocket("ws://" + location.host + "/ws");
+                if (window.location.protocol == "http:")
+                    protocol = "ws:"
+                else
+                    protocol = "wss:"
+		var ws=new WebSocket(protocol + "//" + location.host + "/ws");
 	} else {
 		alert('No WS support');
 	}
