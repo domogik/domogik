@@ -241,6 +241,7 @@ class Butler(Plugin):
                              "mood" : self.butler_mood,
                              "reply_to" : content['source'],
                              "identity" : self.butler_name,
+                             "lang" : self.lang,
                              "text" : reply}
         self.log.info(u"Send response over MQ : {0}".format(data))
 
@@ -517,6 +518,7 @@ class Butler(Plugin):
                                  "mood" : self.butler_mood,
                                  "reply_to" : content['source'],
                                  "identity" : self.butler_name,
+                                 "lang" : self.lang,
                                  "text" : reply}
             self.log.info(u"Send response over MQ : {0}".format(data))
             self.pub.send_event('interface.output',
