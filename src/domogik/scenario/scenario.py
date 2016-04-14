@@ -177,14 +177,15 @@ class ScenarioInstance(MQAsyncSub):
             # Set the trigger to the last test of each kind of test
             self._log.info(u"Scenario '{0}' : configure the trigger to the last item of each test instance".format(remove_accents(self._name)))
             for a_kind_of_test in self._test_instances:
-                self._log.debug(u"Scenario '{0}' : test instance : {1} ({2} items)".format(remove_accents(self._name), a_kind_of_test, len(self._test_instances[a_kind_of_test])))
-                for idx, val in enumerate(self._test_instances[a_kind_of_test]):
-                    if idx+1 != len(self._test_instances[a_kind_of_test]):
-                        self._log.debug("Set trigger for item '{0}' to dummy".format(idx))
-                        val.set_trigger(self._dummy)
-                    else:
-                        self._log.debug("Set trigger for item '{0}' to generic_trigger".format(idx))
-                        val.set_trigger(self.generic_trigger)
+                if a_kind_of_test.startswith("sensor.SensorTest"):
+                    self._log.debug(u"Scenario '{0}' : test instance : {1} ({2} items)".format(remove_accents(self._name), a_kind_of_test, len(self._test_instances[a_kind_of_test])))
+                    for idx, val in enumerate(self._test_instances[a_kind_of_test]):
+                        if idx+1 != len(self._test_instances[a_kind_of_test]):
+                            self._log.debug("Set trigger for item '{0}' to dummy".format(idx))
+                            val.set_trigger(self._dummy)
+                        else:
+                            self._log.debug("Set trigger for item '{0}' to generic_trigger".format(idx))
+                            val.set_trigger(self.generic_trigger)
 
 
             self._log.debug(u"Scenario '{0}' python generated code : \n{1}".format(remove_accents(self._name), self._parsed_condition))
@@ -424,10 +425,14 @@ class ScenarioInstance(MQAsyncSub):
             ### TODO : remove
             ### TODO : remove
             ### TODO : remove
-            if inst in self._test_instances:
-                trigger = self._dummy
-            else:
-                trigger = self.generic_trigger
+            #if inst in self._test_instances:
+            #    trigger = self._dummy
+            #else:
+            #    trigger = self.generic_trigger
+
+            # default : we set the generic trigger for all. It may be changed later in the code for some kind of tests (sensorTest for example).
+            trigger = self.generic_trigger
+
             try:
                 mod, clas, param = inst.split('.')
             except ValueError as err:
