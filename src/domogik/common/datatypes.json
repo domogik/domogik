@@ -106,6 +106,7 @@
             "DT_TempK",
             "DT_TempF",
             "DT_Pression",
+            "DT_mbarPression",
             "DT_Humidity",
             "DT_AirQuality",
             "DT_Volt",
@@ -187,6 +188,13 @@
         "min": null,
         "max": null,
         "unit": "Pa",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_mbarPression": {
+        "min": null,
+        "max": null,
+        "unit": "mbar",
         "parent": "DT_Number",
         "childs": []
     },
