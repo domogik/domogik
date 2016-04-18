@@ -107,8 +107,8 @@ No xpl plugins
 It is now possible to create no xPl plugins. We won't remove the native xPL support, but for most of the plugins, using xPL is "too much". The plugins with no xPL will use the message queue to interact with Domogik.
 
 
-New datatypes : DT_Battery, DT_Motion, DT_Video, DT_VideoMjpeg
---------------------------------------------------------------
+New datatypes : DT_Battery, DT_Motion, DT_Video, DT_VideoMjpeg, DT_mbarPression
+-------------------------------------------------------------------------------
 
 The **DT_Battery** it is similar to DT_Scaling  : the unit is % and the values are between 0 and 100. The aim of this datatype is to allow to group all devices battery sensors on a single view to help the users to manage their devices batteries.
 
@@ -116,6 +116,7 @@ The **DT_Motion** is a boolean datatype to use for motion sensors.
 
 The **DT_Video** datatype should not be used directly but will be the parent datatype for all kind of video related datatypes. Currently, it has only one child : **DT_VideoMjpeg**. The **DT_VideoMjpeg** should be used to store Mjpeg video streams url in sensors.
 
+The **DT_mbarPression** is added for easier weather plugins management of the pressure : the display will be more user friendly
 
 API : MQ and Rest
 =================
