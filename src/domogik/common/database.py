@@ -969,9 +969,10 @@ class DbHelper():
         """
         values = []
         for a_value in self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).limit(num).all():
+            print type(a_value.date)
             values.append({"value_str" : a_value.value_str, 
                            "value_num" : a_value.value_num,
-                           "timestamp" : int(mktime(utc.localize(a_value.date).utctimetuple())) })
+                           "timestamp" : time.mktime(a_value.date.timetuple()) })
         return values
             
     def list_sensor_history_between(self, sid, frm, to=None):
@@ -989,14 +990,8 @@ class DbHelper():
                   ).all():
             values.append({"value_str" : a_value.value_str, 
                            "value_num" : a_value.value_num, 
-                           "timestamp" : int(mktime(utc.localize(a_value.date).utctimetuple())) })
+                           "timestamp" : time.mktime(a_value.date.timetuple()) })
         return values
-        return self.__session.query(SensorHistory
-                  ).filter(SensorHistory.sensor_id==sid
-                  ).filter(SensorHistory.date>=_datetime_string_from_tstamp(frm)
-                  ).filter(SensorHistory.date<=_datetime_string_from_tstamp(to)
-                  ).order_by(sqlalchemy.asc(SensorHistory.date)
-                  ).all()
        
     def list_sensor_history_filter(self, sid, frm, to, step_used, function_used):
         if not frm:
