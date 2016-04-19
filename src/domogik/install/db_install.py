@@ -48,8 +48,11 @@ class DbInstall():
         from domogik.common import sql_schema
         from domogik.common import database
         from sqlalchemy import create_engine, MetaData, Table
+        from sqlalchemy import __version__ as sqla_version
         from alembic.config import Config
         from alembic import command
+
+        info(u"SQLAlchemy version is : {0}".format(sqla_version))
 
         self.db_backup_file = "{0}/domogik-{1}.sql".format(tempfile.gettempdir(), int(time.time()))
         self.alembic_cfg = Config("alembic.ini")

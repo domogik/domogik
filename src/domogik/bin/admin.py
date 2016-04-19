@@ -206,8 +206,10 @@ class Admin(Plugin):
                 self.port = conf_admin['port']
                 # if use_ssl = True, set here path for ssl certificate/key
                 self.use_ssl = conf_admin['use_ssl']
-                self.key_file = conf_admin['ssl_certificate']
-                self.cert_file = conf_admin['ssl_key']
+                if self.use_ssl.strip() == "True":
+                    self.use_ssl = True
+                self.key_file = conf_admin['ssl_key']
+                self.cert_file = conf_admin['ssl_certificate']
                 if 'clean_json' in conf_admin:
                     self.clean_json = conf_admin['clean_json']
                 else:
@@ -226,6 +228,7 @@ class Admin(Plugin):
                 self.clean_json = False
                 self.log.error("Error while reading configuration for section [admin] : using default values instead")
             self.log.info(u"Configuration : interfaces:port = {0}:{1}".format(self.interfaces, self.port))
+            self.log.info(u"Configuration : use_ssl = {0}".format(self.use_ssl))
 	    
 	    # get all datatypes
             cli = MQSyncReq(self.zmq)
@@ -282,6 +285,7 @@ class Admin(Plugin):
                  "certfile": self.cert_file,
                  "keyfile": self.key_file,
             }
+            print(ssl_options)
             self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
             self.http_server = HTTPServer(tapp)

@@ -961,7 +961,7 @@ class DbHelper():
             else:
                 self.__raise_dbhelper_exception("Can not add history to not existing sensor: {0}".format(sid), True)             
         except:
-            self.__raise_dbhelper_exception("Error when adding data to sensor history. Sensor id = {0}  | Value = {1}  | Date = {2}. Error is {3}".format(sid, value, date, traceback.format_exc()))
+            self.__raise_dbhelper_exception(u"Error when adding data to sensor history. Sensor id = {0}  | Value = {1}  | Date = {2}. Error is {3}".format(sid, value, date, traceback.format_exc()))
         return data
 
     def list_sensor_history(self, sid, num=100):
