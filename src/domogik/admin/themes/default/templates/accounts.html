@@ -3,9 +3,7 @@
 {% block content %}
 <div class="container">
     <h1>{% trans %}Account list{% endtrans %}</h1>
-    <!-- Disabled for 0.4.1 
     <a id="start" class="btn btn-success" href="/accounts/0">{% trans %}Add new{% endtrans%}</a>
-    -->
     {% if accounts|length > 0 %}
       <table class="table table-striped" style="border-collapse:collapse;">
             <thead>
@@ -20,16 +18,17 @@
                         <td>{{ data.login }}</td>
                         <td>{{ data.is_admin }}</td>
                         <td>
+                            {% if data.login != "admin" and data.login != "Anonymous" %}
                                 <a href="/accounts/{{ data.id }}">
                                 {% trans %}Update{% endtrans %}
                                 </a> 
-                                <!-- Disabled for 0.4.1
                                 |
                                 <a data-toggle="confirmation" data-placement="bottom" data-href="/accounts/del/{{ data.id }}">
                                 {% trans %}Delete{% endtrans %}
                                 </a>
-                                -->
-
+                            {% else %}
+                                &nbsp;
+                            {% endif %}
                         </td>
                     </tr>
             {% endfor %}

@@ -14,7 +14,8 @@ except ImportError:
     from flaskext.wtf import Form
     pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
-            BooleanField, SubmitField, SelectField, IntegerField
+            BooleanField, SubmitField, SelectField, IntegerField, PasswordField, \
+	    validators
 from wtforms.validators import Required
 from domogik.common.sql_schema import UserAccount
 
@@ -48,27 +49,33 @@ def accounts_edit(account_id):
     with app.db.session_scope():
         if account_id > 0:
             account = app.db.get_user_account(account_id)
+	    login = ""
         else:
             account = None
+	    login = ""
 
-        MyForm = model_form(UserAccount, \
-                        base_class=Form, \
-                        db_session=app.db.get_session(),
-                        exclude=['core_person'])
-        form = MyForm(request.form, account)
+        class F(Form):
+            flogin = TextField("Login")
+	    fpassword = PasswordField('New Password', [
+		validators.Required(),
+		validators.EqualTo('confirm', message='Passwords must match')
+	    ])
+	    confirm = PasswordField('Repeat Password')
+	    id_admin = BooleanField('Is Admin')
+        form = F()
 
         if request.method == 'POST' and form.validate():
             if int(account_id) > 0:
                 app.db.update_user_account(a_id=account_id, \
-                                           a_new_login=request.form['login'], \
+                                           a_new_login=request.form['flogin'], \
                                            a_person_id=request.form['person'], \
                                            a_is_admin=request.form['is_admin'], \
                                            a_skin_used=request.form['skin_used'])
                 # TODO password
             else:
                 app.db.add_user_account(\
-                                        a_login=request.form['login'], \
-                                        a_password=request.form['password'], \
+                                        a_login=request.form['flogin'], \
+                                        a_password=request.form['fpassword'], \
                                         a_person_id=request.form['person'], \
                                         a_is_admin=request.form['is_admin'], \
                                         a_skin_used=request.form['skin_used'])
@@ -81,5 +88,5 @@ def accounts_edit(account_id):
     return render_template('account_edit.html',
             form = form,
             accountid = account_id,
-            mactve="auth"
+            mactive="auth"
             )

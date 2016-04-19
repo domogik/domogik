@@ -21,7 +21,6 @@
         <li{% if mactive == "battery" %} class="active" {% endif %} id="battery"><a href="/battery"><i class="fa fa-battery-full"></i> {% trans %}Battery{% endtrans %}</a></li>
         <li{% if mactive == "orphans" %} class="active" {% endif %} id="orphans"><a href="/orphans"><i class="fa fa-chain-broken"></i> {% trans %}Orphan Domogik devices{% endtrans %}</a></li>
         -->
-
         <li class="dropdown{% if mactive == "timeline" or mactive == "battery" or mactive == "orphans" %} active{% endif %}" id="auth">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-list"></i> {% trans %}Views{% endtrans %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
@@ -30,22 +29,13 @@
             <li{% if mactive == "orphans" %} class="active" {% endif %} id="orphans"><a href="/orphans"><i class="fa fa-chain-broken"></i> {% trans %}Orphan Domogik devices{% endtrans %}</a></li>
           </ul>
         </li>
-
-
-
-        <!-- 
-           this part is not ready for 0.4.1
-           we keep it just for history until we improve the users management
-          --
         <li class="dropdown{% if mactive == "auth" %} active{% endif %}" id="auth">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Auth{% endtrans %} <b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-lock"></i> {% trans %}Auth{% endtrans %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a href="/accounts">{% trans %}Accounts{% endtrans %}</a></li>
-            <li><a href="/persons">{% trans %}Persons{% endtrans %}</a></li>
+              <li><a href="/accounts"><i class="fa fa-check"></i> {% trans %}Accounts{% endtrans %}</a></li>
+            <li><a href="/persons"><i class="fa fa-user"></i> {% trans %}Persons{% endtrans %}</a></li>
           </ul>
         </li>
-        -->
-        <li{% if mactive == "auth" %} class="active" {% endif %} id="auth"><a href="/accounts"><i class="fa fa-user"></i> {% trans %}Accounts{% endtrans %}</a></li>
         <li{% if mactive == "apidoc" %} class="active" {% endif %} id="api"><a href="/apidoc"><i class="fa fa-book"></i> {% trans %}Rest and MQ API{% endtrans %}</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
