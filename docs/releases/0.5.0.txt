@@ -187,3 +187,8 @@ A docker image is now built each time something is pushed to the **develop** bra
 
 The **docker/** folder includes the resources to build this image.
 
+
+Quality
+=======
+
+A review script have been created to check packages quality. It is located in **src/domogik/tools/packages/review.py**
