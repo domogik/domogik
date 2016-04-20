@@ -93,7 +93,7 @@ class SensorTest(AbstractSensorTest):
             if val != None:
                 return float(val)
             else:
-                return None
+                return 0
         elif self._dt_parent == "DT_Bool":
             if val == "1":
                 return True
@@ -103,7 +103,7 @@ class SensorTest(AbstractSensorTest):
             if val != None:
                 tmp = val.split(":")
                 if len(tmp) < 2:   # bad value
-                    return None
+                    return 0
                 else:
                     try:
                         new =  int(tmp[0]) * 60 + int(tmp[1])
@@ -111,9 +111,9 @@ class SensorTest(AbstractSensorTest):
                         return new
                     except:
                         self.log.debug("Error while converting DT_Time value in mminutes. Value='{0}'".format(val))
-                        return None
+                        return 0
             else:
-                return None
+                return 0
         else:
             return val
 
