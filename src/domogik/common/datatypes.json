@@ -132,6 +132,7 @@
             "DT_mSecond",
             "DT_Timestamp",
             "DT_mMeter",
+            "DT_kMeter",
             "DT_mMeterHour",
             "DT_Byte",
             "DT_kByte",
@@ -377,6 +378,13 @@
         "min": null,
         "max": null,
         "unit": "mm",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_kMeter": {
+        "min": null,
+        "max": null,
+        "unit": "km",
         "parent": "DT_Number",
         "childs": []
     },
