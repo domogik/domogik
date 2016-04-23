@@ -81,12 +81,13 @@ class PackageJson():
         """
         json_file = None
         try:
+            # get config
+            cfg = Loader('domogik')
+            config = cfg.load()
+            conf = dict(config[1])
+            self.resources_dir = "{0}/resources".format(conf['libraries_path'])
             # load from sources repository
             if name != None:
-                # get config
-                cfg = Loader('domogik')
-                config = cfg.load()
-                conf = dict(config[1])
 
                 if pkg_type in ["plugin", "brain", "interface"]:
                     json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
@@ -102,7 +103,6 @@ class PackageJson():
                 #json_file = "{0}/{1}.json".format(json_directory, name)
 
                 self.json = json.load(open(json_file))
-
             elif path != None:
                 json_file = path
                 icon_file = None
@@ -119,6 +119,13 @@ class PackageJson():
                 json_file = None
                 icon_file = None
                 self.json = data
+
+            json_file = "{0}/datatypes.json".format(self.resources_dir)
+            self._datatypes = None
+            try:
+                self._datatypes = json.load(open(json_file))
+            except:
+                self.log.error("Error while reading datatypes json file '{0}'. Error is : {1}".format(json_file, traceback.format_exc()))
 
             self.validate()
 
@@ -205,6 +212,10 @@ class PackageJson():
             if item not in explst:
                 raise PackageException("unknown key '{0}' found in {1}".format(item, name))
 
+    def _validate_dataType(self, msg, dataType):
+        if dataType not in self._datatypes:
+            raise PackageException(msg)
+
     def _validate_02(self):
         fieldTypes = ["boolean", "string", "choice", "date", "time", "datetime", "float", "integer", "email", "ipv4", "ipv6", "url", "password"]
         try:
@@ -278,6 +289,7 @@ class PackageJson():
                     raise PackageException("Parameters for command {0} is not a list".format(cmdid))
                 for par in cmd['parameters']:
                     self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
+                    self._validate_dataType("DataType in command {0} is not valid".format(cmdid), par['data_type'])
                 # see that the xpl_command is defined
                 if "xpl_command" in cmd and cmd["xpl_command"] not in self.json["xpl_commands"].keys():
                     raise PackageException("xpl_command {0} defined in command {1} is not found".format(cmd["xpl_command"], cmdid))
@@ -291,6 +303,7 @@ class PackageJson():
                 hexpected = ['store', 'max', 'expire', 'round_value', 'duplicate']
                 self._validate_keys(expected, "sensor {0}".format(senid), list(sens.keys()))
                 self._validate_keys(hexpected, "sensor {0} history".format(senid), list(sens['history'].keys()))
+                self._validate_dataType("DataType in sensor {0} is not valid".format(senid), sens['data_type'])
 
             #validate the xpl command
             if type(self.json["xpl_commands"]) != dict:
