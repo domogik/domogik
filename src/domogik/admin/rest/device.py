@@ -402,9 +402,12 @@ class deviceAPI(MethodView):
         msg = MQMessage()
         msg.set_action('device.update')
         msg.add_data('did', did)
-        msg.add_data('name', request.form['name'])
-        msg.add_data('description', request.form['description'])
-        msg.add_data('reference', request.form['reference'])
+        if 'name' in request.form:
+            msg.add_data('name', request.form['name'])
+        if 'description' in request.form:
+            msg.add_data('description', request.form['description'])
+        if 'reference' in request.form:
+            msg.add_data('reference', request.form['reference'])
         res = cli.request('dbmgr', msg.get(), timeout=10)
         if res is not None:
             data = res.get_data()
