@@ -171,6 +171,7 @@ Download Domogik : ::
     $ cd /opt/dmg/
     $ git clone https://github.com/domogik/domogik.git
     $ cd domogik
+    $ git checkout develop
 
 Install Domogik-mq
 ------------------
