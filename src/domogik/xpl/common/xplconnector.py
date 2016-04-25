@@ -76,12 +76,15 @@ import select
 import threading
 import traceback
 import random
+#from socket import socket, gethostbyname, gethostname, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
+#from domogik.common import logger
+#from domogik.common.baseplugin import BasePlugin
 from domogik.xpl.common.xplmessage import XplMessage, FragmentedXplMessage
 from domogik.common.dmg_exceptions import XplMessageError
+import time
 import uuid
 from domogik.common.utils import get_ip_for_interfaces
-from domogik.common.timer import Timer
 
 READ_NETWORK_TIMEOUT = 2
 STATUS_HBEAT_XPL = 5  # default hbeat interval in minutes
@@ -250,9 +253,7 @@ class Manager:
         self._foundhub.set()
         self.update_status(1)
         if self._h_timer != None:
-	    self._h_timer.stop()
-	    self._h_timer = None
-            self._h_timer = XplTimer(60 * STATUS_HBEAT_XPL, self._SendHeartbeat, self)
+            self._h_timer._timer._time = 60 * STATUS_HBEAT_XPL
         Listener(cb = self.got_hbeat, manager = self, filter = {'schema':'hbeat.request', 'xpltype':'xpl-cmnd'})
 
     def enable_hbeat(self, lock = False):
@@ -552,8 +553,85 @@ class XPLException(Exception):
         return self.repr(self.value)
 
 
-class XplTimer(Timer):
+class XplTimer():
     """
     XplTimer will call a callback function each n seconds
-    This is just and alias for Timer
     """
+#    _time = 0
+#    _callback = None
+#    _timer = None
+
+    def __init__(self, time, cb, manager):
+        """
+        Constructor : create the internal timer
+        @param time : time of loop in second
+        @param cb : callback function which will be call eact 'time' seconds
+        """
+        self._stop = threading.Event()
+        self._timer = self.__InternalTimer(time, cb, self._stop, manager.p.log)
+        self._manager = manager
+        self.log = manager.p.log
+        manager.p.register_timer(self)
+        manager.p.register_thread(self._timer)
+        self.log.debug(u"New timer created : %s " % self)
+
+#    def __repr__(self):
+#        """ Representation of the Timer
+#        """
+#        return "<domogik.xpl.lib.xplconnector.XplTimer> name : %s" % self._timer.name
+
+    def start(self):
+        """
+        Start the timer
+        """
+        self._timer.start()
+
+    def get_stop(self):
+        """ Returns the threading.Event instance used to stop the XplTimer
+        """
+        return self._stop
+
+    def get_timer(self):
+        """
+        Waits for the internal thread to finish
+        """
+        return self._timer
+
+    def __del__(self):
+        self.log.debug(u"__del__ Manager")
+        self.stop()
+
+    def stop(self):
+        """
+        Stop the timer
+        """
+        self.log.debug(u"Timer : stop, try to join() internal thread")
+        self._stop.set()
+        self._timer.join()
+        self.log.debug(u"Timer : stop, internal thread joined, unregister it")
+        self._manager.p.unregister_timer(self._timer)
+
+    class __InternalTimer(threading.Thread):
+        '''
+        Internal timer class
+        '''
+        def __init__(self, time, cb, stop, log):
+            '''
+            @param time : interval between each callback call
+            @param cb : callback function
+            @param stop : Event to check for stop thread
+            '''
+            threading.Thread.__init__(self)
+            self._time = time
+            self._cb = cb
+            self._stop = stop
+            self.name = "internal-timer"
+            self.log = log
+
+        def run(self):
+            '''
+            Call the callback every X seconds
+            '''
+            while not self._stop.isSet():
+                self._cb()
+                self._stop.wait(self._time)
