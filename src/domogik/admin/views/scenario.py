@@ -51,6 +51,12 @@ def scenario():
         scenarios = scenarios,
         mactive = u"scenario")
 
+@app.route('/scenario/examples')
+@login_required
+def scenario_examples():
+    return render_template('scenario_examples.html',
+        mactive = u"scenario")
+
 @app.route('/scenario/del/<id>')
 @login_required
 def scenario_del(id):
