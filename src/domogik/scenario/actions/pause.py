@@ -27,6 +27,8 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.scenario.actions.abstract import AbstractAction
 import time
+import threading
+import traceback
 
 
 class PauseAction(AbstractAction):
@@ -42,12 +44,28 @@ class PauseAction(AbstractAction):
 
         self._log.info("Do a pause of {0} seconds".format(delay))
         try:
-            time.sleep(int(delay))
+            #time.sleep(int(delay))
+            self.the_end = threading.Event()
+            threading.Timer(int(delay), self.end_waiting, []).start()
+            while not self.the_end.is_set():
+                self._log.debug("...")
+                self.the_end.wait(1)  # 1s is the little pause we can do
         except:
-            self._log.error("Error while casting delay '{0}' to int value".format(delay))
+            self._log.error("Error while casting delay '{0}' to int value. Full error is : {1}".format(delay, traceback.format_exc()))
+        self._log.info("Pause of {0} seconds finished".format(delay))
+
+    def end_waiting(self):
+        self._log.debug("End waiting...")
+        self.the_end.set()
+     
 
     def get_expected_entries(self):
         return {'delay': {'type': 'integer',
                             'description': 'Delay in seconds',
                             'default': '5'}
                }
+
+
+if __name__ == "__main__":
+    P = PauseAction()
+    P.do_action()
