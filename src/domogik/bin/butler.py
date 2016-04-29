@@ -219,7 +219,7 @@ class Butler(Plugin):
 
     def _mdp_reply_butler_discuss(self, message):
         """ Discuss over req/rep
-            this should not be called with a 10 seconds timeout...
+            this should NOT be called with a 10 seconds timeout...
         """
         # TODO : merge with the on_message function !!!
 
@@ -239,6 +239,7 @@ class Butler(Plugin):
                              "location" : content['location'],
                              "sex" : self.butler_sex,
                              "mood" : self.butler_mood,
+                             "is_reply" : True,
                              "reply_to" : content['source'],
                              "identity" : self.butler_name,
                              "lang" : self.lang,
@@ -516,6 +517,7 @@ class Butler(Plugin):
                                  "location" : content['location'],
                                  "sex" : self.butler_sex,
                                  "mood" : self.butler_mood,
+                                 "is_reply" : True,
                                  "reply_to" : content['source'],
                                  "identity" : self.butler_name,
                                  "lang" : self.lang,
