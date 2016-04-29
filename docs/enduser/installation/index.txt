@@ -10,7 +10,7 @@ You must first install Domogik 0.4.2 release. Then, you will be able to upgrade 
 Important notice about the 0.5 release
 ======================================
 
-In the 0.5 release, the Rest component has been merger in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
+In the 0.5 release, the Rest component has been merged in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
 
 * use the admin port (40406) instead of the previous rest port (40404)
 * add */rest/* in front of all old Rest url. Example : */device/* become */rest/device/*.
@@ -22,7 +22,7 @@ If you plan to install Domogik on a Raspberry pi
 
 If you want to use a Raspberry pi A/B/B+, you should forget to install Domogik on it. Currently Domogik uses too much memory for these models.
 
-Domogik should work fine on a Raspberry pi 2 only.
+Domogik can work fine on a Raspberry pi 2 but some users encountered some issues. Please avoir using this platform for now.
 
 Installation
 ============
