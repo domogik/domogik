@@ -34,6 +34,7 @@ LAUNCH_DOMOGIK_XPL_HUB="true"
 DOMOGIK_XPL_HUB="python"
 NAME=dmg_manager
 C_XPLHUB=xPL_Hub
+GXPL_XPLHUB=gxpl-hub
 PYTHON_XPLHUB=dmg_hub
 MQ_BROKER=dmg_broker
 MQ_FORWARDER=dmg_forwarder
@@ -84,6 +85,18 @@ function start_xpl {
             exit 1
         fi
         /bin/su - ${DOMOGIK_USER} -c "$(which ${PYTHON_XPLHUB}) >/dev/null"
+        if [ $? -gt 0 ]; then
+            echo " An error occured during Xpl startup."
+            exit 1
+        fi
+
+    elif [ "${DOMOGIK_XPL_HUB}" == "gxpl" ] ; then
+        # The GxPL hub is not installed with Domogik. This is an alternate hub. See http://www.epsilonrt.com/gxPL/
+        if [ -z "$(which ${GXPL_XPLHUB})" ];then
+            echo "ERROR : ${GXPL_XPLHUB} not in path, did you had any issue during the installation ?"
+            exit 1
+        fi
+        /bin/su - ${DOMOGIK_USER} -c "$(which ${GXPL_XPLHUB}) >/dev/null"
         if [ $? -gt 0 ]; then
             echo " An error occured during Xpl startup."
             exit 1
@@ -203,6 +216,16 @@ function status_xpl {
             echo " * ${PYTHON_XPLHUB} is not running"
         fi
 
+    elif [ "${DOMOGIK_XPL_HUB}" == "gxpl" ] ; then
+        set +e
+        RUNNING=$(/usr/bin/pgrep -c ${GXPL_XPLHUB})
+        set -e
+        if [ ! -z ${RUNNING} ] && [ ${RUNNING} -gt 0 ] ; then
+            echo " * ${GXPL_XPLHUB} is running"
+        else
+            echo " * ${GXPL_XPLHUB} is not running"
+        fi
+
     else
         echo " The choosen xpl hub is not known by Domogik : "${DOMOGIK_XPL_HUB}
         exit 1
@@ -255,6 +278,13 @@ function stop_xpl {
 
     elif [ "${DOMOGIK_XPL_HUB}" == "python" ] ; then
         for pid in `ps ax | grep "${PYTHON_XPLHUB}" | grep -v grep | awk '{print $1}'`; do
+            kill -15 $pid 2>/dev/null 1>&2
+            sleep ${DIETIME}
+            kill -9 $pid 2>/dev/null 1>&2
+        done
+
+    elif [ "${DOMOGIK_XPL_HUB}" == "gxpl" ] ; then
+        for pid in `ps ax | grep "${GXPL_XPLHUB}" | grep -v grep | awk '{print $1}'`; do
             kill -15 $pid 2>/dev/null 1>&2
             sleep ${DIETIME}
             kill -9 $pid 2>/dev/null 1>&2
