@@ -140,7 +140,10 @@
             "DT_GByte",
             "DT_pH",
             "DT_Chlorine",
-            "DT_Battery"
+            "DT_Battery",
+            "DT_Co2",
+            "DT_Tvoc",
+            "DT_Insolation"
         ]
     },
     "DT_Scaling": {
@@ -441,6 +444,27 @@
         "min": 0,
         "max": 100,
         "unit": "%",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Co2": {
+        "min": 0,
+        "max": null,
+        "unit": "ppm",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Tvoc": {
+        "min": 0,
+        "max": null,
+        "unit": "ppb",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Insolation": {
+        "min": 0,
+        "max": null,
+        "unit": "W/m²",
         "parent": "DT_Number",
         "childs": []
     },
