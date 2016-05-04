@@ -577,6 +577,7 @@ class PackageInstaller():
         makefile = os.path.join(self.resources_path, "sphinx/Makefile")
         # -e if used to use environments vars
         cmd = "cd {0} && export BUILDDIR={1} && export SPHINXOPTS='-c {2}' && make -e -f {3} html".format(doc_path, os.path.join(doc_path, build_doc_dir), conf_py, makefile)
+        self.log.debug("Build doc: {0}".format(cmd))
         subp = Popen(cmd, 
                      shell=True,
                      stdout=PIPE, stderr=PIPE)
