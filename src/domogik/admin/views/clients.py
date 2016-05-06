@@ -300,6 +300,7 @@ def client_global_edit(client_id, dev_id):
             pass
         for item in dev["parameters"]:
             item = dev["parameters"][item]
+            print("ITEM={0}".format(item))
             default = item["value"]
             arguments = [InputRequired()]
             # keep track of the known fields
@@ -307,25 +308,34 @@ def client_global_edit(client_id, dev_id):
             # build the field
             if item["type"] == "boolean":
                 if default == 'y' or default == 1 or default == True: # in db value stored in lowcase
-                    default = True
+                    #default = True
+                    default = 'y'
                 else:
-                    default = False
-                field = BooleanField(item["key"], [validators.optional()], default=default) # set to optional field due to WTForm BooleanField return no data for false value (HTML checkbox)
+                    #default = False
+                    default = 'n'
+                #field = BooleanField(item["key"], [validators.optional()], default=default) # set to optional field due to WTForm BooleanField return no data for false value (HTML checkbox)
+                field = RadioField( item["key"], 
+                                [validators.optional()],
+                                choices=[('y', 'Yes'), ('n', 'No')], default=default
+                              )
             elif item["type"] == "integer":
                 field = IntegerField(item["key"], arguments, default=default)
-            elif item["type"] == "float":
+            elif item["type"] == "datetime":
                 field = DateTimeField(item["key"], arguments, default=default)
+            elif item["type"] == "float":
+                field = FloatField(item["key"], arguments, default=default)
             else:
                 # time, email, ipv4, ipv6, url
                 field = TextField(item["key"], arguments, default=default)
             # add the field
             setattr(F, "{0}-{1}".format(item["id"], item["key"]), field)
         form = F()
+        print form
         if request.method == 'POST' and form.validate():
             for key, item in known_items.items():
                 val = getattr(form, "{0}-{1}".format(item["id"], key)).data
                 if item["type"] == "boolean":
-                    if val == False:
+                    if val == 'n':
                         val = 'n' # in db value stored in lowcase
                     else:
                         val = 'y' # in db value stored in lowcase
@@ -667,7 +677,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         elif item["type"] == "datetime":
             field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "float":
-            field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
+            field = FloatField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "choice":
             choices = []
             if type(item["choices"]) == list:
@@ -712,7 +722,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         elif item["type"] == "datetime":
             field = DateTimeField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "float":
-            field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
+            field = FloatField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "choice":
             choices = []
             for key in sorted(item["choices"]):
@@ -753,7 +763,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             elif item["type"] == "datetime":
                 field = DateTimeField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
+                field = FloatField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "choice":
                 choices = []
                 for key in sorted(item["choices"]):
@@ -805,7 +815,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 field = DateTimeField(name, [validators.Required(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [validators.InputRequired(gettext("This value is required"))], \
+                field = FloatField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "choice":
                 choices = []
