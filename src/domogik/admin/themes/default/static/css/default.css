@@ -341,6 +341,13 @@ h5 {
     height: 80vh;
 }
 
+.scenarioInfo {
+    background-color: #f8f8f8;
+    padding: 0.5em;
+    border: 1px #e7e7e7 solid;
+    margin-bottom: 0.5em;
+}
+
 
 /*** devices ***/
 

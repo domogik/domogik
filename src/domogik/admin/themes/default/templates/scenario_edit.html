@@ -45,8 +45,14 @@
 
   </form>
 
-  <!-- <pre>{{ jso }}</pre> -->
-  <div id="blocklyArea"></div>
+
+  <!--<pre>{{ jso }}</pre>-->
+  <!--
+  <div class='scenarioInfo'>
+  </div>
+  -->
+  <div id="blocklyArea">
+  </div>
   <div id="blocklyDiv" style="position: absolute; width: 50%;"></div>
   <xml id="toolbox" style="display: none">
     <category name="Logic">
@@ -246,7 +252,11 @@
         }
     );
     function onchange() {
-      $('#sjson').val( Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace()) );
+        $('#sjson').val( Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace()) );
+        // on each json change, check is some 'display informations' actions must be done
+        if ($('#sjson').val().indexOf("trigger.Hysteresis") > -1) {
+            // do something
+        }
     }
     workspace.addChangeListener(onchange);
     $(document).ready(function() {
