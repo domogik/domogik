@@ -79,7 +79,7 @@ class Logger():
 
             if 'log_when' not in config:
                 config['log_when'] = 'D'
-            if 'log_interval 'not in config:
+            if 'log_interval' not in config:
                 config['log_interval'] = 1
             if 'log_backup_count' not in config:
                 config['log_backup_count'] = 10
@@ -96,8 +96,8 @@ class Logger():
             my_logger.propagate = 0
             if not my_logger.handlers:
                 hdlr = TimedRotatingFileHandler(filename, \
-                        when=config['log_when'], interval=config['log_interval'], \
-                        backupCount=config['log_backup_count'])
+                        when=config['log_when'], interval=int(config['log_interval']), \
+                        backupCount=int(config['log_backup_count']))
                 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
                 hdlr.setFormatter(formatter)
                 my_logger.addHandler(hdlr)
