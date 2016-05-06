@@ -35,7 +35,7 @@ class AbstractSensorTest(AbstractTest):
         AbstractTest.__init__(self, log, trigger, cond, params)
         self._subMessages.append( 'device-stats' )
         self._sensorId = params
-        self.set_description("Check if value/date changes for a sensor with id {0}".format(self._sensorId))
+        self.set_description(u"Check if value/date changes for a sensor with id {0}".format(self._sensorId))
         self.log = log
         self._db = DbHelper()
         self._res = None
@@ -64,7 +64,7 @@ class AbstractSensorTest(AbstractTest):
         if self._sensorId:
             if 'sensor_id' in msg:
                 if int(msg['sensor_id']) == int(self._sensorId):
-                    self.log.debug("SensorTest : received MQ message : {0}".format(msg))
+                    self.log.debug(u"SensorTest : received MQ message : {0}".format(msg))
                     self.handle_message(did, msg)
 
 
@@ -76,7 +76,7 @@ class SensorTest(AbstractSensorTest):
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractSensorTest.__init__(self, log, trigger, cond, params)
-        self.add_parameter("usage", "sensor_usage.SensorUsageParameter")
+        self.add_parameter(u"usage", "sensor_usage.SensorUsageParameter")
         self._res = self._convert(self._res)
         self._time = time()
         self._res_old = None
@@ -85,7 +85,7 @@ class SensorTest(AbstractSensorTest):
     def handle_message(self, did, msg):
         self._time = time()
         self._res = self._convert(msg['stored_value'])
-        self.log.debug("SensorTest : Trigger!")
+        self.log.debug(u"SensorTest : Trigger!")
         self._trigger(self)
 
     def _convert(self, val):
@@ -110,7 +110,7 @@ class SensorTest(AbstractSensorTest):
                         #self.log.debug("DT_Time : convert '{0}' to '{1}'".format(val, new))
                         return new
                     except:
-                        self.log.debug("Error while converting DT_Time value in mminutes. Value='{0}'".format(val))
+                        self.log.debug(u"Error while converting DT_Time value in mminutes. Value='{0}'".format(val))
                         return 0
             else:
                 return 0
@@ -125,7 +125,7 @@ class SensorTest(AbstractSensorTest):
         usage = u.evaluate()
 
         if usage == "value":
-            self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, self._res, type(self._res))) 
+            self.log.debug(u"Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, self._res, type(self._res))) 
             self._res_old = self._res
             self._time_old = self._time
             return self._res
@@ -134,7 +134,7 @@ class SensorTest(AbstractSensorTest):
                 has_changed = True
             else:
                 has_changed = False
-            self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, has_changed, type(has_changed))) 
+            self.log.debug(u"Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, has_changed, type(has_changed))) 
             self._res_old = self._res
             self._time_old = self._time
             return has_changed
@@ -142,7 +142,7 @@ class SensorTest(AbstractSensorTest):
             #print("R vs Ro : {0} vs {1}".format(self._res, self._res_old))
             #print("T vs To : {0} vs {1}".format(self._time, self._time_old))
             if self._res_old != None and ((self._res != self._res_old) or (self._time != self._time_old)):   # not sensor startup or sensor value changed or date changed
-                self.log.debug("Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, True, type(True))) 
+                self.log.debug(u"Evaluate SensorTest '{0}' in mode '{1}' to '{2}'. Type is '{3}'".format(self._sensorId, usage, True, type(True))) 
                 self._res_old = self._res
                 self._time_old = self._time
                 return True
