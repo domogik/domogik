@@ -51,7 +51,7 @@
       <img src="/static/images/help/scenario/example_hysteresis_02.png">
       <h3>{% trans %}Explanation{% endtrans %}</h3>
       <p>{% trans %}Each hysteresis block has its own unique identifier. When a hysteresis block is called, its identifier is stored in the scenario engine as the last hysteresis identifie encountered while running some actions for the scenario. The next time the scenario is triggered, when a hysteresis block is called, it checks first if the last identifier stored is the same as the hysteresis block. If it is the same, this hysteresis block will not be processed.{% endtrans %}</p>
-      <p>{% trans %}<strong>You should never use hysteresis block in different <em>IF</em> blocks</strong> : instead you should try so adapt your scenario to use them in the same <strong>IF</strong> block.{% endtrans %}</p>
+      <p>{% trans %}<strong>You should never use hysteresis block in different <em>IF</em> blocks</strong> : instead you should try to adapt your scenario to use them in the same <strong>IF</strong> block.{% endtrans %}</p>
     </div>
 </div>
 {% endblock %}
