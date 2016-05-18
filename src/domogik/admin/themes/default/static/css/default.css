@@ -378,3 +378,11 @@ iframe {
     border: none;
     width: 100%;
 }
+
+/*** persons ***/
+
+.person-info  {
+}
+.person-info .photo {
+    margin-right: 1em;
+}
