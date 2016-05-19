@@ -20,29 +20,29 @@ from domogik.common.sql_schema import Person, UserAccount
 
 from wtforms.ext.sqlalchemy.orm import model_form
 
-@app.route('/persons')
+@app.route('/users')
 @login_required
-def persons():
+def users():
     with app.db.session_scope():
         persons = []
         for per in app.db.list_persons():
             persons.append(per.__dict__)
-        return render_template('persons.html',
+        return render_template('users.html',
             persons=persons,
-            mactive='auth'
+            mactive='users'
         )
 
-@app.route('/persons/del/<pid>')
+@app.route('/user/del/<pid>')
 @login_required
-def persons_delete(pid):
+def user_delete(pid):
     with app.db.session_scope():
         app.db.del_person(pid)
-    return redirect("/persons")
+    return redirect("/users")
 
 
-@app.route('/persons/<person_id>', methods=['GET', 'POST'])
+@app.route('/user/<person_id>', methods=['GET', 'POST'])
 @login_required
-def persons_edit(person_id):
+def user_edit(person_id):
     with app.db.session_scope():
         if person_id > 0:
             person = app.db.get_person(person_id)
@@ -71,9 +71,9 @@ def persons_edit(person_id):
         elif request.method == 'POST' and not form.validate():
             flash(gettext("Invalid input"), "error")        
 
-    return render_template('person_edit.html',
+    return render_template('user_edit.html',
             form = form,
             personid = person_id,
-            mactve="auth",
+            mactve="users",
             )
 

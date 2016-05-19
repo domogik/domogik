@@ -21,7 +21,7 @@
         <li{% if mactive == "battery" %} class="active" {% endif %} id="battery"><a href="/battery"><i class="fa fa-battery-full"></i> {% trans %}Battery{% endtrans %}</a></li>
         <li{% if mactive == "orphans" %} class="active" {% endif %} id="orphans"><a href="/orphans"><i class="fa fa-chain-broken"></i> {% trans %}Orphan Domogik devices{% endtrans %}</a></li>
         -->
-        <li class="dropdown{% if mactive == "timeline" or mactive == "battery" or mactive == "orphans" %} active{% endif %}" id="auth">
+        <li class="dropdown{% if mactive == "timeline" or mactive == "battery" or mactive == "orphans" %} active{% endif %}" id="views">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-list"></i> {% trans %}Views{% endtrans %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li{% if mactive == "timeline" %} class="active" {% endif %} id="timeline"><a href="/timeline"><i class="fa fa-clock-o"></i> {% trans %}Timeline{% endtrans %}</a></li>
@@ -29,13 +29,7 @@
             <li{% if mactive == "orphans" %} class="active" {% endif %} id="orphans"><a href="/orphans"><i class="fa fa-chain-broken"></i> {% trans %}Orphan Domogik devices{% endtrans %}</a></li>
           </ul>
         </li>
-        <li class="dropdown{% if mactive == "auth" %} active{% endif %}" id="auth">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-lock"></i> {% trans %}Auth{% endtrans %} <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-              <li><a href="/accounts"><i class="fa fa-check"></i> {% trans %}Accounts{% endtrans %}</a></li>
-            <li><a href="/persons"><i class="fa fa-user"></i> {% trans %}Persons{% endtrans %}</a></li>
-          </ul>
-        </li>
+        <li{% if mactive == "users" %} class="active" {% endif %} id="users"><a href="/users"><i class="fa fa-users"></i> {% trans %}Users{% endtrans %}</a></li>
         <li{% if mactive == "apidoc" %} class="active" {% endif %} id="api"><a href="/apidoc"><i class="fa fa-book"></i> {% trans %}Rest and MQ API{% endtrans %}</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">

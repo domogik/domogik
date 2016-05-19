@@ -259,8 +259,7 @@ from domogik.admin.views.index import *
 from domogik.admin.views.login import *
 from domogik.admin.views.clients import *
 from domogik.admin.views.orphans import *
-from domogik.admin.views.account import *
-from domogik.admin.views.person import *
+from domogik.admin.views.users import *
 from domogik.admin.views.apidoc import *
 from domogik.admin.views.scenario import *
 from domogik.admin.views.timeline import *
