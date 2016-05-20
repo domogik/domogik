@@ -207,6 +207,8 @@ class UserAccount(DomogikBase):
     person = relation(Person)
     is_admin = Column(Boolean, nullable=False, default=False)
     skin_used = Column(Unicode(80), nullable=False, default=Unicode('default'))
+    lock_edit = Column(Boolean, nullable=False, default=False)
+    lock_delete = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, login, password, is_admin, skin_used, person_id):
         """Class constructor
