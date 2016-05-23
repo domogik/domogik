@@ -100,7 +100,7 @@ class Publisher(MQAsyncSub):
         while True:
             message = yield self.WSmessages.get()
             if len(self.subscribers) > 0:
-                print(u"Pushing MQ message to {} WS subscribers...".format(len(self.subscribers)))
+                #print(u"Pushing MQ message to {} WS subscribers...".format(len(self.subscribers)))
                 yield [subscriber.submit(message) for subscriber in self.subscribers]
 
     @gen.coroutine
@@ -175,7 +175,7 @@ class Subscription(WebSocketHandler):
     
     def on_message(self, content):
         """ reciev message from websocket and send to MQ """
-        print(u"WS to MQ: {0}".format(content))
+        #print(u"WS to MQ: {0}".format(content))
         self.publisher.MQmessages.put(content)
 
 class Admin(Plugin):

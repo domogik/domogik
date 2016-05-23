@@ -1383,6 +1383,14 @@ class DbHelper():
         """
         return self.__session.query(Person).all()
 
+    def list_persons_and_accounts(self):
+        """Return the list of all persons and related accounts
+
+        @return a list of Person objects
+
+        """
+        return self.__session.query(Person, UserAccount).outerjoin(UserAccount).all()
+
     def get_person(self, p_id):
         """Return person information
 
