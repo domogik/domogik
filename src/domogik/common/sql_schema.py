@@ -210,7 +210,7 @@ class UserAccount(DomogikBase):
     lock_edit = Column(Boolean, nullable=False, default=False)
     lock_delete = Column(Boolean, nullable=False, default=False)
 
-    def __init__(self, login, password, is_admin, skin_used, person_id):
+    def __init__(self, login, password, is_admin, skin_used, person_id, lock_edit, lock_delete):
         """Class constructor
 
         @param login : login
@@ -218,6 +218,8 @@ class UserAccount(DomogikBase):
         @param person_id : id of the person associated to this account
         @param is_admin : True if the user has administrator privileges
         @param skin_used : skin used in the UI (default value = 'default')
+        @param lock_edit: True id the account is locked for editing
+        @param lock_delete: True id the account is locked for deleting
 
         """
         self.login = ucode(login)
@@ -225,6 +227,8 @@ class UserAccount(DomogikBase):
         self.person_id = person_id
         self.is_admin = is_admin
         self.skin_used = ucode(skin_used)
+        self.lock_edit = lock_edit
+        self.lock_delete = lock_delete
 
     def set_password(self, password):
         """Set a password for the user"""
