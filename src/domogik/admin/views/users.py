@@ -45,6 +45,12 @@ def users():
 @login_required
 def user_delete(pid):
     with app.db.session_scope():
+        account = app.db.get_user_account_by_person(pid)
+        if account != None:
+            the_lock_delete = account.lock_delete
+            if the_lock_delete == True:
+                flash(gettext("You can't delete this user"), "warning")
+                return redirect("/users")
         app.db.del_person(pid)
     return redirect("/users")
 
@@ -59,6 +65,8 @@ def user_edit(person_id):
         #the_email = None
         #the_phone_number = None
         the_login = None
+        the_lock_edit = None
+        the_lock_delete = None
         if int(person_id) > 0:
             # Person informations
             person = app.db.get_person(person_id)
@@ -72,6 +80,8 @@ def user_edit(person_id):
             account = app.db.get_user_account_by_person(person_id)
             if account != None:
                 the_login = account.login
+                the_lock_edit = account.lock_edit
+                the_lock_delete = account.lock_delete
         else:
             person = None
 
@@ -98,6 +108,11 @@ def user_edit(person_id):
         if request.method == 'POST' and form.validate():
             print("POST!")
             print(request.form)
+            # security for locked users !
+            if the_lock_edit == True:
+                flash(gettext("You can't edit locked users"), "warning")
+                return redirect("/users")
+
             if int(person_id) > 0:
                 app.db.update_person(person_id, \
                                      p_first_name=request.form['first_name'], \
@@ -119,6 +134,7 @@ def user_edit(person_id):
     return render_template('user_edit.html',
             form = form,
             personid = person_id,
+            lock_edit = the_lock_edit,
             mactve="users",
             )
 
