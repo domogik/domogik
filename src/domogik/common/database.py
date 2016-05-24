@@ -1201,13 +1201,15 @@ class DbHelper():
         else:
             return None
 
-    def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False, a_skin_used=''):
+    def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False, a_skin_used='', a_lock_edit=False, a_lock_delete=False):
         """Add a user account
 
         @param a_login : Account login
         @param a_password : Account clear text password (will be hashed in sha256)
         @param a_person_id : id of the person associated to the account
         @param a_is_admin : True if it is an admin account, False otherwise (optional, default=False)
+        @param a_lock_edit : True is user is locked for editing
+        @param a_lock_delete : True is user is locked for deleting
         @return the new UserAccount object or raise a DbHelperException if it already exists
 
         """
@@ -1223,7 +1225,7 @@ class DbHelper():
         if person is None:
             self.__raise_dbhelper_exception("Person id '{0}' does not exist".format(a_person_id))
         user_account = UserAccount(login=a_login, password=_make_crypted_password(a_password),
-                                   person_id=a_person_id, is_admin=a_is_admin, skin_used=a_skin_used)
+                                   person_id=a_person_id, is_admin=a_is_admin, skin_used=a_skin_used, lock_edit=a_lock_edit, lock_delete=a_lock_delete)
         self.__session.add(user_account)
         self._do_commit()
         return user_account
@@ -1340,19 +1342,19 @@ class DbHelper():
         #self.__session.expire_all()
 
         default_person_fname = "Admin"
-        default_person_lname = "Admin"
+        default_person_lname = "Domogik"
         default_user_account_login = "admin"
         if self.__session.query(UserAccount).count() > 0:
             return None
         person = self.add_person(p_first_name=default_person_fname, p_last_name=default_person_lname, 
                                  p_birthdate=datetime.date(1900, 1, 1))
         user_account = self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
-                                     a_is_admin=True)
+                                     a_is_admin=True, a_lock_delete=True)
 
         person = self.add_person(p_first_name='Rest', p_last_name='Anonymous', 
                                  p_birthdate=datetime.date(1900, 1, 1))
         user_account = self.add_user_account(a_login='Anonymous', a_password='Anonymous', a_person_id=person.id, 
-                                     a_is_admin=False)
+                                     a_is_admin=False, a_lock_delete=True, a_lock_edit=True)
         return user_account
 
     def del_user_account(self, a_id):
