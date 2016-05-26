@@ -1201,7 +1201,7 @@ class DbHelper():
         else:
             return None
 
-    def add_user_account(self, a_login, a_password, a_person_id, a_is_admin=False, a_skin_used='', a_lock_edit=False, a_lock_delete=False):
+    def add_user_account(self, a_login,  a_person_id, a_password="s0m3dummyp@ssw0rd", a_is_admin=False, a_skin_used='', a_lock_edit=False, a_lock_delete=False):
         """Add a user account
 
         @param a_login : Account login
@@ -1246,7 +1246,7 @@ class DbHelper():
         """
         self.__session.expire_all()
         person = self.add_person(a_person_first_name, a_person_last_name, a_person_birthdate)
-        return self.add_user_account(a_login, a_password, person.id, a_is_admin, a_skin_used)
+        return self.add_user_account(a_login, person.id, a_password, a_is_admin, a_skin_used)
 
     def update_user_account(self, a_id, a_new_login=None, a_person_id=None, a_is_admin=None, a_skin_used=None):
         """Update a user account
@@ -1308,7 +1308,7 @@ class DbHelper():
         self._do_commit()
         return user_acc
 
-    def change_password(self, a_id, a_old_password, a_new_password):
+    def user_change_password_and_check_previous_one(self, a_id, a_old_password, a_new_password):
         """Change the password
 
         @param a_id : account id
@@ -1331,6 +1331,22 @@ class DbHelper():
         self._do_commit()
         return True
 
+    def user_change_password(self, a_id, a_new_password):
+        """Change the password
+
+        @param a_id : account id
+        @param a_new_password : the new password, in clear text (will be hashed in sha256)
+        @return True if the password could be changed, False otherwise (login or old_password is wrong)
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
+        user_acc.set_password(ucode(_make_crypted_password(a_new_password)))
+        self.__session.add(user_acc)
+        self._do_commit()
+        return True
+
     def add_default_user_account(self):
         """Add a default user account (login = admin, password = domogik, is_admin = True)
         if there isn't already one
@@ -1348,12 +1364,12 @@ class DbHelper():
             return None
         person = self.add_person(p_first_name=default_person_fname, p_last_name=default_person_lname, 
                                  p_birthdate=datetime.date(1900, 1, 1))
-        user_account = self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
+        user_account = self.add_user_account(a_login=default_user_account_login, a_person_id=person.id, a_password='123',
                                      a_is_admin=True, a_lock_delete=True)
 
         person = self.add_person(p_first_name='Rest', p_last_name='Anonymous', 
                                  p_birthdate=datetime.date(1900, 1, 1))
-        user_account = self.add_user_account(a_login='Anonymous', a_password='Anonymous', a_person_id=person.id, 
+        user_account = self.add_user_account(a_login='Anonymous', a_person_id=person.id, a_password='Anonymous',
                                      a_is_admin=False, a_lock_delete=True, a_lock_edit=True)
         return user_account
 
