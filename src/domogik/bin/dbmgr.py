@@ -81,7 +81,7 @@ class DBConnector(Plugin, MQRep):
                     self._db.list_user_accounts()
                     db_ok = True
                 except:
-                    msg = "The database is not responding. Check your configuration of if the database is up. Test {0}/{1}".format(nb_test, DATABASE_CONNECTION_NUM_TRY)
+                    msg = "The database is not responding. Check your configuration of if the database is up. Test {0}/{1}. The error while trying to connect to the database is : {2}".format(nb_test, DATABASE_CONNECTION_NUM_TRY, traceback.format_exc())
                     self.log.error(msg)
                     msg = "Waiting for {0} seconds".format(DATABASE_CONNECTION_WAIT)
                     self.log.info(msg)
