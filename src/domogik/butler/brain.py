@@ -371,13 +371,24 @@ def learn(rs_code, comment = None):
     with open(LEARN_FILE, "a") as file:
         file.write(utf8_data + "\n\n") 
 
-def do_command(log, user_locale, dt_type_list, device, value):
+def do_command(log, user_locale, dt_type_list, device, value, command_reference = None):
+    """ Execute a command
+        @log : logger object
+        @user_locale : fr_FR, ...
+        @dt_type_list : a datatype list
+        @device : the device name on which we want to execute a command
+        @value : the main value for the command
+
+        # TODO : handle several values for complex commands
+
+        @command_reference : if != None, a command reference
+    """
     try:
         # if several datatype have been provided
         dt_type_list = dt_type_list.split("|")
        
         device_name = device.lower()
-        log.info(u"Device name = {0}".format(device_name))
+        log.debug(u"Command : search device. Device name = {0}".format(device_name))
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('device.get')
@@ -386,25 +397,26 @@ def do_command(log, user_locale, dt_type_list, device, value):
         found = None
         for a_device in devices:
             if clean_input(a_device['name']) == clean_input(device_name):
-                cid = 0
                 for a_command in a_device['commands']:
                     pid = 0
                     for a_param in a_device['commands'][a_command]['parameters']:
                         if a_param['data_type'] in dt_type_list:
-                            found = [a_device, a_command, pid]
-                            break
-                        pid = pid + 1
-                    else:
-                        continue
-                        cid = cid + 1
-                    break
+                            if command_reference == None:
+                                found = [a_device, a_command, pid]
+                                break
+                            else:
+                                if command_reference == a_command:
+                                    found = [a_device, a_command, pid]
+                                    break
+                        pid += 1
+                      
         #print("F={0}".format(found))
         if found:
             dev = found[0]
             cid = found[1]
             pid = found[2]
+            log.debug(u"Command : device '{0}' found. id={1}, command id={2}, parameter id={3}".format(device_name, dev['id'], cid, pid))
             dt_type = dev['commands'][cid]['parameters'][pid]['data_type']
-            print(dt_type)
             cli = MQSyncReq(zmq.Context())
             msg = MQMessage()
             msg.set_action('cmd.send')
@@ -428,6 +440,7 @@ def do_command(log, user_locale, dt_type_list, device, value):
             else:
                 msg.add_data('cmdparams', {dev['commands'][cid]['parameters'][pid]['key'] : value})
 
+            log.debug(u"Command : send command for device '{0}' : {1}".format(device_name, msg.get()))
             return cli.request('xplgw', msg.get(), timeout=10).get()
         else:
             return None
