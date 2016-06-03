@@ -123,7 +123,7 @@ def scenario_edit(id):
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
-        sname = TextField("Name", default=name, description=u"Scenario name")
+        sname = TextField("Name", [Required()], default=name, description=u"Scenario name")
         sdis = BooleanField("Disable", default=dis, description=u"Disabling a scenario avoid to delete it if you temporary want it not to run")
         sdesc = TextAreaField("Description", default=desc)
         sjson = HiddenField("json")

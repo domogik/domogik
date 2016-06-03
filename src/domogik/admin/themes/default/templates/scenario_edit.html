@@ -10,7 +10,14 @@
     {{ form.sid }}
     {{ form.sjson }}
     <div id="scenario_title" class="xform-group">
+        <span class="{% if form.sname.errors %} has-error{% endif %}">
         {{ form.sname(class_="form-control input-lg") }}
+        {% if form.sname.errors %} 
+          {% for error in form.sname.errors %}
+            <span class="text-warning">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
+        </span>
         <button type="submit" class="btn btn-info">
           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
           {% trans %}Save{% endtrans %}
