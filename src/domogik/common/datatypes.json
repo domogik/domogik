@@ -469,6 +469,13 @@
         "parent": "DT_Number",
         "childs": []
     },
+    "DT_kgWeight": {
+        "min": 0,
+        "max": null,
+        "unit": "kg",
+        "parent": "DT_Number",
+        "childs": []
+    },
     "DT_Char": {
         "childs": []
     },
