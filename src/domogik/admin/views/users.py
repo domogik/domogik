@@ -33,8 +33,10 @@ def users():
             buf2 = {}
             # preserve person id instead of account id
             id = per[0].id 
+            account_id = None
             if len(per) > 1:
-                account_id = per[1].id
+                if per[1] != None:
+                    account_id = per[1].id
             for buf in per:
                 if buf != None:
                     buf3 = buf.__dict__
