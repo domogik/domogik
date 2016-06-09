@@ -8,7 +8,7 @@
 
     {%- block metas %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ theme_static('dmg-logo.ico') }}"> 
+    <link rel="shortcut icon" href="{{ theme_static('dmg-logo.ico') }}">
     {%- endblock metas %}
 
     {%- block styles %}
@@ -60,10 +60,17 @@
     {% if messages %}
       <script type="text/javascript">
            {% for category, message in messages: %}
-            PNotify.prototype.options.delay = 3000;
+            var delay = 2400;
+            var delayCoeff = (({{ message|length }} + 50)/250)+1;  // Minimun char 50, double time every 250 char
+            if ('{{ category }}' == 'warning') {
+                delay += 1500;
+            } else if ('{{ category }}' == 'danger') {
+                    delay += 2400;
+            };
+            PNotify.prototype.options.delay = parseInt(delay * delayCoeff);
             new PNotify({
                 text: '{{ message }}',
-                type: '{{ categoiry }}',
+                type: '{{ category }}',
                 buttons: {
                     close: false,
                     sticker: false
