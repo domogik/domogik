@@ -189,7 +189,7 @@ def client_devices_known(client_id):
         try:
             device_type_name = detail['data']['device_types'][dev['device_type_id']]['name']
         except KeyError:
-            print("Warning : the device type '{0}' does not exist anymore in the installed package release. Device type name set as the existing id in database".format(dev['device_type_id']))
+            print(u"Warning : the device type '{0}' does not exist anymore in the installed package release. Device type name set as the existing id in database".format(dev['device_type_id']))
             device_type_name = dev['device_type_id']
         if device_type_name in devices_by_device_type_id:
             devices_by_device_type_id[device_type_name].append(dev)
@@ -300,7 +300,6 @@ def client_global_edit(client_id, dev_id):
             pass
         for item in dev["parameters"]:
             item = dev["parameters"][item]
-            print("ITEM={0}".format(item))
             default = item["value"]
             arguments = [InputRequired()]
             # keep track of the known fields
@@ -330,7 +329,6 @@ def client_global_edit(client_id, dev_id):
             # add the field
             setattr(F, "{0}-{1}".format(item["id"], item["key"]), field)
         form = F()
-        print form
         if request.method == 'POST' and form.validate():
             for key, item in known_items.items():
                 val = getattr(form, "{0}-{1}".format(item["id"], key)).data
@@ -839,15 +837,12 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     form_xpl_command = F_xpl_command()
     form_xpl_stat = F_xpl_stat()
 
-    print("request.method={0} / form.validate={1}".format(request.method, form.validate()))
     if request.method == 'POST' and form.validate():
-        print(u"FORM={0}".format(request.form))
         # aprams hold the stucture,
         # append a vlaue key everywhere with the value submitted
         # or fill in the key
         params['client_id'] = client_id
         for item in request.form:
-            print(u"ITEM={0} ({1})".format(item, request.form.get(item)))
             if item in ["name", "reference", "description"]:
                 # handle the global things
                 params[item] = request.form.get(item)
