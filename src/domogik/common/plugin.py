@@ -884,7 +884,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
-               os.mkdir(path, 770)
+               os.mkdir(path, 0770)
                self.log.info(u"Create directory {0}.".format(path))
            except:
                raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))
