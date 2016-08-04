@@ -28,6 +28,7 @@
 #along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 # source application-specific settings
+PATH=$PATH:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 CUSTOM_PATH=""
 HUB_IFACE="lo"
 LAUNCH_DOMOGIK_XPL_HUB="true"
