@@ -73,6 +73,7 @@ class DBConnector(Plugin, MQRep):
         # Check for database connexion
         self._db = DbHelper()
         with self._db.session_scope():
+            # TODO : move in a function and use it (also used in dbmgr)
             nb_test = 0
             db_ok = False
             while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:

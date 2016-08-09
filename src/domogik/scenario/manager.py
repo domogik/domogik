@@ -48,6 +48,11 @@ try:
 except:
     pass
 import traceback
+import time
+
+DATABASE_CONNECTION_NUM_TRY = 50
+DATABASE_CONNECTION_WAIT = 30
+
 
 
 class ScenarioManager:
@@ -119,6 +124,31 @@ class ScenarioManager:
         """
         try:
             with self._db.session_scope():
+                ### TEST if database is up
+                # TODO : move in a function and use it (also used in dbmgr)
+                nb_test = 0
+                db_ok = False
+                while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
+                    nb_test += 1
+                    try:
+                        self._db.list_user_accounts()
+                        db_ok = True
+                    except:
+                        msg = "The database is not responding. Check your configuration of if the database is up. Test {0}/{1}. The error while trying to connect to the database is : {2}".format(nb_test, DATABASE_CONNECTION_NUM_TRY, traceback.format_exc())
+                        self.log.error(msg)
+                        msg = "Waiting for {0} seconds".format(DATABASE_CONNECTION_WAIT)
+                        self.log.info(msg)
+                        time.sleep(DATABASE_CONNECTION_WAIT)
+    
+                if nb_test >= DATABASE_CONNECTION_NUM_TRY:
+                    msg = "Exiting dbmgr!"
+                    self.log.error(msg)
+                    self.force_leave()
+                    return
+    
+                ### Do the stuff
+                msg = "Connected to the database"
+                self.log.info(msg)
                 for scenario in self._db.list_scenario():
                     self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description, scenario.state)
         except:
