@@ -192,7 +192,12 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                                          None,  # no callback to only log
                                          self.log,
                                          self._stop)
-        self._process_info.start()
+        thr_send_process_info = threading.Thread(None,
+                                           self._process_info.start,
+                                           "send_process_info",
+                                           (),
+                                           {})
+        thr_send_process_info.start()
 
         self.dont_run_ready = False
 
