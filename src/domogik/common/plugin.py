@@ -186,14 +186,13 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             return
 
         # Create object which get process informations (cpu, memory, etc)
-        # TODO : activate
-        # TODO : use something else that xPL ?????????
-        #self._process_info = ProcessInfo(os.getpid(),
-        #                                 TIME_BETWEEN_EACH_PROCESS_STATUS,
-        #                                 self._send_process_info,
-        #                                 self.log,
-        #                                 self.myxpl)
-        #self._process_info.start()
+        # TODO : use something else than xPL to store in the database ?
+        self._process_info = ProcessInfo(os.getpid(), "{0}-{1}.{2}".format(self._type, self._name, self.get_sanitized_hostname()), 
+                                         TIME_BETWEEN_EACH_PROCESS_STATUS,
+                                         None,  # no callback to only log
+                                         self.log,
+                                         self._stop)
+        self._process_info.start()
 
         self.dont_run_ready = False
 

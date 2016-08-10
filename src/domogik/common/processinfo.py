@@ -44,21 +44,23 @@ class ProcessInfo():
         cpu usage, memory usage, etc.
     """
 
-    def __init__(self, pid, interval = 0, callback = None, log = None, myxpl = None):
+    def __init__(self, pid, client_id, interval = 0, callback = None, log = None, stop = None):
         """ Init object
             @param pid : process identifier
+            @param client_id : client id
             @param interval : time between looking for values
             @param callback : function to call to give values
                callback input : {"cpu_usage" : 33, ...}
             @param log : logger
-            @param myxpl : xpl plugin instance
+            @param stop : event
         """
         # init vars
         self.pid = None
+        self.client_id = client_id
         self._callback = callback
         self._interval = interval
         self.log = log
-        self.myxpl = myxpl
+        self._stop = stop
         # check pid exists
         if not psutil.pid_exists(pid):
             self.log.warning(u"No process '{0}' exists" .format(pid))
@@ -72,9 +74,9 @@ class ProcessInfo():
         """
         if self.pid == None:
             return
-        stop = threading.Event()
-        timer = XplTimer(self._interval, self._get_values, stop, self.myxpl)
-        timer.start()
+        while not self._stop.isSet():
+            self._get_values()
+            self._stop.wait(self._interval)
 
     def _get_values(self, raw = False):
         """ Get usefull values and put them in a dictionnary
@@ -97,7 +99,8 @@ class ProcessInfo():
         memory_rss = round(memory_info[0] / divisor, 1)
         memory_vsz = round(memory_info[1] / divisor, 1)
         memory_percent = round(self.p.get_memory_percent(),1)
-        values = {"pid" : self.pid,
+        values = {"client_id" : self.client_id,
+                  "pid" : self.pid,
                   "cpu_percent" : cpu_percent,
                   "memory_total_phymem" : memory_total_phymem,
                   "memory_rss" : memory_rss,
@@ -105,10 +108,9 @@ class ProcessInfo():
                   "memory_percent" : memory_percent,
 	 }
         # TODO : add threads number
+        self.log.debug(u"Process informations for client '{2}' with pid = '{0}' : {1}".format(self.pid, values, self.client_id))
         if self._callback != None:
             self._callback(self.pid, values)
-        else:
-            print(u"{0} > {1}".format(self.pid, values))
 
 def display(pid, data):
     print(u"DATA ({0}) = {1}".format(pid, str(data)))
