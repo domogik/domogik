@@ -414,8 +414,11 @@ def scenario_blocks_js():
                 sen_dt = dev['sensors'][sen]['data_type'] 
                 # First, determine the parent type (DT_Number, DT_Bool, ...)
                 dt_parent = sen_dt
-                while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
-                    dt_parent = datatypes[dt_parent]['parent']
+                try:
+                    while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
+                        dt_parent = datatypes[dt_parent]['parent']
+                except KeyError:
+                    print("Error : the datatype of the sensor '{0}' is not known!".format(sen)) 
                 # store it in the used
                 if dt_parent not in used_datatypes:
                     used_datatypes[dt_parent] = []
