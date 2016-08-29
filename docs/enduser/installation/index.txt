@@ -12,7 +12,7 @@ Important notice about the 0.5 release
 
 In the 0.5 release, the Rest component has been merged in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
 
-* use the admin port (40406) instead of the previous rest port (40404)
+* use the admin port (40406) instead of the previous rest port (40405)
 * add */rest/* in front of all old Rest url. Example : */device/* become */rest/device/*.
 
 Some core butler functions interfaces have changed. **All brain packages must be upgrade to Domogik 0.5 compliant releases.**
