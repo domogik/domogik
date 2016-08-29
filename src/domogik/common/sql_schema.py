@@ -109,7 +109,7 @@ class Device(DomogikBase):
     name = Column(Unicode(128), nullable=False)
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
-    device_type_id = Column(Unicode(80), nullable=False, index=True)
+    device_type_id = Column(Unicode(255), nullable=False, index=True)
     client_id = Column(Unicode(80), nullable=False)
     client_version = Column(Unicode(32), nullable=False)
     params = relationship("DeviceParam", backref=__tablename__, cascade="all", passive_deletes=True)
