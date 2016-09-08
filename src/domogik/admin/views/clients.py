@@ -65,6 +65,24 @@ def get_client_detail(client_id):
         detail = {}
     return detail
 
+# used by advanced pages (see plugin-ftpcamera for example)
+def get_client_devices(client_id):
+    """ The advanced pages have no direct db access, so they used this function to easily get all the devices
+    """
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device.get')
+    msg.add_data('type', client_id.split("-")[0])
+    msg.add_data('name', client_id.split("-")[1].split(".")[0])
+    msg.add_data('host', client_id.split(".")[1])
+
+    res = cli.request('dbmgr', msg.get(), timeout=10)
+    if res is not None:
+        devices = res.get_data()['devices']
+    else:
+        devices = {}
+    return devices
+
 def get_butler_history():
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()

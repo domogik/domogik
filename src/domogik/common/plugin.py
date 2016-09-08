@@ -172,6 +172,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self.packages_directory = "{0}/{1}".format(self.config['libraries_path'], PACKAGES_DIR)
         self.resources_directory = "{0}/{1}".format(self.config['libraries_path'], RESOURCES_DIR)
         self.products_directory = "{0}/{1}_{2}/{3}".format(self.packages_directory, self._type, self._name, PRODUCTS_DIR)
+        self.publish_directory = "{0}/{1}".format(self.resources_directory, "publish")
 
         # client config
         self._client_config = None
@@ -910,6 +911,12 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
        #    raise IOError("Can't create a file in directory {0}.".format(path))
        return path
 
+    def get_publish_directory(self):
+       return self.publish_directory
+
+    def get_publish_files_url(self):
+       return "publish://{0}/{1}/".format(self._type, self._name)
+
     def get_publish_files_directory(self):
        """
        Return the directory where a plugin can store files to be published over rest api : /rest/publish/<client type>/<client name>/<file>
@@ -917,13 +924,13 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
        After that, try to create a file inside it.
        If something goes wrong, generate an explicit exception.
        """
-       path = "{0}/{1}/{2}_{3}/publish/".format(self.libraries_directory, PACKAGES_DIR, self._type, self._name)
+       path = "{0}/{1}/{2}/".format(self.publish_directory, self._type, self._name)
        if os.path.exists(path):
            if not os.access(path, os.W_OK & os.X_OK):
                raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
-               os.mkdir(path, 770)
+               os.makedirs(path, 0777)
                self.log.info(u"Create directory {0}.".format(path))
            except:
                raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))

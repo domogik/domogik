@@ -3,13 +3,22 @@ import sys
 import os
 import domogik
 import json
-from subprocess import Popen, PIPE
 from flask import Response, request, send_from_directory
 import traceback
 from flask_login import login_required
 
-@app.route('/rest/publish/<client_type>/<client_name>/<path>', methods=['GET'])
+@app.route("/rest/publish/")
 @login_required
+def tst():
+    return "Hello World!"
+
+@app.route('/rest/publish/<client_type>/<client_name>/<path>', methods=['GET'])
+# TODO : security issue !!!!!
+# TODO : security issue !!!!!
+# TODO : security issue !!!!!
+# TODO : security issue !!!!!
+# Why the fuck the login_required is not working here ?????????
+#@login_required
 def publish_get(client_type, client_name, path):
     """
     @api {get} /butler/publish View content published by some clients
@@ -21,7 +30,7 @@ def publish_get(client_type, client_name, path):
     @apiParam client_name The client name (yi, ...)
 
     @apiExample Example usage with wget
-        $ wget -qO- http://192.168.1.10:40405/rest/publish/plugin/yi/avideo.avi"
+        $ wget -qO- http://192.168.1.10:40405/rest/publish/plugin/ftpcamera/motion_20160907_1154.jpg"
 
     @apiSuccessExample Success-Response:
         HTTTP/1.1 200 
@@ -34,7 +43,6 @@ def publish_get(client_type, client_name, path):
     data = "{0}, {1}, {2}".format(client_type, client_name, path)
     # basic security
     path = path.replace("..", "")
-    root = app.packages_directory
-    root_client = os.path.join(root, "{0}_{1}".format(client_type, client_name), "publish")
-    print(root_client)
+    root = app.publish_directory
+    root_client = os.path.join(root, "{0}/{1}".format(client_type, client_name))
     return send_from_directory(directory = root_client, filename = path)

@@ -271,6 +271,7 @@ class Admin(Plugin):
         admin_app.hostname = self.get_sanitized_hostname()
         admin_app.resources_directory = self.get_resources_directory()
         admin_app.packages_directory = self.get_packages_directory()
+        admin_app.publish_directory = self.get_publish_directory() # publish directory for all packages
         
         publisher = Publisher()
         tapp = Application([
