@@ -30,7 +30,7 @@ def publish_get(client_type, client_name, path):
     @apiParam client_name The client name (yi, ...)
 
     @apiExample Example usage with wget
-        $ wget -qO- http://192.168.1.10:40405/rest/publish/plugin/ftpcamera/motion_20160907_1154.jpg"
+        $ wget -qO- http://192.168.1.10:40406/rest/publish/plugin/ftpcamera/motion_20160907_1154.jpg"
 
     @apiSuccessExample Success-Response:
         HTTTP/1.1 200 
