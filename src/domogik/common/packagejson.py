@@ -125,7 +125,7 @@ class PackageJson():
             try:
                 self._datatypes = json.load(open(json_file))
             except:
-                self.log.error("Error while reading datatypes json file '{0}'. Error is : {1}".format(json_file, traceback.format_exc()))
+                raise PackageException("Error while reading datatypes json file '{0}'. Error is : {1}".format(json_file, traceback.format_exc()))
 
             self.validate()
 

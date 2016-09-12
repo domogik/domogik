@@ -144,7 +144,9 @@
             "DT_Co2",
             "DT_Tvoc",
             "DT_Insolation",
-            "DT_kgWeight"
+            "DT_kgWeight",
+            "DT_VolumeLiter",
+            "DT_VolumeM3"
         ]
     },
     "DT_Scaling": {
@@ -473,6 +475,20 @@
         "min": 0,
         "max": null,
         "unit": "kg",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_VolumeLiter": {
+        "min": 0,
+        "max": null,
+        "unit": "L",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_VolumeM3": {
+        "min": 0,
+        "max": null,
+        "unit": "m3",
         "parent": "DT_Number",
         "childs": []
     },
