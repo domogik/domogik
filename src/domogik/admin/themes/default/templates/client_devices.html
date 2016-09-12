@@ -168,9 +168,13 @@
                                             <em>( {{ datatypes[sen.data_type]['labels'][sen.last_value] }} )</em>
                                           {% elif sen.data_type == "DT_ColorRGBHexa" or datatypes[sen.data_type]['parent'] == "DT_ColorRGBHexa" %} 
                                             <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sen.last_value}}"></span>
-                                          {% elif sen.data_type == "DT_VideoMjpeg" %} 
+                                          {% elif sen.data_type == "DT_VideoMjpeg" or sen.data_type == "DT_Image" %} 
                                             <div>
-                                              <img style="max-width: 80%" src="{{sen.last_value}}"/>
+                                              <img style="max-width: 80%" src="{{sen.last_value | replace("publish://", rest_url + "/publish/")}}"/>
+                                            </div>
+                                          {% elif sen.data_type == "DT_VideoH264" %} 
+                                            <div>
+                                              <a class="btn btn-default" href="{{sen.last_value | replace("publish://", rest_url + "/publish/")}}"><span class='glyphicon glyphicon-facetime-video' aria-hidden='true'></span> {% trans %}Read the video file{% endtrans %}</a>
                                             </div>
                                           {% endif %}
                                         {% else %}

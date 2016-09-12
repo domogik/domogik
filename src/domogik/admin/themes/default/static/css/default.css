@@ -24,6 +24,16 @@ h5 {
 }
 
 
+/** all tables **/
+
+table {
+    table-layout: fixed;
+}
+
+table td {
+    word-wrap: break-word;
+}
+
 /** login **/
 
 .login{
