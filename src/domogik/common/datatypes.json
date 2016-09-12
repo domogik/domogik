@@ -664,11 +664,20 @@
         "childs": []
     },
     "DT_Video": {
-        "childs": ["DT_VideoMjpeg"]
+        "childs": ["DT_VideoMjpeg", "DT_VideoH264"]
     },
     "DT_VideoMjpeg": {
         "format": "",
         "parent": "DT_Video",
+        "childs": []
+    },
+    "DT_VideoH264": {
+        "format": "",
+        "parent": "DT_Video",
+        "childs": []
+    },
+    "DT_Image": {
+        "format": "",
         "childs": []
     }
 }
