@@ -88,17 +88,17 @@ class ProcessInfo():
             self.stop.set()
             return
         # cpu info
-        cpu_percent = round(self.p.get_cpu_percent(), 1)
+        cpu_percent = round(self.p.cpu_percent(), 1)
         # get memory info and set them in Mbyte
         memory_total_phymem = round(psutil.TOTAL_PHYMEM / (1024 * 1024), 0)
-        memory_info = self.p.get_memory_info()
+        memory_info = self.p.memory_info()
         if raw == False:
             divisor = 1024 * 1024
         else:
             divisor = 1
         memory_rss = round(memory_info[0] / divisor, 1)
         memory_vsz = round(memory_info[1] / divisor, 1)
-        memory_percent = round(self.p.get_memory_percent(),1)
+        memory_percent = round(self.p.memory_percent(),1)
         values = {"client_id" : self.client_id,
                   "pid" : self.pid,
                   "cpu_percent" : cpu_percent,

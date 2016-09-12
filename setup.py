@@ -77,7 +77,7 @@ setup(
           'alembic >= 0.7.4',
           'simplejson >= 1.9.2',
           'pyOpenSSL >= 0.10',
-          'psutil >= 0.1.3',
+          'psutil >= 2.0.0',
            mysql,
           'psycopg2',
           'pip >= 1.0',
