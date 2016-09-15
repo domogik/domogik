@@ -38,13 +38,16 @@ import psutil
 import time
 from domogik.xpl.common.xplconnector import XplTimer
 import threading
+import traceback
+import sys
+from domogik import __version__ as domogik_version
 
 class ProcessInfo():
     """ This class get informations about a process :
         cpu usage, memory usage, etc.
     """
 
-    def __init__(self, pid, client_id, interval = 0, callback = None, log = None, stop = None):
+    def __init__(self, pid, client_id, client_version, interval = 0, callback = None, log = None, stop = None):
         """ Init object
             @param pid : process identifier
             @param client_id : client id
@@ -55,8 +58,11 @@ class ProcessInfo():
             @param stop : event
         """
         # init vars
+        self.psutil_version = psutil.__version__
+        self.python_version = "{0}.{1}".format(sys.version_info[0], sys.version_info[1])
         self.pid = None
         self.client_id = client_id
+        self.client_version = client_version
         self._callback = callback
         self._interval = interval
         self.log = log
@@ -82,35 +88,31 @@ class ProcessInfo():
         """ Get usefull values and put them in a dictionnary
             @param raw : True : return raw values. False : return values in Mo
         """
-        # check process status
-        if not psutil.pid_exists(self.pid):
-            self.log.warning(u"Process '{0}' doesn't exists anymore : stop watching for it".format(self.pid))
-            self.stop.set()
-            return
-        # cpu info
-        cpu_percent = round(self.p.cpu_percent(), 1)
-        # get memory info and set them in Mbyte
-        memory_total_phymem = round(psutil.TOTAL_PHYMEM / (1024 * 1024), 0)
-        memory_info = self.p.memory_info()
-        if raw == False:
-            divisor = 1024 * 1024
-        else:
-            divisor = 1
-        memory_rss = round(memory_info[0] / divisor, 1)
-        memory_vsz = round(memory_info[1] / divisor, 1)
-        memory_percent = round(self.p.memory_percent(),1)
-        values = {"client_id" : self.client_id,
-                  "pid" : self.pid,
-                  "cpu_percent" : cpu_percent,
-                  "memory_total_phymem" : memory_total_phymem,
-                  "memory_rss" : memory_rss,
-                  "memory_vsz" : memory_vsz,
-                  "memory_percent" : memory_percent,
-	 }
-        # TODO : add threads number
-        self.log.debug(u"Process informations for client '{2}' with pid = '{0}' : {1}".format(self.pid, values, self.client_id))
-        if self._callback != None:
-            self._callback(self.pid, values)
+        try:
+            # check process status
+            if not psutil.pid_exists(self.pid):
+                self.log.warning(u"Process '{0}' doesn't exists anymore : stop watching for it".format(self.pid))
+                self.stop.set()
+                return
+            # cpu info
+            cpu_percent = round(self.p.cpu_percent(), 1)
+            num_threads = self.p.num_threads()
+            num_fds = self.p.num_fds()
+            # get memory info and set them in Mbyte
+            memory_info = self.p.memory_info()
+            if raw == False:
+                divisor = 1024 * 1024
+            else:
+                divisor = 1
+            memory_total_phymem = round(psutil.virtual_memory()[0] / divisor, 0)
+            memory_rss = round(memory_info[0] / divisor, 1)
+            memory_vsz = round(memory_info[1] / divisor, 1)
+            memory_percent = round(self.p.memory_percent(),1)
+            self.log.debug(u"Process informations|python_version={8}|psutil_version={0}|domogik_version={9}|client={1}|client_version={12}|pid={2}|cpu_percent_usage={3}|memory_total={4}|memory_percent_usage={5}|memory_rss={6}|memory_vsz={7}|num_threads={10}|num_file_descriptors_used={11}|".format(self.psutil_version, self.client_id, self.pid, cpu_percent, memory_total_phymem, memory_percent, memory_rss, memory_vsz, self.python_version, domogik_version, num_threads, num_fds, self.client_version)) 
+            if self._callback != None:
+                self._callback(self.pid, values)
+        except:
+            self.log.warning(u"Process informations for client not working. Psutil version='{0}'. The error is : {1}".format(self.version, traceback.format_exc()))
 
 def display(pid, data):
     print(u"DATA ({0}) = {1}".format(pid, str(data)))

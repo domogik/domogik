@@ -186,9 +186,17 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             self.force_leave()
             return
 
+        self.dont_run_ready = False
+
+        # for all no core elements, load the json
+        # TODO find a way to do it nicer ??
+        if self._name not in CORE_COMPONENTS and self._test == False:
+            self._load_json()
+
         # Create object which get process informations (cpu, memory, etc)
         # TODO : use something else than xPL to store in the database ?
         self._process_info = ProcessInfo(os.getpid(), "{0}-{1}.{2}".format(self._type, self._name, self.get_sanitized_hostname()), 
+                                         self.json_data['identity']['version'],
                                          TIME_BETWEEN_EACH_PROCESS_STATUS,
                                          None,  # no callback to only log
                                          self.log,
@@ -199,13 +207,6 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                                            (),
                                            {})
         thr_send_process_info.start()
-
-        self.dont_run_ready = False
-
-        # for all no core elements, load the json
-        # TODO find a way to do it nicer ??
-        if self._name not in CORE_COMPONENTS and self._test == False:
-            self._load_json()
 
         # init an empty devices list
         self.devices = []
