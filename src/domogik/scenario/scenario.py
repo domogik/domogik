@@ -41,6 +41,8 @@ import logging
 import ast
 from domogik.common.utils import ucode
 
+
+
 class ScenarioInstance(MQAsyncSub):
     """ This class provides base methods for the scenarios
     The scenario json looks like:
@@ -265,7 +267,7 @@ class ScenarioInstance(MQAsyncSub):
             retlist.append( pyObj(u"{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level, debug)), level) )
         # get a local variable
         elif part['type'] == 'variables_get':
-            retlist.append( pyObj(u"{0}".format(part['VAR']), level) )
+            retlist.append( pyObj(u"{0} if vars().has_key('{0}') else ''".format(part['VAR']), level) )
         # True and False block
         elif part['type'] == 'logic_boolean':
             if part['BOOL'] in ("TRUE", "1", 1, True):
