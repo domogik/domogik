@@ -580,9 +580,9 @@ class XplManager(XplPlugin):
                     current_date = item['time']
                     # get the sensor and dev
                     # TODO : DEBUG - LOG TO REMOVE
-                    self._log.debug(u"DEBUG - BEFORE THE with self._db.session_scope()")
+                    #self._log.debug(u"DEBUG - BEFORE THE with self._db.session_scope()")
                     with self._db.session_scope():
-                        self._log.debug(u"DEBUG - BEGINNING OF THE with self._db.session_scope()")
+                        #self._log.debug(u"DEBUG - BEGINNING OF THE with self._db.session_scope()")
                         sen = self._db.get_sensor(senid)
                         dev = self._db.get_device(sen.device_id)
                         # check if we need a conversion
