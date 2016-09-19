@@ -694,12 +694,6 @@ class GenericComponent():
         log = logger.Logger('manager')
         self.log = log.get_logger('manager')
 
-        #TODEL ?#### config
-        #TODEL ?## used only in the function add_configuration_values_to_data()
-        #TODEL ?## elsewhere, this function is used : self.get_config("xxxx")
-        #TODEL ?#self._config = Query(self.zmq, self.log)
-
-
     def register_component(self):
         """ register the component as a client
         """
@@ -910,7 +904,7 @@ class Brain(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log)
+        self._config = Query(self.zmq, self.log, host)
 
         ### set package path
         self._packages_directory = packages_directory
@@ -1022,7 +1016,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log)
+        self._config = Query(self.zmq, self.log, host)
 
         ### get the plugin data (from the json file)
         status = None
@@ -1299,7 +1293,7 @@ class Interface(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log)
+        self._config = Query(self.zmq, self.log, host)
 
         ### get the interface data (from the json file)
         status = None
