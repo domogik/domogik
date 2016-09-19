@@ -35,13 +35,12 @@ Implements
 """
 
 import threading
-#from socket import gethostname
 from argparse import ArgumentParser
+from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import pwd
 import traceback
-#import inspect
 
 from domogik.common.utils import get_sanitized_hostname
 from domogik.common.daemon.daemon import DaemonContext
@@ -66,6 +65,9 @@ class BasePlugin(object):
         @param log_prefix : If set, use this prefix when creating the log file in Logger()
         @param log_on_stdout : if set to True, allow to read logs on both stdout and log file
         '''
+
+        self.set_sanitized_hostname()
+
         ### First, check if the user is allowed to launch the plugin. The user must be the same as the one defined
         # in the file /etc/default/domogik : DOMOGIK_USER
         default = DefaultLoader()
@@ -237,13 +239,19 @@ class BasePlugin(object):
         self._stop_cb.append(callback)
         self._lock_add_cb.release()
 
+    def set_sanitized_hostname(self):
+        """ Get the sanitized hostname of the host 
+        This will lower it and keep only the part before the first dot
+
+        """
+        self._sanitized_hostname = get_sanitized_hostname()
+
     def get_sanitized_hostname(self):
         """ Get the sanitized hostname of the host
         This will lower it and keep only the part before the first dot
 
         """
-        #return gethostname().lower().split('.')[0].replace('-','')[0:16]
-        return get_sanitized_hostname()
+        return self._sanitized_hostname
 
     def set_return_code(self, value):
         """ Helper to set the return code
@@ -298,3 +306,10 @@ class BasePlugin(object):
         if hasattr(self, 'log'):
             self.log.debug(u"__del__ baseplugin")
 
+
+
+if __name__ == "__main__":
+    import time
+    print("aa")
+    time.sleep(50)
+    print("aa")
