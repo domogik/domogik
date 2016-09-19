@@ -39,9 +39,6 @@ Implements
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
 ####################################################
 import os
-#import pwd
-#import threading
-#import time
 import fcntl
 import codecs
 import chardet
