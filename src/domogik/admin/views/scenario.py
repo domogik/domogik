@@ -217,7 +217,7 @@ def scenario_blocks_js():
         if 'result' in res:
             scenario_tests = res['result']
     else:
-        print("Error : no scenario tests found!")
+        print(u"Error : no scenario tests found!")
         scenario_tests = {}
 
     tests = scenario_tests.keys()
@@ -238,7 +238,7 @@ def scenario_blocks_js():
         if 'result' in res:
             scenario_actions = res['result']
     else:
-        print("Error : no scenario actions found!")
+        print(u"Error : no scenario actions found!")
         scenario_actions = {}
 
     actions = scenario_actions.keys()
@@ -262,10 +262,10 @@ def scenario_blocks_js():
         if 'datatypes' in res:
             datatypes = res['datatypes']
     else:
-        print("Error : no datatypes found!")
+        print(u"Error : no datatypes found!")
         datatypes = {}
 
-    # devices 
+    # devices
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('device.get')
@@ -275,7 +275,7 @@ def scenario_blocks_js():
         if 'devices' in res:
             devices = res['devices']
     else:
-        print("Error : no devices found!")
+        print(u"Error : no devices found!")
         devices = []
 
 
@@ -327,7 +327,7 @@ def scenario_blocks_js():
                             {1}
                             this.setOutput(true);
                             this.setInputsInline(false);
-                            this.setTooltip("{2}"); 
+                            this.setTooltip("{2}");
                             this.contextMenu = false;
                         }}
                     }};
@@ -392,12 +392,12 @@ def scenario_blocks_js():
             devices_per_clients[client][name] = {}
             devices_per_clients[client][name]['sensors'] = {}
             devices_per_clients[client][name]['commands'] = {}
-    
+
             ### sensors blocks
             # first, get the parameters
             sensor_usage = []
             for test, sensor_params in scenario_tests.items():
-                if test == "sensor.SensorTest": 
+                if test == "sensor.SensorTest":
                     for buf in sensor_params["parameters"]:
                         if buf["name"] == "usage.usage":
                             sensor_usage = buf["values"]
@@ -411,14 +411,14 @@ def scenario_blocks_js():
                 sen_name = dev['sensors'][sen]['name']
                 devices_per_clients[client][name]['sensors'][sen_name] = sen_id
                 # determ the output type
-                sen_dt = dev['sensors'][sen]['data_type'] 
+                sen_dt = dev['sensors'][sen]['data_type']
                 # First, determine the parent type (DT_Number, DT_Bool, ...)
                 dt_parent = sen_dt
                 try:
                     while 'parent' in datatypes[dt_parent] and datatypes[dt_parent]['parent'] != None:
                         dt_parent = datatypes[dt_parent]['parent']
                 except KeyError:
-                    print("Error : the datatype of the sensor '{0}' is not known!".format(sen)) 
+                    print(u"Error : the datatype of the sensor '{0}' is not known!".format(sen))
                 # store it in the used
                 if dt_parent not in used_datatypes:
                     used_datatypes[dt_parent] = []
@@ -454,12 +454,12 @@ def scenario_blocks_js():
                                 {7}
                                 this.setOutput(true); /*, {4}); */
                                 this.setInputsInline(false);
-                                this.setTooltip("{2}"); 
+                                this.setTooltip("{2}");
                             }}
                         }};
                         """.format(block_id, sen_name, block_description, jso, output, color, sen_dt, papp)
                 js = u'{0}\n\r{1}'.format(js, add)
-    
+
             ### commands blocks
             for cmd in dev['commands']:
                 p = u""
@@ -526,18 +526,18 @@ def scenario_blocks_js():
                                 this.setPreviousStatement(true, "null");
                                 this.setNextStatement(true, "null");
                                 this.setInputsInline(false);
-                                this.setTooltip("{2}"); 
+                                this.setTooltip("{2}");
                             }}
                         }};
                         """.format(block_id, cmd_name, block_description, jso, output, color, js_params)
                 js = u'{0}\n\r{1}'.format(js, add)
         except:
-            print("ERROR while looking on a device : {0}".format(traceback.format_exc()))
+            print(u"ERROR while looking on a device : {0}".format(traceback.format_exc()))
 
     #### datatypes
     for dt_parent, dt_types in used_datatypes.items():
         for dt_type in dt_types:
-            print "{0} => {1}".format(dt_parent, dt_type)
+            print(u"{0} => {1}".format(dt_parent, dt_type))
             if dt_parent == "DT_Bool":
                 color = 20
                 output = "\"Boolean\""
@@ -561,10 +561,26 @@ def scenario_blocks_js():
                          this.appendDummyInput().appendField(new Blockly.FieldColour(""), "COLOUR");
                         """
             else:
-                color = 160
-                output = "\"null\""
-                input = """
-                         this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
+                # Try to build a fieldDropDown list
+                list_options = None
+                if "labels" in datatypes[dt_type]:
+                    list_options = datatypes[dt_type]['labels']
+                elif "values" in datatypes[dt_type]:
+                    list_options = datatypes[dt_type]['values']
+                if list_options != None:
+                    js_list_options = u"["
+                    for opt in list_options:
+                        js_list_options += u"['{0} - {1}', '{1}'],".format(opt, list_options[opt])
+                    js_list_options += u"]"
+                    color = 160
+                    output = "\"String\""
+                    input = u"""this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "TEXT");
+                                """.format(js_list_options)
+                else:
+                    color = 160
+                    output = "\"null\""
+                    input = """
+                             this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
                         """
 
             add = """Blockly.Blocks['{0}'] = {{
@@ -572,14 +588,14 @@ def scenario_blocks_js():
                             this.setColour({1});
                             this.appendDummyInput().appendField("{0}");
                             {3}
-                            this.setTooltip("{0}"); 
+                            this.setTooltip("{0}");
                             this.setOutput(true, {2});
                             this.setInputsInline(false);
                         }}
                     }};
                     """.format(dt_type, color, output, input)
             js = u'{0}\n\r{1}'.format(js, add)
-        
+
     # CODE for #85
     # add the scenario enable/disable block
     #for scen in scenarios:
