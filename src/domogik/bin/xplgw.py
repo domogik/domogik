@@ -66,6 +66,7 @@ class XplManager(XplPlugin):
         self.add_mq_sub('client.conversion')
         self.add_mq_sub('client.list')
         self.add_mq_sub('client.sensor')
+        self.add_mq_sub('device.update')
 
         self.log.info(u"XPL manager initialisation...")
         self._db = DbHelper()
@@ -134,8 +135,19 @@ class XplManager(XplPlugin):
                 self._parse_xpl_target(content)
             elif msgid == 'client.sensor':
                 self._handle_mq_sensor(content)
+            elif msgid == 'device.update':
+                self._handle_mq_device_update(content)
         except Exception as exp:
             self.log.error(traceback.format_exc())
+
+    def _handle_mq_device_update(self, content):
+        """ On a device change, a Mq message is received
+            So we update all the devices parameters used by xplgw
+        """
+        self.log.debug(u"New message (from MQ) about some device changes > reload the devices parameters...")
+        self._x_thread.on_device_changed()
+        self._s_thread.on_device_changed()
+
 
     def _handle_mq_sensor(self, content):
         """ Handles an mq sensor message and push it into the queue
@@ -452,7 +464,7 @@ class XplManager(XplPlugin):
     class _XplSensorThread(threading.Thread):
         """ XplSensorThread class
         Thread that will handle the received xplStat(s) and xplTrigger(s)
-        It will try to fidn the matching sensor and then store it into the sensor Store Queue
+        It will try to find the matching sensor and then store it into the sensor Store Queue
         This is done in a thread as it can be time consuming to do the DB lookups
         """
         def __init__(self, log, queue, storeQueue):
@@ -461,20 +473,58 @@ class XplManager(XplPlugin):
             self._log = log
             self._queue = queue
             self._queue_store = storeQueue
+            # on startup, load the device parameters
+            self.on_device_changed()
+
+        def on_device_changed(self):
+            """ Function called when a device have been changed to reload the devices parameters
+            """
+            self._log.info("Event : one device changed. Reloading data for _XplSensorThread")
+            with self._db.session_scope():
+                self.all_xpl_stat = []
+                for xplstat in self._db.get_all_xpl_stat():
+                    #print(xplstat)
+                    #print(xplstat.params)
+                    # <XplStat: name='Open/Close sensor', json_id='open_close', device_id='95', id='185', schema='ac.basic'>
+                    # <XplStatParam: xplstat_id='188', multiple='None', value='None', ignore_values='', sensor_id='411', static='False', key='current', type='None'>
+                    a_xplstat = {'name' : xplstat.name,
+                                 'json_id' : xplstat.json_id,
+                                 'device_id' : xplstat.device_id,
+                                 'id' : xplstat.id,
+                                 'schema' : xplstat.schema,
+                                 'params' : []
+                                }
+                    for a_xplstat_param in xplstat.params:
+                        a_xplstat['params'].append({
+                                                     'xplstat_id' : a_xplstat_param.xplstat_id,
+                                                     'multiple' : a_xplstat_param.multiple,
+                                                     'value' : a_xplstat_param.value,
+                                                     'ignore_values' : a_xplstat_param.ignore_values,
+                                                     'sensor_id' : a_xplstat_param.sensor_id,
+                                                     'static' : a_xplstat_param.static,
+                                                     'key' : a_xplstat_param.key,
+                                                     'type' : a_xplstat_param.type
+                                                   })
+
+                    self.all_xpl_stat.append(a_xplstat)
+                #print(self.all_xpl_stat)
+
+            self._log.info("Event : one device changed. Reloading data for _XplSensorThread -- finished")
 
         def _find_storeparam(self, item):
             #print("ITEM = {0}".format(item['msg']))
             found = False
             tostore = []
-            for xplstat in self._db.get_all_xpl_stat():
+            #for xplstat in self._db.get_all_xpl_stat():
+            for xplstat in self.all_xpl_stat:
                 sensors = 0
                 matching = 0
                 statics = 0
-                if xplstat.schema == item["msg"].schema:
+                if xplstat['schema'] == item["msg"].schema:
                     #print("  XPLSTAT = {0}".format(xplstat))
                     # we found a possible xplstat
                     # try to match all params and try to find a sensorid and a vlaue to store
-                    for param in xplstat.params:
+                    for param in xplstat['params']:
                         #print("    PARAM = {0}".format(param))
                         ### Caution !
                         # in case you, who are reading this, have to debug something like that :
@@ -489,19 +539,19 @@ class XplManager(XplPlugin):
                         # It can be related to the fact that the device address key is no more corresponding between the plugin (info.json and xpl sent by python) and the way the device was create in the databse
                         # this should not happen, but in case... well, we may try to find a fix...
 
-                        if param.key in item["msg"].data and param.static:
+                        if param['key'] in item["msg"].data and param['static']:
                             statics = statics + 1
-                            if param.multiple is not None and len(param.multiple) == 1 and item["msg"].data[param.key] in param.value.split(param.multiple):
+                            if param['multiple'] is not None and len(param['multiple']) == 1 and item["msg"].data[param['key']] in param['value'].split(param['multiple']):
                                 matching = matching + 1
-                            elif item["msg"].data[param.key] == param.value:
+                            elif item["msg"].data[param['key']] == param['value']:
                                 matching = matching + 1
                     # now we have a matching xplstat, go and find all sensors
                     if matching == statics:
                         #print("  MATHING !!!!!")
-                        for param in xplstat.params:
-                            if param.key in item["msg"].data and not param.static:     
-                                #print("    ===> TOSTORE !!!!!!!!! : {0}".format({'param': param, 'value': item["msg"].data[param.key]}))
-                                tostore.append( {'param': param, 'value': item["msg"].data[param.key]} )
+                        for param in xplstat['params']:
+                            if param['key'] in item["msg"].data and not param['static']:     
+                                #print("    ===> TOSTORE !!!!!!!!! : {0}".format({'param': param, 'value': item["msg"].data[param['key']]}))
+                                tostore.append( {'param': param, 'value': item["msg"].data[param['key']]} )
                     if len(tostore) > 0:
                         found = True
             if found:
@@ -530,13 +580,13 @@ class XplManager(XplPlugin):
                                     #current_date = calendar.timegm(time.gmtime())
                                     current_date = item["received_datetime"]
                                     store = True
-                                    if storeparam.ignore_values:
-                                        if value in eval(storeparam.ignore_values):
-                                            self._log.debug(u"Value {0} is in the ignore list {0}, so not storing.".format(value, storeparam.ignore_values))
+                                    if storeparam['ignore_values']:
+                                        if value in eval(storeparam['ignore_values']):
+                                            self._log.debug(u"Value {0} is in the ignore list {0}, so not storing.".format(value, storeparam['ignore_values']))
                                             store = False
                                     if store:
                                         data = {}
-                                        data['sensor_id'] = storeparam.sensor_id
+                                        data['sensor_id'] = storeparam['sensor_id']
                                         data['time'] = current_date
                                         data['value'] = value
                                         self._log.debug(u"Adding new message to the store queue, current length = {0}".format(self._queue_store.qsize()))
@@ -566,6 +616,51 @@ class XplManager(XplPlugin):
             self._conv = get_conversion_map
             self._queue = queue
             self._pub = pub
+            # on startup, load the device parameters
+            self.on_device_changed()
+
+        def on_device_changed(self):
+            """ Function called when a device have been changed to reload the devices parameters
+            """
+            self._log.info("Event : one device changed. Reloading data for _SensorStoreThread")
+            with self._db.session_scope():
+                self.all_sensors = {}
+                self.all_devices = {}
+                for sen in self._db.get_all_sensor():
+                    #print(sen)
+                    #<Sensor: conversion='', value_min='None', history_round='0.0', reference='adco', data_type='DT_String', history_duplicate='False', last_received='1474968431', incremental='False', id='29', history_expire='0', timeout='180', history_store='True', history_max='0', formula='None', device_id='2', last_value='030928084432', value_max='3.09036843008e+11', name='Electric meter address'>
+                    self.all_sensors[sen.id] = { 'id' : sen.id,
+                                                 'conversion' : sen.conversion,
+                                                 'value_min' : sen.value_min,
+                                                 'history_round' : sen.history_round,
+                                                 'reference' : sen.reference,
+                                                 'data_type' : sen.data_type,
+                                                 'history_duplicate' : sen.history_duplicate,
+                                                 'last_received' : sen.last_received,
+                                                 'incremental' : sen.incremental,
+                                                 'history_expire' : sen.history_expire,
+                                                 'timeout' : sen.timeout,
+                                                 'history_store' : sen.history_store,
+                                                 'history_max' : sen.history_max,
+                                                 'formula' : sen.formula,
+                                                 'device_id' : sen.device_id,
+                                                 'last_value' : sen.last_value,
+                                                 'value_max' : sen.value_max,
+                                                 'name' : sen.name}
+                #print(self.all_sensors)
+
+
+                    
+                for dev in self._db.list_devices():
+                    #print(dev)
+                    #{'xpl_stats': {u'get_total_space': {'json_id': u'get_total_space', 'schema': u'sensor.basic', 'id': 3, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_total_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'total_space', 'key': u'type'}]}, 'name': u'Total space'}, u'get_free_space': {'json_id': u'get_free_space', 'schema': u'sensor.basic', 'id': 4, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_free_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'free_space', 'key': u'type'}]}, 'name': u'Free space'}, u'get_used_space': {'json_id': u'get_used_space', 'schema': u'sensor.basic', 'id': 5, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_used_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'used_space', 'key': u'type'}]}, 'name': u'Used space'}, u'get_percent_used': {'json_id': u'get_percent_used', 'schema': u'sensor.basic', 'id': 6, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_percent_used', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'percent_used', 'key': u'type'}]}, 'name': u'Percent used'}}, 'commands': {}, 'description': u'', 'reference': u'', 'sensors': {u'get_total_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 57, 'reference': u'get_total_space', 'conversion': u'', 'name': u'Total Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'14763409408', 'value_max': 14763409408.0}, u'get_free_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 59, 'reference': u'get_free_space', 'conversion': u'', 'name':u'Free Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'1319346176', 'value_max': 8220349952.0}, u'get_used_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 60, 'reference': u'get_used_space', 'conversion': u'', 'name': u'Used Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'13444063232', 'value_max': 14763409408.0}, u'get_percent_used': {'value_min': None, 'data_type':u'DT_Scaling', 'incremental': False, 'id': 58, 'reference': u'get_percent_used', 'conversion': u'', 'name': u'Percent used', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'91', 'value_max': 100.0}}, 'xpl_commands': {}, 'client_id': u'plugin-diskfree.ambre', 'device_type_id': u'diskfree.disk_usage', 'client_version': u'1.0', 'parameters': {u'interval': {'value': u'5', 'type': u'integer', 'id': 5, 'key': u'interval'}}, 'id': 3, 'name': u'Ambre /'}
+                    self.all_devices[dev['id']] = {
+                                                    'client_id': dev['client_id'],
+                                                    'id': dev['id'],
+                                                    'name': dev['name'],
+                                                  }
+                #print(self.all_devices)
+            self._log.info("Event : one device changed. Reloading data for _SensorStoreThread -- finished")
 
         def run(self):
             while True:
@@ -583,18 +678,20 @@ class XplManager(XplPlugin):
                     #self._log.debug(u"DEBUG - BEFORE THE with self._db.session_scope()")
                     with self._db.session_scope():
                         #self._log.debug(u"DEBUG - BEGINNING OF THE with self._db.session_scope()")
-                        sen = self._db.get_sensor(senid)
-                        dev = self._db.get_device(sen.device_id)
+                        #sen = self._db.get_sensor(senid)
+                        #dev = self._db.get_device(sen.device_id)
+                        sen = self.all_sensors[senid]
+                        dev = self.all_devices[sen['device_id']]
                         # check if we need a conversion
-                        if sen.conversion is not None and sen.conversion != '':
-                            if dev['client_id'] in self._conv() and sen.conversion in self._conv()[dev['client_id']]:
+                        if sen['conversion'] is not None and sen['conversion'] != '':
+                            if dev['client_id'] in self._conv() and sen['conversion'] in self._conv()[dev['client_id']]:
                                 self._log.debug( \
-                                    u"Calling conversion {0}".format(sen.conversion))
-                                exec(self._conv()[dev['client_id']][sen.conversion])
-                                value = locals()[sen.conversion](value)
+                                    u"Calling conversion {0}".format(sen['conversion']))
+                                exec(self._conv()[dev['client_id']][sen['conversion']])
+                                value = locals()[sen['conversion']](value)
                         self._log.info( \
                                 u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}) with value '{4}' after conversion." \
-                                .format(dev['name'], dev['id'], sen.name, sen.id, value))
+                                .format(dev['name'], dev['id'], sen['name'], sen['id'], value))
                         try:
                             # do the store
                             value = self._db.add_sensor_history(\
@@ -605,7 +702,7 @@ class XplManager(XplPlugin):
                             self._pub.send_event('device-stats', \
                                   {"timestamp" : current_date, \
                                   "device_id" : dev['id'], \
-                                  "sensor_id" : sen.id, \
+                                  "sensor_id" : senid, \
                                   "stored_value" : value})
                         except Exception as exp:
                             self._log.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
