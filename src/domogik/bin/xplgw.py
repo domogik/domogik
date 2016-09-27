@@ -76,6 +76,10 @@ class XplManager(XplPlugin):
         self.client_conversion_map = {}
         self._db_sensors = {}
         self._db_xplstats = {}
+
+        # load devices informations
+        self._reload_commands()
+
         # queue to store the message that needs to be ahndled for sensor checking
         self._sensor_queue = queue.Queue()
         # queue to handle the sensor storage
@@ -147,6 +151,65 @@ class XplManager(XplPlugin):
         self.log.debug(u"New message (from MQ) about some device changes > reload the devices parameters...")
         self._x_thread.on_device_changed()
         self._s_thread.on_device_changed()
+        self._reload_commands()
+
+        
+    def _reload_commands(self):
+        """ Reload the commands
+        """
+        self.log.info("Event : one device changed. Reloading data for MQ commands")
+        with self._db.session_scope():
+            self.all_commands = {}
+            for cmd in self._db.get_all_command():
+                #print(cmd)
+                #<Command: return_confirmation='True', name='Swith', reference='switch_lighting2', id='6', device_id='21'>
+                #print(cmd.params)
+                #[<CommandParam: data_type='DT_Trigger', conversion='', cmd_id='16', key='state'>]
+
+                self.all_commands[str(cmd.id)] = {
+                                              'return_confirmation' : cmd.return_confirmation,
+                                              'name' : cmd.name,
+                                              'reference' : cmd.reference,
+                                              'id' : cmd.id,
+                                              'device_id' : cmd.device_id,
+                                              'xpl_command' : None,
+                                              'params' : []
+                                            }
+
+                for param in cmd.params:
+                    self.all_commands[str(cmd.id)]['params'].append({
+                                                                   'data_type' : param.data_type,
+                                                                   'conversion' : param.conversion,
+                                                                   'cmd_id' : param.cmd_id,
+                                                                   'key' : param.key
+                                                               })
+
+                #print(cmd.xpl_command)
+                #<XplCommand: name='Switch', stat_id='82', cmd_id='6', json_id='switch_lighting2', device_id='21', id='6', schema='ac.basic'>
+                if cmd.xpl_command != None:
+                    xpl_command = {
+                                    'name' : cmd.xpl_command.name,
+                                    'stat_id' : cmd.xpl_command.stat_id,
+                                    'cmd_id' : cmd.xpl_command.cmd_id,
+                                    'json_id' : cmd.xpl_command.json_id,
+                                    'device_id' : cmd.xpl_command.device_id,
+                                    'id' : cmd.xpl_command.id,
+                                    'schema' : cmd.xpl_command.schema,
+                                    'params' : []
+                                  }
+                    
+                    for param in cmd.xpl_command.params:
+                        #print(param)
+                        #<XplCommandParam: value='0x0038abfc', key='address', xplcmd_id='6'>
+                        xpl_command['params'].append({'value' : param.value,
+                                                      'key' : param.key,
+                                                      'xplcmd_id' : param.xplcmd_id})
+
+                    self.all_commands[str(cmd.id)]['xpl_command'] = xpl_command
+                    
+        #print(self.all_commands)
+        self.log.info("Event : one device changed. Reloading data for MQ commands -- finished")
+
 
 
     def _handle_mq_sensor(self, content):
@@ -234,9 +297,10 @@ class XplManager(XplPlugin):
                 status = False
             if not failed:
                 # get the command
-                cmd = self._db.get_command(request['cmdid'])
+                #cmd = self._db.get_command(request['cmdid'])
+                cmd = self.all_commands[str(request['cmdid'])]
                 if cmd is not None:
-                    if cmd.xpl_command is not None:
+                    if cmd['xpl_command'] is not None:
                         status, uuid, failed = self._send_xpl_command(cmd, request)
                     else:
                         status, uuid, failed = self._send_mq_command(cmd, request)
@@ -267,27 +331,27 @@ class XplManager(XplPlugin):
         self.log.debug(u"   => Generating MQ message to plugin")
         failed = False
         status = True
-        dev = self._db.get_device(int(cmd.device_id))
+        dev = self._db.get_device(int(cmd['device_id']))
         msg = MQMessage()
         msg.set_action('client.cmd')
-        msg.add_data('command_id', cmd.id)
-        msg.add_data('device_id', cmd.device_id)
-        for par in cmd.params:
-            if par.key in request['cmdparams']:
-                value = request['cmdparams'][par.key]
-                # chieck if we need a conversion
-                if par.conversion is not None and par.conversion != '':
+        msg.add_data('command_id', cmd['id'])
+        msg.add_data('device_id', cmd['device_id'])
+        for par in cmd['params']:
+            if par['key'] in request['cmdparams']:
+                value = request['cmdparams'][par['key']]
+                # check if we need a conversion
+                if par['conversion'] is not None and par['conversion'] != '':
                     if dev['client_id'] in self.client_conversion_map:
-                        if par.conversion in self.client_conversion_map[dev['client_id']]:
+                        if par['conversion'] in self.client_conversion_map[dev['client_id']]:
                             self.log.debug( \
-                                u"      => Calling conversion {0}".format(par.conversion))
-                            exec(self.client_conversion_map[dev['client_id']][par.conversion])
-                            value = locals()[par.conversion](value)
+                                u"      => Calling conversion {0}".format(par['conversion']))
+                            exec(self.client_conversion_map[dev['client_id']][par['conversion']])
+                            value = locals()[par['conversion']](value)
                 self.log.debug( \
-                    u"      => Command parameter after conversion {0} = {1}".format(par.key, value))
-                msg.add_data(par.key, value)
+                    u"      => Command parameter after conversion {0} = {1}".format(par['key'], value))
+                msg.add_data(par['key'], value)
             else:
-                failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par.key)
+                failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par['key'])
                 status = False
         # send to the plugin
         cli = MQSyncReq(self.zmq)
@@ -312,11 +376,14 @@ class XplManager(XplPlugin):
         """
         self.log.debug(u"   => Generating XPL message to plugin")
         failed = False
-        xplcmd = cmd.xpl_command
-        xplstat = self._db.get_xpl_stat(xplcmd.stat_id)
+        xplcmd = cmd['xpl_command']
+
+        # TODO : improve !!!!
+        xplstat = self._db.get_xpl_stat(xplcmd['stat_id'])
+
         if xplstat is not None:
             # get the device from the db
-            dev = self._db.get_device(int(cmd.device_id))
+            dev = self._db.get_device(int(cmd['device_id']))
             msg = XplMessage()
             if not dev['client_id'] in self.client_xpl_map.keys():
                 self._load_client_to_xpl_target()
@@ -326,27 +393,27 @@ class XplManager(XplPlugin):
                 msg.set_target(self.client_xpl_map[dev['client_id']])
             msg.set_source(self.myxpl.get_source())
             msg.set_type("xpl-cmnd")
-            msg.set_schema(xplcmd.schema)
+            msg.set_schema(xplcmd['schema'])
             # static paramsw
-            for par in xplcmd.params:
-                msg.add_data({par.key : par.value})
+            for par in xplcmd['params']:
+                msg.add_data({par['key'] : par['value']})
             # dynamic params
-            for par in cmd.params:
-                if par.key in request['cmdparams']:
-                    value = request['cmdparams'][par.key]
-                    # chieck if we need a conversion
-                    if par.conversion is not None and par.conversion != '':
+            for par in cmd['params']:
+                if par['key'] in request['cmdparams']:
+                    value = request['cmdparams'][par['key']]
+                    # check if we need a conversion
+                    if par['conversion'] is not None and par['conversion'] != '':
                         if dev['client_id'] in self.client_conversion_map:
-                            if par.conversion in self.client_conversion_map[dev['client_id']]:
+                            if par['conversion'] in self.client_conversion_map[dev['client_id']]:
                                 self.log.debug( \
-                                    u"      => Calling conversion {0}".format(par.conversion))
-                                exec(self.client_conversion_map[dev['client_id']][par.conversion])
-                                value = locals()[par.conversion](value)
+                                    u"      => Calling conversion {0}".format(par['conversion']))
+                                exec(self.client_conversion_map[dev['client_id']][par['conversion']])
+                                value = locals()[par['conversion']](value)
                     self.log.debug( \
-                        u"      => Command parameter after conversion {0} = {1}".format(par.key, value))
-                    msg.add_data({par.key : value})
+                        u"      => Command parameter after conversion {0} = {1}".format(par['key'], value))
+                    msg.add_data({par['key'] : value})
                 else:
-                    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par.key)
+                    failed = "Parameter ({0}) for device command msg is not provided in the mq message".format(par['key'])
             if not failed:
                 # send out the msg
                 self.log.debug(u"   => Sending xplmessage: {0}".format(msg))
@@ -629,7 +696,7 @@ class XplManager(XplPlugin):
                 for sen in self._db.get_all_sensor():
                     #print(sen)
                     #<Sensor: conversion='', value_min='None', history_round='0.0', reference='adco', data_type='DT_String', history_duplicate='False', last_received='1474968431', incremental='False', id='29', history_expire='0', timeout='180', history_store='True', history_max='0', formula='None', device_id='2', last_value='030928084432', value_max='3.09036843008e+11', name='Electric meter address'>
-                    self.all_sensors[sen.id] = { 'id' : sen.id,
+                    self.all_sensors[str(sen.id)] = { 'id' : sen.id,
                                                  'conversion' : sen.conversion,
                                                  'value_min' : sen.value_min,
                                                  'history_round' : sen.history_round,
@@ -654,7 +721,7 @@ class XplManager(XplPlugin):
                 for dev in self._db.list_devices():
                     #print(dev)
                     #{'xpl_stats': {u'get_total_space': {'json_id': u'get_total_space', 'schema': u'sensor.basic', 'id': 3, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_total_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'total_space', 'key': u'type'}]}, 'name': u'Total space'}, u'get_free_space': {'json_id': u'get_free_space', 'schema': u'sensor.basic', 'id': 4, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_free_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'free_space', 'key': u'type'}]}, 'name': u'Free space'}, u'get_used_space': {'json_id': u'get_used_space', 'schema': u'sensor.basic', 'id': 5, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_used_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'used_space', 'key': u'type'}]}, 'name': u'Used space'}, u'get_percent_used': {'json_id': u'get_percent_used', 'schema': u'sensor.basic', 'id': 6, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_percent_used', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'percent_used', 'key': u'type'}]}, 'name': u'Percent used'}}, 'commands': {}, 'description': u'', 'reference': u'', 'sensors': {u'get_total_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 57, 'reference': u'get_total_space', 'conversion': u'', 'name': u'Total Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'14763409408', 'value_max': 14763409408.0}, u'get_free_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 59, 'reference': u'get_free_space', 'conversion': u'', 'name':u'Free Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'1319346176', 'value_max': 8220349952.0}, u'get_used_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 60, 'reference': u'get_used_space', 'conversion': u'', 'name': u'Used Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'13444063232', 'value_max': 14763409408.0}, u'get_percent_used': {'value_min': None, 'data_type':u'DT_Scaling', 'incremental': False, 'id': 58, 'reference': u'get_percent_used', 'conversion': u'', 'name': u'Percent used', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'91', 'value_max': 100.0}}, 'xpl_commands': {}, 'client_id': u'plugin-diskfree.ambre', 'device_type_id': u'diskfree.disk_usage', 'client_version': u'1.0', 'parameters': {u'interval': {'value': u'5', 'type': u'integer', 'id': 5, 'key': u'interval'}}, 'id': 3, 'name': u'Ambre /'}
-                    self.all_devices[dev['id']] = {
+                    self.all_devices[str(dev['id'])] = {
                                                     'client_id': dev['client_id'],
                                                     'id': dev['id'],
                                                     'name': dev['name'],
@@ -680,8 +747,8 @@ class XplManager(XplPlugin):
                         #self._log.debug(u"DEBUG - BEGINNING OF THE with self._db.session_scope()")
                         #sen = self._db.get_sensor(senid)
                         #dev = self._db.get_device(sen.device_id)
-                        sen = self.all_sensors[senid]
-                        dev = self.all_devices[sen['device_id']]
+                        sen = self.all_sensors[str(senid)]
+                        dev = self.all_devices[str(sen['device_id'])]
                         # check if we need a conversion
                         if sen['conversion'] is not None and sen['conversion'] != '':
                             if dev['client_id'] in self._conv() and sen['conversion'] in self._conv()[dev['client_id']]:
