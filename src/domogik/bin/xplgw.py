@@ -344,7 +344,9 @@ class XplManager(XplPlugin):
         Send a command, first find out if its an xpl or mq command
         TODO move convertion to here
         """
-        with self._db.session_scope():
+        # TODO : clean the 2 linew below
+        #with self._db.session_scope():
+        if 1 == 1:
             self.log.info(u"Received new cmd request: {0}".format(data))
             failed = False
             status = False
@@ -530,7 +532,8 @@ class XplManager(XplPlugin):
         """
         def __init__(self, log, db, lock_d, lock_p, dic, pkt, pub):
             threading.Thread.__init__(self)
-            self._db = DbHelper()
+            # TODO : remove the line below
+            #self._db = DbHelper()
             self._log = log
             self._lock_d = lock_d
             self._lock_p = lock_p
@@ -700,7 +703,9 @@ class XplManager(XplPlugin):
                     # TODO check temp disabled until external members are working
                     #if item["clientId"] is not None:
                     if True:
-                        with self._db.session_scope():
+                        # TODO : remove the 2 below lines
+                        #with self._db.session_scope():
+                        if 1 == 1:
                             fdata = self._find_storeparam(item)
                             if fdata:
                                 #// ICI !!!
@@ -825,6 +830,7 @@ class XplManager(XplPlugin):
                                 .format(dev['name'], dev['id'], sen['name'], sen['id'], value))
                         try:
                             # do the store
+                            # TODO : improve ????
                             value = self._db.add_sensor_history(\
                                     senid, \
                                     value, \
