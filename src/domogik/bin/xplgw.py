@@ -217,8 +217,15 @@ class XplManager(XplPlugin):
         the sensorStorage thread will do all conversion
         and store it eventually in the db
         """
-        tim = calendar.timegm(time.gmtime())
         self.log.debug(u"New message (from MQ) > start to store each of the sensors in the store queue...")
+        # code for 334
+        if 'atTimestamp' in content:
+            tim = content['atTimestamp']
+            del content['atTimestamp']
+            self.log.debug(u"New message (from MQ) > overriding the timestamp to {0}".fromat(tim))
+        else:
+            tim = calendar.timegm(time.gmtime())
+        # end code for 334
         for sensorid in content:
             data = {}
             data['sensor_id'] = sensorid
