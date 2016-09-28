@@ -4,9 +4,9 @@
 @apiVersion 0.4.0
 @apiName sensor.create
 @apiGroup Sensors
-@apiDescription This request is used to ask Domogik's dbmgr to update a Domogik sensor in database. 
+@apiDescription This request is used to ask Domogik's admin to update a Domogik sensor in database. 
 * Source client : Domogik admin, any other interface which can create some devices
-* Target client : always 'dbmgr'
+* Target client : always 'admin'
 
 @apiExample {python} Example usage:
     cli = MQSyncReq(zmq.Context())
@@ -19,7 +19,7 @@
     msg.add_data('history_expire', <expire>)
     msg.add_data('timeout', <timeout>)
     msg.add_data('formula', <formula>)
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
+    print(cli.request('admin', msg.get(), timeout=10).get())
         
     Here is a json example:
     {
@@ -43,5 +43,5 @@ msg.add_data('history_max', 1000)
 msg.add_data('history_expire', 3600)
 msg.add_data('timeout', 10)
 msg.add_data('formula', "value - 1")
-print(cli.request('dbmgr', msg.get(), timeout=10).get())
+print(cli.request('admin', msg.get(), timeout=10).get())
 

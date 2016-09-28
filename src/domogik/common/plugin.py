@@ -73,7 +73,7 @@ STATUS_INVALID = "invalid"
 STATUS_HBEAT = 15
 
 # core components
-CORE_COMPONENTS = ['manager', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin', 'butler']
+CORE_COMPONENTS = ['manager', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin', 'butler']
 
 # folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "domogik_packages"
@@ -341,7 +341,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         return value
 
     def get_device_list(self, quit_if_no_device = False, max_attempt = 2):
-        """ Request the dbmgr component over MQ to get the devices list for this client
+        """ Request the admin component over MQ to get the devices list for this client
             @param quit_if_no_device: if True, exit the client if there is no devices or MQ request fail
             @param max_attempt : number of retry MQ request if it fail
         """
@@ -355,7 +355,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         result = None
         while not result and attempt <= max_attempt :
             mq_client = MQSyncReq(self.zmq)
-            result = mq_client.request('dbmgr', msg.get(), timeout=10)
+            result = mq_client.request('admin', msg.get(), timeout=10)
             if not result:
                 self.log.warn(u"Unable to retrieve the device list (attempt {0}/{1})".format(attempt, max_attempt))
                 attempt += 1
@@ -676,7 +676,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if self.dont_run_ready == True:
             return
 
-        # TODO : why the dbmgr has no self._name defined ???????
+        # TODO : why the  has no self._name defined ???????
         # temporary set as unknown to avoir blocking bugs
         if not hasattr(self, '_name'):
             self._name = "unknown"

@@ -269,7 +269,7 @@ def scenario_blocks_js():
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('device.get')
-    res = cli.request('dbmgr', msg.get(), timeout=10)
+    res = cli.request('admin', msg.get(), timeout=10)
     if res is not None:
         res = res.get_data()
         if 'devices' in res:

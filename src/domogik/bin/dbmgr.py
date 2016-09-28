@@ -65,15 +65,15 @@ class DBConnector(Plugin, MQRep):
         '''
         Initialize database and xPL connection
         '''
-        Plugin.__init__(self, 'dbmgr', log_prefix='core_')
+        Plugin.__init__(self, 'admin', log_prefix='core_')
         # Already done in Plugin
-        #MQRep.__init__(self, zmq.Context(), 'dbmgr')
+        #MQRep.__init__(self, zmq.Context(), 'admin')
         self.log.debug(u"Init database_manager instance")
 
         # Check for database connexion
         self._db = DbHelper()
         with self._db.session_scope():
-            # TODO : move in a function and use it (also used in dbmgr)
+            # TODO : move in a function and use it (also used in admin)
             nb_test = 0
             db_ok = False
             while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
@@ -89,7 +89,7 @@ class DBConnector(Plugin, MQRep):
                     time.sleep(DATABASE_CONNECTION_WAIT)
 
             if nb_test >= DATABASE_CONNECTION_NUM_TRY:
-                msg = "Exiting dbmgr!"
+                msg = "Exiting admin!"
                 self.log.error(msg)
                 self.force_leave()
                 return
@@ -602,7 +602,7 @@ class DBConnector(Plugin, MQRep):
             res = self._db.add_full_device(params, pjson)
             if not res:
                 status = False
-                reason = "An error occured while adding the device in database. Please check the file dbmgr.log for more informations"
+                reason = "An error occured while adding the device in database. Please check the file admin.log for more informations"
             else:
                 status = True
                 reason = False

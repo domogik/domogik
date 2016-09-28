@@ -24,7 +24,7 @@ Plugin purpose
 
 Domogik manager
 - called with init.d script to start Domogik
-- launch dbmgr and plugins
+- launch core component and plugins
 - manage plugins (start, check for dead plugins) and maintains a list
 - give informations about plugins when requested
 
@@ -120,7 +120,7 @@ class Manager(XplPlugin):
                           help="Start admin interface if not already running.")
         parser.add_argument("-d", 
                           action="store_true", 
-                          dest="start_dbmgr", 
+                          dest="start_admin", 
                           default=False, \
                           help="Start database manager if not already running.")
         parser.add_argument("-x", 
@@ -145,7 +145,6 @@ class Manager(XplPlugin):
         ### Logger
         self.log.info(u"Manager startup")
         self.log.info(u"Host : {0}".format(self.get_sanitized_hostname()))
-        self.log.info(u"Start dbmgr : {0}".format(self.options.start_dbmgr))
         self.log.info(u"Start xpl gateway : {0}".format(self.options.start_xpl))
         self.log.info(u"Start admin interface : {0}".format(self.options.start_admin))
         self.log.info(u"Start scenario manager : {0}".format(self.options.start_scenario))
@@ -190,11 +189,6 @@ class Manager(XplPlugin):
 
         ### Create the interfaces list
         self._interfaces = {}
-
-        ### Start the dbmgr
-        if self.options.start_dbmgr:
-            if not self._start_core_component("dbmgr"):
-                self.log.error(u"Unable to start dbmgr")
 
         ### Start xpl GW
         if self.options.start_xpl:
@@ -374,7 +368,7 @@ class Manager(XplPlugin):
 
     def _start_core_component(self, name):
         """ Start a core component
-            @param name : component name : dbmgr
+            @param name : component name : admin
         """
         component = CoreComponent(name, self.get_sanitized_hostname(), self._clients, self.zmq)
         pid = component.start()
@@ -760,7 +754,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
     def __init__(self, name, host, clients, zmq_context):
         """ Init a component
-            @param name : component name (dbmgr)
+            @param name : component name (admin)
             @param host : hostname
             @param clients : clients list 
             @param zmq_context : 0MQ context

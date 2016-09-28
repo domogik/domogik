@@ -107,7 +107,7 @@ class sensorAPI(MethodView):
         msg.add_data('history_expire', request.get['expire'])
         msg.add_data('timeout', request.get['timeout'])
         msg.add_data('formula', request.get['formula'])
-        res = cli.request('dbmgr', msg.get(), timeout=10)
+        res = cli.request('admin', msg.get(), timeout=10)
         if res is not None:
             data = res.get_data()
             if data["status"]:

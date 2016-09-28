@@ -119,14 +119,14 @@ class QueryMQ():
         else:
             key = "*"
         self._log.info("Request query config for client {0} : key {1}".format(name, key))
-        ret = self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
+        ret = self.cli.request('admin', msg.get(), timeout=QUERY_CONFIG_WAIT)
 
-        ### no response from dbmgr
+        ### no response from admin
         if ret is None:
-            self._log.error("Query config for client {0} on host {1}, key {2} : no response from dbmgr".format(name, self._host, key))
+            self._log.error("Query config for client {0} on host {1}, key {2} : no response from admin".format(name, self._host, key))
             return None
 
-        ### response from dbmgr
+        ### response from admin
         else:
             dat = ret.get_data()
             if dat['status']:

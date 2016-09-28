@@ -125,7 +125,6 @@ class ScenarioManager:
         try:
             with self._db.session_scope():
                 ### TEST if database is up
-                # TODO : move in a function and use it (also used in dbmgr)
                 nb_test = 0
                 db_ok = False
                 while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
@@ -141,7 +140,7 @@ class ScenarioManager:
                         time.sleep(DATABASE_CONNECTION_WAIT)
     
                 if nb_test >= DATABASE_CONNECTION_NUM_TRY:
-                    msg = "Exiting dbmgr!"
+                    msg = "Exiting scenario!"
                     self.log.error(msg)
                     self.force_leave()
                     return

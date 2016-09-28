@@ -66,12 +66,12 @@ def device_params(client_id, dev_type_id):
     msg = MQMessage()
     msg.set_action('device.params')
     msg.add_data('device_type', dev_type_id)
-    res = cli.request('dbmgr', msg.get(), timeout=10)
+    res = cli.request('admin', msg.get(), timeout=10)
     result = {}
     if res:
         res = res.get_data()
         print(type(res['result']))
-        # test if dbmgr returns a str ("Failed")
+        # test if admin returns a str ("Failed")
         # and process this case...
         if isinstance(res['result'], str) or isinstance(res['result'], unicode):
             return 500, "DbMgr did not respond as expected, check the logs. Response is : {0}. {1}".format(res['result'], res['reason'])
@@ -198,7 +198,7 @@ class deviceAPI(MethodView):
         msg = MQMessage()
         msg.set_action('device.delete')
         msg.set_data({'did': did})
-        res = cli.request('dbmgr', msg.get(), timeout=10)
+        res = cli.request('admin', msg.get(), timeout=10)
         if res is not None:
             data = res.get_data()
             if data["status"]:
@@ -298,7 +298,7 @@ class deviceAPI(MethodView):
         msg = MQMessage()
         msg.set_action('device.create')
         msg.set_data({'data': json.loads(request.form.get('params'))})
-        res = cli.request('dbmgr', msg.get(), timeout=10)
+        res = cli.request('admin', msg.get(), timeout=10)
         if res is not None:
             data = res.get_data()
             if data["status"]:
@@ -408,7 +408,7 @@ class deviceAPI(MethodView):
             msg.add_data('description', request.form['description'])
         if 'reference' in request.form:
             msg.add_data('reference', request.form['reference'])
-        res = cli.request('dbmgr', msg.get(), timeout=10)
+        res = cli.request('admin', msg.get(), timeout=10)
         if res is not None:
             data = res.get_data()
             if data["status"]:

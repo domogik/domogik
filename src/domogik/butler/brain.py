@@ -214,7 +214,7 @@ def _get_sensor_data(log, user_locale, dt_type_list, device_name, sensor_referen
             msg.add_data('sensor_id', the_sensor['sensor_id'])
             msg.add_data('mode', 'period')
             msg.add_data('from', since)
-            res = cli.request('dbmgr', msg.get(), timeout=10).get()
+            res = cli.request('admin', msg.get(), timeout=10).get()
             if res == None:
                 log.info(u"No history for this sensor since '{0}'".format(since))
                 return None, None
@@ -267,7 +267,7 @@ def get_sensors_for_datatype(dt_type_list, check_preferences = True, log = None)
     msg.set_action('device.get')
 
     try:
-        str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+        str_devices = cli.request('admin', msg.get(), timeout=10).get()[1]
         devices = json.loads(str_devices)['devices']
         for a_device in devices:
             #print a_device
@@ -392,7 +392,7 @@ def do_command(log, user_locale, dt_type_list, device, value, command_reference 
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('device.get')
-        str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+        str_devices = cli.request('admin', msg.get(), timeout=10).get()[1]
         devices = json.loads(str_devices)['devices']
         found = None
         for a_device in devices:

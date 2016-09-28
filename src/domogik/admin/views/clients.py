@@ -76,7 +76,7 @@ def get_client_devices(client_id):
     msg.add_data('name', client_id.split("-")[1].split(".")[0])
     msg.add_data('host', client_id.split(".")[1])
 
-    res = cli.request('dbmgr', msg.get(), timeout=10)
+    res = cli.request('admin', msg.get(), timeout=10)
     if res is not None:
         devices = res.get_data()['devices']
     else:
@@ -287,7 +287,7 @@ def client_sensor_edit(client_id, sensor_id):
             msg.add_data('formula', request.form['formula'])
             if allow_data_type:
                 msg.add_data('data_type', request.form['data_type'])
-            res = cli.request('dbmgr', msg.get(), timeout=10)
+            res = cli.request('admin', msg.get(), timeout=10)
             if res is not None:
                 data = res.get_data()
                 if data["status"]:
@@ -360,7 +360,7 @@ def client_global_edit(client_id, dev_id):
                 msg.set_action('deviceparam.update')
                 msg.add_data('dpid', item["id"])
                 msg.add_data('value', val)
-                res = cli.request('dbmgr', msg.get(), timeout=10)
+                res = cli.request('admin', msg.get(), timeout=10)
                 if res is not None:
                     data = res.get_data()
                     if data["status"]:
@@ -426,7 +426,7 @@ def client_devices_edit(client_id, did):
             msg.add_data('name', request.form['name'])
             msg.add_data('description', request.form['description'])
             msg.add_data('reference', request.form['reference'])
-            res = cli.request('dbmgr', msg.get(), timeout=10)
+            res = cli.request('admin', msg.get(), timeout=10)
             if res is not None:
                 data = res.get_data()
                 if data["status"]:
@@ -453,7 +453,7 @@ def client_devices_delete(client_id, did):
     msg = MQMessage()
     msg.set_action('device.delete')
     msg.set_data({'did': did})
-    res = cli.request('dbmgr', msg.get(), timeout=10)
+    res = cli.request('admin', msg.get(), timeout=10)
     if res is not None:
         data = res.get_data()
         if data["status"]:
@@ -549,7 +549,7 @@ def client_config(client_id):
         msg.add_data('host', tmp[1])
         msg.add_data('name', tmp[0])
         msg.add_data('data', data)
-        res = cli.request('dbmgr', msg.get(), timeout=10)
+        res = cli.request('admin', msg.get(), timeout=10)
         if res is not None:
             data = res.get_data()
             if data["status"]:
@@ -628,7 +628,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     msg = MQMessage()
     msg.set_action('device.params')
     msg.set_data({'device_type': device_type_id})
-    res = cli.request('dbmgr', msg.get(), timeout=10)
+    res = cli.request('admin', msg.get(), timeout=10)
     if res is not None:
         detaila = res.get_data()
         params = detaila['result']
@@ -894,7 +894,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         msg = MQMessage()
         msg.set_action('device.create')
         msg.set_data({'data': params})
-        res = cli.request('dbmgr', msg.get(), timeout=10)
+        res = cli.request('admin', msg.get(), timeout=10)
         if res is not None:
             data = res.get_data()
             if data["status"]:

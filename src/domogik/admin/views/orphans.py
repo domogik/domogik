@@ -38,7 +38,7 @@ def orphans_delete(did):
     msg = MQMessage()
     msg.set_action('device.delete')
     msg.set_data({'did': did})
-    res = cli.request('dbmgr', msg.get(), timeout=10)
+    res = cli.request('admin', msg.get(), timeout=10)
     if res is not None:
         data = res.get_data()
         if data["status"]:
