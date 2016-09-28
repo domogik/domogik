@@ -49,11 +49,6 @@ Manager
 
 The manager is the core component which will monitor all the other components (core or plugins). When a component start, it will send its status to the manager and this one will look on it during all its life. The manager start and stop plugins (depending on the user actions on the user interface or during the startup sequence).
 
-Dbmgr
------
-
-The dbmgr (database manager) is used to manage the plugin configuration. When a plugin need some configuration parameters, it will query the dbmgr over the message queue.
-
 Rest
 ----
 

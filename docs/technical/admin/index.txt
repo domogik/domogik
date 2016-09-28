@@ -7,6 +7,11 @@ Purpose
 
 Since Domogik 0.4, the administration user interface is no more included in Domoweb. 
 
+It is handling the following functions:
+* The admin interface
+* The rest interface
+* The db access for other components
+
 Technical details
 =================
 

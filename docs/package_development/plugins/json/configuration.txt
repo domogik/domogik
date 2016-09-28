@@ -78,7 +78,7 @@ The **auto_startup** item must be set for all the plugins. This allow the user t
 The hidden configuration item : configured
 ------------------------------------------
 
-An hidden configuration item exists : **configured**. It is set to true in database when a plugin is configured and deleted when the plugin configuration is cleaned (this is done on *dbmgr* side). This item allows to check if a plugin si configured before starting it. If the plugin is not configured, it won't start!
+An hidden configuration item exists : **configured**. It is set to true in database when a plugin is configured and deleted when the plugin configuration is cleaned (this is done on *admin* side). This item allows to check if a plugin si configured before starting it. If the plugin is not configured, it won't start!
 
 Data types
 ----------

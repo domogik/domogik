@@ -112,7 +112,7 @@ Table Of Content
 	/technical/packages/xpl_plugin
 	/technical/core/manager
 	/technical/core/xplgw
-	/technical/core/dbmgr
+	/technical/core/admin
 	/technical/database
 	/technical/command
 	/technical/manager/index

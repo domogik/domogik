@@ -52,7 +52,7 @@ Workers
 anything that needs to act as req/rep worker can extend the MQRep class
 
 the mdpworker needs to be initialized:
-MQRep.init(self, zmq.Context(), 'dbmgr')
+MQRep.init(self, zmq.Context(), 'admin')
 the first argument is the zmq context
 the second argument is the workers name
 

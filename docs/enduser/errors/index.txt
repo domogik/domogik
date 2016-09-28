@@ -71,19 +71,13 @@ Assuming the Domogik user is *domogik*, do the following checks:
         fritz    32700     1  0 14:12 ?        00:00:00 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/rest.pyc
         fritz    32709 32700  0 14:12 ?        00:00:12 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/rest.pyc
 
-    Check if dbmgr is up: ::
-
-        $ ps -fu domogik | grep dbmgr
-        domogik    32669     1  0 14:12 ?        00:00:00 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/dbmgr.py
-        domogik    32678 32669  0 14:12 ?        00:00:13 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/dbmgr.py
-
     Check if xplgw is up: ::
 
         $ ps -fu domogik | grep xplgw
         domogik    32726     1  0 14:12 ?        00:00:00 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/xplgw.py
         domogik    32735 32726  0 14:12 ?        00:00:13 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/xplgw.py
 
-    If one component is not up, check its log files. If the component is *rest*, *dbmgr* or *xplgw* and you find no logs, check in the *manager* logs.
+    If one component is not up, check its log files. If the component is *rest* or *xplgw* and you find no logs, check in the *manager* logs.
 
 Check if services are available
 -------------------------------

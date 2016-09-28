@@ -19,20 +19,25 @@ Database upgrades
 * Some cleanup is done in database :  the old not used table core_device_stats is deleted. The same for the address field on a device. This finished the db upgrade we started in 0.4.x release to migrate from an old Domogik 0.3.x version.
 * Close #96 : SQLAlchemy UTF-8 connection. This allow to use non latin languages with the butler (Russian for example)
 
-Core components : merge of Rest and Admin components
+Core components : merge of Rest, DbMgr and Admin components
 ====================================================
 
 Before the 0.5 release, there were :
 
 * an Admin component used to allow the user to do administrative tasks (packages configuration, devices creation, ...)
 * a REST server which allows user interfaces, scripts, ... to do some actions on Domogik (get devices informations, create a new device, etc...)
+* a DbMgr that would handle all db access for the otehr components
 
-To limit the memory footprint of Domogik, we choosed to merge the both components as they are basically both web servers.
+To limit the memory footprint of Domogik, we choosed to merge these components. Basically they all did the same actions.
 
 We choose to include REST services in the Admin component, so : 
 
 * The REST service is now available on the same port as Domogik Administration (40406 per default).
 * The REST service urls will all start with */rest/*. Example : *http://ip:40405/device/* become *http://ip:40406/rest/device/*.
+
+We also included the DBMGR services in the admin component, so :
+
+* Plugins request there config directly with admin
 
 This merge is a first step of a global performances improvment plan. From now, each release will include one improvement related to performances.
 

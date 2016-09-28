@@ -5,7 +5,7 @@ Manager Overview
 Purpose
 =======
 
-The manager is the one which will start, stop and monitor all the others components (dbmgr, rest, plugins, ...). It will also manage the packages (installation, ...).
+The manager is the one which will start, stop and monitor all the others components (admin, xplgw, plugins, ...). It will also manage the packages (installation, ...).
 
 You can have several managers on a multihost installation.
 
@@ -21,7 +21,6 @@ When it starts, it connects to the xPL network and wait for messages.
 Depending on the options passed at startup, it will be able to start: ::
 
   -h, --help            show this help message and exit
-  -d                    Start database manager if not already running.
   -r                    Start scenario manager if not already running.
   -p                    Activate background ping for all plugins.
   -E                    This manager is the one who looks for hardware.
@@ -56,7 +55,7 @@ On a multi host system, there are 2 sorts of managers :
 Master manager
 --------------
 
-On startup this manager will start **dbmgr**, **rest** and the plugins. It will also look for external members.
+On startup this manager will start **admin**, **xplgw**, **rest** and the plugins. It will also look for external members.
 
 
 

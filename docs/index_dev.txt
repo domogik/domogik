@@ -35,10 +35,6 @@ Core component : manager
 
 * :doc:`Manager </technical/core/manager>`
 
-Core component : dbmgr
-----------------------
-
-* :doc:`Dbmgr </technical/core/dbmgr>`
 
 Core component : xplgw
 ----------------------
