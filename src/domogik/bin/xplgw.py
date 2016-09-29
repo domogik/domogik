@@ -276,7 +276,7 @@ class XplManager(XplPlugin):
         if 'atTimestamp' in content:
             tim = content['atTimestamp']
             del content['atTimestamp']
-            self.log.debug(u"New message (from MQ) > overriding the timestamp to {0}".fromat(tim))
+            self.log.debug(u"New message (from MQ) > overriding the timestamp to {0}".format(tim))
         else:
             tim = calendar.timegm(time.gmtime())
         # end code for 334
