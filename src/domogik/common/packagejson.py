@@ -34,10 +34,11 @@ PackageJson
 @organization: Domogik
 """
 
-from domogik.common.configloader import Loader
 import traceback
 import datetime
 import json
+from domogik.common.configloader import Loader
+from domogik import __version__ as DMG_VERSION
 try:
     # python3
     from urllib.request import urlopen
@@ -200,6 +201,9 @@ class PackageJson():
     def validate(self):
         if self.json["json_version"] == 2:
             self._validate_02()
+            if 'identity' in self.json.keys() and 'domogik_min_version' in self.json['identity']:
+                if self.json['identity']['domogik_min_version'] > DMG_VERSION:
+                    raise PackageException("Domogik version check failed! min_version={0} current varion={1}".format(self.json['identity']['domogik_min_version'], DMG_VERSION));
         else:
             return False
 
