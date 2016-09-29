@@ -831,8 +831,10 @@ class XplManager(XplPlugin):
                         try:
                             # do the store
                             # TODO : improve ????
+                            self._log.debug("DEBUG - ADD SENSOR HISTORY")
                             value = self._db.add_sensor_history(\
                                     senid, \
+                                    sen, \
                                     value, \
                                     current_date)
                             # publish the result
