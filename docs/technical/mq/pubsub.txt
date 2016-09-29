@@ -73,11 +73,13 @@ aSync client
 The MQAsyncSub class is used to subscribe to certain messages on the pub/sub network.
 
 The class needs 3 parameters on init:
+    
     * context = is an instance of zmq.Context()
     * caller_id = is name used to identify the client
     * category_filters = a python list with the messages to subscribe to (string match on the beginning of the message id)
 
 The on_message callback will be called when a message is received that matches one of the category_filters.
 The on_message callback has 2 parameters:
+    
     * msg_id = is the message id of the message
     * content = a python object (probably a dict) that represent the json decoded message content

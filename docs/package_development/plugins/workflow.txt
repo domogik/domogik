@@ -80,8 +80,6 @@ Then, create the new *develop* branch and push it to the remote repository (on G
 
 You can now start to develop your plugin on this branch!
 
-When you think your plugin is ready for a stable release, you can read the :doc:`package releasing guide <releasing>`.
-
 Step 3 - Develop the plugin
 ===========================
 

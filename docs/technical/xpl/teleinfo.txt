@@ -28,7 +28,7 @@ There is no xpl-trig message for this schema
 xpl-stat
 --------
 
-.. notice::
+.. note::
     As this is only a French schema, the keys description is in french
 
 This is the classic message. Notice that the device identifier corresponds to the ADCO field: ::

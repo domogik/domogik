@@ -32,7 +32,7 @@ To get (for example), the level of a dimmable device after a "+10" increasing co
 How do I find the command id ?
 ==============================
 
-To find the *command id* of a device command, you first need to :doc:`query the /device url <device>` and parse the *commands* part.
+To find the *command id* of a device command, you first need to query the /device url and parse the *commands* part.
 
 I am a user interface developer and I don't understand the values to use for the parameters in the url options!
 ===============================================================================================================

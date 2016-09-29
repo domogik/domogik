@@ -13,11 +13,3 @@ General informations
 
 * :doc:`pub/sub </technical/mq/pubsub>`
 * :doc:`req/rep </technical/mq/reqrep>`
-
-MQ messages used in Domogik
-===========================
-
-:doc:`See this page </technical/mq/used>` 
-
-The details about all Domogik pub/sub are :doc: `described here </technical/mq/pubsub_detailed>`.
-The details about all Domogik req/rep are :doc: `described here </technical/mq/reqrep_detailed>`.

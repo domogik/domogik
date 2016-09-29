@@ -10,7 +10,6 @@ Table Of Content
 	/enduser/upgrade/0.3_to_0.4.0
 	/enduser/packages/index
 	/enduser/packages/orphans
-	/enduser/installation/install_from_a_debian
 	/enduser/installation/index
 	/enduser/installation/domogik_cfg_file
 	/enduser/installation/postgresql
@@ -24,11 +23,14 @@ Table Of Content
 	/enduser/quick_start/first_use
 	/enduser/quick_start/clients_status
 	/enduser/quick_start/install_a_package
+        /enduser/openremote/index
 	/releases/0.3.0
 	/releases/0.1.0
 	/releases/0.2.0
 	/releases/0.4.0
 	/releases/0.4.1
+        /releases/0.4.2
+        /releases/0.5.0
 	/user_interface_development/index
 	/xplhub/index
 	/overview/index
@@ -38,6 +40,7 @@ Table Of Content
 	/tools/others
 	/index_dev
 	/package_development/plugins/index
+        package_development/plugins/workflow
 	/package_development/plugins/doc/index
 	/package_development/plugins/doc/dev
 	/package_development/plugins/doc/readthedoc
@@ -65,6 +68,7 @@ Table Of Content
 	/package_development/plugins/releases/release_numbers_rules
 	/package_development/plugins/udev_rules/index
 	/package_development/plugins/field_types/index
+        /package_development/plugins/admin/index
 	/package_development/plugins/changelog
 	/package_development/plugins/plugin_file_tree/index
 	/package_development/plugins/plugin_file_tree/create_sample
@@ -72,36 +76,23 @@ Table Of Content
 	/package_development/plugins/conversion/index
 	/package_development/plugins/git/gitignore
 	/package_development/plugins/git/what_is_a_branch
-	/package_development/plugins/git/switch_to_develop
-	/package_development/plugins/git/branching_model
 	/package_development/plugins/graphical/icon_file
 	/package_development/plugins/create_repository/index
 	/package_development/plugins/what_is_new_in_0.4
 	/package_development/plugins/specifications/index
 	/package_development/plugins/start_file/index
+        /package_development/brains/brain_file_tree/index
+        /package_development/brains/index
+        /package_development/brains/rivescript
 	/bin/readme
 	/index_user
 	/technical/network_ports
 	/technical/data_types/index
 	/technical/mq/pubsub
-	/technical/mq/reqrep_detailed
 	/technical/mq/reqrep
-	/technical/mq/used
-	/technical/mq/pubsub_detailed
 	/technical/mq/overview
 	/technical/sensor
 	/technical/rest/index
-	/technical/rest/device
-	/technical/rest/device_old
-	/technical/rest/map
-	/technical/rest/account
-	/technical/rest/sensorhistory
-	/technical/rest/device_params
-	/technical/rest/sensor
-	/technical/rest/datatype
-	/technical/rest/status
-	/technical/rest/person
-	/technical/rest/device_addglobal
 	/technical/rest/cmd
 	/technical/xpl/internal
 	/technical/xpl/plcbus.basic
@@ -112,11 +103,12 @@ Table Of Content
 	/technical/packages/xpl_plugin
 	/technical/core/manager
 	/technical/core/xplgw
-	/technical/core/admin
 	/technical/database
 	/technical/command
 	/technical/manager/index
 	/technical/plugins/index
+        /technical/butler/index
 	/core_development/index
 	/core_development/wapiti
 	/core_development/releasing
+        /releasing/index

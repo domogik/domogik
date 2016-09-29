@@ -54,7 +54,7 @@ Core component : REST
 * :doc:`More details about the way to send commands with /cmd  </technical/rest/cmd>`
 
 Core component : butler
-----------------------
+-----------------------
 
 * :doc:`Butler </technical/butler/index>`
 

@@ -20,7 +20,7 @@ Database upgrades
 * Close #96 : SQLAlchemy UTF-8 connection. This allow to use non latin languages with the butler (Russian for example)
 
 Core components : merge of Rest, DbMgr and Admin components
-====================================================
+===========================================================
 
 Before the 0.5 release, there were :
 
