@@ -179,8 +179,8 @@ class TestRunner():
             subp.communicate()
             self.results[test] = { 'return_code' : subp.returncode }
             # do a pause to be sure the previous test (and so plugin instance) has been killed
-            self.log.debug("Do a 60s pause... (yeah, this is a lot but Travis CI is not so quick!!!)")
-            time.sleep(60)
+            self.log.debug("Do a 30s pause... (yeah, this is a lot but Travis CI is not so quick!!!)")
+            time.sleep(30)
         # Display a summary and manager return code
         rc = 0
         self.log.info("")
