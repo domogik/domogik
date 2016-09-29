@@ -190,7 +190,7 @@ Give the system user you will use to install Domogik. You can use a dedicated us
 
     Install MQ as master (lib+daemon) or client (lib only) ? [M/s]:
 
-On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.4), on the main server, choose the default option and on the other servers, choose the client option. ::
+On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.4), on the main server, choose the default option and on the other servers, choose the client option.
 
 Install Domogik 
 ---------------
@@ -225,7 +225,7 @@ For this 0.4.2 release, you should keep the *debug* level. ::
     Key name [domogik]: 
     Key host [127.0.0.1]:
 
-Set up the database credentials. I you created the database as defined in this page, you can keep the default values. ::
+Set up the database credentials. I you created the database as defined in this page, you can keep the default values.
 
 You should keep the default values. ::
 

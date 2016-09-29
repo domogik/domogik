@@ -86,8 +86,8 @@ The ``### common tasks`` part is important : you must customize the ``package`` 
 
 After, you will have to create one function for each administration page you need. Each function will at least contains the same actions as the example. 
 
-admin/templates/*.html
-----------------------
+admin/templates/\*.html
+-----------------------
 
 You must at least have one template file. This mandatory file must be named **<package type>_<package name>.html**, for example: ``plugin_diskfree.html``. Each file you will have to create must start by the prefix **<package type>_<package name>**. This allow avoiding collisions between the packages dedicated pages.
 
