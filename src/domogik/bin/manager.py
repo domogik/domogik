@@ -821,13 +821,19 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         """
         ### get python package path for the component
         pkg = "{0}.{1}".format(python_component_basepackage, self.name)
-        self.log.debug(u"Try to import module : {0}".format(pkg))
-        __import__(pkg)
-        component_path = sys.modules[pkg].__file__
+
+        try:
+            the_path = os.path.join(os.path.dirname(__file__), "{0}.py".format(self.name))
+            self.log.debug(u"Path for component '{0}' is : {1}".format(self.name, the_path))
+        except:
+            msg = u"Error while trying to get the module path. The component will not be started !. Error is : {0}".format(traceback.format_exc())
+            self.log.error(msg)
+            return 0
         
         ### Generate command
         # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
-        cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, component_path)
+        #cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, component_path)
+        cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, the_path)
  
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
@@ -853,7 +859,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
-                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.log.debug(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
                 self.set_status(content["event"])
         #        # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
         #        if content["event"] == STATUS_STOP_REQUEST:
@@ -1103,7 +1109,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
-                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.log.debug(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
                 self.set_status(content["event"])
                 # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
                 if content["event"] == STATUS_STOP_REQUEST:
@@ -1362,7 +1368,7 @@ class Interface(GenericComponent, MQAsyncSub):
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
-                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.log.debug(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
                 self.set_status(content["event"])
                 # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
                 if content["event"] == STATUS_STOP_REQUEST:
