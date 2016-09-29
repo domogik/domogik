@@ -16,8 +16,8 @@ sudo apt-get install python-netifaces
 pip install chardet
 
 # for doc building
-pip install phinx
-pip install phinx-rtd-theme
+pip install sphinx
+pip install sphinx-rtd-theme
 pip install sphinxcontrib-actdiag
 pip install sphinxcontrib-blockdiag
 pip install sphinxcontrib-nwdiag
