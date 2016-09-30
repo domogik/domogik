@@ -940,20 +940,25 @@ class DbHelper():
                 #sensor_db.last_received = date
                 #sensor_db.last_value = ucode(value)
                 val = value
+                value_min = None
+                value_max = None
                 try:
                     val = float(value)
                 except ValueError:
                     pass
+                except ValueError:
+                    pass
                 except TypeError:
                     pass
+                else:
+                    value_min = sensor['value_min']
+                    value_max = sensor['value_max']
                
-                # update min/max
-                value_min = sensor['value_min']
-                value_max = sensor['value_max']
-                if sensor['value_min'] > val:
-                    value_min = val
-                if sensor['value_max'] < val:
-                    value_max = val
+                    # update min/max
+                    if sensor['value_min'] > val:
+                        value_min = val
+                    if sensor['value_max'] < val:
+                        value_max = val
 
                 self.__session.query(Sensor).filter(Sensor.id == sid) \
                                           .update({'last_received' : date,

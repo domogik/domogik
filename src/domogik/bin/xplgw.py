@@ -43,7 +43,7 @@ import time
 import traceback
 import calendar
 import zmq
-import json
+#import json
 try:
     import Queue as queue
 except:
@@ -830,8 +830,6 @@ class XplManager(XplPlugin):
                                 .format(dev['name'], dev['id'], sen['name'], sen['id'], value))
                         try:
                             # do the store
-                            # TODO : improve ????
-                            self._log.debug("DEBUG - ADD SENSOR HISTORY")
                             value = self._db.add_sensor_history(\
                                     senid, \
                                     sen, \
