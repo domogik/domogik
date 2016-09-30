@@ -129,6 +129,8 @@ The **DT_kgWeight** is used to measure masses.
 
 The **DT_VolumeLiter** and **DT_VolumeM3**  are used to measure volumes.
 
+The **DT_HeatingPilotWire** is used to control heater by pilot wire.
+
 API : MQ and Rest
 =================
 
