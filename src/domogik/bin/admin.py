@@ -36,9 +36,9 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub)
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.common.database import DbHelper, DbHelperException
+from domogik.common.database import DbHelper      #, DbHelperException
 from domogik.common.plugin import Plugin
-from domogik.common import logger
+#from domogik.common import logger
 from domogik.common.configloader import Loader
 from domogik.common.utils import get_ip_for_interfaces
 from domogikmq.pubsub.subscriber import MQAsyncSub
@@ -49,21 +49,23 @@ from domogik.admin.application import app as admin_app
 import locale
 import traceback
 import zmq
-import signal
+#import signal
 import time
 import json
-import datetime
-import random
-import uuid
-from threading import Thread, Lock
-zmq.eventloop.ioloop.install()
+#import datetime
+#import random
+#import uuid
+#from threading import Thread       #, Lock
 from tornado import gen
 from tornado.queues import Queue
 from tornado.wsgi import WSGIContainer
-from tornado.ioloop import IOLoop, PeriodicCallback 
+from tornado.ioloop import IOLoop                        #, PeriodicCallback 
 from tornado.httpserver import HTTPServer
 from tornado.web import FallbackHandler, Application
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
+
+zmq.eventloop.ioloop.install()
+
 REST_API_VERSION = "0.8"
 
 ################################################################################
