@@ -6,12 +6,12 @@
   <div class="container">
 
     <div class="row-fluid margin-bottom">
-      <a id="create-device" class="btn btn-info" href="/client/{{ clientid }}/dmg_devices/new"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Create a new Domogik device{% endtrans %}</a> 
+      <a id="create-device" class="btn btn-info" href="/client/{{ clientid }}/dmg_devices/new"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Create a new Domogik device{% endtrans %}</a>
       <button id="detected-devices" type="button" class="btn btn-default" data-toggle="modal" data-target="#detected_modal">
         <span class='glyphicon glyphicon-search' aria-hidden='true'></span> {% trans %}Detected devices{% endtrans %}
       </button>
     </div>
-    
+
     <!-- Modal -->
     <div class="modal fade" id="detected_modal" tabindex="-1" role="dialog" aria-labelledby="detectedModal" aria-hidden="true">
       <div class="modal-dialog">
@@ -26,7 +26,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
-            <a class="btn btn-primary" href="/client/{{ clientid }}/dmg_devices/detected">{% trans %}OK, show me the detected devices{% endtrans %}</a> 
+            <a class="btn btn-primary" href="/client/{{ clientid }}/dmg_devices/detected">{% trans %}OK, show me the detected devices{% endtrans %}</a>
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@
     {% if devices|length > 0 %}
       <div class="container-fluid">
         <div class="row">
-        
+
           <!-- Devices list -->
           <div class="col-md-4">
             <h2>{% trans %}Known Devices{% endtrans %}</h2>
@@ -71,7 +71,7 @@
               {% endfor %}
             </ul>
           </div>
-        
+
           <!-- Devices details -->
           <div class="col-md-8">
             <div class="tab-content">
@@ -84,7 +84,7 @@
                       <div class="panel panel-default">
                         <div class="panel-heading">
                           <h4 class="panel-title">{% trans %}Informations{% endtrans %}
-                            <a class="btn btn-default" href="/client/{{ clientid }}/dmg_devices/edit/{{ data.id }}"><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span> {% trans %}Edit{% endtrans %}</a> 
+                            <a class="btn btn-default" href="/client/{{ clientid }}/dmg_devices/edit/{{ data.id }}"><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span> {% trans %}Edit{% endtrans %}</a>
                             <!-- to reactivate when device deletion will be finely implemented
                             <a class="btn btn-default" data-toggle="confirmation" data-placement="bottom" data-href="/client/{{ clientid }}/dmg_devices/delete/{{ data.id }}"><span class='glyphicon glyphicon-trash' aria-hidden='true'></span> {% trans %}Delete the device{% endtrans %}</a>
                             -->
@@ -106,7 +106,7 @@
                           </ul>
                         </div>
                       </div>
-    
+
                       {% if data.parameters|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -138,7 +138,7 @@
                           </div>
                         </div>
                       {% endif %}
-    
+
                       {% if data.sensors|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -166,13 +166,15 @@
                                           {% endif %}
                                           {% if sen.data_type == "DT_Bool" or datatypes[sen.data_type]['parent'] == "DT_Bool" %}
                                             <em>( {{ datatypes[sen.data_type]['labels'][sen.last_value] }} )</em>
-                                          {% elif sen.data_type == "DT_ColorRGBHexa" or datatypes[sen.data_type]['parent'] == "DT_ColorRGBHexa" %} 
+                                          {% elif sen.data_type == "DT_ColorRGBHexa" or datatypes[sen.data_type]['parent'] == "DT_ColorRGBHexa" %}
                                             <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sen.last_value}}"></span>
-                                          {% elif sen.data_type == "DT_VideoMjpeg" or sen.data_type == "DT_Image" %} 
+                                          {% elif 'values' in datatypes[sen.data_type] %}
+                                            <em>( {{ datatypes[sen.data_type]['values'] [sen.last_value] }} )</em>
+                                          {% elif sen.data_type == "DT_VideoMjpeg" or sen.data_type == "DT_Image" %}
                                             <div>
                                               <img style="max-width: 80%" src="{{sen.last_value | replace("publish://", rest_url + "/publish/")}}"/>
                                             </div>
-                                          {% elif sen.data_type == "DT_VideoH264" %} 
+                                          {% elif sen.data_type == "DT_VideoH264" %}
                                             <div>
                                               <a class="btn btn-default" href="{{sen.last_value | replace("publish://", rest_url + "/publish/")}}"><span class='glyphicon glyphicon-facetime-video' aria-hidden='true'></span> {% trans %}Read the video file{% endtrans %}</a>
                                             </div>
@@ -240,7 +242,7 @@
                           </div>
                         </div>
                       {% endif %}
-    
+
                       {% if data.commands|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -277,23 +279,23 @@
                                             </ul>
                                             <div>
                                               <p>Test it :</p>
-                                              <a class="btn btn-primary" href="{{ url_0 }}">{{ datatypes[param.data_type]['labels']['0'] }} (0)</a> 
-                                              <a class="btn btn-primary" href="{{ url_1 }}">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a> 
+                                              <a class="btn btn-primary" href="{{ url_0 }}">{{ datatypes[param.data_type]['labels']['0'] }} (0)</a>
+                                              <a class="btn btn-primary" href="{{ url_1 }}">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a>
                                             </div>
 
 
-                                          {% elif param.data_type == "DT_Trigger" or datatypes[param.data_type]['parent'] == "DT_Trigger" %} 
+                                          {% elif param.data_type == "DT_Trigger" or datatypes[param.data_type]['parent'] == "DT_Trigger" %}
                                             {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
                                             <ul>
                                               <li><strong>{{ datatypes[param.data_type]['labels']['1'] }}</strong> : {{ url_sample }}1</li>
                                             </ul>
                                             <div>
                                               <p>Test it :</p>
-                                              <a class="btn btn-primary" href="{{ url_sample }}1">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a> 
+                                              <a class="btn btn-primary" href="{{ url_sample }}1">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a>
                                             </div>
 
 
-                                          {% elif param.data_type == "DT_ColorRGBHexa" or datatypes[param.data_type]['parent'] == "DT_ColorRGBHexa" %} 
+                                          {% elif param.data_type == "DT_ColorRGBHexa" or datatypes[param.data_type]['parent'] == "DT_ColorRGBHexa" %}
                                             {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
                                             <ul>
                                               <li><strong>{% trans %}Black (off){% endtrans %}</strong> : {{ url_sample }}000000</li>
@@ -336,6 +338,21 @@
                                                    });
                                               });
                                             </script>
+
+                                          {% elif 'values' in datatypes[param.data_type] %}
+                                            <p>{{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;{{ " / ".join(datatypes[param.data_type]['values'].keys()|sort) }}&gt;</p>
+                                            {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
+                                            <div class="input-group col-md-6">
+                                                <label for="values_{{ cmd.id }}">Test it :</label>
+                                                <button type="button" id="values_{{ cmd.id }}" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                {% trans %}Select Command{% endtrans %} <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                {% for val, label in datatypes[param.data_type]['values'] | dictsort %}
+                                                    <li><a href="{{ url_sample }}{{ val }}">{{ val }} - {{ label }}</a></li>
+                                                {% endfor %}
+                                                </ul>
+                                            </div>
 
                                           {% else %}
                                             {{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;key&gt;
@@ -385,7 +402,7 @@
                           </div>
                         </div>
                       {% endif %}
-    
+
                       {% if data.xpl_stats|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -421,7 +438,7 @@
                           </div>
                         </div>
                       {% endif %}
-    
+
                       {% if data.xpl_commands|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -445,7 +462,7 @@
                                 </tbody>
                               </table>
                             {% endfor %}
-    
+
                           </div>
                         </div>
                       {% endif %}
@@ -455,11 +472,11 @@
               {% endfor %}
             </div>
           </div>
-        
+
         </div>
         <script type="text/javascript">
         // Enable the Tabs
-        
+
         $('#myDevices a').click(function (e) {
             e.preventDefault()
             $(this).tab('show')
