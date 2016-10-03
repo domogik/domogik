@@ -271,7 +271,7 @@ import domogik.admin.rest.command
 import domogik.admin.rest.datatype
 import domogik.admin.rest.sensorhistory
 import domogik.admin.rest.butler
-#import domogik.admin.rest.publish
 from domogik.admin.rest.publish import *
 from domogik.admin.rest.device import *
 from domogik.admin.rest.sensor import sensorAPI
+from domogik.admin.rest.product import *
