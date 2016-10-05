@@ -496,8 +496,8 @@ def scenario_blocks_js():
                     # start building the inputs
                     if list_options != None:
                         js_list_options = u"["
-                        for opt in list_options:
-                            js_list_options += u"['{0}', '{1}'],".format(list_options[opt], opt)
+                        for opt in sorted(list_options):
+                            js_list_options += u"['{1} - {0}', '{1}'],".format(list_options[opt], opt)
                         js_list_options += u"]"
                         js_params += u"""this.appendDummyInput().setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ")
                                         .appendField(new Blockly.FieldDropdown({1}), "{0}");
@@ -542,8 +542,8 @@ def scenario_blocks_js():
                 color = 20
                 output = "\"Boolean\""
                 opt = "["
-                for lab in datatypes[dt_type]['labels']:
-                    opt += u"['{0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
+                for lab in sorted(datatypes[dt_type]['labels']):
+                    opt += u"['{1} - {0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
                 opt += "]"
                 input = """
                          this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "BOOL");
@@ -569,8 +569,8 @@ def scenario_blocks_js():
                     list_options = datatypes[dt_type]['values']
                 if list_options != None:
                     js_list_options = u"["
-                    for opt in list_options:
-                        js_list_options += u"['{0} - {1}', '{1}'],".format(opt, list_options[opt])
+                    for opt in sorted(list_options):
+                        js_list_options += u"['{1} - {0}', '{1}'],".format(list_options[opt], opt)
                     js_list_options += u"]"
                     color = 160
                     output = "\"String\""
