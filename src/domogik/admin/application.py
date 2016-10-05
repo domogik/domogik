@@ -30,6 +30,7 @@ else:
     def is_hidden_field_filter(field):
         return isinstance(field, HiddenField)
 from flask.ext.themes2 import Themes, render_theme_template
+from flask.ext.qrcode import QRcode
 from werkzeug.exceptions import Unauthorized
 from werkzeug import WWWAuthenticate
 import traceback
@@ -46,6 +47,7 @@ app = Flask(__name__)
 login_manager.init_app(app)
 babel.init_app(app)
 Themes(app, app_identifier='domogik-admin')
+QRcode(app)
 
 app.debug = True
 app.jinja_env.globals['bootstrap_is_hidden_field'] =\
@@ -83,7 +85,7 @@ def write_access_log_after(response):
 @app.before_request
 def write_acces_log_before():
     app.json_stop_at = []
-    app.logger.info('http request for {0} received'.format(request.path))
+    app.logger.info('http request for {0} received'.format(u''.join(request.path).encode('utf-8')))
 
 # render a template, later on we can select the theme it here
 def render_template(template, **context):
@@ -208,14 +210,14 @@ def jsonp_response(action_func):
 ### error pages
 @app.errorhandler(404)
 def page_not_found(e):
-    if str(request.path).startswith('/rest/'):
+    if u''.join(request.path).encode('utf-8').startswith('/rest/'):
         return render_template('404_json.html'), 404
     else:
         return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def server_error(e):
-    if str(request.path).startswith('/rest/'):
+    if u''.join(request.path).encode('utf-8').startswith('/rest/'):
         return render_template('500_json.html'), 500
     else:
         return render_template('500.html'), 500
