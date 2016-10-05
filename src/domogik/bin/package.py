@@ -476,6 +476,7 @@ class PackageInstaller():
                     # try to load json
                     is_ok = self.is_json_ok(json_file = os.path.join(path, JSON_FILE))
                     if is_ok == False:
+                        self.log.info("")
                         continue
     
                     # display some informations
@@ -505,6 +506,9 @@ class PackageInstaller():
                 pkg_json = PackageJson(path = json_file)
             elif data != None:
                 pkg_json = PackageJson(data = data)
+        except PackageException as e:
+            self.log.error(u"Invalid json file. Reason : {0}".format(e.value))
+            return False
         except:
             self.log.error(u"Error while reading the json file '{0}' : {1}".format(json_file, traceback.format_exc()))
             return False
