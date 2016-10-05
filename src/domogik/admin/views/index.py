@@ -10,12 +10,12 @@ def index():
     mqConfig = Loader('mq').load()[0]
 
     qrCode = dict()
-    qrCode["admin_url"] = request.url
-    qrCode["rest_port"] = app.port
+    qrCode["admin_url"] = str(request.url)
+    qrCode["rest_port"] = int(app.port)
     qrCode["rest_path"] = "/rest/"
-    qrCode["rest_auth"] = app.rest_auth
-    qrCode["mq_ip"] = mqConfig['ip']
-    qrCode["mq_port_pubsub"] = mqConfig['sub_port']
-    qrCode["mq_port_req_rep"] = mqConfig['req_rep_port']
+    qrCode["rest_auth"] = bool(app.rest_auth)
+    qrCode["mq_ip"] = str(mqConfig['ip'])
+    qrCode["mq_port_pubsub"] = int( mqConfig['sub_port'])
+    qrCode["mq_port_req_rep"] = int(mqConfig['req_rep_port'])
     return render_template('index.html',
             qrdata=qrCode)
