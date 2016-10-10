@@ -47,6 +47,7 @@ import sys
 import json
 import sqlalchemy
 from sqlalchemy import Table, MetaData, and_, or_, not_, desc
+from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker, defer
 from sqlalchemy.orm.session import make_transient
@@ -414,7 +415,8 @@ class DbHelper():
                         'description' : device.description,
                         'device_type_id' : device.device_type_id,
                         'client_id' : device.client_id,
-                        'client_version' : device.client_version
+                        'client_version' : device.client_version,
+                        'info_changed' : device.info_changed
                       }
         # params
         json_device['parameters'] = {}
@@ -544,7 +546,7 @@ class DbHelper():
             self.log.debug(u"Device creation : inserting data in core_device...")
             device = Device(name=params['name'], device_type_id=params['device_type'], \
                     client_id=params['client_id'], client_version=client_data['identity']['version'], \
-                    description=params['description'], reference=params['reference'])
+                    description=params['description'], reference=params['reference'], info_changed=func.now())
             self.__session.add(device)
             self.__session.flush()
 
@@ -768,7 +770,7 @@ class DbHelper():
         self._do_commit()
         return device
 
-    def update_device(self, d_id, d_name=None, d_description=None, d_reference=None, d_address=None):
+    def update_device(self, d_id, d_name=None, d_description=None, d_reference=None, d_address=None, d_info_changed=None):
         """Update a device item
 
         If a param is None, then the old value will be kept
@@ -794,6 +796,10 @@ class DbHelper():
         if d_reference is not None:
             if d_reference == '': d_reference = None
             device.reference = ucode(d_reference)
+        if d_info_changed is not None:
+            device.info_changed = datetime.datetime.fromtimestamp(info_changed)
+        else:
+            device.info_changed = func.now()
         self.__session.add(device)
         self._do_commit()
         return device
@@ -1560,6 +1566,7 @@ class DbHelper():
             sensor.formula = formula
         if data_type is not None:
             sensor.data_type = data_type
+        # TODO info_changed
         self.__session.add(sensor)
         self._do_commit()
         return sensor
@@ -1643,6 +1650,7 @@ class DbHelper():
         if name is not None:
             cmd.name = name
         self.__session.add(cmd)
+        self.update_device(device_id)
         self._do_commit()
         return cmd
 
@@ -1689,6 +1697,7 @@ class DbHelper():
         if name is not None:
             stat.name = name
         self.__session.add(stat)
+        self.update_device(device_id)
         self._do_commit()
         param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
         self.__session.add(param)
@@ -1712,6 +1721,7 @@ class DbHelper():
             self.__raise_dbhelper_exception("XplCommandParam with id {0} and key {1} couldn't be found".format(cmd_id, key))
         if value is not None:
             param.value = ucode(value)
+        # TODO info_changed
         self.__session.add(param)
         self._do_commit()
         return param
@@ -1752,6 +1762,7 @@ class DbHelper():
             param.ignore_values = ignore_values
         if type is not None:
             param.type = type
+        # TODO info_changed
         self.__session.add(param)
         self._do_commit()
         return param
