@@ -1566,8 +1566,8 @@ class DbHelper():
             sensor.formula = formula
         if data_type is not None:
             sensor.data_type = data_type
-        # TODO info_changed
         self.__session.add(sensor)
+        self.update_device(sensor.device_id)
         self._do_commit()
         return sensor
 
