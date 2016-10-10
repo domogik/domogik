@@ -753,19 +753,26 @@ class DBConnector(Plugin, MQRep):
         # request for all devices
         if 'type' not in msg_data and \
            'name' not in msg_data and \
-           'host' not in msg_data:
-
+           'host' not in msg_data and \
+           'timestamp'non in msg_data:
             reason = ""
             status = True
             dev_list = self._db.list_devices()
-
             dev_json = dev_list
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('devices', dev_json)
-
-        # request for all devices of one client
+        elif 'timestamp'in msg_data:
+        # request for all devices that changed after timestamp
+            reason = ""
+            status = True
+            dev_list = self._db.list_devices_by_timestamp(msg_data['timestamp'])
+            dev_json = dev_list
+            msg.add_data('status', status)
+            msg.add_data('reason', reason)
+            msg.add_data('devices', dev_json)
         else:
+        # request for all devices of one client
             if 'type' not in msg_data:
                 status = False
                 reason = "Devices request : missing 'type' field : {0}".format(data)
