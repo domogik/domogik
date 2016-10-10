@@ -754,7 +754,7 @@ class DBConnector(Plugin, MQRep):
         if 'type' not in msg_data and \
            'name' not in msg_data and \
            'host' not in msg_data and \
-           'timestamp'non in msg_data:
+           'timestamp' not in msg_data:
             reason = ""
             status = True
             dev_list = self._db.list_devices()
