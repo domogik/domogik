@@ -290,7 +290,7 @@ After declaring an instance of an handling update method of devices, you can reg
 Your *myHandleDeviceUpdate* method will be called each **device.update** event comming from MQ pub message.
 That method must have devices list as parameters. Example of refreshing method to register ::
 
-    # A methode to handle updated devices by callback, in Class déclaration :
+    # A methode to handle updated devices by callback, in Class declaration :
     def myHandleDeviceUpdate(self, devices):
         for hardDevice in self._myHardDevices:
             hardDevice.refreshAllDmgDevice(devices)
