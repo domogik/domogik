@@ -306,10 +306,10 @@ Updating global parameters of device ::
 .. note::
     Overwrite Plugin class method **on_message** needed to call the parent method at first ::
     
-    # Your new overwrite methode
-    def on_message(self, msgid, content):
-        Plugin.on_message(self, msgid, content)
-        ....
+        # Your new overwrite methode
+        def on_message(self, msgid, content):
+            Plugin.on_message(self, msgid, content)
+            ....
         
 Focus on the end : plugin ready
 ===============================
@@ -350,7 +350,7 @@ Get product informations from json plugin can helpfull for :doc:`detection devic
 Get json sensor definition 
 --------------------------
 
-Get :doc:`sensor defined<json/sensors>` in json plugin, helpfull for :doc:`detection devices<detected_devices>`
+Get :doc:`sensor defined<../json/sensors>` in json plugin, helpfull for :doc:`detection devices<detected_devices>`
 
 - Search by Id ::
 
@@ -382,9 +382,9 @@ Get :doc:`sensor defined<json/sensors>` in json plugin, helpfull for :doc:`detec
 You could have several returned sensors if sensors json plugin have same *name*
 
 Get json command definition 
---------------------------
+---------------------------
 
-Get :doc:`command defined<json/commands>` in json plugin, helpfull for :doc:`detection devices<detected_devices>`
+Get :doc:`command defined<../json/commands>` in json plugin, helpfull for :doc:`detection devices<detected_devices>`
 - Search by Id ::
 
     #    @param id : command id to find set in json plugin.
