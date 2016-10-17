@@ -423,8 +423,11 @@ class DbHelper():
                         'device_type_id' : device.device_type_id,
                         'client_id' : device.client_id,
                         'client_version' : device.client_version,
-                        'info_changed' : device.info_changed
+                        'info_changed' : None
                       }
+        if device.info_changed is not None:
+            json_device['info_changed'] = device.info_changed.strftime("%Y-%m-%d %H:%M:%S")
+
         # params
         json_device['parameters'] = {}
         for a_param in device.params:
