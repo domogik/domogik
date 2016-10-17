@@ -217,8 +217,8 @@ class Admin(Plugin):
                     self.clean_json = conf_admin['clean_json']
                 else:
                     self.clean_json = False
-                if 'rest_auth'in conf_admin:
-                    self.rest_auth = conf_admin['rest_auth']
+                if 'rest_auth' in conf_admin and conf_admin['rest_auth'] == 'True':
+                    self.rest_auth = True
                 else:
                     self.rest_auth = False
             except KeyError:
@@ -273,7 +273,6 @@ class Admin(Plugin):
         admin_app.use_ssl = self.use_ssl
         admin_app.interfaces = self.interfaces
         admin_app.port = self.port
-        admin_app.rest_auth = self.rest_auth
         admin_app.hostname = self.get_sanitized_hostname()
         admin_app.resources_directory = self.get_resources_directory()
         admin_app.packages_directory = self.get_packages_directory()
