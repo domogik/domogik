@@ -12,7 +12,7 @@ def index():
     qrCode = dict()
     qrCode["admin_url"] = str(request.url)
     qrCode["rest_port"] = int(app.port)
-    qrCode["rest_path"] = "/rest/"
+    qrCode["rest_path"] = "/rest"
     qrCode["rest_auth"] = bool(app.rest_auth)
     qrCode["mq_ip"] = str(mqConfig['ip'])
     qrCode["mq_port_pubsub"] = int( mqConfig['sub_port'])
