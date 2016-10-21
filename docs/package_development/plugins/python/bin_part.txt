@@ -178,7 +178,7 @@ Finally, tell Domogik that the plugin is ready:
 
 
 
-Focus on the configuration
+Focus on the start process
 ==========================
 
 The plugin global configuration
@@ -279,6 +279,38 @@ Here is an example from the *diskfree* plugin: ::
 
 Notice in this example that we get the devices list, then instantiate the class of the library and finally, for each device, call a method (or more if needed) from the library class in a thread.
 
+Perform updating devices process
+================================
+
+After declaring an instance of an handling update method of devices, you can register it as callback ::
+
+    # register a callback device.update MQ message.
+    self.register_cb_update_devices(myHandleDeviceUpdate)
+    
+Your *myHandleDeviceUpdate* method will be called each **device.update** event comming from MQ pub message.
+That method must have devices list as parameters. Example of refreshing method to register ::
+
+    # A methode to handle updated devices by callback, in Class declaration :
+    def myHandleDeviceUpdate(self, devices):
+        for hardDevice in self._myHardDevices:
+            hardDevice.refreshAllDmgDevice(devices)
+        self.log.info(u"All hard devives are updated from domogik devices")
+
+Updating global parameters of device ::
+        
+        # @param paramId: db id of global parameters getting from dict device['parameters']['myGlobalParam']['id']
+        # @param value : New parameter value.
+        # @return : True if success else False.
+        self.udpate_device_param(param_id, value)
+
+.. note::
+    Overwrite Plugin class method **on_message** needed to call the parent method at first ::
+    
+        # Your new overwrite methode
+        def on_message(self, msgid, content):
+            Plugin.on_message(self, msgid, content)
+            ....
+        
 Focus on the end : plugin ready
 ===============================
 
@@ -287,6 +319,110 @@ At the end of your *__init__* function, just add these 2 lines: ::
     self.ready()
     self.log.info("Plugin ready :)")
 
+Focus on devices tools 
+======================
+
+Get a data types specifications
+--------------------------------
+
+If you need a :doc:`data type <../../../technical/data_types/index>` detail definition to handle a sensor/command. To get it use Plugin class method ::
+
+    @param name :  the name of DT_Type
+    @return : dict DT_Type himself, empty dict if not find.
+    myDataType = self.get_data_type(name)
+
+Get json product information
+----------------------------
+
+Get product informations from json plugin can helpfull for :doc:`detection devices<detected_devices>`. To get it use Plugin class method :: 
+
+    #    @param productId : part of productId set in json plugin. Search it in lower case if your <myProductId> is contained in product['id'] string.
+    #    @return : dict of product defined in json plugin with picture file name added. If not find empty dict.
+    #        {
+    #            "name" : The name of product,
+    #            "id" : product id, this is base name of picture,
+    #            "documentation" : Link to manufacturer documentation, manual, specification,
+    #            "type": Device_type linked to this product,
+    #            "picture" : if exist, file name of picture representing product without full path, else None
+    #       }
+    self.get_product_by_id(self, myProductId):
+
+Get json sensor definition 
+--------------------------
+
+Get :doc:`sensor defined<../json/sensors>` in json plugin, helpfull for :doc:`detection devices<detected_devices>`
+
+- Search by Id ::
+
+    #    @param id : sensor id to find set in json plugin.
+    #    @return : dict of sensor if find else empty dict.
+    sensor = self.get_sensor_by_id(mySensorId):
+    
+- Search by name ::
+
+    #    @param name : value of key name set in json plugin, Search in lower case.
+    #        sensors" : {
+    #            "my_sensor" : {
+    #                "name" : "mySensorName", <== key compared to param <name>
+    #                ...
+    #    @return : dict of all sensors with same key name. If not find return empty dict.
+    #        {
+    #        "my_sensor1" : {
+    #            "name" : "mySensorName",
+    #            ...
+    #            },
+    #        "my_sensor2" : {
+    #            "name" : "mySensorName",
+    #            ...
+    #            },
+    #        ...
+    #        }           
+    sensor = self.get_sensors_by_name(mySensorName)
+   
+You could have several returned sensors if sensors json plugin have same *name*
+
+Get json command definition 
+---------------------------
+
+Get :doc:`command defined<../json/commands>` in json plugin, helpfull for :doc:`detection devices<detected_devices>`
+- Search by Id ::
+
+    #    @param id : command id to find set in json plugin.
+    #    @return : dict of commands if find else empty dict.
+    command = self.get_command_by_id(myCommandId):
+    
+- Search by key value ::
+
+    #    @param key : value of one key parameter set in json plugin. Search in lower case.
+    #        commands" : {
+    #            "my_command" : {
+    #                "name" : "foo name",
+    #                "parameters" : [{
+    #                        "key" : "myKeyValue", <== value of key compared to param <key>
+    #                        ...
+    #                        }]
+    #    @return : dict of all command include same key. If not find return empty dict.
+    #        {
+    #        "my_command1" : {
+    #            "name" : "foo name2",
+    #                "parameters" : [{
+    #                        "key" : "myKeyValue",
+    #                        ...
+    #                        }]
+    #            },
+    #        "my_command2" : {
+    #            "name" : "foo name2",
+    #                "parameters" : [{
+    #                        "key" : "myKeyValue",
+    #                        ...
+    #                        }]
+    #            },
+    #        ...
+    #        }
+
+    commands = self.get_commands_by_key(myKeyValue)
+
+You could have several returned commands if commands json plugin have same *key value*
 
 Focus on the logs
 =================
