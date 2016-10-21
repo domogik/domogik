@@ -454,7 +454,19 @@ class XplManager(XplPlugin):
             if not dev['client_id'] in self.client_xpl_map.keys():
                 failed = "Can not fincd xpl source for {0} client_id".format(dev['client_id'])
             else:
-                msg.set_target(self.client_xpl_map[dev['client_id']])
+                ### Fix bug #349
+                # I am not totally sure why before we used the xpl_source from the client list. 
+                # Indeed for domogik xpl plugins it helps to target the appropriate plugin but
+                # for xpl messages for outside of domogik, this is a blocking point !
+                # As xpl plugins are starting to be deprecated  as the 'common plugin format', it
+                # should not be an issue to retarget xpl messages to '*' for now and later on if
+                # there is a real need to target on a dedicated target, implement a bette way to 
+                # handle this
+                # -- Fritz -- oct 2016
+                #msg.set_target(self.client_xpl_map[dev['client_id']])
+                msg.set_target("*")
+                ### End of fix
+                
             msg.set_source(self.myxpl.get_source())
             msg.set_type("xpl-cmnd")
             msg.set_schema(xplcmd['schema'])
