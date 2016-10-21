@@ -61,6 +61,7 @@ The following tutorials are not mandatory to use Domogik. You can pick just what
 * Configure external access to Domogik administration interface
 * :doc:`Install Domogik in a python virtualenv </enduser/installation/virtualenv>`
 * :doc:`Configure SSL </enduser/installation/ssl>`
+* :doc:`User Nginx to serve Domogik </enduser/installation/nginx>`
 
 Open an issue/ticket
 --------------------
