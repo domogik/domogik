@@ -17,6 +17,7 @@ Table Of Content
 	/enduser/installation/virtualenv
 	/enduser/installation/uninstall
 	/enduser/installation/install_from_a_script
+	/enduser/installation/nginx
 	/enduser/errors/index
 	/enduser/errors/create_a_ticket
 	/enduser/quick_start/terms
