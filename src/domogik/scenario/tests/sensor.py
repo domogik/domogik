@@ -64,7 +64,7 @@ class AbstractSensorTest(AbstractTest):
         if self._sensorId:
             if 'sensor_id' in msg:
                 if int(msg['sensor_id']) == int(self._sensorId):
-                    self.log.debug(u"SensorTest : received MQ message : {0}".format(msg))
+                    self.log.debug(u"SensorTest : received MQ message : {0}. Please notice that if a scenario which use several of this sensor block is currently being evaluated, only one value is processed (in case the sensor values change too fast!)".format(msg))
                     self.handle_message(did, msg)
 
 
@@ -85,7 +85,7 @@ class SensorTest(AbstractSensorTest):
     def handle_message(self, did, msg):
         self._time = time()
         self._res = self._convert(msg['stored_value'])
-        self.log.debug(u"SensorTest : Trigger!")
+        self.log.debug(u"SensorTest : Trigger! Please notice that if a scenario which use several of this sensor block is currently being evaluated, only one trigger is processed to avoid running several times the same test")
         self._trigger(self)
 
     def _convert(self, val):
