@@ -201,7 +201,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self._process_info = ProcessInfo(os.getpid(), "{0}-{1}.{2}".format(self._type, self._name, self.get_sanitized_hostname()),
                                          self.client_version,
                                          TIME_BETWEEN_EACH_PROCESS_STATUS,
-                                         None,  # no callback to only log
+                                         self.send_process_info,
                                          self.log,
                                          self._stop)
         thr_send_process_info = threading.Thread(None,
@@ -228,6 +228,12 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
 
         # init finished
         self.log.info(u"End init of the global client part")
+
+    def send_process_info(self, pid, data):
+        """ Send process informations to the manager. See ProcessInfo (common/processinfo.py) class for more informations about the content.
+            These data are used for anonymous metrics analysis by the domogik team : number of releases of domogik, etc
+        """
+        self._pub.send_event('metrics.processinfo', data)
 
     def register_cb_update_devices(self, cb_update_devices):
         """ For a client only

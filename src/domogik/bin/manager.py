@@ -64,6 +64,7 @@ import tempfile
 import re
 import signal
 import json
+import requests
 
 from threading import Event, Thread, Lock, Semaphore
 from argparse import ArgumentParser
@@ -93,11 +94,12 @@ from domogik.xpl.common.xplconnector import Listener, STATUS_HBEAT_XPL
 ### constants
 
 PYTHON = sys.executable
-WAIT_AFTER_STOP_REQUEST = 15
-CHECK_FOR_NEW_PACKAGES_INTERVAL = 30
+WAIT_AFTER_STOP_REQUEST = 15           # seconds
+CHECK_FOR_NEW_PACKAGES_INTERVAL = 30   # seconds
+SEND_METRICS_INTERVAL = 30             # seconds
 
 
-class Manager(XplPlugin):
+class Manager(XplPlugin, MQAsyncSub):
     """ Domogik manager
     """
 
@@ -151,6 +153,9 @@ class Manager(XplPlugin):
         self.log.info(u"Start scenario manager : {0}".format(self.options.start_scenario))
         self.log.info(u"Start butler : {0}".format(self.options.start_butler))
 
+        ### MQ
+        MQAsyncSub.__init__(self, self.zmq, 'manager', ['metrics.processinfo'])
+
         ### Read the configuration file
         try:
             cfg = Loader('domogik')
@@ -159,12 +164,42 @@ class Manager(XplPlugin):
 
             # pid dir path
             self._pid_dir_path = conf['pid_dir_path']
+
+            # try to get the metrics installation id
+            # this data may be deleted from the end user in the /etc/domogik.cfg file, so we assume that the values will be None 
+            # in case of error
+            try:
+                cfgm = Loader('metrics')
+                configm = cfgm.load()
+                confm = dict(configm[1])
+                self._metrics_id = confm['id']
+                self._metrics_url = confm['url']
+                self.log.info(u"The metrics informations are configured. 'id' = '{0}', 'url' = '{1}'".format(self._metrics_id, self._metrics_url))
+                self.log.info(u"The metrics informations goal is to help us to have an overview of the Domogik releases fragmentation and performances issues. To disable them, just remove the [metrics] section in the Domogik configuration file ;)")
+            except:
+                self.log.warning(u"The metrics options are not configured (one or all) : [metrics] > id, [metrics] > url. This is surely and end user wish, we respect this and won't send metrics for analysis!")
+                self._metrics_id = None
+                self._metrics_url = None
        
         except:
             self.log.error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
             return
 
         self.log.info(u"Packages path : {0}".format(self.get_packages_directory()))
+
+        ### Metrics
+        self.metrics_processinfo = []
+
+        # send metrics from time to time
+        if self._metrics_url != None and self._metrics_id != None:
+            thr_send_metrics = Thread(None,
+                                      self._send_metrics,
+                                      "send_metrics",
+                                      (),
+                                      {})
+            thr_send_metrics.start()
+
+
 
         ### MQ
         # self.zmq = zmq.Context() is aleady define in XplPlugin
@@ -592,6 +627,44 @@ class Manager(XplPlugin):
         self._clients.set_status(message.source, STATUS_ALIVE)
 
 
+    def on_message(self, msgid, content):
+        """ Process publicated messages
+        """
+        if msgid == "metrics.processinfo":
+            ### process the processinfo data
+            # store them in a list so they can be send by group of data from time to time
+            content['id'] = self._metrics_id
+            self.metrics_processinfo.append(content)
+
+    
+    def _send_metrics(self):
+        """ Send the metrics to a REST service. This is related to the ProcessInfo class from common/processinfo.py
+        """
+        while not self._stop.isSet():
+            # send metrics
+            self.log.debug(u"Send the metrics to '{0}'".format(self._metrics_url))
+            url = "{0}/metrics/processinfo/".format(self._metrics_url.strip("/"))
+         
+            self.log.debug(url)
+            self.log.debug(self.metrics_processinfo)
+
+            # TODO : post data
+            try:
+                headers = {'content-type': 'application/json'}
+                response = requests.post(url, data=json.dumps(self.metrics_processinfo), headers=headers)
+                ok = True
+            except:
+                ok = False
+                self.log.warning(u"Error while trying to push metrics on '{0}'. The error is : {1}".format(url, traceback.format_exc()))
+
+            # if ok, empty the history
+            if ok:
+                self.metrics_processinfo = []
+
+            # wait for the next time to send
+            self._stop.wait(SEND_METRICS_INTERVAL)
+            
+            
 
 
 

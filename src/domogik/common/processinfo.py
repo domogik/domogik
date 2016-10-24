@@ -110,9 +110,28 @@ class ProcessInfo():
             memory_percent = round(self.p.memory_percent(),1)
             self.log.debug(u"Process informations|python_version={8}|psutil_version={0}|domogik_version={9}|client={1}|client_version={12}|pid={2}|cpu_percent_usage={3}|memory_total={4}|memory_percent_usage={5}|memory_rss={6}|memory_vsz={7}|num_threads={10}|num_file_descriptors_used={11}|".format(self.psutil_version, self.client_id, self.pid, cpu_percent, memory_total_phymem, memory_percent, memory_rss, memory_vsz, self.python_version, domogik_version, num_threads, num_fds, self.client_version)) 
             if self._callback != None:
-                self._callback(self.pid, values)
+                # the domogik installation id (key 'id') will be filled by the manager or any other component which will process the below data
+                data = {
+                         'tags' : {
+                             'python_version' : self.python_version,
+                             'psutil_version' : self.psutil_version,
+                             'domogik_version' : domogik_version,
+                             'client' : self.client_id
+                         },
+                         'measurements' : {
+                             'cpu_percent_usage' : cpu_percent,
+                             'memory_total' : memory_total_phymem,
+                             'memory_percent_usage' : memory_percent,
+                             'memory_rss' : memory_rss,
+                             'memory_vsz' : memory_vsz,
+                             'num_threads' : num_threads,
+                             'num_file_descriptors_used' : num_fds
+                         },
+                         'timestamp' : time.time()
+                       }
+                self._callback(self.pid, data)
         except:
-            self.log.warning(u"Process informations for client not working. Psutil version='{0}'. The error is : {1}".format(self.version, traceback.format_exc()))
+            self.log.warning(u"Process informations for client not working. Psutil version='{0}'. The error is : {1}".format(self.psutil_version, traceback.format_exc()))
 
 def display(pid, data):
     print(u"DATA ({0}) = {1}".format(pid, str(data)))
