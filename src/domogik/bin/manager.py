@@ -174,10 +174,15 @@ class Manager(XplPlugin, MQAsyncSub):
                 confm = dict(configm[1])
                 self._metrics_id = confm['id']
                 self._metrics_url = confm['url']
-                self.log.info(u"The metrics informations are configured. 'id' = '{0}', 'url' = '{1}'".format(self._metrics_id, self._metrics_url))
-                self.log.info(u"The metrics informations goal is to help us to have an overview of the Domogik releases fragmentation and performances issues. To disable them, just remove the [metrics] section in the Domogik configuration file ;)")
+                if self._metrics_id != '' and self._metrics_url != '':
+                    self.log.info(u"The metrics informations are configured. 'id' = '{0}', 'url' = '{1}'".format(self._metrics_id, self._metrics_url))
+                    self.log.info(u"The metrics informations goal is to help us to have an overview of the Domogik releases fragmentation and performances issues. To disable them, just remove the [metrics] section in the Domogik configuration file ;)")
+                else:
+                    self.log.warning(u"The metrics options are not configured (one or all) : [metrics] > id, [metrics] > url. This is surely an end user wish, we respect this and won't send metrics for analysis!")
+                    self._metrics_id = None
+                    self._metrics_url = None
             except:
-                self.log.warning(u"The metrics options are not configured (one or all) : [metrics] > id, [metrics] > url. This is surely and end user wish, we respect this and won't send metrics for analysis!")
+                self.log.warning(u"The metrics options are not configured (one or all) : [metrics] > id, [metrics] > url. This is surely an end user wish, we respect this and won't send metrics for analysis!")
                 self._metrics_id = None
                 self._metrics_url = None
        

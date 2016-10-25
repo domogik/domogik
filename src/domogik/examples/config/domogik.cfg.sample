@@ -115,7 +115,7 @@ folder=/var/lib/domogik/backup/
 # - technical informations about each Domogik process : cpu and memory usage, ...
 
 # the id is generated during Domogik installation based on some system properties. It should be unique. You can freely change its value to something more fun like your github username for example ;)
-id = some_anonymous_id
+id = 
 
 # this is the url on which the metrics are sent. Don't change this value!
 url = http://metrics.domogik.org/

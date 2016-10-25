@@ -250,6 +250,8 @@ def write_domogik_configfile(advanced_mode, intf):
         # manage metrics section
         else:
             config.set(sect, "id", uuid.getnode())   # set an unique id which is hardware dependent
+            print("Set [{0}] : {1} = {2}".format(sect, id, uuid.getnode()))
+            debug("Value {0} in domogik.cfg > [metrics] set to {1}".format(id, uuid.getnode()))
 
     # write the config file
     with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
@@ -294,7 +296,8 @@ def write_domogik_configfile_from_command_line(args):
                 print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                 config.set(sect, item[0], new_value)
                 newvalues = True
-            debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
+            debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
+
     # write the config file
     with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
         ok("Writing the config file")
@@ -314,7 +317,7 @@ def write_xplhub_configfile_from_command_line(args):
                 print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                 config.set(sect, item[0], new_value)
                 newvalues = True
-            debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
+            debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
     with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
         ok("Writing the config file")
