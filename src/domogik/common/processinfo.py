@@ -47,10 +47,10 @@ class ProcessInfo():
         cpu usage, memory usage, etc.
     """
 
-    def __init__(self, pid, client_id, client_version, interval = 0, callback = None, log = None, stop = None):
+    def __init__(self, pid, component_id, component_version, interval = 0, callback = None, log = None, stop = None):
         """ Init object
             @param pid : process identifier
-            @param client_id : client id
+            @param component_id : component id
             @param interval : time between looking for values
             @param callback : function to call to give values
                callback input : {"cpu_usage" : 33, ...}
@@ -61,8 +61,8 @@ class ProcessInfo():
         self.psutil_version = psutil.__version__
         self.python_version = "{0}.{1}".format(sys.version_info[0], sys.version_info[1])
         self.pid = None
-        self.client_id = client_id
-        self.client_version = client_version
+        self.component_id = component_id
+        self.component_version = component_version
         self._callback = callback
         self._interval = interval
         self.log = log
@@ -108,7 +108,7 @@ class ProcessInfo():
             memory_rss = round(memory_info[0] / divisor, 1)
             memory_vsz = round(memory_info[1] / divisor, 1)
             memory_percent = round(self.p.memory_percent(),1)
-            self.log.debug(u"Process informations|python_version={8}|psutil_version={0}|domogik_version={9}|client={1}|client_version={12}|pid={2}|cpu_percent_usage={3}|memory_total={4}|memory_percent_usage={5}|memory_rss={6}|memory_vsz={7}|num_threads={10}|num_file_descriptors_used={11}|".format(self.psutil_version, self.client_id, self.pid, cpu_percent, memory_total_phymem, memory_percent, memory_rss, memory_vsz, self.python_version, domogik_version, num_threads, num_fds, self.client_version)) 
+            self.log.debug(u"Process informations|python_version={8}|psutil_version={0}|domogik_version={9}|component={1}|component_version={12}|pid={2}|cpu_percent_usage={3}|memory_total={4}|memory_percent_usage={5}|memory_rss={6}|memory_vsz={7}|num_threads={10}|num_file_descriptors_used={11}|".format(self.psutil_version, self.component_id, self.pid, cpu_percent, memory_total_phymem, memory_percent, memory_rss, memory_vsz, self.python_version, domogik_version, num_threads, num_fds, self.component_version)) 
             if self._callback != None:
                 # the domogik installation id (key 'id') will be filled by the manager or any other component which will process the below data
                 data = {
@@ -116,8 +116,8 @@ class ProcessInfo():
                              'python_version' : self.python_version,
                              'psutil_version' : self.psutil_version,
                              'domogik_version' : domogik_version,
-                             'client' : self.client_id,
-                             'client_version' : self.client_version
+                             'component' : self.component_id,
+                             'component_version' : self.component_version
                          },
                          'measurements' : {
                              'unit' : 1,                               # this one is used to count items on grafana side

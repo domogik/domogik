@@ -202,7 +202,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             the_type = "core"
         else:
             the_type = self._type
-        self._process_info = ProcessInfo(os.getpid(), "{0}-{1}.{2}".format(the_type, self._name, self.get_sanitized_hostname()),
+        self._process_info = ProcessInfo(os.getpid(), "{0}-{1}".format(the_type, self._name),
                                          self.client_version,
                                          TIME_BETWEEN_EACH_PROCESS_STATUS,
                                          self.send_process_info,
