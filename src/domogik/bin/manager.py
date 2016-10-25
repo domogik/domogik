@@ -642,19 +642,18 @@ class Manager(XplPlugin, MQAsyncSub):
         """
         while not self._stop.isSet():
             # send metrics
-            self.log.debug(u"Send the metrics to '{0}'".format(self._metrics_url))
             url = "{0}/metrics/processinfo/".format(self._metrics_url.strip("/"))
+            self.log.debug(u"Send the metrics to '{0}'".format(url))
          
-            self.log.debug(url)
-            self.log.debug(self.metrics_processinfo)
-
-            # TODO : post data
+            ratio = 1
             try:
                 headers = {'content-type': 'application/json'}
                 response = requests.post(url, data=json.dumps(self.metrics_processinfo), headers=headers)
+                self.log.debug(u"Metrics send. Server response (http code) is '{0}'".format(response.status_code))
                 ok = True
             except:
                 ok = False
+                ratio = 3    # in case the server does not respond because the load on it is too heavy, send data less often
                 self.log.warning(u"Error while trying to push metrics on '{0}'. The error is : {1}".format(url, traceback.format_exc()))
 
             # if ok, empty the history
@@ -662,7 +661,7 @@ class Manager(XplPlugin, MQAsyncSub):
                 self.metrics_processinfo = []
 
             # wait for the next time to send
-            self._stop.wait(SEND_METRICS_INTERVAL)
+            self._stop.wait(SEND_METRICS_INTERVAL * ratio)
             
             
 

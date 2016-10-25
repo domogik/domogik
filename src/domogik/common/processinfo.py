@@ -116,9 +116,11 @@ class ProcessInfo():
                              'python_version' : self.python_version,
                              'psutil_version' : self.psutil_version,
                              'domogik_version' : domogik_version,
-                             'client' : self.client_id
+                             'client' : self.client_id,
+                             'client_version' : self.client_version
                          },
                          'measurements' : {
+                             'unit' : 1,                               # this one is used to count items on grafana side
                              'cpu_percent_usage' : cpu_percent,
                              'memory_total' : memory_total_phymem,
                              'memory_percent_usage' : memory_percent,
