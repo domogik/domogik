@@ -17,6 +17,7 @@ import logging
 import pkg_resources
 from subprocess import Popen, PIPE, STDOUT
 from distutils import version
+import uuid
 
 
 BLUE = '\033[94m'
@@ -233,17 +234,23 @@ def write_domogik_configfile(advanced_mode, intf):
     itf = ['bind_interface', 'interfaces']
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
-        for item in config.items(sect):
-            if item[0] in itf  and not advanced_mode:
-                config.set(sect, item[0], intf)
-                debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
-            elif is_domogik_advanced(advanced_mode, sect, item[0]):
-                print("- {0} [{1}]: ".format(item[0], item[1])),
-                new_value = sys.stdin.readline().rstrip('\n')
-                if new_value != item[1] and new_value != '':
-                    # need to write it to config file
-                    config.set(sect, item[0], new_value)
-                    newvalues = True
+        if sect != "metrics":
+            for item in config.items(sect):
+                if item[0] in itf  and not advanced_mode:
+                    config.set(sect, item[0], intf)
+                    debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
+                elif is_domogik_advanced(advanced_mode, sect, item[0]):
+                    print("- {0} [{1}]: ".format(item[0], item[1])),
+                    new_value = sys.stdin.readline().rstrip('\n')
+                    if new_value != item[1] and new_value != '':
+                        # need to write it to config file
+                        config.set(sect, item[0], new_value)
+                        newvalues = True
+
+        # manage metrics section
+        else:
+            config.set(sect, "id", uuid.getnode())   # set an unique id which is hardware dependent
+
     # write the config file
     with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
         ok("Writing the config file")
