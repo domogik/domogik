@@ -65,6 +65,7 @@ import re
 import signal
 import json
 import requests
+import platform
 
 from threading import Event, Thread, Lock, Semaphore
 from argparse import ArgumentParser
@@ -194,6 +195,7 @@ class Manager(XplPlugin, MQAsyncSub):
 
         ### Metrics
         self.metrics_processinfo = []
+        self.distribution = "{0} {1}".format(platform.linux_distribution()[0], platform.linux_distribution()[1])
 
         # send metrics from time to time
         if self._metrics_url != None and self._metrics_id != None:
@@ -639,6 +641,10 @@ class Manager(XplPlugin, MQAsyncSub):
             ### process the processinfo data
             # store them in a list so they can be send by group of data from time to time
             content['id'] = self._metrics_id
+            # some additionnal informations
+            # TODO : do in ProcessInfo ?
+            content['tags']['distribution'] = self.distribution
+
             self.metrics_processinfo.append(content)
 
     
