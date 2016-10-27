@@ -85,7 +85,7 @@ class SensorTest(AbstractSensorTest):
     def handle_message(self, did, msg):
         self._time = time()
         self._res = self._convert(msg['stored_value'])
-        self.log.debug(u"SensorTest : Trigger! Please notice that if a scenario which use several of this sensor block is currently being evaluated, only one trigger is processed to avoid running several times the same test")
+        self.log.debug(u"SensorTest : Set sensor value = '{0}' for sensor id '{1}'. Trigger raised! Please notice that if a scenario which use several of this sensor block is currently being evaluated, only one trigger is processed to avoid running several times the same test.".format(self._res, self._sensorId))
         self._trigger(self)
 
     def _convert(self, val):
