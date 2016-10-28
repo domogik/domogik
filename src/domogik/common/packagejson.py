@@ -242,7 +242,7 @@ class PackageJson():
             for conf in self.json["configuration"]:
                 self._validate_keys(expected, "a configuration item param", conf.keys(), optional)
                 if conf['type'] not in fieldTypes:
-                    raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(conf['type'], fieldTypes))
+                    raise PackageException("Type ({0}) in a config item is not in the allowed list: {1}".format(conf['type'], fieldTypes))
 
             # validate products
             if 'products' in self.json.keys():
