@@ -85,7 +85,7 @@ class ScenarioInstance(MQAsyncSub):
         @param json : The json describing the scenario
         """
         self._name = name
-        
+
         # TODO : fix for Russian names for example
         #self._log = log.getChild(remove_accents(name))
         try:
@@ -120,7 +120,7 @@ class ScenarioInstance(MQAsyncSub):
         self._mapping = { 'test': {}, 'action': {} }
         if not self._disabled:
             self._instanciate()
-    
+
     def enable(self):
         if self._disabled:
             self._disabled = False
@@ -241,6 +241,8 @@ class ScenarioInstance(MQAsyncSub):
                 part['type'] = "math_number"
             elif dt_parent == "DT_String":
                 part['type'] = "text"
+            else:
+                part['type'] = "text"
         # parse the blocks
         if part['type'] == 'controls_if':
             # handle all Ifx and dox
@@ -336,7 +338,7 @@ class ScenarioInstance(MQAsyncSub):
                 retlist.append( pyObj(u"if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
             else:
                 retlist.append( eval(u"if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
-            nlevel = level 
+            nlevel = level
             level = level + 1
             retlist.append( pyObj(u"{0}".format(self.__parse_part(part['Run'], level, debug))) )
         # apply an action
@@ -356,7 +358,7 @@ class ScenarioInstance(MQAsyncSub):
             # test[0] : test object
             # test[1] : test uuid
 
-            # build a test instance list. Example : 
+            # build a test instance list. Example :
             # foo.bar
             #  \_ obj1
             #  \_ obj2
@@ -434,12 +436,12 @@ class ScenarioInstance(MQAsyncSub):
 
             # default : we set the generic trigger for all. It may be changed later in the code for some kind of tests (sensorTest for example).
             trigger = self.generic_trigger
-
             try:
                 mod, clas, param = inst.split('.')
             except ValueError as err:
                 mod, clas = inst.split('.')
                 param = None
+
             module_name = "domogik.scenario.tests.{0}".format(mod)
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create test instance {0} with uuid {1}".format(inst, uuid))
