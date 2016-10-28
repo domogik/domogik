@@ -97,7 +97,7 @@ from domogik.xpl.common.xplconnector import Listener, STATUS_HBEAT_XPL
 PYTHON = sys.executable
 WAIT_AFTER_STOP_REQUEST = 15           # seconds
 CHECK_FOR_NEW_PACKAGES_INTERVAL = 30   # seconds
-SEND_METRICS_INTERVAL = 30             # seconds
+SEND_METRICS_INTERVAL = 120            # seconds
 
 
 class Manager(XplPlugin, MQAsyncSub):
@@ -155,7 +155,7 @@ class Manager(XplPlugin, MQAsyncSub):
         self.log.info(u"Start butler : {0}".format(self.options.start_butler))
 
         ### MQ
-        MQAsyncSub.__init__(self, self.zmq, 'manager', ['metrics.processinfo'])
+        MQAsyncSub.__init__(self, self.zmq, 'manager', ['metrics.processinfo', 'metrics.browser'])
 
         ### Read the configuration file
         try:
@@ -195,6 +195,7 @@ class Manager(XplPlugin, MQAsyncSub):
 
         ### Metrics
         self.metrics_processinfo = []
+        self.metrics_browser = []
         self.distribution = "{0} {1}".format(platform.linux_distribution()[0], platform.linux_distribution()[1])
 
         # send metrics from time to time
@@ -644,8 +645,13 @@ class Manager(XplPlugin, MQAsyncSub):
             # some additionnal informations
             # TODO : do in ProcessInfo ?
             content['tags']['distribution'] = self.distribution
-
             self.metrics_processinfo.append(content)
+
+        elif msgid == "metrics.browser":
+            ### process the processinfo data
+            # store them in a list so they can be send by group of data from time to time
+            content['id'] = self._metrics_id
+            self.metrics_browser.append(content)
 
     
     def _send_metrics(self):
@@ -653,23 +659,33 @@ class Manager(XplPlugin, MQAsyncSub):
         """
         while not self._stop.isSet():
             # send metrics
-            url = "{0}/metrics/processinfo/".format(self._metrics_url.strip("/"))
-            self.log.debug(u"Send the metrics to '{0}'".format(url))
+            self.log.debug(u"Send the metrics to '{0}'".format(self._metrics_url))
+            url = self._metrics_url   # just in case of except before first set
          
             ratio = 1
             try:
                 headers = {'content-type': 'application/json'}
+
+                ### send process info metrics
+                url = "{0}/metrics/processinfo/".format(self._metrics_url.strip("/"))
                 response = requests.post(url, data=json.dumps(self.metrics_processinfo), headers=headers)
-                self.log.debug(u"Metrics send. Server response (http code) is '{0}'".format(response.status_code))
+                self.log.debug(u"Metrics for process info send. Server response (http code) is '{0}'".format(response.status_code))
+
+                ### send browser metrics
+                url = "{0}/metrics/domoweb-browser/".format(self._metrics_url.strip("/"))
+                response = requests.post(url, data=json.dumps(self.metrics_browser), headers=headers)
+                self.log.debug(u"Metrics for domoweb browser send. Server response (http code) is '{0}'".format(response.status_code))
+
                 ok = True
             except:
                 ok = False
-                ratio = 3    # in case the server does not respond because the load on it is too heavy, send data less often
+                ratio = 2    # in case the server does not respond because the load on it is too heavy, send data less often
                 self.log.warning(u"Error while trying to push metrics on '{0}'. The error is : {1}".format(url, traceback.format_exc()))
 
             # if ok, empty the history
             if ok:
                 self.metrics_processinfo = []
+                self.metrics_browser = []
 
             # wait for the next time to send
             self._stop.wait(SEND_METRICS_INTERVAL * ratio)
