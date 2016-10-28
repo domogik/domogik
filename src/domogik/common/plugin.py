@@ -928,7 +928,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             @return : True if success else False.
         """
 
-        self.log.debug(u"Setting global device parameter {0} with value {2}".format(paramId, value))
+        self.log.debug(u"Setting global device parameter {0} with value {1}".format(paramId, value))
         mq_client = MQSyncReq(self.zmq)
         msg = MQMessage()
         msg.set_action('deviceparam.update')
@@ -938,6 +938,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if result is not None:
             data = result.get_data()
             if data["status"]:
+                threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
                 return True
             else:
                 self.log.warning(u"{0}".format(data["reason"]))
