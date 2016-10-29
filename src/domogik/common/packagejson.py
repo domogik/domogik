@@ -277,7 +277,7 @@ class PackageJson():
                 for par in devt["parameters"]:
                     self._validate_keys(expected, "a param for device_type {0}".format(devtype), par.keys(), optional)
                     if par['type'] not in fieldTypes:
-                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(par['type'], fieldTypes))
+                        raise PackageException("Type ({0}) in a config item is not in the allowed list: {1}".format(par['type'], fieldTypes))
 
             #validate the commands
             if type(self.json["commands"]) != dict:
@@ -333,7 +333,7 @@ class PackageJson():
                 for stat in xcmd['parameters']['device']:
                     self._validate_keys(expected, "a device parameter for xpl_command {0}".format(xcmdid), stat.keys(), optional)
                     if stat['type'] not in fieldTypes:
-                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(stat['type'], fieldTypes))
+                        raise PackageException("Type ({0}) in a config item is not in the allowed list: {1}".format(stat['type'], fieldTypes))
                 # see that the xpl_stat is defined
                 if xcmd["xplstat_name"] not in self.json["xpl_stats"].keys():
                     raise PackageException("xplstat_name {0} defined in xpl_command {1} is not found".format(xcmd["xplstat_name"], xcmdid))
@@ -362,7 +362,7 @@ class PackageJson():
                 for stat in xstat['parameters']['device']:
                     self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys(), optional)
                     if stat['type'] not in fieldTypes:
-                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(stat['type'], fieldTypes))
+                        raise PackageException("Type ({0}) in a config item is not in the allowed list: {1}".format(stat['type'], fieldTypes))
                 # dynamic parameter
                 expected = ["key", "sensor"]
                 opt = ["ignore_values"]
