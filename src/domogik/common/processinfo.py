@@ -42,6 +42,8 @@ import traceback
 import sys
 from domogik import __version__ as domogik_version
 import platform
+from subprocess import Popen, PIPE
+import os
 
 class ProcessInfo():
     """ This class get informations about a process :
@@ -77,6 +79,44 @@ class ProcessInfo():
         self.pid = self.p.pid
         self.platform = platform.machine()
         self.num_core = psutil.cpu_count()
+        self.git_branch = self.get_git_branch()
+        self.git_revision = self.get_git_revision()
+
+    def get_git_branch(self):
+        """ If the current process file source is part of a git repo, return information (branch)
+            Else, return an empty string
+        """
+
+        # TODO : improve if possible
+        # dirty trick...
+        # the manager is run from init.d by dmg_manager located in /usr/local/bin. So we can't find the manager.py path...
+        # So we use the processinfo module path which is in the same git repo as manager.py
+        if self.component_id == "core-manager":
+            path = os.path.dirname(os.path.realpath(__file__))
+        else:
+            path = os.path.dirname(os.path.realpath(sys.argv[0]))
+        cmd = 'cd "{0}" ; echo "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"'.format(path)
+        sp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        out, err = sp.communicate()
+        return out.strip()
+    
+    def get_git_revision(self):
+        """ If the current process file source is part of a git repo, return information (rev)
+            Else, return an empty string
+        """
+        # TODO : improve if possible
+        # dirty trick...
+        # the manager is run from init.d by dmg_manager located in /usr/local/bin. So we can't find the manager.py path...
+        # So we use the processinfo module path which is in the same git repo as manager.py
+        if self.component_id == "core-manager":
+            path = os.path.dirname(os.path.realpath(__file__))
+        else:
+            path = os.path.dirname(os.path.realpath(sys.argv[0]))
+        cmd = 'cd "{0}" ; echo "$(git rev-parse --short HEAD 2>/dev/null)"'.format(path)
+        sp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        out, err = sp.communicate()
+        return out.strip()
+    
 
     def start(self):
         """ Get values each <interval> seconds while process is up
@@ -111,7 +151,7 @@ class ProcessInfo():
             memory_rss = round(memory_info[0] / divisor, 1)
             memory_vsz = round(memory_info[1] / divisor, 1)
             memory_percent = round(self.p.memory_percent(),1)
-            self.log.debug(u"Process informations|python_version={8}|psutil_version={0}|domogik_version={9}|component={1}|component_version={12}|pid={2}|cpu_percent_usage={3}|memory_total={4}|memory_percent_usage={5}|memory_rss={6}|memory_vsz={7}|num_threads={10}|num_file_descriptors_used={11}|platform={13}|num_core={14}".format(self.psutil_version, self.component_id, self.pid, cpu_percent, memory_total_phymem, memory_percent, memory_rss, memory_vsz, self.python_version, domogik_version, num_threads, num_fds, self.component_version, self.platform, self.num_core)) 
+            self.log.debug(u"Process informations|python_version={8}|psutil_version={0}|domogik_version={9}|component={1}|component_version={12}|pid={2}|cpu_percent_usage={3}|memory_total={4}|memory_percent_usage={5}|memory_rss={6}|memory_vsz={7}|num_threads={10}|num_file_descriptors_used={11}|platform={13}|num_core={14}|git_branch={15}|git_revision={16}".format(self.psutil_version, self.component_id, self.pid, cpu_percent, memory_total_phymem, memory_percent, memory_rss, memory_vsz, self.python_version, domogik_version, num_threads, num_fds, self.component_version, self.platform, self.num_core, self.git_branch, self.git_revision)) 
             if self._callback != None:
                 # the domogik installation id (key 'id') will be filled by the manager or any other component which will process the below data
                 data = {
@@ -122,7 +162,9 @@ class ProcessInfo():
                              'component' : self.component_id,
                              'component_version' : self.component_version,
                              'platform' : self.platform,
-                             'num_core' : self.num_core
+                             'num_core' : self.num_core,
+                             'git_branch' : self.git_branch,
+                             'git_revision' : self.git_revision
                          },
                          'measurements' : {
                              'unit' : 1,                               # this one is used to count items on grafana side
@@ -143,6 +185,4 @@ class ProcessInfo():
 def display(pid, data):
     print(u"DATA ({0}) = {1}".format(pid, str(data)))
 
-if __name__ == "__main__":
-    my_process = ProcessInfo(3529)
-    #my_process.start()
+
