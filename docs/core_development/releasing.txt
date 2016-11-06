@@ -15,7 +15,7 @@ Resources
 0.4.0 specific tasks
 ====================
 
-* apply the branching model and communicate on it with all developpers! * master => release-0.4 * create develop from master
+* apply the branching model and communicate on it with all developers! * master => release-0.4 * create develop from master
 * write doc about it for plugins
 * write doc about it for the core (add a dedicated section about core dev in the doc) : hotfixes, features branches, ...
 * set up the new download manager
@@ -37,7 +37,7 @@ Specific tasks for the final release
 
 * update the install documentation to use the package instead of git
 * doc: create the release doc : update banner, create a dedicated cron task which use the release-0.4.0 branch (for example)
-* update the roadmap for the next releases and communicate about it (at least a tweet + mail to ML to the udpated page)
+* update the roadmap for the next releases and communicate about it (at least a tweet + mail to ML to the updated page)
 
 Packaging
 =========

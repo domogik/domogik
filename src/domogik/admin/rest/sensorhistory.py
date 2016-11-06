@@ -5,12 +5,12 @@ import os
 import domogik
 from subprocess import Popen, PIPE
 from flask import Response
-
+from flask_login import login_required
 
 @app.route('/rest/sensorhistory/id/<int:sid>/latest')
 @app.route('/rest/sensorhistory/id/<int:sid>/latest/')
 @json_response
-@timeit
+@login_required
 def sensorHistory_latest(sid):
     """
     @api {get} /rest/sensorhistory/id/<id>/latest Retrieve the last stored value for a sensor
@@ -60,11 +60,14 @@ def sensorHistory_latest(sid):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, app.db.list_sensor_history(sid, 1)
+    app.db.open_session()
+    b = app.db.list_sensor_history(sid, 1)
+    app.db.close_session()
+    return 200, b
 
 @app.route('/rest/sensorhistory/id/<int:sid>/last/<int:num>')
 @json_response
-@timeit
+@login_required
 def sensorHistory_last(sid, num):
     """
     @api {get} /rest/sensorhistory/id/<id>/last/<num> Retrieve the last x number of stored value for a sensor
@@ -132,11 +135,14 @@ def sensorHistory_last(sid, num):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, app.db.list_sensor_history(sid, num)
+    app.db.open_session()
+    b = app.db.list_sensor_history(sid, num)
+    app.db.close_session()
+    return 200, b
 
 @app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>')
 @json_response
-@timeit
+@login_required
 def sensorHistory_from(sid, ftime):
     """
     @api {get} /rest/sensorhistory/id/<id>/from/<tstamp> Retrieve the history from a certain timestamp on
@@ -183,11 +189,14 @@ def sensorHistory_from(sid, ftime):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
+    app.db.open_session()
+    b = app.db.list_sensor_history_between(sid, ftime)
+    app.db.close_session()
     return 200, app.db.list_sensor_history_between(sid, ftime)
 
 @app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/to/<int:ttime>')
 @json_response
-@timeit
+@login_required
 def sensorHistory_from_to(sid, ftime, ttime):
     """
     @api {get} /rest/sensorhistory/id/<id>/from/<tstampFrom>/to/<tstampTo> Retrieve the history between 2 timestamps
@@ -235,11 +244,14 @@ def sensorHistory_from_to(sid, ftime, ttime):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, app.db.list_sensor_history_between(sid, ftime, ttime)
+    app.db.open_session()
+    b = app.db.list_sensor_history_between(sid, ftime, ttime)
+    app.db.close_session()
+    return 200, b
 
 @app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/to/<int:ttime>/interval/<interval>/selector/<selector>')
 @json_response
-@timeit
+@login_required
 def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
     """
     @api {get} /rest/sensorhistory/id/<id>/from/<tstampFrom>/to/<tstampTo>/interval/<interval>/selector/<selector> Retrieve the filtered and calculated history between 2 timestamps
@@ -303,13 +315,16 @@ def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, app.db.list_sensor_history_filter(
-            sid=sid, frm=ftime, to=ttime,
-            step_used=interval, function_used=selector)
+    app.db.open_session()
+    b = app.db.list_sensor_history_filter(
+        sid=sid, frm=ftime, to=ttime,
+        step_used=interval, function_used=selector)
+    app.db.close_session()
+    return 200, b
 
 @app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/interval/<interval>/selector/<selector>')
 @json_response
-@timeit
+@login_required
 def sensorHistory_from_to_filter(sid, ftime, interval, selector):
     """
     @api {get} /rest/sensorhistory/id/<id>/from/<tstampFrom>/interval/<interval>/selector/<selector> Retrieve the filtered and calculated history starting from a certain timestamp
@@ -372,6 +387,9 @@ def sensorHistory_from_to_filter(sid, ftime, interval, selector):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    return 200, app.db.list_sensor_history_filter(
-            sid=sid, frm=ftime, to=None,
-            step_used=interval, function_used=selector)
+    app.db.open_session()
+    b = app.db.list_sensor_history_filter(
+        sid=sid, frm=ftime, to=None,
+        step_used=interval, function_used=selector)
+    app.db.close_session()
+    return 200, b

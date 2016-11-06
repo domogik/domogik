@@ -2,18 +2,29 @@
 SSL configuration
 =================
 
-Activate ssl for REST
-=====================
+Activate ssl for admin and REST
+===============================
 
-Generate the certificate 
-------------------------
+.. note::
+    Personal ssl certificate  is not certified, your browser may refuse access to Domogik server. Just ignore the warning message.
+
+Basic activation
+----------------
+
+Just execute the **ssl_activate.sh** script and restart domogik to use ssl.
+
+Advanced activation tutorials
+-----------------------------
+
+Generate the certificate
+************************
 
 Tou will need to generate 2 files, the self signed certificate and the key file:
 
-First we need to generate the key file: ::
-    
-    $ openssl genrsa -des3 -out <hostname> 1024
-    
+First we need to generate the key file **without a paraphrase**: ::
+
+    $ openssl genrsa -des3 -out <hostname>.key 1024
+
 You should now have a <hostname>.key file.
 
 The second file is the certificate itself, this is generated in 2 steps:
@@ -21,22 +32,23 @@ The second file is the certificate itself, this is generated in 2 steps:
 1- generating the Certificate Signing Request: ::
 
     $ openssl req -new -key <hostname>.key -out <hostname>.csr
-    
+
 2- the self signed certificate: ::
 
     $ openssl x509 -req -days 365 -in <hostname>.csr -signkey <hostname>.key -out <hostname>.crt
-    
+
 If you followed the above steps you will have the 2 needed files, <hostname>.key and <hostname>.crt
 
 Configure REST
---------------
+**************
 
-To configure rest to use ssl we need to adapt the /etc/domogik/domogik.cfg file, there are 2 importent keys for this
+To configure rest to use ssl we need to adapt the /etc/domogik/domogik.cfg file, there are 3 important keys for this
 
+* use_ssl = True
 * ssl_certificate = should point to the .crt file
 * ssl_key = should point to the .key file
-    
+
 One this is updated restart domogik, and rest should be running with ssl enabled.
-    
+
 
 Restart the REST server.

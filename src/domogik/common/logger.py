@@ -39,6 +39,7 @@ Implements
 """
 
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import sys
 from domogik.common.configloader import Loader
 
@@ -76,6 +77,13 @@ class Logger():
                 filename = "{0}/{1}.log".format(config['log_dir_path'], use_filename)
             level = config['log_level']
 
+            if 'log_when' not in config:
+                config['log_when'] = 'D'
+            if 'log_interval' not in config:
+                config['log_interval'] = 1
+            if 'log_backup_count' not in config:
+                config['log_backup_count'] = 10
+
             if level not in LEVELS:
                 raise ValueError("level must be one of 'debug','info','warning',"\
                         "'error','critical'. Check your config.")
@@ -87,7 +95,9 @@ class Logger():
             # log to file
             my_logger.propagate = 0
             if not my_logger.handlers:
-                hdlr = logging.FileHandler(filename)
+                hdlr = TimedRotatingFileHandler(filename, \
+                        when=config['log_when'], interval=int(config['log_interval']), \
+                        backupCount=int(config['log_backup_count']))
                 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
                 hdlr.setFormatter(formatter)
                 my_logger.addHandler(hdlr)

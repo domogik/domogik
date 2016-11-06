@@ -92,5 +92,5 @@ if __name__ == "__main__":
     print("====")
     print("I sleep 5s")
     sleep(5)
-    print ("Trying to evaluate : {0}".format(TEST.evaluate()))
+    print("Trying to evaluate : {0}".format(TEST.evaluate()))
     TEST.destroy()

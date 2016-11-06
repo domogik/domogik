@@ -5,7 +5,7 @@ Set a udev rule
 Purpose
 =======
 
-Setting a udev rule allow the computer to create a permanent /dev/mydevice entry for a device. This is usefull to be sure of the path of a device.
+Setting a udev rule allow the computer to create a permanent /dev/mydevice entry for a device. This is useful to be sure of the path of a device.
 
 Udev rules are indicated by Domogik plugins
 ===========================================

@@ -2,9 +2,9 @@
 Plugin specifications
 =====================
 
-For any development project, the developper (ideally not the developper, but for Domogik plugins, it will be the developper for most of the plugins), must write some specifications.
+For any development project, the developer (ideally not the developer, but for Domogik plugins, it will be the developer for most of the plugins), must write some specifications.
 
-People often think that specifications takes too much time and it is an optionnal step. Yes, you can skip the specifications step, but there is a risk you loose a lot of time when doing this ;).
+People often think that specifications takes too much time and it is an optional step. Yes, you can skip the specifications step, but there is a risk you loose a lot of time when doing this ;).
 
 For Domogik plugins we strongly suggest you to write some specifications before doing anything. Here are some things you should focus on: 
 

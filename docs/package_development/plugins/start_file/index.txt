@@ -5,7 +5,7 @@ start.sh
 Purpose
 =======
 
-The **start.sh** file is only an helper for the developpers and people who want to test the plugin from the command line. It will override the PYTHONPATH environment variable and launch the plugin.
+The **start.sh** file is only an helper for the developers and people who want to test the plugin from the command line. It will override the PYTHONPATH environment variable and launch the plugin.
 
 Create the start.sh
 ===================

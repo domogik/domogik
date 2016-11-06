@@ -7,7 +7,7 @@ Some big changes
 
 With Domogik 0.4, the plugin format changes a lot. But don't be afraid, it is the last big change of the plugins format : as Domogik 0.4 is the new base for the next Domogik releases, the plugins format won't change like it did from 0.1 to 0.2 and from 0.3 to 0.4!
 
-The 0.4 release come with a new database model, more powerfull, more efficient. This model will allow to handle multi addresses technologies, like KNX or Chacon devices with the RFXCOM (for which the address is *unit+id*). It will also allow a more accurate choice of data types.
+The 0.4 release come with a new database model, more powerful, more efficient. This model will allow to handle multi addresses technologies, like KNX or Chacon devices with the RFXCOM (for which the address is *unit+id*). It will also allow a more accurate choice of data types.
 
 There are several important changes about the plugins format: 
 

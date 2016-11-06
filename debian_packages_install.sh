@@ -118,7 +118,8 @@ pip_list="Flask-Login \
           sphinx-better-theme \
           sqlalchemy-utils \
           linux-metrics \
-          pytz
+          pytz \
+          chardet
          "
 
 for elt in $pip_list

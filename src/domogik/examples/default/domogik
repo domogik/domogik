@@ -26,7 +26,8 @@ LAUNCH_DOMOGIK_XPL_HUB=true
 # - the Domogik python hub
 # By default, the Domogik python hub is used. On very slow computers, you may 
 # want to use the C hub instead.
-# Possible values are: c, python
+# Possible values are: 'c', 'python'
+# You may also use the 'gxpl' value to use the gxpl hub. If so, you will have to install yourself the GxPL hub : http://www.epsilonrt.com/gxPL/
 DOMOGIK_XPL_HUB=python
 
 

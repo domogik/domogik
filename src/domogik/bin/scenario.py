@@ -49,14 +49,14 @@ class ScenarioFrontend(Plugin):
     """
 
     def __init__(self):
-        Plugin.__init__(self, name = 'scenario')
+        Plugin.__init__(self, name = 'scenario', log_prefix='core_')
         ### check that needed services are up on MQ side
         cli = MQSyncReq(zmq.Context())
         mq_services = None
         while mq_services == None or 'xplgw' not in mq_services:
             mq_services_raw = cli.rawrequest('mmi.services', '', timeout=10)
             if mq_services_raw != None: 
-                mq_services = mq_services_raw[0].replace(" ", "").split(",")
+                mq_services = str(mq_services_raw[0]).replace(" ", "").split(",")
             self.log.info("Checking for MQ services : {0}".format(mq_services))
             if mq_services == None or 'xplgw' not in mq_services:
                 self.log.debug("Needed MQ services not yet available : waiting")
@@ -89,7 +89,8 @@ class ScenarioFrontend(Plugin):
                         'get': self._backend.get_parsed_condition,
                         'evaluate': self._backend.eval_condition,
                         'enable': self._backend.enable_scenario,
-                        'disable': self._backend.disable_scenario
+                        'disable': self._backend.disable_scenario,
+                        'test': self._backend.test_scenario
                     },
                     'action':
                     {
@@ -106,6 +107,7 @@ class ScenarioFrontend(Plugin):
                     if msg.get_data() == {}:
                         payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]]()
                     else:
+                        print(msg.get_data())
                         payload = mapping[msg.get_action().split('.')[0]][msg.get_action().split('.')[1]](**msg.get_data())
                     self._mdp_reply(msg.get_action(), payload)
         except:

@@ -5,10 +5,10 @@ import os
 import domogik
 from subprocess import Popen, PIPE
 from flask import Response
+from flask_login import login_required
 
 @app.route('/rest/')
 @json_response
-@timeit
 def api_root():
     """
     @api {get} /rest/ Get the status of the REST server

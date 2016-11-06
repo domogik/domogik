@@ -24,6 +24,16 @@ h5 {
 }
 
 
+/** all tables **/
+
+table {
+    table-layout: fixed;
+}
+
+table td {
+    word-wrap: break-word;
+}
+
 /** login **/
 
 .login{
@@ -341,6 +351,13 @@ h5 {
     height: 80vh;
 }
 
+.scenarioInfo {
+    background-color: #f8f8f8;
+    padding: 0.5em;
+    border: 1px #e7e7e7 solid;
+    margin-bottom: 0.5em;
+}
+
 
 /*** devices ***/
 
@@ -349,6 +366,13 @@ h5 {
 #myDevices > li.active > a:focus {
     color: white;
     text-decoration: none;
+}
+
+/* form */
+.form-group ul {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
 }
 
 /*** forms ***/
@@ -363,4 +387,12 @@ input {
 iframe {
     border: none;
     width: 100%;
+}
+
+/*** persons ***/
+
+.person-info  {
+}
+.person-info .photo {
+    margin-right: 1em;
 }

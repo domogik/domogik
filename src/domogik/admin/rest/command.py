@@ -1,4 +1,4 @@
-from domogik.admin.application import app, json_response, timeit
+from domogik.admin.application import app, json_response
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 import sys
@@ -8,13 +8,13 @@ import json
 from subprocess import Popen, PIPE
 from flask import Response, request
 from domogik.common.utils import call_package_conversion
-from domogikmq.pubsub.subscriber import MQSyncSub
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
+from flask_login import login_required
 
 @app.route('/rest/cmd/id/<int:cid>', methods=['GET'])
 @json_response
-@timeit
+@login_required
 def api_ncommand(cid):
     """
     @api {get} /rest/cmd/id/<int:cid> Trigger a command

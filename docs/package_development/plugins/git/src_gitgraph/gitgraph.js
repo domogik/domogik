@@ -43,7 +43,7 @@
     switch (options.orientation) {
     case "vertical-reverse" :
       this.template.commit.spacingY *= -1;
-      this.orientation = "verticale-reverse";
+      this.orientation = "vertical-reverse";
       break;
     case "horizontal" :
       this.template.commit.message.display = false;

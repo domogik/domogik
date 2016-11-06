@@ -33,8 +33,6 @@ Implements
 @organization: Domogik
 """
 
-from socket import gethostname
-#from exceptions import ImportError, AttributeError
 from subprocess import Popen, PIPE
 import os
 import sys
@@ -43,11 +41,15 @@ from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
 from domogik.common.configloader import Loader, CONFIG_FILE
 import datetime
 import time
+import unicodedata
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
 
 REGEXP_PS_SEPARATOR = re.compile('[\s]+')
+
+# to optimize get_sanitized_hostname()
+HOSTNAME= os.uname()[1].lower().split('.')[0].replace('-','')[0:16]
 
 
 def get_interfaces():
@@ -104,7 +106,9 @@ def get_sanitized_hostname():
     """ Get the sanitized hostname of the host 
     This will lower it and keep only the part before the first dot
     """
-    return gethostname().lower().split('.')[0].replace('-','')[0:16]
+    #print(">>>>>> get_sanitized_hostname()")
+    #return os.uname()[1].lower().split('.')[0].replace('-','')[0:16]
+    return HOSTNAME
 
 def ucode(my_string):
     """Convert a string into unicode or return None if None value is passed
@@ -268,6 +272,11 @@ def get_midnight_timestamp():
     ts = time.time()
     return int(ts - get_seconds_since_midnight())
 
+def remove_accents(input_str):
+    """ Remove accents in utf-8 strings
+    """
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 if __name__ == "__main__":
     print(get_seconds_since_midnight())

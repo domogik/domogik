@@ -17,7 +17,7 @@ Domogik
        * Installation
        * Documentation
 
-|dev|  :doc:`Technical and developpers documentation <index_dev>`
+|dev|  :doc:`Technical and developers documentation <index_dev>`
 
        * Technical descriptions 
        * Plugin development

@@ -73,14 +73,12 @@ class Sniffer(XplPlugin):
         Print received message
         '''
         if self.options.compress == False:
-            #print(u"{0} - {1}".foramt(datetime.datetime.now(), message))
             self.log.info(u"{0} - {1}".format(datetime.datetime.now(), message))
         else:
             ldt = localtime()
             date = "{0}/{1}/{2}".format(ldt[0], self._format(ldt[1]), self._format(ldt[2]))
             time = "{0}:{1}:{2}".format(self._format(ldt[3]), self._format(ldt[4]), self._format(ldt[5]))
             display = "{0}".format(time)
-            #self.log.info(u"{0} - {1}".format(datetime.datetime.now(), message))
             print(u"{0} - {1} {2} hop={3} source={4} target={5}".format(display,
                                                           message.type,
                                                           message.schema,
@@ -89,7 +87,7 @@ class Sniffer(XplPlugin):
                                                           message.target))
             idx = 0
             for elt in message.data:
-                print(u"  {0}={1}" % (elt, message.data[elt]))
+                print(u"  {0}={1}".format(elt, message.data[elt]))
                 idx += 1
                 if idx == 4:
                     print(u"  ...")

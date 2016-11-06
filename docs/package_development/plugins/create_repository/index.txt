@@ -28,8 +28,8 @@ The repository is now created:
 .. image:: create_repository_03.png
 
 
-Clone the repository to start developping your plugin
-=====================================================
+Clone the repository to start developing your plugin
+====================================================
 
 In the right column, you can easily copy a link to clone the repository. To clone over ssh, just click on the **SSH** link:
 

@@ -333,7 +333,7 @@ class CronExpression(object):
                 if value >= minmax[0] and value <= minmax[1]:
                     return set((value,))
                 else:
-                    raise ValueError("Invalid bounds: \"%s\"" % parse)
+                    raise ValueError("Invalid bounds: \"{0}\"".format(parse))
             elif '-' in parse or '/' in parse:
                 divide = parse.split('/')
                 subrange = divide[0]
@@ -345,12 +345,12 @@ class CronExpression(object):
                     # Example: a-b
                     prefix, suffix = [int(n) for n in subrange.split('-')]
                     if prefix < minmax[0] or suffix > minmax[1]:
-                        raise ValueError("Invalid bounds: \"%s\"" % parse)
+                        raise ValueError("Invalid bounds: \"{0}\"".format(parse))
                 elif subrange == '*':
                     # Include all values with the given range
                     prefix, suffix = minmax
                 else:
-                    raise ValueError("Unrecognized symbol: \"%s\"" % subrange)
+                    raise ValueError("Unrecognized symbol: \"{0}\"".format(subrange))
     
                 if prefix < suffix:
                     # Example: 7-10

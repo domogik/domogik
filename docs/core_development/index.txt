@@ -3,7 +3,7 @@ Core development
 ================
 
 .. todo::
-    Add some informations for core developpers
+    Add some informations for core developers
 
 * :doc:`Releasing tasks <releasing>`
 

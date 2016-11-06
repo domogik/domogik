@@ -32,7 +32,7 @@ Eight plugins are provided in this version :
 
 Android application
 ===================
-An Android application called `Domodroid <https://market.android.com/details?id=org.panel&feature=search_result>`_ is available on the Android Market and is fully operationnal with Domogik 0.1.0.
+An Android application called `Domodroid <https://market.android.com/details?id=org.panel&feature=search_result>`_ is available on the Android Market and is fully operational with Domogik 0.1.0.
 
 Compatibility
 =============
@@ -63,7 +63,7 @@ Others browsers may or may not be able to use all functionnalities (due to some 
 Known wish list
 ===============
 .. note::
-    Here are listed all unimplemented features, problems or bugs that are known and will be processed in futur releases.
+    Here are listed all unimplemented features, problems or bugs that are known and will be processed in future releases.
 
 * Scenarios management is not available in this release.
 * Smartphone browsers are not currently fully supported due to advanced html 5 features used by Domogik web UI. Adaptation for smartphone browsers will be made in a next release.
@@ -91,4 +91,4 @@ You just find a bug in this release and want to indicate us : just follow these 
 
 Plugin development
 ==================
-It is currently possible to develop your own plugins for Domogik. There are at the present time several people working on differen plugins. Feel free to join us : you will find help on the irc channel or on the forum.
+It is currently possible to develop your own plugins for Domogik. There are at the present time several people working on different plugins. Feel free to join us : you will find help on the irc channel or on the forum.

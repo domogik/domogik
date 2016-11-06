@@ -17,6 +17,7 @@ import logging
 import pkg_resources
 from subprocess import Popen, PIPE, STDOUT
 from distutils import version
+import uuid
 
 
 BLUE = '\033[94m'
@@ -107,8 +108,7 @@ def build_file_list(user):
     if os.path.exists('/etc/logrotate.d'):
         debug("Found a directory for the logrotate script: /etc/logrotate.d")
         d_files.append(('/etc/logrotate.d', ['root', None], \
-                ['src/domogik/examples/logrotate/domogik', \
-                'src/domogik/xpl/hub/examples/logrotate/xplhub']))
+                ['src/domogik/xpl/hub/examples/logrotate/xplhub']))
 
     if os.path.exists('/etc/init.d'):
         debug("Init script path is /etc/init.d")
@@ -195,9 +195,10 @@ def create_user(d_user, d_shell = "/bin/sh"):
 def is_domogik_advanced(advanced_mode, sect, key):
     advanced_keys = {
         'domogik': ['libraries_path', 'src_prefix', \
-                'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level'],
+                'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level', \
+                'log_when', 'log_interval', 'log_backup_count'],
         'database': ['prefix', 'pool_recycle'],
-        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json'],
+        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth'],
     }
     if advanced_mode:
         return True
@@ -233,17 +234,25 @@ def write_domogik_configfile(advanced_mode, intf):
     itf = ['bind_interface', 'interfaces']
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
-        for item in config.items(sect):
-            if item[0] in itf  and not advanced_mode:
-                config.set(sect, item[0], intf)
-                debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
-            elif is_domogik_advanced(advanced_mode, sect, item[0]):
-                print("- {0} [{1}]: ".format(item[0], item[1])),
-                new_value = sys.stdin.readline().rstrip('\n')
-                if new_value != item[1] and new_value != '':
-                    # need to write it to config file
-                    config.set(sect, item[0], new_value)
-                    newvalues = True
+        if sect != "metrics":
+            for item in config.items(sect):
+                if item[0] in itf  and not advanced_mode:
+                    config.set(sect, item[0], intf)
+                    debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
+                elif is_domogik_advanced(advanced_mode, sect, item[0]):
+                    print("- {0} [{1}]: ".format(item[0], item[1])),
+                    new_value = sys.stdin.readline().rstrip('\n')
+                    if new_value != item[1] and new_value != '':
+                        # need to write it to config file
+                        config.set(sect, item[0], new_value)
+                        newvalues = True
+
+        # manage metrics section
+        else:
+            config.set(sect, "id", uuid.getnode())   # set an unique id which is hardware dependent
+            print("Set [{0}] : {1} = {2}".format(sect, id, uuid.getnode()))
+            debug("Value {0} in domogik.cfg > [metrics] set to {1}".format(id, uuid.getnode()))
+
     # write the config file
     with open('/etc/domogik/domogik.cfg', 'w') as configfile:
         ok("Writing the config file")
@@ -287,7 +296,8 @@ def write_domogik_configfile_from_command_line(args):
                 print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                 config.set(sect, item[0], new_value)
                 newvalues = True
-            debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
+            debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
+
     # write the config file
     with open('/etc/domogik/domogik.cfg', 'w') as configfile:
         ok("Writing the config file")
@@ -307,7 +317,7 @@ def write_xplhub_configfile_from_command_line(args):
                 print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                 config.set(sect, item[0], new_value)
                 newvalues = True
-            debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
+            debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
     if newvalues:
         with open('/etc/domogik/xplhub.cfg', 'w') as configfile:

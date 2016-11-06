@@ -13,7 +13,7 @@ Domogik is no more compliant with Python 2.6. You need at least Python 2.7 to ru
 New database model
 ------------------
 
-A new database model has been implemented. With this new model we removed the usages but add support for multiple adress fields (like address and channel). We also added support for devices that use a different address for receiving commands and for sending there statusses (like KNX). With this implementation we increased the plugin json_version to 2, meaning that the old plugins will not work in this release.
+A new database model has been implemented. With this new model we removed the usages but add support for multiple address fields (like address and channel). We also added support for devices that use a different address for receiving commands and for sending there status (like KNX). With this implementation we increased the plugin json_version to 2, meaning that the old plugins will not work in this release.
 
 This new model is really more efficient that the previous one and will allow us to now handle more technologies in a better way.
 
@@ -27,7 +27,7 @@ But keep in mind that for now, all plugins are using xPL so a hub is still neede
 Domogik Datatypes
 -----------------
 
-All data comming from and going to the domogik database is now in an uniform format, the domogik datatypes. For example here are the available datatypes for boolean based data:
+All data coming from and going to the domogik database is now in an uniform format, the domogik datatypes. For example here are the available datatypes for boolean based data:
 
 * DT_Bool
 * DT_Switch
@@ -86,7 +86,7 @@ Domogik can, as in the 0.3 release, handle some external xPL clients. There are 
 New administration interface
 ----------------------------
 
-The administration interface is no more included in Domoweb. It is now included in Domogik and available on http://ip:40406/. This interface is based on Flask and Bootstrap and is light and responsive! Some usefull options have been added in the new administration interface.
+The administration interface is no more included in Domoweb. It is now included in Domogik and available on http://ip:40406/. This interface is based on Flask and Bootstrap and is light and responsive! Some useful options have been added in the new administration interface.
 
 Tests
 -----
@@ -98,7 +98,7 @@ A continuous integration service is now used : Travis CI. This one is used to va
 New installations script
 ------------------------
 
-The installation script has been totally rewritten. You can now use it with options, skip some steps, ... This will be usefull for distribution packagers and also for developpers (to quickly set up new environments).
+The installation script has been totally rewritten. You can now use it with options, skip some steps, ... This will be useful for distribution packagers and also for developers (to quickly set up new environments).
 
 Files moved
 -----------

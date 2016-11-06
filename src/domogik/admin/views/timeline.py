@@ -49,9 +49,15 @@ def timeline_generic(the_device_id = None):
             print(elt)
             (device_name, device_id, client, sensor_name, sensor_dt_type, sensor_id, date_of_value, value) = elt
    
-            if "unit" in datatypes[sensor_dt_type]:
-                unit = datatypes[sensor_dt_type]["unit"]
+            if sensor_dt_type in datatypes:
+                if "unit" in datatypes[sensor_dt_type]:
+                    unit = datatypes[sensor_dt_type]["unit"]
+                else:
+                    unit = None
+            # datatype not known : new plugin with an old datatype file on domogik side.
+            # this should happen only in dev mode
             else:
+                datatypes[sensor_dt_type] = None
                 unit = None
 
             if device_id == previous_device_id and date_of_value == previous_date:
@@ -62,6 +68,7 @@ def timeline_generic(the_device_id = None):
                                       "date" : previous_date.date(),
                                       "time" : previous_date.time(),
                                       "device_name" : previous_device_name,
+                                      "device_id" : previous_device_id,
                                       "client" : previous_client,
                                       "sensors_changes" : sensors_changes_for_the_device
                                     })
@@ -89,6 +96,7 @@ def timeline_generic(the_device_id = None):
     return render_template('timeline.html',
         mactive="timeline",
         device_name=the_device_name,
-        timeline=timeline
+        timeline=timeline,
+        datatypes = datatypes
         )
 

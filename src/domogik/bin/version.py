@@ -35,8 +35,8 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from domogik.bin.rest import REST_API_VERSION
-import domogik.rest
+#from domogik.bin.admin import REST_API_VERSION
+#import domogik.admin.rest
 import sys
 import os
 from subprocess import Popen, PIPE

@@ -26,6 +26,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.actions.abstract import AbstractAction
+from domogik.common.utils import ucode
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 import zmq
@@ -33,30 +34,50 @@ import json
 import traceback
 
 class CommandAction(AbstractAction):
-    """ Simple action that log something in scenario logfile
+    """ Simple action that calls a device command
     """
 
     def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log, params)
         self.log = log
-        self.set_description("Start a certain command")
+        self.set_description(u"Start a certain command")
         self._cmdId = params
 
     def do_action(self):
-        print self._params
+        self.log.info(u"Command : Do an action...")
+
+        # live udate some values
+        self.log.debug(u"Command : Preprocessing on parameters...")
+        self.log.debug(u"Command : Parameters before processing : {0}".format(self._params))
+        params = {}
+        for key in self._params:
+            self._params[key] = ucode(self._params[key])
+            self.log.debug(u"Command : Preprocess for param : key={0}, typeofvalue={1}, value={2}".format(key, type(self._params[key]), self._params[key]))
+            params[key] = self._params[key]
+            if key == "color" and params[key].startswith("#"):
+                self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
+                params[key] = params[key][1:]
+
+        self.log.debug(u"Command : Parameters after processing : {0}".format(params))
+        self.log.debug(u"Command : Send action command over MQ...")
+
+        # do the command
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('cmd.send')
         msg.add_data('cmdid', self._cmdId)
-        msg.add_data('cmdparams', self._params)
+        msg.add_data('cmdparams', params)
+
+        self.log.debug(u"Command : Command id = '{0}', command params = '{1}'".format(self._cmdId, params)) 
         # do the request
         res = cli.request('xplgw', msg.get(), timeout=10)
         if res:
             data = res.get_data()
             if not data['status']:
-                self.log.error("Command sending to XPL gw failed: {0}".format(res))
+                self.log.error(u"Command : Command sending to XPL gw failed: {0}".format(res))
         else:
-            self.log.error("XPL gw did not respond")
+            self.log.error(u"Command : XPL gw did not respond")
+        self.log.debug(u"Command : Action done")
 
     def get_expected_entries(self):
         return {

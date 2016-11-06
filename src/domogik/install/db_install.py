@@ -47,8 +47,11 @@ class DbInstall():
         from domogik.common import sql_schema
         from domogik.common import database
         from sqlalchemy import create_engine, MetaData, Table
+        from sqlalchemy import __version__ as sqla_version
         from alembic.config import Config
         from alembic import command
+
+        info(u"SQLAlchemy version is : {0}".format(sqla_version))
 
         self.db_backup_file = "{0}/domogik-{1}.sql".format(tempfile.gettempdir(), int(time.time()))
         self.alembic_cfg = Config("alembic.ini")
@@ -61,7 +64,7 @@ class DbInstall():
         from sqlalchemy_utils import database_exists, create_database
 
         if not self._db.is_db_type_mysql():
-            raise OSError("Create data base of %s is not implemented. Sorry! "%self._db.get_db_type())
+            raise OSError("Create data base of {0} is not implemented. Sorry! ".format(self._db.get_db_type()))
 
         info("Checking the db existance")
         if self.check_db_exists() == True:
@@ -80,7 +83,7 @@ class DbInstall():
         print(sh_script)
         print("---------------------------------------------------")
 
-        ok("Please entrer %s root password"%(self._db.get_db_type()))
+        ok("Please entrer {0} root password".format(self._db.get_db_type()))
         res = os.system(sh_script)
         if ( res != 0 ):
             fail("Cannot apply permissions")

@@ -21,6 +21,7 @@ domogik.sqlite
 dist/ 
 build/
 _build/*
+docs/_build/*
 install.log
 *.swp
 pipinstall.log

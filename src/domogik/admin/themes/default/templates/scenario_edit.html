@@ -10,7 +10,14 @@
     {{ form.sid }}
     {{ form.sjson }}
     <div id="scenario_title" class="xform-group">
+        <span class="{% if form.sname.errors %} has-error{% endif %}">
         {{ form.sname(class_="form-control input-lg") }}
+        {% if form.sname.errors %} 
+          {% for error in form.sname.errors %}
+            <span class="text-warning">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
+        </span>
         <button type="submit" class="btn btn-info">
           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
           {% trans %}Save{% endtrans %}
@@ -18,9 +25,14 @@
     <a class="btn btn-default" data-toggle="confirmation" data-placement="bottom" data-href="/scenario/del/{{ scenario_id }}">
       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans %}Delete{% endtrans %}
     </a>
+<!-- TEMPORARY DISABLED
     <button id="help" type="button" class="btn btn-default"  data-toggle="modal" data-target="#help_modal">
       <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {% trans %}Help{% endtrans %}
     </button>
+-->
+    <a id="examples" type="button" class="btn btn-default" href="/scenario/examples">
+      <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {% trans %}Help - examples{% endtrans %}
+    </a>
     </div>
     </div>
   <div class="form-group">
@@ -37,21 +49,45 @@
       <span class="help-block">{{ form.sdesc.description }}</span>
     </div>
   </div>
+
   </form>
 
-  <!-- <pre>{{ jso }}</pre> -->
-  <div id="blocklyArea"></div>
+
+  <!--<pre>{{ jso }}</pre>-->
+  <!--
+  <div class='scenarioInfo'>
+  </div>
+  -->
+  <div id="blocklyArea">
+  </div>
   <div id="blocklyDiv" style="position: absolute; width: 50%;"></div>
   <xml id="toolbox" style="display: none">
     <category name="Logic">
+        <block type="controls_if"></block>
         <block type="logic_compare"></block>
+        <block type="trigger.Hysteresis"></block>
         <block type="logic_operation"></block>
         <block type="logic_negate"></block>
+        <block type="math_arithmetic"></block>
+    </category>
+    <category name="Constants">
         <block type="logic_boolean"></block>
+        <block type="math_number"></block>
+        <block type="text"></block>
+    </category>
+    <category name="Variables" custom="VARIABLE"></category>
+    <category name="Text">
+        <block type="text_join"></block>
+        <block type="text_length"></block>
+        <block type="text_isEmpty"></block>
     </category>
     <category name="Datatypes">
-        {% for d in datatypes %}
-            <block type="{{ d }}"></block>
+        {% for p, ds in datatypes.items() %}
+            <category name="{{ p }}">
+            {% for d in ds %}
+                <block type="{{ d }}"></block>
+            {% endfor %}
+            </category>
         {% endfor %}
     </category>
     <category name="Devices">
@@ -80,7 +116,9 @@
     </category>
     <category name="Other sensors">
         {% for t in tests %}
-            <block type="{{ t }}"></block>
+            {% if t != "trigger.Hysteresis" %}
+                <block type="{{ t }}"></block>
+            {% endif %}
         {% endfor %}
     </category>
     <category name="Other commands">
@@ -203,7 +241,6 @@
             .appendField('Do');
         this.setPreviousStatement(false);
         this.setNextStatement(false);
-        this.setDeletable(false);
         this.contextMenu = false;
         this.setInputsInline(false);
       }
@@ -211,11 +248,22 @@
     var workspace = Blockly.inject('blocklyDiv',
         {
             media: '../../static/libraries/blockly/media/',
-            toolbox: document.getElementById('toolbox')
+            toolbox: document.getElementById('toolbox'),
+            zoom:
+                {controls: true,
+                 wheel: false,
+                 startScale: 1.0,
+                 maxScale: 1.5,
+                 minScale: 0.5,
+                 scaleSpeed: 1.2}
         }
     );
     function onchange() {
-      $('#sjson').val( Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace()) );
+        $('#sjson').val( Blockly.JSON.workspaceToJson(Blockly.getMainWorkspace()) );
+        // on each json change, check is some 'display informations' actions must be done
+        if ($('#sjson').val().indexOf("trigger.Hysteresis") > -1) {
+            // do something
+        }
     }
     workspace.addChangeListener(onchange);
     $(document).ready(function() {

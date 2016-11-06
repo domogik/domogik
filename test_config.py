@@ -37,15 +37,23 @@ Implements
 import os
 import pwd
 import sys
+import re
 from multiprocessing import Process, Pipe
 from socket import gethostbyname, gethostname
 from domogik.common.utils import get_ip_for_interfaces
+from domogik.xpl.common.xplmessage import REGEXP_SOURCE
 
 BLUE = '\033[94m'
 OK = '\033[92m'
 WARNING = '\033[93m'
 FAIL = '\033[91m'
 ENDC = '\033[0m'
+
+REGEXP_HOSTNAME = r"""(?P<source>
+                        (?P<source_instance_id>[a-z, 0-9, \-]{1,16})$
+                    )
+                """
+
 
 user = ''
 
@@ -145,9 +153,6 @@ def test_config_files():
     params = True
     if "-d" not in manager_params:
         warning("No -d option in MANAGER_PARAMS. You should have it unless you are using domogik on more than one computer.")
-        params = False
-    if "-r" not in manager_params:
-        warning("No -r option in MANAGER_PARAMS. You should have it unless you are using domogik on more than one computer.")
         params = False
     if params:
         ok("Manager params seem good")
@@ -281,10 +286,12 @@ def test_hostname():
         warning("Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
             You should change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again.")
     #ok("Hostname length is < 16.")
-    if gethostname().count("-") > 0:
-        warning("Your hostname is '%s'. It shouldn't contain the character '-'." % gethostname())
+    __regexp_source = re.compile(REGEXP_HOSTNAME, re.UNICODE | re.VERBOSE)
+    match_source = __regexp_source.match(gethostname().split(',')[0])
+    if match_source is None:
+        warning("Your hostname is not valid (%s). Must contain only alphanumeric (a to z, 0 to 9) chars and be < 16 chars.")
     else:
-        ok("Hostname characters are OK")
+        ok("Hostname is OK")
 
 def test_config():
     try:

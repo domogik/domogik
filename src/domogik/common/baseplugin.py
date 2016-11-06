@@ -35,29 +35,28 @@ Implements
 """
 
 import threading
-from socket import gethostname 
+from argparse import ArgumentParser
 from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import pwd
 import traceback
-import inspect
 
+from domogik.common.utils import get_sanitized_hostname
 from domogik.common.daemon.daemon import DaemonContext
 from domogik.common.defaultloader import DefaultLoader
 from domogik.common import logger
 from domogik.common.utils import is_already_launched
-from argparse import ArgumentParser
 
 FIFO_DIR = "/var/run/domogik/"
 
 
-class BasePlugin():
+class BasePlugin(object):
     """ Basic plugin class, manage common part of all plugins.
     For all xPL plugins, the XplPlugin class must be use as a basis, not this one.
     """
-    def __init__(self, name, stop_cb = None, p = None, daemonize = True, log_prefix= "", log_on_stdout = True):
-        ''' 
+    def __init__(self, name, stop_cb=None, p=None, daemonize=True, log_prefix="", log_on_stdout=True):
+        '''
         @param p : An instance of ArgumentParser. If you want to add extra options to the generic option parser,
         create your own ArgumentParser instance, use parser.add_argument and then pass your parser instance as parameter.
         Your options/params will then be available on self.options and self.args
@@ -66,10 +65,13 @@ class BasePlugin():
         @param log_prefix : If set, use this prefix when creating the log file in Logger()
         @param log_on_stdout : if set to True, allow to read logs on both stdout and log file
         '''
+
+        self.set_sanitized_hostname()
+
         ### First, check if the user is allowed to launch the plugin. The user must be the same as the one defined
         # in the file /etc/default/domogik : DOMOGIK_USER
-        Default = DefaultLoader()
-        dmg_user = Default.get("DOMOGIK_USER")
+        default = DefaultLoader()
+        dmg_user = default.get("DOMOGIK_USER")
         logname = pwd.getpwuid(os.getuid())[0]
         if dmg_user != logname:
             print(u"ERROR : this Domogik part must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : {0}".format(dmg_user))
@@ -78,8 +80,8 @@ class BasePlugin():
         if name is not None:
             self._plugin_name = name
 
-        l = logger.Logger(name, use_filename = "{0}{1}".format(log_prefix, name), log_on_stdout = log_on_stdout)
-        self.log = l.get_logger()
+        logg = logger.Logger(name, use_filename="{0}{1}".format(log_prefix, name), log_on_stdout=log_on_stdout)
+        self.log = logg.get_logger()
 
         ### Check if the plugin is not already launched
         # notice that when the plugin is launched from the manager, this call is not done as the manager already does this test before starting a plugin
@@ -92,7 +94,7 @@ class BasePlugin():
         ### Create a file to handle the return code
         # this is used by the function set_return_code and get_return_code
         # this is needed as a Domogik process is forked, there is no way to send from a class a return code from the child to the parent.
-        try: 
+        try:
             self.return_code_filename = "{0}/{1}_return_code_{2}".format(FIFO_DIR, self._plugin_name, os.getpid())
             # just touch the file to create it
             open(self.return_code_filename, 'a').close()
@@ -117,21 +119,21 @@ class BasePlugin():
             parser = p
         else:
             parser = ArgumentParser()
-        parser.add_argument("-V", 
-                          "--version", 
-                          action="store_true", 
-                          dest="display_version", 
-                          default=False, 
-                          help="Display Domogik version.")
-        parser.add_argument("-f", 
-                          action="store_true", 
-                          dest="run_in_foreground", 
-                          default=False, 
-                          help="Run the plugin in foreground, default to background.")
-        parser.add_argument("-T", 
-                          dest="test_option", 
-                          default=None,
-                          help="Test option.")
+        parser.add_argument("-V",
+                            "--version",
+                            action="store_true",
+                            dest="display_version",
+                            default=False,
+                            help="Display Domogik version.")
+        parser.add_argument("-f",
+                            action="store_true",
+                            dest="run_in_foreground",
+                            default=False,
+                            help="Run the plugin in foreground, default to background.")
+        parser.add_argument("-T",
+                            dest="test_option",
+                            default=None,
+                            help="Test option.")
         self.options = parser.parse_args()
         if self.options.display_version:
             __import__("domogik")
@@ -141,7 +143,8 @@ class BasePlugin():
         elif not self.options.run_in_foreground and daemonize:
             self.log.info(u"Starting the plugin in background...")
             ctx = DaemonContext()
-            ctx.files_preserve = l.get_fds([name])
+            #ctx = daemon.DaemonContext()
+            ctx.files_preserve = logg.get_fds([name])
             ctx.open()
             self.log.info(u"Daemonize plugin {0}".format(name))
             self.is_daemon = True
@@ -177,11 +180,11 @@ class BasePlugin():
         '''
         # self.log.debug('New thread registered : {0}'.format(thread))
         #Remove all stopped thread from the list
-        for t in self._threads:
-            if not  t.isAlive():
-                self._threads.remove(t)
+        for thread in self._threads:
+            if not  thread.isAlive():
+                self._threads.remove(thread)
         if thread in self._threads:
-            self.log.info(u"Try to register a thread twice :" % thread)
+            self.log.info(u"Try to register a thread twice: {0}".format(thread))
         else:
             self._lock_add_thread.acquire()
             self._threads.append(thread)
@@ -228,44 +231,49 @@ class BasePlugin():
             self._timers.remove(timer)
         self._lock_add_timer.release()
 
-    def add_stop_cb(self, cb):
+    def add_stop_cb(self, callback):
         '''
         Add an additionnal callback to call when a stop request is received
         '''
         self._lock_add_cb.acquire()
-        self._stop_cb.append(cb)
+        self._stop_cb.append(callback)
         self._lock_add_cb.release()
 
-    def get_sanitized_hostname(self):
+    def set_sanitized_hostname(self):
         """ Get the sanitized hostname of the host 
         This will lower it and keep only the part before the first dot
 
         """
-        #return gethostname().lower().split('.')[0].replace('-','')[0:16]
-        return get_sanitized_hostname()
+        self._sanitized_hostname = get_sanitized_hostname()
+
+    def get_sanitized_hostname(self):
+        """ Get the sanitized hostname of the host
+        This will lower it and keep only the part before the first dot
+
+        """
+        return self._sanitized_hostname
 
     def set_return_code(self, value):
-        """ Helper to set the return code 
+        """ Helper to set the return code
             @param value : return code to set
         """
         # the fifo is created in the __init__ :
         # x = os.mkfifo(filename)
         try:
-            file = os.open(self.return_code_filename, os.O_WRONLY)
-            os.write(file, "{0}".format(value))
+            filel = os.open(self.return_code_filename, os.O_WRONLY)
+            os.write(filel, "{0}".format(value))
         except:
             self.log.error("Error while setting return code in '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))
-        
 
     def get_return_code(self):
-        """ Helper to get the return code set with set_return_code 
+        """ Helper to get the return code set with set_return_code
             @return : return code
         """
         # the fifo is created in the __init__ :
         # x = os.mkfifo(filename)
         try:
-            file = open(self.return_code_filename, 'r')
-            lines = file.readline()
+            filel = open(self.return_code_filename, 'r')
+            lines = filel.readline()
             # just in case the file is empty (no return code set)
             if lines == '':
                 lines = 0
@@ -283,20 +291,25 @@ class BasePlugin():
         """ To be called when we exit (Watcher class) to delete the file used to handle the retur code
         """
         try:
-            # TODO : 
+            # TODO :
             # delete the file
             # delete also in /etc/init.d/domogik start|stop ???
             self.log.debug("Delete the file {0}".format(self.return_code_filename))
-            self.log.debug(u"the stack is :")
-            for elt in inspect.stack():
-                self.log.debug(u"    {0}".format(elt))
+            #self.log.debug(u"the stack is :")
+            #for elt in inspect.stack():
+            #    self.log.debug(u"    {0}".format(elt))
             os.unlink(self.return_code_filename)
         except:
             self.log.error("Error while deleting the file '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))
 
-        
-
     def __del__(self):
-        if hasattr(self, log):
+        if hasattr(self, 'log'):
             self.log.debug(u"__del__ baseplugin")
 
+
+
+if __name__ == "__main__":
+    import time
+    print("aa")
+    time.sleep(50)
+    print("aa")

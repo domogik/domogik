@@ -10,19 +10,19 @@ You must first install Domogik 0.4.2 release. Then, you will be able to upgrade 
 Important notice about the 0.5 release
 ======================================
 
-In the 0.5 release, the Rest component has been merger in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
+In the 0.5 release, the Rest component has been merged in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
 
-* use the admin port (40406) instead of the previous rest port (40404)
+* use the admin port (40406) instead of the previous rest port (40405)
 * add */rest/* in front of all old Rest url. Example : */device/* become */rest/device/*.
 
-Some core butler functions interfaces have changd. **All brain packages must be upgrade to Domogik 0.5 compliant releases.**
+Some core butler functions interfaces have changed. **All brain packages must be upgrade to Domogik 0.5 compliant releases.**
 
 If you plan to install Domogik on a Raspberry pi
 ================================================
 
 If you want to use a Raspberry pi A/B/B+, you should forget to install Domogik on it. Currently Domogik uses too much memory for these models.
 
-Domogik should work fine on a Raspberry pi 2 only.
+Domogik can work fine on a Raspberry pi 2 but some users encountered some issues. Please avoir using this platform for now.
 
 Installation
 ============
@@ -71,11 +71,11 @@ If you don't already have Python 2.7 or above (you have it if you are running a 
         $ sudo apt-get install python2.7
         $ sudo ln -sf /usr/bin/python2.7 /usr/bin/python
 
-Here are the needed dependencies. depanding on your Linux distribution, they will be installed autmatically Debian, Ubuntu) or not.
+Here are the needed dependencies. depanding on your Linux distribution, they will be installed automatically Debian, Ubuntu) or not.
 
 * the development packages, pip and setuptools : **python2.7-dev, python-pip, python-setuptools**
 * SSL libraries : **libssl-dev**
-* Zero MQ librariy : **libzmq-dev >= 14.4**. With the 14.3 release of this library, the publish/subscribe feature will not work!
+* Zero MQ library : **libzmq-dev >= 14.4**. With the 14.3 release of this library, the publish/subscribe feature will not work!
 * postgresql libraries : **libpq-dev, python-psycopg2**
 * various needed libraries : **python-mako, libffi-dev, python-netifaces**
 * git : **git**
@@ -98,6 +98,10 @@ The **netifaces python library** can't be installed automatically. For now you w
 
     $ sudo apt-get install python2.7-dev
     $ sudo pip install netifaces
+
+In minimum debian repo the package **sphinx-better-theme** does not exist::
+
+    $ sudo pip install sphinx-better-theme
 
 
 Mysql server
@@ -130,7 +134,7 @@ Download Domogik components
     The following commands assume that you are using the **/opt/dmg/** folder as the root folder for Domogik. And so Domogik will be installed in the */opt/dmg/domogik/* folder.
     If you choose another folder, please keep in mind the below points:
 
-    * You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be carefull if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
+    * You must put Domogik sources in a folder which can be read by all the system users and the domogik user. For example, be careful if you extract domogik sources in */home/john/domogik* and you choose the *domogik* user during installation : the *domogik* user must have write access to */home/john/domogik*.
     * Don't download Domogik sources directly in */root* or */*
     * The folder path must also not contains any spaces in its name!
 
@@ -167,6 +171,7 @@ Download Domogik : ::
     $ cd /opt/dmg/
     $ git clone https://github.com/domogik/domogik.git
     $ cd domogik
+    $ git checkout develop
 
 Install Domogik-mq
 ------------------
@@ -181,11 +186,11 @@ You will be requested to give some informations. ::
     [ Create domogik-mq user ]
     As what user should domogik-mq run? [domogik]: 
 
-Give the system user you will use to install Domogik. You can use a dedicated user named *domogik* if you want. I would suggest you to use your personnal user if you are not familiar with users and related permissions on Linux. ::
+Give the system user you will use to install Domogik. You can use a dedicated user named *domogik* if you want. I would suggest you to use your personal user if you are not familiar with users and related permissions on Linux. ::
 
     Install MQ as master (lib+daemon) or client (lib only) ? [M/s]:
 
-On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.4), on the main server, choose the default option and on the other servers, choose the client option. ::
+On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.4), on the main server, choose the default option and on the other servers, choose the client option.
 
 Install Domogik 
 ---------------
@@ -200,7 +205,7 @@ You will be requested to give some informations. ::
     [ Create domogik user ]
     As what user should domogik run? [domogik]: 
 
-Give the system user you will use to install Domogik. You can use a dedicated user named *domogik* if you want. I would suggest you to use your personnal user if you are not familiar with users and related permissions on Linux. ::
+Give the system user you will use to install Domogik. You can use a dedicated user named *domogik* if you want. I would suggest you to use your personal user if you are not familiar with users and related permissions on Linux. ::
 
     [ Update /etc/default/domogik ]
     Configuration files
@@ -220,7 +225,7 @@ For this 0.4.2 release, you should keep the *debug* level. ::
     Key name [domogik]: 
     Key host [127.0.0.1]:
 
-Set up the database credentials. I you created the database as defined in this page, you can keep the default values. ::
+Set up the database credentials. I you created the database as defined in this page, you can keep the default values.
 
 You should keep the default values. ::
 
@@ -245,6 +250,12 @@ If you are upgrading your Domogik, you should let the installer do a backup of y
     Backup file? [/tmp/domogik-1442999380.sql] 
 
 Set the backup file
+
+.. note::
+    About Domogik 0.5 database upgrade.
+
+    * the following action may take some time : **INFO  [alembic.runtime.migration] Running upgrade 2e6c120aa69a -> a2a3015badf, Upgrade float precission**: it will affect all the history table, so it may take a while to run! Don't worry if this is very long, just wait for the end ;)
+
 
 .. note::
 
@@ -327,7 +338,7 @@ And add at the end the below lines: ::
     # Domogik backup each night at 1:00
     0 1 * * * /opt/dmg/domogik/backup.py > /var/log/domogik/backup-$(date "+\%Y\%m\%d_\%H\%M").log 2>&1
     # Domogik : regenerate packages documentation each hour
-    0 * * * * /opt/dmg/domogik/src/domogik/bin/package.py >> /var/log/domogik/refresh_docs_pkg-$(date "+\%Y\%m\%d").log 2>&1
+    0 * * * * /opt/dmg/domogik/src/domogik/bin/package.py -d >> /var/log/domogik/refresh_docs_pkg-$(date "+\%Y\%m\%d").log 2>&1
 
 The default backup folder is **/var/lib/domogik/backup/**. You can change it in the file **/etc/domogik/domogik.cfg** in the section **[backup]**. Example: ::
 

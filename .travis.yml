@@ -41,6 +41,7 @@ before_script:
 script:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-run-domogik-tests.sh
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-run-test-plugin.sh
+  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-run-test-docs.sh
 after_script:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-after.sh
 notifications:

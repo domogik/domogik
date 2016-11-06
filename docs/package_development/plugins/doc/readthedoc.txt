@@ -79,7 +79,7 @@ Set the **develop** version as **Active**. Uncheck the **Active** checkbox for t
 
 You are now on the **Overview** page for your plugin project. The only version available is **develop**. You can click on **Build** to start the build of the documentation for the **develop** branch.
 
-In the **Builds** menu for your project, you can check if the build was successfull or not. If not, you can click on the status to get the error details.
+In the **Builds** menu for your project, you can check if the build was successful or not. If not, you can click on the status to get the error details.
 
 You can now see the built documentation at http://domogik-plugin-myplugin.readthedocs.org/en/develop/ (adapt *myplugin* to your plugin name)
 
@@ -93,7 +93,7 @@ In your github project, you can set a hook to launch the documentation build on 
 Go on your Github project url. For example https://github.com/mygithublogin/domogik-plugin-myplugin
 
 * Go in the **Settings** menu, then in **Webhooks and services**.
-* In the **Services** part, click on **Add servive** and choose **ReadTheDocs**.
+* In the **Services** part, click on **Add service** and choose **ReadTheDocs**.
 * The ReadTheDocs service configuration page will be displayed. Check that **Active** is set and click on **Add service**.
 
 Now, just do a documentation update, commit it and push it. You should see the doc updated a few minutes later.

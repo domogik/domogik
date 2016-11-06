@@ -60,7 +60,7 @@ class OrderedDict(DictMixin):
                 length = len(items[i])
                 if length != 2:
                     raise ValueError('dictionary update sequence element '
-                        '#{0} has length {1}; 2 is required'.format(i, length))
+                        '{0} has length {1}; 2 is required'.format(i, length))
                 self._keys.append(items[i][0])
                 self._data[items[i][0]] = items[i][1]
         if kwdata:

@@ -308,7 +308,7 @@ function getFieldsJs_(block) {
         case 'field_angle':
           // Result: new Blockly.FieldAngle(90), 'ANGLE'
           fields.push('new Blockly.FieldAngle(' +
-              escapeString(block.getFieldValue('ANGLE')) + '), ' +
+              parseFloat(block.getFieldValue('ANGLE')) + '), ' +
               escapeString(block.getFieldValue('FIELDNAME')));
           break;
         case 'field_checkbox':
@@ -576,12 +576,20 @@ function updateGenerator(block) {
       }
     }
   }
+  // Most languages end lines with a semicolon.  Python does not.
+  var lineEnd = {
+    'JavaScript': ';',
+    'Python': '',
+    'PHP': ';',
+    'Dart': ';'
+  };
   code.push("  // TODO: Assemble " + language + " into code variable.");
-  code.push("  var code = \'...\';");
   if (block.outputConnection) {
+    code.push("  var code = '...';");
     code.push("  // TODO: Change ORDER_NONE to the correct strength.");
     code.push("  return [code, Blockly." + language + ".ORDER_NONE];");
   } else {
+    code.push("  var code = '..." + (lineEnd[language] || '') + "\\n';");
     code.push("  return code;");
   }
   code.push("};");
@@ -669,7 +677,7 @@ function updatePreview() {
     }
 
     // Create the preview block.
-    var previewBlock = Blockly.Block.obtain(previewWorkspace, blockType);
+    var previewBlock = previewWorkspace.newBlock(blockType);
     previewBlock.initSvg();
     previewBlock.render();
     previewBlock.setMovable(false);
@@ -771,11 +779,8 @@ function init() {
     BlocklyStorage.retrieveXml(window.location.hash.substring(1),
                                mainWorkspace);
   } else {
-    var rootBlock = Blockly.Block.obtain(mainWorkspace, 'factory_base');
-    rootBlock.initSvg();
-    rootBlock.render();
-    rootBlock.setMovable(false);
-    rootBlock.setDeletable(false);
+    var xml = '<xml><block type="factory_base" deletable="false" movable="false"></block></xml>';
+    Blockly.Xml.domToWorkspace(mainWorkspace, Blockly.Xml.textToDom(xml));
   }
 
   mainWorkspace.addChangeListener(updateLanguage);

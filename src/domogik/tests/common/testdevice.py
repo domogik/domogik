@@ -123,7 +123,8 @@ class TestDevice():
         # first, retrieve all the devices
         response = requests.get(url, \
                                  headers={'content-type':'application/x-www-form-urlencoded'})
-        print(u"Response : [{0}]".format(response.status_code))
+        #print(u"Response : [{0}]".format(response.status_code))
+        print(u"Response : [{0}] : {1}".format(response.status_code, response.text))
         if response.status_code != 200:
             raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
         if response.text == "":

@@ -36,7 +36,7 @@ The following way of writing have changed:
 * yes/no => true/false
 * empty => null
 * optionnal => required
-* the *option* part is optionnal if not required by the type.
+* the *option* part is optional if not required by the type.
 
 The following items has been added:
 
