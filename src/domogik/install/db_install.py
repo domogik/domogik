@@ -29,13 +29,13 @@ FAIL = '\033[91m'
 ENDC = '\033[0m'
 
 def info(msg):
-    print(u"{0} [ {1} ] {2}".format(BLUE,msg,ENDC))
+    print("{0} [ {1} ] {2}".format(BLUE,msg,ENDC))
 def ok(msg):
-    print(u"{0} ==> {1} {2}".format(OK,msg,ENDC))
+    print("{0} ==> {1} {2}".format(OK,msg,ENDC))
 def warning(msg):
-    print(u"{0} ==> {1}  {2}".format(WARNING,msg,ENDC))
+    print("{0} ==> {1}  {2}".format(WARNING,msg,ENDC))
 def fail(msg):
-    print(u"{0} ==> {1}  {2}".format(FAIL,msg,ENDC))
+    print("{0} ==> {1}  {2}".format(FAIL,msg,ENDC))
 ### <<<<
 
 
@@ -51,7 +51,7 @@ class DbInstall():
         from alembic.config import Config
         from alembic import command
 
-        info(u"SQLAlchemy version is : {0}".format(sqla_version))
+        info("SQLAlchemy version is : {0}".format(sqla_version))
 
         self.db_backup_file = "{0}/domogik-{1}.sql".format(tempfile.gettempdir(), int(time.time()))
         self.alembic_cfg = Config("alembic.ini")
