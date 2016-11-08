@@ -1032,7 +1032,6 @@ class DbHelper():
         """
         values = []
         for a_value in self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).limit(num).all():
-            print type(a_value.date)
             values.append({"value_str" : a_value.value_str,
                            "value_num" : a_value.value_num,
                            "timestamp" : time.mktime(a_value.date.timetuple()) })
