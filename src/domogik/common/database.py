@@ -326,14 +326,7 @@ class DbHelper():
         else:
             plugin_config.value = ucode(pl_value)
         self.__session.add(plugin_config)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return plugin_config
 
     def del_plugin_config(self, pl_type, pl_id, pl_hostname):
@@ -354,14 +347,7 @@ class DbHelper():
                                 ).filter_by(hostname=ucode(pl_hostname)).all()
         for plc in plugin_config_list:
             self.__session.delete(plc)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return plugin_config_list
 
     def del_plugin_config_key(self, pl_type, pl_id, pl_hostname, pl_key):
@@ -384,14 +370,7 @@ class DbHelper():
                            ).filter_by(key=ucode(pl_key)).first()
         if plugin_config is not None:
             self.__session.delete(plugin_config)
-<<<<<<< HEAD
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
             self._do_commit()
->>>>>>> develop
         return plugin_config
 
 ###
@@ -715,15 +694,7 @@ class DbHelper():
                                 self.__session.add(par)
 
             ### Finally, commit all !
-<<<<<<< HEAD
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-    
-=======
             self._do_commit()
->>>>>>> develop
             ### Return the created device as json
             d = self.get_device(device.id)
             return d
@@ -806,14 +777,7 @@ class DbHelper():
         device = Device(name=d_name, description=d_description, reference=d_reference, \
                         device_type_id=d_type_id, client_id=d_client_id)
         self.__session.add(device)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return device
 
     def update_device(self, d_id, d_name=None, d_description=None, d_reference=None, d_address=None, d_info_changed=None):
@@ -847,14 +811,7 @@ class DbHelper():
         else:
             device.info_changed = func.now()
         self.__session.add(device)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return device
 
     def del_device(self, d_id):
@@ -869,10 +826,6 @@ class DbHelper():
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             self.__raise_dbhelper_exception("Device with id {0} couldn't be found".format(d_id))
-<<<<<<< HEAD
-        
-=======
-
         # check if this device i used in a scenario
         llist = []
         fdo = False
@@ -894,7 +847,6 @@ class DbHelper():
         del llist
         del fdo
 
->>>>>>> develop
         # delete sensor history data
         ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
         meta = MetaData(bind=DbHelper.__engine)
@@ -905,14 +857,7 @@ class DbHelper():
             )
 
         self.__session.delete(device)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return device
 
 ####
@@ -963,66 +908,6 @@ class DbHelper():
                         newval = value
                         self.log.warning("Failed to apply formula ({0}) to sensor ({1}): {2}".format(sensor['formula'], sensor, exp))
                     value = newval
-<<<<<<< HEAD
-                ### only store stats if the value is different
-                # if duplicate == 1 we allow duplicate values
-                # else we skip if the new value has the same value as the last one in database
-                #
-                # TODO : maybe we could improve this part and do the following :
-                # if not duplicate
-                #     if new_value == last_value == before_last_value:
-                #         insert new_value
-                #         delete last_value
-                # so we would keep only the first and the last value of the N same values 
-                if (sensor.history_duplicate == 1) or (sensor.history_duplicate == 0 and str(sensor.last_value) != str(value)):
-                    # handle history_round
-                    # reduce device stats
-                    if sensor.history_round > 0:
-                        last = self.__session.query(SensorHistory) \
-                            .filter(SensorHistory.sensor_id == sid) \
-                            .order_by(SensorHistory.date.desc()) \
-                            .limit(2) \
-                            .all()
-                        last.reverse()
-                        if last and len(last) == 2:
-                            delta = abs(float(last[0].value_num) - float(last[1].value_num))
-                            if delta < sensor.history_round:
-                                delta0 = abs(float(value) - float(last[0].value_num))
-                                delta1 = abs(float(value) - float(last[1].value_num))
-                                if delta0 < sensor.history_round \
-                                        and delta1 < sensor.history_round:
-                                    self.__session.query(SensorHistory) \
-                                        .filter(SensorHistory.id == last[1].id) \
-                                        .delete()
-                    # insert new recored in core_sensor_history
-                    # store the history value if requested
-                    if sensor.history_store:
-                        h = SensorHistory(sensor.id, datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
-                        self.__session.add(h)
-                    sensor.last_received = date
-                    sensor.last_value = ucode(value)
-                    try:
-                        val = float(value)
-                    except ValueError:
-                        pass
-                    except TypeError:
-                        pass
-                    else:
-                        # update min/max
-                        if sensor.value_min > val:
-                            sensor.value_min = val
-                        if sensor.value_max < val:
-                            sensor.value_max = val
-                    self.__session.add(sensor)
-                    try:
-                        self.__session.commit()
-                    except Exception as sql_exception:
-                        self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-                # handle the max value
-                if sensor.history_max > 0:
-                    count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor.id).count()
-                    if count > sensor.history_max:
-=======
 
                 if sensor['history_round'] > 0:
                     #last = self.__session.query(SensorHistory) \
@@ -1108,7 +993,6 @@ class DbHelper():
                 if sensor['history_max'] > 0:
                     count = self.__session.query(SensorHistory).filter_by(sensor_id=sensor['id']).count()
                     if count > sensor['history_max']:
->>>>>>> develop
                         # delete from sensor_history where id not in (select id from sensor_history order by date desc limit x)
                         tokeep1 = self.__session.query(SensorHistory.id) \
                                 .filter(SensorHistory.sensor_id==sensor['id']) \
@@ -1123,15 +1007,6 @@ class DbHelper():
                                         ~SensorHistory.id.in_(tokeep2) \
                                     ) \
                             .delete(synchronize_session=False)
-<<<<<<< HEAD
-                        try:
-                            self.__session.commit()
-                        except Exception as sql_exception:
-                            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-                # handle the expire value (days)
-                if sensor.history_expire > 0:
-                    stamp = datetime.datetime.now() - datetime.timedelta(days=sensor.history_expire)
-=======
                         self._do_commit()
 
 
@@ -1139,27 +1014,15 @@ class DbHelper():
                 # TODO : move in a dedicated function which would be called each day or N hours
                 if sensor['history_expire'] > 0:
                     stamp = datetime.datetime.now() - datetime.timedelta(days=sensor['history_expire'])
->>>>>>> develop
                     self.__session.query(SensorHistory) \
                         .filter( \
                                     SensorHistory.date<=stamp, \
                                     SensorHistory.sensor_id==sensor['id'] \
                                 ) \
                         .delete(synchronize_session=False)
-<<<<<<< HEAD
-                    try:
-                        self.__session.commit()
-                    except Exception as sql_exception:
-                        self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-            else:
-                self.__raise_dbhelper_exception("Can not add history to not existing sensor: {0}".format(sid), True)             
-=======
                     self._do_commit()
-
-
             else:
                 self.__raise_dbhelper_exception("Can not add history to not existing sensor: {0}".format(sid), True)
->>>>>>> develop
         except:
             self.__raise_dbhelper_exception(u"Error when adding data to sensor history. Sensor id = {0}  | Value = {1}  | Date = {2}. Error is {3}".format(sid, value, date, traceback.format_exc()))
         return data
@@ -1427,14 +1290,11 @@ class DbHelper():
         user_account = UserAccount(login=a_login, password=_make_crypted_password(a_password),
                                    person_id=a_person_id, is_admin=a_is_admin, skin_used=a_skin_used, lock_edit=a_lock_edit, lock_delete=a_lock_delete)
         self.__session.add(user_account)
-<<<<<<< HEAD
         try:
             self.__session.commit()
         except Exception as sql_exception:
             self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return user_account
 
     def add_user_account_with_person(self, a_login, a_password, a_person_first_name, a_person_last_name,
@@ -1483,14 +1343,7 @@ class DbHelper():
         if a_skin_used is not None:
             user_acc.skin_used = ucode(a_skin_used)
         self.__session.add(user_acc)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return user_acc
 
     def update_user_account_with_person(self, a_id, a_login=None, p_first_name=None, p_last_name=None, p_birthdate=None,
@@ -1519,14 +1372,7 @@ class DbHelper():
         if p_birthdate is not None:
             person.birthdate = p_birthdate
         self.__session.add(person)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return user_acc
 
     def user_change_password_and_check_previous_one(self, a_id, a_old_password, a_new_password):
@@ -1549,12 +1395,6 @@ class DbHelper():
             return False
         user_acc.set_password(ucode(_make_crypted_password(a_new_password)))
         self.__session.add(user_acc)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
         return True
 
@@ -1572,7 +1412,6 @@ class DbHelper():
         user_acc.set_password(ucode(_make_crypted_password(a_new_password)))
         self.__session.add(user_acc)
         self._do_commit()
->>>>>>> develop
         return True
 
     def add_default_user_account(self):
@@ -1592,15 +1431,6 @@ class DbHelper():
             return None
         person = self.add_person(p_first_name=default_person_fname, p_last_name=default_person_lname,
                                  p_birthdate=datetime.date(1900, 1, 1))
-<<<<<<< HEAD
-        user_account = self.add_user_account(a_login=default_user_account_login, a_password='123', a_person_id=person.id, 
-                                     a_is_admin=True)
-        #try:
-        #    self.__session.commit()
-        #except Exception as sql_exception:
-        #    self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-
-=======
         user_account = self.add_user_account(a_login=default_user_account_login, a_person_id=person.id, a_password='123',
                                      a_is_admin=True, a_lock_delete=True)
 
@@ -1608,7 +1438,6 @@ class DbHelper():
                                  p_birthdate=datetime.date(1900, 1, 1))
         user_account = self.add_user_account(a_login='Anonymous', a_person_id=person.id, a_password='Anonymous',
                                      a_is_admin=False, a_lock_delete=True, a_lock_edit=True)
->>>>>>> develop
         return user_account
 
     def del_user_account(self, a_id):
@@ -1623,14 +1452,7 @@ class DbHelper():
         user_account = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_account:
             self.__session.delete(user_account)
-<<<<<<< HEAD
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
             self._do_commit()
->>>>>>> develop
             return user_account
         else:
             self.__raise_dbhelper_exception("Couldn't delete user account with id {0} : it doesn't exist".format(a_id))
@@ -1676,14 +1498,7 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         person = Person(first_name=p_first_name, last_name=p_last_name, birthdate=p_birthdate)
         self.__session.add(person)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return person
 
     def update_person(self, p_id, p_first_name=None, p_last_name=None, p_birthdate=None):
@@ -1709,14 +1524,7 @@ class DbHelper():
                 p_birthdate = None
             person.birthdate = p_birthdate
         self.__session.add(person)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return person
 
     def del_person(self, p_id):
@@ -1731,14 +1539,7 @@ class DbHelper():
         person = self.__session.query(Person).filter_by(id=p_id).first()
         if person is not None:
             self.__session.delete(person)
-<<<<<<< HEAD
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
             self._do_commit()
->>>>>>> develop
             return person
         else:
             self.__raise_dbhelper_exception("Couldn't delete person with id {0} : it doesn't exist".format(p_id))
@@ -1777,15 +1578,8 @@ class DbHelper():
         if data_type is not None:
             sensor.data_type = data_type
         self.__session.add(sensor)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self.update_device(sensor.device_id)
         self._do_commit()
->>>>>>> develop
         return sensor
 
 
@@ -1806,14 +1600,7 @@ class DbHelper():
         self.__session.expire_all()
         cmd = Command(name=name, device_id=device_id, reference=reference, return_confirmation=return_confirmation)
         self.__session.add(cmd)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return cmd
 
 ###################
@@ -1823,14 +1610,7 @@ class DbHelper():
         self.__session.expire_all()
         p = CommandParam(cmd_id=cmd_id, key=key, data_type=dtype, conversion=conversion)
         self.__session.add(p)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return p
 
 ###################
@@ -1849,14 +1629,7 @@ class DbHelper():
         self.__session.expire_all()
         cmd = XplCommand(cmd_id=cmd_id, name=name, schema=schema, device_id=device_id, stat_id=stat_id, json_id=json_id)
         self.__session.add(cmd)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return cmd
 
     def del_xpl_command(self, id):
@@ -1864,14 +1637,7 @@ class DbHelper():
         cmd = self.__session.query(XplCommand).filter_by(id=id).first()
         if cmd is not None:
             self.__session.delete(cmd)
-<<<<<<< HEAD
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
             self._do_commit()
->>>>>>> develop
             return cmd
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-command with id {0} : it doesn't exist".format(id))
@@ -1895,15 +1661,8 @@ class DbHelper():
         if name is not None:
             cmd.name = name
         self.__session.add(cmd)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self.update_device(device_id)
         self._do_commit()
->>>>>>> develop
         return cmd
 
 
@@ -1923,14 +1682,7 @@ class DbHelper():
         self.__session.expire_all()
         stat = XplStat(name=name, schema=schema, device_id=device_id, json_id=json_id)
         self.__session.add(stat)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return stat
 
     def del_xpl_stat(self, id):
@@ -1938,22 +1690,11 @@ class DbHelper():
         stat = self.__session.query(XplStat).filter_by(id=id).first()
         if stat is not None:
             self.__session.delete(stat)
-<<<<<<< HEAD
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-            return stat
-        else:
-            self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id {0} : it doesn't exist".format(id))
-    
-=======
             self._do_commit()
             return stat
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id {0} : it doesn't exist".foramt(id))
 
->>>>>>> develop
     def update_xpl_stat(self, id, name=None, schema=None, device_id=None):
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
@@ -1967,21 +1708,11 @@ class DbHelper():
         if name is not None:
             stat.name = name
         self.__session.add(stat)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-            param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
-            self.__session.add(param)
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self.update_device(device_id)
         self._do_commit()
         param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
         self.__session.add(param)
         self._do_commit()
->>>>>>> develop
         return param
 
 ###################
@@ -1991,14 +1722,7 @@ class DbHelper():
         self.__session.expire_all()
         param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
         self.__session.add(param)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return param
 
     def update_xpl_command_param(self, cmd_id, key, value=None):
@@ -2010,14 +1734,7 @@ class DbHelper():
             param.value = ucode(value)
         # TODO info_changed
         self.__session.add(param)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return param
 
     def del_xpl_command_param(self, id, key):
@@ -2025,14 +1742,7 @@ class DbHelper():
         param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=id).filter_by(key=key).first()
         if param is not None:
             self.__session.delete(param)
-<<<<<<< HEAD
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
             self._do_commit()
->>>>>>> develop
             return param
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-command-param with id {0} : it doesn't exist".format(id))
@@ -2047,14 +1757,7 @@ class DbHelper():
         self.__session.expire_all()
         param = XplStatParam(xplstat_id=statid, key=key, value=value, static=static, sensor_id=None, ignore_values=ignore_values, type=type)
         self.__session.add(param)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return param
 
     def update_xpl_stat_param(self, stat_id, key, value=None, static=None, ignore_values=None, type=None):
@@ -2072,14 +1775,7 @@ class DbHelper():
             param.type = type
         # TODO info_changed
         self.__session.add(param)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return param
 
     def del_xpl_stat_param(self, stat_id, key):
@@ -2087,22 +1783,11 @@ class DbHelper():
         param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
         if param is not None:
             self.__session.delete(param)
-<<<<<<< HEAD
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-            return param
-        else:
-            self.__raise_dbhelper_exception("Couldn't delete xpl-stat-param with id {0} : it doesn't exist".format(id))
-         
-=======
             self._do_commit()
             return param
         else:
             self.__raise_dbhelper_exception("Couldn't delete xpl-stat-param with id {0} : it doesn't exist".format(id))
 
->>>>>>> develop
 ###################
 # Scenario
 ###################
@@ -2119,14 +1804,7 @@ class DbHelper():
         self.__session.expire_all()
         scenario = Scenario(name=name, json=json, disabled=disabled, description=desc, state=state)
         self.__session.add(scenario)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return scenario
 
     def update_scenario(self, s_id, name=None, json=None, disabled=None, description=None, state=None):
@@ -2145,14 +1823,7 @@ class DbHelper():
         if state is not None:
             scenario.state = state
         self.__session.add(scenario)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return scenario
 
     def del_scenario(self, s_id):
@@ -2160,14 +1831,7 @@ class DbHelper():
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is not None:
             self.__session.delete(scenario)
-<<<<<<< HEAD
-            try:
-                self.__session.commit()
-            except Exception as sql_exception:
-                self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
             self._do_commit()
->>>>>>> develop
             return scenario
         else:
             self.__raise_dbhelper_exception("Couldn't delete scenario with id {0} : it doesn't exist".format(s_id))
@@ -2179,14 +1843,7 @@ class DbHelper():
         self.__session.expire_all()
         config = DeviceParam(device_id=d_id, key=key, value=value, type=type)
         self.__session.add(config)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return config
 
     def udpate_device_param(self, dc_id, key=None, value=None):
@@ -2199,14 +1856,7 @@ class DbHelper():
         if value is not None:
             config.value = ucode(value)
         self.__session.add(config)
-<<<<<<< HEAD
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
-=======
         self._do_commit()
->>>>>>> develop
         return config
 
 ###################
