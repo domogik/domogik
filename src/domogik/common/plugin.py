@@ -375,7 +375,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             self._dataTypes = result.get_data()['datatypes']
             self.log.info(u"data_types list loaded.")
         else :
-            self._log.warning(u"Error on retreive data_types list from MQ.")
+            self.log.warning(u"Error on retreive data_types list from MQ.")
 
     def get_data_type(self, name):
         """ Return Datatype dict corresponding to name
@@ -752,7 +752,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                 Plugin.on_message(self, msgid, content).
         """
         if msgid == "device.update":
-            self._log.debug(u"Receive pub message {0}, {1}".format(msgid, content))
+            self.log.debug(u"Receive pub message {0}, {1}".format(msgid, content))
             threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
 
     def on_mdp_request(self, msg):
