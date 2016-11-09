@@ -402,7 +402,6 @@ def install():
             "src/domogik/xpl/hub/examples/config/xplhub.cfg.sample")
 
     args = parser.parse_args()
-    print args
     try:
         # CHECK python version
         if sys.version_info < (2, 6):
