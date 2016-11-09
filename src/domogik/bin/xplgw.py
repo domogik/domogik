@@ -32,6 +32,7 @@ class XplManager(XplPlugin):
 @license: GPL(v3)
 @organization: Domogik
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.database import DbHelper

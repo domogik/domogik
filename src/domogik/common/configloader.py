@@ -38,6 +38,7 @@ Implements
 ####################################################
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
 ####################################################
+from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import fcntl
 import codecs

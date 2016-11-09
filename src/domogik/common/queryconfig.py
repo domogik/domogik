@@ -35,7 +35,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from threading import Event
 import zmq
 from domogikmq.message import MQMessage

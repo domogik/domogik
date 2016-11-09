@@ -34,7 +34,7 @@ Usage
 """
 
 
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.common.utils import get_rest_url
 from domogik.common.utils import get_sanitized_hostname
 import requests

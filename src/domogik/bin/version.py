@@ -35,6 +35,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 #from domogik.bin.admin import REST_API_VERSION
 #import domogik.admin.rest
 import sys

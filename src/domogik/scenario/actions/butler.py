@@ -24,7 +24,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @license: GPL(v3)
 @organization: Domogik
 """
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.scenario.actions.abstract import AbstractAction
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common.utils import ucode

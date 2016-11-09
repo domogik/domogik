@@ -37,7 +37,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from argparse import ArgumentParser

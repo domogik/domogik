@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.tests.common.helpers import check_domogik_is_running
 import os
 

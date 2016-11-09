@@ -32,7 +32,7 @@ True
 >>> job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6)
 True
 """
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 import datetime
 import calendar
 import ephem

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.admin.application import app, render_template
 from flask import request, flash, redirect, Response
 from domogikmq.reqrep.client import MQSyncReq

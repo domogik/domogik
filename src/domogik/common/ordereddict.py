@@ -38,7 +38,7 @@ From recipe ASPN N°496761
 @license: GPL(v3)
 @organization: Domogik
 """
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 try:
     # Python 2
     from UserDict import DictMixin

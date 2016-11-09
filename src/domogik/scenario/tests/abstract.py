@@ -24,6 +24,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @license: GPL(v3)
 @organization: Domogik
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 try:
     from exceptions import IndexError, NotImplementedError, AttributeError
 except:

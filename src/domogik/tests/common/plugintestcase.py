@@ -33,7 +33,7 @@ Usage
 @license: GPL(v3)
 @organization: Domogik
 """
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.common.utils import get_sanitized_hostname
 from domogik.tests.common.templatetestcase import TemplateTestCase
 from domogik.tests.common.helpers import check_domogik_is_running

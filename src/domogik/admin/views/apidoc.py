@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.admin.application import app
 from flask import send_from_directory, redirect
 from domogik.common.utils import get_rest_doc_path

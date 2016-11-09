@@ -30,7 +30,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 # in fill method create a cronExpressionObject
 # in evaluate check cronExpression.check_trigger_now()
 # in destroy clean up the cron expression
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from threading import Thread, Event
 from domogik.scenario.parameters.abstract import AbstractParameter
 from domogik.common.cron import CronExpression

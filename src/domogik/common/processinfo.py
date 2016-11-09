@@ -33,7 +33,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 import psutil
 import time
 from domogik.xpl.common.xplconnector import XplTimer

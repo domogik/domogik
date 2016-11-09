@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.common.utils import get_packages_directory
 from domogik.admin.application import app, render_template
 from flask import request, flash, redirect, send_from_directory

@@ -34,7 +34,7 @@ Implements
 @organization: Domogik
 """
 
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogikmq.message import MQMessage

@@ -33,7 +33,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 import threading
 from argparse import ArgumentParser
 from domogik.common.utils import get_sanitized_hostname

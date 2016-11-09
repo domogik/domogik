@@ -32,7 +32,7 @@ Implements
 @organization: Domogik
 """
 
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from argparse import ArgumentParser
 from domogik.common.daemon.daemon import DaemonContext
 from sys import stdout

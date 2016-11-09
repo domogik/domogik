@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.common.utils import get_packages_directory, get_libraries_directory
 from domogik.common.jsondata import domogik_encoder
 from functools import wraps

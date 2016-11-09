@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.admin.application import app, json_response, register_api, timeit
 from flask.views import MethodView

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.admin.application import app, json_response, register_api
 from flask import request
 from flask.views import MethodView

@@ -36,6 +36,7 @@ class AdminWebSocket(WebSocketHandler, MQAsyncSub)
 @license: GPL(v3)
 @organization: Domogik
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.common.database import DbHelper      #, DbHelperException
 from domogik.common.plugin import Plugin
 #from domogik.common import logger

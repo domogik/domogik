@@ -33,7 +33,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.butler.brain import get_resources_directory
 import json
 import traceback
