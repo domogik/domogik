@@ -251,14 +251,15 @@ class ScenarioInstance(MQAsyncSub):
                     num = int(ipart.replace('IF', ''))
                     if num == 0:
                         st = "print('---- Start evaluating ----')\nif"
-                        #st = "if"
+                        incLev = 1
                     else:
-                        st = "elif"
+                        st =  "{0}{1}".format(pyObj(u"else:\n", num-1), pyObj(u"if", num))
+                        incLev = 2 * num
                     # if stays at the same lvl
                     ifp = self.__parse_part(part["IF{0}".format(num)], level, debug)
                     retlist.append( pyObj(u"{0} {1}:\r\n".format(st, ifp), level) )
                     # do is a level deeper
-                    dop = self.__parse_part(part["DO{0}".format(num)], (level+1), debug)
+                    dop = self.__parse_part(part["DO{0}".format(num)], (level+incLev), debug)
                     retlist.append( pyObj(dop, level) )
             # handle ELSE
             if 'ELSE' in part:
