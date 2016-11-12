@@ -38,7 +38,6 @@ from domogikmq.pubsub.subscriber import MQAsyncSub
 import zmq
 import traceback
 import logging
-import time
 import ast
 from domogik.common.utils import ucode
 
@@ -184,7 +183,6 @@ class ScenarioInstance(MQAsyncSub):
                 if a_kind_of_test.startswith("sensor.SensorTest"):
                     self._log.debug(u"Scenario '{0}' : test instance : {1} ({2} items)".format(remove_accents(self._name), a_kind_of_test, len(self._test_instances[a_kind_of_test])))
                     for idx, val in enumerate(self._test_instances[a_kind_of_test]):
-#                        if idx+1 != len(self._test_instances[a_kind_of_test]) :
                         if val.__class__.__name__ == 'SensorTest':
                             self._log.debug("Set trigger for item '{0}' to generic_trigger".format(idx))
                             val.set_trigger(self.generic_trigger)
@@ -424,7 +422,7 @@ class ScenarioInstance(MQAsyncSub):
         """ Dummy function to avoid calling self.generic_trigger() when not needed
             See _create_instance for more details
         """
-        self._log.debug(u"Dummy {0} escape trigger with value : {1}".format(foo._sensorId, foo._res))
+        self._log.debug(u"Dummy sensor {0} escape trigger with value : {1}".format(foo._sensorId, foo._res))
 
     def _create_instance(self, inst, itype, parentPart):
         uuid = self._get_uuid()

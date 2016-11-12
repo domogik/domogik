@@ -28,7 +28,6 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 from domogik.scenario.tests.abstract import AbstractTest
 from domogik.common.database import DbHelper
 from time import sleep, time
-import threading
 import zmq
 
 class AbstractSensorTest(AbstractTest):
