@@ -108,7 +108,7 @@ It is now possible to create no xPl plugins. We won't remove the native xPL supp
 
 
 New datatypes : DT_Battery, DT_Motion, DT_Video, DT_VideoMjpeg, DT_VideoH264, DT_Image, DT_mbarPression, DT_barPression,  DT_kMeter, DT_kgWeight, DT_VolumeLiter, DT_VolumeM3
-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 The **DT_Battery** it is similar to DT_Scaling  : the unit is % and the values are between 0 and 100. The aim of this datatype is to allow to group all devices battery sensors on a single view to help the users to manage their devices batteries.
 
