@@ -55,7 +55,7 @@ class ScenarioFrontend(Plugin):
         mq_services = None
         while mq_services == None or 'xplgw' not in mq_services:
             mq_services_raw = cli.rawrequest('mmi.services', '', timeout=10)
-            if mq_services_raw != None: 
+            if mq_services_raw != None:
                 mq_services = str(mq_services_raw[0]).replace(" ", "").split(",")
             self.log.info("Checking for MQ services : {0}".format(mq_services))
             if mq_services == None or 'xplgw' not in mq_services:
