@@ -320,7 +320,7 @@ class Admin(Plugin):
         self.http_server.stop()
  
         self.log.info('Will shutdown in 10 seconds ...' )
-        io_loop = tornado.ioloop.IOLoop.instance()
+        io_loop = IOLoop.instance()
         deadline = time.time() + 10
  
         def stop_loop():
