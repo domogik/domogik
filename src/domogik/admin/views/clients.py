@@ -215,6 +215,7 @@ def client_devices_known(client_id):
             devices_by_device_type_id[device_type_name] = [dev]
 
     # sorting
+    # disabled as this breaks because of storing other objects then normal strings
     devices_by_device_type_id = json.dumps(devices_by_device_type_id, sort_keys=True)
     devices_by_device_type_id = json.loads(devices_by_device_type_id, object_pairs_hook=OrderedDict)
 
@@ -415,7 +416,7 @@ def client_devices_edit(client_id, did):
                         db_session=app.db.get_session(),
                         exclude=['params', 'commands', 'sensors', 'address', \
                                 'xpl_commands', 'xpl_stats', 'device_type_id', \
-                                'client_id', 'client_version'])
+                                'client_id', 'client_version', 'info_changed'])
         form = MyForm(request.form, device)
 
         if request.method == 'POST' and form.validate():

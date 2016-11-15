@@ -43,7 +43,7 @@ import time
 import traceback
 import calendar
 import zmq
-import json
+#import json
 try:
     import Queue as queue
 except:
@@ -78,7 +78,9 @@ class XplManager(XplPlugin):
         self._db_xplstats = {}
 
         # load devices informations
+        self._reload_devices()
         self._reload_commands()
+        self._reload_xpl_stats()
 
         # queue to store the message that needs to be ahndled for sensor checking
         self._sensor_queue = queue.Queue()
@@ -151,15 +153,33 @@ class XplManager(XplPlugin):
         self.log.debug(u"New message (from MQ) about some device changes > reload the devices parameters...")
         self._x_thread.on_device_changed()
         self._s_thread.on_device_changed()
+        self._reload_devices()
         self._reload_commands()
 
         
+    def _reload_devices(self):
+        """ Reload the commands
+        """
+        self.log.info("Event : one device changed. Reloading data for devices (light data)")
+        self.all_devices = {}
+        with self._db.session_scope():
+            for dev in self._db.list_devices():
+                #print(dev)
+                #{'xpl_stats': {u'get_total_space': {'json_id': u'get_total_space', 'schema': u'sensor.basic', 'id': 3, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_total_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'total_space', 'key': u'type'}]}, 'name': u'Total space'}, u'get_free_space': {'json_id': u'get_free_space', 'schema': u'sensor.basic', 'id': 4, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_free_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'free_space', 'key': u'type'}]}, 'name': u'Free space'}, u'get_used_space': {'json_id': u'get_used_space', 'schema': u'sensor.basic', 'id': 5, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_used_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'used_space', 'key': u'type'}]}, 'name': u'Used space'}, u'get_percent_used': {'json_id': u'get_percent_used', 'schema': u'sensor.basic', 'id': 6, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_percent_used', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'percent_used', 'key': u'type'}]}, 'name': u'Percent used'}}, 'commands': {}, 'description': u'', 'reference': u'', 'sensors': {u'get_total_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 57, 'reference': u'get_total_space', 'conversion': u'', 'name': u'Total Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'14763409408', 'value_max': 14763409408.0}, u'get_free_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 59, 'reference': u'get_free_space', 'conversion': u'', 'name':u'Free Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'1319346176', 'value_max': 8220349952.0}, u'get_used_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 60, 'reference': u'get_used_space', 'conversion': u'', 'name': u'Used Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'13444063232', 'value_max': 14763409408.0}, u'get_percent_used': {'value_min': None, 'data_type':u'DT_Scaling', 'incremental': False, 'id': 58, 'reference': u'get_percent_used', 'conversion': u'', 'name': u'Percent used', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'91', 'value_max': 100.0}}, 'xpl_commands': {}, 'client_id': u'plugin-diskfree.ambre', 'device_type_id': u'diskfree.disk_usage', 'client_version': u'1.0', 'parameters': {u'interval': {'value': u'5', 'type': u'integer', 'id': 5, 'key': u'interval'}}, 'id': 3, 'name': u'Ambre /'}
+                self.all_devices[str(dev['id'])] = {
+                                                'client_id': dev['client_id'],
+                                                'id': dev['id'],
+                                                'name': dev['name'],
+                                              }
+            #print(self.all_devices)
+        self.log.info("Event : one device changed. Reloading data for devices (light data) -- finished")
+
     def _reload_commands(self):
         """ Reload the commands
         """
-        self.log.info("Event : one device changed. Reloading data for MQ commands")
+        self.log.info("Event : one device changed. Reloading data for commands")
+        self.all_commands = {}
         with self._db.session_scope():
-            self.all_commands = {}
             for cmd in self._db.get_all_command():
                 #print(cmd)
                 #<Command: return_confirmation='True', name='Swith', reference='switch_lighting2', id='6', device_id='21'>
@@ -208,8 +228,42 @@ class XplManager(XplPlugin):
                     self.all_commands[str(cmd.id)]['xpl_command'] = xpl_command
                     
         #print(self.all_commands)
-        self.log.info("Event : one device changed. Reloading data for MQ commands -- finished")
+        self.log.info("Event : one device changed. Reloading data for commands -- finished")
 
+    def _reload_xpl_stats(self):
+        """ Reload the commands
+        """
+        self.log.info("Event : one device changed. Reloading data for xpl stats")
+        self.all_xpl_stats = {}
+        with self._db.session_scope():
+            for xplstat in self._db.get_all_xpl_stat():
+                #print(xplstat)
+                #print(xplstat.params)
+                # <XplStat: name='Open/Close sensor', json_id='open_close', device_id='95', id='185', schema='ac.basic'>
+                # <XplStatParam: xplstat_id='188', multiple='None', value='None', ignore_values='', sensor_id='411', static='False', key='current', type='None'>
+                a_xplstat = {'name' : xplstat.name,
+                             'json_id' : xplstat.json_id,
+                             'device_id' : xplstat.device_id,
+                             'id' : xplstat.id,
+                             'schema' : xplstat.schema,
+                             'params' : []
+                            }
+                for a_xplstat_param in xplstat.params:
+                    a_xplstat['params'].append({
+                                                 'xplstat_id' : a_xplstat_param.xplstat_id,
+                                                 'multiple' : a_xplstat_param.multiple,
+                                                 'value' : a_xplstat_param.value,
+                                                 'ignore_values' : a_xplstat_param.ignore_values,
+                                                 'sensor_id' : a_xplstat_param.sensor_id,
+                                                 'static' : a_xplstat_param.static,
+                                                 'key' : a_xplstat_param.key,
+                                                 'type' : a_xplstat_param.type
+                                               })
+
+                self.all_xpl_stats[str(xplstat.id)] = a_xplstat
+            #print(self.all_xpl_stats)
+
+        self.log.info("Event : one device changed. Reloading data for xpl stats -- finished")
 
 
     def _handle_mq_sensor(self, content):
@@ -222,7 +276,7 @@ class XplManager(XplPlugin):
         if 'atTimestamp' in content:
             tim = content['atTimestamp']
             del content['atTimestamp']
-            self.log.debug(u"New message (from MQ) > overriding the timestamp to {0}".fromat(tim))
+            self.log.debug(u"New message (from MQ) > overriding the timestamp to {0}".format(tim))
         else:
             tim = calendar.timegm(time.gmtime())
         # end code for 334
@@ -290,7 +344,9 @@ class XplManager(XplPlugin):
         Send a command, first find out if its an xpl or mq command
         TODO move convertion to here
         """
-        with self._db.session_scope():
+        # TODO : clean the 2 linew below
+        #with self._db.session_scope():
+        if 1 == 1:
             self.log.info(u"Received new cmd request: {0}".format(data))
             failed = False
             status = False
@@ -338,7 +394,8 @@ class XplManager(XplPlugin):
         self.log.debug(u"   => Generating MQ message to plugin")
         failed = False
         status = True
-        dev = self._db.get_device(int(cmd['device_id']))
+        #dev = self._db.get_device(int(cmd['device_id']))
+        dev = self.all_devices[str(cmd['device_id'])]
         msg = MQMessage()
         msg.set_action('client.cmd')
         msg.add_data('command_id', cmd['id'])
@@ -385,19 +442,31 @@ class XplManager(XplPlugin):
         failed = False
         xplcmd = cmd['xpl_command']
 
-        # TODO : improve !!!!
-        xplstat = self._db.get_xpl_stat(xplcmd['stat_id'])
+        #xplstat = self._db.get_xpl_stat(xplcmd['stat_id'])
+        xplstat = self.all_xpl_stats[str(xplcmd['stat_id'])]
 
         if xplstat is not None:
             # get the device from the db
-            dev = self._db.get_device(int(cmd['device_id']))
+            dev = self.all_devices[str(cmd['device_id'])]
             msg = XplMessage()
             if not dev['client_id'] in self.client_xpl_map.keys():
                 self._load_client_to_xpl_target()
             if not dev['client_id'] in self.client_xpl_map.keys():
                 failed = "Can not fincd xpl source for {0} client_id".format(dev['client_id'])
             else:
-                msg.set_target(self.client_xpl_map[dev['client_id']])
+                ### Fix bug #349
+                # I am not totally sure why before we used the xpl_source from the client list. 
+                # Indeed for domogik xpl plugins it helps to target the appropriate plugin but
+                # for xpl messages for outside of domogik, this is a blocking point !
+                # As xpl plugins are starting to be deprecated  as the 'common plugin format', it
+                # should not be an issue to retarget xpl messages to '*' for now and later on if
+                # there is a real need to target on a dedicated target, implement a bette way to 
+                # handle this
+                # -- Fritz -- oct 2016
+                #msg.set_target(self.client_xpl_map[dev['client_id']])
+                msg.set_target("*")
+                ### End of fix
+                
             msg.set_source(self.myxpl.get_source())
             msg.set_type("xpl-cmnd")
             msg.set_schema(xplcmd['schema'])
@@ -428,7 +497,7 @@ class XplManager(XplPlugin):
                     self.myxpl.send(msg)
                 except XplMessageError as msg:
                     failed = msg
-                xplstat = self._db.detach(xplstat)
+                #xplstat = self._db.detach(xplstat)
                 # generate an uuid for the matching answer published messages
                 if xplstat != None:
                     resp_uuid = uuid4()
@@ -475,7 +544,8 @@ class XplManager(XplPlugin):
         """
         def __init__(self, log, db, lock_d, lock_p, dic, pkt, pub):
             threading.Thread.__init__(self)
-            self._db = DbHelper()
+            # TODO : remove the line below
+            #self._db = DbHelper()
             self._log = log
             self._lock_d = lock_d
             self._lock_p = lock_p
@@ -498,14 +568,16 @@ class XplManager(XplPlugin):
                     todel_dict = []
                     for uuid, search in self._dict.items():
                         for tim, pkt in self._pkt.items():
-                            if search.schema == pkt.schema:
+                            print(search)
+                            print(pkt)
+                            if search['schema'] == pkt.schema:
                                 found = True
-                                for par in search.params:
-                                    if par.key not in pkt.data:
-                                        if par.value != pkt.data[par.key]:
+                                for par in search['params']:
+                                    if par['key'] not in pkt.data:
+                                        if par['value'] != pkt.data[par['key']]:
                                             found = False
-                                        elif par.multiple is not None and len(par.multiple) == 1:
-                                            if pkt.data[par.key] not in par.value.split(par.multiple):
+                                        elif par['multiple'] is not None and len(par['multiple']) == 1:
+                                            if pkt.data[par['key']] not in par['value'].split(par['multiple']):
                                                 found = False
                                 if found:
                                     self._log.info(u"Found response message to command with uuid: {0}".format(uuid))
@@ -554,8 +626,8 @@ class XplManager(XplPlugin):
             """ Function called when a device have been changed to reload the devices parameters
             """
             self._log.info("Event : one device changed. Reloading data for _XplSensorThread")
+            self.all_xpl_stat = []
             with self._db.session_scope():
-                self.all_xpl_stat = []
                 for xplstat in self._db.get_all_xpl_stat():
                     #print(xplstat)
                     #print(xplstat.params)
@@ -643,7 +715,9 @@ class XplManager(XplPlugin):
                     # TODO check temp disabled until external members are working
                     #if item["clientId"] is not None:
                     if True:
-                        with self._db.session_scope():
+                        # TODO : remove the 2 below lines
+                        #with self._db.session_scope():
+                        if 1 == 1:
                             fdata = self._find_storeparam(item)
                             if fdata:
                                 #// ICI !!!
@@ -697,9 +771,9 @@ class XplManager(XplPlugin):
             """ Function called when a device have been changed to reload the devices parameters
             """
             self._log.info("Event : one device changed. Reloading data for _SensorStoreThread")
+            self.all_sensors = {}
+            self.all_devices = {}
             with self._db.session_scope():
-                self.all_sensors = {}
-                self.all_devices = {}
                 for sen in self._db.get_all_sensor():
                     #print(sen)
                     #<Sensor: conversion='', value_min='None', history_round='0.0', reference='adco', data_type='DT_String', history_duplicate='False', last_received='1474968431', incremental='False', id='29', history_expire='0', timeout='180', history_store='True', history_max='0', formula='None', device_id='2', last_value='030928084432', value_max='3.09036843008e+11', name='Electric meter address'>
@@ -770,6 +844,7 @@ class XplManager(XplPlugin):
                             # do the store
                             value = self._db.add_sensor_history(\
                                     senid, \
+                                    sen, \
                                     value, \
                                     current_date)
                             # publish the result

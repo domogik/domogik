@@ -630,6 +630,17 @@
         },
         "childs": []
     },
+    "DT_HeatingPilotWire": {
+        "values": {
+            "1": "Comfort",
+            "2": "Comfort -1",
+            "3": "Comfort -2",
+            "4": "Economy",
+            "5": "Building Protection",
+            "6": "Off/Unballasting"
+        },
+        "childs": []
+    },
     "DT_UPSState": {
         "values": {
             "OL": "mains",

@@ -40,7 +40,7 @@ from domogik.common.jsondata import domogik_encoder
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.plugin import Plugin
-from domogik.common import logger
+#from domogik.common import logger
 from domogik.common.configloader import Loader
 from domogik.common.utils import get_ip_for_interfaces
 from domogikmq.pubsub.subscriber import MQAsyncSub
@@ -51,21 +51,22 @@ from domogik.admin.application import app as admin_app
 import locale
 import traceback
 import zmq
-import signal
+#import signal
 import time
 import json
-import datetime
-import random
-import uuid
-from threading import Thread, Lock
-zmq.eventloop.ioloop.install()
+#import datetime
+#import random
+#import uuid
+#from threading import Thread       #, Lock
 from tornado import gen
 from tornado.queues import Queue
 from tornado.wsgi import WSGIContainer
-from tornado.ioloop import IOLoop, PeriodicCallback 
+from tornado.ioloop import IOLoop                        #, PeriodicCallback 
 from tornado.httpserver import HTTPServer
 from tornado.web import FallbackHandler, Application
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
+
+zmq.eventloop.ioloop.install()
 
 REST_API_VERSION = "0.8"
 DATABASE_CONNECTION_NUM_TRY = 50
@@ -237,6 +238,7 @@ class Admin(Plugin):
         self.log.debug(u"locale : {0}".format(locale.getdefaultlocale()))
         try:
             try:
+                self.mq_config = Loader('mq')
                 # admin config
                 cfg_admin = Loader('admin')
                 config_admin = cfg_admin.load()
@@ -253,8 +255,8 @@ class Admin(Plugin):
                     self.clean_json = conf_admin['clean_json']
                 else:
                     self.clean_json = False
-                if 'rest_auth'in conf_admin:
-                    self.rest_auth = conf_admin['rest_auth']
+                if 'rest_auth' in conf_admin and conf_admin['rest_auth'] == 'True':
+                    self.rest_auth = True
                 else:
                     self.rest_auth = False
             except KeyError:
@@ -307,6 +309,8 @@ class Admin(Plugin):
         admin_app.rest_auth = self.rest_auth
         admin_app.apiversion = REST_API_VERSION
         admin_app.use_ssl = self.use_ssl
+        admin_app.interfaces = self.interfaces
+        admin_app.port = self.port
         admin_app.hostname = self.get_sanitized_hostname()
         admin_app.resources_directory = self.get_resources_directory()
         admin_app.packages_directory = self.get_packages_directory()

@@ -85,7 +85,7 @@ class ScenarioInstance(MQAsyncSub):
         @param json : The json describing the scenario
         """
         self._name = name
-        
+
         # TODO : fix for Russian names for example
         #self._log = log.getChild(remove_accents(name))
         try:
@@ -120,7 +120,7 @@ class ScenarioInstance(MQAsyncSub):
         self._mapping = { 'test': {}, 'action': {} }
         if not self._disabled:
             self._instanciate()
-    
+
     def enable(self):
         if self._disabled:
             self._disabled = False
@@ -177,18 +177,18 @@ class ScenarioInstance(MQAsyncSub):
             self._parsed_condition = self.__parse_part(self._json)
 
             # Set the trigger to the last test of each kind of test
+            # Only SensorTest class receive generic_trigger
             self._log.info(u"Scenario '{0}' : configure the trigger to the last item of each test instance".format(remove_accents(self._name)))
             for a_kind_of_test in self._test_instances:
                 if a_kind_of_test.startswith("sensor.SensorTest"):
                     self._log.debug(u"Scenario '{0}' : test instance : {1} ({2} items)".format(remove_accents(self._name), a_kind_of_test, len(self._test_instances[a_kind_of_test])))
                     for idx, val in enumerate(self._test_instances[a_kind_of_test]):
-                        if idx+1 != len(self._test_instances[a_kind_of_test]):
-                            self._log.debug("Set trigger for item '{0}' to dummy".format(idx))
-                            val.set_trigger(self._dummy)
-                        else:
+                        if val.__class__.__name__ == 'SensorTest':
                             self._log.debug("Set trigger for item '{0}' to generic_trigger".format(idx))
                             val.set_trigger(self.generic_trigger)
-
+                        else:
+                            self._log.debug("Set trigger for item '{0}' to dummy".format(idx))
+                            val.set_trigger(self._dummy)
 
             self._log.debug(u"Scenario '{0}' python generated code : \n{1}".format(remove_accents(self._name), self._parsed_condition))
             # this line is to decomment only for debug purpose
@@ -205,7 +205,7 @@ class ScenarioInstance(MQAsyncSub):
         except:
             raise
 
-    def __parse_part(self, part, level=0, debug=False):
+    def __parse_part(self, part, level=0, debug=False, parentPart=False):
         """Parse the json code and generate a python string that can be evaluated
         indentation needs to be done on the following objects:
         - do of an if part
@@ -213,6 +213,7 @@ class ScenarioInstance(MQAsyncSub):
         - get/set variables
         If debug=False, generate the python code for the scenario
         Else, generate a python code evaluated for debugging
+        If parentPart, change SensorTest as SensorValue class to avoid tiggerring not needed.
         """
         # Do not handle disabled blocks
         if 'disabled'in part and part['disabled'] == 'true':
@@ -241,30 +242,35 @@ class ScenarioInstance(MQAsyncSub):
                 part['type'] = "math_number"
             elif dt_parent == "DT_String":
                 part['type'] = "text"
+            else:
+                part['type'] = "text"
         # parse the blocks
         if part['type'] == 'controls_if':
             # handle all Ifx and dox
+            incLev = 1 # Account for elif level to  indente an else if
             for ipart, val in sorted(part.items()):
                 if ipart.startswith('IF'):
                     num = int(ipart.replace('IF', ''))
                     if num == 0:
                         st = "print('---- Start evaluating ----')\nif"
-                        #st = "if"
+                        incLev = 1
                     else:
-                        st = "elif"
+                        st =  "{0}{1}".format(pyObj(u"else:\n", num-1), pyObj(u"if", num))
+                        incLev = num + 1
                     # if stays at the same lvl
-                    ifp = self.__parse_part(part["IF{0}".format(num)], level, debug)
+                    ifp = self.__parse_part(part["IF{0}".format(num)], level, debug, False)
                     retlist.append( pyObj(u"{0} {1}:\r\n".format(st, ifp), level) )
                     # do is a level deeper
-                    dop = self.__parse_part(part["DO{0}".format(num)], (level+1), debug)
+                    dop = self.__parse_part(part["DO{0}".format(num)], (level+incLev), debug, True)
                     retlist.append( pyObj(dop, level) )
             # handle ELSE
             if 'ELSE' in part:
-                retlist.append( pyObj(u"else:\r\n", level) )
-                retlist.append( pyObj(self.__parse_part(part['ELSE'], (level+1), debug), (level)) )
+                incLev -= 1 # decrease elif level for final else, could be 0 if no elif
+                retlist.append( pyObj(u"else:\r\n", level+incLev) )
+                retlist.append( pyObj(self.__parse_part(part['ELSE'], (level+incLev+1), debug, parentPart), (level)) )
         # Set a local variable
         elif part['type'] == 'variables_set':
-            retlist.append( pyObj(u"{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level, debug)), level) )
+            retlist.append( pyObj(u"{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level, debug, parentPart)), level) )
         # get a local variable
         elif part['type'] == 'variables_get':
             retlist.append( pyObj(u"{0} if vars().has_key('{0}') else ''".format(part['VAR']), level) )
@@ -285,15 +291,15 @@ class ScenarioInstance(MQAsyncSub):
             reslst = []
             for ipart, val in sorted(part.items()):
                 if ipart.startswith('ADD'):
-                    addp = self.__parse_part(part[ipart], level, debug)
+                    addp = self.__parse_part(part[ipart], level, debug, parentPart)
                     reslst.append(u"str({0})".format(addp))
             retlist.append( pyObj(u" + ".join(reslst)) )
         # get the length of a string
         elif part['type'] == 'text_length':
-            retlist.append( pyObj(u"len({0})".format(self.__parse_part(part['VALUE'], level, debug))) )
+            retlist.append( pyObj(u"len({0})".format(self.__parse_part(part['VALUE'], level, debug, parentPart))) )
         # is the string empty
         elif part['type'] == 'text_isEmpty':
-            retlist.append( pyObj(u"not len({0})".format(self.__parse_part(part['VALUE'], level, debug))) )
+            retlist.append( pyObj(u"not len({0})".format(self.__parse_part(part['VALUE'], level, debug, parentPart))) )
         # do a calculation on 2 numbers
         elif part['type'] == 'math_arithmetic':
             if part['OP'].lower() == "add":
@@ -306,7 +312,7 @@ class ScenarioInstance(MQAsyncSub):
                 compare = "/"
             elif part['OP'].lower() == "power":
                 compare = "^"
-            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level, debug), compare, self.__parse_part(part['B'], level, debug))) )
+            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level, debug, parentPart), compare, self.__parse_part(part['B'], level, debug, parentPart))) )
         # logically compare 2 items
         elif part['type'] == 'logic_compare':
             if part['OP'].lower() == "eq":
@@ -321,42 +327,42 @@ class ScenarioInstance(MQAsyncSub):
                 compare = ">"
             elif part['OP'].lower() == "gte":
                 compare = ">="
-            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level, debug), compare, self.__parse_part(part['B'], level, debug))) )
+            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level, debug, parentPart), compare, self.__parse_part(part['B'], level, debug, parentPart))) )
         # logical operate (and, or, not)
         elif part['type'] == 'logic_operation':
-            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level, debug), part['OP'].lower(), self.__parse_part(part['B'], level, debug))) )
+            retlist.append( pyObj(u"( {0} {1} {2} )".format(self.__parse_part(part['A'], level, debug, parentPart), part['OP'].lower(), self.__parse_part(part['B'], level, debug, parentPart))) )
         # a not function
         elif part['type'] == 'logic_negate':
-            retlist.append( pyObj(u"not {0}".format(self.__parse_part(part['BOOL'], level, debug))) )
+            retlist.append( pyObj(u"not {0}".format(self.__parse_part(part['BOOL'], level, debug, parentPart))) )
         # handle hysteresis
         elif part['type'] == "trigger.Hysteresis":
-            test = self._create_instance(part['type'], 'test')
+            test = self._create_instance(part['type'], 'test', parentPart)
             test[0].fill_parameters({"id.id": part['id']})
             if debug == False:
                 retlist.append( pyObj(u"if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
             else:
                 retlist.append( eval(u"if self._mapping['test']['{0}'].evaluate():\r\n".format(test[1]), level) )
-            nlevel = level 
+            nlevel = level
             level = level + 1
-            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['Run'], level, debug))) )
+            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['Run'], level, debug, parentPart))) )
         # apply an action
         elif "Action" in part['type']:
-            act = self._create_instance(part['type'], 'action')
+            act = self._create_instance(part['type'], 'action', parentPart)
             for p, v in part.items():
                 if p not in ['id', 'type', 'NEXT']:
                     if 'type' in v:
-                        v2 = ( self.__parse_part(v, 0, debug) )
+                        v2 = ( self.__parse_part(v, 0, debug, parentPart) )
                     else:
                         v2 = u"\"{0}\"".format(v)
                     retlist.append( pyObj(u"self._mapping['action']['{0}'].set_param(\"{1}\", ({2}))\r\n".format(act[1], p, v2), level) )
             retlist.append( pyObj(u"self._mapping['action']['{0}'].do_action()\r\n".format(act[1]), level) )
         # if we end up here we should be a test case
         else:
-            test = self._create_instance(part['type'], 'test')
+            test = self._create_instance(part['type'], 'test', parentPart)
             # test[0] : test object
             # test[1] : test uuid
 
-            # build a test instance list. Example : 
+            # build a test instance list. Example :
             # foo.bar
             #  \_ obj1
             #  \_ obj2
@@ -376,7 +382,7 @@ class ScenarioInstance(MQAsyncSub):
                 retlist.append( eval(u"self._mapping['test']['{0}'].evaluate()".format(test[1])) )
         # handle the NEXT, so we can stack blocks
         if 'NEXT'in part:
-            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['NEXT'], level if not nlevel else nlevel, debug))) )
+            retlist.append( pyObj(u"{0}".format(self.__parse_part(part['NEXT'], level if not nlevel else nlevel, debug, parentPart))) )
         # build the output string
         res = u""
         for ret in retlist:
@@ -416,9 +422,9 @@ class ScenarioInstance(MQAsyncSub):
         """ Dummy function to avoid calling self.generic_trigger() when not needed
             See _create_instance for more details
         """
-        pass
+        self._log.debug(u"Dummy sensor {0} escape trigger with value : {1}".format(foo._sensorId, foo._res))
 
-    def _create_instance(self, inst, itype):
+    def _create_instance(self, inst, itype, parentPart):
         uuid = self._get_uuid()
         if itype == 'test':
             # To avoid triggering a scenario N times if it uses N times the same test, we register the used tests
@@ -434,17 +440,35 @@ class ScenarioInstance(MQAsyncSub):
 
             # default : we set the generic trigger for all. It may be changed later in the code for some kind of tests (sensorTest for example).
             trigger = self.generic_trigger
-
             try:
                 mod, clas, param = inst.split('.')
             except ValueError as err:
                 mod, clas = inst.split('.')
                 param = None
+
             module_name = "domogik.scenario.tests.{0}".format(mod)
+            if parentPart : # Parent block is a DO for action, SensorTest must be redirect to SensorValue
+                # If SensorTest allready exist on IF, same Sensor stay in Test mode not Value, so a dummy became SensorTestDummy and not a SensorValueDummy.
+                # This 2 class are equivalante, so finale behavior is same between SensorTestDummy and SensorValueDummy.
+                if clas == 'SensorTest' : clas='SensorValue'  # force class as SensorValue to avoid trigger evaluation
+            objM = None
+            for i in self._mapping['test'] :
+                objM = self._mapping['test'][i]
+                if objM.__class__.__name__ == 'SensorTest' and objM._sensorId == param :
+                    self._log.debug(u"SensorTest for sensor {0} allready set, move to dummy instance".format(param))
+                    clas='SensorTestDummy' # force class as SensorTestDummy to avoid uncontrollable call order update
+                    break
+                elif objM.__class__.__name__ == 'SensorValue' and objM._sensorId == param :
+                    self._log.debug(u"SensorValue for sensor {0} allready set, move to dummy instance".format(param))
+                    clas='SensorValueDummy' # force class as SensorValueDummy to avoid uncontrollable call order update
+                    break
+                else :
+                    objM = None
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create test instance {0} with uuid {1}".format(inst, uuid))
             #obj = cobj(log=self._log, trigger=self.generic_trigger, cond=self, params=param)
             obj = cobj(log=self._log, trigger=trigger, cond=self, params=param)
+            if objM is not None : objM.register_dummy(obj)
             self._subList = self._subList + obj.get_subMessages()
             self._mapping['test'][uuid] = obj
             return (obj, uuid)
@@ -455,6 +479,7 @@ class ScenarioInstance(MQAsyncSub):
                 mod, clas = inst.split('.')
                 params = None
             module_name = "domogik.scenario.actions.{0}".format(mod)
+
             cobj = getattr(__import__(module_name, fromlist=[mod]), clas)
             self._log.debug(u"Create action instance {0} with uuid {1}".format(inst, uuid))
             obj = cobj(log=self._log, params=params)
@@ -478,7 +503,6 @@ class ScenarioInstance(MQAsyncSub):
         pass
 
     def generic_trigger(self, test):
-        self.eval_condition()
         #if test.get_condition():
         #    cond = test.get_condition()
         #    if cond.get_parsed_condition() is None:
@@ -486,6 +510,7 @@ class ScenarioInstance(MQAsyncSub):
         #    st = cond.eval_condition()
         #else:
         #    test.evaluate()
+        self.eval_condition()
 
 class pyObj:
     """

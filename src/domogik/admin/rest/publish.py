@@ -7,10 +7,10 @@ from flask import Response, request, send_from_directory
 import traceback
 from flask_login import login_required
 
-@app.route("/rest/publish/")
-@login_required
-def tst():
-    return "Hello World!"
+#@app.route("/rest/publish/")
+#@login_required
+#def tst():
+#    return "Hello World!"
 
 @app.route('/rest/publish/<client_type>/<client_name>/<path>', methods=['GET'])
 # TODO : security issue !!!!!

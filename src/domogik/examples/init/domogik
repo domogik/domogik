@@ -358,12 +358,13 @@ function check_lock_dir {
         mkdir ${PIDDIR}
     fi
     [ -p ${PIDDIR}/dmg-manager-state ] && rm -f ${PIDDIR}/dmg-manager-state
-    chown ${DOMOGIK_USER}: ${PIDDIR}
+    chown -R ${DOMOGIK_USER}: ${PIDDIR}
     [ ! -d ${LOCKDIR} ] && mkdir ${LOCKDIR}
-    chown ${DOMOGIK_USER}: ${LOCKDIR}
+    chown -R ${DOMOGIK_USER}: ${LOCKDIR}
     [ ! -d ${LOGDIR} ] && mkdir ${LOGDIR}
-    chown ${DOMOGIK_USER}: ${LOGDIR}
+    chown -R ${DOMOGIK_USER}: ${LOGDIR}
 }
+
 
 case "$1" in
     start)

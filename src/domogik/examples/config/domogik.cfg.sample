@@ -102,3 +102,20 @@ sex = female
 ###
 [backup]
 folder=/var/lib/domogik/backup/
+
+
+### 
+# Metrics configuration
+###
+
+[metrics]
+
+# The metrics are some data sent by Domogik to an online server. Except if you change the id below, the data are anonymous.
+# The informations sent are :
+# - technical informations about each Domogik process : cpu and memory usage, ...
+
+# the id is generated during Domogik installation based on some system properties. It should be unique. You can freely change its value to something more fun like your github username for example ;)
+id = 
+
+# this is the url on which the metrics are sent. Don't change this value!
+url = http://metrics.domogik.org/
