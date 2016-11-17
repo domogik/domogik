@@ -160,18 +160,21 @@ def clients():
         msg_core_dead = msg_core_dead)
 
 
-@app.route('/client/<client_id>')
+@app.route('/client/<client_id>/timeline')
 @login_required
-def client_detail(client_id):
+def client_timeline(client_id):
+    from domogik.admin.views.timeline import timeline_generic
+    temp = timeline_generic(the_client_id = client_id, asDict = True)
     detail = get_client_detail(client_id)
 
-    return render_template('client.html',
-            loop = {'index': 1},
-            clientid = client_id,
+    return render_template('client_timeline.html',
+            timeline = temp['timeline'],
+            datatypes = temp['datatypes'],
             client_detail = detail,
+            clientid = client_id,
+            device_name = client_id,
             mactive="clients",
-            active = 'home')
-
+            active = 'timeline')
 
 @app.route('/client/<client_id>/dmg_devices/known')
 @login_required
