@@ -950,6 +950,10 @@ class DbHelper():
                     # finally store the value
                     h = SensorHistory(sensor['id'], datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
                     self.__session.add(h)
+                    self._do_commit()
+                    # update the info changed
+                    self.update_device(sensor['device_id'])
+                    self._do_commit()
 
                 ### update time and value in the sensor table
                 #sensor_db = self.__session.query(Sensor).filter_by(id=sid).first()
@@ -1035,7 +1039,6 @@ class DbHelper():
         """
         values = []
         for a_value in self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).limit(num).all():
-            print type(a_value.date)
             values.append({"value_str" : a_value.value_str,
                            "value_num" : a_value.value_num,
                            "timestamp" : time.mktime(a_value.date.timetuple()) })
