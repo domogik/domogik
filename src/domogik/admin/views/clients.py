@@ -159,6 +159,17 @@ def clients():
         client_list_per_host_per_type=client_list_per_host_per_type,
         msg_core_dead = msg_core_dead)
 
+@app.route('/client/<client_id>')
+@login_required
+def client_detail(client_id):
+    detail = get_client_detail(client_id)
+
+    return render_template('client.html',
+            loop = {'index': 1},
+            clientid = client_id,
+            client_detail = detail,
+            mactive="clients",
+            active = 'home')
 
 @app.route('/client/<client_id>/timeline')
 @login_required
