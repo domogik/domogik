@@ -65,6 +65,10 @@ class RepresentableBase(object):
     def __repr__(self):
         items = ("{0}='{1}'".format(k, v) for k, v in self.__dict__.items() if not k.startswith('_'))
         return "<{0}: {1}>".format(self.__class__.__name__, ', '.join(items))
+    
+    @classmethod
+    def get_tablename(self):
+        return self.__tablename__
 
 DomogikBase = declarative_base(cls=RepresentableBase)
 metadata = DomogikBase.metadata
@@ -95,10 +99,6 @@ class PluginConfig(DomogikBase):
         self.hostname = ucode(hostname)
         self.key = ucode(key)
         self.value = ucode(value)
-
-    @staticmethod
-    def get_tablename():
-        return PluginConfig.__tablename__
 
 class Device(DomogikBase):
     """Device"""
@@ -138,10 +138,6 @@ class Device(DomogikBase):
         self.description = ucode(description)
         self.info_changed = info_changed
 
-    @staticmethod
-    def get_tablename():
-        return Device.__tablename__
-
 class DeviceParam(DomogikBase):
     """Device config, some config parameters that are only accessable over the mq, or inside domogik, these have nothin todo with xpl"""
 
@@ -166,10 +162,6 @@ class DeviceParam(DomogikBase):
         self.value = ucode(value)
         self.type = ucode(type)
 
-    @staticmethod
-    def get_tablename():
-        return DeviceParam.__tablename__
-
 class Person(DomogikBase):
     """Persons registered in the app"""
 
@@ -192,10 +184,6 @@ class Person(DomogikBase):
         self.first_name = ucode(first_name)
         self.last_name = ucode(last_name)
         self.birthdate = birthdate
-
-    @staticmethod
-    def get_tablename():
-        return Person.__tablename__
 
 class UserAccount(DomogikBase):
     """User account for persons : it is only used by the UI"""
@@ -249,10 +237,6 @@ class UserAccount(DomogikBase):
     def __unicode__(self):
         return self.login
 
-    @staticmethod
-    def get_tablename():
-        return UserAccount.__tablename__
-
 class Command(DomogikBase):
     __tablename__ = '{0}_command'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
@@ -270,10 +254,6 @@ class Command(DomogikBase):
         self.return_confirmation = return_confirmation
         self.reference = ucode(reference)
 
-    @staticmethod
-    def get_tablename():
-        return Command.__tablename__
-
 class CommandParam(DomogikBase):
     __tablename__ = '{0}_command_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
@@ -288,10 +268,6 @@ class CommandParam(DomogikBase):
         self.key = ucode(key)
         self.data_type = ucode(data_type)
         self.conversion = ucode(conversion)
-
-    @staticmethod
-    def get_tablename():
-        return CommandParam.__tablename__
 
 class Sensor(DomogikBase):
     __tablename__ = '{0}_sensor'.format(_db_prefix)
@@ -332,10 +308,6 @@ class Sensor(DomogikBase):
         self.value_min = None
         self.value_max = None
 
-    @staticmethod
-    def get_tablename():
-        return Sensor.__tablename__
-
 class SensorHistory(DomogikBase):
     __tablename__ = '{0}_sensor_history'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
@@ -358,10 +330,6 @@ class SensorHistory(DomogikBase):
             pass
         self.value_str = ucode(value)
 
-    @staticmethod
-    def get_tablename():
-        return SensorHistory.__tablename__
-
 class XplStat(DomogikBase):
     __tablename__ = '{0}_xplstat'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
@@ -377,10 +345,6 @@ class XplStat(DomogikBase):
         self.name = ucode(name)
         self.schema = ucode(schema)
         self.json_id = ucode(json_id)
-
-    @staticmethod
-    def get_tablename():
-        return XplStat.__tablename__
 
 class XplStatParam(DomogikBase):
     __tablename__ = '{0}_xplstat_param'.format(_db_prefix)
@@ -405,10 +369,6 @@ class XplStatParam(DomogikBase):
         self.type = ucode(type)
         self.multiple = ucode(multiple)
 
-    @staticmethod
-    def get_tablename():
-        return XplStatParam.__tablename__
-
 class XplCommand(DomogikBase):
     __tablename__ = '{0}_xplcommand'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
@@ -430,10 +390,6 @@ class XplCommand(DomogikBase):
         self.stat_id = stat_id
         self.json_id = json_id
 
-    @staticmethod
-    def get_tablename():
-        return XplCommand.__tablename__
-
 class XplCommandParam(DomogikBase):
     __tablename__ = '{0}_xplcommand_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
@@ -446,10 +402,6 @@ class XplCommandParam(DomogikBase):
         self.xplcmd_id = cmd_id
         self.key = ucode(key)
         self.value = ucode(value)
-
-    @staticmethod
-    def get_tablename():
-        return XplCommandParam.__tablename__
 
 class Scenario(DomogikBase):
     __tablename__ = '{0}_scenario'.format(_db_prefix)
@@ -467,7 +419,3 @@ class Scenario(DomogikBase):
         self.disabled = disabled
         self.description = description
         self.state = state
-
-    @staticmethod
-    def get_tablename():
-        return Scenario.__tablename__

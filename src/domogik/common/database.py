@@ -1577,6 +1577,7 @@ class DbHelper():
         if data_type is not None:
             sensor.data_type = data_type
         self.__session.add(sensor)
+        self._do_commit()
         self.update_device(sensor.device_id)
         self._do_commit()
         return sensor
