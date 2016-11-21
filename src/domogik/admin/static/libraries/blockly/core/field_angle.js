@@ -51,35 +51,6 @@ Blockly.FieldAngle = function(text, opt_validator) {
 goog.inherits(Blockly.FieldAngle, Blockly.FieldTextInput);
 
 /**
- * Sets a new change handler for angle field.
- * @param {Function} handler New change handler, or null.
- */
-Blockly.FieldAngle.prototype.setValidator = function(handler) {
-  var wrappedHandler;
-  if (handler) {
-    // Wrap the user's change handler together with the angle validator.
-    wrappedHandler = function(value) {
-      var v1 = handler.call(this, value);
-      if (v1 === null) {
-        var v2 = v1;
-      } else {
-        if (v1 === undefined) {
-          v1 = value;
-        }
-        var v2 = Blockly.FieldAngle.angleValidator.call(this, v1);
-        if (v2 === undefined) {
-          v2 = v1;
-        }
-      }
-      return v2 === value ? undefined : v2;
-    };
-  } else {
-    wrappedHandler = Blockly.FieldAngle.angleValidator;
-  }
-  Blockly.FieldAngle.superClass_.setValidator.call(this, wrappedHandler);
-};
-
-/**
  * Round angles to the nearest 15 degrees when using mouse.
  * Set to 0 to disable rounding.
  */
@@ -159,7 +130,7 @@ Blockly.FieldAngle.prototype.showEditor_ = function() {
   Blockly.FieldAngle.superClass_.showEditor_.call(this, noFocus);
   var div = Blockly.WidgetDiv.DIV;
   if (!div.firstChild) {
-    // Mobile interface uses window.prompt.
+    // Mobile interface uses Blockly.prompt.
     return;
   }
   // Build the SVG DOM.
@@ -183,25 +154,31 @@ Blockly.FieldAngle.prototype.showEditor_ = function() {
       'y1': Blockly.FieldAngle.HALF,
       'class': 'blocklyAngleLine'}, svg);
   // Draw markers around the edge.
-  for (var a = 0; a < 360; a += 15) {
+  for (var angle = 0; angle < 360; angle += 15) {
     Blockly.createSvgElement('line', {
       'x1': Blockly.FieldAngle.HALF + Blockly.FieldAngle.RADIUS,
       'y1': Blockly.FieldAngle.HALF,
       'x2': Blockly.FieldAngle.HALF + Blockly.FieldAngle.RADIUS -
-          (a % 45 == 0 ? 10 : 5),
+          (angle % 45 == 0 ? 10 : 5),
       'y2': Blockly.FieldAngle.HALF,
       'class': 'blocklyAngleMarks',
-      'transform': 'rotate(' + a + ',' +
+      'transform': 'rotate(' + angle + ',' +
           Blockly.FieldAngle.HALF + ',' + Blockly.FieldAngle.HALF + ')'
     }, svg);
   }
   svg.style.marginLeft = (15 - Blockly.FieldAngle.RADIUS) + 'px';
+
+  // The angle picker is different from other fields in that it updates on
+  // mousemove even if it's not in the middle of a drag.  In future we may
+  // change this behavior.  For now, using bindEvent_ instead of
+  // bindEventWithChecks_ allows it to work without a mousedown/touchstart.
   this.clickWrapper_ =
       Blockly.bindEvent_(svg, 'click', this, Blockly.WidgetDiv.hide);
   this.moveWrapper1_ =
       Blockly.bindEvent_(circle, 'mousemove', this, this.onMouseMove);
   this.moveWrapper2_ =
-      Blockly.bindEvent_(this.gauge_, 'mousemove', this, this.onMouseMove);
+      Blockly.bindEvent_(this.gauge_, 'mousemove', this,
+      this.onMouseMove);
   this.updateGraph_();
 };
 
@@ -234,9 +211,8 @@ Blockly.FieldAngle.prototype.onMouseMove = function(e) {
     angle = Math.round(angle / Blockly.FieldAngle.ROUND) *
         Blockly.FieldAngle.ROUND;
   }
-  angle = Blockly.FieldAngle.angleValidator(angle);
+  angle = this.callValidator(angle);
   Blockly.FieldTextInput.htmlInput_.value = angle;
-  this.sourceBlock_.setShadow(false);
   this.setValue(angle);
   this.validate_();
   this.resizeEditor_();
@@ -305,17 +281,20 @@ Blockly.FieldAngle.prototype.updateGraph_ = function() {
  * @param {string} text The user's text.
  * @return {?string} A string representing a valid angle, or null if invalid.
  */
-Blockly.FieldAngle.angleValidator = function(text) {
-  var n = Blockly.FieldTextInput.numberValidator(text);
-  if (n !== null) {
-    n = n % 360;
-    if (n < 0) {
-      n += 360;
-    }
-    if (n > Blockly.FieldAngle.WRAP) {
-      n -= 360;
-    }
-    n = String(n);
-   }
-  return n;
+Blockly.FieldAngle.prototype.classValidator = function(text) {
+  if (text === null) {
+    return null;
+  }
+  var n = parseFloat(text || 0);
+  if (isNaN(n)) {
+    return null;
+  }
+  n = n % 360;
+  if (n < 0) {
+    n += 360;
+  }
+  if (n > Blockly.FieldAngle.WRAP) {
+    n -= 360;
+  }
+  return String(n);
 };
