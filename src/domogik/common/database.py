@@ -952,8 +952,8 @@ class DbHelper():
                     self.__session.add(h)
                     self._do_commit()
                     # update the info changed
-                    self.update_device(sensor['device_id'])
-                    self._do_commit()
+                    #self.update_device(sensor['device_id'])
+                    #self._do_commit()
 
                 ### update time and value in the sensor table
                 #sensor_db = self.__session.query(Sensor).filter_by(id=sid).first()
