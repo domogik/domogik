@@ -19,8 +19,8 @@ exclude_patterns = ['_build']
 pygments_style = 'sphinx'
 todo_include_todos=True
 
-html_theme = 'domogikdoc'
-#html_theme_path = ["_theme", "../../../sphinx/_theme"]
+html_theme_path = [better_theme_path]
+html_theme = 'better'
 html_static_path = []
 
 
