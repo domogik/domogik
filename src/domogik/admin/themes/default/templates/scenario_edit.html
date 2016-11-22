@@ -12,7 +12,7 @@
     <div id="scenario_title" class="xform-group">
         <span class="{% if form.sname.errors %} has-error{% endif %}">
         {{ form.sname(class_="form-control input-lg") }}
-        {% if form.sname.errors %} 
+        {% if form.sname.errors %}
           {% for error in form.sname.errors %}
             <span class="text-warning">{{ error }}</span>
           {% endfor %}
@@ -291,7 +291,8 @@
     };
     window.addEventListener('resize', onresize, false);
     onresize();
+    Blockly.svgResize(workspace);
   </script>
- 
+
 </div>
 {% endblock %}
