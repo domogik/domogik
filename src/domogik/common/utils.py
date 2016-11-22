@@ -206,7 +206,7 @@ def is_already_launched(log, type, id, manager=True):
     return is_launched, pid_list
 
 
-def get_rest_url():
+def get_rest_url(noRest=False):
     """ Build and return the rest url
     """
     cfg = Loader('admin')
@@ -219,7 +219,10 @@ def get_rest_url():
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
 
-    return "http://{0}:{1}/rest".format(ip, port)
+    if noRest:
+        return "http://{0}:{1}".format(ip, port)
+    else:
+        return "http://{0}:{1}/rest".format(ip, port)
 
 
 def get_rest_doc_path():

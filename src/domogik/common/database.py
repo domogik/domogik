@@ -950,6 +950,10 @@ class DbHelper():
                     # finally store the value
                     h = SensorHistory(sensor['id'], datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
                     self.__session.add(h)
+                    self._do_commit()
+                    # update the info changed
+                    #self.update_device(sensor['device_id'])
+                    #self._do_commit()
 
                 ### update time and value in the sensor table
                 #sensor_db = self.__session.query(Sensor).filter_by(id=sid).first()
@@ -1035,7 +1039,6 @@ class DbHelper():
         """
         values = []
         for a_value in self.__session.query(SensorHistory).filter(SensorHistory.sensor_id==sid).order_by(SensorHistory.date.desc()).limit(num).all():
-            print type(a_value.date)
             values.append({"value_str" : a_value.value_str,
                            "value_num" : a_value.value_num,
                            "timestamp" : time.mktime(a_value.date.timetuple()) })
@@ -1577,6 +1580,7 @@ class DbHelper():
         if data_type is not None:
             sensor.data_type = data_type
         self.__session.add(sensor)
+        self._do_commit()
         self.update_device(sensor.device_id)
         self._do_commit()
         return sensor
@@ -1861,7 +1865,7 @@ class DbHelper():
 ###################
 # Timeline
 ###################
-    def get_timeline(self, device_id = None):
+    def get_timeline(self, device_id = None, client_id = None):
         """ Get the history of the last events
         """
         if device_id:
@@ -1880,6 +1884,23 @@ class DbHelper():
                              .join(SensorHistory) \
                              .order_by(SensorHistory.date.desc()) \
                              .limit(100)
+        elif client_id:
+            return self.__session.query(
+                                    Device.name,
+                                    Device.id,
+                                    Device.client_id,
+                                    Sensor.name,
+                                    Sensor.data_type,
+                                    SensorHistory.sensor_id,
+                                    SensorHistory.date,
+                                    SensorHistory.value_str
+                             ) \
+                             .filter(Device.client_id == client_id) \
+                             .join(Sensor) \
+                             .join(SensorHistory) \
+                             .order_by(SensorHistory.date.desc()) \
+                             .limit(100)
+
         else:
             return self.__session.query(
                                     Device.name,

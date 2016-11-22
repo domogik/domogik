@@ -657,17 +657,40 @@ class Manager(XplPlugin, MQAsyncSub):
             url = self._metrics_url   # just in case of except before first set
          
             ratio = 1
-            try:
-                headers = {'content-type': 'application/json'}
 
-                ### send process info metrics
+            # We put the metrics in buffers and clean the self.xxx metrics now.
+            # if the send will fail, we will put back "after" the metrics in the self.xxx in order to resend them later on
+            # these buffers allow to avoid cleaning self.xxx with some stuff added during the post actions
+            metrics_processinfo = self.metrics_processinfo
+            self.metrics_processinfo = []
+            metrics_browser = self.metrics_browser
+            self.metrics_browser = []
+            
+            headers = {'content-type': 'application/json'}
+
+            ### Send process info metrics
+            try:
                 url = "{0}/metrics/processinfo/".format(self._metrics_url.strip("/"))
-                response = requests.post(url, data=json.dumps(self.metrics_processinfo), headers=headers)
+                response = requests.post(url, data=json.dumps(metrics_processinfo), headers=headers)
                 self.log.debug(u"Metrics for process info send. Server response (http code) is '{0}'".format(response.status_code))
 
-                ### send browser metrics
+                ok = True
+            except:
+                ok = False
+                ratio = 2    # in case the server does not respond because the load on it is too heavy, send data less often
+                self.log.warning(u"Error while trying to push metrics on '{0}'. The error is : {1}".format(url, traceback.format_exc()))
+            # if ok, do nothing
+            # if not ok, refill self.xxx with buffer metrics
+            if not ok:
+                #for item in self.metrics_processinfo:
+                #    self.log.debug("XXXXX {0}".format(json.dumps(item)))
+                self.metrics_processinfo = metrics_processinfo
+
+
+            ### Send browsers metrics
+            try:
                 url = "{0}/metrics/domoweb-browser/".format(self._metrics_url.strip("/"))
-                response = requests.post(url, data=json.dumps(self.metrics_browser), headers=headers)
+                response = requests.post(url, data=json.dumps(metrics_browser), headers=headers)
                 self.log.debug(u"Metrics for domoweb browser send. Server response (http code) is '{0}'".format(response.status_code))
 
                 ok = True
@@ -675,11 +698,14 @@ class Manager(XplPlugin, MQAsyncSub):
                 ok = False
                 ratio = 2    # in case the server does not respond because the load on it is too heavy, send data less often
                 self.log.warning(u"Error while trying to push metrics on '{0}'. The error is : {1}".format(url, traceback.format_exc()))
+            # if ok, do nothing
+            # if not ok, refill self.xxx with buffer metrics
+            if not ok:
+                #for item in self.metrics_browser:
+                #    self.log.debug("XXXXX {0}".format(json.dumps(item)))
+                self.metrics_browser = metrics_browser
 
-            # if ok, empty the history
-            if ok:
-                self.metrics_processinfo = []
-                self.metrics_browser = []
+
 
             # wait for the next time to send
             self._stop.wait(SEND_METRICS_INTERVAL * ratio)
