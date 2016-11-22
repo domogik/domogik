@@ -194,20 +194,12 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 500 INTERNAL SERVER ERROR
         """
-        cli = MQSyncReq(app.zmq_context)
-        msg = MQMessage()
-        msg.set_action('device.delete')
-        msg.set_data({'did': did})
-        res = cli.request('admin', msg.get(), timeout=10)
-        if res is not None:
-            data = res.get_data()
-            if data["status"]:
-                return 201, None
+        with app.db.session_scope():
+            res = app.db.del_device(did)
+            if not res:
+                return 500, "Device deleted failed"
             else:
-                return 500, data["reason"]
-        else:
-            return 500, "DbMgr did not respond on the device.delete, check the logs"
-        return 201, None
+                return 201, None
 
     def post(self):
         """
@@ -398,25 +390,25 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        cli = MQSyncReq(app.zmq_context)
-        msg = MQMessage()
-        msg.set_action('device.update')
-        msg.add_data('did', did)
         if 'name' in request.form:
-            msg.add_data('name', request.form['name'])
-        if 'description' in request.form:
-            msg.add_data('description', request.form['description'])
-        if 'reference' in request.form:
-            msg.add_data('reference', request.form['reference'])
-        res = cli.request('admin', msg.get(), timeout=10)
-        if res is not None:
-            data = res.get_data()
-            if data["status"]:
-                return 201, None
-            else:
-                return 500, data["reason"]
+            name = request.form['name']
         else:
-            return 500, "DbMgr did not respond on the device.update, check the logs"
-        return 200, app.db.get_device(did)
+            name = None
+        if 'description' in request.form:
+            desc = request.form['description']
+        else:
+            desc = None
+        if 'reference' in request.form:
+            ref = request.form['reference']
+        else:
+            ref = None
+        res = app.db.update_device(did, \
+            d_name=name, \
+            d_description=desc, \
+            d_reference=ref)
+        if res:
+            return 201, app.db.get_device(did)
+        else:
+            return 500, None
 
 register_api(deviceAPI, 'device', '/rest/device/', pk='did', pk_type='int')
