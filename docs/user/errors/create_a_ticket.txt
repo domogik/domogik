@@ -1,0 +1,27 @@
+===============
+Report an issue
+===============
+
+If you encountered an issue, you may want to open a ticket.
+
+Open a ticket for Domogik
+=========================
+
+Just go on http://github.com/domogik/domogik/issues/new
+
+Open a ticket for Domoweb
+=========================
+
+Just go on http://github.com/domogik/domoweb/issues/new
+
+Open a ticket for Domodroid
+=========================
+
+Just go on http://github.com/domogik/domodroid/issues/new
+
+Open a ticket for a plugin
+==========================
+
+Assuming the plugin is hosted on github, you should create the ticket on the github plugin tracker.
+
+For example, to create a ticket for the *teleinfo* plugin which is hosted at https://github.com/fritz-smh/domogik-plugin-teleinfo, you can open a ticket at https://github.com/fritz-smh/domogik-plugin-teleinfo/issues

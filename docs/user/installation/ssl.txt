@@ -1,0 +1,71 @@
+=================
+SSL configuration
+=================
+
+Activate ssl for admin and REST
+===============================
+
+.. xxnote::
+    Personal ssl certificate  is not certified, your browser may refuse access to Domogik server. Just ignore the warning message.
+
+Activating ssl is a good idea for the security. But, without a valid certificate (:doc:`more informations here <https://en.wikipedia.org/wiki/Certificate_authority>`), your browser may display a message that warn you about security when you are trying to access Domogik administration.
+
+The instructions on this page will install a personnal certificate which will not be valid. But it will still add more security!
+
+Don't forget to **upgrade your Domoweb or Domodroid configuration if you activate the ssl! **.
+
+Basic activation
+----------------
+
+Just execute the **ssl_activate.sh** script and restart domogik to use ssl.
+
+Advanced activation tutorials
+-----------------------------
+
+Generate the certificate
+************************
+
+Tou will need to generate 2 files, the self signed certificate and the key file:
+
+First we need to generate the key file **without a paraphrase**: ::
+
+    $ openssl genrsa -des3 -out <hostname>.key 1024
+
+You should now have a <hostname>.key file.
+
+The second file is the certificate itself, this is generated in 2 steps:
+
+1- generating the Certificate Signing Request: ::
+
+    $ openssl req -new -key <hostname>.key -out <hostname>.csr
+
+2- the self signed certificate: ::
+
+    $ openssl x509 -req -days 365 -in <hostname>.csr -signkey <hostname>.key -out <hostname>.crt
+
+If you followed the above steps you will have the 2 needed files, <hostname>.key and <hostname>.crt
+
+Configure REST
+**************
+
+To configure rest to use ssl we need to adapt the /etc/domogik/domogik.cfg file, there are 3 important keys for this
+
+* use_ssl = True
+* ssl_certificate = should point to the .crt file
+* ssl_key = should point to the .key file
+
+One this is updated restart domogik, and rest should be running with ssl enabled.
+
+Restart the REST server.
+
+Upgrade Domoweb configuration
+-----------------------------
+
+Just replace the **rest_url** parameter. For example, ::
+
+    rest_url = 'http://192.168.1.50:40406/rest'
+
+Will become : ::
+
+    rest_url = 'https://192.168.1.50:40406/rest'
+

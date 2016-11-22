@@ -1,0 +1,22 @@
+================================
+Configure Nginx to serve Domogik
+================================
+
+Here is an example to publish your internal Domogik administration on internet thanks to Nginx.
+
+We assume the Domogik administration is hosted at https://192.168.1.31:40406. Just add this to your Nginx configuration : ::
+
+    location / {
+        proxy_pass https://192.168.1.31:40406;
+        proxy_redirect    off;
+        proxy_set_header  Host $host;
+        proxy_set_header  X-Real-IP $remote_addr;
+        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Host $server_name;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+    }
+
