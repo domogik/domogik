@@ -29,6 +29,5 @@ Table Of Content
     /user/releases/0.2.0
     /user/releases/0.4.2
     /user/releases/0.5.0
-    /contents
     /developers
     /developers/components
