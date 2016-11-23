@@ -200,7 +200,6 @@ class Admin(Plugin):
         self.log.debug(u"locale : {0}".format(locale.getdefaultlocale()))
         try:
             try:
-                self.mq_config = Loader('mq')
                 # admin config
                 cfg_admin = Loader('admin')
                 config_admin = cfg_admin.load()
