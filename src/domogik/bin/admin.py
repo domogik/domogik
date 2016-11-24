@@ -42,7 +42,7 @@ from domogik.common.database import DbHelper, DbHelperException
 from domogik.common.plugin import Plugin
 #from domogik.common import logger
 from domogik.common.configloader import Loader
-from domogik.common.utils import get_ip_for_interfaces
+from domogik.common.utils import get_ip_for_interfaces, build_deviceType_from_packageJson
 from domogikmq.pubsub.subscriber import MQAsyncSub
 from domogikmq.pubsub.publisher import MQPub
 from domogikmq.message import MQMessage
@@ -914,10 +914,7 @@ class Admin(Plugin):
                 dev_type_id = msg_data['device_type']
     
             # check the received info
-            tmp = self._build_deviceType_from_packageJson(self.zmq, dev_type_id)
-            result = tmp['result']
-            status = tmp['status']
-            reason = tmp['reason']
+            (result, reason, status) = build_deviceType_from_packageJson(self.zmq, dev_type_id)
             msg = MQMessage()
             msg.set_action('device.params.result')
             if not status:
@@ -1104,89 +1101,6 @@ class Admin(Plugin):
                               "name" : name,
                               "host" : host,
                               "event" : "updated"})
-
-    def _build_deviceType_from_packageJson(self, zmq, dev_type_id):
-        result = {}
-        status = True
-        reason = ""
-        # request the packagejson from manager
-        cli = MQSyncReq(zmq)
-        msg = MQMessage()
-        msg.set_action('device_types.get')
-        msg.add_data('device_type', dev_type_id)
-        res = cli.request('manager', msg.get(), timeout=10)
-        del cli
-        if res is None:
-            status = False
-            reason = "Manager is not replying to the mq request" 
-        if status:
-            pjson = res.get_data()
-            if pjson is None:
-                status = False
-                reason = "No data for {0} found by manager".format(msg_data['device_type']) 
-        if status:
-            pjson = pjson[dev_type_id]
-            if pjson is None:
-                status = False
-                reason = "The json for {0} found by manager is empty".format(msg_data['device_type']) 
-        if status:
-            # build the device params
-            stats = []
-            result['device_type'] = dev_type_id
-            result['name'] = ""
-            result['reference'] = ""
-            result['description'] = ""
-            # append the global xpl and on-xpl params
-            result['xpl'] = []
-            result['global'] = []
-            for param in pjson['device_types'][dev_type_id]['parameters']:
-                if param['xpl']:
-                    del param['xpl']
-                    result['xpl'].append(param)
-                else:
-                    del param['xpl']
-                    result['global'].append(param)
-            # find the xplCommands
-            result['xpl_commands'] = {}
-            for cmdn in pjson['device_types'][dev_type_id]['commands']:
-                cmd = pjson['commands'][cmdn]
-                if 'xpl_command'in cmd:
-                    xcmdn = cmd['xpl_command']
-                    xcmd = pjson['xpl_commands'][xcmdn]
-                    result['xpl_commands'][xcmdn] = []
-                    stats.append( xcmd['xplstat_name'] )
-                    for param in xcmd['parameters']['device']:
-                        result['xpl_commands'][xcmdn].append(param)
-            # find the xplStats
-            sensors = pjson['device_types'][dev_type_id]['sensors']
-            #print("SENSORS = {0}".format(sensors))
-            for xstatn in pjson['xpl_stats']:
-                #print("XSTATN = {0}".format(xstatn))
-                xstat = pjson['xpl_stats'][xstatn]
-                for sparam in xstat['parameters']['dynamic']:
-                    #print("XSTATN = {0}, SPARAM = {1}".format(xstatn, sparam))
-                    #if 'sensor' in sparam and xstatn in sensors:
-                    # => This condition was used to fix a bug which occurs while creating complexe devices for rfxcom
-                    #    But is introduced a bug for the geoloc plugin...
-                    #    In fact we had to fix the rfxcom info.json file (open_close uses now rssi_open_close instead of
-                    #    rssi_lighting2
-                    #    So, this one is NOT the good one.
-                    if 'sensor' in sparam:
-                    # => this condition was the original one restored to make the geoloc pluin ok for tests
-                    #    Strangely, there is no issue while using the admin (which uses only mq)
-                    #    but is sucks with test library which uses rest...
-                    #    This one is the good one
-                        if sparam['sensor'] in sensors:
-                            #print("ADD") 
-                            stats.append(xstatn)
-            result['xpl_stats'] = {}
-            #print("STATS = {0}".format(stats))
-            for xstatn in stats:
-                xstat = pjson['xpl_stats'][xstatn]
-                result['xpl_stats'][xstatn] = []
-                for param in xstat['parameters']['device']:
-                    result['xpl_stats'][xstatn].append(param)
-        return {"result": result, "reason": reason, "status": status}
 
 def main():
     ''' Called by the easyinstall mapping script

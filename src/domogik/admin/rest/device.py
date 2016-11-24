@@ -1,4 +1,5 @@
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
+from domogik.common.utils import build_deviceType_from_packageJson
 from domogik.admin.application import app, json_response, register_api, timeit
 from flask.views import MethodView
 from flask import request
@@ -62,9 +63,9 @@ def device_params(client_id, dev_type_id):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    tmp = app.build_deviceType_from_packageJson
+    (result, reason, status) = build_deviceType_from_packageJson(app.zmq_context, dev_type_id)
     # return the info
-    return 200, tmp['result']
+    return 200, result
 
 class deviceAPI(MethodView):
     decorators = [login_required, json_response]

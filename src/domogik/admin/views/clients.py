@@ -27,6 +27,7 @@ from wtforms.widgets import TextArea
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
+from domogik.common.utils import build_deviceType_from_packageJson
 import re
 import json
 import traceback
@@ -621,18 +622,7 @@ def client_devices_new_prod(client_id, device_type_id, product):
 
 def client_devices_new_wiz(client_id, device_type_id, product):
     detail = get_client_detail(client_id)
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('device_types.get')
-    msg.add_data('device_type', device_type_id)
-    res = cli.request('manager', msg.get(), timeout=10)
-    if res is None:
-        flash(gettext("Device creation failed"), "warning")
-        flash(gettext("DbMGR is not answering with device_type parameters"), "danger")
-        return redirect("/client/{0}/dmg_devices/known".format(client_id))
-    detaila = res.get_data()
-    params = detaila[device_type_id]
-    print params
+    (params, reason, status) = build_deviceType_from_packageJson(app.zmq_context, device_type_id)
 
     # dynamically generate the wtfform
     class F(Form):
