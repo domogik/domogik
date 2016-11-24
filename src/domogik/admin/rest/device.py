@@ -62,23 +62,9 @@ def device_params(client_id, dev_type_id):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('device.params')
-    msg.add_data('device_type', dev_type_id)
-    res = cli.request('admin', msg.get(), timeout=10)
-    result = {}
-    if res:
-        res = res.get_data()
-        print(type(res['result']))
-        # test if admin returns a str ("Failed")
-        # and process this case...
-        if isinstance(res['result'], str) or isinstance(res['result'], unicode):
-            return 500, "DbMgr did not respond as expected, check the logs. Response is : {0}. {1}".format(res['result'], res['reason'])
-        result = res['result'];
-        result["client_id"] = client_id
+    tmp = app.build_deviceType_from_packageJson
     # return the info
-    return 200, result
+    return 200, tmp['result']
 
 class deviceAPI(MethodView):
     decorators = [login_required, json_response]
@@ -288,18 +274,37 @@ class deviceAPI(MethodView):
         """
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
-        msg.set_action('device.create')
-        msg.set_data({'data': json.loads(request.form.get('params'))})
-        res = cli.request('admin', msg.get(), timeout=10)
-        if res is not None:
-            data = res.get_data()
-            if data["status"]:
-                return 201, data["result"]
-            else:
-                return 500, data["reason"]
-        else:
-            return 500, "DbMgr did not respond on the device.create, check the logs"
-        return 201, None
+        msg.set_action('device_types.get')
+        msg.add_data('device_type', params['device_type'])
+        res = cli.request('manager', msg.get(), timeout=10)
+        del cli
+        if res is None:
+            status = False
+            reason = "Manager is not replying to the mq request"
+        pjson = res.get_data()
+        if pjson is None:
+            status = False
+            reason = "No data for {0} found by manager".format(params['device_type'])
+        pjson = pjson[params['device_type']]
+        if pjson is None:
+            status = False
+            reason = "The json for {0} found by manager is empty".format(params['device_type'])
+
+	with app.db.session_scope():
+	    if status:
+		# call the add device function
+		res = self._db.add_full_device(json.loads(request.form.get('params')), pjson)
+		if not res:
+		    status = False
+		    reason = "An error occured while adding the device in database. Please check the file admin.log for more informations"
+		else:
+		    status = True
+		    reason = False
+		    result = res
+	    if status:
+		return 201, result
+	    else:
+		return 500, reason
 
     def put(self, did):
         """

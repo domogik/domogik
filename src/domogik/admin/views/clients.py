@@ -623,16 +623,16 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     detail = get_client_detail(client_id)
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
-    msg.set_action('device.params')
-    msg.set_data({'device_type': device_type_id})
-    res = cli.request('admin', msg.get(), timeout=10)
-    if res is not None:
-        detaila = res.get_data()
-        params = detaila['result']
-    else:
+    msg.set_action('device_types.get')
+    msg.add_data('device_type', device_type_id)
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is None:
         flash(gettext("Device creation failed"), "warning")
         flash(gettext("DbMGR is not answering with device_type parameters"), "danger")
         return redirect("/client/{0}/dmg_devices/known".format(client_id))
+    detaila = res.get_data()
+    params = detaila[device_type_id]
+    print params
 
     # dynamically generate the wtfform
     class F(Form):

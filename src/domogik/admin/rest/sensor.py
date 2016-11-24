@@ -97,26 +97,48 @@ class sensorAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        cli = MQSyncReq(app.zmq_context)
-        msg = MQMessage()
-        msg.set_action('sensor.update')
-        msg.add_data('sid', id)
-        msg.add_data('history_round', request.get['round'])
-        msg.add_data('history_store', request.get['store'])
-        msg.add_data('history_max', request.get['max'])
-        msg.add_data('history_expire', request.get['expire'])
-        msg.add_data('timeout', request.get['timeout'])
-        msg.add_data('formula', request.get['formula'])
-        res = cli.request('admin', msg.get(), timeout=10)
-        if res is not None:
-            data = res.get_data()
-            if data["status"]:
-                return 201, data["result"]
+        with app.db.session_scope():
+            sid = data['sid']
+            if 'history_round' not in request.get:
+                hround = None
             else:
-                return 500, data["reason"]
-        else:
-            return 500, "DbMgr did not respond on the sensor.update, check the logs"
-        return 200, app.db.get_device(did)
-
+                hround = request.get['history_round']
+            if 'history_store' not in request.get:
+                hstore = None
+            else:
+                hstore = request.get['history_store']
+            if 'history_max' not in request.get:
+                hmax = None
+            else:
+                hmax = request.get['history_max']
+            if 'history_expire' not in request.get:
+                hexpire = None
+            else:
+                hexpire = request.get['history_expire']
+            if 'timeout' not in request.get:
+                timeout = None
+            else:
+                timeout = request.get['timeout']
+            if 'formula' not in request.get:
+                formula = None
+            else:
+                formula = request.get['formula']
+            if 'data_type' not in request.get:
+                data_type = None
+            else:
+                data_type = request.get['data_type']
+            # do the update
+            res = app.db.update_sensor(id, \
+                 history_round=hround, \
+                 history_store=hstore, \
+                 history_max=hmax, \
+                 history_expire=hexpire, \
+                 timeout=timeout, \
+                 formula=formula, \
+                 data_type=data_type)
+            if res:
+                return 201, app.db.get_sensor(id)
+            else:
+                return 500, None
 
 register_api(sensorAPI, 'sensor_api', '/rest/sensor/', pk='id')
