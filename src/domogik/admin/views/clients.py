@@ -525,37 +525,23 @@ def client_config(client_id):
     else:
         form = None
 
-
     if request.method == 'POST' and form.validate():
-        # build the requested config set
-        data = {}
-        for key, typ in known_items.items():
-            val = getattr(form, key).data
-            if typ == "boolean":
-                if val == False:
-                    val = 'N'
-                else:
-                    val = 'Y'
-            data[key] = val
-        # build the message
-        msg = MQMessage()
-        msg.set_action('config.set')
-        tmp = client_id.split('-')
-        msg.add_data('type', tmp[0])
-        tmp = tmp[1].split('.')
-        msg.add_data('host', tmp[1])
-        msg.add_data('name', tmp[0])
-        msg.add_data('data', data)
-        res = cli.request('admin', msg.get(), timeout=10)
-        if res is not None:
-            data = res.get_data()
-            if data["status"]:
-                flash(gettext("Config saved successfull"), 'success')
-            else:
-                flash(gettext("Config saved failed"), 'warning')
-                flash(data["reason"], 'danger')
-        else:
-            flash(gettext("DbMgr did not respond on the config.set, check the logs"), 'danger')
+        with app.db.session_scope():
+            tmp = client_id.split('-')
+            type = tmp[0]
+            tmp = tmp[1].split('.')
+            host = tmp[1]
+            name = tmp[0]
+            app.db.set_plugin_config(type, name, host, "configured", True)
+            for key, typ in known_items.items():
+                val = getattr(form, key).data
+                if typ == "boolean":
+                    if val == False:
+                        val = 'N'
+                    else:
+                        val = 'Y'
+                app.db.set_plugin_config(type, name, host, key, val)
+            flash(gettext("Config saved successfull"), 'success')
 
     return render_template('client_config.html',
             form = form,
@@ -563,7 +549,6 @@ def client_config(client_id):
             mactive="clients",
             active = 'config',
             client_detail = detail)
-
 
 @app.route('/client/<client_id>/dmg_devices/new')
 @login_required
@@ -877,19 +862,32 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                         params[key][name][i]['value'] = request.form.get(item)
                     i = i + 1
         # we now have the json to return
+	reason = False
+        cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
-        msg.set_action('device.create')
-        msg.set_data({'data': params})
-        res = cli.request('admin', msg.get(), timeout=10)
-        if res is not None:
-            data = res.get_data()
-            if data["status"]:
+        msg.set_action('device_types.get')
+        msg.add_data('device_type', params['device_type'])
+        res = cli.request('manager', msg.get(), timeout=10)
+        del cli
+        if res is None:
+            status = False
+            reason = "Manager is not replying to the mq request"
+        pjson = res.get_data()
+        if pjson is None:
+            status = False
+            reason = "No data for {0} found by manager".format(params['device_type'])
+        pjson = pjson[params['device_type']]
+        if pjson is None:
+            status = False
+            reason = "The json for {0} found by manager is empty".format(params['device_type'])
+        with app.db.session_scope():
+            res = app.db.add_full_device(params, pjson)
+            if res:
                 flash(gettext("Device created succesfully"), 'success')
             else:
                 flash(gettext("Device creation failed"), 'warning')
-                flash(data["reason"], 'danger')
-        else:
-            flash(gettext("DbMgr did not respond on the device.create, check the logs"), 'danger')
+		if reason:
+		    flash(reason, 'warning')
         return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
     return render_template('client_device_new_wiz.html',

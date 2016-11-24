@@ -43,7 +43,7 @@ babel = Babel()
 app = Flask(__name__)
 ### next steps...
 
-#app.debug = True
+app.debug = True
 login_manager.init_app(app)
 babel.init_app(app)
 Themes(app, app_identifier='domogik-admin')

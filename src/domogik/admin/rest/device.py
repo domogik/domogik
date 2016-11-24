@@ -273,6 +273,9 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 500 Internal Server Error
         """
+        params = json.loads(request.form.get('params'))
+        status = True
+        print params
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
         msg.set_action('device_types.get')
@@ -294,7 +297,7 @@ class deviceAPI(MethodView):
 	with app.db.session_scope():
 	    if status:
 		# call the add device function
-		res = self._db.add_full_device(json.loads(request.form.get('params')), pjson)
+		res = app.db.add_full_device(params, pjson)
 		if not res:
 		    status = False
 		    reason = "An error occured while adding the device in database. Please check the file admin.log for more informations"
