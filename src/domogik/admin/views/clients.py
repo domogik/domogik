@@ -70,18 +70,8 @@ def get_client_detail(client_id):
 def get_client_devices(client_id):
     """ The advanced pages have no direct db access, so they used this function to easily get all the devices
     """
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('device.get')
-    msg.add_data('type', client_id.split("-")[0])
-    msg.add_data('name', client_id.split("-")[1].split(".")[0])
-    msg.add_data('host', client_id.split(".")[1])
-
-    res = cli.request('admin', msg.get(), timeout=10)
-    if res is not None:
-        devices = res.get_data()['devices']
-    else:
-        devices = {}
+    with app.db.session_scope():
+        devices = app.db.list_devices_by_plugin(client_id)
     return devices
 
 def get_butler_history():
@@ -288,35 +278,53 @@ def client_sensor_edit(client_id, sensor_id):
 
         if request.method == 'POST' and form.validate():
             if request.form['history_store'] == 'y':
-                store = 1
+                hstore = 1
             else:
-                store = 0
-            cli = MQSyncReq(app.zmq_context)
-            msg = MQMessage()
-            msg.set_action('sensor.update')
-            msg.add_data('sid', sensor_id)
-            msg.add_data('history_round', request.form['history_round'])
-            msg.add_data('history_store', store)
-            msg.add_data('history_max', request.form['history_max'])
-            msg.add_data('history_expire', request.form['history_expire'])
-            msg.add_data('timeout', request.form['timeout'])
-            msg.add_data('formula', request.form['formula'])
-            if allow_data_type:
-                msg.add_data('data_type', request.form['data_type'])
-            res = cli.request('admin', msg.get(), timeout=10)
-            if res is not None:
-                data = res.get_data()
-                if data["status"]:
-                    flash(gettext("Sensor update succesfully"), 'success')
-                else:
-                    flash(gettext("Senor update failed"), 'warning')
-                    flash(data["reason"], 'danger')
-            else:
-                flash(gettext("DbMgr did not respond on the sensor.update, check the logs"), 'danger')
+                hstore = 0
+	    if 'history_round' not in request.form:
+		hround = None
+	    else:
+		hround = request.form['history_round']
+	    if 'history_store' not in request.form:
+		hstore = None
+	    else:
+		hstore = request.form['history_store']
+	    if 'history_max' not in request.form:
+		hmax = None
+	    else:
+		hmax = request.form['history_max']
+	    if 'history_expire' not in request.form:
+		hexpire = None
+	    else:
+		hexpire = request.form['history_expire']
+	    if 'timeout' not in request.form:
+		timeout = None
+	    else:
+		timeout = request.form['timeout']
+	    if 'formula' not in request.form:
+		formula = None
+	    else:
+		formula = request.form['formula']
+	    if 'data_type' not in request.form:
+		data_type = None
+	    else:
+		data_type = request.form['data_type']
+	    # do the update
+	    res = self._db.update_sensor(sensor_id, \
+		 history_round=hround, \
+		 history_store=hstore, \
+		 history_max=hmax, \
+		 history_expire=hexpire, \
+		 timeout=timeout, \
+		 formula=formula, \
+		 data_type=data_type)
+	    if res:
+		flash(gettext("Sensor update succesfully"), 'success')
+	    else:
+		flash(gettext("Senor update failed"), 'warning')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
-            pass
         else:
-                return render_template('client_sensor.html',
+	    return render_template('client_sensor.html',
                 form = form,
                 clientid = client_id,
                 mactive="clients",
@@ -371,21 +379,12 @@ def client_global_edit(client_id, dev_id):
                         val = 'n' # in db value stored in lowcase
                     else:
                         val = 'y' # in db value stored in lowcase
-                cli = MQSyncReq(app.zmq_context)
-                msg = MQMessage()
-                msg.set_action('deviceparam.update')
-                msg.add_data('dpid', item["id"])
-                msg.add_data('value', val)
-                res = cli.request('admin', msg.get(), timeout=10)
-                if res is not None:
-                    data = res.get_data()
-                    if data["status"]:
+                with app.db.session_scope():
+                    res = app.db.udpate_device_param(item["id"], val)
+                    if res:
                         flash(gettext("Param update succesfully"), 'success')
                     else:
                         flash(gettext("Param update failed"), 'warning')
-                        flash(data["reason"], 'danger')
-                else:
-                    flash(gettext("DbMgr did not respond on the deviceparam.update, check the logs"), 'danger')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
             pass
         else:

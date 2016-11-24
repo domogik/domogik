@@ -49,7 +49,6 @@ babel.init_app(app)
 Themes(app, app_identifier='domogik-admin')
 QRcode(app)
 
-app.debug = True
 app.jinja_env.globals['bootstrap_is_hidden_field'] =\
     is_hidden_field_filter
 app.jinja_env.add_extension('jinja2.ext.do')

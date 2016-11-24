@@ -266,18 +266,8 @@ def scenario_blocks_js():
         datatypes = {}
 
     # devices
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('device.get')
-    res = cli.request('admin', msg.get(), timeout=10)
-    if res is not None:
-        res = res.get_data()
-        if 'devices' in res:
-            devices = res['devices']
-    else:
-        print(u"Error : no devices found!")
-        devices = []
-
+    with app.db.session_scope():
+        devices = app.db.list_devices()
 
     ### Now start the javascript generation
     js = ""
