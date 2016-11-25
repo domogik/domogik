@@ -5,30 +5,36 @@ Table Of Content
 ================
 
 .. toctree::
+    :numbered:
 
 
     /index
-    /user/installation/uninstall
-    /user/installation/postgresql
     /user/installation/index
-    /user/installation/virtualenv
-    /user/installation/ssl
-    /user/installation/domogik_cfg_file
-    /user/installation/nginx
-    /user/installation/install_from_a_script
-    /user/quickstart/orphans
-    /user/quickstart/glossary
-    /user/quickstart/clients_status
+        /user/installation/uninstall
+        /user/installation/domogik_cfg_file
+        /user/installation/postgresql
+        /user/installation/virtualenv
+        /user/installation/ssl
+        /user/installation/nginx
+        /user/installation/install_from_a_script
+
     /user/quickstart/first_use
+    /user/quickstart/glossary
     /user/quickstart/install_a_package
+    /user/quickstart/clients_status
+    /user/quickstart/orphans
+
     /user/errors/index
     /user/errors/create_a_ticket
-    /user/openremote/index
-    /user/releases/0.3.0
-    /user/releases/0.4.0
-    /user/releases/0.4.1
-    /user/releases/0.1.0
-    /user/releases/0.2.0
-    /user/releases/0.4.2
+
     /user/releases/0.5.0
+    /user/releases/0.4.2
+    /user/releases/0.4.1
+    /user/releases/0.4.0
+    /user/releases/0.3.0
+    /user/releases/0.2.0
+    /user/releases/0.1.0
+
+    /user/openremote/index
+
     /developers/components
