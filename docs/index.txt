@@ -13,6 +13,8 @@ Domogik is a smart home (or home automation) free and open source solution. With
 
 .. TODO : include a nice image  with domoweb, domodroid, a wall mounted tablet
 
+For more informations about this release of Domogik, you can check the :doc:`release note </user/releases/0.5.0>` 
+
 Prerequisites
 =============
 
@@ -25,16 +27,6 @@ I am a newbie in Linux world, what do I need to know ?
 
 First, you should use a distribution like Ubuntu. Then, you should first learn the Linux basements.
 
-Releases history
-================
-
-* :doc:`Release 0.5.0 </user/releases/0.5.0>` 
-* :doc:`Release 0.4.2 </user/releases/0.4.2>` 
-* :doc:`Release 0.4.1 </user/releases/0.4.1>` 
-* :doc:`Release 0.4.0 </user/releases/0.4.0>` 
-* :doc:`Release 0.3.0 </user/releases/0.3.0>`
-* :doc:`Release 0.2.0 </user/releases/0.2.0>`
-* :doc:`Release 0.1.0 </user/releases/0.1.0>`
 
 Install Domogik
 ===============
@@ -103,4 +95,14 @@ As Domogik provide an API, you can control Domogik from other control solutions,
 * :doc:`Openremote integration </enduser/openremote/index>`
 
 
+Releases history
+================
+
+* :doc:`Release 0.5.0 </user/releases/0.5.0>` 
+* :doc:`Release 0.4.2 </user/releases/0.4.2>` 
+* :doc:`Release 0.4.1 </user/releases/0.4.1>` 
+* :doc:`Release 0.4.0 </user/releases/0.4.0>` 
+* :doc:`Release 0.3.0 </user/releases/0.3.0>`
+* :doc:`Release 0.2.0 </user/releases/0.2.0>`
+* :doc:`Release 0.1.0 </user/releases/0.1.0>`
  
