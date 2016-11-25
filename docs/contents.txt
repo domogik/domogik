@@ -6,9 +6,8 @@ Table Of Content
 
 .. toctree::
 
+
     /index
-    /user/errors/index
-    /user/errors/create_a_ticket
     /user/installation/uninstall
     /user/installation/postgresql
     /user/installation/index
@@ -17,7 +16,14 @@ Table Of Content
     /user/installation/domogik_cfg_file
     /user/installation/nginx
     /user/installation/install_from_a_script
-    /user/releases/0.3
+    /user/quickstart/orphans
+    /user/quickstart/glossary
+    /user/quickstart/clients_status
+    /user/quickstart/first_use
+    /user/quickstart/install_a_package
+    /user/errors/index
+    /user/errors/create_a_ticket
+    /user/openremote/index
     /user/releases/0.3.0
     /user/releases/0.4.0
     /user/releases/0.4.1

@@ -74,42 +74,33 @@ The following tutorials are not mandatory to use Domogik. You can pick just what
 I have an error 
 ---------------
 
-First, please check, the :doc:`common errors page </user/errors/index.txt>`. Then, if you are still the error, you can create an issue.
+First, please check, the :doc:`common errors page </user/errors/index.txt>`. 
 
 When using Domogik or a plugin, if you find an issue, :doc:`please report it on the issue tracker </user/errors/create_a_ticket>`.
 
-
-
-
-
-
-
-OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
-=======================================
-
-
-Open an issue/ticket
---------------------
-
-
 Quick start guide
------------------
+=================
 
-.. todo::
-    complete
+.. TODO : complete missing parts
 
-* :doc:`Terms </enduser/quick_start/terms>`
-* :doc:`First use : go to the admin </enduser/quick_start/first_use>`
-* :doc:`Find and install a package </enduser/quick_start/install_a_package>`
+* :doc:`Glossary </user/quick_start/glossary>`
+* :doc:`First use </user/quick_start/first_use>`
+* :doc:`Find and install a package </user/quick_start/install_a_package>`
 * configure a client and create its devices
-* :doc:`What is an orphan device ? <enduser/packages/orphans>`
+* :doc:`What is an orphan device ? <user/quick_start/orphans>`
 * start a client
-* :doc:`Clients status </enduser/quick_start/clients_status>`
+
+Various informations
+====================
+
+* :doc:`Clients status </user/quick_start/clients_status>`
+
+Use alternate interfaces
+========================
+
+As Domogik provide an API, you can control Domogik from other control solutions, like **OpenRemote** for example.
+
 * :doc:`Openremote integration </enduser/openremote/index>`
 
-Detailed guide
---------------
-
-* :doc:`Manage packages </enduser/packages/index>` 
 
  
