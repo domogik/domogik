@@ -31,7 +31,7 @@ First, you should use a distribution like Ubuntu. Then, you should first learn t
 Install Domogik
 ===============
 
-.. todo::
+.. xtodo::
     complete standard installation part
     links to domoweb/domodroid doc
 
@@ -44,8 +44,8 @@ To install Domogik, just follow the instructions :  :doc:`basic installation </u
 
 Then, you will need to install one user interface : 
 
-* Domoweb : TODO
-* Domodroid : TODO
+* `Domoweb <http://domoweb.readthedocs.io/en/latest/>`_
+* `Domodroid <http://domodroid.readthedocs.io/en/latest/>`_
 
 If you want to uninstall Domogik, you will need to :doc:`use the uninstall tool </user/installation/uninstall>`.
 

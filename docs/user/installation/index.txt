@@ -1,6 +1,6 @@
-=====================
-Standard installation
-=====================
+===============
+Install Domogik
+===============
 
 If you are already a Domogik 0.3 user
 =====================================

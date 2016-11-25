@@ -8,7 +8,7 @@ Table Of Content
 
     /index
 
-        /user/installation/index
+    /user/installation/index
         /user/installation/uninstall
         /user/installation/domogik_cfg_file
         /user/installation/postgresql
