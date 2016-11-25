@@ -1,0 +1,77 @@
+=====
+Tools
+=====
+
+Overview
+========
+
+Some tools are installed with Domogik, they all starts by **dmg_**. The others are available only in Domogik sources.
+In this page, the first ones will be describes.
+
+See :doc:`the sources tools <others>` for the other tools.
+
+dmg_dump
+========
+
+**dmg_dump** is a tool to listen xPL messages on the server.
+
+Example: ::
+
+    $ dmg_dump 
+    HUB discovery > starting
+    HUB discovery > looking for the hub. I hope there is one hub, Domogik won't work without the hub!
+    HUB discovery > Received HBEAT echo, HUB detected
+    HUB discovery > hub found, configuration in progress
+    2013-01-26 15:15:16.384598 - xpl-trig
+    {
+    hop=1
+    source=domogik-xpl_time.ambre
+    target=*
+    }
+    datetime.basic
+    {
+    datetime=20130126151847
+    date=20130126
+    time=151847
+    format1=201301261518475
+    }
+    
+    ^CKeyBoardInterrupt
+    
+It can be used with several options. See the **-h** option to get the full list: ::
+
+    $ dmg_dump -h
+    Usage: dmg_dump [options]
+    
+    Options:
+      -h, --help      show this help message and exit
+      -c              Diaply data in a compress way
+      -t XPLTYPE      Filter messages on XPL message type
+      -s XPLSOURCE    Filter messages on XPL source field
+      -S XPLSCHEMA    Filter messages on XPL schema field
+      -i XPLINSTANCE  Filter messages on XPL instance
+      -V, --version   Display Domogik version.
+      -f              Run the plugin in foreground, default to background.
+    
+
+
+dmg_send
+========
+
+**dmg_send** allows you to send xPL messages from the command line. 
+
+Example: ::
+
+    $ ./send.py xpl-cmnd x10.basic "device=a1,command=on"
+
+
+dmg_version
+===========
+
+This tool will display the current Domogik version: ::
+
+    $ dmg_version 
+    REST_API_release : 0.6
+    Domogik_release : 0.3.0
+    Sources_release : default.5689 (0.2.0-alpha1) - 2013-01-26 14:56 +0100
+

@@ -5,6 +5,7 @@ Table Of Content
 ================
 
 .. toctree::
+    :glob:
 
     /index
 
@@ -36,4 +37,5 @@ Table Of Content
 
         /user/openremote/index
 
-        /developers/components
+    /developers
+        /developers/*

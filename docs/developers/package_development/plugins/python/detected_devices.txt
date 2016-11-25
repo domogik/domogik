@@ -1,0 +1,96 @@
+=================
+Devices detection
+=================
+
+Purpose
+=======
+
+Some plugins can see all devices for the related hardware or service. For example, *rfxcom* plugin can catch all messages of all devices seen by the Rfxcom product. The *onewire* can also see all devices when reading the onewire bus. When a device which is not known from Domogik is detected, a message is sent over the MQ and catched by the user interfaces for being displayed.
+
+How to implement this ?
+=======================
+
+Allow 0 devices created by the user
+-----------------------------------
+
+First, you should make your plugin able to start without any devices created by the user. So, the first time, the user will start the plugin and then will be able to create some devices from the user interfaces.
+
+.. note::
+    Keep in mind that for now, when a new device is created, the user has to restart the plugin!
+
+On plugin startup
+-----------------
+
+First, in the *__init__()* function of your *bin* class, get the devices list like this (don't forget the comment to explain why you don't quit the plugin on startup if no devices are created): ::
+
+        # get the devices list
+        # for this plugin, if no devices are created we won't be able to use devices.
+        # but.... if we stop the plugin right now, we won't be able to detect existing device and send events about them
+        # so we don't stop the plugin if no devices are created
+        self.devices = self.get_device_list(quit_if_no_device = False)
+
+Then, when you instantiate your plugin *lib* class, add the **self.device_detected()** function as a parameter (this is named a callback). Example for the *rfxcom* plugin: ::
+
+        self.rfxcom_manager = Rfxcom(..., self.device_detected, ...)
+
+
+In the library
+--------------
+
+First, get the callback for the **device_detected()** function like this (this is still the *rfxcom* example): ::
+
+    class Rfxcom:
+        """ Rfxcom
+        """
+    
+        def __init__(self, ..., cb_device_detected, ...):
+            """ Some blah blah
+                @param ...
+                @param cb_device_detected : callback to handle detected devices
+                @param ...
+            """
+            ...
+    
+            self.cb_device_detected = cb_device_detected
+
+            ...
+
+
+Then, in the plugin *lib* class, the way to detect a device can be different from a hardware/service and another one. When you detect a device, don't focus if it is a known device or not and just get some informations about it: 
+
+* the items about its address or parameters
+* its model or reference if possible
+* any other information that may be useful during a device creation
+
+Then, for each of its feature, call the callback for the **device_detected()** function. Here is an example for the *rfxcom* plugin: ::
+
+        # handle device features detection
+        for feature in ['temperature', 'humidity']:
+            self.cb_device_detected(device_type = "rfxcom.temperature_humidity",
+                                    type = "xpl_stats",
+                                    feature = feature,
+                                    data = {"device" : address,
+                                            "reference" : model})
+
+
+.. note::
+    Be careful about the *reference* keyword. This is the only one which must always be named like this! The other ones may be related to the *device_types* section of the *info.json* file. Example for *rfxcom* (we find the same *device* key which is for this feature of this plugin the device address): ::
+
+        "device_types": {
+            "rfxcom.temperature": {
+                "description": "",
+                "id": "rfxcom.temperature",
+                "name": "Temperature sensors",
+                "commands": [],
+                "sensors": ["temperature", "battery", "rssi"],
+                "parameters": [
+                    {
+                        "key": "device",
+                        "xpl" : true,
+                        "description": "Device address. Example: th9 0xFFFF",
+                        "type": "string"
+                    }
+                ]
+            },
+
+There is nothing else to do! This function will check if the device is already created in database. If the device is not created, this device will be stored in memory and a MQ message *device.new* will be sent.

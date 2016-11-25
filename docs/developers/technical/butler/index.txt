@@ -1,0 +1,55 @@
+========================
+Butler technical details
+========================
+
+The butler component is based on RiveScript engine.
+
+Startup
+=======
+
+On startup, the butler will check for installed **brain** packages in the Domogik package directory. Depending on the configured language, it will load the appropriate language related files.
+
+Interacting with the butler
+===========================
+
+To interact with the butler, you just need to :
+
+* publish your queries in an **interface.input** MQ message.
+* subscribe for responses or notifications to an **interface.output** MQ message
+
+interface.input
+---------------
+
+Example : ::
+
+    {
+      "text" : ... ,
+      "media" : ... ,
+      "location" : ... ,
+      "identity" : ... ,
+      "sex" : ... ,
+      "mood" : ... ,
+      "source" : ... ,
+    }
+
+Only **text**, **media** and **source** (interface-name.hostname) are mandatory.
+
+interface.output
+----------------
+
+Example : ::
+
+    {
+      "text" : ... ,
+      "media" : ... ,
+      "location" : ... ,
+      "identity" : ... ,
+      "sex" : ... ,
+      "mood" : ... ,
+      "reply_to" : ... ,
+    }
+
+The **reply_to** filed is filled with the **source** value of an input message.
+
+
+

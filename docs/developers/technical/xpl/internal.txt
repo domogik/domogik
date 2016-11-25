@@ -1,0 +1,9 @@
+=============================
+Internal domogik xpl messages
+=============================
+
+Actually Domogik uses some custon xPL schema for the communication between the components. They will be replaced by a message queue soon. You can find some informations about them on the wiki:
+
+* http://wiki.domogik.org/xPL_Domogik_system_schema
+* http://wiki.domogik.org/xPL_process_information
+* http://wiki.domogik.org/ManagerAndPackages
