@@ -5,8 +5,6 @@ Table Of Content
 ================
 
 .. toctree::
-    :numbered:
-
 
     /index
     /user/installation/index
@@ -24,8 +22,8 @@ Table Of Content
     /user/quickstart/clients_status
     /user/quickstart/orphans
 
-    /user/errors/index
-    /user/errors/create_a_ticket
+        /user/errors/index
+        /user/errors/create_a_ticket
 
     /user/releases/0.5.0
     /user/releases/0.4.2
@@ -35,6 +33,6 @@ Table Of Content
     /user/releases/0.2.0
     /user/releases/0.1.0
 
-    /user/openremote/index
+        /user/openremote/index
 
-    /developers/components
+        /developers/components

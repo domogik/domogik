@@ -1,6 +1,6 @@
-=====================
-Domogik documentation
-=====================
+=====
+Index
+=====
 
 What is Domogik ?
 =================
@@ -75,17 +75,17 @@ Quick start guide
 
 .. TODO : complete missing parts
 
-* :doc:`Glossary </user/quick_start/glossary>`
-* :doc:`First use </user/quick_start/first_use>`
-* :doc:`Find and install a package </user/quick_start/install_a_package>`
+* :doc:`Glossary </user/quickstart/glossary>`
+* :doc:`First use </user/quickstart/first_use>`
+* :doc:`Find and install a package </user/quickstart/install_a_package>`
 * configure a client and create its devices
-* :doc:`What is an orphan device ? <user/quick_start/orphans>`
+* :doc:`What is an orphan device ? <user/quickstart/orphans>`
 * start a client
 
 Various informations
 ====================
 
-* :doc:`Clients status </user/quick_start/clients_status>`
+* :doc:`Clients status </user/quickstart/clients_status>`
 
 Use alternate interfaces
 ========================
