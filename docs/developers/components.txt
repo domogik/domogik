@@ -13,10 +13,6 @@ How does it work ?
 
 Domogik is made of several core components. Each core component has some dedicated tasks. All components interact between them thanks to a message queue : `Zero MQ <http://zeromq.org/>`_. As Domogik uses xPL for automation purpose, some core components are plugged to the xPL network which is used by the xPL plugins. There is also one database to store configuration and data of all the sensors.
 
-Here is an overview of all the Domogik components :
-
-.. image:: overview.svg
-
 Components overview
 ===================
 
