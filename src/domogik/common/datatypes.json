@@ -124,6 +124,7 @@
             "DT_ApparantEnergy",
             "DT_Speed",
             "DT_kmhSpeed",
+            "DT_ktsSpeed",
             "DT_Year",
             "DT_Month",
             "DT_Day",
@@ -329,6 +330,13 @@
         "min": null,
         "max": null,
         "unit": "km/h",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_ktsSpeed": {
+        "min": null,
+        "max": null,
+        "unit": "kts",
         "parent": "DT_Number",
         "childs": []
     },
