@@ -80,6 +80,8 @@ class Review():
         self.title("Manual TODO list")
 
         self.action("Design : check the icon appearance")
+        self.action("Battery : check if the plugin manager sensors about batteries. If so, check that the appropriate DT_Battery is used.")
+        self.action("Motion : check if the plugin manager sensors about motion sensors. If so, check that the appropriate DT_Motion is used.")
 
         if self.has_automated_tests:
             self.action("Automated test : check they run")
