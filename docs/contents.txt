@@ -28,4 +28,5 @@ Table Of Content
     :glob:
 
     /user/*/*
+    /developers/*
     /developers/*/*
