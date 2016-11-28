@@ -15,7 +15,7 @@ Open a ticket for Domoweb
 Just go on http://github.com/domogik/domoweb/issues/new
 
 Open a ticket for Domodroid
-=========================
+===========================
 
 Just go on http://github.com/domogik/domodroid/issues/new
 
