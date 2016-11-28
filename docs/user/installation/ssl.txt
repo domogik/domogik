@@ -9,7 +9,7 @@ Activating ssl is a good idea for the security. But, without a valid certificate
 
 The instructions on this page will install a personnal certificate which will not be valid. But it will still add more security!
 
-Don't forget to **upgrade your Domoweb or Domodroid configuration if you activate the ssl! **.
+Don't forget to **upgrade your Domoweb or Domodroid configuration if you activate the ssl**.
 
 Basic activation
 ----------------
