@@ -69,7 +69,7 @@ The related part in the json file which describes the data types is: ::
 So, the available values that can be used in the url are *0* and *1*. The labels *on* and *off* are used only for display in the user interface : the button to send the value *0* will be named as *off*.
 
 .. note::
-    Notice that is *0* and *1* are the values of the /cmd url, these values can be translated to something else (off/on, low/high, ...) in the generated xPL message. More informations in the :doc:`conversion chapter </package_development/plugins/conversion/index>`.
+    Notice that is *0* and *1* are the values of the /cmd url, these values can be translated to something else (off/on, low/high, ...) in the generated xPL message. More informations in the :doc:`conversion chapter </developers/package_development/plugins/conversion/index>`.
 
    The goal of the **/cmd** url is really to be the same for all devices features of the same data type! If the xPL messages are not the same for 2 plugins which use the same data type, this is handled by the plugins thanks to the *conversions*.
 

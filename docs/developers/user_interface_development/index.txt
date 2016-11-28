@@ -46,7 +46,7 @@ Don't forget to think about:
 Read the documentation
 ----------------------
 
-You should read all the Domogik technical documentation, especially the *REST* and *Message Queue* parts. Don't forget to look at data types </package_development/plugins/data_types/index>
+You should read all the Domogik technical documentation, especially the *REST* and *Message Queue* parts. Don't forget to look at data types </developers/package_development/plugins/data_types/index>
 
 Prepare your project
 --------------------

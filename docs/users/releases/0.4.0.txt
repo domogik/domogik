@@ -72,7 +72,7 @@ The plugin format has been changed. The main changes are:
 * the json file format has been reviewed and has new parts.
 * the plugin management has been improved a lot for more quality.
 * a test framework has been designed to allow automatic testing on the plugins.
-* a :doc:`documentation has been written to help you to create your own plugins </package_development/plugins/index>`.
+* a :doc:`documentation has been written to help you to create your own plugins </developers/package_development/plugins/index>`.
 * ...
 
 xPL clients not related to Domogik

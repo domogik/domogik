@@ -10,5 +10,5 @@ xPL plugins packages, called also *plugins* are the first type of packages avail
 How to develop a plugin ?
 =========================
 
-Just read the documentation on :doc:`how to develop a plugin </package_development/plugins/index>`.
+Just read the documentation on :doc:`how to develop a plugin </developers/package_development/plugins/index>`.
 
