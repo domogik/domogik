@@ -8,26 +8,26 @@ Table Of Content
     :glob:
 
     /index
-    /user/installation/index
-    /user/quickstart/first_use
-    /user/quickstart/glossary
-    /user/quickstart/install_a_package
-    /user/quickstart/clients_status
-    /user/quickstart/orphans
-    /user/releases/0.5.0
-    /user/releases/0.4.2
-    /user/releases/0.4.1
-    /user/releases/0.4.0
-    /user/releases/0.3.0
-    /user/releases/0.2.0
-    /user/releases/0.1.0
+    /users/installation/index
+    /users/quickstart/first_use
+    /users/quickstart/glossary
+    /users/quickstart/install_a_package
+    /users/quickstart/clients_status
+    /users/quickstart/orphans
+    /users/releases/0.5.0
+    /users/releases/0.4.2
+    /users/releases/0.4.1
+    /users/releases/0.4.0
+    /users/releases/0.3.0
+    /users/releases/0.2.0
+    /users/releases/0.1.0
     /developers
 
 .. toctree::
     :hidden:
     :glob:
 
-    /user/*/*
+    /users/*/*
     /developers/user_interface_development/index
     /developers/xplhub/index
     /developers/package_development/brains/index
