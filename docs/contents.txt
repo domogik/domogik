@@ -22,3 +22,10 @@ Table Of Content
     /user/releases/0.2.0
     /user/releases/0.1.0
     /developers
+
+.. toctree::
+    :hidden:
+    :glob:
+
+    /user/*
+    /developers/*
