@@ -27,5 +27,5 @@ Table Of Content
     :hidden:
     :glob:
 
-    /user/*
-    /developers/*
+    /user/*/*
+    /developers/*/*
