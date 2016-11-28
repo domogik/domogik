@@ -5,9 +5,6 @@ SSL configuration
 Activate ssl for admin and REST
 ===============================
 
-.. xxnote::
-    Personal ssl certificate  is not certified, your browser may refuse access to Domogik server. Just ignore the warning message.
-
 Activating ssl is a good idea for the security. But, without a valid certificate (:doc:`more informations here <https://en.wikipedia.org/wiki/Certificate_authority>`), your browser may display a message that warn you about security when you are trying to access Domogik administration.
 
 The instructions on this page will install a personnal certificate which will not be valid. But it will still add more security!
