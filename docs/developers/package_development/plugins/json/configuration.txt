@@ -91,7 +91,7 @@ Here are some type examples:
 * String
 * ...
 
-:doc:`Please check the most of all available field types </package_development/plugins/field_types/index>`.
+:doc:`Please check the most of all available field types </developers/package_development/plugins/field_types/index>`.
 
 
 
