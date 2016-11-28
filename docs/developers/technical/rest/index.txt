@@ -65,7 +65,7 @@ In Domogik configuration file, there are several options about REST in **[rest]*
 How to use REST with SSL?
 =========================
 
-See the :doc:`ssl configuration tutorial </enduser/installation/ssl>`.
+See the :doc:`ssl configuration tutorial </users/installation/ssl>`.
 
 Status 
 ======

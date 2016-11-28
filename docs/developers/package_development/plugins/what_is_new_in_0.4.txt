@@ -18,4 +18,4 @@ The plugins are easier to install
 =================================
 
 To deploy a plugin from its author sources, you will just have to grab the sources or a zip file, extract it somewhere in your filesystem and just create a symbolic link in */var/lib/domogik/domogik_packages* to the plugin directory! Nothing else to do! 
-And there is a tool which will do that for you. :doc:More informations about packages installation in the dedicated chapter </enduser/packages/index>.
+And there is a tool which will do that for you. :doc:More informations about packages installation in the dedicated chapter </users/packages/index>.
