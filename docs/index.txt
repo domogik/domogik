@@ -31,14 +31,8 @@ First, you should use a distribution like Ubuntu. Then, you should first learn t
 Install Domogik
 ===============
 
-.. xtodo::
-    complete standard installation part
-    links to domoweb/domodroid doc
-
 Basic installation
 ------------------
-
-.. todo : link to domoweb and domodroid docs on RTD
 
 To install Domogik, just follow the instructions :  :doc:`basic installation </user/installation/index>`.
 
