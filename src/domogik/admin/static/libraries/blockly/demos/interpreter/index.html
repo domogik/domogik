@@ -25,7 +25,7 @@
 
   <p>This is a simple demo of executing code with a sandboxed JavaScript interpreter.</p>
 
-  <p>&rarr; More info on <a href="https://developers.google.com/blockly/installation/js-interpreter">JS Interpreter</a>...</p>
+  <p>&rarr; More info on <a href="https://developers.google.com/blockly/guides/configure-blockly/web/running-javascript#js_interpreter">JS Interpreter</a>&hellip;</p>
 
   <p>
     <button onclick="parseCode()">Parse JavaScript</button>
@@ -124,8 +124,8 @@
     var workspace = Blockly.inject('blocklyDiv',
         {media: '../../media/',
          toolbox: document.getElementById('toolbox')});
-    Blockly.Xml.domToWorkspace(workspace,
-        document.getElementById('startBlocks'));
+    Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'),
+                               workspace);
 
     var myInterpreter = null;
 
@@ -172,7 +172,6 @@
       alert('Ready to execute this code:\n\n' + code);
       document.getElementById('stepButton').disabled = '';
       highlightPause = false;
-      workspace.traceOn(true);
       workspace.highlightBlock(null);
     }
 
@@ -183,6 +182,7 @@
         if (!ok) {
           // Program complete, no more code to execute.
           document.getElementById('stepButton').disabled = 'disabled';
+          workspace.highlightBlock(null);
           return;
         }
       }

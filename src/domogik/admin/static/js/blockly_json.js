@@ -63,7 +63,6 @@ Blockly.JSON.jsonToWorkspace = function(workspace, json) {
       }
     }, 1);
     topBlock.updateDisabled();
-    Blockly.fireUiEvent(window, 'resize');
   }
   Blockly.Events.enable();
   if (Blockly.Events.isEnabled() && !topBlock.isShadow()) {
@@ -76,7 +75,7 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock) {
   var prototypeName = jsonBlock['type'];
   var id = jsonBlock['id'];
   if (!prototypeName) { throw 'Block type unspecified: \n'; }
-  if (!id) { 
+  if (!id) {
       block = workspace.newBlock( prototypeName);
   } else {
       block = workspace.newBlock( prototypeName, jsonBlock['id']);

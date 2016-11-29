@@ -84,9 +84,10 @@ Blockly.Css.inject = function(hasCss, pathToMedia) {
   // Strip off any trailing slash (either Unix or Windows).
   Blockly.Css.mediaPath_ = pathToMedia.replace(/[\\\/]$/, '');
   text = text.replace(/<<<PATH>>>/g, Blockly.Css.mediaPath_);
-  // Inject CSS tag.
+  // Inject CSS tag at start of head.
   var cssNode = document.createElement('style');
-  document.head.appendChild(cssNode);
+  document.head.insertBefore(cssNode, document.head.firstChild);
+
   var cssTextNode = document.createTextNode(text);
   cssNode.appendChild(cssTextNode);
   Blockly.Css.styleSheet_ = cssNode.sheet;
@@ -135,12 +136,25 @@ Blockly.Css.CONTENT = [
     'background-color: #fff;',
     'outline: none;',
     'overflow: hidden;',  /* IE overflows by default. */
+    'display: block;',
   '}',
 
   '.blocklyWidgetDiv {',
     'display: none;',
     'position: absolute;',
-    'z-index: 999;',
+    'z-index: 99999;', /* big value for bootstrap3 compatibility */
+  '}',
+
+  '.injectionDiv {',
+    'height: 100%;',
+    'position: relative;',
+  '}',
+
+  '.blocklyNonSelectable {',
+    'user-select: none;',
+    '-moz-user-select: none;',
+    '-webkit-user-select: none;',
+    '-ms-user-select: none;',
   '}',
 
   '.blocklyTooltipDiv {',
@@ -154,7 +168,7 @@ Blockly.Css.CONTENT = [
     'opacity: 0.9;',
     'padding: 2px;',
     'position: absolute;',
-    'z-index: 1000;',
+    'z-index: 100000;', /* big value for bootstrap3 compatibility */
   '}',
 
   '.blocklyResizeSE {',
@@ -244,6 +258,35 @@ Blockly.Css.CONTENT = [
     'fill: #000;',
   '}',
 
+  '.blocklyFlyoutButton {',
+    'fill: #888;',
+    'cursor: default;',
+  '}',
+
+  '.blocklyFlyoutButtonShadow {',
+    'fill: #666;',
+  '}',
+
+  '.blocklyFlyoutButton:hover {',
+    'fill: #aaa;',
+  '}',
+
+  '.blocklyFlyoutLabel {',
+    'cursor: default;',
+  '}',
+
+  '.blocklyFlyoutLabelBackground {',
+    'opacity: 0;',
+  '}',
+
+  '.blocklyFlyoutLabelText {',
+    'fill: #000;',
+  '}',
+
+  '.blocklyFlyoutLabelText:hover {',
+    'fill: #aaa;',
+  '}',
+
   /*
     Don't allow users to select text.  It gets annoying when trying to
     drag a block and selected text moves instead.
@@ -326,12 +369,12 @@ Blockly.Css.CONTENT = [
     'opacity: 0;',
   '}',
 
-  '.blocklyScrollbarKnob {',
+  '.blocklyScrollbarHandle {',
     'fill: #ccc;',
   '}',
 
-  '.blocklyScrollbarBackground:hover+.blocklyScrollbarKnob,',
-  '.blocklyScrollbarKnob:hover {',
+  '.blocklyScrollbarBackground:hover+.blocklyScrollbarHandle,',
+  '.blocklyScrollbarHandle:hover {',
     'fill: #bbb;',
   '}',
 
@@ -349,12 +392,12 @@ Blockly.Css.CONTENT = [
 
   /* Darken flyout scrollbars due to being on a grey background. */
   /* By contrast, workspace scrollbars are on a white background. */
-  '.blocklyFlyout .blocklyScrollbarKnob {',
+  '.blocklyFlyout .blocklyScrollbarHandle {',
     'fill: #bbb;',
   '}',
 
-  '.blocklyFlyout .blocklyScrollbarBackground:hover+.blocklyScrollbarKnob,',
-  '.blocklyFlyout .blocklyScrollbarKnob:hover {',
+  '.blocklyFlyout .blocklyScrollbarBackground:hover+.blocklyScrollbarHandle,',
+  '.blocklyFlyout .blocklyScrollbarHandle:hover {',
     'fill: #aaa;',
   '}',
 
@@ -423,6 +466,16 @@ Blockly.Css.CONTENT = [
     'white-space: nowrap;',
   '}',
 
+  '.blocklyHorizontalTree {',
+    'float: left;',
+    'margin: 1px 5px 8px 0;',
+  '}',
+
+  '.blocklyHorizontalTreeRtl {',
+    'float: right;',
+    'margin: 1px 0 8px 5px;',
+  '}',
+
   '.blocklyToolboxDiv[dir="RTL"] .blocklyTreeRow {',
     'margin-left: 8px;',
   '}',
@@ -433,9 +486,17 @@ Blockly.Css.CONTENT = [
 
   '.blocklyTreeSeparator {',
     'border-bottom: solid #e5e5e5 1px;',
-    'height: 0px;',
+    'height: 0;',
     'margin: 5px 0;',
   '}',
+
+  '.blocklyTreeSeparatorHorizontal {',
+    'border-right: solid #e5e5e5 1px;',
+    'width: 0;',
+    'padding: 5px 0;',
+    'margin: 0 5px;',
+  '}',
+
 
   '.blocklyTreeIcon {',
     'background-image: url(<<<PATH>>>/sprites.png);',
