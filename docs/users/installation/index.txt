@@ -96,7 +96,7 @@ Dependencies to install manually
 
 The **netifaces python library** can't be installed automatically. For now you will have to install it manually. Example for debian based distributions: ::
 
-    $ sudo apt-get install python2.7-dev
+    $ sudo apt-get install python2.7-dev python-pip
     $ sudo pip install netifaces
 
 In minimum debian repo the package **sphinx-better-theme** does not exist::
@@ -153,6 +153,7 @@ Create the folder */opt/dmg/* : ::
     $ sudo mkdir -p /opt/dmg
     $ sudo useradd -M domogik
     $ sudo chown domogik /opt/dmg  # assuming the user domogik already exists!
+    $ sudo chmod 777 /opt/dmg     
 
 
 Download the packages
@@ -242,7 +243,9 @@ These are the information about the butler. If you are not a french user, set th
     [ Starting on section backup ]
     Key folder [/var/lib/domogik/backup/]: /tmp/
 
-Set the folder you want to use to save Domogik backups. ::
+Set the folder you want to use to save Domogik backups. 
+
+During the database installation or update, if needed the mysql administrator password will be asked. ::
 
     [ Installing or upgrading the db ]
     ==> Creating backup
