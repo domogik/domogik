@@ -60,7 +60,7 @@ The following tutorials are not mandatory to use Domogik. You can pick just what
 I have an error 
 ---------------
 
-First, please check, the :doc:`common errors page </users/errors/index.txt>`. 
+First, please check, the :doc:`common errors page </users/errors/index>`. 
 
 When using Domogik or a plugin, if you find an issue, :doc:`please report it on the issue tracker </users/errors/create_a_ticket>`.
 
