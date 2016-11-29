@@ -11,7 +11,9 @@ Domogik is a smart home (or home automation) free and open source solution. With
 * use several user interfaces to monitor and control your smart home : Domoweb from your brower (Chrome, Firefox, ...), Domodroid from your Android smartphone or tablet, Openremote which allows to create photo realistic interfaces.
 * speak with your smarthome thanks to the Butler. You can use the butler over the Domoweb or a dedicated Android application named DomoButler.
 
-.. TODO : include a nice image  with domoweb, domodroid, a wall mounted tablet
+.. image:: 0.5_800x400.jpg
+    :align: center
+    :alt: Domogik
 
 For more informations about this release of Domogik, you can check the :doc:`release note </users/releases/0.5.0>` 
 
