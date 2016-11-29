@@ -223,6 +223,9 @@ def scenario_blocks_js():
     tests = scenario_tests.keys()
     try:
         tests.remove(u'sensor.SensorTest')
+        tests.remove(u'sensor.SensorValueDummy')
+        tests.remove(u'sensor.SensorValue')
+        tests.remove(u'sensor.SensorTestDummy')
     except ValueError:
         pass
 
@@ -283,7 +286,7 @@ def scenario_blocks_js():
     js = ""
 
     ### tests
-    print(u"ITEMS={0}".format(scenario_tests.items()))
+    #print(u"ITEMS={0}".format(scenario_tests.items()))
 
     # Check if there are some errors in the python tests files
     # TODO : Improve error handling
@@ -305,7 +308,7 @@ def scenario_blocks_js():
             js = u'{0}\n\r{1}'.format(js, add)
         else:
             #for parv in params:
-            print(u"TEST={0}".format(test))
+            #print(u"TEST={0}".format(test))
             for parv in params['parameters']:
                 par = parv['name']
                 papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
@@ -537,7 +540,7 @@ def scenario_blocks_js():
     #### datatypes
     for dt_parent, dt_types in used_datatypes.items():
         for dt_type in dt_types:
-            print(u"{0} => {1}".format(dt_parent, dt_type))
+            #print(u"{0} => {1}".format(dt_parent, dt_type))
             if dt_parent == "DT_Bool":
                 color = 20
                 output = "\"Boolean\""
