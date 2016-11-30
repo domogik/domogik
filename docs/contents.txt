@@ -5,8 +5,8 @@ Table Of Content
 ================
 
 .. toctree::
-    :glob:
-
+    :includehidden:
+    
     /index
     /users/installation/index
     /users/quickstart/first_use
@@ -25,7 +25,7 @@ Table Of Content
 
 .. toctree::
     :hidden:
-
+    
     /users/errors/index
     /users/errors/create_a_ticket
     /users/openremote/index
