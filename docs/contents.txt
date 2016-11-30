@@ -26,7 +26,6 @@ Table Of Content
 .. toctree::
     :hidden:
 
-
     /users/errors/index
     /users/errors/create_a_ticket
     /users/openremote/index
