@@ -2,6 +2,8 @@
 Technical and developers documentation
 ======================================
 
+If you are looking for **installing and using Domogik**, please check the `user documentation <http://domogik.readthedocs.io/>`_.
+
 Technical Documentation
 =======================
 
