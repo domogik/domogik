@@ -1,6 +1,6 @@
-================================
-Install Domogik using postgresql 
-================================
+======================================
+Installation - use postgresql database
+======================================
 
 This documentation assume you will follow `the basic installation steps </users/installation/index.html>`_ and replace the *mysql* related actions by some *postgresql* actions which are described below.
 

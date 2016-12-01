@@ -1,6 +1,6 @@
-================================
-Configure Nginx to serve Domogik
-================================
+===============================================
+Installation - Configure Nginx to serve Domogik
+===============================================
 
 Here is an example to publish your internal Domogik administration on internet thanks to Nginx.
 

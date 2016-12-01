@@ -14,6 +14,18 @@ Table Of Content
     /users/quickstart/install_a_package
     /users/quickstart/clients_status
     /users/quickstart/orphans
+
+    /users/errors/index
+    /users/errors/create_a_ticket
+    /users/installation/domogik_cfg_file
+    /users/installation/ssl
+    /users/installation/install_from_a_script
+    /users/installation/nginx
+    /users/installation/postgresql
+    /users/installation/virtualenv
+    /users/installation/uninstall
+    /users/openremote/index
+
     /users/releases/0.5.0
     /users/releases/0.4.2
     /users/releases/0.4.1
@@ -21,18 +33,3 @@ Table Of Content
     /users/releases/0.3.0
     /users/releases/0.2.0
     /users/releases/0.1.0
-
-.. toctree::
-    :hidden:
-    
-    /users/errors/index
-    /users/errors/create_a_ticket
-    /users/openremote/index
-    /users/installation/uninstall
-    /users/installation/postgresql
-    /users/installation/index
-    /users/installation/virtualenv
-    /users/installation/ssl
-    /users/installation/domogik_cfg_file
-    /users/installation/nginx
-    /users/installation/install_from_a_script

@@ -1,6 +1,6 @@
-=================
-SSL configuration
-=================
+================================
+Installation - SSL configuration
+================================
 
 Activate ssl for admin and REST
 ===============================
