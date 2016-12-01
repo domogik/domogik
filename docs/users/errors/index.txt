@@ -97,7 +97,7 @@ If message queue broket and forwarder are up, you will see: ::
     tcp        0      0 192.168.1.10:40411      0.0.0.0:*               LISTEN      32583/python
     tcp        0      0 192.168.1.10:40412      0.0.0.0:*               LISTEN      32583/python
 
-You can find more informations about the used ports in the :doc:`network ports page </developers/technical/network_ports>`.
+You can find more informations about the used ports in the technical documentation.
 
 
 Check if xPL is working fine

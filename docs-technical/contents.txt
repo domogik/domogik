@@ -5,6 +5,10 @@ Table Of Content
 ================
 
 .. toctree::
-    :includehidden:
+    :glob:
     
     /index
+    /developers/*
+    /developers/*/*
+    /developers/*/*/*
+    /developers/*/*/*/*

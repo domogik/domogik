@@ -9,7 +9,7 @@ In Domgik world a package is a category of module. There are packages for Domogi
 
 Currently there is only one package type in Domogik: the xPL plugins, called as *plugins*.
 
-In Domogik 0.4, the only way to install a package, :doc:`is a command line tool : the packages manager</users/quickstart/install_a_package>`. 
+In Domogik 0.5, the only way to install a package is a command line tool : see the user documentation for more inforations.
 
 In the next releases, there will be, as it is in Domogik 0.3, a way to install and find packages over the administration web interface.
  
