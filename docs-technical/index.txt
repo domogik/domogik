@@ -5,6 +5,8 @@ Technical and developers documentation
 Technical Documentation
 =======================
 
+.. todo :: Please notice that this documentation is not fully up to date for Domogik 0.5.
+
 General informations
 --------------------
 

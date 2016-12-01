@@ -42,7 +42,7 @@ source_suffix = '.txt'
 master_doc = 'contents'
 
 # General information about the project.
-project = u'Domogik'
+project = u'Domogik - Technical documentation'
 copyright = u'2016, Domogik'
 
 # The version info for the project you're documenting, acts as replacement for
