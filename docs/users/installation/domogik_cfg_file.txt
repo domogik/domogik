@@ -1,6 +1,9 @@
-====================================================================
-Installation - Domogik configuration file : /etc/domogik/domogik.cfg
-====================================================================
+============
+Installation
+============
+
+Domogik configuration file : /etc/domogik/domogik.cfg
+=====================================================
 
 Purpose
 =======
