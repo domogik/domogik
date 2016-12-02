@@ -1,6 +1,8 @@
 ======================================
-Installation - use postgresql database
+Installation - Use postgresql database
 ======================================
+
+.. note :: This chapter is for information. For a basic installation, you don't need to apply the content of this chapter.
 
 This documentation assume you will follow `the basic installation steps </users/installation/index.html>`_ and replace the *mysql* related actions by some *postgresql* actions which are described below.
 

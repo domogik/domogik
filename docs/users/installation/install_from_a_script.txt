@@ -1,6 +1,8 @@
-=============================
-Install Domogik from a script
-=============================
+=====================================
+Installation - Automatic installation
+=====================================
+
+.. note :: This chapter is for information. For a basic installation, you don't need to apply the content of this chapter.
 
 Purpose
 =======

@@ -1,14 +1,11 @@
-============
-Installation
-============
-
-Domogik configuration file : /etc/domogik/domogik.cfg
-=====================================================
+=====================================
+Installation - The configuration file
+=====================================
 
 Purpose
 =======
 
-The Domogik configuration file is created when the *install.py* script is launched. For each key of this file, an option is available for the *install.py* script (this is managed dynamically, so each update on the template configuration file will available from the *install.py* script without needing to modify this one).
+The Domogik configuration file, located in **/etc/domogik/domogik.cfg**, is created when the *install.py* script is launched. For each key of this file, an option is available for the *install.py* script (this is managed dynamically, so each update on the template configuration file will available from the *install.py* script without needing to modify this one).
 
 
 Template

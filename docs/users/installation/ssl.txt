@@ -1,9 +1,8 @@
-============
-Installation
-============
+==================
+Installation - SSL
+==================
 
-SSL configuration
-=================
+.. note :: This chapter is for information. For a basic installation, you don't need to apply the content of this chapter.
 
 Activate ssl for admin and REST
 ===============================
@@ -45,10 +44,10 @@ The second file is the certificate itself, this is generated in 2 steps:
 
 If you followed the above steps you will have the 2 needed files, <hostname>.key and <hostname>.crt
 
-Configure REST
-**************
+Configure the Admin/rest component to use ssl
+*********************************************
 
-To configure rest to use ssl we need to adapt the /etc/domogik/domogik.cfg file, there are 3 important keys for this
+To configure rest to use ssl we need to adapt the */etc/domogik/domogik.cfg* file, there are 3 important keys for this
 
 * use_ssl = True
 * ssl_certificate = should point to the .crt file
@@ -56,7 +55,7 @@ To configure rest to use ssl we need to adapt the /etc/domogik/domogik.cfg file,
 
 One this is updated restart domogik, and rest should be running with ssl enabled.
 
-Restart the REST server.
+Restart Domogik.
 
 Upgrade Domoweb configuration
 -----------------------------
@@ -69,3 +68,4 @@ Will become : ::
 
     rest_url = 'https://192.168.1.50:40406/rest'
 
+Restart Domoweb.

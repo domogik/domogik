@@ -2,6 +2,8 @@
 Installation - Configure Nginx to serve Domogik
 ===============================================
 
+.. note :: This chapter is for information. For a basic installation, you don't need to apply the content of this chapter.
+
 Here is an example to publish your internal Domogik administration on internet thanks to Nginx.
 
 We assume the Domogik administration is hosted at https://192.168.1.31:40406. Just add this to your Nginx configuration : ::
