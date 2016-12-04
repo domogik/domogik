@@ -680,7 +680,7 @@ Blockly.Blocks['block_minute_at'] = {
         .appendField("mn");
     this.setOutput(true, 'block_minute_at');
     this.setColour(160);
-    this.setTooltip('"Used to specify a particular minute. For example, “30” means “at 30 minutes after hour”.");');
+    this.setTooltip("Used to specify a particular minute. For example, “30” means “at 30 minutes after hour”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -739,7 +739,7 @@ Blockly.Blocks['block_hour_at'] = {
         .appendField("h");
     this.setOutput(true, 'block_hour_at');
     this.setColour(230);
-    this.setTooltip('"Used to specify a particular hour. For example, “10” means “at 10 h”.");');
+    this.setTooltip("Used to specify a particular hour. For example, “10” means “at 10 h”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -760,7 +760,7 @@ Blockly.Blocks['block_hour_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_hour_from_to');
     this.setColour(230);
-    this.setTooltip('Used to specify ranges. For example, “10-12” means “the hours 10, 11 and 12”.');
+    this.setTooltip("Used to specify ranges. For example, “10-12” means “the hours 10, 11 and 12”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -818,7 +818,7 @@ Blockly.Blocks['block_day_of_month_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_of_month_from_to');
     this.setColour(65);
-    this.setTooltip('Used to specify ranges. For example, “5-25” means “all day of month between 5th to 25th”.');
+    this.setTooltip("Used to specify ranges. For example, “5-25” means “all day of month between 5th to 25th”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -898,7 +898,7 @@ Blockly.Blocks['block_month_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_month_from_to');
     this.setColour(45);
-    this.setTooltip('Used to specify ranges. For example, “2-6” means “all month between february to june”.');
+    this.setTooltip("Used to specify ranges. For example, “2-6” means “all month between february to june”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -954,7 +954,7 @@ Blockly.Blocks['block_day_w_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_from_to');
     this.setColour(290);
-    this.setTooltip('Used to specify ranges. For example, “2-5” means “all day of week between thuesday to friday”.');
+    this.setTooltip("Used to specify ranges. For example, “2-5” means “all day of week between thuesday to friday”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -1028,7 +1028,7 @@ Blockly.Blocks['block_day_w_w_end'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_w_end');
     this.setColour(290);
-    this.setTooltip('Used to specify weekend day “saturday and sunday”.');
+    this.setTooltip("Used to specify weekend day “saturday and sunday”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -1063,7 +1063,7 @@ Blockly.Blocks['block_year_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_year_from_to');
     this.setColour(100);
-    this.setTooltip('Used to specify ranges. For example, “2016-2020” means “all years between 2016 to 2020”.');
+    this.setTooltip("Used to specify ranges. For example, “2016-2020” means “all years between 2016 to 2020”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -1083,7 +1083,7 @@ Blockly.Blocks['block_year_inc'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_year_inc');
     this.setColour(100);
-    this.setTooltip('Used to specify increments. For example, “2016/2” means “every 2 years from 2016”.');
+    this.setTooltip("Used to specify increments. For example, “2016/2” means “every 2 years from 2016”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
