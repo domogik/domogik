@@ -115,7 +115,7 @@ var CRON_FIELD_DATA = {
     "DayOfMonth": {
         "label": "Day of month",
         "help" : "",
-        "check": ['block_all','block_last','block_no_specif','block_day_of_month_at','block_day_of_month_from_to','block_day_of_month_inc','block_day_of_month_w','block_day_of_month_from_to'],
+        "check": ['block_all','block_last','block_no_specif','block_day_of_month_at','block_day_of_month_from_to','block_day_of_month_inc','block_day_of_month_near_to_w'],
         "rule" : CRON_D_MONTH
     },
     "Month":  {
@@ -158,7 +158,7 @@ var PREDEFINED_OPTIONS = [
     ["Midnight","@midnight"],
     ["Hourly","@hourly"]
 ];
-var WEEKDAYS = [["Sunday", "0"], ["Monday", "1"], ["Thuesday", "2"], ["Wednesday", "3"], ["Wednesday", "4"], ["Friday", "5"], ["Saturday", "6"]];
+var WEEKDAYS = [["Sunday", "0"], ["Monday", "1"], ["Thuesday", "2"], ["Wednesday", "3"], ["Thursday", "4"], ["Friday", "5"], ["Saturday", "6"]];
 var MONTHS = [["January", "1"], ["Frebruary", "2"], ["March", "3"], ["April", "4"], ["May", "5"], ["June", "6"], ["July", "7"], ["August", "8"], ["September", "9"], ["October", "10"], ["November", "11"], ["December", "12"]];
 
 Blockly.Blocks['cron.CronTest'] = {
@@ -496,12 +496,8 @@ Blockly.Blocks['cron.CronTest'] = {
         } else if (exp.crontype.specChar == 'L') {
             var nBlock = this.workspace.newBlock('block_last');
         } else if (exp.crontype.specChar == 'W') {
-            if (exp.values.length == 0) {
-                var nBlock = this.workspace.newBlock('block_day_of_month_w');
-            } else {
-                var nBlock = this.workspace.newBlock('block_day_of_month_near_to_w');
-                nBlock.setFieldValue(exp.values[0], 'day_m');
-            };
+            var nBlock = this.workspace.newBlock('block_day_of_month_near_to_w');
+            nBlock.setFieldValue(exp.values[0], 'day_m');
         } else if (exp.crontype.specChar == '?') {
             var nBlock = this.workspace.newBlock('block_no_specif');
         } else if (exp.crontype.specChar == '') {
@@ -631,7 +627,10 @@ Blockly.Blocks['block_no_specif'] = {
         .appendField("No specific");
     this.setOutput(true, 'block_no_specif');
     this.setColour(20);
-    this.setTooltip('');
+    this.setTooltip("Used when you need to specify something in one of the two fields in which the character is allowed, but not the other."+
+                " For example, if I want my trigger to fire on a particular day of the month (say, the 10th),"+
+                " but don’t care what day of the week that happens to be, I would put “10” in the day-of-month field,"+
+                " and “?” in the day-of-week field.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -645,7 +644,12 @@ Blockly.Blocks['block_last'] = {
         .appendField("Last");
     this.setOutput(true, 'block_last');
     this.setColour(330);
-    this.setTooltip('');
+    this.setTooltip("Has different meaning in each of the two fields in which it is allowed."+
+                " For example, the value “L” in the day-of-month field means “the last day of the month” - day 31 for January,"+
+                " day 28 for February on non-leap years. If used in the day-of-week field by itself, it simply means “7” or “SAT”."+
+                " But if used in the day-of-week field after another value, it means “the last xxx day of the month” - for example “6L” means “the last friday of the month”."+
+                " You can also specify an offset from the last day of the month, such as “L-3” which would mean the third-to-last day of the calendar month."+
+                " When using the ‘L’ option, it is important not to specify lists, or ranges of values, as you’ll get confusing/unexpected results.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -676,7 +680,7 @@ Blockly.Blocks['block_minute_at'] = {
         .appendField("mn");
     this.setOutput(true, 'block_minute_at');
     this.setColour(160);
-    this.setTooltip('');
+    this.setTooltip('"Used to specify a particular minute. For example, “30” means “at 30 minutes after hour”.");');
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -697,7 +701,7 @@ Blockly.Blocks['block_minute_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_minute_from_to');
     this.setColour(160);
-    this.setTooltip('Used to specify ranges. For example, “5-10” in the minute field means “all minutes between 5 to 10”.');
+    this.setTooltip('Used to specify ranges. For example, “5-10” means “all minutes between 5 to 10”.');
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -718,7 +722,7 @@ Blockly.Blocks['block_minute_inc'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_minute_inc');
     this.setColour(160);
-    this.setTooltip('');
+    this.setTooltip("Used to specify increments. For example, “0/15” means “the minutes 0, 15, 30, and 45”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -735,7 +739,7 @@ Blockly.Blocks['block_hour_at'] = {
         .appendField("h");
     this.setOutput(true, 'block_hour_at');
     this.setColour(230);
-    this.setTooltip('');
+    this.setTooltip('"Used to specify a particular hour. For example, “10” means “at 10 h”.");');
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -756,7 +760,7 @@ Blockly.Blocks['block_hour_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_hour_from_to');
     this.setColour(230);
-    this.setTooltip('');
+    this.setTooltip('Used to specify ranges. For example, “10-12” means “the hours 10, 11 and 12”.');
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -777,7 +781,7 @@ Blockly.Blocks['block_hour_inc'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_hour_inc');
     this.setColour(230);
-    this.setTooltip('');
+    this.setTooltip("Used to specify increments. For example, “2/5” means “the hours 2, 7, 12, 15, 18, and 23.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -794,7 +798,7 @@ Blockly.Blocks['block_day_of_month_at'] = {
         .appendField("of month");
     this.setOutput(true, 'block_day_of_month_at');
     this.setColour(65);
-    this.setTooltip('');
+    this.setTooltip("Used to specify a particular day of the month. For example, “15” means “the 15th day of the month”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -814,7 +818,7 @@ Blockly.Blocks['block_day_of_month_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_of_month_from_to');
     this.setColour(65);
-    this.setTooltip('');
+    this.setTooltip('Used to specify ranges. For example, “5-25” means “all day of month between 5th to 25th”.');
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -834,26 +838,11 @@ Blockly.Blocks['block_day_of_month_inc'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_of_month_inc');
     this.setColour(65);
-    this.setTooltip('');
+    this.setTooltip("Used to specify increments. For example, “1/3” means “fire every 3 days starting on the first day of the month”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('start')+'/'+this.getFieldValue('inc');
-  }
-};
-
-Blockly.Blocks['block_day_of_month_w'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("On weekdays");
-    this.setInputsInline(true);
-    this.setOutput(true, 'block_day_of_month_w');
-    this.setColour(65);
-    this.setTooltip('');
-    this.setHelpUrl('');
-  },
-  formatValue_: function() {
-      return 'W';
   }
 };
 
@@ -866,7 +855,14 @@ Blockly.Blocks['block_day_of_month_near_to_w'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_of_month_near_to_w');
     this.setColour(65);
-    this.setTooltip('');
+    this.setTooltip("Used to specify the weekday (Monday-Friday) nearest the given day."+
+                " As an example, if you were to specify “15W” as the value for the day-of-month field,"+
+                " the meaning is: “the nearest weekday to the 15th of the month”. So if the 15th is a Saturday,"+
+                " the trigger will fire on Friday the 14th. If the 15th is a Sunday, the trigger will fire on Monday the 16th."+
+                " If the 15th is a Tuesday, then it will fire on Tuesday the 15th."+
+                " However if you specify “1W” as the value for day-of-month, and the 1st is a Saturday, the trigger will fire on Monday the 3rd,"+
+                " as it will not ‘jump’ over the boundary of a month’s days. The ‘W’ character can only be specified when the day-of-month is a single day, not a range or list of days.\n"+
+                "The 'L' and 'W' characters can also be combined in the day-of-month field to yield 'LW', which translates to “last weekday of the month”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -883,7 +879,7 @@ Blockly.Blocks['block_month_on'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_month_on');
     this.setColour(45);
-    this.setTooltip('');
+    this.setTooltip("Used to specify a particular month. For example, “7” means “july”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -902,7 +898,7 @@ Blockly.Blocks['block_month_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_month_from_to');
     this.setColour(45);
-    this.setTooltip('');
+    this.setTooltip('Used to specify ranges. For example, “2-6” means “all month between february to june”.');
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -922,7 +918,7 @@ Blockly.Blocks['block_month_inc'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_month_inc');
     this.setColour(45);
-    this.setTooltip('');
+    this.setTooltip("Used to specify increments. For example, “1/4” means “the month january, may and september”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -930,7 +926,7 @@ Blockly.Blocks['block_month_inc'] = {
   }
 };
 
-// Block month
+// Block day of week
 Blockly.Blocks['block_day_w_on'] = {
   init: function() {
     this.appendDummyInput()
@@ -939,7 +935,7 @@ Blockly.Blocks['block_day_w_on'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_on');
     this.setColour(290);
-    this.setTooltip('');
+    this.setTooltip("Used to specify a particular day of week. For example, “1” means “monday”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -958,7 +954,7 @@ Blockly.Blocks['block_day_w_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_from_to');
     this.setColour(290);
-    this.setTooltip('');
+    this.setTooltip('Used to specify ranges. For example, “2-5” means “all day of week between thuesday to friday”.');
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -978,7 +974,7 @@ Blockly.Blocks['block_day_w_inc'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_inc');
     this.setColour(290);
-    this.setTooltip('');
+    this.setTooltip("Used to specify increments. For example, “1/2” means “the day of week sunday, thuesday, thursday, and saturday”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -995,7 +991,7 @@ Blockly.Blocks['block_day_w_last_of_month'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_last_of_month');
     this.setColour(290);
-    this.setTooltip('');
+    this.setTooltip("Used to specify “the last xxx day of the month” - for example “6L” means “the last friday of the month”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -1007,14 +1003,17 @@ Blockly.Blocks['block_day_w_nth_of_month'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("The")
-        .appendField(new Blockly.FieldDropdown([["1st", "1"], ["2nd", "2"], ["3rd", "3"], ["4th", "4"], ["5th", "5"], ["6th", "6"]]), "nth")
+        .appendField(new Blockly.FieldDropdown([["1st", "1"], ["2nd", "2"], ["3rd", "3"], ["4th", "4"], ["5th", "5"], ["6th", "6"]]), "nth");
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(WEEKDAYS), "day_w")
         .appendField("of the month");
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_nth_of_month');
     this.setColour(290);
-    this.setTooltip('');
+    this.setTooltip("Used to specify “the nth” XXX day of the month."+
+                " For example, the value of “6#3” in the day-of-week field means “the third Friday of the month” (day 6 = Friday and “#3” = the 3rd one in the month)."+
+                " Other examples: “2#1” = the first Monday of the month and “4#5” = the fifth Wednesday of the month."+
+                " Note that if you specify “#5” and there is not 5 of the given day-of-week in the month, then no firing will occur that month.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -1029,11 +1028,11 @@ Blockly.Blocks['block_day_w_w_end'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_w_end');
     this.setColour(290);
-    this.setTooltip('');
+    this.setTooltip('Used to specify weekend day “saturday and sunday”.');
     this.setHelpUrl('');
   },
   formatValue_: function() {
-      return 'SAT,SUN';
+      return '0,6';
   }
 };
 
@@ -1045,7 +1044,7 @@ Blockly.Blocks['block_year_in'] = {
         .appendField(new Blockly.FieldNumber(0, 0, 9999), "year");
     this.setOutput(true, 'block_year_in');
     this.setColour(100);
-    this.setTooltip('');
+    this.setTooltip("Used to specify a particular year. For example, “2017” means “in 2017”.");
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -1064,7 +1063,7 @@ Blockly.Blocks['block_year_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_year_from_to');
     this.setColour(100);
-    this.setTooltip('');
+    this.setTooltip('Used to specify ranges. For example, “2016-2020” means “all years between 2016 to 2020”.');
     this.setHelpUrl('');
   },
   formatValue_: function() {
@@ -1084,7 +1083,7 @@ Blockly.Blocks['block_year_inc'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_year_inc');
     this.setColour(100);
-    this.setTooltip('');
+    this.setTooltip('Used to specify increments. For example, “2016/2” means “every 2 years from 2016”.');
     this.setHelpUrl('');
   },
   formatValue_: function() {
