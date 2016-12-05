@@ -1,0 +1,251 @@
+=============
+Release 0.5.0
+=============
+
+Purpose
+=======
+
+The 0.5.0 release is finally bigger than expected and includes a lot of improvments about :
+
+* the scenario engine
+* the admin and rest are merged for resources improvment
+* utf8 issues
+* performances issues
+* start of ssl support
+* ...
+
+.. image:: 0.5_800x400.jpg
+    :align: center
+    :alt: Domogik
+
+
+Database upgrades
+=================
+
+* Some cleanup is done in database :  the old not used table core_device_stats is deleted. The same for the address field on a device. This finished the db upgrade we started in 0.4.x release to migrate from an old Domogik 0.3.x version.
+* Close #96 : SQLAlchemy UTF-8 connection. This allow to use non latin languages with the butler (Russian for example)
+
+Core components : merge of Rest and Admin components
+====================================================
+
+Before the 0.5 release, there were :
+
+* an Admin component used to allow the user to do administrative tasks (packages configuration, devices creation, ...)
+* a REST server which allows user interfaces, scripts, ... to do some actions on Domogik (get devices informations, create a new device, etc...)
+
+To limit the memory footprint of Domogik, we choosed to merge the both components as they are basically both web servers.
+
+We choose to include REST services in the Admin component, so : 
+
+* The REST service is now available on the same port as Domogik Administration (40406 per default).
+* The REST service urls will all start with */rest/*. Example : *http://ip:40405/device/* become *http://ip:40406/rest/device/*.
+
+This merge is a first step of a global performances improvment plan. From now, each release will include one improvement related to performances.
+
+REST Api version is upgraded to 0.8 (previously : 0.7)
+
+Install process
+===============
+
+The install script have been improved to make the install process more simple and reliable.
+
+* Some options that are not changed by most of the users are now hidden during the installation process. You still access them with the *--advanced* option or by editing the configuration file after the installation.
+* We did some minor fixes for some advanced usages.
+* The installation script will now set up automatically the network configuration (since 0.4.2). You can of course override it in advanced mode or by manually editing the configuration files.
+
+Scenarios
+=========
+
+.. TODO::
+    A help dialog have been added in the scenario page. It show with an example how to create a scenario.
+
+The scenario engine have been partially rewritten to be more powerfull.
+
+* You can now use multiple conditions in a scenario : **if/else if/else**.
+* You can use local variables in a scenario.
+* To use global variables, you can install the plugin **vdevice**.
+* Logs are more clear : each log line is related to the corresponding scenario name.
+
+Butler
+======
+
+* A new Rest service have been added. See the chapter about Rest for more informations.
+* Now, if a client sends an *uuid* field in the json while speaking to the butler, the butler will respond with the same uuid in the json response.
+* The butler packages can now log data in the butler log file.
+* Some core butler functions interfaces have changed. **All brain packages must be upgraded to the Domogik 0.5 compliant releases.**
+* Domoweb now included a voice interface to the butler.
+
+Admin 
+=====
+
+New section : timeline
+----------------------
+
+A timeline have been added to the Administration. It displays the last sensors changes on a timeline. You can also see each device or plugin timeline.
+
+New section : batteries
+-----------------------
+
+A page dedicated to the battery sensors is added. In this page you can see all the batteray sensors of all your devices.
+
+Devices management
+------------------
+
+In a device detail, some helpers have been added to show/use the devices sensors and commands :
+
+* RGB devices : some dedicated tests buttons have been added.
+* Video Mjpeg : the video feed is displayed.
+* Strings : a new value can be set manually.
+
+For basic sensors (DT_Number, DT_Bool, DT_String) you can now manually change their datatype in the sensor configuration. For example, you can set a DT_Number sensor to become a DT_Humidity sensor).
+
+Layout
+------
+
+Various layout improvements, especially for the clients and devices configuration.
+
+Packages
+========
+
+No xpl plugins
+--------------
+
+It is now possible to create no xPl plugins. We won't remove the native xPL support, but for most of the plugins, using xPL is "too much". The plugins with no xPL will use the message queue to interact with Domogik.
+
+
+New datatypes
+-------------
+
+The **DT_Battery** it is similar to DT_Scaling  : the unit is % and the values are between 0 and 100. The aim of this datatype is to allow to group all devices battery sensors on a single view to help the users to manage their devices batteries.
+
+The **DT_Motion** is a boolean datatype to use for motion sensors. 
+
+The **DT_Video** datatype should not be used directly but will be the parent datatype for all kind of video related datatypes. Currently, it has 2 childs : 
+
+* **DT_VideoMjpeg** : should be used to store Mjpeg video streams url in sensors
+* **DT_VideoH264** : should be used to store H264 video streams url in sensors
+
+The **DT_Image** can be used to store images url in sensors.
+
+The **DT_mbarPression** is added for easier weather plugins management of the pressure : the display will be more user friendly
+
+The **DT_barPression** is added for plugins management of pressure : Like a Boiler Pressure for example with Ebus, or Coolant Pressure for Xee
+
+The **DT_kMeter** is added for easier big distances management : for example visbility informations in km for weather conditions. It may also be used later on with geolocalisation.
+
+The **DT_kgWeight** is used to measure masses.
+
+The **DT_VolumeLiter** and **DT_VolumeM3**  are used to measure volumes.
+
+The **DT_HeatingPilotWire** is used to control heater by pilot wire.
+
+API : MQ and Rest
+=================
+
+MQ : sensors history
+--------------------
+
+Some outputs related to the **sensor history** MQ messages and REST requests have changed. These features were not really used until now.
+
+For this release, please avoid using the **sensor history** features, there may be still some improvements in the next releases!
+
+MQ : device upgrades
+--------------------
+
+Now, devices changes (new device, upgrades, etc) are published over MQ. User interfaces can now dynamically reload the devices list for example. A plugin could also reload itself (this needs to be implemented for each plugin).
+
+Domoweb will no more need to be restarted when devices are created or upgraded.
+
+REST : new service to discuss with the butler
+---------------------------------------------
+
+A new service have been added to rest : **GET,POST /rest/butler/discuss**. It allows to discuss with the butler over a Rest url. This service can be useful to interact with the butler from scripts, web interfaces or alternate home automation systems.
+
+REST : new service to access content published by some packages (experimental)
+------------------------------------------------------------------------------
+
+**Warning : this service is still a beta. It may change in the next release!** We are still testing how to use this in the best way.
+
+A new service have been added to rest : **GET /rest/publish/<client type>/<client name>/<data path>**. It allows to access to content published by some packages. For example, videos registered when a motion is detected by a camera.
+
+Domoweb
+=======
+
+Domoweb, the user web interface includes also a lot of improvments!
+
+* New widgets : 
+
+  * Control RGB lights.
+  * Mjpeg camera.
+  * Navigation button to display another section.
+  * List of the last inbound calls.
+  * Basic rolling shutters command.
+  * Display a simple string sensor.
+  * Gauge widget
+  * Trigger widget
+  * ...
+
+* Widgets improvments :
+
+  * Various improvments to allow a better color configuration of the widgets.
+  * The trigger and switch command widgets can have customized labels.
+  * ...
+
+* Butler page (click on the top right button to access it from all sections). SSL activation and Chrome usage are required to use this new page.
+
+* Direct access to a section : you can add a section name or id at the end of the url to display directly this section. For example : http://ip:40404/Kitchen
+
+* SSL support. Just execute the **ssl_activate.sh** script to use ssl on Domoweb.
+
+
+Backup
+======
+
+The backup script have been improved.
+
+Docker image
+============
+
+A docker image is now built each time something is pushed to the **develop** branch. For now this image is quite big and includes also a mysql server and some tools for development purpose. We will surely create another image in the next release which will be more appropriate for end users.
+
+The **docker/** folder includes the resources to build this image.
+
+
+Quality
+=======
+
+A review script have been created to check packages quality. It is located in **src/domogik/tools/packages/review.py**
+
+Performances
+============
+
+Performances have been improved a lot on cpu usage : about 33% of improvment for some users. The memory footprint have been reduced for some components.
+
+Metrics
+=======
+
+A metric service have been installed on metrics.domogik.org. A default installation will sent at fixed interval some data to this service.
+
+Of course, you can disable this feature : you just need to remove all the **[metrics]** part in the Domogik configuration file.
+
+The metrics pushed are :
+
+* cpu and memory usage for each Domogik component.
+* informations about the environement : OS release, python release, ...
+* informations about the server : memory max, number of cpu cores, ...
+
+There is no such data sent :
+
+* users related data
+* configuration items (login, password, ...)
+
+If you want to check exactly what is collected, just check the file **src/domogik/common/processinfo.py**.
+
+What will we use these metrics for ? Well :
+
+* get an idea on how many Domogik are installed.
+* get an idea on which releases are still used.
+* get an idea of which packages (and their releases) are used.
+* do some statistics about the components performances on a large user audience. This will help us to improve performances on the appropriate components and also this will help us to detect performances regressions when releasing a new Domogik version.
+
+We will of course report summaries of these metrics to the community.

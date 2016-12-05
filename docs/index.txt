@@ -2,27 +2,106 @@
 Domogik
 =======
 
+What is Domogik ?
+=================
 
-.. |user| image:: index_user.png
-    :target: index_user.html
+Domogik is a smart home (or home automation) free and open source solution. With Domogik you can :
 
-.. |dev| image:: index_dev.png
-    :target: index_dev.html
-
-
-====== ============================================================================
-|user| :doc:`End users documentation <index_user>` 
-
-       * Domogik overview
-       * Installation
-       * Documentation
-
-|dev|  :doc:`Technical and developers documentation <index_dev>`
-
-       * Technical descriptions 
-       * Plugin development
-       * Core development
-       * User interfaces development
-====== ============================================================================
+* use several non compliant technologies in a single solution.
+* use several user interfaces to monitor and control your smart home : Domoweb from your brower (Chrome, Firefox, ...), Domodroid from your Android smartphone or tablet, Openremote which allows to create photo realistic interfaces.
+* speak with your smarthome thanks to the Butler. You can use the butler over the Domoweb or a dedicated Android application named DomoButler.
 
 
+.. image:: 0.5_800x400.jpg
+    :align: center
+    :alt: Domogik
+
+For more informations about this release of Domogik, you can check the :doc:`release note </users/releases/0.5.0>` 
+
+If you are looking for technical informations or how to create a plugin, please check `the technical and developers documentation <http://domogik-technical.readthedocs.io/>`_.
+
+Prerequisites
+=============
+
+To install Domogik, you need to have a computer or server with a GNU/Linux distribution (Ubuntu, Debian, Archlinux, or others).
+
+Then depending on your needs you will need some automation gateways (for x10, knx, ipx800 relayboards, 1wire, Zwave, ...)
+
+I am a newbie in Linux world, what do I need to know ?
+------------------------------------------------------
+
+First, you should use a distribution like Ubuntu. Then, you should first learn the Linux basements.
+
+
+Install Domogik
+===============
+
+Basic installation
+------------------
+
+To install Domogik, just follow the instructions :  :doc:`basic installation </users/installation/index>`.
+
+Then, you will need to install one user interface : 
+
+* `Domoweb <http://domoweb.readthedocs.io/en/latest/>`_
+* `Domodroid <http://domodroid.readthedocs.io/en/latest/>`_
+
+If you want to uninstall Domogik, you will need to :doc:`use the uninstall tool </users/installation/uninstall>`.
+
+
+Advanced installation tutorials
+-------------------------------
+
+The following tutorials are not mandatory to use Domogik. You can pick just what you need for what you want.
+
+* :doc:`Domogik configuration files </users/installation/domogik_cfg_file>`
+* :doc:`Install Domogik from a script </users/installation/install_from_a_script>`
+* :doc:`Use postgresql instead of mysql </users/installation/postgresql>`
+* Configure external access to Domogik administration interface
+* :doc:`Install Domogik in a python virtualenv </users/installation/virtualenv>`
+* :doc:`Configure SSL </users/installation/ssl>`
+* :doc:`Use Nginx to serve Domogik </users/installation/nginx>`
+
+I have an error 
+---------------
+
+First, please check, the :doc:`common errors page </users/errors/index>`. 
+
+When using Domogik or a plugin, if you find an issue, :doc:`please report it on the issue tracker </users/errors/create_a_ticket>`.
+
+Quick start guide
+=================
+
+.. TODO : complete missing parts
+
+* :doc:`Glossary </users/quickstart/glossary>`
+* :doc:`First use </users/quickstart/first_use>`
+* :doc:`Find and install a package </users/quickstart/install_a_package>`
+* configure a client and create its devices
+* :doc:`What is an orphan device ? <users/quickstart/orphans>`
+* start a client
+
+Various informations
+====================
+
+* :doc:`Clients status </users/quickstart/clients_status>`
+
+Use alternate interfaces
+========================
+
+As Domogik provide an API, you can control Domogik from other control solutions, like **OpenRemote** for example.
+
+* :doc:`Openremote integration </users/openremote/index>`
+
+
+Releases history
+================
+
+* :doc:`Release 0.5.0 </users/releases/0.5.0>` 
+* :doc:`Release 0.4.2 </users/releases/0.4.2>` 
+* :doc:`Release 0.4.1 </users/releases/0.4.1>` 
+* :doc:`Release 0.4.0 </users/releases/0.4.0>` 
+* :doc:`Release 0.3.0 </users/releases/0.3.0>`
+* :doc:`Release 0.2.0 </users/releases/0.2.0>`
+* :doc:`Release 0.1.0 </users/releases/0.1.0>`
+ 

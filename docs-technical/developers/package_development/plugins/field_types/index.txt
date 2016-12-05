@@ -1,0 +1,90 @@
+===================
+Domogik field types
+===================
+
+Purpose
+=======
+
+These types are used to validate the input (on the ui) for certain fields.
+An example configuration parameters, command parameters, ....
+
+Known Field Types
+=================
+
+Boolean
+-------
+Will result in a checkbox, value can be True or False
+
+String
+------
+Wil result in a text input field
+
+optional parameters:
+   * max_length : integer
+   * min_length : integer
+   * mask_str : regexp to validate the string
+   * multiline : boolean
+
+Password
+--------
+Wil result in a password input field
+
+optional parameters:
+   * max_length : integer
+   * min_length : integer
+   * mask_str : regexp to validate the string
+
+Choice
+------
+Will result in a dropdownbox
+
+required parameters:
+   * choices : A list of possibilities
+
+Date
+----
+A format of 'DD/MM/YYYY'
+
+Time
+----
+A format of 'HH:MM:SS'
+
+DateTime
+--------
+A format of 'DD/MM/YYYY HH:MM:SS'
+
+Float
+-----
+A floating point number
+
+optional parameters:
+   * max_value : integer
+   * min_value : integer
+
+Integer
+-------
+A decimal number
+
+optional parameters:
+   * max_value : integer
+   * min_value : integer
+
+Email
+-----
+An email format
+
+Ipv4
+----
+An ipv4 address
+
+Ipv6
+----
+An ipv6 address
+
+Url
+---
+An url string
+
+optional parameters:
+   * max_length : integer
+   * min_length : integer
