@@ -118,15 +118,22 @@ Blockly.Field.NBSP = '\u00A0';
 Blockly.Field.prototype.EDITABLE = true;
 
 /**
- * Install this field on a block.
+ * Attach this field to a block.
  * @param {!Blockly.Block} block The block containing this field.
  */
-Blockly.Field.prototype.init = function(block) {
-  if (this.sourceBlock_) {
+Blockly.Field.prototype.setSourceBlock = function(block) {
+  goog.asserts.assert(!this.sourceBlock_, 'Field already bound to a block.');
+  this.sourceBlock_ = block;
+};
+
+/**
+ * Install this field on a block.
+ */
+Blockly.Field.prototype.init = function() {
+  if (this.fieldGroup_) {
     // Field has already been initialized once.
     return;
   }
-  this.sourceBlock_ = block;
   // Build the DOM.
   this.fieldGroup_ = Blockly.createSvgElement('g', {}, null);
   if (!this.visible_) {
@@ -144,15 +151,12 @@ Blockly.Field.prototype.init = function(block) {
       this.fieldGroup_);
 
   this.updateEditable();
-  block.getSvgRoot().appendChild(this.fieldGroup_);
+  this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
   this.mouseUpWrapper_ =
-      Blockly.bindEvent_(this.fieldGroup_, 'mouseup', this, this.onMouseUp_);
+      Blockly.bindEventWithChecks_(this.fieldGroup_, 'mouseup', this,
+      this.onMouseUp_);
   // Force a render.
   this.updateTextNode_();
-  if (Blockly.Events.isEnabled()) {
-    Blockly.Events.fire(new Blockly.Events.Change(
-        this.sourceBlock_, 'field', this.name, '', this.getValue()));
-  }
 };
 
 /**
@@ -175,20 +179,17 @@ Blockly.Field.prototype.dispose = function() {
  * Add or remove the UI indicating if this field is editable or not.
  */
 Blockly.Field.prototype.updateEditable = function() {
-  if (!this.EDITABLE || !this.sourceBlock_) {
+  var group = this.fieldGroup_;
+  if (!this.EDITABLE || !group) {
     return;
   }
   if (this.sourceBlock_.isEditable()) {
-    Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
-                      'blocklyEditableText');
-    Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
-                         'blocklyNoNEditableText');
+    Blockly.addClass_(group, 'blocklyEditableText');
+    Blockly.removeClass_(group, 'blocklyNonEditableText');
     this.fieldGroup_.style.cursor = this.CURSOR;
   } else {
-    Blockly.addClass_(/** @type {!Element} */ (this.fieldGroup_),
-                      'blocklyNonEditableText');
-    Blockly.removeClass_(/** @type {!Element} */ (this.fieldGroup_),
-                         'blocklyEditableText');
+    Blockly.addClass_(group, 'blocklyNonEditableText');
+    Blockly.removeClass_(group, 'blocklyEditableText');
     this.fieldGroup_.style.cursor = '';
   }
 };
@@ -223,6 +224,50 @@ Blockly.Field.prototype.setVisible = function(visible) {
  */
 Blockly.Field.prototype.setValidator = function(handler) {
   this.validator_ = handler;
+};
+
+/**
+ * Gets the validation function for editable fields.
+ * @return {Function} Validation function, or null.
+ */
+Blockly.Field.prototype.getValidator = function() {
+  return this.validator_;
+};
+
+/**
+ * Validates a change.  Does nothing.  Subclasses may override this.
+ * @param {string} text The user's text.
+ * @return {string} No change needed.
+ */
+Blockly.Field.prototype.classValidator = function(text) {
+  return text;
+};
+
+/**
+ * Calls the validation function for this field, as well as all the validation
+ * function for the field's class and its parents.
+ * @param {string} text Proposed text.
+ * @return {?string} Revised text, or null if invalid.
+ */
+Blockly.Field.prototype.callValidator = function(text) {
+  var classResult = this.classValidator(text);
+  if (classResult === null) {
+    // Class validator rejects value.  Game over.
+    return null;
+  } else if (classResult !== undefined) {
+    text = classResult;
+  }
+  var userValidator = this.getValidator();
+  if (userValidator) {
+    var userResult = userValidator.call(this, text);
+    if (userResult === null) {
+      // User validator rejects value.  Game over.
+      return null;
+    } else if (userResult !== undefined) {
+      text = userResult;
+    }
+  }
+  return text;
 };
 
 /**
@@ -304,6 +349,7 @@ Blockly.Field.prototype.getSize = function() {
  * Returns the height and width of the field,
  * accounting for the workspace scaling.
  * @return {!goog.math.Size} Height and width.
+ * @private
  */
 Blockly.Field.prototype.getScaledBBox_ = function() {
   var bBox = this.borderRect_.getBBox();
@@ -357,8 +403,6 @@ Blockly.Field.prototype.updateTextNode_ = function() {
     // Truncate displayed string and add an ellipsis ('...').
     text = text.substring(0, this.maxDisplayLength - 2) + '\u2026';
   }
-  // Empty the text element.
-  goog.dom.removeChildren(/** @type {!Element} */ (this.textElement_));
   // Replace whitespace with non-breaking spaces so the text doesn't collapse.
   text = text.replace(/\s/g, Blockly.Field.NBSP);
   if (this.sourceBlock_.RTL && text) {
@@ -369,6 +413,9 @@ Blockly.Field.prototype.updateTextNode_ = function() {
     // Prevent the field from disappearing if empty.
     text = Blockly.Field.NBSP;
   }
+
+  // Replace the text.
+  goog.dom.removeChildren(/** @type {!Element} */ (this.textElement_));
   var textNode = document.createTextNode(text);
   this.textElement_.appendChild(textNode);
 
@@ -421,12 +468,15 @@ Blockly.Field.prototype.onMouseUp_ = function(e) {
   } else if (Blockly.isRightButton(e)) {
     // Right-click.
     return;
-  } else if (Blockly.dragMode_ == 2) {
+  } else if (this.sourceBlock_.workspace.isDragging()) {
     // Drag operation is concluding.  Don't open the editor.
     return;
   } else if (this.sourceBlock_.isEditable()) {
     // Non-abstract sub-classes must define a showEditor_ method.
     this.showEditor_();
+    // The field is handling the touch, but we also want the blockSvg onMouseUp
+    // handler to fire, so we will leave the touch identifier as it is.
+    // The next onMouseUp is responsible for nulling it out.
   }
 };
 
@@ -442,7 +492,7 @@ Blockly.Field.prototype.setTooltip = function(newTip) {
 /**
  * Return the absolute coordinates of the top-left corner of this field.
  * The origin (0,0) is the top-left corner of the page body.
- * @return {{!goog.math.Coordinate}} Object with .x and .y properties.
+ * @return {!goog.math.Coordinate} Object with .x and .y properties.
  * @private
  */
 Blockly.Field.prototype.getAbsoluteXY_ = function() {
