@@ -38,6 +38,17 @@
 <script src="../../generators/php/variables.js"></script>
 <script src="../../generators/php/procedures.js"></script>
 
+<script src="../../generators/lua.js"></script>
+<script src="unittest_lua.js"></script>
+<script src="../../generators/lua/logic.js"></script>
+<script src="../../generators/lua/loops.js"></script>
+<script src="../../generators/lua/math.js"></script>
+<script src="../../generators/lua/text.js"></script>
+<script src="../../generators/lua/lists.js"></script>
+<script src="../../generators/lua/colour.js"></script>
+<script src="../../generators/lua/variables.js"></script>
+<script src="../../generators/lua/procedures.js"></script>
+
 <script src="../../generators/dart.js"></script>
 <script src="unittest_dart.js"></script>
 <script src="../../generators/dart/logic.js"></script>
@@ -66,7 +77,16 @@ var workspace = null;
 
 function start() {
   workspace = Blockly.inject('blocklyDiv',
-      {media: '../../media/', toolbox: document.getElementById('toolbox')});
+      {grid:
+         {spacing: 25,
+          length: 3,
+          colour: '#ccc',
+          snap: true},
+       media: '../../media/',
+       toolbox: document.getElementById('toolbox'),
+       zoom: {controls: true, wheel: true}
+       });
+  changeIndex();
 }
 
 function loadXml() {
@@ -116,7 +136,7 @@ function fromXml(xmlText) {
     alert('Error parsing XML:\n' + e);
     return;
   }
-  Blockly.Xml.domToWorkspace(workspace, xmlDoc);
+  Blockly.Xml.domToWorkspace(xmlDoc, workspace);
 }
 
 function setOutput(text) {
@@ -149,9 +169,20 @@ function toPhp() {
   setOutput(code);
 }
 
+function toLua() {
+  var code = Blockly.Lua.workspaceToCode(workspace);
+  setOutput(code);
+}
+
 function toDart() {
   var code = Blockly.Dart.workspaceToCode(workspace);
   setOutput(code);
+}
+
+function changeIndex() {
+  var oneBasedIndex = document.getElementById('indexing').checked;
+  workspace.options.oneBasedIndex = oneBasedIndex;
+  workspace.toolbox_.flyout_.workspace_.options.oneBasedIndex = oneBasedIndex;
 }
 </script>
 
@@ -188,9 +219,22 @@ h1 {
   <xml id="toolbox" style="display: none">
     <category name="Unit test" colour="65">
       <block type="unittest_main"></block>
-      <block type="unittest_assertequals"></block>
-      <block type="unittest_assertvalue"></block>
+      <block type="unittest_assertequals">
+        <value name="MESSAGE">
+          <block type="text">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+      </block>
+      <block type="unittest_assertvalue">
+        <value name="MESSAGE">
+          <block type="text">
+            <field name="TEXT"></field>
+          </block>
+        </value>
+      </block>
       <block type="unittest_fail"></block>
+      <block type="unittest_adjustindex"></block>
     </category>
     <category name="Logic" colour="210">
       <block type="controls_if"></block>
@@ -215,7 +259,6 @@ h1 {
       <block type="math_trig"></block>
       <block type="math_constant"></block>
       <block type="math_number_property"></block>
-      <block type="math_change"></block>
       <block type="math_round"></block>
       <block type="math_on_list"></block>
       <block type="math_modulo"></block>
@@ -247,6 +290,7 @@ h1 {
       <block type="lists_getIndex"></block>
       <block type="lists_setIndex"></block>
       <block type="lists_getSublist"></block>
+      <block type="lists_sort"></block>
       <block type="lists_split"></block>
     </category>
     <category name="Colour" colour="20">
@@ -281,11 +325,17 @@ h1 {
     </p>
 
     <p>
+      <input id="indexing" type="checkbox" onchange="changeIndex()" checked>
+      <label for="indexing">Generate with one-based indexing</label>
+    </p>
+
+    <p>
       Generate:
       <input type="button" value="XML" onclick="toXml()">
       <input type="button" value="JavaScript" onclick="toJavaScript()">
       <input type="button" value="Python" onclick="toPython()">
       <input type="button" value="PHP" onclick="toPhp()">
+      <input type="button" value="Lua" onclick="toLua()">
       <input type="button" value="Dart" onclick="toDart()">
     </p>
   </td></tr><tr><td height="99%">
