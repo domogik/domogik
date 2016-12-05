@@ -11,24 +11,29 @@ Blockly.JSON.blockToJson = function(block) {
   var element = {};
   element['type'] = block.type;
   element['id'] = block.id;
-  for (var x = 0, input; input = block.inputList[x]; x++) {
-    for (var y = 0, field; field = input.fieldRow[y]; y++) {
-      if (field.name && field.EDITABLE) {
-        element[field.name] = field.getValue();
+  // Add exception handle for complex block like cron.block
+  if (block.type == 'cron.CronTest') {
+      element['cron.cron'] = block.getValue();
+  } else {
+      for (var x = 0, input; input = block.inputList[x]; x++) {
+        for (var y = 0, field; field = input.fieldRow[y]; y++) {
+          if (field.name && field.EDITABLE) {
+            element[field.name] = field.getValue();
+          }
+        }
       }
-    }
-  }
-  var hasValues = false;
-  for (var i = 0, input; input = block.inputList[i]; i++) {
-    var empty = true;
-    if (input.type == Blockly.DUMMY_INPUT) {
-      continue;
-    } else {
-      var childBlock = input.connection.targetBlock();
-      if (childBlock) {
-        element[input.name] = Blockly.JSON.blockToJson(childBlock);
+      var hasValues = false;
+      for (var i = 0, input; input = block.inputList[i]; i++) {
+        var empty = true;
+        if (input.type == Blockly.DUMMY_INPUT) {
+          continue;
+        } else {
+          var childBlock = input.connection.targetBlock();
+          if (childBlock) {
+            element[input.name] = Blockly.JSON.blockToJson(childBlock);
+          }
+        }
       }
-    }
   }
   if (hasValues) { element['inline'] = block.inputsInline; }
   if (block.isCollapsed()) { element['collapsed'] = true; }
@@ -104,6 +109,9 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock) {
       }
       if ( jsonBlock['itemCount'] ) {
         mut.setAttribute('items', jsonBlock['itemCount'])
+      }
+      if ( jsonBlock['cron.cron'] ) {
+        mut.setAttribute('block_input', 'txt')
       }
       block.domToMutation(mut);
   }

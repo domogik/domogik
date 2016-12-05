@@ -81,6 +81,126 @@
         <block type="text_length"></block>
         <block type="text_isEmpty"></block>
     </category>
+    <category name="Cron">
+        <block type="cron.CronTest"></block>
+        <category name="Minute" colour="#5ca6a4">
+            <block type="lists_create_with">
+              <mutation items="2"></mutation>
+            </block>
+            <block type="block_all"></block>
+            <block type="block_minute_at">
+              <field name="minute">0</field>
+            </block>
+            <block type="block_minute_from_to">
+              <field name="from">0</field>
+              <field name="to">0</field>
+            </block>
+            <block type="block_minute_inc">
+              <field name="start">0</field>
+              <field name="inc">0</field>
+            </block>
+        </category>
+        <category name="Hour" colour="#5c6aa6">
+            <block type="lists_create_with">
+              <mutation items="2"></mutation>
+            </block>
+            <block type="block_all"></block>
+            <block type="block_hour_at">
+              <field name="hour">0</field>
+            </block>
+            <block type="block_hour_from_to">
+              <field name="from">0</field>
+              <field name="to">0</field>
+            </block>
+            <block type="block_hour_inc">
+              <field name="start">0</field>
+              <field name="inc">0</field>
+            </block>
+        </category>
+        <category name="Day of month" colour="#9fa65c">
+            <block type="lists_create_with">
+              <mutation items="2"></mutation>
+            </block>
+            <block type="block_all"></block>
+            <block type="block_last"></block>
+            <block type="block_no_specif"></block>
+            <block type="block_day_of_month_at">
+              <field name="day_m">1</field>
+            </block>
+            <block type="block_day_of_month_from_to">
+              <field name="from">1</field>
+              <field name="to">1</field>
+            </block>
+            <block type="block_day_of_month_inc">
+              <field name="start">0</field>
+              <field name="inc">1</field>
+            </block>
+            <block type="block_day_of_month_near_to_w">
+              <field name="day_m">1</field>
+            </block>
+        </category>
+        <category name="Month" colour="#a6815c">
+            <block type="lists_create_with">
+              <mutation items="2"></mutation>
+            </block>
+            <block type="block_all"></block>
+            <block type="block_month_on">
+              <field name="month">1</field>
+            </block>
+            <block type="block_month_from_to">
+              <field name="from">1</field>
+              <field name="to">1</field>
+            </block>
+            <block type="block_month_inc">
+              <field name="start">1</field>
+              <field name="inc">1</field>
+            </block>
+        </category>
+        <category name="Day of week" colour="#9a5ca6">
+            <block type="lists_create_with">
+              <mutation items="2"></mutation>
+            </block>
+            <block type="block_all"></block>
+            <block type="block_last"></block>
+            <block type="block_no_specif"></block>
+            <block type="block_day_w_on">
+              <field name="day_w">1</field>
+            </block>
+            <block type="block_day_w_from_to">
+              <field name="from">1</field>
+              <field name="to">1</field>
+            </block>
+            <block type="block_day_w_inc">
+              <field name="start">1</field>
+              <field name="inc">1</field>
+            </block>
+            <block type="block_day_w_last_of_month">
+              <field name="day_w">1</field>
+            </block>
+            <block type="block_day_w_nth_of_month"></block>
+              <field name="day_w">1</field>
+              <field name="nth">1</field>
+            <block type="block_day_w_w_end"></block>
+        </category>
+        <category name="Year" colour="#81a65c">
+            <block type="lists_create_with">
+              <mutation items="2"></mutation>
+            </block>
+            <block type="block_all"></block>
+            <block type="block_year_in">
+              <field name="year">2016</field>
+            </block>
+            <block type="block_year_from_to">
+              <field name="from">2016</field>
+              <field name="to">2017</field>
+            </block>
+            <block type="block_year_inc">
+              <field name="start">2016</field>
+              <field name="inc">1</field>
+            </block>
+        </category>
+
+    </category>
     <category name="Datatypes">
         {% for p, ds in datatypes.items() %}
             <category name="{{ p }}">
@@ -220,6 +340,11 @@
   <script type="text/javascript" src="/static/libraries/blockly/blocks_compressed.js"></script>
   <script type="text/javascript" src="/static/libraries/blockly/msg/js/en.js"></script>
   <script type="text/javascript" src="/static/js/blockly_json.js"></script>
+  <script type="text/javascript" src="/static/js/blockly_field_clickimage.js"></script>
+  <script type="text/javascript" src="/static/js/cronstrue-i18n.min.js"></script>
+  <script type="text/javascript" src="/static/js/later.min.js"></script>
+  <script type="text/javascript" src="/static/js/blockly_cron_checkrules.js"></script>
+  <script type="text/javascript" src="/static/js/blockly_cron_edit.js"></script>
   <script type="text/javascript" src="/static/js/jquery-bootstrap-modal-steps.min.js"></script>
   <script type="text/javascript">
     $('#help_modal').modalSteps();
