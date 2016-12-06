@@ -178,7 +178,7 @@ Blockly.Blocks['cron.CronTest'] = {
     this.setTooltip('');
     this.setHelpUrl('');
     this.initDialCheck = false;
-    this.validCron = false;
+    this.cron_old = "";
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');
@@ -281,20 +281,31 @@ Blockly.Blocks['cron.CronTest'] = {
             if (exp && exp.indexOf("Bad cron format") == -1) {
                 try {
                     // Add second if year is set
-                    if (item.length == 6) {item.unshift("0");};
-                    trad = cronstrue.toString(exp, { locale: navigator.language });
+                   var exp2 = exp;
+                    if (item.length == 6) {exp2 = "0 "+exp;};
+                    trad = cronstrue.toString(exp2, { locale: navigator.language, use24HourTimeFormat:true });
                 } catch (err) {};
             };
         };
     };
     this.setTooltip(trad);
-    if (this.tooltip.indexOf("Can't translate") != -1 || trad == "") {
-        this.validCron = false;
-        this.getField('btCheck').setValue('/static/images/icon-cron-invalid.png');
-    } else {
-        this.validCron = true;
-        this.getField('btCheck').setValue('/static/images/icon-cron-valid.png');
+    if (this.cron_old != exp) {
+        if (this.tooltip.indexOf("Can't translate") != -1 || trad == "") {
+            this.getField('btCheck').setValue('/static/images/icon-cron-invalid.png');
+        } else {
+            var dateN = new Date(); // js date month [0..11]
+            var dateC = dateN.getFullYear()+','+parseInt(dateN.getMonth()+1)+','+dateN.getDate()+','+dateN.getHours()+','+dateN.getMinutes();
+            var that = this;
+            $.getJSON('/scenario/cronruletest/checkdate', {cronrule:exp, date:dateC}, function(data, result) {
+                if (result == "error" || data.content.error != "") {
+                    that.getField('btCheck').setValue('/static/images/icon-cron-invalid.png');
+                } else {
+                    that.getField('btCheck').setValue('/static/images/icon-cron-valid.png');
+                };
+            });
+        };
     };
+    this.cron_old = exp;
   },
   setCheckLists_: function(inputName, check) {
     var listCreate = this.getInput(inputName).connection.targetBlock();

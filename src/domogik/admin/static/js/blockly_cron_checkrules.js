@@ -164,14 +164,16 @@ function createCronCheckDialog(blImage, inputName) {
                         text: data.content.error,
                         delay: 6000
                     });
+                    $("#testNowResult").text('Bad cron expression: ').removeClass().addClass('bg-danger');
+                    $("#testDateResult").html(data.content.error).removeClass().addClass('bg-danger');
                 } else {
                     var dateC = $('#datepicker1').val() + '<br>at '+$('#AtHours').val() +'h ' + $('#AtMinutes').val()+'mn'
                     $("#testNowResult").text('Triggered for now : '+data.content.result.now);
                     if (data.content.result.now) {$("#testNowResult").removeClass().addClass('bg-success');
-                    } else {$("#testNowResult").removeClass().addClass('bg-danger');};
+                    } else {$("#testNowResult").removeClass().addClass('bg-warning');};
                     $("#testDateResult").html('Triggered for '+dateC+' : '+data.content.result.date);
                     if (data.content.result.date) {$("#testDateResult").removeClass().addClass('bg-success');
-                    } else {$("#testDateResult").removeClass().addClass('bg-danger');};
+                    } else {$("#testDateResult").removeClass().addClass('bg-warning');};
                 };
             });
         });
