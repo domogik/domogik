@@ -249,3 +249,8 @@ What will we use these metrics for ? Well :
 * do some statistics about the components performances on a large user audience. This will help us to improve performances on the appropriate components and also this will help us to detect performances regressions when releasing a new Domogik version.
 
 We will of course report summaries of these metrics to the community.
+
+Domogik Message Queue
+=====================
+
+Some bugs have been fixed in the message queue library. The new release to use is Domogik-MQ 1.4.
