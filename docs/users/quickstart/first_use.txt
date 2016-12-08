@@ -19,7 +19,7 @@ Well, first, you should log in! The default credentials are :
 
 Please don't forget to change the password for security reasons!
 
-.. todo : explain how ot change the password
+.. todo : explain how to change the password
 
 Then, you can access the clients list. As you just installed Domogik, there is no client and no device yet.
 

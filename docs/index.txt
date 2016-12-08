@@ -72,7 +72,7 @@ When using Domogik or a plugin, if you find an issue, :doc:`please report it on 
 Quick start guide
 =================
 
-.. TODO : complete missing parts
+.. TODO : complete the missing parts
 
 * :doc:`Glossary </users/quickstart/glossary>`
 * :doc:`First use </users/quickstart/first_use>`

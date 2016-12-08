@@ -56,8 +56,8 @@ The install script have been improved to make the install process more simple an
 Scenarios
 =========
 
-.. TODO::
-    A help dialog have been added in the scenario page. It show with an example how to create a scenario.
+.. note::
+    A help dialog have been added in the scenario page. It shows an example on how to create a scenario.
 
 The scenario engine have been partially rewritten to be more powerfull.
 

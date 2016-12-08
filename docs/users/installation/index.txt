@@ -367,17 +367,16 @@ The default backup folder is **/var/lib/domogik/backup/**. You can change it in 
 
 
 
-Next step : domoweb, the web user interface
--------------------------------------------
+Next step : install and use a user interface
+--------------------------------------------
 
-.. todo : upgrade the link to RTD
+You can use either Domoweb or Domodroid to control your home.
 
-Check in the Domoweb documentation : http://docs.domogik.org/domoweb/
+* `Domoweb <http://domoweb.readthedocs.io/en/latest/>`_
+* `Domodroid <http://domodroid.readthedocs.io/en/latest/>`_
 
 It doesn't work?
 ----------------
-
-.. todo : keep this page ?
 
 * :doc:`See errors and solutions </users/errors/index>`
 
