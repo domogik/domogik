@@ -192,6 +192,8 @@ def scenario_croncheckdate():
         data['date'] = tuple ([int(i) for i in data['date'].split(',')])
         try :
             job = CronExpression(data['cronrule'])
+            if not job.isValidate() :
+                return jsonify(result='error', reply="", content = {'error': gettext(u"Cron rule is not valid.")})
             now = job.check_trigger_now()
             istriggered = job.check_trigger(data['date'])
         except :
