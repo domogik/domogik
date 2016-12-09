@@ -68,6 +68,7 @@ pkg_list="\
          python-gluon \
          python-babel \
          python-sphinx \
+         python-pil \
          libusb-1.0-0-dev \
          "
 
