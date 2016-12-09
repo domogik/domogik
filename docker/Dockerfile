@@ -52,7 +52,8 @@ RUN apt-get install -y \
     sudo \
     python2.7-dev \
     python-pip \
-    git
+    git \
+    python-pil 
     
 RUN pip install netifaces \
  && pip install sphinx-better-theme
@@ -121,7 +122,6 @@ RUN cd /opt/dmg \
 
 # Patches. TODO : move before
 RUN pip install Flask-Themes2
-RUN pip install Flask-QRcode
 RUN apt-get install -y libpq-dev
 RUN pip install alembic
 RUN pip install SQLAlchemy-Utils

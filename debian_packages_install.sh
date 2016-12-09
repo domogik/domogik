@@ -68,6 +68,7 @@ pkg_list="\
          python-gluon \
          python-babel \
          python-sphinx \
+         python-pil \
          libusb-1.0-0-dev \
          "
 
@@ -115,7 +116,6 @@ continue $?
 pip_list="Flask-Login \
           Flask-Babel \
           Flask-Bootstrap \
-          Flask-QRcode \
           sphinx-better-theme \
           sqlalchemy-utils \
           linux-metrics \
