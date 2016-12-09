@@ -371,11 +371,19 @@ class PackageInstaller():
                         return None, None
     
                     # check the mime type
-                    peek = response.iter_content(256).next()
-                    mime = magic.from_buffer(peek, mime=True)
-                    if mime not in ALLOWED_MIMES:
-                        self.log.error("The package downloaded has not a compliant mime type : {0}. The mime type should be one of these : {1}".format(mime, ALLOWED_MIMES))
-                        return None, None
+                    # TODO : reactivate
+                    # 0.5.0 / dec 2016 : 
+                    # commented because it sucks with python-magic on ubuntu : 
+                    #   Error while downloading the package : Traceback (most recent call last):
+                    #     File "/opt/dmg/domogik/src/domogik/bin/package.py", line 375, in download_from_url
+                    #       mime = magic.from_buffer(peek, mime=True)
+                    #   AttributeError: 'module' object has no attribute 'from_buffer'
+
+                    #peek = response.iter_content(256).next()
+                    #mime = magic.from_buffer(peek, mime=True)
+                    #if mime not in ALLOWED_MIMES:
+                    #    self.log.error("The package downloaded has not a compliant mime type : {0}. The mime type should be one of these : {1}".format(mime, ALLOWED_MIMES))
+                    #    return None, None
     
                     # download
                     # if streaming is activated
