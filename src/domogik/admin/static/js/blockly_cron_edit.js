@@ -34,6 +34,17 @@ function cron_dayOfWeekValidation(exp){
 	return /^[\d,\-\*\/L#\?]+$/.test(exp);
 };
 
+function valideNumRange(m, range) {
+    try {
+        parseInt(m);
+    } catch (err) {return false;};
+    return (m >= range[0] && m <= range[1]);
+};
+
+function getMsgFieldOOR(field, range,value) {
+    return "Error in field '"+field+"' value ("+value+") out of range "+range[0]+" to "+range[1];
+};
+
 function CronType(sChar){
     this.specChar= sChar;
 };
@@ -102,39 +113,45 @@ function cronPart_Parse(str,strType){
 var CRON_FIELD_DATA = {
     "Minute": {
         "label": "Minute",
-        "help" : "",
         "check": ['block_all','block_minute_at','block_minute_from_to','block_minute_inc'],
-        "rule" : CRON_GENERAL
+        "rule" : CRON_GENERAL,
+        "range": [0,59],
+        "inc" : [1,30]
     },
     "Hour": {
         "label": "Hour",
-        "help" : "",
         "check": ['block_all','block_hour_at','block_hour_from_to','block_hour_inc'],
-        "rule" : CRON_GENERAL
+        "rule" : CRON_GENERAL,
+        "range": [0,23],
+        "inc" : [1,6]
     },
     "DayOfMonth": {
         "label": "Day of month",
-        "help" : "",
         "check": ['block_all','block_last','block_no_specif','block_day_of_month_at','block_day_of_month_from_to','block_day_of_month_inc','block_day_of_month_near_to_w'],
-        "rule" : CRON_D_MONTH
+        "rule" : CRON_D_MONTH,
+        "range": [1,31],
+        "inc" : [1,15]
     },
     "Month":  {
         "label": "Month",
-        "help" : "",
         "check": ['block_all','block_month_on','block_month_from_to','block_month_inc'],
-        "rule" : CRON_GENERAL
+        "rule" : CRON_GENERAL,
+        "range": [1,12],
+        "inc" : [1,6]
     },
     "DayOfWeek":  {
         "label": "Day of week",
-        "help" : "",
         "check": ['block_all','block_last','block_no_specif','block_day_w_on','block_day_w_from_to','block_day_w_inc','block_day_w_last_of_month','block_day_w_nth_of_month','block_day_w_w_end'],
-        "rule" : CRON_D_WEEK
+        "rule" : CRON_D_WEEK,
+        "range": [0,6],
+        "inc" : [1,3]
     },
     "Year":  {
         "label": "Year (optional)",
-        "help" : "",
         "check": ['block_all','block_year_in','block_year_from_to','block_year_inc'],
-        "rule" : CRON_GENERAL
+        "rule" : CRON_GENERAL,
+        "range": [2016,2200],
+        "inc" : [1,100]
     }
 }
 
@@ -176,9 +193,9 @@ Blockly.Blocks['cron.CronTest'] = {
     this.setOutput(true);
     this.setColour(120);
     this.setTooltip('');
-    this.setHelpUrl('');
     this.initDialCheck = false;
     this.cron_old = "";
+    this.cron_valid = true;
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');
@@ -232,7 +249,7 @@ Blockly.Blocks['cron.CronTest'] = {
             for (input in CRON_FIELD_DATA) {
                 this.appendValueInput(input)
                     .setCheck(['Array'].concat(CRON_FIELD_DATA[input].check))
-                    .appendField(CRON_FIELD_DATA[input].label)
+                    .appendField(CRON_FIELD_DATA[input].label, CRON_FIELD_DATA[input].label)
                     .setAlign(Blockly.ALIGN_RIGHT);
             };
             this.generateCronBlock_(exp);
@@ -270,15 +287,18 @@ Blockly.Blocks['cron.CronTest'] = {
         this.setWarningText(null);
     };
     var exp = this.getFieldValue('cron.cron');
+    var trad = "";
     if (exp in EPHEM_TRANLATION) {
+        this.cron_valid = true;
         trad = EPHEM_TRANLATION[exp];
     } else if (exp in PREDEFINED_TRANLATION) {
+        this.cron_valid = true;
         trad = PREDEFINED_TRANLATION[exp];
     } else {
-        var trad = "Can't translate cron expression."
+        trad = "Can't translate cron expression."
         var item = exp.split(' ');
         if (item.length == 5 || item.length == 6) {
-            if (exp && exp.indexOf("Bad cron format") == -1) {
+            if (exp && this.cron_valid) {
                 try {
                     // Add second if year is set
                    var exp2 = exp;
@@ -290,20 +310,20 @@ Blockly.Blocks['cron.CronTest'] = {
     };
     this.setTooltip(trad);
     if (this.cron_old != exp) {
-        if (this.tooltip.indexOf("Can't translate") != -1 || trad == "") {
-            this.getField('btCheck').setValue('/static/images/icon-cron-invalid.png');
-        } else {
-            var dateN = new Date(); // js date month [0..11]
-            var dateC = dateN.getFullYear()+','+parseInt(dateN.getMonth()+1)+','+dateN.getDate()+','+dateN.getHours()+','+dateN.getMinutes();
-            var that = this;
-            $.getJSON('/scenario/cronruletest/checkdate', {cronrule:exp, date:dateC}, function(data, result) {
-                if (result == "error" || data.content.error != "") {
-                    that.getField('btCheck').setValue('/static/images/icon-cron-invalid.png');
-                } else {
-                    that.getField('btCheck').setValue('/static/images/icon-cron-valid.png');
-                };
-            });
-        };
+        var dateN = new Date(); // js date month [0..11]
+        var dateC = dateN.getFullYear()+','+parseInt(dateN.getMonth()+1)+','+dateN.getDate()+','+dateN.getHours()+','+dateN.getMinutes();
+        var that = this;
+        $.getJSON('/scenario/cronruletest/checkdate', {cronrule:exp, date:dateC}, function(data, result) {
+            if (result == "error" || data.content.error != "") {
+                that.cron_valid = false;
+                $("#bt_save").attr('disabled', true).attr('title', "Save disable, please fix crontab error.");
+                that.getField('btCheck').setValue('/static/images/icon-cron-invalid.png');
+            } else {
+                $("#bt_save").attr('disabled', false).attr('title', "");
+                that.cron_valid = true;
+                that.getField('btCheck').setValue('/static/images/icon-cron-valid.png');
+            };
+        });
     };
     this.cron_old = exp;
   },
@@ -326,6 +346,9 @@ Blockly.Blocks['cron.CronTest'] = {
         if (input != 'Year') {
             if (!this.getInput(input).connection.targetBlock()) {
                 badInput += '- '+CRON_FIELD_DATA[input].label+'\n';
+                this.setFieldHelper_(input, 'Connect a block in necessary');
+            } else {
+                this.setFieldHelper_(input, '');
             };
         };
     };
@@ -345,6 +368,7 @@ Blockly.Blocks['cron.CronTest'] = {
   generateCronExp_: function() {
     var exp = '';
     var inputBlock;
+    this.cron_valid = true;
     for (var input in CRON_FIELD_DATA) {
         inputBlock = this.getInput(input).connection.targetBlock()
         if (input != 'Year') {
@@ -355,7 +379,9 @@ Blockly.Blocks['cron.CronTest'] = {
                         if (item) {
                             exp += item.formatValue_() + ',';
                         } else {
-                            return 'Bad cron format ! ('+exp+')';
+                            this.cron_valid = false;
+//                            return 'Bad cron format ! ('+exp+')';
+                            return exp;
                         };
                     };
                     exp = exp.replace(/,$/, " ");
@@ -363,7 +389,9 @@ Blockly.Blocks['cron.CronTest'] = {
                     exp += inputBlock.formatValue_() + ' ';
                 };
             } else {
-                return 'Bad cron format ! ('+exp+')';
+                this.cron_valid = false;
+//                            return 'Bad cron format ! ('+exp+')';
+                return exp;
             };
         } else {
             if (inputBlock) {
@@ -373,7 +401,9 @@ Blockly.Blocks['cron.CronTest'] = {
                         if (item) {
                             exp += item.formatValue_() + ',';
                         } else {
-                            return 'Bad cron format ! ('+exp+')';
+                            this.cron_valid = false;
+//                            return 'Bad cron format ! ('+exp+')';
+                            return exp;
                         };
                     };
                     exp = exp.replace(/,$/, "");
@@ -390,13 +420,13 @@ Blockly.Blocks['cron.CronTest'] = {
       var result = ""
       var expI, error;
       if (item.length == 5 || item.length == 6) {
-        this.generateCronInput_(item[0], 'Minute', this.MinuteToBlock_);
-        this.generateCronInput_(item[1], 'Hour', this.HourToBlock_);
-        this.generateCronInput_(item[2], 'DayOfMonth', this.DayOfMonthToBlock_);
-        this.generateCronInput_(item[3], 'Month', this.MonthToBlock_);
-        this.generateCronInput_(item[4], 'DayOfWeek', this.DayOfWeekToBlock_);
+        this.setFieldHelper_('Minute', this.generateCronInput_(item[0], 'Minute', this.MinuteToBlock_), true);
+        this.setFieldHelper_('Hour', this.generateCronInput_(item[1], 'Hour', this.HourToBlock_), true);
+        this.setFieldHelper_('DayOfMonth', this.generateCronInput_(item[2], 'DayOfMonth', this.DayOfMonthToBlock_), true);
+        this.setFieldHelper_('Month', this.generateCronInput_(item[3], 'Month', this.MonthToBlock_), true);
+        this.setFieldHelper_('DayOfWeek', this.generateCronInput_(item[4], 'DayOfWeek', this.DayOfWeekToBlock_), true);
         if (item.length == 6) {
-            this.generateCronInput_(item[5], 'Year', this.YearToBlock_);
+            this.setFieldHelper_('Year', this.generateCronInput_(item[5], 'Year', this.YearToBlock_), true);
         };
     };
   },
@@ -412,6 +442,22 @@ Blockly.Blocks['cron.CronTest'] = {
   },
   getValue : function() {
         return this.getFieldValue('cron.cron')
+  },
+  setFieldHelper_: function(input, text, notify) {
+    this.getField(CRON_FIELD_DATA[input].label).setTooltip(text);
+    if (text != "") {
+        if (notify) {
+            new PNotify({
+                type: 'error',
+                title: 'Field '+input+' error',
+                text: text,
+                delay: 6000
+            });
+        };
+        $(this.getField(CRON_FIELD_DATA[input].label).textElement_).css({'fill': 'red'});
+    } else {
+        $(this.getField(CRON_FIELD_DATA[input].label).textElement_).css({'fill': 'white'});
+    };
   },
   // Cron expression to block
   generateCronInput_: function(item, inputName, constructorBlock){
@@ -441,18 +487,25 @@ Blockly.Blocks['cron.CronTest'] = {
   MinuteToBlock_: function(exp, connectTo) {
     var error = "";
     if (exp) {
+        var range = CRON_FIELD_DATA['Minute'].range;
+        var rInc = CRON_FIELD_DATA['Minute'].inc;
         var nBlock = null;
         if (exp.crontype.specChar == '*'){
           var nBlock = this.workspace.newBlock('block_all');
         } else if (exp.crontype.specChar == '-') {
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('from', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], range)) { return getMsgFieldOOR('to', range, exp.values[1]);};
             var nBlock = this.workspace.newBlock('block_minute_from_to');
             nBlock.setFieldValue(exp.values[0], 'from');
             nBlock.setFieldValue(exp.values[1], 'to');
         } else if (exp.crontype.specChar == '/') {
             var nBlock = this.workspace.newBlock('block_minute_inc');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('start', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], rInc)) { return getMsgFieldOOR('inc',rInc, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'start');
             nBlock.setFieldValue(exp.values[1], 'inc');
         } else if (exp.crontype.specChar == '') {
+            if (!valideNumRange(exp.values[0],range)) { return getMsgFieldOOR('minute',range, exp.values[0]);};
             var nBlock = this.workspace.newBlock('block_minute_at');
             nBlock.setFieldValue(exp.values[0], 'minute');
         };
@@ -467,18 +520,25 @@ Blockly.Blocks['cron.CronTest'] = {
   HourToBlock_: function(exp, connectTo) {
     var error = "";
     if (exp) {
+        var range = CRON_FIELD_DATA['Hour'].range;
+        var rInc = CRON_FIELD_DATA['Hour'].inc;
         var nBlock = null;
         if (exp.crontype.specChar == '*'){
           var nBlock = this.workspace.newBlock('block_all');
         } else if (exp.crontype.specChar == '-') {
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('from', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], range)) { return getMsgFieldOOR('to', range, exp.values[1]);};
             var nBlock = this.workspace.newBlock('block_hour_from_to');
             nBlock.setFieldValue(exp.values[0], 'from');
             nBlock.setFieldValue(exp.values[1], 'to');
         } else if (exp.crontype.specChar == '/') {
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('start', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], rInc)) { return getMsgFieldOOR('inc',rInc, exp.values[1]);};
             var nBlock = this.workspace.newBlock('block_hour_inc');
             nBlock.setFieldValue(exp.values[0], 'start');
             nBlock.setFieldValue(exp.values[1], 'inc');
         } else if (exp.crontype.specChar == '') {
+            if (!valideNumRange(exp.values[0],range)) { return getMsgFieldOOR('hour',range, exp.values[0]);};
             var nBlock = this.workspace.newBlock('block_hour_at');
             nBlock.setFieldValue(exp.values[0], 'hour');
         };
@@ -493,25 +553,33 @@ Blockly.Blocks['cron.CronTest'] = {
   DayOfMonthToBlock_: function(exp, connectTo) {
     var error = "";
     if (exp) {
+        var range = CRON_FIELD_DATA['DayOfMonth'].range;
+        var rInc = CRON_FIELD_DATA['DayOfMonth'].inc;
         var nBlock = null;
         if (exp.crontype.specChar == '*'){
           var nBlock = this.workspace.newBlock('block_all');
         } else if (exp.crontype.specChar == '-') {
             var nBlock = this.workspace.newBlock('block_day_of_month_from_to');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('from', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], range)) { return getMsgFieldOOR('to', range, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'from');
             nBlock.setFieldValue(exp.values[1], 'to');
         } else if (exp.crontype.specChar == '/') {
             var nBlock = this.workspace.newBlock('block_day_of_month_inc');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('start', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], rInc)) { return getMsgFieldOOR('inc',rInc, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'start');
             nBlock.setFieldValue(exp.values[1], 'inc');
         } else if (exp.crontype.specChar == 'L') {
             var nBlock = this.workspace.newBlock('block_last');
         } else if (exp.crontype.specChar == 'W') {
+            if (!valideNumRange(exp.values[0],range)) { return getMsgFieldOOR('day of month',range, exp.values[0]);};
             var nBlock = this.workspace.newBlock('block_day_of_month_near_to_w');
             nBlock.setFieldValue(exp.values[0], 'day_m');
         } else if (exp.crontype.specChar == '?') {
             var nBlock = this.workspace.newBlock('block_no_specif');
         } else if (exp.crontype.specChar == '') {
+            if (!valideNumRange(exp.values[0],range)) { return getMsgFieldOOR('day of month',range, exp.values[0]);};
             var nBlock = this.workspace.newBlock('block_day_of_month_at');
             nBlock.setFieldValue(exp.values[0], 'day_m');
         };
@@ -526,18 +594,25 @@ Blockly.Blocks['cron.CronTest'] = {
   MonthToBlock_: function(exp, connectTo) {
     var error = "";
     if (exp) {
+        var range = CRON_FIELD_DATA['DayOfWeek'].range;
+        var rInc = CRON_FIELD_DATA['DayOfWeek'].inc;
         var nBlock = null;
         if (exp.crontype.specChar == '*'){
           var nBlock = this.workspace.newBlock('block_all');
         } else if (exp.crontype.specChar == '-') {
             var nBlock = this.workspace.newBlock('block_month_from_to');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('from', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], range)) { return getMsgFieldOOR('to', range, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'from');
             nBlock.setFieldValue(exp.values[1], 'to');
         } else if (exp.crontype.specChar == '/') {
             var nBlock = this.workspace.newBlock('block_month_inc');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('start', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], rInc)) { return getMsgFieldOOR('inc',rInc, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'start');
             nBlock.setFieldValue(exp.values[1], 'inc');
         } else if (exp.crontype.specChar == '') {
+            if (!valideNumRange(exp.values[0],range)) { return getMsgFieldOOR('month',range, exp.values[0]);};
             var nBlock = this.workspace.newBlock('block_month_on');
             nBlock.setFieldValue(exp.values[0], 'month');
         };
@@ -552,15 +627,21 @@ Blockly.Blocks['cron.CronTest'] = {
   DayOfWeekToBlock_: function(exp, connectTo) {
     var error = "";
     if (exp) {
+        var range = CRON_FIELD_DATA['DayOfWeek'].range;
+        var rInc = CRON_FIELD_DATA['DayOfWeek'].inc;
         var nBlock = null;
         if (exp.crontype.specChar == '*'){
           var nBlock = this.workspace.newBlock('block_all');
         } else if (exp.crontype.specChar == '-') {
             var nBlock = this.workspace.newBlock('block_day_w_from_to');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('from', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], range)) { return getMsgFieldOOR('to', range, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'from');
             nBlock.setFieldValue(exp.values[1], 'to');
         } else if (exp.crontype.specChar == '/') {
             var nBlock = this.workspace.newBlock('block_day_w_inc');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('start', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], rInc)) { return getMsgFieldOOR('inc',rInc, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'start');
             nBlock.setFieldValue(exp.values[1], 'inc');
         } else if (exp.crontype.specChar == '?') {
@@ -570,14 +651,18 @@ Blockly.Blocks['cron.CronTest'] = {
                 var nBlock = this.workspace.newBlock('block_last');
             } else {
                 var nBlock = this.workspace.newBlock('block_day_w_last_of_month');
+                if (!valideNumRange(exp.values[0],range)) { return getMsgFieldOOR('week day', range, exp.values[0]);};
                 nBlock.setFieldValue(exp.values[0], 'day_w');
             };
         } else if (exp.crontype.specChar == '#') {
             var nBlock = this.workspace.newBlock('block_day_w_nth_of_month');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('week day',range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], rInc)) { return getMsgFieldOOR('nth day', rInc, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'day_w');
             nBlock.setFieldValue(exp.values[1], 'nth');
         } else if (exp.crontype.specChar == '') {
             var nBlock = this.workspace.newBlock('block_day_w_on');
+            if (!valideNumRange(exp.values[0],range)) { return getMsgFieldOOR('week day',range, exp.values[0]);};
             nBlock.setFieldValue(exp.values[0], 'day_w');
         };
         if (nBlock) {
@@ -591,19 +676,26 @@ Blockly.Blocks['cron.CronTest'] = {
   YearToBlock_: function(exp, connectTo) {
     var error = "";
     if (exp) {
+        var range = CRON_FIELD_DATA['Year'].range;
+        var rInc = CRON_FIELD_DATA['Year'].inc;
         var nBlock = null;
         if (exp.crontype.specChar == '*'){
           var nBlock = this.workspace.newBlock('block_all');
         } else if (exp.crontype.specChar == '-') {
             var nBlock = this.workspace.newBlock('block_year_from_to');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('from', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], range)) { return getMsgFieldOOR('to', range, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'from');
             nBlock.setFieldValue(exp.values[1], 'to');
         } else if (exp.crontype.specChar == '/') {
             var nBlock = this.workspace.newBlock('block_year_inc');
+            if (!valideNumRange(exp.values[0], range)) { return getMsgFieldOOR('start', range, exp.values[0]);};
+            if (!valideNumRange(exp.values[1], rInc)) { return getMsgFieldOOR('inc',rInc, exp.values[1]);};
             nBlock.setFieldValue(exp.values[0], 'start');
             nBlock.setFieldValue(exp.values[1], 'inc');
         } else if (exp.crontype.specChar == '') {
             var nBlock = this.workspace.newBlock('block_year_in');
+            if (!valideNumRange(exp.values[1], range)) { return getMsgFieldOOR('year', range, exp.values[0]);};
             nBlock.setFieldValue(exp.values[0], 'year');
         };
         if (nBlock) {
@@ -625,7 +717,6 @@ Blockly.Blocks['block_all'] = {
     this.setOutput(true, 'block_all');
     this.setColour(330);
     this.setTooltip('Used to select all values within a field. For example, * in the minute field means “every minute”.');
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return '*'
@@ -642,7 +733,6 @@ Blockly.Blocks['block_no_specif'] = {
                 " For example, if I want my trigger to fire on a particular day of the month (say, the 10th),"+
                 " but don’t care what day of the week that happens to be, I would put “10” in the day-of-month field,"+
                 " and “?” in the day-of-week field.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return '?';
@@ -661,7 +751,6 @@ Blockly.Blocks['block_last'] = {
                 " But if used in the day-of-week field after another value, it means “the last xxx day of the month” - for example “6L” means “the last friday of the month”."+
                 " You can also specify an offset from the last day of the month, such as “L-3” which would mean the third-to-last day of the calendar month."+
                 " When using the ‘L’ option, it is important not to specify lists, or ranges of values, as you’ll get confusing/unexpected results.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return 'L';
@@ -675,7 +764,6 @@ Blockly.Blocks['block_empty'] = {
     this.setOutput(true, 'block_empty');
     this.setColour(330);
     this.setTooltip('');
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return '';
@@ -687,12 +775,11 @@ Blockly.Blocks['block_minute_at'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("At")
-        .appendField(new Blockly.FieldNumber(0, 0, 59), "minute")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Minute'].range[0], CRON_FIELD_DATA['Minute'].range[1]), "minute")
         .appendField("mn");
     this.setOutput(true, 'block_minute_at');
     this.setColour(160);
     this.setTooltip("Used to specify a particular minute. For example, “30” means “at 30 minutes after hour”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('minute');
@@ -703,17 +790,16 @@ Blockly.Blocks['block_minute_from_to'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("From")
-        .appendField(new Blockly.FieldNumber(0, 0, 59), "from")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Minute'].range[0], CRON_FIELD_DATA['Minute'].range[1]), "from")
         .appendField("mn");
     this.appendDummyInput()
         .appendField("to")
-        .appendField(new Blockly.FieldNumber(0, 0, 59), "to")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Minute'].range[0], CRON_FIELD_DATA['Minute'].range[1]), "to")
         .appendField("mn");
     this.setInputsInline(true);
     this.setOutput(true, 'block_minute_from_to');
     this.setColour(160);
     this.setTooltip('Used to specify ranges. For example, “5-10” means “all minutes between 5 to 10”.');
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('from')+'-'+this.getFieldValue('to');
@@ -724,17 +810,16 @@ Blockly.Blocks['block_minute_inc'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("Starting from")
-        .appendField(new Blockly.FieldNumber(0, 0, 59), "start")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Minute'].range[0], CRON_FIELD_DATA['Minute'].range[1]), "start")
         .appendField("mn");
     this.appendDummyInput()
         .appendField("every")
-        .appendField(new Blockly.FieldNumber(0, 0, 59), "inc")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Minute'].inc[0], CRON_FIELD_DATA['Minute'].inc[1]), "inc")
         .appendField("mn");
     this.setInputsInline(true);
     this.setOutput(true, 'block_minute_inc');
     this.setColour(160);
     this.setTooltip("Used to specify increments. For example, “0/15” means “the minutes 0, 15, 30, and 45”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('start')+'/'+this.getFieldValue('inc')
@@ -746,12 +831,11 @@ Blockly.Blocks['block_hour_at'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("At")
-        .appendField(new Blockly.FieldNumber(0, 0, 23), "hour")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Hour'].range[0], CRON_FIELD_DATA['Hour'].range[1]), "hour")
         .appendField("h");
     this.setOutput(true, 'block_hour_at');
     this.setColour(230);
     this.setTooltip("Used to specify a particular hour. For example, “10” means “at 10 h”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('hour');
@@ -762,17 +846,16 @@ Blockly.Blocks['block_hour_from_to'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("From")
-        .appendField(new Blockly.FieldNumber(0, 0, 23), "from")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Hour'].range[0], CRON_FIELD_DATA['Hour'].range[1]), "from")
         .appendField("h");
     this.appendDummyInput()
         .appendField("to")
-        .appendField(new Blockly.FieldNumber(0, 0, 23), "to")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Hour'].range[0], CRON_FIELD_DATA['Hour'].range[1]), "to")
         .appendField("h");
     this.setInputsInline(true);
     this.setOutput(true, 'block_hour_from_to');
     this.setColour(230);
     this.setTooltip("Used to specify ranges. For example, “10-12” means “the hours 10, 11 and 12”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('from')+'-'+this.getFieldValue('to');
@@ -783,17 +866,16 @@ Blockly.Blocks['block_hour_inc'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("Starting from")
-        .appendField(new Blockly.FieldNumber(0, 0, 23), "start")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Hour'].range[0], CRON_FIELD_DATA['Hour'].range[1]), "start")
         .appendField("h");
     this.appendDummyInput()
         .appendField("every")
-        .appendField(new Blockly.FieldNumber(0, 0, 23), "inc")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Hour'].inc[0], CRON_FIELD_DATA['Hour'].inc[1]), "inc")
         .appendField("h");
     this.setInputsInline(true);
     this.setOutput(true, 'block_hour_inc');
     this.setColour(230);
     this.setTooltip("Used to specify increments. For example, “2/5” means “the hours 2, 7, 12, 15, 18, and 23.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('start')+'/'+this.getFieldValue('inc');
@@ -805,12 +887,11 @@ Blockly.Blocks['block_day_of_month_at'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("At")
-        .appendField(new Blockly.FieldNumber(1, 1, 31), "day_m")
+        .appendField(new Blockly.FieldNumber(1, CRON_FIELD_DATA['DayOfMonth'].range[0], CRON_FIELD_DATA['DayOfMonth'].range[1]), "day_m")
         .appendField("of month");
     this.setOutput(true, 'block_day_of_month_at');
     this.setColour(65);
     this.setTooltip("Used to specify a particular day of the month. For example, “15” means “the 15th day of the month”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('day_m');
@@ -821,16 +902,15 @@ Blockly.Blocks['block_day_of_month_from_to'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("From")
-        .appendField(new Blockly.FieldNumber(1, 1, 31), "from");
+        .appendField(new Blockly.FieldNumber(1, CRON_FIELD_DATA['DayOfMonth'].range[0], CRON_FIELD_DATA['DayOfMonth'].range[1]), "from");
     this.appendDummyInput()
         .appendField("to")
-        .appendField(new Blockly.FieldNumber(1, 1, 31), "to")
+        .appendField(new Blockly.FieldNumber(1, CRON_FIELD_DATA['DayOfMonth'].range[0], CRON_FIELD_DATA['DayOfMonth'].range[1]), "to")
         .appendField("of the month");
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_of_month_from_to');
     this.setColour(65);
     this.setTooltip("Used to specify ranges. For example, “5-25” means “all day of month between 5th to 25th”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('from')+'-'+this.getFieldValue('to');
@@ -841,16 +921,15 @@ Blockly.Blocks['block_day_of_month_inc'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("Starting from")
-        .appendField(new Blockly.FieldNumber(1, 1, 31), "start");
+        .appendField(new Blockly.FieldNumber(1, CRON_FIELD_DATA['DayOfMonth'].range[0], CRON_FIELD_DATA['DayOfMonth'].range[1]), "start");
     this.appendDummyInput()
         .appendField("of the month every")
-        .appendField(new Blockly.FieldNumber(1, 1, 31), "inc")
+        .appendField(new Blockly.FieldNumber(1, CRON_FIELD_DATA['DayOfMonth'].inc[0], CRON_FIELD_DATA['DayOfMonth'].inc[1]), "inc")
         .appendField("day");
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_of_month_inc');
     this.setColour(65);
     this.setTooltip("Used to specify increments. For example, “1/3” means “fire every 3 days starting on the first day of the month”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('start')+'/'+this.getFieldValue('inc');
@@ -861,7 +940,7 @@ Blockly.Blocks['block_day_of_month_near_to_w'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("The nearest weekday to the")
-        .appendField(new Blockly.FieldNumber(1, 1, 31), "day_m")
+        .appendField(new Blockly.FieldNumber(1, CRON_FIELD_DATA['DayOfMonth'].range[0], CRON_FIELD_DATA['DayOfMonth'].range[1]), "day_m")
         .appendField("of the month");
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_of_month_near_to_w');
@@ -874,7 +953,6 @@ Blockly.Blocks['block_day_of_month_near_to_w'] = {
                 " However if you specify “1W” as the value for day-of-month, and the 1st is a Saturday, the trigger will fire on Monday the 3rd,"+
                 " as it will not ‘jump’ over the boundary of a month’s days. The ‘W’ character can only be specified when the day-of-month is a single day, not a range or list of days.\n"+
                 "The 'L' and 'W' characters can also be combined in the day-of-month field to yield 'LW', which translates to “last weekday of the month”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('day_m')+'W';
@@ -891,7 +969,6 @@ Blockly.Blocks['block_month_on'] = {
     this.setOutput(true, 'block_month_on');
     this.setColour(45);
     this.setTooltip("Used to specify a particular month. For example, “7” means “july”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('month');
@@ -910,7 +987,6 @@ Blockly.Blocks['block_month_from_to'] = {
     this.setOutput(true, 'block_month_from_to');
     this.setColour(45);
     this.setTooltip("Used to specify ranges. For example, “2-6” means “all month between february to june”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('from')+'-'+this.getFieldValue('to');
@@ -924,13 +1000,12 @@ Blockly.Blocks['block_month_inc'] = {
         .appendField(new Blockly.FieldDropdown(MONTHS.slice(0, MONTHS.length -1)), "start");
     this.appendDummyInput()
         .appendField("every")
-        .appendField(new Blockly.FieldNumber(1, 1, 11), "inc")
+        .appendField(new Blockly.FieldNumber(1, CRON_FIELD_DATA['Month'].inc[0], CRON_FIELD_DATA['Month'].inc[1]), "inc")
         .appendField("month");
     this.setInputsInline(true);
     this.setOutput(true, 'block_month_inc');
     this.setColour(45);
     this.setTooltip("Used to specify increments. For example, “1/4” means “the month january, may and september”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('start')+'/'+this.getFieldValue('inc');
@@ -947,7 +1022,6 @@ Blockly.Blocks['block_day_w_on'] = {
     this.setOutput(true, 'block_day_w_on');
     this.setColour(290);
     this.setTooltip("Used to specify a particular day of week. For example, “1” means “monday”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('day_w');
@@ -966,7 +1040,6 @@ Blockly.Blocks['block_day_w_from_to'] = {
     this.setOutput(true, 'block_day_w_from_to');
     this.setColour(290);
     this.setTooltip("Used to specify ranges. For example, “2-5” means “all day of week between thuesday to friday”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('from')+'-'+this.getFieldValue('to');
@@ -980,13 +1053,12 @@ Blockly.Blocks['block_day_w_inc'] = {
         .appendField(new Blockly.FieldDropdown(WEEKDAYS), "start");
     this.appendDummyInput()
         .appendField("every")
-        .appendField(new Blockly.FieldNumber(1, 1, 6), "inc")
+        .appendField(new Blockly.FieldNumber(1, CRON_FIELD_DATA['DayOfWeek'].inc[0], CRON_FIELD_DATA['DayOfWeek'].inc[1]), "inc")
         .appendField("day");
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_inc');
     this.setColour(290);
     this.setTooltip("Used to specify increments. For example, “1/2” means “the day of week sunday, thuesday, thursday, and saturday”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('start')+'/'+this.getFieldValue('inc');
@@ -1003,7 +1075,6 @@ Blockly.Blocks['block_day_w_last_of_month'] = {
     this.setOutput(true, 'block_day_w_last_of_month');
     this.setColour(290);
     this.setTooltip("Used to specify “the last xxx day of the month” - for example “6L” means “the last friday of the month”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('day_w')+'L';
@@ -1014,7 +1085,7 @@ Blockly.Blocks['block_day_w_nth_of_month'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("The")
-        .appendField(new Blockly.FieldDropdown([["1st", "1"], ["2nd", "2"], ["3rd", "3"], ["4th", "4"], ["5th", "5"], ["6th", "6"]]), "nth");
+        .appendField(new Blockly.FieldDropdown([["1st", "1"], ["2nd", "2"], ["3rd", "3"], ["4th", "4"], ["5th", "5"]]), "nth");
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(WEEKDAYS), "day_w")
         .appendField("of the month");
@@ -1025,7 +1096,6 @@ Blockly.Blocks['block_day_w_nth_of_month'] = {
                 " For example, the value of “6#3” in the day-of-week field means “the third Friday of the month” (day 6 = Friday and “#3” = the 3rd one in the month)."+
                 " Other examples: “2#1” = the first Monday of the month and “4#5” = the fifth Wednesday of the month."+
                 " Note that if you specify “#5” and there is not 5 of the given day-of-week in the month, then no firing will occur that month.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('day_w')+'#'+this.getFieldValue('nth');
@@ -1040,7 +1110,6 @@ Blockly.Blocks['block_day_w_w_end'] = {
     this.setOutput(true, 'block_day_w_w_end');
     this.setColour(290);
     this.setTooltip("Used to specify weekend day “saturday and sunday”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return '0,6';
@@ -1052,11 +1121,10 @@ Blockly.Blocks['block_year_in'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("In")
-        .appendField(new Blockly.FieldNumber(0, 0, 9999), "year");
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Year'].range[0], CRON_FIELD_DATA['Year'].range[1]), "year");
     this.setOutput(true, 'block_year_in');
     this.setColour(100);
     this.setTooltip("Used to specify a particular year. For example, “2017” means “in 2017”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('year');
@@ -1067,15 +1135,14 @@ Blockly.Blocks['block_year_from_to'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("From")
-        .appendField(new Blockly.FieldNumber(0, 0, 9999), "from");
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Year'].range[0], CRON_FIELD_DATA['Year'].range[1]), "from");
     this.appendDummyInput()
         .appendField("to")
-        .appendField(new Blockly.FieldNumber(0, 0, 9999), "to");
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Year'].range[0], CRON_FIELD_DATA['Year'].range[1]), "to");
     this.setInputsInline(true);
     this.setOutput(true, 'block_year_from_to');
     this.setColour(100);
     this.setTooltip("Used to specify ranges. For example, “2016-2020” means “all years between 2016 to 2020”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('from')+'-'+this.getFieldValue('to');
@@ -1086,16 +1153,15 @@ Blockly.Blocks['block_year_inc'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("Start in")
-        .appendField(new Blockly.FieldNumber(0, 1, 9999), "start");
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Year'].range[0], CRON_FIELD_DATA['Year'].range[1]), "start");
     this.appendDummyInput()
         .appendField("every")
-        .appendField(new Blockly.FieldNumber(0, 0, 9999), "inc")
+        .appendField(new Blockly.FieldNumber(0, CRON_FIELD_DATA['Year'].inc[0], CRON_FIELD_DATA['Year'].inc[1]), "inc")
         .appendField("year");
     this.setInputsInline(true);
     this.setOutput(true, 'block_year_inc');
     this.setColour(100);
     this.setTooltip("Used to specify increments. For example, “2016/2” means “every 2 years from 2016”.");
-    this.setHelpUrl('');
   },
   formatValue_: function() {
       return this.getFieldValue('start')+'/'+this.getFieldValue('inc');
