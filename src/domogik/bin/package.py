@@ -378,6 +378,7 @@ class PackageInstaller():
                     #     File "/opt/dmg/domogik/src/domogik/bin/package.py", line 375, in download_from_url
                     #       mime = magic.from_buffer(peek, mime=True)
                     #   AttributeError: 'module' object has no attribute 'from_buffer'
+                    mime = MIME_ZIP
 
                     #peek = response.iter_content(256).next()
                     #mime = magic.from_buffer(peek, mime=True)
