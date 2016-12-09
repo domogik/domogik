@@ -89,7 +89,6 @@ setup(
           'Flask-Login >= 0.3.2',
           'Flask-Babel',
           'Flask-Themes2',
-          'Flask-QRcode',
           'tornado >= 4.2',
           'requests >= 0.12.1',
           magic,
