@@ -52,8 +52,7 @@ RUN apt-get install -y \
     sudo \
     python2.7-dev \
     python-pip \
-    git \
-    python-pil 
+    git 
     
 RUN pip install netifaces \
  && pip install sphinx-better-theme
