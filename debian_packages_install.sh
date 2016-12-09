@@ -116,7 +116,6 @@ continue $?
 pip_list="Flask-Login \
           Flask-Babel \
           Flask-Bootstrap \
-          Flask-QRcode \
           sphinx-better-theme \
           sqlalchemy-utils \
           linux-metrics \
