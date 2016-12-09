@@ -1,0 +1,21 @@
+=====================================
+Installation - The configuration file
+=====================================
+
+Purpose
+=======
+
+The Domogik configuration file, located in **/etc/domogik/domogik.cfg**, is created when the *install.py* script is launched. For each key of this file, an option is available for the *install.py* script (this is managed dynamically, so each update on the template configuration file will available from the *install.py* script without needing to modify this one).
+
+
+Template
+========
+
+The template is located in *src/domogik/examples/config/domogik.cfg.sample*. It contains the default values and comments to describe all the keys. Please check this file for more informations about the way to configure it!
+
+During the installation, this file is also copied as */etc/domogik/domogik.cfg.sample*.
+
+domogik.cfg
+===========
+
+The domogik.cfg file does not contain any comments as it is generated from the sample file during the installation.

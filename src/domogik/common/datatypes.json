@@ -18,7 +18,8 @@
             "DT_UpDown",
             "DT_OpenClose",
             "DT_Start",
-            "DT_State"
+            "DT_State",
+            "DT_Motion"
         ]
     },
     "DT_Switch": {
@@ -85,6 +86,14 @@
         "parent": "DT_Bool",
         "childs": []
     },
+    "DT_Motion": {
+        "labels": {
+            "0": "No motion",
+            "1": "Motion"
+        },
+        "parent": "DT_Bool",
+        "childs": []
+    },
     "DT_Number": {
         "min": null,
         "max": null,
@@ -96,7 +105,9 @@
             "DT_Temp",
             "DT_TempK",
             "DT_TempF",
-            "DT_Pression",
+            "DT_Pressure",
+            "DT_mbarPressure",
+            "DT_barPressure",
             "DT_Humidity",
             "DT_AirQuality",
             "DT_Volt",
@@ -113,6 +124,8 @@
             "DT_ApparantEnergy",
             "DT_Speed",
             "DT_kmhSpeed",
+            "DT_rpmSpeed",
+            "DT_ktsSpeed",
             "DT_Year",
             "DT_Month",
             "DT_Day",
@@ -122,13 +135,21 @@
             "DT_mSecond",
             "DT_Timestamp",
             "DT_mMeter",
+            "DT_kMeter",
             "DT_mMeterHour",
             "DT_Byte",
             "DT_kByte",
             "DT_MByte",
             "DT_GByte",
             "DT_pH",
-            "DT_Chlorine"
+            "DT_Chlorine",
+            "DT_Battery",
+            "DT_Co2",
+            "DT_Tvoc",
+            "DT_Insolation",
+            "DT_kgWeight",
+            "DT_VolumeLiter",
+            "DT_VolumeM3"
         ]
     },
     "DT_Scaling": {
@@ -173,10 +194,24 @@
         "parent": "DT_Number",
         "childs": []
     },
-    "DT_Pression": {
+    "DT_Pressure": {
         "min": null,
         "max": null,
         "unit": "Pa",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_mbarPressure": {
+        "min": null,
+        "max": null,
+        "unit": "mbar",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_barPressure": {
+        "min": null,
+        "max": null,
+        "unit": "bar",
         "parent": "DT_Number",
         "childs": []
     },
@@ -299,6 +334,20 @@
         "parent": "DT_Number",
         "childs": []
     },
+    "DT_rpmSpeed": {
+        "min": null,
+        "max": null,
+        "unit": "rpm",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_ktsSpeed": {
+        "min": null,
+        "max": null,
+        "unit": "kts",
+        "parent": "DT_Number",
+        "childs": []
+    },
     "DT_Year": {
         "min": null,
         "max": null,
@@ -362,6 +411,13 @@
         "parent": "DT_Number",
         "childs": []
     },
+    "DT_kMeter": {
+        "min": null,
+        "max": null,
+        "unit": "km",
+        "parent": "DT_Number",
+        "childs": []
+    },
     "DT_mMeterHour": {
         "min": null,
         "max": null,
@@ -408,6 +464,55 @@
         "min": null,
         "max": null,
         "unit": "mg/l",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Battery": {
+        "min": 0,
+        "max": 100,
+        "unit": "%",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Co2": {
+        "min": 0,
+        "max": null,
+        "unit": "ppm",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Tvoc": {
+        "min": 0,
+        "max": null,
+        "unit": "ppb",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_Insolation": {
+        "min": 0,
+        "max": null,
+        "unit": "W/m²",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_kgWeight": {
+        "min": 0,
+        "max": null,
+        "unit": "kg",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_VolumeLiter": {
+        "min": 0,
+        "max": null,
+        "unit": "L",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_VolumeM3": {
+        "min": 0,
+        "max": null,
+        "unit": "m3",
         "parent": "DT_Number",
         "childs": []
     },
@@ -549,6 +654,17 @@
         },
         "childs": []
     },
+    "DT_HeatingPilotWire": {
+        "values": {
+            "1": "Comfort",
+            "2": "Comfort -1",
+            "3": "Comfort -2",
+            "4": "Economy",
+            "5": "Building Protection",
+            "6": "Off/Unballasting"
+        },
+        "childs": []
+    },
     "DT_UPSState": {
         "values": {
             "OL": "mains",
@@ -596,6 +712,23 @@
     "DT_CoordDMS": {
         "format": "(N|S) DD MM SS.s,(E|W) DD MM SS.s",
         "parent": "DT_String",
+        "childs": []
+    },
+    "DT_Video": {
+        "childs": ["DT_VideoMjpeg", "DT_VideoH264"]
+    },
+    "DT_VideoMjpeg": {
+        "format": "",
+        "parent": "DT_Video",
+        "childs": []
+    },
+    "DT_VideoH264": {
+        "format": "",
+        "parent": "DT_Video",
+        "childs": []
+    },
+    "DT_Image": {
+        "format": "",
         "childs": []
     }
 }

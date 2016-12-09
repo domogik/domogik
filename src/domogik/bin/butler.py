@@ -41,13 +41,12 @@ from threading import Thread
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import Plugin
-from domogik.butler.rivescript import RiveScript
+from domogik.butler.rivescript.rivescript import RiveScript
 from domogik.butler.brain import LEARN_FILE
 from domogik.butler.brain import STAR_FILE
 from domogik.butler.brain import clean_input
 #from domogikmq.reqrep.worker import MQRep
 from domogikmq.message import MQMessage
-from domogikmq.pubsub.subscriber import MQAsyncSub
 from domogikmq.pubsub.publisher import MQPub
 #import zmq
 import os
@@ -56,6 +55,7 @@ from subprocess import Popen, PIPE
 import time
 import re
 import sys
+from domogik.common.utils import ucode
 
 
 
@@ -63,6 +63,7 @@ BRAIN_PKG_TYPES = ["brain", "plugin"]
 MINIMAL_BRAIN = "{0}/../butler/brain_minimal.rive".format(os.path.dirname(os.path.abspath(__file__)))
 RIVESCRIPT_DIR = "rs"
 RIVESCRIPT_EXTENSION = ".rive"
+BRAIN_BASE = "brain_base"
 
 FEATURE_TAG = "##feature##"
 SUGGEST_REGEXP = r'\/\* *##suggest##.*\n([\S\s]*?)\*\/'
@@ -71,7 +72,7 @@ SEX_MALE = "male"
 SEX_FEMALE = "female"
 SEX_ALLOWED = [SEX_MALE, SEX_FEMALE]
 
-class Butler(Plugin, MQAsyncSub):
+class Butler(Plugin):
     """ Butler component
 
         TODO : 
@@ -89,7 +90,7 @@ class Butler(Plugin, MQAsyncSub):
                           default=False, \
                           help="Butler interactive mode (must be used WITH -f).")
 
-        Plugin.__init__(self, name = 'butler', parser = parser)
+        Plugin.__init__(self, name = 'butler', parser = parser, log_prefix='core_')
 
         ### MQ
         # MQ publisher
@@ -99,7 +100,7 @@ class Butler(Plugin, MQAsyncSub):
         self.pub = MQPub(self.zmq, self._mq_name)
 
         # subscribe the MQ for interfaces inputs
-        MQAsyncSub.__init__(self, self.zmq, self._name, ['interface.input'])
+        self.add_mq_sub('interface.input')
 
 
         ### Configuration elements
@@ -110,6 +111,9 @@ class Butler(Plugin, MQAsyncSub):
 
             self.lang = conf['lang']
             self.butler_name = conf['name']
+            self.log.debug(u"The butler configured name is '{0}'".format(self.butler_name))
+            self.butler_name_cleaned = clean_input(conf['name'])
+            self.log.debug(u"The butler cleaned name is '{0}'".format(self.butler_name_cleaned))
             self.butler_sex = conf['sex']
             self.butler_mood = None
             if self.butler_sex not in SEX_ALLOWED:
@@ -135,10 +139,10 @@ class Butler(Plugin, MQAsyncSub):
 
         # Configure bot variables
         # all must be lower case....
-        self.log.info("Configuring name and sex : {0}, {1}".format(self.butler_name.lower(), self.butler_sex.lower()))
-        self.brain.set_variable("name", self.butler_name.lower())
-        self.brain.set_variable("fullname", self.butler_name.lower())
-        self.brain.set_variable("sex", self.butler_sex.lower())
+        self.log.info(u"Configuring name and sex : {0}, {1}".format(self.butler_name_cleaned.lower(), self.butler_sex.lower()))
+        self.brain.set_variable(u"name", self.butler_name_cleaned.lower())
+        self.brain.set_variable(u"fullname", self.butler_name.lower())
+        self.brain.set_variable(u"sex", self.butler_sex.lower())
 
         # set the PYTHONPATH
         sys.path.append(self.get_libraries_directory())
@@ -152,12 +156,17 @@ class Butler(Plugin, MQAsyncSub):
         # shortcut to allow the core brain package to reload the brain for learning
         self.brain.reload_butler = self.reload
 
+        # shortcut to allow the core brain package to do logging
+        self.brain.log = self.log
+
 
         # history
         self.history = []
 
-        print(u"*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
-        print(u"You may type /quit to let {0} have a break".format(self.butler_name))
+        self.log.info(u"*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
+
+        # for chat more only
+        #self.log.info(u"You may type /quit to let {0} have a break".format(self.butler_name))
 
 
         ### Interactive mode
@@ -187,8 +196,12 @@ class Butler(Plugin, MQAsyncSub):
             @param msg : MQ req message
         """
         try:
+            ### discuss over Req/Rep (used by rest url)
+            if msg.get_action() == "butler.discuss.do":
+                self.log.info(u"Discuss request : {0}".format(msg))
+                self._mdp_reply_butler_discuss(msg)
             ### rivescript files detail
-            if msg.get_action() == "butler.scripts.get":
+            elif msg.get_action() == "butler.scripts.get":
                 self.log.info(u"Scripts request : {0}".format(msg))
                 self._mdp_reply_butler_scripts(msg)
             ### rivescript files detail
@@ -207,6 +220,44 @@ class Butler(Plugin, MQAsyncSub):
             self.log.error(u"Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
    
 
+    def _mdp_reply_butler_discuss(self, message):
+        """ Discuss over req/rep
+            this should NOT be called with a 10 seconds timeout...
+        """
+        # TODO : merge with the on_message function !!!
+
+        content = message.get_data()
+        self.log.info(u"Received message : {0}".format(content))
+
+        self.add_to_history(u"interface.input", content)
+        reply = self.process(content['text'])
+
+        # fill empty data
+        for elt in ['identity', 'media', 'location', 'sex', 'mood', 'reply_to']:
+            if elt not in content:
+                content[elt] = None
+
+        # publish over MQ
+        data =              {"media" : content['media'],
+                             "location" : content['location'],
+                             "sex" : self.butler_sex,
+                             "mood" : self.butler_mood,
+                             "is_reply" : True,
+                             "reply_to" : content['source'],
+                             "identity" : self.butler_name,
+                             "lang" : self.lang,
+                             "text" : reply}
+        self.log.info(u"Send response over MQ : {0}".format(data))
+
+
+        msg = MQMessage()
+        msg.set_action('butler.discuss.result')
+        msg.set_data(data)
+        self.reply(msg.get())
+
+        self.add_to_history(u"interface.output", data)
+
+
     def _mdp_reply_butler_scripts(self, message):
         """ Send the raw content for the brain parts over the MQ
         """
@@ -218,8 +269,8 @@ class Butler(Plugin, MQAsyncSub):
 
         msg = MQMessage()
         msg.set_action('butler.scripts.result')
-        msg.add_data("learn", self.learn_content)
-        msg.add_data("not_understood", self.not_understood_content)
+        msg.add_data(u"learn", self.learn_content)
+        msg.add_data(u"not_understood", self.not_understood_content)
         for client_id in self.brain_content:
             msg.add_data(client_id, self.brain_content[client_id])
         self.reply(msg.get())
@@ -245,7 +296,7 @@ class Butler(Plugin, MQAsyncSub):
         """
         msg = MQMessage()
         msg.set_action('butler.history.result')
-        msg.add_data("history", self.history)
+        msg.add_data(u"history", self.history)
         self.reply(msg.get())
 
 
@@ -254,7 +305,7 @@ class Butler(Plugin, MQAsyncSub):
         """
         msg = MQMessage()
         msg.set_action('butler.features.result')
-        msg.add_data("features", self.butler_features)
+        msg.add_data(u"features", self.butler_features)
         self.reply(msg.get())
 
 
@@ -289,7 +340,14 @@ class Butler(Plugin, MQAsyncSub):
         try:
             list = []
             # first load the packages parts
-            for a_file in os.listdir(self.get_packages_directory()):
+            dir_list = os.listdir(self.get_packages_directory())
+
+            # first, make sure the brain_base package is loaded the first!!
+            if BRAIN_BASE in dir_list:
+                dir_list.remove(BRAIN_BASE)
+                dir_list = [BRAIN_BASE] + dir_list
+
+            for a_file in dir_list:
                 try:
                     pkg_type, name = a_file.split("_")
                 except ValueError:
@@ -392,6 +450,7 @@ class Butler(Plugin, MQAsyncSub):
         """ Process the input query by calling rivescript brain
             @param query : the text query
         """
+        reply = ""
         try:
             self.log.debug(u"Before transforming query : {0}".format(query))
             self.brain.raw_query = query
@@ -408,8 +467,6 @@ class Butler(Plugin, MQAsyncSub):
             return reply
         except:
             self.log.error(u"Error while processing query '{0}'. Error is : {1}".format(query, traceback.format_exc()))
-            self.log.error(reply)
-            self.log.error(type(reply))
             return "Error"
 
 
@@ -425,6 +482,9 @@ class Butler(Plugin, MQAsyncSub):
         """ When a message is received from the MQ (pub/sub)
         """
         if msgid == "interface.input":
+            # TODO :
+            # merge with the on_mdp_reply_butler_disscuss() function
+
             self.log.info(u"Received message : {0}".format(content))
 
             ### Get response from the brain
@@ -434,7 +494,7 @@ class Butler(Plugin, MQAsyncSub):
             # 20s : reply "It takes already 20s for processing, I cancel the request" and kill the thread
             #reply = self.brain.reply(self.user_name, content['text'])
 
-            self.add_to_history("interface.input", content)
+            self.add_to_history(u"interface.input", content)
             reply = self.process(content['text'])
 
             ### Prepare response for the MQ
@@ -460,13 +520,15 @@ class Butler(Plugin, MQAsyncSub):
                                  "location" : content['location'],
                                  "sex" : self.butler_sex,
                                  "mood" : self.butler_mood,
+                                 "is_reply" : True,
                                  "reply_to" : content['source'],
                                  "identity" : self.butler_name,
+                                 "lang" : self.lang,
                                  "text" : reply}
             self.log.info(u"Send response over MQ : {0}".format(data))
             self.pub.send_event('interface.output',
                                 data)
-            self.add_to_history("interface.output", data)
+            self.add_to_history(u"interface.output", data)
 
 
     def run_chat(self):
@@ -490,7 +552,7 @@ class Butler(Plugin, MQAsyncSub):
             reply = self.process(msg)
 
             # let Nestor answer in the chat
-            print(u"{0} > {1}".format(self.butler_name, reply))
+            print("{0} > {1}".format(ucode(self.butler_name), ucode(reply)))
 
             # let Nestor speak
             #tts = u"espeak -p 40 -s 140 -v mb/mb-fr1 \"{0}\" | mbrola /usr/share/mbrola/fr1/fr1 - -.au | aplay".format(reply)

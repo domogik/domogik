@@ -49,6 +49,12 @@ WARNING = '\033[93m'
 FAIL = '\033[91m'
 ENDC = '\033[0m'
 
+REGEXP_HOSTNAME = r"""(?P<source>
+                        (?P<source_instance_id>[a-z, 0-9, \-]{1,16})$
+                    )
+                """
+
+
 user = ''
 
 def info(msg):
@@ -148,19 +154,18 @@ def test_config_files():
     if "-d" not in manager_params:
         warning("No -d option in MANAGER_PARAMS. You should have it unless you are using domogik on more than one computer.")
         params = False
-    if "-r" not in manager_params:
-        warning("No -r option in MANAGER_PARAMS. You should have it unless you are using domogik on more than one computer.")
-        params = False
     if params:
         ok("Manager params seem good")
 
+    # The xPL hub is no more used by default, no need to test it
+
     #Check if we can find xPL_Hub
-    info("Check xPL_Hub is in path")
-    path = os.environ['PATH'].split(':')
-    path.append(custom_path)
-    l = [p for p in path if os.path.exists(os.path.join(p, 'xPL_Hub'))]
-    assert l != [], "xPL_Hub can't be found, please double check CUSTOM_PATH is correctly defined if you are in development mode. In install mode, check your architecture is supported or check src/domogik/xpl/tools/COMPILE.txt, then restart test_config.py"
-    ok("xPL_Hub found in the path")
+    #info("Check xPL_Hub is in path")
+    #path = os.environ['PATH'].split(':')
+    #path.append(custom_path)
+    #l = [p for p in path if os.path.exists(os.path.join(p, 'xPL_Hub'))]
+    #assert l != [], "xPL_Hub can't be found, please double check CUSTOM_PATH is correctly defined if you are in development mode. In install mode, check your architecture is supported or check src/domogik/xpl/tools/COMPILE.txt, then restart test_config.py"
+    #ok("xPL_Hub found in the path")
 
     info("Test user / config file")
 
@@ -209,7 +214,6 @@ def test_user_config_file(user_home, user_entry):
     #check [domogik] section
     dmg = dict(config.items('domogik'))
     database = dict(config.items('database'))
-    rest = dict(config.items('rest'))
     admin = dict(config.items('admin'))
     butler = dict(config.items('butler'))
     backup = dict(config.items('backup'))
@@ -256,12 +260,6 @@ def test_user_config_file(user_home, user_entry):
 
     ok("[database] section seems good")
 
-    # Check [rest] section
-    info("Parse [rest] section")
-    for ipadd in get_ip_for_interfaces(rest['interfaces'].split(",")):
-        _check_port_availability(ipadd, rest['port'])
-    ok("Rest server IP/port is not bound by anything else")
-
     # Check [admin] section
     info("Parse [admin] section")
     for ipadd in get_ip_for_interfaces(admin['interfaces'].split(",")):
@@ -288,12 +286,12 @@ def test_hostname():
         warning("Your hostname length is > 16, because it is used into xpl messages, it must be < 16).\
             You should change it in /etc/hostname and /etc/hosts, logout and login, then run ./test_config.py again.")
     #ok("Hostname length is < 16.")
-    __regexp_source = re.compile(REGEXP_SOURCE, re.UNICODE | re.VERBOSE)
+    __regexp_source = re.compile(REGEXP_HOSTNAME, re.UNICODE | re.VERBOSE)
     match_source = __regexp_source.match(gethostname().split(',')[0])
     if match_source is None:
         warning("Your hostname is not valid (%s). Must contain only alphanumeric (a to z, 0 to 9) chars and be < 16 chars.")
     else:
-        ok("Hostname characters are OK")
+        ok("Hostname is OK")
 
 def test_config():
     try:

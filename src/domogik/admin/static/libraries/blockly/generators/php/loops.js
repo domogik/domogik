@@ -29,24 +29,16 @@ goog.provide('Blockly.PHP.loops');
 goog.require('Blockly.PHP');
 
 
-Blockly.PHP['controls_repeat'] = function(block) {
-  // Repeat n times (internal number).
-  var repeats = Number(block.getFieldValue('TIMES'));
-  var branch = Blockly.PHP.statementToCode(block, 'DO');
-  branch = Blockly.PHP.addLoopTrap(branch, block.id);
-  var loopVar = Blockly.PHP.variableDB_.getDistinctName(
-      'count', Blockly.Variables.NAME_TYPE);
-  var code = 'for (' + loopVar + ' = 0; ' +
-      loopVar + ' < ' + repeats + '; ' +
-      loopVar + '++) {\n' +
-      branch + '}\n';
-  return code;
-};
-
 Blockly.PHP['controls_repeat_ext'] = function(block) {
-  // Repeat n times (external number).
-  var repeats = Blockly.PHP.valueToCode(block, 'TIMES',
-      Blockly.PHP.ORDER_ASSIGNMENT) || '0';
+  // Repeat n times.
+  if (block.getField('TIMES')) {
+    // Internal number.
+    var repeats = String(Number(block.getFieldValue('TIMES')));
+  } else {
+    // External number.
+    var repeats = Blockly.PHP.valueToCode(block, 'TIMES',
+        Blockly.PHP.ORDER_ASSIGNMENT) || '0';
+  }
   var branch = Blockly.PHP.statementToCode(block, 'DO');
   branch = Blockly.PHP.addLoopTrap(branch, block.id);
   var code = '';
@@ -64,6 +56,8 @@ Blockly.PHP['controls_repeat_ext'] = function(block) {
       branch + '}\n';
   return code;
 };
+
+Blockly.PHP['controls_repeat'] = Blockly.PHP['controls_repeat_ext'];
 
 Blockly.PHP['controls_whileUntil'] = function(block) {
   // Do while/until loop.
@@ -134,11 +128,11 @@ Blockly.PHP['controls_for'] = function(block) {
     code += 'if (' + startVar + ' > ' + endVar + ') {\n';
     code += Blockly.PHP.INDENT + incVar + ' = -' + incVar + ';\n';
     code += '}\n';
-    code += 'for (' + variable0 + ' = ' + startVar + ';\n' +
-        '     ' + incVar + ' >= 0 ? ' +
+    code += 'for (' + variable0 + ' = ' + startVar + '; ' +
+        incVar + ' >= 0 ? ' +
         variable0 + ' <= ' + endVar + ' : ' +
-        variable0 + ' >= ' + endVar + ';\n' +
-        '     ' + variable0 + ' += ' + incVar + ') {\n' +
+        variable0 + ' >= ' + endVar + '; ' +
+        variable0 + ' += ' + incVar + ') {\n' +
         branch + '}\n';
   }
   return code;

@@ -40,16 +40,102 @@ from domogik.xpl.common.xplconnector import Listener
 from domogik.xpl.common.xplmessage import XplMessage
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.tests.common.helpers import *
+from domogikmq.pubsub.subscriber import MQSyncSub
+from domogikmq.message import MQMessage
 import unittest
 import time
+import zmq
+import json
 
-class TemplateTestCase(unittest.TestCase):
+class TemplateTestCase(unittest.TestCase):   #, MQAsyncSub):
+
+    #def __init__(self, testname):
+    #    self.zmq = zmq.Context()
+    #    unittest.TestCase.__init__(self, testname)
+    #    MQAsyncSub.__init__(self, self.zmq, testname, ["client.sensor"])
 
     def setUp(self):
         """ sort of a Constructor
         """
         print(u"\n------------------------------------------------------------------")
         #self.config = {}
+
+
+    ### MQ tools
+
+    def wait_for_mq(self, device_id = None, data = {}, timeout = 10):
+        """ Wait for a MQ message for a given time (in seconds)
+            @param device_id : the device_id
+            @param data : the list of keys/values we should find in the message. { 'key1' : 'val1', ... }
+            @param timeout : time (in seconds) given to get the message. Once timeout has expired, we return False
+        """
+        msg = MQMessage()
+        msg.set_action('device.get')
+        mq_client = MQSyncReq(zmq.Context())
+        result = mq_client.request('dbmgr', msg.get(), timeout=10)
+        if not result:
+            raise RuntimeError(u"Unable to retrieve the device list, max attempt achieved : {0}".format(max_attempt))
+            return False
+        else:
+            device_list = result.get_data()['devices']
+
+        for dev in device_list:
+            if dev['id'] == device_id: 
+                device = dev
+
+        # we add 5% to the timeout as some operations may be done in the plugin and so the interval is not totally exact
+        timeout = timeout*1.05 
+
+        # Bacause of the TestPlugin component, we can't use the MQAsyncSub class here...
+        # So we will do a manual loop thanks to MQSyncSub
+        # To avoid eternal waiting for a not send message, we catch also the plugin.status messages that occurs each 
+        # 15s but we don't process them
+
+        do_loop = True
+        time_start = time.time()
+        while do_loop:
+            cli = MQSyncSub(zmq.Context(), "test", ["client.sensor", "plugin.status"])
+            resp = cli.wait_for_event()
+            # client.sensor message
+            if resp['id'].startswith("client.sensor"):
+                res = json.loads(resp['content'])
+                print("MQ client.sensor message received. Data = {0}".format(res))
+
+                # check if this is the waited message...
+
+                # compare sensors values
+                sensors_id = {}
+                is_ok = True
+                for key in data:
+                    # find sensor id
+                    for a_sensor in device['sensors']:
+                        if key == a_sensor:
+                            sensor_id = str(device['sensors'][a_sensor]['id'])
+                            print("{0} vs {1}".format( res[sensor_id], data[key]))
+                            if res[sensor_id] != data[key]:
+                                is_ok = False
+
+                if is_ok:
+                    return True
+
+                # if this was not the waited message...
+                # check timeout
+                if time.time() - time_start > timeout:
+                    raise RuntimeError("No MQ message received before the timeout reached")
+            # plugin.status message
+            else:
+                # check timeout
+                #print(time.time() - time_start)
+                if (time.time() - time_start) > timeout:
+                    raise RuntimeError("No MQ message received before the timeout reached")
+                    
+ 
+
+
+        return False
+
+    def on_message(self, msg_id, content):
+        print("MQ => {0}".format(msg_id))
 
 
     ### xpl tools

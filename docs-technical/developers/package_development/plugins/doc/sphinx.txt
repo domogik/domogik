@@ -1,0 +1,6 @@
+===============================================
+Writing documentation for sphinx in ReST format
+===============================================
+
+* http://sphinx-doc.org/rest.html
+* http://openalea.gforge.inria.fr/doc/openalea/doc/_build/html/source/sphinx/rest_syntax.html

@@ -58,19 +58,43 @@
               </h2>
               {% for client in client_list_per_host_per_type[host][type] %}
                 {% if type == "core" %}
-                  <a class="list-group-item" href="/core/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
+                  <!-- link -->
+                  {% if client_list_per_host_per_type[host][type][client].name == "scenario" %}
+                    <a class="list-group-item" href="/scenario">
+                  {% else %}
+                    <a class="list-group-item" href="/core/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
+                  {% endif %}
+
+                  <!-- icon -->
+                  {% if client_list_per_host_per_type[host][type][client].name == "admin" %}
+                    <i class="fa fa-shield"></i>
+                  {% elif client_list_per_host_per_type[host][type][client].name == "butler" %}
+                    <i class="fa fa-comments"></i>
+                  {% elif client_list_per_host_per_type[host][type][client].name == "dbmgr" %}
+                    <i class="fa fa-database"></i>
+                  {% elif client_list_per_host_per_type[host][type][client].name == "scenario" %}
+                    <i class="fa fa-cog"></i>
+                  {% elif client_list_per_host_per_type[host][type][client].name == "xplgw" %}
+                    <i class="fa fa-exchange"></i>
+                  {% else %}
+                    <i class="fa fa-question"></i>
+                  {% endif %}
                 {% elif type == "plugin" %}
                   <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
+                  <i class="fa fa-cube"></i>
                 {% elif type == "brain" %}
                   <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
+                  <i class="fa fa-cogs"></i>
                 {% elif type == "interface" %}
                   <a class="list-group-item" href="/client/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
+                  <i class="fa fa-comments"></i>
                 {% else %}
                   <a class="list-group-item" href="#">
+                  <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> 
                 {% endif %}
 
-                <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> 
-                  {{ client_list_per_host_per_type[host][type][client].name }}
+                <!-- text (name) -->
+                  &nbsp;&nbsp;{{ client_list_per_host_per_type[host][type][client].name }}
 
 
                 {# for a plugin for only external xpl clients, there is nothing to start so no status ;) #}

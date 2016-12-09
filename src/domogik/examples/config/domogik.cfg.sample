@@ -22,6 +22,12 @@ pid_dir_path = /var/run/domogik/
 # Debug levels are debug, info, warning, error, critical
 log_level = debug
 
+# info about the values
+# https://docs.python.org/2/library/logging.handlers.html#timedrotatingfilehandler
+log_when = D
+log_interval = 1
+log_backup_count = 10
+
 # This parameter defines which interface the Domogik xPL plugins should listen for xPL
 # If you have only one computer to run the Domogik installation (of course, 
 # the one used to browse the interface is not important), you can set it 
@@ -57,19 +63,20 @@ prefix = core
 #pool_recycle = 3600
 
 ###
-# REST section
+# Admin interface
 ###
-[rest]
-# REST is a plugin that allows all UI to get info in database or to discuss 
-# with xpl network.
-# REST is a HTTP server. Following parameters will indicate REST on which 
+[admin]
+# Admin is the component that handles 2 things:
+# 1- the admin UI
+# 2- the rest inetrface
+# its a HTTP server. Following parameters will indicate REST on which 
 # ip:port it will run
 # * means that it will be available on all network interfaces
 #interfaces = eth0, lo
 #interfaces = eth0
 #interfaces = *
 interfaces = lo
-port = 40405
+port = 40406
 # set to True if you want to use rest with ssl (https://....)
 use_ssl = False
 # if rest_use_ssl = True, set here path for ssl certificate/key
@@ -77,16 +84,8 @@ ssl_certificate =
 ssl_key =
 # if set to True, this will result in a nicely formatted json
 clean_json = False
-
-###
-# Admin interface
-###
-[admin]
-interfaces = lo
-port = 40406
-use_ssl = False
-ssl_certificate =
-ssl_key =
+# if set to True, all the /rest/ urls need basic authentication
+rest_auth = False
 
 ###
 # Butler configuration
@@ -103,3 +102,20 @@ sex = female
 ###
 [backup]
 folder=/var/lib/domogik/backup/
+
+
+### 
+# Metrics configuration
+###
+
+[metrics]
+
+# The metrics are some data sent by Domogik to an online server. Except if you change the id below, the data are anonymous.
+# The informations sent are :
+# - technical informations about each Domogik process : cpu and memory usage, ...
+
+# the id is generated during Domogik installation based on some system properties. It should be unique. You can freely change its value to something more fun like your github username for example ;)
+id = 
+
+# this is the url on which the metrics are sent. Don't change this value!
+url = http://metrics.domogik.org/

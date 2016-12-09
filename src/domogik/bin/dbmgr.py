@@ -65,7 +65,7 @@ class DBConnector(Plugin, MQRep):
         '''
         Initialize database and xPL connection
         '''
-        Plugin.__init__(self, 'dbmgr')
+        Plugin.__init__(self, 'dbmgr', log_prefix='core_')
         # Already done in Plugin
         #MQRep.__init__(self, zmq.Context(), 'dbmgr')
         self.log.debug(u"Init database_manager instance")
@@ -73,6 +73,7 @@ class DBConnector(Plugin, MQRep):
         # Check for database connexion
         self._db = DbHelper()
         with self._db.session_scope():
+            # TODO : move in a function and use it (also used in dbmgr)
             nb_test = 0
             db_ok = False
             while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
@@ -81,7 +82,7 @@ class DBConnector(Plugin, MQRep):
                     self._db.list_user_accounts()
                     db_ok = True
                 except:
-                    msg = "The database is not responding. Check your configuration of if the database is up. Test {0}/{1}".format(nb_test, DATABASE_CONNECTION_NUM_TRY)
+                    msg = "The database is not responding. Check your configuration of if the database is up. Test {0}/{1}. The error while trying to connect to the database is : {2}".format(nb_test, DATABASE_CONNECTION_NUM_TRY, traceback.format_exc())
                     self.log.error(msg)
                     msg = "Waiting for {0} seconds".format(DATABASE_CONNECTION_WAIT)
                     self.log.info(msg)
@@ -133,6 +134,15 @@ class DBConnector(Plugin, MQRep):
                 # device delete
                 elif msg.get_action() == "device.delete":
                     self._mdp_reply_devices_delete_result(msg)
+                # device update
+                elif msg.get_action() == "device.update":
+                    self._mdp_reply_devices_update_result(msg)
+                # deviceparam update
+                elif msg.get_action() == "deviceparam.update":
+                    self._mdp_reply_deviceparam_update_result(msg)
+                # sensor update
+                elif msg.get_action() == "sensor.update":
+                    self._mdp_reply_sensor_update_result(msg)
                 # sensor history
                 elif msg.get_action() == "sensor_history.get":
                     self._mdp_reply_sensor_history(msg)
@@ -383,6 +393,184 @@ class DBConnector(Plugin, MQRep):
             msg.add_data('reason', reason)
         self.log.debug(msg.get())
         self.reply(msg.get())
+        # send the pub message
+        if status and res:
+            self._pub.send_event('device.update',
+                     {"device_id" : did,
+                      "client_id" : res.client_id})
+
+    def _mdp_reply_sensor_update_result(self, data):
+        status = True
+        reason = False
+
+        self.log.debug(u"Updating sensor : {0}".format(data))
+        try:
+            data = data.get_data()
+            if 'sid' in data:
+                sid = data['sid']
+                if 'history_round' not in data:
+                    hround = None
+                else:
+                    hround = data['history_round']
+                if 'history_store' not in data:
+                    hstore = None
+                else:
+                    hstore = data['history_store']
+                if 'history_max' not in data:
+                    hmax = None
+                else:
+                    hmax = data['history_max']
+                if 'history_expire' not in data:
+                    hexpire = None
+                else:
+                    hexpire = data['history_expire']
+                if 'timeout' not in data:
+                    timeout = None
+                else:
+                    timeout = data['timeout']
+                if 'formula' not in data:
+                    formula = None
+                else:
+                    formula = data['formula']
+                if 'data_type' not in data:
+                    data_type = None
+                else:
+                    data_type = data['data_type']
+                # do the update
+                res = self._db.update_sensor(sid, \
+                     history_round=hround, \
+                     history_store=hstore, \
+                     history_max=hmax, \
+                     history_expire=hexpire, \
+                     timeout=timeout, \
+                     formula=formula, \
+                     data_type=data_type)
+                if not res:
+                    status = False
+                else:
+                    status = True 
+            else:
+                status = False
+                reason = "There is no such sensor"
+                self.log.debug(reason)
+            # delete done
+        except DbHelperException as d:
+            status = False
+            reason = "Error while updating sensor: {0}".format(d.value)
+            self.log.error(reason)
+        except:
+            status = False
+            reason = "Error while updating sensor: {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        # send the result
+        msg = MQMessage()
+        msg.set_action('sensor.update.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+        # send the pub message
+        if status and res:
+            dev = self._db.get_device(res.device_id)
+            self._pub.send_event('device.update',
+                     {"device_id" : res.device_id,
+                      "client_id" : dev['client_id']})
+
+    def _mdp_reply_deviceparam_update_result(self, data):
+        status = True
+        reason = False
+
+        self.log.debug(u"Updating device param : {0}".format(data))
+        try:
+            data = data.get_data()
+            if 'dpid' in data:
+                dpid = data['dpid']
+                val = data['value']
+                # do the update
+                res = self._db.udpate_device_param(dpid, value=val)
+                if not res:
+                    status = False
+                else:
+                    status = True 
+            else:
+                status = False
+                reason = "There is no such device param"
+                self.log.debug(reason)
+            # delete done
+        except DbHelperException as d:
+            status = False
+            reason = "Error while updating device param: {0}".format(d.value)
+            self.log.error(reason)
+        except:
+            status = False
+            reason = "Error while updating device param: {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        # send the result
+        msg = MQMessage()
+        msg.set_action('deviceparam.update.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+
+    def _mdp_reply_devices_update_result(self, data):
+        status = True
+        reason = False
+
+        self.log.debug(u"Updating device : {0}".format(data))
+        try:
+            data = data.get_data()
+            if 'did' in data:
+                did = data['did']
+                if 'name' not in data:
+                    name = None
+                else:
+                    name = data['name']
+                if 'reference' not in data:
+                    ref = None
+                else:
+                    ref = data['reference']
+                if 'description' not in data:
+                    desc = None
+                else:
+                    desc = data['description']
+                # do the update
+                res = self._db.update_device(did, \
+                    d_name=name, \
+                    d_description=desc, \
+                    d_reference=ref)
+                if not res:
+                    status = False
+                else:
+                    status = True 
+            else:
+                status = False
+                reason = "There is no such device"
+                self.log.debug(reason)
+            # delete done
+        except DbHelperException as d:
+            status = False
+            reason = "Error while updating device: {0}".format(d.value)
+            self.log.error(reason)
+        except:
+            status = False
+            reason = "Error while updating device: {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        # send the result
+        msg = MQMessage()
+        msg.set_action('device.update.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
+        # send the pub message
+        if status and res:
+            self._pub.send_event('device.update',
+                     {"device_id" : res.id,
+                      "client_id" : res.client_id})
 
     def _mdp_reply_devices_create_result(self, data):
         status = True
@@ -429,6 +617,11 @@ class DBConnector(Plugin, MQRep):
         msg.add_data('status', status)
         self.log.debug(msg.get())
         self.reply(msg.get())
+        # send the pub message
+        if status and res:
+            self._pub.send_event('device.update',
+                     {"device_id" : res['id'],
+                      "client_id" : res['client_id']})
 
     def _mdp_reply_devices_params_result(self, data):
         """
@@ -560,19 +753,26 @@ class DBConnector(Plugin, MQRep):
         # request for all devices
         if 'type' not in msg_data and \
            'name' not in msg_data and \
-           'host' not in msg_data:
-
+           'host' not in msg_data and \
+           'timestamp' not in msg_data:
             reason = ""
             status = True
             dev_list = self._db.list_devices()
-
             dev_json = dev_list
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('devices', dev_json)
-
-        # request for all devices of one client
+        elif 'timestamp'in msg_data:
+        # request for all devices that changed after timestamp
+            reason = ""
+            status = True
+            dev_list = self._db.list_devices_by_timestamp(msg_data['timestamp'])
+            dev_json = dev_list
+            msg.add_data('status', status)
+            msg.add_data('reason', reason)
+            msg.add_data('devices', dev_json)
         else:
+        # request for all devices of one client
             if 'type' not in msg_data:
                 status = False
                 reason = "Devices request : missing 'type' field : {0}".format(data)
@@ -616,24 +816,80 @@ class DBConnector(Plugin, MQRep):
         status = True
         reason = ""
 
+        ### process parameters
         msg_data = data.get_data()
-
-        try:
+        if 'sensor_id' in msg_data:
             sensor_id = msg_data['sensor_id']
-            history = self._db.list_sensor_history(sensor_id, 1)
-            if len(history) == 0:
-                last_value = None
-            else: 
-                last_value = self._db.list_sensor_history(sensor_id, 1)[0].value_str
-        except:
-            self.log.error("ERROR when getting sensor history for id = {0} : {1}".format(sensor_id, traceback.format_exc()))
-            reason = "ERROR : {0}".format(traceback.format_exc())
+        else:
+            reason = "ERROR when getting sensor history. No sensor_id declared in the message"
+            self.log.error(reason)
             status = False
+            sensor_id = None
+        if 'mode' in msg_data:
+            if msg_data['mode'] == "last":
+                mode = "last"
+            elif msg_data['mode'] == "period":
+                mode = "period"
+            else:
+                reason = "ERROR when getting sensor history. No valid type (last, from) declared in the message"
+                self.log.error(reason)
+                status = False
+                mode = None
+        else:
+            reason = "ERROR when getting sensor history. No type (last, from) declared in the message"
+            self.log.error(reason)
+            status = False
+            sensor_id = None
+
+        values = None
+
+        ### last N values
+        if mode == "last":
+            if 'number' in msg_data:
+                number = msg_data['number']
+            else:
+                number = 1
+
+            try:
+                history = self._db.list_sensor_history(sensor_id, number)
+                if len(history) == 0:
+                    values = None
+                else: 
+                    values = self._db.list_sensor_history(sensor_id, number)
+            except:
+                self.log.error("ERROR when getting sensor history for id = {0} : {1}".format(sensor_id, traceback.format_exc()))
+                reason = "ERROR : {0}".format(traceback.format_exc())
+                status = False
+
+        ### period
+        elif mode == "period":
+            if 'from' in msg_data:
+                frm = msg_data['from']
+            else:
+                reason = "ERROR when getting sensor history. No key 'from' defined for mode = 'period'!"
+                self.log.error(reason)
+                status = False
+                frm = None
+
+            if 'to' in msg_data:
+                to = msg_data['to']
+            else:
+                to = None
+
+            if frm != None and to == None:
+                values = self._db.list_sensor_history_between(sensor_id, frm)
+                print(values)
+
+            else:
+                # TODO
+                values = "TODO"
+        
 
         msg.add_data('status', status)
         msg.add_data('reason', reason)
         msg.add_data('sensor_id', sensor_id)
-        msg.add_data('values', [last_value])
+        msg.add_data('mode', mode)
+        msg.add_data('values', values)
 
         self.reply(msg.get())
 

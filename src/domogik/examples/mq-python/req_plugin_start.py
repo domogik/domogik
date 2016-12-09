@@ -14,6 +14,7 @@
     msg.set_action('plugin.start.do')
     msg.add_data('name', 'diskfree')
     msg.add_data('host', 'darkstar')
+    msg.add_data('type', 'plugin')
     print(cli.request('manager', msg.get(), timeout=10).get())
 
 @apiParam {String} name The plugin name to start
@@ -36,6 +37,7 @@ msg = MQMessage()
 msg.set_action('plugin.start.do')
 msg.add_data('name', 'diskfree')
 msg.add_data('host', 'darkstar')
+msg.add_data('type', 'plugin')
 print(cli.request('manager', msg.get(), timeout=10).get())
 
 

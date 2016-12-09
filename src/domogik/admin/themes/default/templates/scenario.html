@@ -6,18 +6,49 @@
     <a id="start" class="btn btn-info" href="/scenario/edit/0">{% trans %}Create a new scenario{% endtrans%}</a>
     <p></p>
     {% if scenarios|length > 0 %}
-      <ul class="list-group">
+      <div class="list-group">
         {% for data in scenarios %}
-          <li class="list-group-item">
+          <div class="list-group-item clearfix">
             <a href="/scenario/edit/{{ data.cid }}">
               <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
               {{ data.name }}
             </a>
-          </li>
+            <span class="pull-right">
+                {% if data.disabled %}
+                    <button type="button" class="btn btn-warning btn-xs dropdown-toggle status-label" data-toggle="dropdown" aria-expanded="false">
+                        <span class="status">{{ data.endis }}</span> <span class="caret"></span>
+                    </button>
+                {% else %}
+                    <button type="button" class="btn btn-info btn-xs dropdown-toggle status-label" data-toggle="dropdown" aria-expanded="false">
+                        <span class="status">{{ data.endis }}</span> <span class="caret"></span>
+                    </button>
+                {% endif %}
+                <ul class="dropdown-menu" role="menu">
+                    {% if data.disabled %}
+                        <li><a href="/scenario/enable/{{ data.cid }}">Enable</a></li>
+                    {% else %}
+                        <li><a href="/scenario/disable/{{ data.cid }}">Disable</a></li>
+                    {% endif %}
+                </ul>                                                                                                           
+                <a href="/scenario/clone/{{ data.cid }}" class="btn btn-default btn-xs">
+                  <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
+                  {% trans %}Clone{% endtrans %}
+                </a>
+            </span>
+          </div>
         {% endfor %}
-      </ul>
+      </div>
     {% else %}
       <div class="alert alert-warning">{% trans %}There is no scenario yet{% endtrans %}</div>
     {% endif %}
 </div>
+<script type="text/javascript">
+    $( document ).ready(function() {
+        $(".testactions").click(function() {
+            console.log("testa ctions request");
+            ws.send('{"dst": "scenario", "mq_request": "scenario.test", "data": {"cid" : "'+ $(this).attr("data-cid") + '"}}');
+            console.log("ws send done");
+        });
+    });
+</script>
 {% endblock %}

@@ -47,10 +47,19 @@ import errno
 from domogik.common import sql_schema
 from domogik.common import database
 from domogik.common.configloader import Loader, CONFIG_FILE
+from domogik.common.plugin import PACKAGES_DIR
 from domogik.butler.brain import LEARN_FILE, STAR_FILE
 from sqlalchemy import create_engine, MetaData, Table
 from alembic.config import Config
 from alembic import command
+
+
+def title(msg):
+    """ Display a title to improve output reading
+    """
+    print(u"=========================================================")
+    print(u"{0}".format(msg))
+    print(u"=========================================================")
 
 
 def get_backup_dir():
@@ -65,7 +74,28 @@ def get_backup_dir():
         print(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
         return None
 
+def get_packages_dir():
+    ### Read the configuration file
+    try:
+        cfg = Loader('domogik')
+        config = cfg.load()
+        conf = dict(config[1])
+        return os.path.join(conf['libraries_path'], PACKAGES_DIR)
+   
+    except:
+        print(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
+        return None
+
+def backup_some_files(files):
+    for fic in files:
+        src = fic['src']
+        dst = fic['dst']
+        cmd = "tar cvzfh {0}/{1} {2}".format(folder, dst, src)
+        print(cmd)
+        os.system(cmd)
+
 def backup_database(folder):
+    title(u"Backup of the database")
     now = time.strftime("%Y%m%d-%H%M")
     db_backup_file = "{0}/domogik-database-{1}.sql.gz".format(folder, now)
     _db = database.DbHelper()
@@ -86,30 +116,29 @@ def backup_database(folder):
     os.system(" ".join(mysqldump_cmd))
 
 def backup_config(folder):
+    title(u"Backup of the configuration")
     now = time.strftime("%Y%m%d-%H%M")
     files = [{ 'src' : '/etc/domogik/',
                'dst' : 'domogik-etc-{0}.tgz'.format(now)},
              { 'src' : '/etc/default/domogik*',
                'dst' : 'domogik-default-{0}.tgz'.format(now)}]
-    for fic in files:
-        src = fic['src']
-        dst = fic['dst']
-        cmd = "tar cvzf {0}/{1} {2}".format(folder, dst, src)
-        print(cmd)
-        os.system(cmd)
+    backup_some_files(files)
 
 def backup_butler_file(folder):
+    title(u"Backup of the butler generated files")
     now = time.strftime("%Y%m%d-%H%M")
     files = [{ 'src' : LEARN_FILE,
                'dst' : 'domogik-butler-learn-file-{0}.tgz'.format(now)},
              { 'src' : STAR_FILE,
                'dst' : 'domogik-butler-unknown_queries-file-{0}.tgz'.format(now)}]
-    for fic in files:
-        src = fic['src']
-        dst = fic['dst']
-        cmd = "tar cvzf {0}/{1} {2}".format(folder, dst, src)
-        print(cmd)
-        os.system(cmd)
+    backup_some_files(files)
+
+def backup_packages(folder):
+    title(u"Backup of all the packages")
+    now = time.strftime("%Y%m%d-%H%M")
+    files = [{ 'src' : get_packages_dir(),
+               'dst' : 'domogik-all-packages-{0}.tgz'.format(now)}]
+    backup_some_files(files)
 
     
 if __name__ == "__main__":
@@ -124,6 +153,7 @@ if __name__ == "__main__":
             backup_database(folder)
             backup_config(folder)
             backup_butler_file(folder)
+            backup_packages(folder)
         except:
             print("Error while doing the backup : {0}".format(traceback.format_exc()))
             

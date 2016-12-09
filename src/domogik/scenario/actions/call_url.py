@@ -26,6 +26,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.actions.abstract import AbstractAction
+from domogik.common.utils import ucode
 import traceback
 try:
     # python3
@@ -46,26 +47,27 @@ class CallUrlAction(AbstractAction):
         self.set_description("Call an url.")
 
     def do_action(self):
-        self._log.info(u"Calling url : {0}".format(self._params['url']))
-        try:
-            # TODO : encore only the args!
-            #        so, first, split url and then process it
-            #        p3 porting : http://docs.pythonsprints.com/python3_porting/py-porting.html
+        url = self._params['url']
 
+        self._log.info(u"Calling url : {0}".format(ucode(url)))
+        try:
             # encode url
-            url = self._params['url']
-            url = self._params['url'].encode('utf-8')
+            url = ucode(url).encode('utf-8')
             url_elts = urlparse(url)
             url_args = url_elts.query.split("&")
             new_url_args = u""
             for arg in url_args:
-                if args:
-                    key, value = arg.split("=")
+                if arg != '':
+                    tmp = arg.split("=")
+                    key = tmp[0]
+                    value = "=".join(tmp[1:])
                     new_url_args += u"{0}={1}&".format(quote(key), quote(value))
             new_url = u"{0}://{1}{2}?{3}".format(url_elts.scheme,
                                                url_elts.netloc,
                                                url_elts.path,
                                                new_url_args)
+            if new_url.endswith('?'):
+                new_url = new_url[:-1]
             # call url
             self._log.debug(u"Calling url (transformed) : {0}".format(new_url))
             html = urlopen(new_url)

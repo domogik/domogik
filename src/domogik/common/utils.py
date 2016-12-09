@@ -33,19 +33,23 @@ Implements
 @organization: Domogik
 """
 
-from socket import gethostname
-#from exceptions import ImportError, AttributeError
 from subprocess import Popen, PIPE
 import os
 import sys
 import re
 from netifaces import interfaces, ifaddresses, AF_INET, AF_INET6
 from domogik.common.configloader import Loader, CONFIG_FILE
+import datetime
+import time
+import unicodedata
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
 
 REGEXP_PS_SEPARATOR = re.compile('[\s]+')
+
+# to optimize get_sanitized_hostname()
+HOSTNAME= os.uname()[1].lower().split('.')[0].replace('-','')[0:16]
 
 
 def get_interfaces():
@@ -102,7 +106,9 @@ def get_sanitized_hostname():
     """ Get the sanitized hostname of the host 
     This will lower it and keep only the part before the first dot
     """
-    return gethostname().lower().split('.')[0].replace('-','')[0:16]
+    #print(">>>>>> get_sanitized_hostname()")
+    #return os.uname()[1].lower().split('.')[0].replace('-','')[0:16]
+    return HOSTNAME
 
 def ucode(my_string):
     """Convert a string into unicode or return None if None value is passed
@@ -112,8 +118,14 @@ def ucode(my_string):
 
     """
     if my_string is not None:
+        #print("ucode : {0}".format(type(my_string)))
         if type(my_string) == unicode:
-            return my_string
+            try:
+                # the following line is here to test if an Unicode error would occur...
+                foo = "bar{0}".format(my_string)
+                return my_string
+            except UnicodeEncodeError:
+                return my_string.encode('utf8')
         elif not type(my_string) == str:
             return str(my_string).decode("utf-8")
         else:
@@ -164,7 +176,6 @@ def is_already_launched(log, type, id, manager=True):
     if manager:
         #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
         cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v mprof | grep -v update".format(id, STARTED_BY_MANAGER, my_pid)
-        print "is manager"
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
     # the grep python is needed to avoid a client to not start because someone is editing the client with vi :)
@@ -195,10 +206,10 @@ def is_already_launched(log, type, id, manager=True):
     return is_launched, pid_list
 
 
-def get_rest_url():
+def get_rest_url(noRest=False):
     """ Build and return the rest url
     """
-    cfg = Loader('rest')
+    cfg = Loader('admin')
     config = cfg.load()
     conf = dict(config[1])
     ### get REST ip and port
@@ -208,7 +219,10 @@ def get_rest_url():
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
 
-    return "http://{0}:{1}".format(ip, port)
+    if noRest:
+        return "http://{0}:{1}".format(ip, port)
+    else:
+        return "http://{0}:{1}/rest".format(ip, port)
 
 
 def get_rest_doc_path():
@@ -244,3 +258,32 @@ def get_libraries_directory():
     conf_global = dict(config_global[1])
     return conf_global['libraries_path']
 
+def get_data_files_directory_for_plugin(plugin_name):
+    """ This function is already defined in the Plugin class, but this one is used by the admin in application.py
+        In fact, this is not really the same function as this one takes one parameter
+    """
+    # global config
+    cfg_global = Loader('domogik')
+    config_global = cfg_global.load()
+    conf_global = dict(config_global[1])
+    return "{0}/{1}/plugin_{2}/data".format(conf_global['libraries_path'], "domogik_packages", plugin_name)
+
+
+def get_seconds_since_midnight():
+    now = datetime.datetime.now()
+    return (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()
+
+
+def get_midnight_timestamp():
+    ts = time.time()
+    return int(ts - get_seconds_since_midnight())
+
+def remove_accents(input_str):
+    """ Remove accents in utf-8 strings
+    """
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+if __name__ == "__main__":
+    print(get_seconds_since_midnight())
+    print(get_midnight_timestamp())

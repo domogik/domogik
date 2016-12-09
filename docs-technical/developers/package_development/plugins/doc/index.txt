@@ -1,0 +1,16 @@
+=========================
+Documentation for plugins
+=========================
+
+The documentation of a plugin must be included in the **docs/** folder of the plugin. :doc:`The documentation is written in reStructuredText format and will be build with sphinx <sphinx>`.
+
+Thanks to sphinx, you can choose the way (and url) to generate your plugin documentation. But we suggest you to use `the ReadTheDocs.org <http://readthedocs.org>` (RTD) online service. It offers several useful features:
+
+* documentation is hosted by RTD
+* you can easily manage separate documentation for each version of your plugin
+* documentation can be build on each commit pushed on a Github repository
+* the built documentation is really clear and easy to read
+
+
+
+

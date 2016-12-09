@@ -34,11 +34,18 @@ PackageJson
 @organization: Domogik
 """
 
-from domogik.common.configloader import Loader
 import traceback
-import urllib2
 import datetime
 import json
+from domogik.common.configloader import Loader
+from domogik import __version__ as DMG_VERSION
+try:
+    # python3
+    from urllib.request import urlopen
+except ImportError:
+    # python2
+    from urllib import urlopen
+
 #TODO : why this import fails ?
 #from domogik.xpl.common.plugin import PACKAGES_DIR
 PACKAGES_DIR = "domogik_packages"
@@ -75,22 +82,28 @@ class PackageJson():
         """
         json_file = None
         try:
+            # get config
+            cfg = Loader('domogik')
+            config = cfg.load()
+            conf = dict(config[1])
+            self.resources_dir = "{0}/resources".format(conf['libraries_path'])
             # load from sources repository
             if name != None:
-                # get config
-                cfg = Loader('domogik')
-                config = cfg.load()
-                conf = dict(config[1])
 
                 if pkg_type in ["plugin", "brain", "interface"]:
                     json_file = "{0}/{1}/{2}_{3}/info.json".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
                     icon_file = "{0}/{1}/{2}_{3}/design/icon.png".format(conf['libraries_path'], PACKAGES_DIR, pkg_type, name)
+                # TODO : reactivate later
+                #elif pkg_type == "external":
+                #    if 'package_path' in conf:
+                #        json_directory = "%s/domogik_packages/externals/" % (conf['package_path'])
+                #    else:
+                #        json_directory = "%s/%s" % (conf['src_prefix'], "share/domogik/externals/")
                 else:
-                    raise PackageException("Type '%s' doesn't exists" % pkg_type)
-                #json_file = "%s/%s.json" % (json_directory, name)
+                    raise PackageException("Type '{0}' doesn't exists".format(pkg_type))
+                #json_file = "{0}/{1}.json".format(json_directory, name)
 
                 self.json = json.load(open(json_file))
-
             elif path != None:
                 json_file = path
                 icon_file = None
@@ -99,7 +112,7 @@ class PackageJson():
             elif url != None:
                 json_file = url
                 icon_file = None
-                json_data = urllib2.urlopen(json_file)
+                json_data = urlopen(json_file)
                 # TODO : there is an error here!!!!!
                 self.json = json.load(xml_data)
 
@@ -108,11 +121,18 @@ class PackageJson():
                 icon_file = None
                 self.json = data
 
+            json_file = "{0}/datatypes.json".format(self.resources_dir)
+            self._datatypes = None
+            try:
+                self._datatypes = json.load(open(json_file))
+            except:
+                raise PackageException("Error while reading datatypes json file '{0}'. Error is : {1}".format(json_file, traceback.format_exc()))
+
             self.validate()
 
             ### complete json
             # identity data
-            self.json["identity"]["package_id"] = "%s-%s" % (self.json["identity"]["type"],
+            self.json["identity"]["package_id"] = "{0}-{1}".format(self.json["identity"]["type"],
                                                            self.json["identity"]["name"])
             self.json["identity"]["icon_file"] = icon_file
 
@@ -144,7 +164,7 @@ class PackageJson():
         except PackageException as exp:
             raise PackageException(exp.value)
         except:
-            raise PackageException("Error reading json file : %s : %s" % (json_file, str(traceback.format_exc())))
+            raise PackageException("Error reading json file : {0} : {1}".format(json_file, str(traceback.format_exc())))
 
 
     #def cache_xml(self, cache_folder, url, repo_url, priority):
@@ -161,7 +181,7 @@ class PackageJson():
     #    new_elt.setAttribute("priority", priority)
     #    new_elt.setAttribute("source", repo_url)
     #    top_elt.appendChild(new_elt)
-    #    cache_file = open("%s/%s" % (cache_folder, self.json_filename), "w") 
+    #    cache_file = open("{0}/{1}".format(cache_folder, self.json_filename), "w") 
     #    cache_file.write(self.xml_content.toxml().encode("utf-8"))
     #    cache_file.close()
 
@@ -174,13 +194,16 @@ class PackageJson():
     #    new_elt = self.xml_content.createElementNS(None, 'repository')
     #    new_elt.setAttribute("source", source)
     #    top_elt.appendChild(new_elt)
-    #    my_file = open("%s" % (self.info_file), "w") 
+    #    my_file = open("{0}".format(self.info_file), "w") 
     #    my_file.write(self.xml_content.toxml().encode("utf-8"))
     #    my_file.close()
 
     def validate(self):
         if self.json["json_version"] == 2:
             self._validate_02()
+            if 'identity' in self.json.keys() and 'domogik_min_version' in self.json['identity']:
+                if self.json['identity']['domogik_min_version'] > DMG_VERSION:
+                    raise PackageException("Domogik version check failed! min_version={0} current varion={1}".format(self.json['identity']['domogik_min_version'], DMG_VERSION));
         else:
             return False
 
@@ -192,6 +215,10 @@ class PackageJson():
         for item in lst:
             if item not in explst:
                 raise PackageException("unknown key '{0}' found in {1}".format(item, name))
+
+    def _validate_dataType(self, msg, dataType):
+        if dataType not in self._datatypes:
+            raise PackageException(msg)
 
     def _validate_02(self):
         fieldTypes = ["boolean", "string", "choice", "date", "time", "datetime", "float", "integer", "email", "ipv4", "ipv6", "url", "password"]
@@ -215,7 +242,7 @@ class PackageJson():
             for conf in self.json["configuration"]:
                 self._validate_keys(expected, "a configuration item param", conf.keys(), optional)
                 if conf['type'] not in fieldTypes:
-                    raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(conf['type'], fieldTypes))
+                    raise PackageException("Type ({0}) in a config item is not in the allowed list: {1}".format(conf['type'], fieldTypes))
 
             # validate products
             if 'products' in self.json.keys():
@@ -250,23 +277,25 @@ class PackageJson():
                 for par in devt["parameters"]:
                     self._validate_keys(expected, "a param for device_type {0}".format(devtype), par.keys(), optional)
                     if par['type'] not in fieldTypes:
-                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(par['type'], fieldTypes))
+                        raise PackageException("Type ({0}) in a config item is not in the allowed list: {1}".format(par['type'], fieldTypes))
 
             #validate the commands
             if type(self.json["commands"]) != dict:
                 raise PackageException("Commands part is NOT a dictionary!")
             for cmdid in self.json["commands"]:
                 cmd = self.json["commands"][cmdid]
-                expected = ['name', 'return_confirmation', 'parameters', 'xpl_command']
-                self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys())
+                expected = ['name', 'return_confirmation', 'parameters']
+                optional = ['xpl_command']
+                self._validate_keys(expected, "command {0}".format(cmdid), cmd.keys(), optional)
                 # validate the params
                 expected = ['key', 'data_type', 'conversion']
                 if type(cmd['parameters']) != list:
                     raise PackageException("Parameters for command {0} is not a list".format(cmdid))
                 for par in cmd['parameters']:
                     self._validate_keys(expected, "a param for command {0}".format(cmdid), par.keys())
+                    self._validate_dataType("DataType in command {0} is not valid".format(cmdid), par['data_type'])
                 # see that the xpl_command is defined
-                if cmd["xpl_command"] not in self.json["xpl_commands"].keys():
+                if "xpl_command" in cmd and cmd["xpl_command"] not in self.json["xpl_commands"].keys():
                     raise PackageException("xpl_command {0} defined in command {1} is not found".format(cmd["xpl_command"], cmdid))
 
             #validate the sensors
@@ -278,6 +307,7 @@ class PackageJson():
                 hexpected = ['store', 'max', 'expire', 'round_value', 'duplicate']
                 self._validate_keys(expected, "sensor {0}".format(senid), list(sens.keys()))
                 self._validate_keys(hexpected, "sensor {0} history".format(senid), list(sens['history'].keys()))
+                self._validate_dataType("DataType in sensor {0} is not valid".format(senid), sens['data_type'])
 
             #validate the xpl command
             if type(self.json["xpl_commands"]) != dict:
@@ -303,7 +333,7 @@ class PackageJson():
                 for stat in xcmd['parameters']['device']:
                     self._validate_keys(expected, "a device parameter for xpl_command {0}".format(xcmdid), stat.keys(), optional)
                     if stat['type'] not in fieldTypes:
-                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(stat['type'], fieldTypes))
+                        raise PackageException("Type ({0}) in a config item is not in the allowed list: {1}".format(stat['type'], fieldTypes))
                 # see that the xpl_stat is defined
                 if xcmd["xplstat_name"] not in self.json["xpl_stats"].keys():
                     raise PackageException("xplstat_name {0} defined in xpl_command {1} is not found".format(xcmd["xplstat_name"], xcmdid))
@@ -332,7 +362,7 @@ class PackageJson():
                 for stat in xstat['parameters']['device']:
                     self._validate_keys(expected, "a device parameter for xpl_stat {0}".format(xstatid), stat.keys(), optional)
                     if stat['type'] not in fieldTypes:
-                        raise PackageException("Type ({0}) in a config item is not in the allowd list: {1}".format(stat['type'], fieldTypes))
+                        raise PackageException("Type ({0}) in a config item is not in the allowed list: {1}".format(stat['type'], fieldTypes))
                 # dynamic parameter
                 expected = ["key", "sensor"]
                 opt = ["ignore_values"]
@@ -365,17 +395,17 @@ class PackageJson():
         """ Display xml data in a fine way
         """
         print(u"---- Package informations -------------------------------")
-        print(u"Type                : %s" % self.json["identity"]["type"])
-        print(u"Name                : %s" % self.json["identity"]["name"])
-        print(u"Package id          : %s" % self.json["identity"]["package_id"])
-        print(u"Version             : %s" % self.json["identity"]["version"])
-        print(u"Tags                : %s" % self.json["identity"]["tags"])
-        print(u"Link for doc        : %s" % self.json["identity"]["documentation"])
-        print(u"Description         : %s" % self.json["identity"]["description"])
-        print(u"Changelog           : %s" % self.json["identity"]["changelog"])
-        print(u"Author              : %s" % self.json["identity"]["author"])
-        print(u"Author's email      : %s" % self.json["identity"]["author_email"])
-        print(u"Domogik min version : %s" % self.json["identity"]["domogik_min_version"])
+        print(u"Type                : {0}".format(self.json["identity"]["type"]))
+        print(u"Name                : {0}".format(self.json["identity"]["name"]))
+        print(u"Package id          : {0}".format(self.json["identity"]["package_id"]))
+        print(u"Version             : {0}".format(self.json["identity"]["version"]))
+        print(u"Tags                : {0}".format(self.json["identity"]["tags"]))
+        print(u"Link for doc        : {0}".format(self.json["identity"]["documentation"]))
+        print(u"Description         : {0}".format(self.json["identity"]["description"]))
+        print(u"Changelog           : {0}".format(self.json["identity"]["changelog"]))
+        print(u"Author              : {0}".format(self.json["identity"]["author"]))
+        print(u"Author's email      : {0}".format(self.json["identity"]["author_email"]))
+        print(u"Domogik min version : {0}".format(self.json["identity"]["domogik_min_version"]))
         print(u"---------------------------------------------------------")
 
     def find_xplstats_for_device_type(self, devtype):
@@ -400,7 +430,7 @@ def set_nightly_version(path):
     """
     my_json = json.load(open(path))
     # suffix the version with .devYYYYMMDD
-    suffix = ".dev%s" % datetime.datetime.now().strftime('%Y%m%d')
+    suffix = ".dev{0}".format(datetime.datetime.now().strftime('%Y%m%d'))
     my_json["identity"]["version"] += suffix
     my_file = open(path, "w")
     my_file.write(json.dumps(my_json))

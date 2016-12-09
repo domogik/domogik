@@ -20,22 +20,22 @@
 'use strict';
 
 var XML_TEXT = ['<xml xmlns="http://www.w3.org/1999/xhtml">',
-  '  <block type="controls_repeat_ext" id="10" inline="true" x="21" y="23">',
+  '  <block type="controls_repeat_ext" inline="true" x="21" y="23">',
   '    <value name="TIMES">',
-  '      <block type="math_number" id="11">',
+  '      <block type="math_number">',
   '        <field name="NUM">10</field>',
   '      </block>',
   '    </value>',
   '    <statement name="DO">',
-  '      <block type="variables_set" id="139" inline="true">',
+  '      <block type="variables_set" inline="true">',
   '        <field name="VAR">item</field>',
   '        <value name="VALUE">',
-  '          <block type="lists_create_empty" id="171"></block>',
+  '          <block type="lists_create_empty"></block>',
   '        </value>',
   '        <next>',
-  '          <block type="text_print" id="78" inline="false">',
+  '          <block type="text_print" inline="false">',
   '            <value name="TEXT">',
-  '              <block type="text" id="189">',
+  '              <block type="text">',
   '                <field name="TEXT">Hello</field>',
   '              </block>',
   '            </value>',
@@ -44,7 +44,7 @@ var XML_TEXT = ['<xml xmlns="http://www.w3.org/1999/xhtml">',
   '      </block>',
   '    </statement>',
   '  </block>',
-  '</xml>'].join('/n');
+  '</xml>'].join('\n');
 
 function test_textToDom() {
   var dom = Blockly.Xml.textToDom(XML_TEXT);
@@ -57,6 +57,29 @@ function test_domToText() {
   var text = Blockly.Xml.domToText(dom);
   assertEquals('Round trip', XML_TEXT.replace(/\s+/g, ''),
       text.replace(/\s+/g, ''));
+}
+
+function test_domToWorkspace() {
+  Blockly.Blocks.test_block = {
+    init: function() {
+      this.jsonInit({
+        message0: 'test',
+      });
+    }
+  };
+
+  try {
+    var dom = Blockly.Xml.textToDom(
+        '<xml xmlns="http://www.w3.org/1999/xhtml">' +
+        '  <block type="test_block" inline="true" x="21" y="23">' +
+        '  </block>' +
+        '</xml>');
+    var workspace = new Blockly.Workspace();
+    Blockly.Xml.domToWorkspace(dom, workspace);
+    assertEquals('Block count', 1, workspace.getAllBlocks().length);
+  } finally {
+    delete Blockly.Blocks.test_block;
+  }
 }
 
 function test_domToPrettyText() {

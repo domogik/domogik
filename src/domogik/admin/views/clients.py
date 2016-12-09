@@ -11,8 +11,8 @@ except ImportError:
     pass
 from wtforms import TextField, HiddenField, validators, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField, \
-            DateField, DateTimeField, FloatField, PasswordField
-from wtforms.validators import Required
+            DateField, DateTimeField, FloatField, PasswordField, RadioField
+from wtforms.validators import Required, InputRequired
 from flask_login import login_required
 try:
     from flask.ext.babel import gettext, ngettext
@@ -23,12 +23,14 @@ except ImportError:
 from domogik.common.sql_schema import Device, DeviceParam, Sensor
 from domogik.common.plugin import STATUS_DEAD
 from wtforms.ext.sqlalchemy.orm import model_form
+from wtforms.widgets import TextArea
 from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
 import re
 import json
 import traceback
+import operator
 
 try:
     import html.parser
@@ -62,6 +64,24 @@ def get_client_detail(client_id):
     else:
         detail = {}
     return detail
+
+# used by advanced pages (see plugin-ftpcamera for example)
+def get_client_devices(client_id):
+    """ The advanced pages have no direct db access, so they used this function to easily get all the devices
+    """
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('device.get')
+    msg.add_data('type', client_id.split("-")[0])
+    msg.add_data('name', client_id.split("-")[1].split(".")[0])
+    msg.add_data('host', client_id.split(".")[1])
+
+    res = cli.request('dbmgr', msg.get(), timeout=10)
+    if res is not None:
+        devices = res.get_data()['devices']
+    else:
+        devices = {}
+    return devices
 
 def get_butler_history():
     cli = MQSyncReq(app.zmq_context)
@@ -117,6 +137,11 @@ def clients():
 
         client_list_per_host_per_type[cli_host][cli_type][client] = client_list[client]
 
+
+    # sorting
+    client_list_per_host_per_type = json.dumps(client_list_per_host_per_type, sort_keys=True)
+    client_list_per_host_per_type = json.loads(client_list_per_host_per_type, object_pairs_hook=OrderedDict)
+
     # if all the core clients are dead, there is an issue with MQ pub/sub (forwarder)
     # so display a message
     if num_core > 0 and num_core == num_core_dead:
@@ -124,7 +149,7 @@ def clients():
         msg_core_dead += "The message queue is not working for PUB/SUB messages.<br>"
         msg_core_dead += "This is related to the component MQ forwarder.<br>"
         msg_core_dead += "The related configuration file is : /etc/domogik/domogik-mq.cfg.<br>"
-    else: 
+    else:
         msg_core_dead = None
 
     return render_template('clients.html',
@@ -133,7 +158,6 @@ def clients():
         clients=client_list,
         client_list_per_host_per_type=client_list_per_host_per_type,
         msg_core_dead = msg_core_dead)
-
 
 @app.route('/client/<client_id>')
 @login_required
@@ -147,6 +171,21 @@ def client_detail(client_id):
             mactive="clients",
             active = 'home')
 
+@app.route('/client/<client_id>/timeline')
+@login_required
+def client_timeline(client_id):
+    from domogik.admin.views.timeline import timeline_generic
+    temp = timeline_generic(the_client_id = client_id, asDict = True)
+    detail = get_client_detail(client_id)
+
+    return render_template('client_timeline.html',
+            timeline = temp['timeline'],
+            datatypes = temp['datatypes'],
+            client_detail = detail,
+            clientid = client_id,
+            device_name = client_id,
+            mactive="clients",
+            active = 'timeline')
 
 @app.route('/client/<client_id>/dmg_devices/known')
 @login_required
@@ -172,13 +211,27 @@ def client_devices_known(client_id):
             error = "Error while retrieving the devices list. Error is : {0}".format(traceback.format_exc())
             devices = []
 
-    # sort clients per device type
+    # first sort by device name
+    devices = sorted(devices, key=itemgetter("name"))
+    #    device_types_list[key] = data["device_types"][key]
+
+    # group clients per device type
     devices_by_device_type_id = {}
     for dev in devices:
-        if dev['device_type_id'] in devices_by_device_type_id:
-            devices_by_device_type_id[dev['device_type_id']].append(dev)
+        try:
+            device_type_name = detail['data']['device_types'][dev['device_type_id']]['name']
+        except KeyError:
+            print(u"Warning : the device type '{0}' does not exist anymore in the installed package release. Device type name set as the existing id in database".format(dev['device_type_id']))
+            device_type_name = dev['device_type_id']
+        if device_type_name in devices_by_device_type_id:
+            devices_by_device_type_id[device_type_name].append(dev)
         else:
-            devices_by_device_type_id[dev['device_type_id']] = [dev]
+            devices_by_device_type_id[device_type_name] = [dev]
+
+    # sorting
+    # disabled as this breaks because of storing other objects then normal strings
+    devices_by_device_type_id = json.dumps(devices_by_device_type_id, sort_keys=True)
+    devices_by_device_type_id = json.loads(devices_by_device_type_id, object_pairs_hook=OrderedDict)
 
     return render_template('client_devices.html',
             datatypes = app.datatypes,
@@ -187,7 +240,8 @@ def client_devices_known(client_id):
             clientid = client_id,
             mactive="clients",
             active = 'devices',
-            rest_url = get_rest_url(),
+            #rest_url = get_rest_url(),
+            rest_url = request.url_root + "rest",
             client_detail = detail,
             error = error)
 
@@ -195,33 +249,69 @@ def client_devices_known(client_id):
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
 @login_required
 def client_sensor_edit(client_id, sensor_id):
+    if app.datatypes == {}:
+        cli = MQSyncReq(app.zmq_context)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        res = cli.request('manager', msg.get(), timeout=10)
+        if res is not None:
+            app.datatypes = res.get_data()['datatypes']
+        else:
+            app.datatypes = {}
+
     with app.db.session_scope():
         sensor = app.db.get_sensor(sensor_id)
-        MyForm = model_form(Sensor, \
-                        base_class=Form, \
-                        db_session=app.db.get_session(),
-                        exclude=['core_device', 'name', 'reference', \
-                                'incremental', 'data_type', 'conversion', \
-                                'last_value', 'last_received', 'history_duplicate', \
-                                'value_min', 'value_max'])
-        #MyForm.history_duplicate.kwargs['validators'] = []
-        MyForm.history_store.kwargs['validators'] = []
-        form = MyForm(request.form, sensor)
+        cdata_type = app.datatypes[sensor.data_type]
+        if 'childs'in cdata_type and len(cdata_type['childs']) > 0:
+            allow_data_type = True
+            lst = cdata_type['childs']
+            lst.append(sensor.data_type)
+            tmp = dict(zip(lst, lst))
+            tmps = sorted(tmp.items(), key=operator.itemgetter(1))
+        else:
+            allow_data_type = False
+        class F(Form):
+            timeout = TextField("Timeout", default=sensor.timeout)
+            formula = TextField("Formula", default=sensor.formula, widget=TextArea())
+            history_store = BooleanField("History Store", default=sensor.history_store)
+            history_expire = TextField("History Expire", default=sensor.history_expire)
+            history_round = TextField("History_round", default=sensor.history_round)
+            history_max = TextField("History_max", default=sensor.history_max)
+            pass
+        # TODO add fiel
+        if allow_data_type:
+            field = SelectField("Data_type", default=sensor.data_type, choices=tmps)
+            setattr(F, 'data_type', field)
+
+        form = F()
 
         if request.method == 'POST' and form.validate():
             if request.form['history_store'] == 'y':
                 store = 1
             else:
                 store = 0
-            app.db.update_sensor(sensor_id, \
-                     history_round=request.form['history_round'], \
-                     history_store=store, \
-                     history_max=request.form['history_max'], \
-                     history_expire=request.form['history_expire'],
-                     timeout=request.form['timeout'],
-                     formula=request.form['formula'])
-
-            flash(gettext("Changes saved"), "success")
+            cli = MQSyncReq(app.zmq_context)
+            msg = MQMessage()
+            msg.set_action('sensor.update')
+            msg.add_data('sid', sensor_id)
+            msg.add_data('history_round', request.form['history_round'])
+            msg.add_data('history_store', store)
+            msg.add_data('history_max', request.form['history_max'])
+            msg.add_data('history_expire', request.form['history_expire'])
+            msg.add_data('timeout', request.form['timeout'])
+            msg.add_data('formula', request.form['formula'])
+            if allow_data_type:
+                msg.add_data('data_type', request.form['data_type'])
+            res = cli.request('dbmgr', msg.get(), timeout=10)
+            if res is not None:
+                data = res.get_data()
+                if data["status"]:
+                    flash(gettext("Sensor update succesfully"), 'success')
+                else:
+                    flash(gettext("Senor update failed"), 'warning')
+                    flash(data["reason"], 'danger')
+            else:
+                flash(gettext("DbMgr did not respond on the sensor.update, check the logs"), 'danger')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
             pass
         else:
@@ -230,6 +320,7 @@ def client_sensor_edit(client_id, sensor_id):
                 clientid = client_id,
                 mactive="clients",
                 active = 'devices',
+                allow_data_type = allow_data_type,
                 sensor = sensor)
 
 @app.route('/client/<client_id>/global/edit/<dev_id>', methods=['GET', 'POST'])
@@ -243,20 +334,28 @@ def client_global_edit(client_id, dev_id):
         for item in dev["parameters"]:
             item = dev["parameters"][item]
             default = item["value"]
-            arguments = [Required()]
+            arguments = [InputRequired()]
             # keep track of the known fields
             known_items[item["key"]] = {u"id": item["id"], u"type": item["type"]}
             # build the field
             if item["type"] == "boolean":
                 if default == 'y' or default == 1 or default == True: # in db value stored in lowcase
-                    default = True
+                    #default = True
+                    default = 'y'
                 else:
-                    default = False
-                field = BooleanField(item["key"], [validators.optional()], default=default) # set to optional field due to WTForm BooleanField return no data for false value (HTML checkbox)
+                    #default = False
+                    default = 'n'
+                #field = BooleanField(item["key"], [validators.optional()], default=default) # set to optional field due to WTForm BooleanField return no data for false value (HTML checkbox)
+                field = RadioField( item["key"], 
+                                [validators.optional()],
+                                choices=[('y', 'Yes'), ('n', 'No')], default=default
+                              )
             elif item["type"] == "integer":
                 field = IntegerField(item["key"], arguments, default=default)
-            elif item["type"] == "float":
+            elif item["type"] == "datetime":
                 field = DateTimeField(item["key"], arguments, default=default)
+            elif item["type"] == "float":
+                field = FloatField(item["key"], arguments, default=default)
             else:
                 # time, email, ipv4, ipv6, url
                 field = TextField(item["key"], arguments, default=default)
@@ -264,14 +363,28 @@ def client_global_edit(client_id, dev_id):
             setattr(F, "{0}-{1}".format(item["id"], item["key"]), field)
         form = F()
         if request.method == 'POST' and form.validate():
-            for key, item in known_items.iteritems():
+            for key, item in known_items.items():
                 val = getattr(form, "{0}-{1}".format(item["id"], key)).data
                 if item["type"] == "boolean":
-                    if val == False:
+                    if val == 'n':
                         val = 'n' # in db value stored in lowcase
                     else:
                         val = 'y' # in db value stored in lowcase
-                app.db.udpate_device_param(item["id"], value=val)
+                cli = MQSyncReq(app.zmq_context)
+                msg = MQMessage()
+                msg.set_action('deviceparam.update')
+                msg.add_data('dpid', item["id"])
+                msg.add_data('value', val)
+                res = cli.request('dbmgr', msg.get(), timeout=10)
+                if res is not None:
+                    data = res.get_data()
+                    if data["status"]:
+                        flash(gettext("Param update succesfully"), 'success')
+                    else:
+                        flash(gettext("Param update failed"), 'warning')
+                        flash(data["reason"], 'danger')
+                else:
+                    flash(gettext("DbMgr did not respond on the deviceparam.update, check the logs"), 'danger')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
             pass
         else:
@@ -317,18 +430,27 @@ def client_devices_edit(client_id, did):
                         db_session=app.db.get_session(),
                         exclude=['params', 'commands', 'sensors', 'address', \
                                 'xpl_commands', 'xpl_stats', 'device_type_id', \
-                                'client_id', 'client_version'])
+                                'client_id', 'client_version', 'info_changed'])
         form = MyForm(request.form, device)
 
         if request.method == 'POST' and form.validate():
-            # save it
-            app.db.update_device(did, \
-                    d_name=request.form['name'], \
-                    d_description=request.form['description'], \
-                    d_reference=request.form['reference'])
-            # message the suer
-            flash(gettext("Device saved"), 'success')
-            # redirect
+            cli = MQSyncReq(app.zmq_context)
+            msg = MQMessage()
+            msg.set_action('device.update')
+            msg.add_data('did', did)
+            msg.add_data('name', request.form['name'])
+            msg.add_data('description', request.form['description'])
+            msg.add_data('reference', request.form['reference'])
+            res = cli.request('dbmgr', msg.get(), timeout=10)
+            if res is not None:
+                data = res.get_data()
+                if data["status"]:
+                    flash(gettext("Device update succesfully"), 'success')
+                else:
+                    flash(gettext("Device update failed"), 'warning')
+                    flash(data["reason"], 'danger')
+            else:
+                flash(gettext("DbMgr did not respond on the device.update, check the logs"), 'danger')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
         else:
             return render_template('client_device_edit.html',
@@ -338,7 +460,6 @@ def client_devices_edit(client_id, did):
                 active = 'devices',
                 client_detail = detail,
                 )
-
 
 @app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required
@@ -377,7 +498,7 @@ def client_config(client_id):
         known_items[item["key"]] = item["type"]
         # handle required
         if item["required"] == "yes":
-            arguments = [Required()]
+            arguments = [InputRequired()]
         else:
             arguments = []
         # fill in the field
@@ -426,7 +547,7 @@ def client_config(client_id):
     if request.method == 'POST' and form.validate():
         # build the requested config set
         data = {}
-        for key, typ in known_items.iteritems():
+        for key, typ in known_items.items():
             val = getattr(form, key).data
             if typ == "boolean":
                 if val == False:
@@ -468,10 +589,16 @@ def client_devices_new(client_id):
     detail = get_client_detail(client_id)
     data = detail['data']
 
+    # devices type list
     device_types_keys = sorted(data["device_types"])
     device_types_list = OrderedDict()
     for key in device_types_keys:
         device_types_list[key] = data["device_types"][key]
+
+    # sorting
+    # TODO
+
+    # products list
     products = {}
     products_per_type = OrderedDict()
     if "products" in data:
@@ -528,8 +655,12 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     # dynamically generate the wtfform
     class F(Form):
         name = TextField("Device name", [Required()], description=gettext("The display name for this device"))
-        description = TextField("Description", description=gettext("A description for this device"))
-        reference = TextField("Reference", description=gettext("A reference for this device"))
+        try: default = request.args.get('Description')
+        except: default = None
+        description = TextField("Description", description=gettext("A description for this device"), default=default)
+        try: default = request.args.get('Reference')
+        except: default = None
+        reference = TextField("Reference", description=gettext("A reference for this device"), default=default)
         pass
     # Form for the Global part
     class F_global(Form):
@@ -548,28 +679,45 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     for item in params["global"]:
         # build the field
         name = "{0}".format(item["key"])
-        default = None
+        try: 
+            default = request.args.get(name)
+        except: 
+            if item["type"] == "boolean":
+                default = False
+            else:
+                default = None
         if 'default' in item:
             default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
-                default = True
+                #default = True
+                default = 'y'
             else:
-                default = False
-            field = BooleanField(name, [Required()], description=item["description"], default=default)
+                #default = False
+                default = 'n'
+            #field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
+            #field = BooleanField(name, [], description=item["description"], default=default)
+            field = RadioField( name, 
+                                [validators.Required()], description=item["description"],
+                                choices=[('y', 'Yes'), ('n', 'No')], default=default
+                              )
         elif item["type"] == "integer":
-            field = IntegerField(name, [Required()], description=item["description"], default=default)
+            field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "date":
-            field = DateField(name, [Required()], description=item["description"], default=default)
+            field = DateField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "datetime":
-            field = DateTimeField(name, [Required()], description=item["description"], default=default)
+            field = DateTimeField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "float":
-            field = DateTimeField(name, [Required()], description=item["description"], default=default)
+            field = FloatField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "choice":
             choices = []
-            for key in sorted(item["choices"]):
-                choices.append((key, item["choices"][key]))
-            field = SelectField(name, [Required()], description=item["description"], choices=choices)
+            if type(item["choices"]) == list:
+                for key in sorted(item["choices"]):
+                    choices.append((key, key))
+            else:
+                for key in sorted(item["choices"]):
+                    choices.append((key, item["choices"][key]))
+            field = SelectField(name, [Required()], description=item["description"], choices=choices, default=default)
         elif item["type"] == "password":
             field = PasswordField(name, [Required()], description=item["description"], default=default)
         else:
@@ -581,23 +729,31 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     for item in params["xpl"]:
         # build the field
         name = "{0}".format(item["key"])
-        default = None
+        try: default = request.args.get(name)
+        except: default = None
         if 'default' in item:
             default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
-                default = True
+                #default = True
+                default = 'y'
             else:
-                default = False
-            field = BooleanField(name, [Required()], description=item["description"], default=default)
+                #default = False
+                default = 'n'
+            #field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
+            #field = BooleanField(name, [], description=item["description"], default=default)
+            field = RadioField( name,
+                                [validators.Required()], description=item["description"],
+                                choices=[('y', 'Yes'), ('n', 'No')], default=default
+                              )
         elif item["type"] == "integer":
-            field = IntegerField(name, [Required()], description=item["description"], default=default)
+            field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "date":
             field = DateField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "datetime":
             field = DateTimeField(name, [Required()], description=item["description"], default=default)
         elif item["type"] == "float":
-            field = DateTimeField(name, [Required()], description=item["description"], default=default)
+            field = FloatField(name, [InputRequired()], description=item["description"], default=default)
         elif item["type"] == "choice":
             choices = []
             for key in sorted(item["choices"]):
@@ -614,23 +770,31 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         for item in params["xpl_commands"][cmd]:
             # build the field
             name = "{0} - {1}".format(cmd, item["key"])
-            default = None
+            try: default = request.args.get(name)
+            except: default = None
             if 'default' in item:
                 default = item['default']
             if item["type"] == "boolean":
                 if default == 'Y' or default == 1 or default == True:
-                    default = True
+                    #default = True
+                    default = 'y'
                 else:
-                    default = False
-                field = BooleanField(name, [Required()], description=item["description"], default=default)
+                    #default = False
+                    default = 'n'
+                #field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
+                #field = BooleanField(name, [], description=item["description"], default=default)
+                field = RadioField( name,
+                                    [validators.Required()], description=item["description"],
+                                    choices=[('y', 'Yes'), ('n', 'No')], default=default
+                                  )
             elif item["type"] == "integer":
-                field = IntegerField(name, [Required()], description=item["description"], default=default)
+                field = IntegerField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "date":
                 field = DateField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "datetime":
                 field = DateTimeField(name, [Required()], description=item["description"], default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [Required()], description=item["description"], default=default)
+                field = FloatField(name, [InputRequired()], description=item["description"], default=default)
             elif item["type"] == "choice":
                 choices = []
                 for key in sorted(item["choices"]):
@@ -648,7 +812,8 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         for item in params["xpl_stats"][cmd]:
             # build the field
             name = "{0} - {1}".format(cmd, item["key"])
-            default = None
+            try: default = request.args.get(name)
+            except: default = None
             if 'default' in item:
                 default = item['default']
             desc = item["description"]
@@ -658,13 +823,21 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 item['type'] = "string"
             if item["type"] == "boolean":
                 if default == 'Y' or default == 1 or default == True:
-                    default = True
+                    #default = True
+                    default = 'y'
                 else:
-                    default = False
-                field = BooleanField(name, [validators.Required(gettext("This value is required"))], \
-                        description=desc, default=default)
+                    #default = False
+                    default = 'n'
+                #field = BooleanField(name, [validators.InputRequired(gettext("This value is required"))], \
+                #        description=desc, default=default)
+                #field = BooleanField(name, [], \
+                #        description=desc, default=default)
+                field = RadioField( name,
+                                    [validators.Required()], description=item["description"],
+                                    choices=[('y', 'Yes'), ('n', 'No')], default=default
+                                  )
             elif item["type"] == "integer":
-                field = IntegerField(name, [validators.Required(gettext("This value is required"))], \
+                field = IntegerField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "date":
                 field = DateField(name, [validators.Required(gettext("This value is required"))], \
@@ -673,7 +846,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 field = DateTimeField(name, [validators.Required(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "float":
-                field = DateTimeField(name, [validators.Required(gettext("This value is required"))], \
+                field = FloatField(name, [validators.InputRequired(gettext("This value is required"))], \
                         description=desc, default=default)
             elif item["type"] == "choice":
                 choices = []
@@ -781,6 +954,10 @@ def get_brain_content(client_id):
     else:
         detail = {}
 
+    # sorting
+    detail = json.dumps(detail, sort_keys=True)
+    detail = json.loads(detail, object_pairs_hook=OrderedDict)
+
     # do a post processing on content to add html inside
     for client_id in detail:
         # we skip the learn file
@@ -885,7 +1062,7 @@ def core(client_id):
         return render_template('core_butler.html',
                 loop = {'index': 1},
                 clientid = client_id,
-                client_list = client_list, 
+                client_list = client_list,
                 history = map(json.dumps, history),
                 brain = brain,
                 mactive="clients",

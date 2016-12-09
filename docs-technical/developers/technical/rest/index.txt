@@ -1,0 +1,109 @@
+=============
+REST Overview
+=============
+
+.. todo::
+
+    * description
+    * pictures/charts about startup, url processing, MQ dialogs
+    * ...
+   
+Overview
+========
+
+REST is a web server which handle request in `REST format <http://en.wikipedia.org/wiki/Representational_state_transfer>`_. It is used by the user interfaces to get informations about devices, sensor history, send commands, ...
+
+
+How to test REST requests 
+=========================
+
+wget method
+-----------
+You can execute a REST GET request from a console using the *wget* command. 
+For example you can run: ::
+
+    $ wget -qO- http://127.0.0.1:40405/device/1
+
+This will run the request and show you the results (thanks to the *-qO-* parameter).
+
+FireFox RESTClient
+------------------
+
+This Firefox plugin will allow you to send easily POST, DELETE and other requests.
+
+Install FF plugin from here: https://addons.mozilla.org/en-us/firefox/addon/restclient/.
+ 
+Lauch with **Tools > RestClient**
+ 
+In this example we will use RESTClient for testing POST url 
+ 
+In the RESTClient interface menu go in **Headers > Custom Header** and : 
+
+* Create a header with **name**: 'Content-Type', **value**: 'application/x-www-form-urlencoded'
+* You may tick **Save to favorites** for the next time
+
+Next, go back on the RESTClient main interface and fill the fields. Example for creating a new device:
+
+* **method**: 'POST', **url**: 'http://xxxxx:40405/device/'
+* **body** : name=device%20name&type=plugin&id=diskfree&host=darkstar&description=desc&reference=ref&device_type=diskfree.disk_usage
+ 
+Then, click on **Send**
+
+Configuration section in /etc/domogik/domogik.cfg 
+=================================================
+
+In Domogik configuration file, there are several options about REST in **[rest]** section:
+
+* interfaces : the network interface to use : eth0, lo, ...
+* port : the port for the rest service : 40405
+* use_ssl : use ssl (True) or not (False)
+* ssl_certificate : The ssl .crt file
+* ssl_key : The ssl .key file
+* clean_json : display a clean json result (indentation, carriage return) (True) or a raw result (False)
+
+
+How to use REST with SSL?
+=========================
+
+Please read the installation documentation.
+
+Status 
+======
+
+Rest uses http status codes to identify the error:
+
+get:
+    code = 200
+
+    data = the returned data from the get request (json)
+
+delete:
+
+    code = 204
+
+    data = empty
+ 
+put (update):
+
+    code = 200
+
+    data = the updated object (json)
+ 
+post (create):
+
+    code = 201
+
+    data = the new object (json)
+ 
+error:
+
+    code = 400
+
+    data = {msg: "string describing the error"}
+ 
+action ok, no content returned:
+
+    code = 204
+
+    data = Empty
+

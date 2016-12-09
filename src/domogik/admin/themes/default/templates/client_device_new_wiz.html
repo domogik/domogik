@@ -46,7 +46,11 @@
           <div class="form-group ">
             <label class="control-label col-xs-3">{{ item.label }}</label>
             <div class="col-xs-9">
-              {{ item(size = 50) }}  
+              {% if item.type == "TextField" %} 
+                {{ item(size = 50) }} 
+              {% else %}
+                {{ item }} 
+              {% endif %}
               <span class="help-block">{{ item.description }}</span>
             </div>
           </div>
@@ -65,7 +69,11 @@
           <div class="form-group ">
             <label class="control-label col-xs-3">{{ item.label }}</label>
             <div class="col-xs-9">
-              {{ item(size = 50) }}  
+              {% if item.type == "TextField" %} 
+                {{ item(size = 50) }} 
+              {% else %}
+                {{ item }} 
+              {% endif %}
               <span class="help-block">{{ item.description }}</span>
             </div>
           </div>
@@ -84,7 +92,11 @@
           <div class="form-group ">
             <label class="control-label col-xs-3">{{ item.label }}</label>
             <div class="col-xs-9">
-              {{ item(size = 50) }}  
+              {% if item.type == "TextField" %} 
+                {{ item(size = 50) }} 
+              {% else %}
+                {{ item }} 
+              {% endif %}
               <span class="help-block">{{ item.description }}</span>
             </div>
           </div>
@@ -103,7 +115,11 @@
           <div class="form-group ">
             <label class="control-label col-xs-3">{{ item.label }}</label>
             <div class="col-xs-9">
-              {{ item(size = 50) }}  
+              {% if item.type == "TextField" %} 
+                {{ item(size = 50) }} 
+              {% else %}
+                {{ item }} 
+              {% endif %}
               <span class="help-block">{{ item.description }}</span>
             </div>
           </div>

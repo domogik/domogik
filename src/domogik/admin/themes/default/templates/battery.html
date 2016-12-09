@@ -1,0 +1,95 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+<style>
+
+.battery-informations {
+    min-height: 60px;
+    list-style-type: none;
+}
+
+/**** vertical ****/
+.battery {
+    float: left;
+    width: 30px;
+    height: 50px;
+    border: 3px solid #2D2C2F;
+    position: relative;
+    background-color: #005774;
+    margin-right: 2em;
+}
+.battery:after {
+    content: '';
+    display: block;
+    height: 6px;
+    width: 16px;
+    background-color: #2D2C2F;
+    position: absolute;
+    right: 4px;
+    top: -8px;
+}
+
+.battery .level {
+    height: 20%%;
+    width: 100%;
+    background-color: #fff;
+    color: #ffffff;
+    text-align: center;
+}
+
+
+/**** horizontal 
+.battery {
+    width: 70px;
+    height: 30px;
+    border: 3px solid #2D2C2F;
+    position: relative;
+    background-color: #fff;
+}
+.battery:after {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 16px;
+    background-color: #2D2C2F;
+    position: absolute;
+    right: -8px;
+    top: 4px;
+}
+
+.battery .level {
+    height: 100%;
+    width: 20%;
+    background-color: #005774;
+}
+*/
+
+</style>
+
+<div class="container">
+    <h2>{% trans %}Battery sensors{% endtrans %}</h2>
+
+    {% if sensors|length > 0 %}
+        {% for elt in sensors %}
+            <h3>{{ elt.device_name }} - {{ elt.name }} <small>({{ elt.client_id }})</small></h3>
+            <div class="battery">
+              {% if elt.last_value is none %}  
+                <div class="level" style="height: 0%">
+                  ?
+                </div>
+              {% else %}
+                <div class="level" style="height: {{ 100 - elt.last_value }}%">
+                </div>
+              {% endif %}
+            </div>
+            <ul class="battery-informations">
+              <li><strong>{% trans %}Value : </strong>{% endtrans %}{{ elt.last_value }}%</li>
+              <li><strong>{% trans %}Last udpate : </strong>{% endtrans %}{{ elt.last_received|datetime }}</li>
+            </ul>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-warning">{% trans %}No battery sensors found!{% endtrans %}</div>
+    {% endif %}
+</div>
+{% endblock %}

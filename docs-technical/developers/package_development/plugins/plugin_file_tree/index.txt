@@ -1,0 +1,41 @@
+====================
+The plugin file tree
+====================
+
+First, as already said in :doc:`the chapter about creating the plugin repository on GitHub <../create_repository/index>`, there are some rules about a plugin name : don't forget to respect them.
+
+The plugin file tree will at least contains (assuming the plugin name is *myplugin*):
+
+* **start.sh** : a script to start the plugin manually
+* **__init__.py** : an empty file needed by python
+* **info.json** : the json file which describe the plugin and its features. This file must always be named like this!
+* **bin/** : the main python program will be in this folder
+
+  * **bin/__init__.py** : an empty file needed by python
+  * **bin/myplugin.py** : the python main part. This file must be always named like this : **bin/myplugin.py**. Example for the *diskfree* plugin : *bin/diskfree.py*.
+
+* **lib/** : the python libraries
+  
+  * **lib/__init__.py** : an empty file needed by python
+  * **lib/myplugin.py** : the python library part
+
+* **conversion** : the python conversion functions
+
+  * **conversion/__init__.py** : an empty file needed by python
+  * **conversion/from_foo_to_bar.py** : a python conversion function
+  * **conversion/from_fii_to_bur.py** : another python conversion function
+
+* **doc/** : the sphynx documentation in ReST format
+* **design/** : this folder will contain all graphical resources (icons, ...)
+
+  * **design/icon.png** : the plugin icon (png, 96px * 96px). This file must always be named like this!
+
+* **udev/** : this folder will contain the udev rules needed for this plugin
+
+Some other items may be added: 
+
+* **data** : if needed this folder can contain data needed by the plugin or the plugin may write data in it
+* **tests** : if the plugin have some tests scripts, they must be here
+
+
+

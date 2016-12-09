@@ -36,6 +36,7 @@ True
 import datetime
 import calendar
 import ephem
+import re
 import traceback
 
 __all__ = ["CronExpression", "DEFAULT_EPOCH", "SUBSTITUTIONS"]
@@ -47,8 +48,9 @@ HOURS = (0, 23)
 DAYS_OF_MONTH = (1, 31)
 MONTHS = (1, 12)
 DAYS_OF_WEEK = (0, 6)
+YEARS = (2016, 2200)
 L_FIELDS = (DAYS_OF_WEEK, DAYS_OF_MONTH)
-FIELD_RANGES = (MINUTES, HOURS, DAYS_OF_MONTH, MONTHS, DAYS_OF_WEEK)
+FIELD_RANGES = (MINUTES, HOURS, DAYS_OF_MONTH, MONTHS, DAYS_OF_WEEK, YEARS)
 MONTH_NAMES = zip(('jan', 'feb', 'mar', 'apr', 'may', 'jun',
                    'jul', 'aug', 'sep', 'oct', 'nov', 'dec'), xrange(1, 13))
 DEFAULT_EPOCH = (1970, 1, 1, 0, 0, 0)
@@ -65,7 +67,7 @@ SUBSTITUTIONS = {
 SPECIALS = [
     '@fullmoon', '@newmoon', '@firstquarter', '@lastquarter',
     '@equinox', '@solstice',
-    '@dawn', '@dusk'    
+    '@dawn', '@dusk'
 ]
 
 class CronExpression(object):
@@ -93,11 +95,24 @@ class CronExpression(object):
                     line = line.replace(key, value)
                     break
 
-            fields = line.split(None, 5)
+            fields = line.split(' ')
+            if len(fields) >= 6:
+                if re.match( r'^(?:\*$)|(^\d{4}$)|(^\d{4}(([,-]?\d{4})|(/?\d))+$)', fields[5]) is not None :
+                    # this a years field
+                    fields = line.split(None, 6)
+                else :
+                    # add years all in field
+                    fields = line.split(None, 5)
+                    fields.insert(5, '*')
+            else :
+                fields = line.split(None, 5)
             if len(fields) == 5:
+                # add years all in field
+                fields.append('*')
+            if len(fields) == 6:
+                # add empty comment
                 fields.append('')
-
-            minutes, hours, dom, months, dow, self.comment = fields
+            minutes, hours, dom, months, dow, years, self.comment = fields
 
             dow = dow.replace('7', '0').replace('?', '*')
             dom = dom.replace('?', '*')
@@ -108,25 +123,25 @@ class CronExpression(object):
             for dowstr, downum in DAY_NAMES:
                 dow = dow.lower().replace(dowstr, str(downum))
 
-            self.string_tab = [minutes, hours, dom.upper(), months, dow.upper()]
+            self.string_tab = [minutes, hours, dom.upper(), months, dow.upper(), years]
             self.compute_numtab()
         else:
             self.string_tab = line.split(' ')[0]
             self.comment = None
-   
+
         # handle epoch
         if len(epoch) == 5:
             y, mo, d, h, m = epoch
             self.epoch = (y, mo, d, h, m, epoch_utc_offset)
         else:
             self.epoch = epoch
-        
+
 
     def __str__(self):
         if self.epoch != DEFAULT_EPOCH:
             return "{0}(\"{1}\", epoch=\"{2}\")".format(self.__class__.__name__, self.orig_line, repr(self.epoch))
         else:
-            return "{0}(\"{1})\"".format(self.__class__.__name__, self.orig_line)
+            return "{0}(\"{1}\")".format(self.__class__.__name__, self.orig_line)
 
     def __repr__(self):
         return str(self)
@@ -152,12 +167,47 @@ class CronExpression(object):
                     if special_char in cron_atom:
                         break
                 else:
-                    unified.update(self._parse_atom(cron_atom, span))
+                    if span == YEARS and field_str == "*" :  # don't create  numerical_tab for all years
+                        unified.update(set())
+                    else :
+                        unified.update(self._parse_atom(cron_atom, span))
 
             self.numerical_tab.append(unified)
-
+        print("string_tab : {0}".format(self.string_tab))
+        print("numtab : {0}".format(self.numerical_tab))
         if self.string_tab[2] == "*" and self.string_tab[4] != "*":
             self.numerical_tab[2] = set()
+
+    def get_next_date_special(self, date_tuple, utc_offset=0):
+        """
+        Returns next ephemeris date the given time.
+        The date tuple should be in the local time.
+        return date tupple
+        """
+        cpm = None;
+        if self.string_tab == '@fullmoon':
+            cpm = ephem.next_full_moon(date_tuple)
+        elif self.string_tab == '@newmoon':
+            cpm = ephem.next_new_moon(date_tuple)
+        elif self.string_tab == '@firstquarter':
+            cpm = ephem.next_first_quarter_moon(date_tuple)
+        elif self.string_tab == '@lastquarter':
+            cpm = ephem.next_last_quarter_moon(date_tuple)
+        elif self.string_tab == '@equinox':
+            cpm = ephem.next_equinox(date_tuple)
+        elif self.string_tab == '@solstice':
+            cpm = ephem.next_solstice(date_tuple)
+        elif self.string_tab in ['@dawn', '@dusk']:
+            bobs = ephem.Sun()
+            date = "{0}/{1}/{2}".format(date_tuple[0], date_tuple[1], date_tuple[2])
+            if self.string_tab == '@dawn':
+                cpm = self._city.next_rising(bobs, start=date)
+            else:
+                cpm = self._city.next_setting(bobs, start=date)
+
+        if cpm:
+            return cpm.tuple()[:-1]
+        return None
 
     def check_trigger_now(self):
         now = datetime.datetime.now()
@@ -174,33 +224,8 @@ class CronExpression(object):
         Returns boolean indicating if the trigger is active at the given time.
         The date tuple should be in the local time.
         """
-        cpm = False;
+        return date_tuple == self.get_next_date_special(date_tuple, utc_offset)
 
-        if self.string_tab == '@fullmoon':
-            cpm = ephem.next_full_moon(date_tuple)
-        elif self.string_tab == '@newmoon':
-            cpm = ephem.next_new_moon(date_tuple)
-        elif self.string_tab == '@firstquarter':
-            cpm = ephem.next_first_quarter_moon(date_tuple)
-        elif self.string_tab == '@lastquarter':
-            cpm = ephem.next_last_quarter_moon(date_tuple)
-        elif self.string_tab == '@equinox':
-            cpm = ephem.next_equinox(date_tuple)
-        elif self.string_tab == '@solstice':
-            cpm = ephem.next_solistice(date_tuple)
-        elif self.string_tab in ['@dawn', '@dusk']:
-            bobs = ephem.Sun()
-            if self.string_tab == '@dawn':
-                cpm = self._city.next_rising(bobs)
-            else:
-                cpm = self._city.next_setting(bobs)
-
-        if cpm:
-            """ Do compare """
-            print cpm
-            return True
-        else:
-            return False
 
     def _check_trigger_normal(self, date_tuple, utc_offset=0):
         """
@@ -230,15 +255,15 @@ class CronExpression(object):
 
         # Makes iterating through like components easier.
         quintuple = zip(
-            (mins, hour, day, month, given_dow),
+            (mins, hour, day, month, given_dow, year),
             self.numerical_tab,
             self.string_tab,
-            (mod_delta_min, mod_delta_hrs, mod_delta_day, mod_delta_mon,
-                mod_delta_day),
+            (mod_delta_min, mod_delta_hrs, mod_delta_day, mod_delta_mon, mod_delta_day, mod_delta_yrs),
             FIELD_RANGES)
 
         for value, valid_values, field_str, delta_t, field_type in quintuple:
             # All valid, static values for the fields are stored in sets
+            print(u"Match for {0} value {1} in {2}".format(field_type, value, valid_values))
             if value in valid_values:
                 continue
 
@@ -294,6 +319,9 @@ class CronExpression(object):
                     # If we got here, then days of months validated so it does
                     # not matter that days of the week failed.
                     return dom_matched
+                elif field_type == YEARS and self.string_tab[5] == '*':
+                    # All years valids
+                    continue
 
                 # None of the expressions matched which means this field fails
                 return False
@@ -322,7 +350,7 @@ class CronExpression(object):
         >>> parse_atom("*/9",(0,23))
         set([0, 9, 18])
         """
-        print("CronExpression > _parse_atom. parse = {0}, minmax = {1}".format(parse, minmax))
+#        print("CronExpression > _parse_atom. parse = {0}, minmax = {1}".format(parse, minmax))
         try:
             parse = parse.strip()
             increment = 1
@@ -334,25 +362,29 @@ class CronExpression(object):
                 if value >= minmax[0] and value <= minmax[1]:
                     return set((value,))
                 else:
-                    raise ValueError("Invalid bounds: \"%s\"" % parse)
+                    raise ValueError("Invalid bounds: \"{0}\"".format(parse))
             elif '-' in parse or '/' in parse:
                 divide = parse.split('/')
                 subrange = divide[0]
                 if len(divide) == 2:
                     # Example: 1-3/5 or */7 increment should be 5 and 7 respectively
                     increment = int(divide[1])
-    
+
                 if '-' in subrange:
                     # Example: a-b
                     prefix, suffix = [int(n) for n in subrange.split('-')]
                     if prefix < minmax[0] or suffix > minmax[1]:
-                        raise ValueError("Invalid bounds: \"%s\"" % parse)
+                        raise ValueError("Invalid bounds: \"{0}\"".format(parse))
                 elif subrange == '*':
                     # Include all values with the given range
-                    prefix, suffix = minmax
+                    prefix, suffix = minmax, parse, minmax
                 else:
-                    raise ValueError("Unrecognized symbol: \"%s\"" % subrange)
-    
+                    try :
+                        prefix = int(subrange)
+                        suffix = prefix
+                    except :
+                        raise ValueError("Unrecognized symbol: \"{0}\"".format(subrange))
+
                 if prefix < suffix:
                     # Example: 7-10
                     return set(xrange(prefix, suffix + 1, increment))
@@ -362,34 +394,59 @@ class CronExpression(object):
                     noskips+= list(xrange(minmax[0], suffix + 1))
                     return set(noskips[::increment])
         except:
-            # TODO : handle the error in a better way ! 
+            # TODO : handle the error in a better way !
             # it happens for example when a bad cron expression is set (month = 0 instead of 1-12 for example)
             print("ERROR : bad value : {0}. Expected : {1}. Error : {2}".format(parse, minmax, traceback.format_exc()))
             return []  # we return an empty set as the expression is invalid
 
 if __name__ == "__main__":
     job = CronExpression("@fullmoon")
-    print job
-    print job.check_trigger_now()
-    print ""
+    print(job)
+    print(job.check_trigger_now())
+    print(job.check_trigger((2016, 12, 14, 0, 5)))
+    print(job.get_next_date_special((2016, 12, 16, 0, 5)))
+    print("")
     job = CronExpression("@dawn")
-    print job
-    print job.check_trigger_now()
-    print ""
+    print(job)
+    print(job.check_trigger_now())
+    print(job.check_trigger((2016, 12, 7, 7, 26)))
+    print(job.get_next_date_special((2016, 12, 16, 0, 5)))
+    print("")
+    job = CronExpression("@dusk")
+    print(job)
+    print(job.check_trigger_now())
+    print(job.check_trigger((2016, 12, 7, 7, 26)))
+    print("")
     job = CronExpression("@equinox")
-    print job
-    print job.check_trigger_now()
-    print ""
-    #print job.check_trigger((2010, 11, 17, 0, 0))
+    print(job._city)
+    print(job)
+    print(job.check_trigger_now())
+    print("")
+    job = CronExpression("@solstice")
+    print(job._city)
+    print(job)
+    print(job.check_trigger_now())
+    print(job.check_trigger((2016, 12, 21, 10, 44)))
+    print(job.get_next_date_special((2016, 12, 22, 0, 5)))
+    print("")
+    #print(job.check_trigger((2010, 11, 17, 0, 0)))
     job = CronExpression("0 0 * * 1-5/2 find /var/log -delete")
-    print job
-    print job.check_trigger_now()
-    print job.check_trigger((2010, 11, 17, 0, 0))
-    print job.check_trigger((2012, 12, 21, 0 , 0))
-    print ""
+    print(job)
+    print(job.check_trigger_now())
+    print(job.check_trigger((2010, 11, 17, 0, 0)))
+    print(job.check_trigger((2012, 12, 21, 0 , 0)))
+    print("")
     job = CronExpression("@midnight Feed 'it'", (2010, 5, 1, 7, 0, -6))
-    print job
-    print job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6)
-    print job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6)
-    print job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6)
-    print ""
+    print(job)
+    print(job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6))
+    print(job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6))
+    print(job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6))
+    print("")
+    print(ephem.cities.lookup("paris, france"))
+    print("**************************************************")
+    job = CronExpression(("5-10 10,16 ? 2/3 1#2 2017/100"))
+    print(job.check_trigger((2017, 2, 13, 10 , 6)))
+    print("")
+    job = CronExpression(("0 11 * 1-6 1"))
+    print(job.check_trigger((2017, 2, 13, 10 , 6)))
+    print("")

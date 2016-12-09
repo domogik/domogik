@@ -39,6 +39,7 @@ Implements
 """
 
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import sys
 from domogik.common.configloader import Loader
 
@@ -71,23 +72,32 @@ class Logger():
             cfg = Loader()
             config = cfg.load()[0]
             if use_filename is None:
-                filename = "%s/%s.log" % (config['log_dir_path'], component_name)
+                filename = "{0}/{1}.log".format(config['log_dir_path'], component_name)
             else:
-                filename = "%s/%s.log" % (config['log_dir_path'], use_filename)
+                filename = "{0}/{1}.log".format(config['log_dir_path'], use_filename)
             level = config['log_level']
+
+            if 'log_when' not in config:
+                config['log_when'] = 'D'
+            if 'log_interval' not in config:
+                config['log_interval'] = 1
+            if 'log_backup_count' not in config:
+                config['log_backup_count'] = 10
 
             if level not in LEVELS:
                 raise ValueError("level must be one of 'debug','info','warning',"\
                         "'error','critical'. Check your config.")
 
             if domogik_prefix:
-                my_logger = logging.getLogger('domogik-%s' % component_name)
+                my_logger = logging.getLogger('domogik-{0}'.format(component_name))
             else:
                 my_logger = logging.getLogger(component_name)
             # log to file
             my_logger.propagate = 0
             if not my_logger.handlers:
-                hdlr = logging.FileHandler(filename)
+                hdlr = TimedRotatingFileHandler(filename, \
+                        when=config['log_when'], interval=int(config['log_interval']), \
+                        backupCount=int(config['log_backup_count']))
                 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
                 hdlr.setFormatter(formatter)
                 my_logger.addHandler(hdlr)
@@ -120,7 +130,7 @@ class Logger():
         if logger_name is not None:
             return self.__class__.logger[logger_name]
         elif len(self.__class__.logger.keys()) == 1:
-            return self.__class__.logger[self.__class__.logger.keys()[0]]
+            return self.__class__.logger[list(self.__class__.logger)[0]]
         else:
             raise AttributeError("You must specify a loggger name")
 
