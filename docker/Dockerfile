@@ -122,7 +122,6 @@ RUN cd /opt/dmg \
 
 # Patches. TODO : move before
 RUN pip install Flask-Themes2
-RUN pip install Flask-QRcode
 RUN apt-get install -y libpq-dev
 RUN pip install alembic
 RUN pip install SQLAlchemy-Utils
