@@ -79,6 +79,7 @@ class CronExpression(object):
         The epoch should be defined down to the minute sorted by
         descending significance.
         """
+        self._valid = True
         self._special = False
         for key in SPECIALS:
             if line.startswith(key):
@@ -101,9 +102,13 @@ class CronExpression(object):
                     # this a years field
                     fields = line.split(None, 6)
                 else :
-                    # add years all in field
-                    fields = line.split(None, 5)
-                    fields.insert(5, '*')
+                    if re.match( r'(^\d{}$)|(^\d(([,-]?\d)|(/?\d))+$)', fields[5]) is not None :
+                        # this a bad years field but keep it, raise should be arrive in computing
+                        fields = line.split(None, 6)
+                    else :
+                        # add years all in field
+                        fields = line.split(None, 5)
+                        fields.insert(5, '*')
             else :
                 fields = line.split(None, 5)
             if len(fields) == 5:
@@ -146,6 +151,12 @@ class CronExpression(object):
     def __repr__(self):
         return str(self)
 
+    def isValidate(self):
+        """
+        Return True if cron expression is validate, else False
+        """
+        return self._valid
+
     def compute_numtab(self):
         """
         Recomputes the sets for the static ranges of the trigger time.
@@ -154,10 +165,11 @@ class CronExpression(object):
         member is modified.
         """
         self.numerical_tab = []
-
+        self._valid = True
         for field_str, span in zip(self.string_tab, FIELD_RANGES):
             split_field_str = field_str.split(',')
             if len(split_field_str) > 1 and "*" in split_field_str:
+                self._valid = False
                 raise ValueError("\"*\" must be alone in a field.")
 
             unified = set()
@@ -173,8 +185,8 @@ class CronExpression(object):
                         unified.update(self._parse_atom(cron_atom, span))
 
             self.numerical_tab.append(unified)
-        print("string_tab : {0}".format(self.string_tab))
-        print("numtab : {0}".format(self.numerical_tab))
+#        print("string_tab : {0}".format(self.string_tab))
+#        print("numtab : {0}".format(self.numerical_tab))
         if self.string_tab[2] == "*" and self.string_tab[4] != "*":
             self.numerical_tab[2] = set()
 
@@ -214,6 +226,7 @@ class CronExpression(object):
         return self.check_trigger((now.year, now.month, now.day, now.hour, now.minute))
 
     def check_trigger(self, date_tuple, utc_offset=0):
+        if self._valid == False : return False
         if self._special:
             return self._check_trigger_special(date_tuple, utc_offset)
         else:
@@ -362,6 +375,7 @@ class CronExpression(object):
                 if value >= minmax[0] and value <= minmax[1]:
                     return set((value,))
                 else:
+                    self._valid = False
                     raise ValueError("Invalid bounds: \"{0}\"".format(parse))
             elif '-' in parse or '/' in parse:
                 divide = parse.split('/')
@@ -374,6 +388,7 @@ class CronExpression(object):
                     # Example: a-b
                     prefix, suffix = [int(n) for n in subrange.split('-')]
                     if prefix < minmax[0] or suffix > minmax[1]:
+                        self._valid = False
                         raise ValueError("Invalid bounds: \"{0}\"".format(parse))
                 elif subrange == '*':
                     # Include all values with the given range
@@ -383,6 +398,7 @@ class CronExpression(object):
                         prefix = int(subrange)
                         suffix = prefix
                     except :
+                        self._valid = False
                         raise ValueError("Unrecognized symbol: \"{0}\"".format(subrange))
 
                 if prefix < suffix:
@@ -445,8 +461,10 @@ if __name__ == "__main__":
     print(ephem.cities.lookup("paris, france"))
     print("**************************************************")
     job = CronExpression(("5-10 10,16 ? 2/3 1#2 2017/100"))
+    print("cron valid : {0}".format(job.isValidate()))
     print(job.check_trigger((2017, 2, 13, 10 , 6)))
     print("")
-    job = CronExpression(("0 11 * 1-6 1"))
+    job = CronExpression(("10 12-15 ? 1-6 5 205"))
+    print("cron valid : {0}".format(job.isValidate()))
     print(job.check_trigger((2017, 2, 13, 10 , 6)))
     print("")

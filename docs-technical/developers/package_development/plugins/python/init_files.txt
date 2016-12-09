@@ -1,0 +1,10 @@
+========================
+Python __init__.py files
+========================
+
+Several __init__.py file must be created. They are needed in each folder which contains some python files (directly in the folder or in any subfolders). To create them, just do from the package root directory: ::
+
+    $ touch __init__.py
+    $ touch bin/__init__.py
+    $ touch lib/__init__.py
+    $ touch conversions/__init__.py
