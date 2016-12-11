@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # This script will generate a self signed SSL certificate which will be valid for 2 years.
 # The certificate will have no passphrase
 

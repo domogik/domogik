@@ -1,0 +1,16 @@
+============================================
+Plugins developement documentation changelog
+============================================
+
+.. note::
+    This page will be used for the next releases of Domogik (after 0.4.0) is some updates happen in the plugin format.
+
+0.4.1
+=====
+
+* Complete doc for 0.4.1
+
+0.4.0
+=====
+
+* New plugin format for Domogik 0.4.

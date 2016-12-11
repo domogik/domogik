@@ -1,0 +1,101 @@
+============
+plcbus.basic
+============
+
+Purpose
+=======
+
+No official xPL Schema exists for Plcbus. A dedicated schema has been made for this feature.
+Discussion on the official xPL Forum about this xPL schema: http://xplproject.org.uk/forums/viewtopic.php?f=2&t=908&
+
+plcbus.basic Message specification
+====================================
+
+* Class = PLCBUS
+* Type = BASIC 
+
+xpl-cmnd
+--------
+
+This sends a command to the plcbus plugin. The usercode used is always the same in one house (it only changes if we manage a plcbus system in many houses near from each others). ACK may be ignored if not usable with the defined COMMAND. ::
+
+    PLCBUS.BASIC
+    {
+    USERCODE=<plcbus network usercode>
+    DEVICE=<sensor name>
+    COMMAND=<value sent to the device>
+    [ACK=<0|1>]
+    [DATA1=<additional data>]
+    [DATA2=<additional data>]
+    }
+
+.. todo:: 
+
+    * explain more Usercode and Device (with examples)
+    * check if ACK is used or not
+    * list of available COMMAND values
+    * DATA1 and DATA2 : description of usage
+
+
+xpl-stat
+--------
+
+It is used to send a message when a command is received *from* the plcbus network (for ex, is sent by a remote). ::
+
+    PLCBUS.BASIC
+    {
+    USERCODE=<plcbus network usercode>
+    DEVICE=<device name>
+    COMMAND=<value sent to the device>
+    [DATA1=<additional data>]
+    [DATA2=<additional data>]
+    }
+
+xpl-trig
+--------
+
+This is used to send an acknowledge when an ack command is received or when an event is raised. ::
+
+    PLCBUS.BASIC
+    {
+    USERCODE=<plcbus network usercode>
+    DEVICE=<device name>
+    COMMAND=<value sent to the device>
+    ACK=1
+    [DATA1=<additional data>]
+    [DATA2=<additional data>]
+    }
+
+Examples
+========
+
+Find below manual commands examples, assuming your usercode is "FF":
+
+Turn ON A1: ::
+
+    dmg_send xpl-cmnd plcbus.basic "device=A1,command=ON,usercode=FF"
+
+Turn OFF A1: ::
+
+    dmg_send xpl-cmnd plcbus.basic "device=A1,command=OFF,usercode=FF"
+
+Preselect Dimmer to 40% on A1: ::
+
+    dmg_send xpl-cmnd plcbus.basic "device=A1,command=PRESET_DIM,usercode=FF,data1=40"
+
+Preselect Dimmer to 40% with 3 secondes Fade Rate on A1: ::
+
+    dmg_send xpl-cmnd plcbus.basic "device=A1,command=PRESET_DIM,usercode=FF,data1=40,data2=3"
+
+Preselect No Fade Rate on A1: ::
+
+    dmg_send xpl-cmnd plcbus.basic "device=A1,command=PRESET_DIM,usercode=FF,data2=0"
+
+Turn ALL Ligths OFF: ::
+
+    dmg_send xpl-cmnd plcbus.basic "command=ALL_LIGHTS_OFF"
+
+Turn ALL Ligths ON: ::
+
+    dmg_send xpl-cmnd plcbus.basic "command=ALL_LIGHTS_ON"
+

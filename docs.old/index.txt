@@ -1,0 +1,28 @@
+=======
+Domogik
+=======
+
+
+.. |user| image:: index_user.png
+    :target: index_user.html
+
+.. |dev| image:: index_dev.png
+    :target: index_dev.html
+
+
+====== ============================================================================
+|user| :doc:`End users documentation <index_user>` 
+
+       * Domogik overview
+       * Installation
+       * Documentation
+
+|dev|  :doc:`Technical and developers documentation <index_dev>`
+
+       * Technical descriptions 
+       * Plugin development
+       * Core development
+       * User interfaces development
+====== ============================================================================
+
+

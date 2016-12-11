@@ -19,9 +19,9 @@ function createCronCheckDialog(blImage, inputName) {
         if (d instanceof Array) {
             // js date month [0..11]
             var date = new Date(d[0], parseInt(d[1])-1, d[2], d[3], d[4]);
-            return "<li class='small'>) " + date.toString() + "</li>";
+            return "<li class='small'>| " + date.toString() + "</li>";
         }   else {
-        return "<li class='small'>) " + d + "</li>";
+        return "<li class='small'>| " + d + "</li>";
         };
     };
 
@@ -164,14 +164,16 @@ function createCronCheckDialog(blImage, inputName) {
                         text: data.content.error,
                         delay: 6000
                     });
+                    $("#testNowResult").text('Bad cron expression: ').removeClass().addClass('bg-danger');
+                    $("#testDateResult").html(data.content.error).removeClass().addClass('bg-danger');
                 } else {
                     var dateC = $('#datepicker1').val() + '<br>at '+$('#AtHours').val() +'h ' + $('#AtMinutes').val()+'mn'
                     $("#testNowResult").text('Triggered for now : '+data.content.result.now);
                     if (data.content.result.now) {$("#testNowResult").removeClass().addClass('bg-success');
-                    } else {$("#testNowResult").removeClass().addClass('bg-danger');};
+                    } else {$("#testNowResult").removeClass().addClass('bg-warning');};
                     $("#testDateResult").html('Triggered for '+dateC+' : '+data.content.result.date);
                     if (data.content.result.date) {$("#testDateResult").removeClass().addClass('bg-success');
-                    } else {$("#testDateResult").removeClass().addClass('bg-danger');};
+                    } else {$("#testDateResult").removeClass().addClass('bg-warning');};
                 };
             });
         });
@@ -208,12 +210,19 @@ function createCronCheckDialog(blImage, inputName) {
                     for (var i = 0; i < dates.length; i++) {
                         $("#listnextdates").each(function () { $(this).append(nextDateList(dates[i])); });
                     };
+                } else if (s.exceptions.length != 0) {
+                    $("#listnextdates").each(function () { $(this).append(nextDateList("Error, can't calculate next date"));});
                 } else {
-                    $("#listnextdates").each(function () { $(this).append(nextDateList("Too complex, can't calculate next date"));});
+                    $("#listnextdates").each(function () { $(this).append(nextDateList("There no next date"));});
                 };
             };
         });
-        $("#nbNextDates").trigger("change");
+        if (blocklyImage.sourceBlock_.cron_valid) {
+            $("#nbNextDates").trigger("change");
+        } else {
+            $("#nbNextDates").attr('disabled',true)
+            $("#cronTabExp").removeClass('label-info').addClass('label-danger');
+        };
     });
     $(blocklyElement).on('hidden.bs.popover', function () {
         $('.datepicker').remove();

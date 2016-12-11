@@ -30,7 +30,6 @@ else:
     def is_hidden_field_filter(field):
         return isinstance(field, HiddenField)
 from flask.ext.themes2 import Themes, render_theme_template
-from flask.ext.qrcode import QRcode
 from werkzeug.exceptions import Unauthorized
 from werkzeug import WWWAuthenticate
 import traceback
@@ -47,7 +46,6 @@ app.debug = True
 login_manager.init_app(app)
 babel.init_app(app)
 Themes(app, app_identifier='domogik-admin')
-QRcode(app)
 
 app.jinja_env.globals['bootstrap_is_hidden_field'] =\
     is_hidden_field_filter
