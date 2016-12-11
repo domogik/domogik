@@ -117,7 +117,10 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         @param log_on_stdout : If set to True, allow to read the logs on both stdout and log file
         '''
         BasePlugin.__init__(self, name, stop_cb, parser, daemonize, log_prefix, log_on_stdout)
-        Watcher(self)
+        ioloop = IOLoop.instance()
+        signal.signal(signal.SIGINT, lambda sig, frame: ioloop.add_callback_from_signal(self.force_leave))
+        signal.signal(signal.SIGTERM, lambda sig, frame: ioloop.add_callback_from_signal(self.force_leave))
+
         self.log.info(u"----------------------------------")
         self.log.info(u"Starting client '{0}' (new manager instance)".format(name))
         self.log.info(u"Python version is {0}".format(sys.version_info))
@@ -1193,6 +1196,12 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             #for elt in inspect.stack():
             #    self.log.debug(u"    {0}".format(elt))
 
+        # try to stop the thread
+        try:
+            self.get_stop().set()
+        except AttributeError:
+            pass
+
         if return_code != None:
             self.set_return_code(return_code)
             self.log.info("Return code set to {0} when calling force_leave()".format(return_code))
@@ -1211,11 +1220,6 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         else:
             self._set_status(STATUS_STOPPED)
 
-        # try to stop the thread
-        try:
-            self.get_stop().set()
-        except AttributeError:
-            pass
 
         if hasattr(self, "_timers"):
             for t in self._timers:
@@ -1255,6 +1259,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
                 self.log.warn(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
+        sys.exit()
 
 
 class Watcher:

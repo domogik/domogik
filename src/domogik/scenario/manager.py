@@ -157,8 +157,9 @@ class ScenarioManager:
     def shutdown(self):
         """ Callback to shut down all parameters
         """
-        for cond in self._conditions.keys():
-            self.delete_scenario(cond, db_delete=False)
+        for cid, inst in self._instances.items():
+            self._instances[cid]['instance'].destroy()
+            del(self._instances[cid])
 
     def get_parsed_condition(self, name):
         """ Call cond.get_parsed_condition on the cond with name 'name'

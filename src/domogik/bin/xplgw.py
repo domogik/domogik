@@ -101,18 +101,21 @@ class XplManager(XplPlugin):
         self._create_xpl_trigger()
         # start handling the xplmessages
         self._x_thread = self._XplSensorThread(\
-            self.log, self._sensor_queue, \
+            self.log, self.get_stop(), self._sensor_queue, \
             self._sensor_store_queue)
+        self.register_thread(self._x_thread)
         self._x_thread.start()
         # start handling the command reponses in a thread
         self._c_thread = self._XplCommandThread(\
-            self.log, self._db, self._cmd_lock_d, \
+            self.log, self.get_stop(), self._db, self._cmd_lock_d, \
             self._cmd_lock_p, self._cmd_dict, self._cmd_pkt, self.pub)
+        self.register_thread(self._c_thread)
         self._c_thread.start()
         # start the sensor storage thread
         self._s_thread = self._SensorStoreThread(\
                 self._sensor_store_queue, self.log, \
-                self._get_conversion_map, self.pub)
+                self._get_conversion_map, self.pub, self.get_stop())
+        self.register_thread(self._s_thread)
         self._s_thread.start()
         # start the sensorthread
         self.ready()
@@ -542,8 +545,8 @@ class XplManager(XplPlugin):
         Thread that waits for the coresponding reply to a xpl command
         It will send out a pub message when the reply is found
         """
-        def __init__(self, log, db, lock_d, lock_p, dic, pkt, pub):
-            threading.Thread.__init__(self)
+        def __init__(self, log, stop, db, lock_d, lock_p, dic, pkt, pub):
+            threading.Thread.__init__(self, name="XplCommandThread")
             # TODO : remove the line below
             #self._db = DbHelper()
             self._log = log
@@ -552,9 +555,10 @@ class XplManager(XplPlugin):
             self._dict = dic
             self._pkt = pkt
             self._pub = pub
+            self._stop = stop
 
         def run(self):
-            while True:
+            while not self._stop.isSet():
                 # remove old pkts
                 self._lock_p.acquire()
                 for pkt in self._pkt.keys():
@@ -613,12 +617,13 @@ class XplManager(XplPlugin):
         It will try to find the matching sensor and then store it into the sensor Store Queue
         This is done in a thread as it can be time consuming to do the DB lookups
         """
-        def __init__(self, log, queue, storeQueue):
-            threading.Thread.__init__(self)
+        def __init__(self, log, stop, queue, storeQueue):
+            threading.Thread.__init__(self, name="XplSensorThread")
             self._db = DbHelper()
             self._log = log
             self._queue = queue
             self._queue_store = storeQueue
+            self._stop = stop
             # on startup, load the device parameters
             self.on_device_changed()
 
@@ -706,9 +711,9 @@ class XplManager(XplPlugin):
                 return False
 
         def run(self):
-            while True:
+            while not self._stop.isSet():
                 try:
-                    item = self._queue.get()
+                    item = self._queue.get(timeout=1)
                     #self._log.debug(u"Getting item from the sensor queue, current length = {0}".format(self._queue.qsize()))
                     self._log.debug(u"Getting item from the sensor queue, current length = {0}, item = '{1}'".format(self._queue.qsize(), item))
                     # if clientid is none, we don't know this sender so ignore
@@ -757,13 +762,14 @@ class XplManager(XplPlugin):
         - and eventually storing it in the db
         Its a thread to make sure it does not block anything else
         """
-        def __init__(self, queue, log, get_conversion_map, pub):
-            threading.Thread.__init__(self)
+        def __init__(self, queue, log, get_conversion_map, pub, stop):
+            threading.Thread.__init__(self, name="SensorStoreThread")
             self._log = log
             self._db = DbHelper()
             self._conv = get_conversion_map
             self._queue = queue
             self._pub = pub
+            self._stop = stop
             # on startup, load the device parameters
             self.on_device_changed()
 
@@ -811,10 +817,10 @@ class XplManager(XplPlugin):
             self._log.info("Event : one device changed. Reloading data for _SensorStoreThread -- finished")
 
         def run(self):
-            while True:
+            while not self._stop.isSet():
                 try:
                     store = True
-                    item = self._queue.get()
+                    item = self._queue.get(timeout=1)
                     #self._log.debug(u"Getting item from the store queue, current length = {0}".format(self._queue.qsize()))
                     self._log.debug(u"Getting item from the store queue, current length = {0}, item = '{1}'".format(self._queue.qsize(), item))
                     # handle ignore
