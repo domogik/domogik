@@ -66,7 +66,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 zmq.eventloop.ioloop.install()
 
-REST_API_VERSION = "0.8"
+REST_API_VERSION = "0.9"
 
 ################################################################################
 
