@@ -1,5 +1,5 @@
 =============
-Domogik 0.5.0
+Domogik 0.6.0
 =============
 
 What is Domogik ?
@@ -16,7 +16,7 @@ Domogik is a smart home (or home automation) free and open source solution. With
     :align: center
     :alt: Domogik
 
-For more informations about this release of Domogik, you can check the :doc:`release note </users/releases/0.5.0>` 
+For more informations about this release of Domogik, you can check the :doc:`release note </users/releases/0.6.0>` 
 
 If you are looking for technical informations or how to create a plugin, please check `the technical and developers documentation <http://domogik-technical.readthedocs.io/>`_.
 

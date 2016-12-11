@@ -173,9 +173,9 @@ Download Domogik-mq : ::
 Download Domogik : ::
 
     $ cd /opt/dmg/
-    $ wget --content-disposition https://github.com/domogik/domogik/archive/0.5.0.tar.gz
-    $ tar xvzf domogik-0.5.0.tar.gz
-    $ ln -s domogik-0.5.0 domogik
+    $ wget --content-disposition https://github.com/domogik/domogik/archive/0.6.0.tar.gz
+    $ tar xvzf domogik-0.6.0.tar.gz
+    $ ln -s domogik-0.6.0 domogik
     $ cd domogik
 
 Install Domogik-mq
