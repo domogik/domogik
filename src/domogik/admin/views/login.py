@@ -26,7 +26,7 @@ def load_user(userid):
 @login_manager.unauthorized_handler
 def rediret_to_login():
     if str(request.path).startswith('/rest/'):
-        if app.rest_auth == 'True':
+        if app.rest_auth == True:
             # take into account that json_reponse is called after this, so we need to pass th params to json_reponse
             return 401, "Could not verify your access level for that URL.\n You have to login with proper credentials."
         else:
@@ -37,8 +37,9 @@ def rediret_to_login():
 @login_manager.request_loader
 def load_user_from_request(request):
     if str(request.path).startswith('/rest/'):
-        if app.rest_auth == 'True':
+        if app.rest_auth == True:
             auth = request.authorization
+            print(auth)
             if not auth:
                 print("Rest auth active - no authorization request received")
                 return None
