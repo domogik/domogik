@@ -107,6 +107,7 @@
             "DT_TempF",
             "DT_Pressure",
             "DT_mbarPressure",
+            "DT_barPressure",
             "DT_Humidity",
             "DT_AirQuality",
             "DT_Volt",
@@ -123,6 +124,8 @@
             "DT_ApparantEnergy",
             "DT_Speed",
             "DT_kmhSpeed",
+            "DT_rpmSpeed",
+            "DT_ktsSpeed",
             "DT_Year",
             "DT_Month",
             "DT_Day",
@@ -202,6 +205,13 @@
         "min": null,
         "max": null,
         "unit": "mbar",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_barPressure": {
+        "min": null,
+        "max": null,
+        "unit": "bar",
         "parent": "DT_Number",
         "childs": []
     },
@@ -321,6 +331,20 @@
         "min": null,
         "max": null,
         "unit": "km/h",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_rpmSpeed": {
+        "min": null,
+        "max": null,
+        "unit": "rpm",
+        "parent": "DT_Number",
+        "childs": []
+    },
+    "DT_ktsSpeed": {
+        "min": null,
+        "max": null,
+        "unit": "kts",
         "parent": "DT_Number",
         "childs": []
     },

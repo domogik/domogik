@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.admin.application import app, render_template
-from flask import request, flash, redirect, Response
+from flask import request, flash, redirect, Response, jsonify
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 try:
@@ -18,6 +18,7 @@ from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField, TextAreaField
 from wtforms.validators import Required
 from domogik.common.sql_schema import UserAccount
+from domogik.common.cron import CronExpression
 
 from wtforms.ext.sqlalchemy.orm import model_form
 import json
@@ -28,6 +29,7 @@ except ImportError:
 import traceback
 from operator import itemgetter
 from collections import OrderedDict
+import os
 
 @app.route('/scenario')
 @login_required
@@ -181,6 +183,51 @@ def scenario_edit(id):
             jso = jso,
             scenario_id = id)
 
+@app.route('/scenario/cronruletest/checkdate')
+@login_required
+def scenario_croncheckdate():
+    data = {}
+    try :
+        for k, v in request.args.iteritems():
+            data[k] = v
+        data['date'] = tuple ([int(i) for i in data['date'].split(',')])
+        try :
+            job = CronExpression(data['cronrule'])
+            if not job.isValidate() :
+                return jsonify(result='error', reply="", content = {'error': gettext(u"Cron rule is not valid.")})
+            now = job.check_trigger_now()
+            istriggered = job.check_trigger(data['date'])
+        except :
+            print(traceback.format_exc())
+            return jsonify(result='error', reply="", content = {'error': gettext(u"Error in cron rule, can't trigger it.")})
+        return jsonify(result='success', reply="", content = {'error': "", 'result': {'now': now, 'date': istriggered}})
+    except :
+        print(traceback.format_exc())
+        jsonify(result='error', reply="", content = {'error': gettext(u"Cron checking, bad request parameters.")})
+
+@app.route('/scenario/cronruletest/getephemdate')
+@login_required
+def scenario_croncephemdate():
+    data = {}
+    try :
+        for k, v in request.args.iteritems():
+            data[k] = v
+        data['date'] = tuple ([int(i) for i in data['date'].split(',')])
+        try :
+            job = CronExpression(data['cronrule'])
+            dates = []
+            dates.append(job.get_next_date_special(data['date']))
+            for i in range(1, int(data['number'])):
+                nDate = (dates[i-1][0], dates[i-1][1], dates[i-1][2]+1, dates[i-1][3], dates[i-1][4])
+                dates.append(job.get_next_date_special(nDate))
+        except :
+            print(traceback.format_exc())
+            return jsonify(result='error', reply="", content = {'error': gettext(u"Error in cron rule, can't get next date.")})
+        return jsonify(result='success', reply="", content = {'error': "", 'result': {'dates': dates}})
+    except :
+        print(traceback.format_exc())
+        jsonify(result='error', reply="", content = {'error': gettext(u"Ephemeris next date, bad request parameters.")})
+
 def scenario_blocks_js():
     """
         Generate all the dynamic Blockly blocs : tests, commands, devices sensors and commands, datatype
@@ -220,10 +267,15 @@ def scenario_blocks_js():
     else:
         print(u"Error : no scenario tests found!")
         scenario_tests = {}
+#   remove cron.CronTest from other sensors list
+    del scenario_tests['cron.CronTest']
 
     tests = scenario_tests.keys()
     try:
         tests.remove(u'sensor.SensorTest')
+        tests.remove(u'sensor.SensorValueDummy')
+        tests.remove(u'sensor.SensorValue')
+        tests.remove(u'sensor.SensorTestDummy')
     except ValueError:
         pass
 
@@ -284,7 +336,7 @@ def scenario_blocks_js():
     js = ""
 
     ### tests
-    print(u"ITEMS={0}".format(scenario_tests.items()))
+#    print(u"ITEMS={0}".format(scenario_tests.items()))
 
     # Check if there are some errors in the python tests files
     # TODO : Improve error handling
@@ -308,9 +360,12 @@ def scenario_blocks_js():
             #for parv in params:
             print(u"TEST={0}".format(test))
             for parv in params['parameters']:
+                print(u"Parv : {0}".format(parv))
                 par = parv['name']
                 papp = u"this.appendDummyInput().appendField('{0} : ')".format(parv['description'])
-                if parv['type'] == 'string':
+                if parv['name'] =='cron.cron':
+                    papp = u"{0}.appendField(new CronFielDialog('/static/images/icon-edit.png', 20, 20, '*', true, '{1}'));".format(papp, par)
+                elif parv['type'] == 'string':
                     jso = u'{0}, "{1}": "\'+ block.getFieldValue(\'{1}\') + \'" '.format(jso, par)
                     papp = u"{0}.appendField(new Blockly.FieldTextInput('{1}'), '{2}');".format(papp, '', par)
                 elif parv['type'] == 'integer':
@@ -538,7 +593,7 @@ def scenario_blocks_js():
     #### datatypes
     for dt_parent, dt_types in used_datatypes.items():
         for dt_type in dt_types:
-            print(u"{0} => {1}".format(dt_parent, dt_type))
+#            print(u"{0} => {1}".format(dt_parent, dt_type))
             if dt_parent == "DT_Bool":
                 color = 20
                 output = "\"Boolean\""
@@ -626,21 +681,3 @@ def scenario_blocks_js():
 
     # return values
     return js, tests, actions, devices_per_clients, used_datatypes
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,0 +1,5 @@
+=============
+weather.basic
+=============
+
+Actually, find all the informations on the wiki : http://wiki.domogik.org/Plugin_weather_recommendations

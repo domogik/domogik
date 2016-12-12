@@ -1,0 +1,68 @@
+========
+Glossary
+========
+
+.. glossary::
+
+    RTFM
+        *Read the fucking manual*. Don't forget to search the information in the doc before asking ;). There are a lot of informations in the documentation. But of course if you don't find the information, we will help you!
+
+    Domogik
+        It is the core part of the Domogik automation system. Domogik is made of core components, a message queue and a database. Domogik has no control user interface included : only a web administration interface is provided.
+
+    User interface
+        There are several user interfaces available for Domogik : Domoweb, Domodroid, DomoButler.
+
+    Domoweb
+        Domoweb is the web interface. You can use it in a browser, from your computer, laptop, tablet or smartphone.
+
+    Domodroid
+        Domodroid is an Android application for your tablet or smartphone. This application is a control interface.
+
+    DomoButler
+        DomoButler is an Android application for your tablet or smartphone. This application allows you to speak with Domogik's butler.
+
+    Core component
+        Domogik core components are the heart of Domogik, they have no automation features but they are needed to make all automation plugins to interact together.
+    
+    Butler
+        The butler is one of the core components. It allows you to speak with Domogik and get informations about temperature or control the lights (for example).
+
+    Package
+        A package is a group of files with a type (plugin, brain, ...), a name and a version. Example : *plugin zwave 0.1*. A package will add new features to Domogik.
+
+    Plugin
+        This is a type of package. Plugins are packages for Domogik. A plugin will handle one technology, one hardware gateway or some online services.
+
+    Brain
+        This is a type of package. Brains are packages for the Butler of Domogik. A brain will add more voices interactions to your Domogik system.
+
+    Client
+        A client is a package instance. For example, a plugin installed on a server is a client.
+
+    Device
+        A device is a reference to a hardware, software or online service element. A device is related to a device type. A device is linked to a client. If the client is uninstalled or disappear (is this is some external xPL device for example), the device will become orphan.
+
+    Device type
+        A plugin will allow to create various kind of devices (for example a temperature sensor or a temperature and humidity sensor). A kind of device is a device type. A device type can have several features. 
+
+    Device feature
+        A device feature can be a sensor or a command. Each device feature can have its own parameters (address, polling interval, ...).
+
+    Sensor
+        A sensor is something that read or catch some values (temperature, humidity, light status, ...)
+
+    Command
+        A command is something that do an action (switch on the light, ...)
+
+    Message queue
+        Messages queues provide an asynchronous communication protocol. This is used by Domogik components to discuss together.
+
+    xPL
+        xPL is an open protocol intended to permit the control and monitoring of home automation devices. Domogik have some xPL plugins and some no xPL plugins.
+
+    xPL hub
+        A xPL hub is a software hub which is used to handle xPL flows.
+
+
+

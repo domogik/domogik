@@ -17,10 +17,7 @@ def timeline():
 def timeline_device(device_id):
     return timeline_generic(the_device_id = device_id)
 
-
-
-
-def timeline_generic(the_device_id = None):
+def timeline_generic(the_device_id = None, the_client_id = None, asDict = False):
 
     # datatypes
     datatypes = {}
@@ -41,7 +38,7 @@ def timeline_generic(the_device_id = None):
     # timeline
     with app.db.session_scope():
         timeline = []
-        data = app.db.get_timeline(device_id = the_device_id)
+        data = app.db.get_timeline(device_id = the_device_id, client_id = the_client_id)
         previous_device_id = 0
         previous_date = None
         sensors_changes_for_the_device = []
@@ -92,12 +89,16 @@ def timeline_generic(the_device_id = None):
     else:
         the_device_name = None
 
-         
-
-    return render_template('timeline.html',
-        mactive="timeline",
-        device_name=the_device_name,
-        timeline=timeline,
-        datatypes = datatypes
-        )
+    if asDict:
+        return {
+                "timeline": timeline,
+                "datatypes": datatypes
+                }
+    else:
+        return render_template('timeline.html',
+            mactive="timeline",
+            device_name=the_device_name,
+            timeline=timeline,
+            datatypes = datatypes
+            )
 

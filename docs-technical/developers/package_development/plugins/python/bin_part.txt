@@ -1,0 +1,589 @@
+==================
+Plugin binary part
+==================
+
+
+TODO : "helpers" for special pages
+
+
+Purpose
+=======
+
+First, as already said in :doc:`the chapter about creating the plugin repository on GitHub <../create_repository/index>`, there are some rules about a plugin name : don't forget to respect them.
+
+The binary part of a plugin will in all cases be a single file. Assuming your plugin name is *myplugin*, the file name will be **bin/myplugin.py**.
+
+This file is the gateway between the library and Domogik. Basically it will:
+
+* import the needed libraries
+* check if the plugin is configured
+* get the plugin configuration values
+* instantiate the library class
+* use the library and thanks to callback functions communicate wih Domogik
+* set the plugin as ready when it is fully started
+
+
+Depending on your plugin, more actions may be done:
+
+* after getting the configuration, get the devices list from the database (over the MQ). This is needed when the plugin can't know the devices addresses, for example a weather plugin don't know in which town you live, so it will check the weather for already created devices.
+* register a newly detected device. For example, if a new sensor is plugged on your onewire network or if you add a new temperature sensor compliant with RFXCOM devices, the related plugins (*onewire* and *rfxcom*) will be able to detect the new devices, and if the device is not known, it will be registered, so a notification will be send to the user interfaces over MQ.
+
+XplPlugin and its useful functions
+==================================
+
+..todo ::
+    overview
+
+Helper function
+---------------
+
+* register_helper(action, help_string, callback)
+* publish_helper(key, data)
+
+Hidden but useful features
+--------------------------
+
+..todo ::
+    check plugin not laucnhed, status, ...
+
+On demande features
+-------------------
+
+..todo ::
+    * ready, config, library, packages, resources, data getter functions
+    * logging, force_leave (and return code),
+    * MQ usage
+
+Template of the binary part
+===========================
+
+Header
+------
+
+First, you need to put a header in the file. Here is a template: ::
+
+    #!/usr/bin/python
+    # -*- coding: utf-8 -*-
+    
+    """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
+    
+    License
+    =======
+    
+    B{Domogik} is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    B{Domogik} is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with Domogik. If not, see U{http://www.gnu.org/licenses}.
+    
+    Plugin purpose
+    ==============
+    
+    A quick description of the plugin
+    
+    Implements
+    ==========
+    
+    MyClassName()
+    -  __init__()
+    -  a_function()
+    
+    @author: The developer name <the.developer@email.com>
+    @copyright: (C) 2007-2013 Domogik project
+    @license: GPL(v3)
+    @organization: Domogik
+    """
+
+The first line is called the `shebang <http://en.wikipedia.org/wiki/Shebang_%28Unix%29>`_. The second line specify to python that we will use the *utf-8* coding.
+Then, there is a big comment part : *"""..."""* It contains 4 sections:
+
+* *License*: this should be the same for all Domogik plugins. It says that the file/plugin is uses the GPL license.
+* *Plugin purpose*: a quick description of the plugin.
+* *Implements*: this should list of the implement classes and methods
+* the 4 lines which starts with a *@*: fill the first line with your name or surname and your email.
+
+Import the needed libraries
+---------------------------
+
+Then, you need to import some libraries needed by the plugin. Example: ::
+
+    from domogik.xpl.common.plugin import XplPlugin
+    from domogik.xpl.common.xplmessage import XplMessage
+    
+    from domogik_packages.plugin_diskfree.lib.diskfree import Disk
+    import threading
+    import traceback
+
+Some import lines are mandatory: ::
+
+    from domogik.xpl.common.plugin import XplPlugin # this one is needed as all the xPL plugins extends from the class XplPlugin. This class will provide you some useful functions to get the configuration parameters values, ...
+    from domogik.xpl.common.xplmessage import XplMessage # this one is needed to create a xPL message.
+
+Then, you have to import your plugin library objects (here for the plugin diskfree we import a class): ::
+
+    from domogik_packages.plugin_diskfree.lib.diskfree import Disk
+
+To finish, depending on the plugin needs, you may need to import some various librairies. Example: ::
+
+    import threading
+    import traceback
+
+Create the main class
+---------------------
+
+Now, you can create your main class. Here is an empty class template and the final part of the plugin bin file which will allow to instantiate this class when you execute the bin file: ::
+
+    class MypluginManager(XplPlugin):
+        """ A description about the class
+        """
+    
+        def __init__(self):
+            """ The constructor of your class. This function  will be called when the class is instantiated.
+            """
+            XplPlugin.__init__(self, name='myplugin')
+            # do some other actions
+    
+    if __name__ == "__main__":
+        MypluginManager()
+
+Of course, rename *MypluginManager* and *myplugin* with your plugin name!
+
+
+What should be done in the main class ?
+---------------------------------------
+
+Well, it depends on your plugin! 
+
+First, you should handle the configuration part:
+
+* get the global configuration elements for your plugin (see the *configuration* part of the json file)
+* eventually, get the created devices list and for each device get its configuration values
+* if needed, do some checks about the configuration elements and the devices
+
+Then, start the features:
+
+* if the plugin manage some sensors, launch some threads to listen for the sensors (the threads should launch functions from the plugin library)
+* if the plugin manage some actuators, create some listeners for xPL commands messages. These listeners will call some callback functions (which should be defined in the library part)
+
+Finally, tell Domogik that the plugin is ready: 
+
+* when all is ready, call the *ready()* function
+
+
+
+Focus on the start process
+==========================
+
+The plugin global configuration
+-------------------------------
+
+If you except the mandatory *auto_startup* key, a plugin can have no configuration elements and another one can have multiple configuration elements. A plugin without configuration elements can be started without any configuration from the user (but maybe the user will need to create some devices, we will see this later). But for plugins with some configuration elements, the plugin developer may want to check that the plugin has been configured before the plugin can start!
+This can be done by calling the function *``self.check_configured()``* and check its return value: ::
+
+    # check if the plugin is configured. If not, this will stop the plugin and log an error
+    if not self.check_configured():
+        return
+
+How this functions works ? It is quite simple: when the user save the plugin configuration on a user interface, a *configured* key is inserted in database for the plugin and the host on which it is installed. If this key is not set to true in database, when you call this function, it will return False.
+
+
+To retrieve a configuration parameter value, you just need to do this: ::
+
+    self.interval = self.get_config("interval") 
+
+This function will check in database if a value is set for the key *interval* and the host where the plugin is installed. If there is such a value, it will be cast returned and casted to the data type configured in the json file. If there is no value, the default value configured in the json file will be returned.
+So, you don't need to cast the value and you don't need to handle some default value as it is already done in the json file. 
+
+Notice that the *auto_startup* configuration key which is dynamically added to the configuration parameters set in the *info.json* file is not to handle in the plugin. This is a configuration key used only by the *manager*.
+
+Get the created devices list for a plugin
+-----------------------------------------
+
+Some plugins may need to know the devices on which they need to interact. To get the devices list, just do: ::
+
+    # get the devices list
+    self.devices = self.get_device_list(quit_if_no_device = True)
+
+If your plugin needs some devices to be created to be run, set the parameter *quit_if_no_device* to *True*. If you do so and if no device exists when the plugin starts, the plugin will stop itself and log an error about this.
+
+Then, you can make a look on the device list and for each device get its parameters and do something (launch a thread, create a listener, ...). Example for the loop: ::
+
+    # loop on all found devices
+    for a_device in self.devices:
+        try:
+            # get the configuration values for the key 'the_key' for the sensor 'the_sensor' of the device
+            the_value = self.get_parameter_for_feature(a_device, "xpl_stats", "the_sensor", "the_key")
+
+            # do something
+        except:
+            # if there is an error, log it
+            self.log.error(traceback.format_exc())
+            # if the error is something blocking (a hardware gateway unavailable for example), you may want the plugin to stop.
+            # if so, uncomment the following lines
+            #self.force_leave()
+            #return
+
+Here is an example from the *diskfree* plugin: ::
+
+    # get the devices list
+    self.devices = self.get_device_list(quit_if_no_device = True)
+    
+    # instantiate the class of the library
+    # notice that we sent as parameters some callbacks :
+    # * the logger object (self.log)
+    # * the function to send a xPL messages
+    # * a function to help to stop the plugin
+    disk_manager = Disk(self.log, self.send_xpl, self.get_stop())
+            
+    # loop on all found devices
+    threads = {}
+    for a_device in self.devices:
+        try:
+            ### feature get_total_space
+            # get the path to check for the sensor 'get_total_space' of the device. The configuration key is 'device'
+            path = self.get_parameter_for_feature(a_device, "xpl_stats", "get_total_space", "device")
+            # get the interval between each check for the sensor 'get_total_space' of the device. The configuration key is 'interval'
+            interval = self.get_parameter_for_feature(a_device, "xpl_stats", "get_total_space", "interval")
+
+            self.log.info("Start monitoring total space for '%s'" % path)
+            # start a thread
+            # the thread must be named to be explicit in the logs 
+            thr_name = "{0}-{1}".format(a_device['name'], "get_total_space")
+            # create the thread
+            threads[thr_name] = threading.Thread(None,
+                                           disk_manager.get_total_space,
+                                          thr_name,
+                                          (path, interval,),
+                                          {})
+            # start the thread
+            threads[thr_name].start()
+            self.register_thread(threads[thr_name])
+
+
+            # [...] 3 other features are managed like this in the plugin
+
+        except:
+            # if there is an error, log it
+            self.log.error(traceback.format_exc())
+            # we don't quit plugin if an error occurred
+            # a disk can have been unmounted for a while
+            #self.force_leave()
+            #return
+
+Notice in this example that we get the devices list, then instantiate the class of the library and finally, for each device, call a method (or more if needed) from the library class in a thread.
+
+Perform updating devices process
+================================
+
+After declaring an instance of an handling update method of devices, you can register it as callback ::
+
+    # register a callback device.update MQ message.
+    self.register_cb_update_devices(myHandleDeviceUpdate)
+    
+Your *myHandleDeviceUpdate* method will be called each **device.update** event comming from MQ pub message.
+That method must have devices list as parameters. Example of refreshing method to register ::
+
+    # A methode to handle updated devices by callback, in Class declaration :
+    def myHandleDeviceUpdate(self, devices):
+        for hardDevice in self._myHardDevices:
+            hardDevice.refreshAllDmgDevice(devices)
+        self.log.info(u"All hard devives are updated from domogik devices")
+
+Updating global parameters of device ::
+        
+        # @param paramId: db id of global parameters getting from dict device['parameters']['myGlobalParam']['id']
+        # @param value : New parameter value.
+        # @return : True if success else False.
+        self.udpate_device_param(param_id, value)
+
+.. note::
+    Overwrite Plugin class method **on_message** needed to call the parent method at first ::
+    
+        # Your new overwrite methode
+        def on_message(self, msgid, content):
+            Plugin.on_message(self, msgid, content)
+            ....
+        
+Focus on the end : plugin ready
+===============================
+
+At the end of your *__init__* function, just add these 2 lines: ::
+
+    self.ready()
+    self.log.info("Plugin ready :)")
+
+Focus on devices tools 
+======================
+
+Get a data types specifications
+--------------------------------
+
+If you need a :doc:`data type <../../../technical/data_types/index>` detail definition to handle a sensor/command. To get it use Plugin class method ::
+
+    @param name :  the name of DT_Type
+    @return : dict DT_Type himself, empty dict if not find.
+    myDataType = self.get_data_type(name)
+
+Get json product information
+----------------------------
+
+Get product informations from json plugin can helpfull for :doc:`detection devices<detected_devices>`. To get it use Plugin class method :: 
+
+    #    @param productId : part of productId set in json plugin. Search it in lower case if your <myProductId> is contained in product['id'] string.
+    #    @return : dict of product defined in json plugin with picture file name added. If not find empty dict.
+    #        {
+    #            "name" : The name of product,
+    #            "id" : product id, this is base name of picture,
+    #            "documentation" : Link to manufacturer documentation, manual, specification,
+    #            "type": Device_type linked to this product,
+    #            "picture" : if exist, file name of picture representing product without full path, else None
+    #       }
+    self.get_product_by_id(self, myProductId):
+
+Get json sensor definition 
+--------------------------
+
+Get :doc:`sensor defined<../json/sensors>` in json plugin, helpfull for :doc:`detection devices<detected_devices>`
+
+- Search by Id ::
+
+    #    @param id : sensor id to find set in json plugin.
+    #    @return : dict of sensor if find else empty dict.
+    sensor = self.get_sensor_by_id(mySensorId):
+    
+- Search by name ::
+
+    #    @param name : value of key name set in json plugin, Search in lower case.
+    #        sensors" : {
+    #            "my_sensor" : {
+    #                "name" : "mySensorName", <== key compared to param <name>
+    #                ...
+    #    @return : dict of all sensors with same key name. If not find return empty dict.
+    #        {
+    #        "my_sensor1" : {
+    #            "name" : "mySensorName",
+    #            ...
+    #            },
+    #        "my_sensor2" : {
+    #            "name" : "mySensorName",
+    #            ...
+    #            },
+    #        ...
+    #        }           
+    sensor = self.get_sensors_by_name(mySensorName)
+   
+You could have several returned sensors if sensors json plugin have same *name*
+
+Get json command definition 
+---------------------------
+
+Get :doc:`command defined<../json/commands>` in json plugin, helpfull for :doc:`detection devices<detected_devices>`
+- Search by Id ::
+
+    #    @param id : command id to find set in json plugin.
+    #    @return : dict of commands if find else empty dict.
+    command = self.get_command_by_id(myCommandId):
+    
+- Search by key value ::
+
+    #    @param key : value of one key parameter set in json plugin. Search in lower case.
+    #        commands" : {
+    #            "my_command" : {
+    #                "name" : "foo name",
+    #                "parameters" : [{
+    #                        "key" : "myKeyValue", <== value of key compared to param <key>
+    #                        ...
+    #                        }]
+    #    @return : dict of all command include same key. If not find return empty dict.
+    #        {
+    #        "my_command1" : {
+    #            "name" : "foo name2",
+    #                "parameters" : [{
+    #                        "key" : "myKeyValue",
+    #                        ...
+    #                        }]
+    #            },
+    #        "my_command2" : {
+    #            "name" : "foo name2",
+    #                "parameters" : [{
+    #                        "key" : "myKeyValue",
+    #                        ...
+    #                        }]
+    #            },
+    #        ...
+    #        }
+
+    commands = self.get_commands_by_key(myKeyValue)
+
+You could have several returned commands if commands json plugin have same *key value*
+
+Focus on the logs
+=================
+
+There are 4 methods that enable you to log informations in the log files. The default logfiles are located in the directory configured in */etc/domogik/domogik.cfg* as *log_dir_path* (default is */var/log/domogik/*). The filename is *myplugin.log*.
+
+Here are the 4 methods:
+
+* ``self.log.error("a message")``: log an error message
+* ``self.log.warning("a message")``: log a warning message
+* ``self.log.info("a message")``: log an information message
+* ``self.log.debug("a message")``: log a debug message
+
+Error
+-----
+
+The error messages are to be used to log all critical or blocking points. You must use this : 
+
+* each time the plugin can't open a resource (hardware, file, url)
+* each time the plugin catch some important exception, as a connexion lost to a hardware, url, ...
+* if something is wrong in the plugin configuration
+* ...
+
+Warning
+-------
+
+The warning messages are to be used to log the small errors (with no real impact : for example an incorrect value is read from a sensor but it may happen as the technology is not 100% reliable) or some strange behaviour that are not blocking points
+
+Info
+----
+
+The info messages must be used for important informations:
+
+* some informations about the plugin startup
+* any information that may help someone who reads the log to check the plugin started successfully
+* give some informations about the hardware (if the plugin uses some hardware) : firmware version, configuration modes, ...
+* ...
+
+You must not use this log level for debug messages, for example:
+
+* avoid to use this level in eternal loops (to avoir big log files). Use the debug level in this case
+
+Debug
+-----
+
+The debug log level is not activated with Domogik official packages, so these messages won't be written in the log files. The development version of Domogik has this log level activated.
+The debug messages are to be used for:
+* logging any step in the plugin processing
+* log actions in the eternal loops
+* log important variable status
+* log any connection to a service or a hardware. For example, with a serial device you must log all that is sent to the device or all that is received from the device. These are very important informations for debugging! These informations can also be used later to create some automated tests or fix bugs and test them thanks to the user logs.
+* ...
+
+You can and you must use the debug messages! They are evry important when a bug is discovered as they allow anybody to check what is the issue.
+
+Using the logs in the library part
+----------------------------------
+
+:doc:`See the library part documentation <lib_part>`
+
+
+Focus on xPL : send xPL messages and listen for xPL messages
+============================================================
+
+Send xPL messages
+-----------------
+
+To allow the plugin to send some xPL messages, you must create such a function in the binary part. The function will not be the same for all the plugins and depends on the plugin features and on the xPL schema used. 
+
+Here is a template: ::
+
+    def send_xpl(self, arg1, arg2, ...):
+        """ Send xPL message on network
+        """
+        self.log.debug("Sending xPL message for arg1={0}, arg2={1}...".format(arg1, arg2))
+        msg = XplMessage()
+        msg.set_type("xpl-stat")
+        msg.set_schema("aschema.basic")
+        msg.add_data({"key1" : arg1})
+        msg.add_data({"key2" : arg2})
+        # ...
+        self.myxpl.send(msg)
+
+This function should be called from the library part. To allow the library part to call this function, you must sends this function as a callback parameter to the library.
+
+Here is an example of the function for the *sensor.basic* xPL message: ::
+
+    def send_xpl(self, address, type, value):
+        """ Send xPL message on network
+        """
+        self.log.debug("Values for {0} on {1} : {2}".format(type, address, value))
+        msg = XplMessage()
+        msg.set_type("xpl-stat")
+        msg.set_schema("sensor.basic")
+        msg.add_data({"device" : address})
+        msg.add_data({"type" : type})
+        msg.add_data({"current" : value})
+        self.myxpl.send(msg)
+
+Let's see how to use it with the library...
+
+First, when you instantiate the class of the library, set the function as a parameter (this is call a callback): ::
+
+    my_object = MyLibraryClass(self.log, self.send_xpl, self.get_stop())
+
+As you can see here, the ``self.send_xpl`` function is set as a parameter. We will see in the :doc:`library documentation <lib_part>` how to use it.
+
+
+Listen for xPL messages
+-----------------------
+
+.. todo::
+    TODO !
+
+
+Focus on launching threads 
+==========================
+
+When you want to launch an infinite task, you can use a thread. In this thread you can have an infinite loop with a timer in it or an infinite reading on something. 
+
+To be sure that the thread could be stopped when the plugin is requested to stop, you will need to use a *stop flag* in the library. So you need to give this *stop flag* to the library, for example when instantiating the library class. Example: ::
+
+
+    my_object = MyLibraryClass(self.log, self.send_xpl, self.get_stop())
+
+The function ``self.get_stop()`` will get the stop flag of the plugin and so give it to *my_object*. Then, in the methods of the library class, you will be able to handle this flag in the loops. You can read the :doc:`library documentation <lib_part>` to see how to handle it.
+
+Then, you can create your thread. Example: ::
+
+    import threading
+    # [...]
+    
+    class MypluginManager(XplPlugin):
+        # [...]
+ 
+        def a_function(self):
+            # [...]
+
+            # instantiate the class of the library
+            my_object = MyLibraryClass(self.log, self.send_xpl, self.get_stop())
+        
+            # set the thread name
+            thr_name = "a_name_for_my_thread"
+            # create the thread
+            my_thread = threading.Thread(None,
+                                          my_object.the_function,
+                                          thr_name,
+                                          (arg1, arg2,),
+                                          {})
+            # start the thread
+            my_thread.start()
+            self.register_thread(my_thread)
+
+Notice that a function **self.register_thread()** has been called. This function is important is it register the thread in a list. When the plugin is requested to stop, this list is used to help killing the existing threads! If your plugin doesn't stop, please check that all your threads are registered.
+
+
+Focus on the json file
+======================
+
+If you need, for some reasons to access the json file content, please notice that:
+
+* you should really ask yourself if the data you are looking for is not available somewhere else (over MQ or over REST).
+* the json content is available in *self.json_data*. Don't write in it!!!
+

@@ -17,6 +17,10 @@
   <p>If you find a bug or need an improvment about a package, please open a ticket in the package related GitHub tracker.</p>
   
   <h1>{% trans %}Configure DomoDroid{% endtrans %}</h1>
-  <img src="{{ qrcode(qrdata) }}" alt="DomogoDroid QR tag" width="130px" />
+  <div id="qr"></div>
+  <script type="text/javascript" src="static/js/qrcode.js"></script>
+  <script type="text/javascript">
+    $('#qr').qrcode("{{ qrdata|safe }}");
+  </script>
 </div>
 {% endblock %}

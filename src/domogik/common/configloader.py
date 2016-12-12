@@ -99,8 +99,11 @@ class Loader(object):
         self.config = configparser.ConfigParser()
 
         # find the configuration file encoding (default will be ascii, but depending on characters in the butler name it could be different!)
-        tmp = open(self.cfile, 'rb').read()
-        encoding = chardet.detect(tmp)['encoding']
+        #tmp = open(self.cfile).read()
+        #encoding = chardet.detect(tmp)['encoding']
+
+        encoding = "utf8"
+
         # sample result of detect() :
         #{'confidence': 0.9275988341086866, 'encoding': 'ISO-8859-2'}
 

@@ -68,7 +68,7 @@ class ScenarioManager:
         The test on devices are managed directly by xpl Listeners
         The test on time will be managed by a TimeManager
         The actions will be managed by an ActionManager
-        { 
+        {
          "condition" :
             { "AND" : {
                     "OR" : {
@@ -140,13 +140,13 @@ class ScenarioManager:
                         msg = "Waiting for {0} seconds".format(DATABASE_CONNECTION_WAIT)
                         self.log.info(msg)
                         time.sleep(DATABASE_CONNECTION_WAIT)
-    
+
                 if nb_test >= DATABASE_CONNECTION_NUM_TRY:
                     msg = "Exiting dbmgr!"
                     self.log.error(msg)
                     self.force_leave()
                     return
-    
+
                 ### Do the stuff
                 msg = "Connected to the database"
                 self.log.info(msg)
@@ -158,8 +158,9 @@ class ScenarioManager:
     def shutdown(self):
         """ Callback to shut down all parameters
         """
-        for cond in self._conditions.keys():
-            self.delete_scenario(cond, db_delete=False)
+        for cid, inst in self._instances.items():
+            self._instances[cid]['instance'].destroy()
+            del(self._instances[cid])
 
     def get_parsed_condition(self, name):
         """ Call cond.get_parsed_condition on the cond with name 'name'
@@ -234,10 +235,10 @@ class ScenarioManager:
         # create the condition itself
         try:
             scen = ScenarioInstance(self.log, cid, name, payload, dis, state, self._db)
-            self._instances[cid] = {'name': name, 'json': payload, 'instance': scen, 'disabled': dis } 
+            self._instances[cid] = {'name': name, 'json': payload, 'instance': scen, 'disabled': dis }
             self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload))
             self._instances[cid]['instance'].eval_condition()
-        except Exception as e:  
+        except Exception as e:
             if int(ocid) == 0:
                 with self._db.session_scope():
                     self._db.del_scenario(cid)
@@ -355,7 +356,7 @@ class ScenarioManager:
             msg = u"Error while enabling the scenario id='{0}'. Error is : {1}".format(cid, traceback.format_exc())
             self.log.error(msg)
             return {'status': 'ERROR', 'msg': msg}
- 
+
     def disable_scenario(self, cid):
         try:
             if cid == '' or int(cid) not in self._instances.keys():
