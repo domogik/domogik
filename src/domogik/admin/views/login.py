@@ -41,7 +41,7 @@ def load_user_from_request(request):
             auth = request.authorization
             print(auth)
             if not auth:
-                print("Rest auth active - no authorization request received")
+                print("Rest auth active - no authorization request received. If you added login and password in the url, you may encounter this error. Bad usage : curl http://login:password@url/ - Good usage : curl --user login:password http://url/ ")
                 return None
             else:
                 with app.db.session_scope():
