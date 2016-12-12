@@ -40,20 +40,27 @@ def load_user_from_request(request):
         if app.rest_auth == 'True':
             auth = request.authorization
             if not auth:
+                print("Rest auth active - no authorization request received")
                 return None
             else:
                 with app.db.session_scope():
                     if app.db.authenticate(auth.username, auth.password):
+                        print("Rest auth active - user authenticated")
                         user = app.db.get_user_account_by_login(auth.username)
                         if user.is_admin:
+                            print("Rest auth active - user authenticated - user is admin (ok)")
                             return user
                         else:
+                            print("Rest auth active - user authenticated - user is NOT admin (not granted : only admin users can query REST)")
                             return None
                     else:
+                            print("Rest auth active - user not authenticated - incorrect login or password")
                             return None
         else:
+            print("Rest auth inactive - anonymous user will be used")
             with app.db.session_scope():
                 user = app.db.get_user_account_by_login('Anonymous')
+                print("Rest auth inactive - anonymous user is : '{0}'".format(user))
                 return user
     else:
         return None
