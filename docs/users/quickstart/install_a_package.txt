@@ -12,7 +12,7 @@ You can also find some packages which are not yet reviewed on GitHub. You can us
 How to install a package ?
 ==========================
 
-In Domogik 0.5.x the packages installation can only be done from the command line. In a next releases we should restore an installation process from the administration user interface.
+In Domogik 0.6.x the packages installation can only be done from the command line. In a next releases we should restore an installation process from the administration user interface.
 
 There are 3 ways to install a package from the command line:
 

@@ -1,0 +1,12 @@
+=============
+Release 0.6.0
+=============
+
+Purpose
+=======
+
+Removed watcher
+===============
+
+Previous all plugins and core components where forked, with this change we removed the need of the fork
+

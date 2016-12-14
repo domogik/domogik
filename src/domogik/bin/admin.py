@@ -68,9 +68,9 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 zmq.eventloop.ioloop.install()
 
-REST_API_VERSION = "0.8"
 DATABASE_CONNECTION_NUM_TRY = 50
 DATABASE_CONNECTION_WAIT = 30
+REST_API_VERSION = "0.9"
 
 ################################################################################
 
