@@ -5,7 +5,7 @@ Install Domogik
 If you are already a Domogik 0.3 user
 =====================================
 
-You must first `install Domogik 0.4.2 release <http://domogik.readthedocs.io/en/0.4.0/enduser/installation/index.html>`_. Then, you will be able to upgrade to Domogik 0.5.
+You must first `install Domogik 0.4.2 release <http://domogik.readthedocs.io/en/0.4.2/enduser/installation/index.html>`_. Then, you will be able to upgrade to Domogik 0.5.
 
 Important notice about the 0.5 release
 ======================================
