@@ -606,7 +606,7 @@ def client_devices_new_prod(client_id, device_type_id, product):
 
 def client_devices_new_wiz(client_id, device_type_id, product):
     detail = get_client_detail(client_id)
-    (params, reason, status) = build_deviceType_from_packageJson(app.zmq_context, device_type_id)
+    (params, reason, status) = build_deviceType_from_packageJson(app.zmq_context, device_type_id, client_id)
 
     # dynamically generate the wtfform
     class F(Form):

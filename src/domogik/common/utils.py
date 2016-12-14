@@ -287,7 +287,7 @@ def remove_accents(input_str):
     return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
-def build_deviceType_from_packageJson(zmq, dev_type_id):
+def build_deviceType_from_packageJson(zmq, dev_type_id, client_id):
     result = {}
     status = True
     reason = ""
@@ -315,6 +315,7 @@ def build_deviceType_from_packageJson(zmq, dev_type_id):
         # build the device params
         stats = []
         result['device_type'] = dev_type_id
+        result['client_id'] = client_id
         result['name'] = ""
         result['reference'] = ""
         result['description'] = ""

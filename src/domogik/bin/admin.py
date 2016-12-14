@@ -303,6 +303,7 @@ class Admin(Plugin):
             admin_app.logger.addHandler(log)
         admin_app.zmq_context = self.zmq
         admin_app.db = DbHelper()
+        admin_app.log = self.log
         admin_app.datatypes = self.datatypes
         admin_app.clean_json = self.clean_json
         admin_app.rest_auth = self.rest_auth

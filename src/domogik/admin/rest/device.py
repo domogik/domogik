@@ -63,7 +63,7 @@ def device_params(client_id, dev_type_id):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    (result, reason, status) = build_deviceType_from_packageJson(app.zmq_context, dev_type_id)
+    (result, reason, status) = build_deviceType_from_packageJson(app.zmq_context, dev_type_id, client_id)
     # return the info
     return 200, result
 
