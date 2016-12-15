@@ -419,3 +419,30 @@ class Scenario(DomogikBase):
         self.disabled = disabled
         self.description = description
         self.state = state
+
+class Location(DomogikBase):
+    __tablename__ = '{0}_location'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = Column(Unicode(32), nullable=False, autoincrement=False)
+    isHome = Column(Boolean, nullable=False, default=False)
+    type = Column(Unicode(10), nullable=True)
+    params = relationship("LocationParam", backref=__tablename__, cascade="all", passive_deletes=True)
+
+    def __init__(self, name, type, isHome=False):
+        self.name = ucode(name)
+        self.type = type
+        self.isHome = isHome
+
+class LocationParam(DomogikBase):
+    __tablename__ = '{0}_location_param'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    id = Column(Integer, primary_key=True)
+    location_id = Column(Integer, ForeignKey('{0}.id'.format(Location.get_tablename()), ondelete="cascade"), nullable=False)
+    key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
+    value = Column(Unicode(255), nullable=True)
+
+    def __init__(self, location_id, key, value):
+        self.location_id = location_id
+        self.key = ucode(key)
+        self.value = ucode(value)

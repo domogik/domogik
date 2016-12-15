@@ -63,7 +63,8 @@ from domogik.common.sql_schema import (
         Scenario,
         Command, CommandParam,
         Sensor, SensorHistory,
-        XplCommand, XplStat, XplStatParam, XplCommandParam
+        XplCommand, XplStat, XplStatParam, XplCommandParam,
+        Location, LocationParam
 )
 from contextlib import contextmanager
 
@@ -264,7 +265,7 @@ class DbHelper():
 
         """
         return self.__session.query(PluginConfig).all()
-
+    
     def list_plugin_config(self, pl_type, pl_id, pl_hostname):
         """Return all parameters of a plugin
 
@@ -1916,6 +1917,60 @@ class DbHelper():
                              .join(SensorHistory) \
                              .order_by(SensorHistory.date.desc()) \
                              .limit(100)
+
+###################
+# Location name, type, isHome=False
+###################
+    def get_all_location(self):
+        return self.__session.query(Location).all()
+
+    def get_location(self, id):
+        return self.__session.query(Location).filter_by(id=id).first()
+
+    def add_location(self, name, type, isHome=False):
+        self.__session.expire_all()
+        config = Location(name=name, type=type, isHome=isHome)
+        self.__session.add(config)
+        self._do_commit()
+        return config
+
+    def udpate_location_param(self, l_id, name=None, type=None, isHome=None):
+        self.__session.expire_all()
+        config = self.__session.query(Location).filter_by(id=l_id).first()
+        if config is None:
+            self.__raise_dbhelper_exception("Location with id {0} couldn't be found".format(l_id))
+        if name is not None:
+            config.name = ucode(name)
+        if type is not None:
+            config.type = ucode(type)
+        if isHome is not None:
+            config.isHome = isHome
+        self.__session.add(config)
+        self._do_commit()
+        return config
+
+
+
+###################
+# Location params
+###################
+    def add_location_param(self, l_id, key, value):
+        self.__session.expire_all()
+        config = LocationParam(location_id=l_id, key=key, value=value)
+        self.__session.add(config)
+        self._do_commit()
+        return config
+
+    def udpate_location_param(self, l_id, key, value):
+        self.__session.expire_all()
+        config = self.__session.query(LocationParam).filter_by(location_id=l_id).filter_by(key=key).first()
+        if config is None:
+            self.__raise_dbhelper_exception("Location param with id {0} couldn't be found".format(l_id))
+        if value is not None:
+            config.value = ucode(value)
+        self.__session.add(config)
+        self._do_commit()
+        return config
 
 
 ###################

@@ -1,0 +1,25 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+<div class="container">
+    <h1>{% trans %}Location{% endtrans %}</h1>
+    <a id="start" class="btn btn-info" href="/locations/edit/0">{% trans %}Add a new location{% endtrans%}</a>
+    <p></p>
+    {% if locations|length > 0 %}
+      <div class="list-group">
+        {% for data in locations %}
+          <div class="list-group-item clearfix">
+            <a href="/location/edit/{{ data.cid }}">
+              <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+              {{ data.name }}
+            </a>
+            <span class="pull-right">
+            </span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-warning">{% trans %}There are no locations yet, you should at least add one with the name home{% endtrans %}</div>
+    {% endif %}
+</div>
+{% endblock %}

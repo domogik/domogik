@@ -263,6 +263,7 @@ from domogik.admin.views.apidoc import *
 from domogik.admin.views.scenario import *
 from domogik.admin.views.timeline import *
 from domogik.admin.views.battery import *
+from domogik.admin.views.locations import *
 
 ### import all rest urls
 import domogik.admin.rest.status
