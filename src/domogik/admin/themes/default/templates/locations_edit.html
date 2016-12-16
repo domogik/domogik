@@ -2,7 +2,7 @@
 
 {% block content %}
 <script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
-<script src="/static/js/jquery.geocomplete.min.js"></script>
+<script src="{{ theme_static('libraries/geolocation/jquery.geocomplete.min.js') }}"></script>
 <div class="container">
     <h1>{% trans %}Location Edit{% endtrans %}</h1>
     <div class="row-fluid">
