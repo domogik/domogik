@@ -1,0 +1,15 @@
+=============
+Release 0.5.2
+=============
+
+Purpose
+=======
+
+The **0.5.2 release** is a minor release which includes some fixes about the 0.5.1 release.
+
+
+Fixes
+=====
+
+* The **docs.old** folder have been removed.
+
