@@ -175,9 +175,9 @@ def is_already_launched(log, type, id, manager=True):
     # the grep -v mprof is there to allow run of memory profiler
     if manager:
         #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
-        cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v mprof | grep -v update".format(id, STARTED_BY_MANAGER, my_pid)
+        cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v mprof | grep -v update | grep -v sysadmin".format(id, STARTED_BY_MANAGER, my_pid)
     else:
-        cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
+        cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su | grep -v sysadmin".format(id)
     # the grep python is needed to avoid a client to not start because someone is editing the client with vi :)
     
     if log:
