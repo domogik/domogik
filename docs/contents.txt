@@ -28,6 +28,7 @@ Table Of Content
 
     /users/openremote/index
 
+    /users/releases/0.5.2
     /users/releases/0.5.0
     /users/releases/0.4.2
     /users/releases/0.4.1
