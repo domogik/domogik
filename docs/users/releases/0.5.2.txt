@@ -12,4 +12,5 @@ Fixes
 =====
 
 * The **docs.old** folder have been removed.
+* Scenario : the action *Make the Butler say something* is now fixed. It works with the plugins that listen for incoming messages from the Butler.
 
