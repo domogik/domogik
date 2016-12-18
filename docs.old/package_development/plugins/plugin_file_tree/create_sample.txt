@@ -1,7 +1,0 @@
-=========================================
-Create main folders and files in one shot
-=========================================
-
-There is an online repository which can help you to create a plugin template : https://github.com/vdomos/domogik_create_plugin_sample
-
-
