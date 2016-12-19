@@ -5,7 +5,7 @@ Install Domogik
 If you are already a Domogik 0.3 user
 =====================================
 
-You must first `install Domogik 0.4.2 release <http://domogik.readthedocs.io/en/0.4.0/enduser/installation/index.html>`_. Then, you will be able to upgrade to Domogik 0.5.
+You must first `install Domogik 0.4.2 release <http://domogik.readthedocs.io/en/0.4.2/enduser/installation/index.html>`_. Then, you will be able to upgrade to Domogik 0.5.
 
 Important notice about the 0.5 release
 ======================================
@@ -103,6 +103,15 @@ In minimum debian repo the package **sphinx-better-theme** does not exist::
 
     $ sudo pip install sphinx-better-theme
 
+About Debian stable (8.6)
+*************************
+
+If you are using a Debian stable, you will need to install a more recent release of the **alembic** package. You can do ::
+
+    $ cd /tmp
+    $ wget http://ftp.fr.debian.org/debian/pool/main/a/alembic/alembic_0.8.8-2_all.deb
+    $ sudo dpkg -i alembic_0.8.8-2_all.deb
+ 
 
 Mysql server
 ------------
