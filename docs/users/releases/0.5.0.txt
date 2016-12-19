@@ -1,11 +1,11 @@
 =============
-Release 0.5.0
+Release 0.5.x
 =============
 
 Purpose
 =======
 
-The 0.5.0 release is finally bigger than expected and includes a lot of improvments about :
+The **0.5.0 release** is finally bigger than expected and includes a lot of improvments about :
 
 * the scenario engine
 * the admin and rest are merged for resources improvment
@@ -17,6 +17,9 @@ The 0.5.0 release is finally bigger than expected and includes a lot of improvme
 .. image:: 0.5_800x400.jpg
     :align: center
     :alt: Domogik
+
+
+The **0.5.1 release** includes a fix about authentication.
 
 
 Database upgrades
