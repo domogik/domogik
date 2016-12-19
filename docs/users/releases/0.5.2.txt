@@ -14,4 +14,4 @@ Fixes
 * The **docs.old** folder have been removed.
 * Scenario : the action *Make the Butler say something* is now fixed. It works with the plugins that listen for incoming messages from the Butler.
 * The function that detects if a component is already launched is improved.
-
+* The admin component is no more raising a 500 error if a device has a sensor or command with an obsolete data type. A warning will be displayed.
