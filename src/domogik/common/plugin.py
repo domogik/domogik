@@ -353,7 +353,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             if type == "float":
                 return float(value)
             if type == "integer":
-                return float(value)
+                return int(value)
             # type == ipv4 : nothing to do
             # type == multiple choice : nothing to do
             # type == string : nothing to do
