@@ -3,6 +3,56 @@ from flask import request
 from flask.views import MethodView
 from flask_login import login_required
 
+@app.route('/rest/sensor/since/<timestamp>', methods=['GET'])
+@json_response
+@login_required
+def sensor_since(timestamp):
+    """
+    @api {get} /rest/sensor/since/<timestamp> Returns all sensors changed since this timestamp
+    @apiName getSensorSince
+    @apiGroup Sensor
+    @apiVersion 0.4.1
+
+    @apiParam {timestamp} timestamp the unix timestamp
+
+    @apiSuccess {json} result The json representing of the sensors
+
+    @apiSampleRequest /sensor/since/123456
+
+    @apiSuccessExample Success-Response:
+	HTTTP/1.1 200 OK
+	[
+	    {
+		"conversion": "",
+		"history_duplicate": false,
+		"history_round": 0,
+		"name": "Power_sensor",
+		"data_type": "DT_Power",
+		"last_received": 1410857820,
+		"value_max": 652,
+		"value_min": 54,
+		"history_max": 0,
+		"incremental": false,
+		"timeout": 0,
+		"history_store": true,
+		"history_expire": 0,
+		"formula": null,
+		"last_value": "241.0",
+		"id": 2,
+		"reference": "power",
+		"device_id": 2
+	    }
+	]
+
+    @apiErrorExample Error-Response:
+	HTTTP/1.1 404 Not Found
+    """
+    app.json_stop_at = ["core_device"]
+    app.db.open_session()
+    b = app.db.get_all_sensor_since(timestamp)
+    app.db.close_session()
+    return 200, b
+
 class sensorAPI(MethodView):
     decorators = [login_required, json_response]
 

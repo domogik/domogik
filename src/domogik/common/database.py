@@ -1559,6 +1559,9 @@ class DbHelper():
     def get_sensor_by_device_id(self, did):
         return self.__session.query(Sensor).filter_by(device_id=did).all()
 
+    def get_all_sensor_since(self, tstamp):
+        return self.__session.query(Sensor).filter(Sensor.last_received > tstamp).all()
+
     def update_sensor(self, sid, history_round=None, \
             history_store=None, history_max=None, \
             history_expire=None, timeout=None, \
