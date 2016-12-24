@@ -396,7 +396,7 @@ class DbHelper():
     def list_devices_by_timestamp(self, tstamp):
         #return self.__session.query(Device).filter_by(client_id=p_id).all()
         device_list = []
-        for device in self.__session.query(Device).filter_by(info_changed>tstamp).all():
+        for device in self.__session.query(Device).filter(Device.info_changed>datetime.datetime.fromtimestamp(float(tstamp))).all():
             device_list.append(self.get_device(device=device))
         return device_list
 

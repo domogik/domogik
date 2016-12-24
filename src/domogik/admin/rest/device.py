@@ -10,6 +10,101 @@ from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from flask_login import login_required
 
+@app.route('/rest/device/since/<timestamp>', methods=['GET'])
+@json_response
+@login_required
+def device_since(timestamp):
+    """
+    @api {get} /rest/device/since/<timestamp> Returns all devices changed since this timestamp
+    @apiName getSensorSince
+    @apiGroup Sensor
+    @apiVersion 0.4.1
+
+    @apiParam {timestamp} timestamp the unix timestamp
+
+    @apiSuccess {json} result The json representing of the device
+
+    @apiSampleRequest /device/since/123456
+    
+    @apiSuccessExample Success-Response:
+        HTTTP/1.1 200 OK
+        {
+            "xpl_stats": {
+                "get_temp": {
+                    "json_id": "get_temp",
+                    "schema": "sensor.basic",
+                    "id": 4,
+                    "parameters": {
+                        "dynamic": [
+                            {
+                                "ignore_values": "",
+                                "sensor_name": "temp",
+                                "key": "current"
+                            }
+                        ],
+                        "static": [
+                            {
+                                "type": "integer",
+                                "value": "2",
+                                "key": "device"
+                            },
+                            {
+                                "type": null,
+                                "value": "temp",
+                                "key": "type"
+                            },
+                            {
+                                "type": null,
+                                "value": "c",
+                                "key": "units"
+                            }
+                        ]
+                    },
+                    "name": "get_temp"
+                },
+                ...
+            },
+            "commands": {
+                ...
+            },
+            "description": "Test Temp",
+            "reference": "VMB1TS",
+            "xpl_commands": {
+                ...
+            },
+            "client_id": "plugin-velbus.igor",
+            "device_type_id": "velbus.temp",
+            "sensors": {
+                "temp": {
+                    "value_min": 21.875,
+                    "data_type": "DT_Temp",
+                    "incremental": false,
+                    "id": 4,
+                    "reference": "temp",
+                    "conversion": "",
+                    "name": "temp_sensor",
+                    "last_received": 1410857216,
+                    "timeout": 0,
+                    "formula": null,
+                    "last_value": "29.1875",
+                    "value_max": 37.4375
+                }
+            },
+            "parameters": {
+                ...
+            },
+            "id": 3,
+            "name": "Temp elentrik"
+        }
+
+    @apiErrorExample Error-Response:
+	HTTTP/1.1 404 Not Found
+    """
+    app.db.open_session()
+    b = app.db.list_devices_by_timestamp(timestamp)
+    app.db.close_session()
+    return 200, b
+
 @app.route('/rest/device/params/<client_id>/<dev_type_id>', methods=['GET'])
 @json_response
 @login_required
