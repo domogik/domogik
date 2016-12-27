@@ -1930,6 +1930,12 @@ class DbHelper():
     def get_location(self, id):
         return self.__session.query(Location).filter_by(id=id).first()
 
+    def add_full_location(self, name, type, isHome, params):
+        loc = self.add_location(name, type, isHome)
+        for (key, val) in params.items():
+            self.add_location_param(loc.id, key, val)
+        return loc
+
     def add_location(self, name, type, isHome=False):
         self.__session.expire_all()
         config = Location(name=name, type=type, isHome=isHome)
@@ -1937,7 +1943,7 @@ class DbHelper():
         self._do_commit()
         return config
 
-    def udpate_location_param(self, l_id, name=None, type=None, isHome=None):
+    def udpate_location(self, l_id, name=None, type=None, isHome=None):
         self.__session.expire_all()
         config = self.__session.query(Location).filter_by(id=l_id).first()
         if config is None:
