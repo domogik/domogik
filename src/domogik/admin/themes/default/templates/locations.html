@@ -9,11 +9,13 @@
       <div class="list-group">
         {% for data in locations %}
           <div class="list-group-item clearfix">
-            <a href="/location/edit/{{ data.cid }}">
+            <a href="/locations/edit/{{ data.id }}">
               <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
               {{ data.name }}
             </a>
+            ({{ data.type }})
             <span class="pull-right">
+                {% if data.isHome %}<span class="fa fa-home"></span>{% endif %}
             </span>
           </div>
         {% endfor %}
