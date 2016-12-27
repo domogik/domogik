@@ -3,9 +3,6 @@ Releasing tasks
 ===============
 
 
-.. todo::
-    Complete while releasing 0.4.0
-
 Resources
 =========
 
@@ -52,3 +49,15 @@ Packaging
 * create the mail for ML
 * tweet the release : link to the website article
 
+0.5.x releasing tasks
+=====================
+
+In a dedicated branch :
+
+* Update src/domogik/__init__.py
+* Create a new release note docs/users/releases/
+* Add the new release note in docs/contents.txt and docs/index.txt and docs/users/installation/index.txt
+* test
+* update docs/users/installation/index.txt with the new packages path
+* merge in master
+* tag

@@ -58,15 +58,13 @@ class ButlerAction(AbstractAction):
         self.pub = MQPub(self.zmq, self._mq_name)
 
     def do_action(self):
-        media = self._params['media']
-        location = self._params['location']
         text = self._params['text']
 
-        self._log.info(u"Make the butler say '{0}'. Media is '{1}', location is '{2}'".format(text, media, location))
+        self._log.info(u"Make the butler say '{0}'. ".format(text))
 
         # publish over MQ
-        data =              {"media" : media,
-                             "location" : location,
+        data =              {"media" : "*",
+                             "location" : "*",
                              "sex" : self.butler_sex,
                              "mood" : None,
                              "reply_to" : None,
@@ -76,14 +74,7 @@ class ButlerAction(AbstractAction):
                             data)
 
     def get_expected_entries(self):
-        return {'media': {'type': 'list',
-                            'description': 'Media target',
-                            'values' : [['*', '*'], ['Audio', 'audio']],
-                            'default': '*'},
-                'location': {'type': 'string',
-                            'description': 'Location',
-                            'default': ''},
-                'text': {'type': 'string',
-                            'description': 'Text',
-                            'default': ''}
+        return {'text': {'type': 'string',
+                         'description': 'Text',
+                         'default': ''}
                }

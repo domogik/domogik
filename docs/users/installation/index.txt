@@ -313,7 +313,7 @@ Metrics section :
 * The **id** should be some anonymous id. 
 * The **url** must not be changed.
 
-If you are wondering what metrics are, please check the :doc:`note about metrics in the release note </users/releases/0.5.0>`.
+If you are wondering what metrics are, please check the :doc:`note about metrics in the 0.5.0 release note </users/releases/0.5.0>`.
 
 Make Domogik start with your computer
 -------------------------------------
