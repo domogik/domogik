@@ -1,53 +1,57 @@
 {% extends theme("base/base.html") %}
 
 {% block content %}
-<script src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
+<script src="http://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyD43wvlTg66qR_yPOQOgEG4zeSOMC_ubu4"></script>
 <script src="{{ theme_static('libraries/geolocation/jquery.geocomplete.min.js') }}"></script>
 <div class="container">
     <h1>{% trans %}Location Edit{% endtrans %}</h1>
-    <div class="row-fluid">
-      <div class="span4">
-         <form id="location_form" method="post" role="form">
-            <input name="lat" type="hidden" value="" />
-            <input name="lng" type="hidden" value="" />
-            <input name="formatted_address" type="hidden" value="" />
-            <input name="postal_code" type="hidden" value="" />
-            <input name="locality" type="hidden" value="" />
-            <input name="country" type="hidden" value="" />
-            <input name="country_short" type="hidden" value="" />
-            <label>Name</label><input name="lname" type="text" value="" /><br />
-            <label>Radius</label><input name="lradius" type="text" value="" /><br />
-        </form>
+  <form id="location_form" method="post" role="form" class="form-horizontal">
+  {% for item in form %}
+    {% if item.type == "HiddenField" or item.name == "csrf_token" %}
+        {{ item }}
+    {% elif item.name == "submit" %}
+      <div class="form-group">
+	<div class="col-xs-offset-3 col-xs-9">
+	<input type="submit" value="{% trans %}Save{% endtrans %}" class="btn btn-primary">
+	</div>
+      </div>
+    {% else %}
+      <div class="form-group">
+	<label class="control-label col-xs-3">{{ item.label }}</label>
+	<div class="col-xs-9">
+	  {% if item.type == "TextField" %}
+	    {{ item(size = 50) }}
+	  {% else %}
+	    {{ item }}
+	  {% endif %}
+	  <span class="help-block">{{ item.description }}</span>
+	</div>
+      </div>
+    {% endif %}
+  {% endfor %}
+    <div class="form-group">
+        <div class="col-xs-offset-3 col-xs-9">
+            <input id="geocomplete" type="text" placeholder="Type in an address" size="50" value="{{ formatted_address }}" />
+            <input id="find" type="button" value="find" />
+            <div id="map_canvas" style="width:400px; height:400px"></div>
+        </div>
     </div>
-    <div class="span8 pull-right" style="text-align:right">
-          <input id="geocomplete" type="text" placeholder="Type in an address" size="50" value="Grotstraat, 2400 Mol, België" />
-          <input id="find" type="button" value="find" />
-          <div id="map_canvas" style="width:400px; height:400px"></div>
-    </div>
-    </div>
+  </form>
     <script>
       $(function(){
-        
         var options = {
           map: "#map_canvas",
           details: "#location_form"
         };
-        
-        $("#geocomplete").geocomplete(options)
-          .bind("geocode:error", function(event, status){
-            console.log("ERROR: " + status);
-          });
-        
+        $("#geocomplete").geocomplete(options);
         $("#find").click(function(){
           $("#geocomplete").trigger("geocode");
         });
-        
         $("#examples a").click(function(){
           $("#geocomplete").val($(this).text()).trigger("geocode");
           return false;
         });
         $("#geocomplete").trigger("geocode");
-        
       });
     </script>
 </div>
