@@ -26,6 +26,7 @@ def api_butler_discuss_get():
     @apiParam callback The callback name (automatically added by jquery)
 
     @apiExample Example usage with wget
+        If authentication is activated, you will need to also use these options : --auth-no-challenge --http-user=admin --http-password=123 
         $ wget -qO- 'http://192.168.1.10:40406/rest/butler/discuss?callback=foo&data={"text" : "hello", "source" : "a_script"}' --header="Content-type: application/json"
         foo({
             "identity": "Aria", 
@@ -104,6 +105,7 @@ def api_butler_discuss_post():
 
 
     @apiExample Example usage with wget
+        If authentication is activated, you will need to also use these options : --auth-no-challenge --http-user=admin --http-password=123 
         $ wget -qO- http://192.168.1.10:40406/rest/butler/discuss --post-data='{"text" : "hello", "source" : "a_script"}' --header="Content-type: application/json"
         {
             "identity": "Aria", 
