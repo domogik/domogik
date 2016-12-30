@@ -892,10 +892,9 @@ class DbHelper():
                     #    .filter(SensorHistory.sensor_id == sid) \
                     #    .order_by(SensorHistory.date.desc()) \
                     #    .first()
-                    last = last2[0]
-                    if last is not None:
-                        if last.original_value_num is not None:
-                            value = float(value) - last.original_value_num
+                    if len(last2) > 0 and last2[0] is not None:
+                        if last2[0].original_value_num is not None:
+                            value = float(value) - last2[0].original_value_num
                     else:
                         # set the begin value to 0
                         value = 0
