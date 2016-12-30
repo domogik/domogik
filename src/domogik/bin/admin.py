@@ -316,6 +316,8 @@ class Admin(Plugin):
         admin_app.resources_directory = self.get_resources_directory()
         admin_app.packages_directory = self.get_packages_directory()
         admin_app.publish_directory = self.get_publish_directory() # publish directory for all packages
+        #admin_app.mqpub = self._pub
+        admin_app.mqpub = MQPub(zmq.Context(), 'admin-views')
         
         publisher = Publisher()
         tapp = Application([

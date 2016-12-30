@@ -541,8 +541,13 @@ def client_config(client_id):
                     else:
                         val = 'Y'
                 app.db.set_plugin_config(type, name, host, key, val)
-            flash(gettext("Config saved successfull"), 'success')
-
+	app.mqpub.send_event('plugin.configuration',
+			 {"type" : type,
+			  "name" : name,
+			  "host" : host,
+			  "event" : "updated"})
+	flash(gettext("Config saved successfull"), 'success')
+    
     return render_template('client_config.html',
             form = form,
             clientid = client_id,
