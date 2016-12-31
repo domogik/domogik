@@ -85,7 +85,7 @@ class PackageInstaller():
     def __init__(self):
         """ Init
         """
-        l = logger.Logger("package")
+        l = logger.Logger("package", log_on_stdout=True)
         l.set_format_mode("messageOnly")
         self.log = l.get_logger()
 
