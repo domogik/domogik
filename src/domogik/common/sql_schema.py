@@ -79,7 +79,7 @@ class PluginConfig(DomogikBase):
 
     __tablename__ = '{0}_plugin_config'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Unicode(30), primary_key=True)
+    id = Column(Unicode(30), primary_key=True, autoincrement=True, nullable=False)
     type = Column(Unicode(30), primary_key=True, default=u'plugin')
     hostname = Column(Unicode(40), primary_key=True)
     key = Column(Unicode(255), primary_key=True)
@@ -105,7 +105,7 @@ class Device(DomogikBase):
 
     __tablename__ = '{0}_device'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     name = Column(Unicode(128), nullable=False)
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
@@ -143,7 +143,7 @@ class DeviceParam(DomogikBase):
 
     __tablename__ = '{0}_device_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
@@ -167,7 +167,7 @@ class Person(DomogikBase):
 
     __tablename__ = '{0}_person'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     first_name = Column(Unicode(20), nullable=False)
     last_name = Column(Unicode(20), nullable=False)
     birthdate = Column(Date)
@@ -190,7 +190,7 @@ class UserAccount(DomogikBase):
 
     __tablename__ = '{0}_user_account'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     login = Column(Unicode(20), nullable=False, unique=True)
     password = Column("password", Unicode(255), nullable=False)
     person_id = Column(Integer, ForeignKey('{0}.id'.format(Person.get_tablename())))
@@ -240,7 +240,7 @@ class UserAccount(DomogikBase):
 class Command(DomogikBase):
     __tablename__ = '{0}_command'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True) 
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255), nullable=False)
     reference = Column(Unicode(64))
@@ -272,7 +272,7 @@ class CommandParam(DomogikBase):
 class Sensor(DomogikBase):
     __tablename__ = '{0}_sensor'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True) 
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
@@ -311,7 +311,7 @@ class Sensor(DomogikBase):
 class SensorHistory(DomogikBase):
     __tablename__ = '{0}_sensor_history'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True) 
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
     sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
     value_num = Column(Float(53), nullable=True)
@@ -333,7 +333,7 @@ class SensorHistory(DomogikBase):
 class XplStat(DomogikBase):
     __tablename__ = '{0}_xplstat'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
     name = Column(Unicode(64), nullable=False)
@@ -372,7 +372,7 @@ class XplStatParam(DomogikBase):
 class XplCommand(DomogikBase):
     __tablename__ = '{0}_xplcommand'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     cmd_id = Column(Integer, ForeignKey('{0}.id'.format(Command.get_tablename()), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
