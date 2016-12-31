@@ -79,7 +79,7 @@ class PluginConfig(DomogikBase):
 
     __tablename__ = '{0}_plugin_config'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Unicode(30), primary_key=True, autoincrement=True, nullable=False)
+    id = Column(Unicode(30), primary_key=True)
     type = Column(Unicode(30), primary_key=True, default=u'plugin')
     hostname = Column(Unicode(40), primary_key=True)
     key = Column(Unicode(255), primary_key=True)
