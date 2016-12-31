@@ -437,8 +437,7 @@ class Location(DomogikBase):
 class LocationParam(DomogikBase):
     __tablename__ = '{0}_location_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    location_id = Column(Integer, ForeignKey('{0}.id'.format(Location.get_tablename()), ondelete="cascade"), nullable=False)
+    location_id = Column(Integer, ForeignKey('{0}.id'.format(Location.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
 

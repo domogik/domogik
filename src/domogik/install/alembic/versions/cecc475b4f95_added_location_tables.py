@@ -26,12 +26,11 @@ def upgrade():
     mysql_engine='InnoDB'
     )
     op.create_table('core_location_param',
-    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('location_id', sa.Integer(), nullable=False),
     sa.Column('key', sa.Unicode(length=32), autoincrement=False, nullable=False),
     sa.Column('value', sa.Unicode(length=255), nullable=True),
     sa.ForeignKeyConstraint(['location_id'], ['core_location.id'], ondelete='cascade'),
-    sa.PrimaryKeyConstraint('id', 'key'),
+    sa.PrimaryKeyConstraint('location_id', 'key'),
     mysql_character_set='utf8',
     mysql_engine='InnoDB'
     )

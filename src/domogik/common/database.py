@@ -1933,7 +1933,7 @@ class DbHelper():
         loc = self.add_location(name, type, isHome)
         for (key, val) in params.items():
             self.add_location_param(loc.id, key, val)
-        return loc
+        return self.get_location(loc.id)
 
     def add_location(self, name, type, isHome=False):
         self.__session.expire_all()
@@ -1942,7 +1942,19 @@ class DbHelper():
         self._do_commit()
         return config
 
-    def udpate_location(self, l_id, name=None, type=None, isHome=None):
+    def update_full_location(self, l_id, name=None, type=None, isHome=None, params=None):
+        loc = self.update_location(l_id, name, type, isHome)
+        # delete all params for this location
+        params_list = self.__session.query(LocationParam).filter_by(location_id=l_id).all()
+        for plc in params_list:
+            self.__session.delete(plc)
+        self._do_commit()
+        # add all params
+        for (key, val) in params.items():
+            self.add_location_param(loc.id, key, val)
+        return self.get_location(l_id)
+
+    def update_location(self, l_id, name=None, type=None, isHome=None):
         self.__session.expire_all()
         config = self.__session.query(Location).filter_by(id=l_id).first()
         if config is None:
@@ -1968,18 +1980,6 @@ class DbHelper():
         self.__session.add(config)
         self._do_commit()
         return config
-
-    def udpate_location_param(self, l_id, key, value):
-        self.__session.expire_all()
-        config = self.__session.query(LocationParam).filter_by(location_id=l_id).filter_by(key=key).first()
-        if config is None:
-            self.__raise_dbhelper_exception("Location param with id {0} couldn't be found".format(l_id))
-        if value is not None:
-            config.value = ucode(value)
-        self.__session.add(config)
-        self._do_commit()
-        return config
-
 
 ###################
 # helper functions
