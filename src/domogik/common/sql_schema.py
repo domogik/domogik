@@ -162,81 +162,6 @@ class DeviceParam(DomogikBase):
         self.value = ucode(value)
         self.type = ucode(type)
 
-class Person(DomogikBase):
-    """Persons registered in the app"""
-
-    __tablename__ = '{0}_person'.format(_db_prefix)
-    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    first_name = Column(Unicode(20), nullable=False)
-    last_name = Column(Unicode(20), nullable=False)
-    birthdate = Column(Date)
-    user_accounts = relation("UserAccount", backref=__tablename__, cascade="all")
-
-    def __init__(self, first_name, last_name, birthdate):
-        """Class constructor
-
-        @param first_name : first name
-        @param last_name : last name
-        @param birthdate : birthdate
-
-        """
-        self.first_name = ucode(first_name)
-        self.last_name = ucode(last_name)
-        self.birthdate = birthdate
-
-class UserAccount(DomogikBase):
-    """User account for persons : it is only used by the UI"""
-
-    __tablename__ = '{0}_user_account'.format(_db_prefix)
-    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    login = Column(Unicode(20), nullable=False, unique=True)
-    password = Column("password", Unicode(255), nullable=False)
-    person_id = Column(Integer, ForeignKey('{0}.id'.format(Person.get_tablename())))
-    person = relation(Person)
-    is_admin = Column(Boolean, nullable=False, default=False)
-    skin_used = Column(Unicode(80), nullable=False, default=Unicode('default'))
-    lock_edit = Column(Boolean, nullable=False, default=False)
-    lock_delete = Column(Boolean, nullable=False, default=False)
-
-    def __init__(self, login, password, is_admin, skin_used, person_id, lock_edit, lock_delete):
-        """Class constructor
-
-        @param login : login
-        @param password : password
-        @param person_id : id of the person associated to this account
-        @param is_admin : True if the user has administrator privileges
-        @param skin_used : skin used in the UI (default value = 'default')
-        @param lock_edit: True id the account is locked for editing
-        @param lock_delete: True id the account is locked for deleting
-
-        """
-        self.login = ucode(login)
-        self.password = ucode(password)
-        self.person_id = person_id
-        self.is_admin = is_admin
-        self.skin_used = ucode(skin_used)
-        self.lock_edit = lock_edit
-        self.lock_delete = lock_delete
-
-    def set_password(self, password):
-        """Set a password for the user"""
-        self.password = ucode(password)
-
-   # Flask-Login integration
-    def is_authenticated(self):
-        return True
-    def is_active(self):
-        return True
-    def is_anonymous(self):
-        return False
-    def get_id(self):
-        return self.id
-    # Required for administrative interface
-    def __unicode__(self):
-        return self.login
-
 class Command(DomogikBase):
     __tablename__ = '{0}_command'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
@@ -419,6 +344,84 @@ class Scenario(DomogikBase):
         self.disabled = disabled
         self.description = description
         self.state = state
+
+class Person(DomogikBase):
+    """Persons registered in the app"""
+
+    __tablename__ = '{0}_person'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    first_name = Column(Unicode(20), nullable=False)
+    last_name = Column(Unicode(20), nullable=False)
+    birthdate = Column(Date)
+    location_sensor = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=True)
+    user_accounts = relation("UserAccount", backref=__tablename__, cascade="all")
+
+    def __init__(self, first_name, last_name, birthdate, location_sensor=False):
+        """Class constructor
+
+        @param first_name : first name
+        @param last_name : last name
+        @param birthdate : birthdate
+
+        """
+        self.first_name = ucode(first_name)
+        self.last_name = ucode(last_name)
+        self.birthdate = birthdate
+        self.location_sensor = location_sensor
+
+class UserAccount(DomogikBase):
+    """User account for persons : it is only used by the UI"""
+
+    __tablename__ = '{0}_user_account'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    login = Column(Unicode(20), nullable=False, unique=True)
+    password = Column("password", Unicode(255), nullable=False)
+    person_id = Column(Integer, ForeignKey('{0}.id'.format(Person.get_tablename())))
+    person = relation(Person)
+    is_admin = Column(Boolean, nullable=False, default=False)
+    skin_used = Column(Unicode(80), nullable=False, default=Unicode('default'))
+    lock_edit = Column(Boolean, nullable=False, default=False)
+    lock_delete = Column(Boolean, nullable=False, default=False)
+
+    def __init__(self, login, password, is_admin, skin_used, person_id, lock_edit, lock_delete):
+        """Class constructor
+
+        @param login : login
+        @param password : password
+        @param person_id : id of the person associated to this account
+        @param is_admin : True if the user has administrator privileges
+        @param skin_used : skin used in the UI (default value = 'default')
+        @param lock_edit: True id the account is locked for editing
+        @param lock_delete: True id the account is locked for deleting
+
+        """
+        self.login = ucode(login)
+        self.password = ucode(password)
+        self.person_id = person_id
+        self.is_admin = is_admin
+        self.skin_used = ucode(skin_used)
+        self.lock_edit = lock_edit
+        self.lock_delete = lock_delete
+
+    def set_password(self, password):
+        """Set a password for the user"""
+        self.password = ucode(password)
+
+   # Flask-Login integration
+    def is_authenticated(self):
+        return True
+    def is_active(self):
+        return True
+    def is_anonymous(self):
+        return False
+    def get_id(self):
+        return self.id
+    # Required for administrative interface
+    def __unicode__(self):
+        return self.login
+
 
 class Location(DomogikBase):
     __tablename__ = '{0}_location'.format(_db_prefix)

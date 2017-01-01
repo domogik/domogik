@@ -78,6 +78,7 @@ def user_edit(person_id):
         the_lock_edit = None
         the_is_admin = None
         the_lock_delete = None
+        the_hasLocation = 0
         if int(person_id) > 0:
             # Person informations
             person = app.db.get_person(person_id)
@@ -87,6 +88,8 @@ def user_edit(person_id):
             the_first_name = person.first_name
             the_last_name = person.last_name
             the_birthdate = person.birthdate
+            if person.location_sensor is not None:
+                the_hasLocation = 1
             #the_email = None
             #the_phone_number = None
 
@@ -116,6 +119,7 @@ def user_edit(person_id):
             #password = PasswordField("Password", [Required(), EqualTo('password2', message='You must type twice the same password')], default="")
             #password2 = PasswordField("Repeat the password")
             is_admin = BooleanField("User is administrator", [Optional()], default=the_is_admin)
+            hasLocation = BooleanField("User is using location", [Optional()], default=the_hasLocation, description="If you disable this, you will lose all history")
             submit = SubmitField(u"Submit")
             pass
         form = F()
@@ -126,12 +130,20 @@ def user_edit(person_id):
                 if the_lock_edit == True:
                     flash(gettext("You can't edit locked users"), "warning")
                     return redirect("/users")
-    
+
+                if 'hasLocation' not in request.form:
+                    hasLocation = 0
+                elif request.form['hasLocation'] == 'y':
+                    hasLocation = 1
+                else:
+                    hasLocation = 0
+
                 if int(person_id) > 0:
                     app.db.update_person(person_id, \
                                          p_first_name=request.form['first_name'], \
                                          p_last_name=request.form['last_name'], \
-                                         p_birthdate=request.form['birthdate'])
+                                         p_birthdate=request.form['birthdate'], \
+                                         p_hasLocation=hasLocation)
                     if request.form['login'] != "":
                         if 'is_admin' not in request.form:
                             is_admin = 0
@@ -153,7 +165,8 @@ def user_edit(person_id):
                     person = app.db.add_person(\
                                       p_first_name=request.form['first_name'], \
                                       p_last_name=request.form['last_name'], \
-                                      p_birthdate=request.form['birthdate'])
+                                      p_birthdate=request.form['birthdate'], \
+                                      p_hasLocation=hasLocation)
                     if request.form['login'] != "":
                         if 'is_admin' not in request.form:
                             is_admin = 0

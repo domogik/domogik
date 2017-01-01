@@ -42,6 +42,7 @@
       {% endif %}
       {{ wtf.form_field(form.login) }}
       {{ wtf.form_field(form.is_admin) }}
+      {{ wtf.form_field(form.hasLocation) }}<div class="alert alert-info" role="alert">If you disable this, you will lose all location info for this user</div>
 
       {% if form.account_exists.data == True %}
         <div class="col-sm-offset-2">

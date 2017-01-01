@@ -1487,7 +1487,7 @@ class DbHelper():
         """
         return self.__session.query(Person).filter_by(id=p_id).first()
 
-    def add_person(self, p_first_name, p_last_name, p_birthdate=None):
+    def add_person(self, p_first_name, p_last_name, p_birthdate=None, p_hasLocation=None):
         """Add a person
 
         @param p_first_name     : first name
@@ -1501,9 +1501,10 @@ class DbHelper():
         person = Person(first_name=p_first_name, last_name=p_last_name, birthdate=p_birthdate)
         self.__session.add(person)
         self._do_commit()
+        self,_checkPersonLocation(person, p_hasLocation)
         return person
 
-    def update_person(self, p_id, p_first_name=None, p_last_name=None, p_birthdate=None):
+    def update_person(self, p_id, p_first_name=None, p_last_name=None, p_birthdate=None, p_hasLocation=None):
         """Update a person
 
         @param p_id             : person id to be updated
@@ -1527,7 +1528,29 @@ class DbHelper():
             person.birthdate = p_birthdate
         self.__session.add(person)
         self._do_commit()
+        self._checkPersonLocation(person, p_hasLocation)
         return person
+    
+    def _checkPersonLocation(self, person, hasLocation):
+        # Enable it
+        if hasLocation and person.location_sensor is None:
+            # TODO enable location
+            # add a full device
+            # with 1 sensor of dt_cooar
+            # store the sensor id in person.location_sensor
+            location_sensor = 2
+        # Disable it
+        elif not hasLocation and person.location_sensor is not None:
+            # TODO disable location
+            # Get the sensor
+            # delete the full device
+            # set the person.location_sensor back to Null
+            location_sensor = None
+        # Update the person
+        person.location_sensor = location_sensor
+        self.__session.add(person)
+        self._do_commit()
+
 
     def del_person(self, p_id):
         """Delete a person and the associated user account if it exists
