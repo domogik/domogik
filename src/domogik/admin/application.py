@@ -276,3 +276,4 @@ from domogik.admin.rest.publish import *
 from domogik.admin.rest.device import *
 from domogik.admin.rest.sensor import sensorAPI
 from domogik.admin.rest.product import *
+from domogik.admin.rest.location import *
