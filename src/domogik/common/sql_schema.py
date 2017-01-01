@@ -357,7 +357,7 @@ class Person(DomogikBase):
     location_sensor = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=True)
     user_accounts = relation("UserAccount", backref=__tablename__, cascade="all")
 
-    def __init__(self, first_name, last_name, birthdate, location_sensor=False):
+    def __init__(self, first_name, last_name, birthdate, location_sensor=None):
         """Class constructor
 
         @param first_name : first name
