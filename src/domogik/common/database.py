@@ -1501,7 +1501,7 @@ class DbHelper():
         person = Person(first_name=p_first_name, last_name=p_last_name, birthdate=p_birthdate)
         self.__session.add(person)
         self._do_commit()
-        self,_checkPersonLocation(person, p_hasLocation)
+        self._checkPersonLocation(person, p_hasLocation)
         return person
 
     def update_person(self, p_id, p_first_name=None, p_last_name=None, p_birthdate=None, p_hasLocation=None):
@@ -1534,23 +1534,46 @@ class DbHelper():
     def _checkPersonLocation(self, person, hasLocation):
         # Enable it
         if hasLocation and person.location_sensor is None:
-            # TODO enable location
-            # add a full device
-            # with 1 sensor of dt_cooar
+            # enable location
+            # add device
+            d_name = "Location {0} {1}".format(person.first_name, person.last_name)
+            dev = Device(d_name, '', 'core.personLocation', 'core', '1.0', info_changed=func.now())
+            self.__session.add(dev)
+            self._do_commit()
+            # add sensor
+            sen = Sensor(name = "GPS coordinates", \
+                            reference = None, \
+                            device_id  = dev.id, \
+                            incremental = 0, \
+                            data_type = 'DT_CoordD', \
+                            conversion = None, \
+                            h_store = 1, \
+                            h_max = None, \
+                            h_expire = None, \
+                            h_round = None, \
+                            h_duplicate = 0, \
+                            formula = None, \
+                            timeout = 0, \
+                            )
+
+            self.__session.add(sen)
+            self._do_commit()
             # store the sensor id in person.location_sensor
-            location_sensor = 2
+            person.location_sensor = sen.id
+            self.__session.add(person)
+            self._do_commit()
         # Disable it
         elif not hasLocation and person.location_sensor is not None:
             # TODO disable location
-            # Get the sensor
+            senid = person.location_sensor
+            # Update the person
+            person.location_sensor = None
+            self.__session.add(person)
+            self._do_commit()
             # delete the full device
-            # set the person.location_sensor back to Null
-            location_sensor = None
-        # Update the person
-        person.location_sensor = location_sensor
-        self.__session.add(person)
-        self._do_commit()
-
+            sen = self.__session.query(Sensor).filter_by(id=senid).first()
+            dev = self.__session.query(Device).filter_by(id=sen.device_id).first()
+            self.del_device(dev.id)
 
     def del_person(self, p_id):
         """Delete a person and the associated user account if it exists
