@@ -1975,6 +1975,9 @@ class DbHelper():
     def get_location(self, id):
         return self.__session.query(Location).filter_by(id=id).first()
 
+    def get_home_location(self):
+        return self.__session.query(Location).filter_by(isHome=1).first()
+
     def add_full_location(self, name, type, isHome, params):
         loc = self.add_location(name, type, isHome)
         for (key, val) in params.items():
