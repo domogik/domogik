@@ -2018,7 +2018,16 @@ class DbHelper():
         self._do_commit()
         return config
 
-
+    def del_location(self, lid):
+        self.__session.expire_all()
+        loc = self.__session.query(Location).filter_by(id=lid).first()
+        if loc is not None:
+            self.__session.delete(loc)
+            self._do_commit()
+            return loc
+        else:
+            self.__raise_dbhelper_exception("Location with id {0} couldn't be found".format(lid))
+         
 
 ###################
 # Location params

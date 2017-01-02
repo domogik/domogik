@@ -22,6 +22,13 @@ def locations():
             locations = app.db.get_all_location(),
             mactive = "locations")
 
+@app.route('/locations/del/<lid>')
+@login_required
+def locations_del(lid):
+    with app.db.session_scope():
+        app.db.del_location(lid)
+    return redirect("/locations")
+
 @app.route('/locations/edit/<lid>', methods=['GET', 'POST'])
 @login_required
 def locations_edit(lid):
