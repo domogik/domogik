@@ -24,7 +24,8 @@ def index():
         else:
             mqConfig = mqLoader('mq').load()[0]
             butlerConfig = dict(dmgLoader('butler').load()[1])
-            qrCode = dict()
+            #qrCode = dict()
+            qrCode = app.db.get_core_config()
             qrCode["admin_url"] = str(request.url)
             qrCode["rest_port"] = int(app.port)
             qrCode["rest_path"] = "/rest"
