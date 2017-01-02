@@ -52,7 +52,7 @@ from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker, defer
 from sqlalchemy.orm.session import make_transient
 from sqlalchemy.pool import QueuePool
-from domogik.common.utils import ucode
+from domogik.common.utils import ucode, get_sanitized_hostname
 from domogik.common import logger
 #from domogik.common.packagejson import PackageJson
 from domogik.common.configloader import Loader
@@ -265,7 +265,23 @@ class DbHelper():
 
         """
         return self.__session.query(PluginConfig).all()
-    
+
+    def get_core_config(self):
+        cfg = self.__session.query(PluginConfig).filter_by(type='core').all()
+        res = {}
+        for item in cfg:
+            res[item.key] = item.value
+        return res
+   
+    def set_core_config(self, cfg):
+        # DELETE all
+        config_list = self.__session.query(PluginConfig).filter_by(type='core').all()
+        for plc in config_list:
+            self.__session.delete(plc)
+        # READD
+        for (key, val) in cfg.items():
+            self.set_plugin_config('core', 'core', get_sanitized_hostname(), key, val)
+
     def list_plugin_config(self, pl_type, pl_id, pl_hostname):
         """Return all parameters of a plugin
 

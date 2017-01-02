@@ -265,6 +265,7 @@ from domogik.admin.views.timeline import *
 from domogik.admin.views.battery import *
 from domogik.admin.views.datatypes import *
 from domogik.admin.views.locations import *
+from domogik.admin.views.config import *
 
 ### import all rest urls
 import domogik.admin.rest.status

@@ -3,6 +3,30 @@
 {% block content %}
 <div class="container">
   <h1>Global Domogik config</h1>
-  {{ items }}
+  <form id="location_form" method="post" role="form" class="form-horizontal">
+  {% for item in form %}
+    {% if item.type == "HiddenField" or item.name == "csrf_token" %}
+        {{ item }}
+    {% elif item.name == "submit" %}
+      <div class="form-group">
+        <div class="col-xs-offset-3 col-xs-9">
+        <input type="submit" value="{% trans %}Save{% endtrans %}" class="btn btn-primary">
+        </div>
+      </div>
+    {% else %}
+      <div class="form-group">
+        <label class="control-label col-xs-3">{{ item.label }}</label>
+        <div class="col-xs-9">
+          {% if item.type == "TextField" %}
+            {{ item(size = 50) }}
+          {% else %}
+            {{ item }}
+          {% endif %}
+          <span class="help-block">{{ item.description }}</span>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+  </form>
 </div>
 {% endblock %}
