@@ -27,6 +27,7 @@
         </li>
         <li{% if mactive == "users" %} class="active" {% endif %} id="users"><a href="/users"><i class="fa fa-users"></i> {% trans %}Users{% endtrans %}</a></li>
         <li{% if mactive == "locations" %} class="active" {% endif %} id="locations"><a href="/locations"><i class="fa fa-map-marker"></i> {% trans %}Locations{% endtrans %}</a></li>
+        <li{% if mactive == "config" %} class="active" {% endif %} id="config"><a href="/config"><i class="fa fa-pencil-square-o"></i> {% trans %}Global Config{% endtrans %}</a></li>
         <li{% if mactive == "apidoc" %} class="active" {% endif %} id="api"><a href="/apidoc"><i class="fa fa-book"></i> {% trans %}Rest and MQ API{% endtrans %}</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
