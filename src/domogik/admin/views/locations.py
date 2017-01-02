@@ -38,6 +38,10 @@ def locations_edit(lid):
             lname = loc.name
             lisHome = loc.isHome
 
+        lisHomeDisabled = False
+        if app.db.get_home_location():
+            lisHomeDisabled = True
+
         class F(Form):
             locid = HiddenField("lid", default=lid)
             lat = HiddenField("lat")
@@ -49,7 +53,9 @@ def locations_edit(lid):
             country_short = HiddenField("country_short")
             locname = TextField("Name", [Required()], default=lname)
             radius = TextField("Radius", [Required()], default=lrad)
-            locisHome = BooleanField("is Home", default=lisHome)
+            if app.db.get_home_location() is None:
+                # we can have only one home location
+                locisHome = BooleanField("is Home", [], default=lisHome)
             submit = SubmitField("Save")
             pass
         form = F()
