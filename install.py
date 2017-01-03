@@ -198,7 +198,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
                 'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level', \
                 'log_when', 'log_interval', 'log_backup_count'],
         'database': ['prefix', 'pool_recycle'],
-        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth'],
+        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth', 'secret_key'],
     }
     if advanced_mode:
         return True
@@ -236,7 +236,9 @@ def write_domogik_configfile(advanced_mode, intf):
         info("Starting on section {0}".format(sect))
         if sect != "metrics":
             for item in config.items(sect):
-                if item[0] in itf  and not advanced_mode:
+                if sect == 'admin'and item[0] == 'secret_key':
+                    config.set(sect, item[0], uuid.uuid4())
+                elif item[0] in itf  and not advanced_mode:
                     config.set(sect, item[0], intf)
                     debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
                 elif is_domogik_advanced(advanced_mode, sect, item[0]):

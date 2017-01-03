@@ -86,6 +86,8 @@ ssl_key =
 clean_json = False
 # if set to True, all the /rest/ urls need basic authentication
 rest_auth = False
+# A secret key used as a salt for the session storage
+secret_key = 
 
 ###
 # Butler configuration
