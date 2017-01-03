@@ -150,7 +150,7 @@ class Subscription(WebSocketHandler):
         self.finished = False
 
     def open(self):
-        print("New subscriber.")
+        #print("New subscriber.")
         self.publisher.register(self)
         self.run()
 
@@ -158,7 +158,7 @@ class Subscription(WebSocketHandler):
         self._close()        
 
     def _close(self):
-        print("Subscriber left.")
+        #print("Subscriber left.")
         self.publisher.deregister(self)
         self.finished = True
 
