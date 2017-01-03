@@ -267,7 +267,7 @@ class DbHelper():
         return self.__session.query(PluginConfig).all()
 
     def get_core_config(self):
-        cfg = self.__session.query(PluginConfig).filter_by(type='core').all()
+        cfg = self.__session.query(PluginConfig).filter_by(type=u'core').all()
         res = {}
         for item in cfg:
             res[item.key] = item.value
@@ -275,7 +275,7 @@ class DbHelper():
    
     def set_core_config(self, cfg):
         # DELETE all
-        config_list = self.__session.query(PluginConfig).filter_by(type='core').all()
+        config_list = self.__session.query(PluginConfig).filter_by(type=u'core').all()
         for plc in config_list:
             self.__session.delete(plc)
         # READD
