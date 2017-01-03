@@ -31,6 +31,9 @@
                     {% if data.is_admin == True %}
                       <i class="fa fa-shield fa-1x" aria-hidden="true"></i>
                     {% endif %}
+                    {% if data.location_sensor > 0 %}
+                      <i class="fa fa-map-marker fa-1x" aria-hidden="true"></i>
+                    {% endif %}
                     {% if data.lock_edit == True %}
                       <i class="fa fa-lock fa-1x" aria-hidden="true"></i>
                     {% endif %}
