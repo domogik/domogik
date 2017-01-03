@@ -250,6 +250,7 @@ class Admin(Plugin):
                     self.use_ssl = True
                 self.key_file = conf_admin['ssl_key']
                 self.cert_file = conf_admin['ssl_certificate']
+                self.secret_key = conf_admin['secret_key']
                 if 'clean_json' in conf_admin:
                     self.clean_json = conf_admin['clean_json']
                 else:
@@ -307,6 +308,7 @@ class Admin(Plugin):
         admin_app.datatypes = self.datatypes
         admin_app.clean_json = self.clean_json
         admin_app.rest_auth = self.rest_auth
+        admin_app.secret_key = self.secret_key
         admin_app.apiversion = REST_API_VERSION
         admin_app.use_ssl = self.use_ssl
         admin_app.interfaces = self.interfaces
@@ -332,7 +334,6 @@ class Admin(Plugin):
                  "certfile": self.cert_file,
                  "keyfile": self.key_file,
             }
-            print(ssl_options)
             self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
             self.http_server = HTTPServer(tapp)

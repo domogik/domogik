@@ -41,7 +41,7 @@ app = Flask(__name__)
 ### set Flask Config
 app.jinja_env.globals['bootstrap_is_hidden_field'] = is_hidden_field_filter
 app.jinja_env.add_extension('jinja2.ext.do')
-app.config['SECRET_KEY'] = '12sfjklghort nvlbneropgtbhni won ouiw'
+#app.config['SECRET_KEY'] = '12sfjklghort nvlbneropgtbhni won ouiw'
 app.config['RECAPTCHA_PUBLIC_KEY'] = '6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
 app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Paris'
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -49,7 +49,6 @@ app.config['SESSION_FILE_DIR'] = '/tmp'
 app.config['SESSION_FILE_THRESHOLD'] = 25
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
-app.config.from_object(__name__)
 
 ### init extensions and load them
 
@@ -63,7 +62,6 @@ babel = Babel()
 babel.init_app(app)
 
 Themes(app, app_identifier='domogik-admin')
-
 
 # jinja 2 filters
 def format_babel_datetime(value, format='medium'):
