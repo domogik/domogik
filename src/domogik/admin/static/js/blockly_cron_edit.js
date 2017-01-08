@@ -594,8 +594,8 @@ Blockly.Blocks['cron.CronTest'] = {
   MonthToBlock_: function(exp, connectTo) {
     var error = "";
     if (exp) {
-        var range = CRON_FIELD_DATA['DayOfWeek'].range;
-        var rInc = CRON_FIELD_DATA['DayOfWeek'].inc;
+        var range = CRON_FIELD_DATA['Month'].range;
+        var rInc = CRON_FIELD_DATA['Month'].inc;
         var nBlock = null;
         if (exp.crontype.specChar == '*'){
           var nBlock = this.workspace.newBlock('block_all');
