@@ -296,7 +296,7 @@ In case you keep your old Domogik 0.4.0 configuration file **/etc/domogik/domogi
 
 And you will also have to replace the below line value (use a network interface name instead of an ip address). Example: ::
 
-    bind_interface = eth0
+    bind_interface = eth0,lo
 
 Butler section : 
 
