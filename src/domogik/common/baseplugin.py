@@ -41,6 +41,7 @@ import sys
 import os
 import pwd
 import traceback
+import locale
 
 from domogik.common.utils import get_sanitized_hostname
 from domogik.common.daemon.daemon import DaemonContext
@@ -101,6 +102,10 @@ class BasePlugin(object):
         except:
             self.log.error("Error while creating return_code file '{0}' : {1}".format(self.return_code_filename, traceback.format_exc()))
             sys.exit(3)
+
+        # set the lcoale to the system one
+        locale.resetlocale()
+        self.log.debug("Setting locale to system locale: {0}".format(locale.getlocale()))
 
         ### Start the plugin...
         self._threads = []
