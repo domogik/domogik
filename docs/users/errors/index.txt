@@ -68,7 +68,7 @@ Assuming the Domogik user is *domogik*, do the following checks:
         $ ps -fu domogik | grep xplgw
         domogik    32735      1  0 14:12 ?        00:00:13 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/xplgw.py
 
-    If one component is not up, check its log files. If the component is *rest*, *dbmgr* or *xplgw* and you find no logs, check in the *manager* logs.
+    If one component is not up, check its log files. If the component is *admin*, *scenario*, *butler* or *xplgw* and you find no logs, check in the *manager* logs.
 
 Check if services are available
 -------------------------------
