@@ -206,11 +206,8 @@ def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, senso
         msg.set_action('sensor_history.get')
         msg.add_data('sensor_id', the_sensor['sensor_id'])
         msg.add_data('mode', 'last')
-        print("AVANT sensor_history.get")
         res = cli.request('dbmgr', msg.get(), timeout=10).get()
         res = json.loads(res[1])
-        print("APRES sensor_history.get")
-        print(res)
         the_value = res['values'][0]['value_str']
         last_received = res['values'][0]['timestamp']
 
@@ -249,9 +246,7 @@ def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, senso
             msg.add_data('sensor_id', the_sensor['sensor_id'])
             msg.add_data('mode', 'period')
             msg.add_data('from', since)
-            print("AVANT sensor_history.get")
             res = cli.request('dbmgr', msg.get(), timeout=10).get()
-            print("AVANT sensor_history.get")
             if res == None:
                 log.info(u"No history for this sensor since '{0}'".format(since))
                 return None, None
@@ -304,10 +299,6 @@ def get_sensors_for_datatype(devices, dt_type_list, check_preferences = True, lo
     # TODO DEL # msg.set_action('device.get')
 
     try:
-        # TODO DEL # print("AVANT device.get (get sensor for dt)")
-        # TODO DEL # str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
-        # TODO DEL # print("APRES device.get (get sensor for dt)")
-        # TODO DEL # devices = json.loads(str_devices)['devices']
         for a_device in devices:
             #print a_device
             # search in all sensors
@@ -431,9 +422,7 @@ def do_command(log, user_locale, dt_type_list, device, value, command_reference 
         cli = MQSyncReq(zmq.Context())
         msg = MQMessage()
         msg.set_action('device.get')
-        print("AVANT device.get (do command)")
         str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
-        print("APRES device.get (do command)")
         devices = json.loads(str_devices)['devices']
         found = None
         for a_device in devices:
