@@ -1617,6 +1617,18 @@ class DbHelper():
     def get_sensor(self, id):
         return self.__session.query(Sensor).filter_by(id=id).first()
 
+    def get_last_sensor_value(self, sid):
+        """ Used if no history available for the sensor
+        """
+        values = []  # a list wil only one history value will be returned to be compliant with the history functions
+        a_value = self.__session.query(Sensor).filter_by(id=sid).first()
+        #<Sensor: conversion='', value_min='None', history_round='0.0', name='Day 0 - Condition code', reference='forecast_0_condition_code', history_duplicate='False', incremental='False', timeout='3900', id='108', data_type='DT_String', history_max='0', last_received='1484302742', history_store='False', history_expire='0', formula='None', last_value='39', value_max='47.0', device_id='14'>
+        values.append({"value_str" : a_value.last_value,
+                       "value_num" : a_value.last_value,
+                       "timestamp" : a_value.last_received })
+        return values
+
+
     def get_sensor_by_device_id(self, did):
         return self.__session.query(Sensor).filter_by(device_id=did).all()
 

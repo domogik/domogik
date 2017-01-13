@@ -1042,7 +1042,7 @@ class Admin(Plugin):
             try:
                 history = self._db.list_sensor_history(sensor_id, number)
                 if len(history) == 0:
-                    values = None
+                    values = self._db.get_last_sensor_value(sensor_id)
                 else: 
                     values = self._db.list_sensor_history(sensor_id, number)
             except:
