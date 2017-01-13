@@ -294,17 +294,30 @@ class XplManager(XplPlugin):
 
     def _load_client_to_xpl_target(self):
         """ Request the client conversion info
-        This is an mq req to manager
+            This is an mq req to manager
+            If this function does not call self._parse_xpl_target(), all xpl sensors will not be procesed!
         """
-        cli = MQSyncReq(self.zmq)
-        msg = MQMessage()
-        msg.set_action('client.list.get')
-        response = cli.request('manager', msg.get(), timeout=10)
-        if response:
-            self._parse_xpl_target(response.get_data())
+        nb_try = 0
+        max_try = 5
+        ok = False
+        while nb_try <= max_try and ok == False:
+            nb_try += 1
+            cli = MQSyncReq(self.zmq)
+            msg = MQMessage()
+            msg.set_action('client.list.get')
+            response = cli.request('manager', msg.get(), timeout=10)
+            if response:
+                self._parse_xpl_target(response.get_data())
+                ok = True
+            else:
+                self.log.error(\
+                    u"Updating client list failed, no response from manager (try number {0}/{1})".format(nb_try, max_try))
+                # We fail to load the client list, so we wait to get something
+                time.sleep(5)
+        if ok == True:
+            self.log.info(u"Updating client list success") 
         else:
-            self.log.error(\
-                u"Updating client list failed, no response from manager")
+            self.log.error(u"Updating client list failed too much time! The xpl sensors will not be processed by this component")
 
     def _parse_xpl_target(self, data):
         """ Translate the mq data info a dict
