@@ -31,7 +31,8 @@ def index():
             qrCode["rest_path"] = "/rest"
             qrCode["rest_auth"] = bool(app.rest_auth)
             qrCode["mq_ip"] = str(mqConfig['ip'])
-            qrCode["mq_port_pubsub"] = int( mqConfig['sub_port'])
+            qrCode["mq_port_sub"] = int( mqConfig['sub_port'])
+            qrCode["mq_port_pub"] = int( mqConfig['pub_port'])
             qrCode["mq_port_req_rep"] = int(mqConfig['req_rep_port'])
             qrCode["butler_name"] = ucode(butlerConfig['name'])
             qrCode["butler_sex"] = str(butlerConfig['sex'])

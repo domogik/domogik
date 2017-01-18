@@ -2002,6 +2002,9 @@ class DbHelper():
 
     def get_location(self, id):
         return self.__session.query(Location).filter_by(id=id).first()
+    
+    def get_location_by_name(self, name):
+        return self.__session.query(Location).filter_by(name=name).first()
 
     def get_home_location(self):
         return self.__session.query(Location).filter_by(isHome=1).first()
