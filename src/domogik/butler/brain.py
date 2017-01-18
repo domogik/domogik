@@ -401,7 +401,7 @@ def learn(rs_code, comment = None):
     with open(LEARN_FILE, "a") as file:
         file.write(utf8_data + "\n\n") 
 
-def do_command(log, user_locale, dt_type_list, device, value, command_reference = None):
+def do_command(log, devices, user_locale, dt_type_list, device, value, command_reference = None):
     """ Execute a command
         @log : logger object
         @user_locale : fr_FR, ...
@@ -419,11 +419,11 @@ def do_command(log, user_locale, dt_type_list, device, value, command_reference 
        
         device_name = device.lower()
         log.debug(u"Command : search device. Device name = {0}".format(device_name))
-        cli = MQSyncReq(zmq.Context())
-        msg = MQMessage()
-        msg.set_action('device.get')
-        str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
-        devices = json.loads(str_devices)['devices']
+        #cli = MQSyncReq(zmq.Context())
+        #msg = MQMessage()
+        #msg.set_action('device.get')
+        #str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+        #devices = json.loads(str_devices)['devices']
         found = None
         for a_device in devices:
             if clean_input(a_device['name']) == clean_input(device_name):
