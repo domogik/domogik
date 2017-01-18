@@ -93,7 +93,7 @@ class TestDevice():
         #print(u"Response : [{0}]".format(response.status_code))
         print(u"Response : [{0}] {1}".format(response.status_code, response.text))
         if response.status_code != 201:
-            raise RuntimeError("Error when creating the device : {0}".format(response.text))
+            raise RuntimeError("Error when creating the device : {0}".format(response))
         else:
             dev = json.loads(response.text)
             print(u"The new device is: {0}".format(dev))

@@ -77,7 +77,7 @@ def check_domogik_is_running():
         else:
             print("component {0} is running".format(chk))
 
-    to_check = ['xplgw', 'dbmgr', 'manager', 'admin', 'scenario']
+    to_check = ['xplgw', 'manager', 'admin', 'scenario']
     for chk in to_check:
         status = is_already_launched(None, "core", chk, False)
         if not status[0]:
@@ -96,7 +96,7 @@ def delete_configuration(type, name, host):
     msg.add_data('type', type)
     msg.add_data('host', host)
     msg.add_data('name', name)
-    result = cli.request('dbmgr', msg.get(), timeout=10)
+    result = cli.request('admin', msg.get(), timeout=10)
     if result:
 	data = result.get_data()
 	if 'status' in data:
@@ -119,7 +119,7 @@ def configure(type, name, host, key, value):
     msg.add_data('host', host)
     msg.add_data('name', name)
     msg.add_data('data', {key : value})
-    result = cli.request('dbmgr', msg.get(), timeout=10)
+    result = cli.request('admin', msg.get(), timeout=10)
     if result:
 	data = result.get_data()
 	if 'status' in data:
@@ -142,7 +142,7 @@ def check_config(type, name, host, key, exp_value):
     msg.add_data('host', host)
     msg.add_data('name', name)
     msg.add_data('key', key)
-    result = cli.request('dbmgr', msg.get(), timeout=10)
+    result = cli.request('admin', msg.get(), timeout=10)
     if result:
 	data = result.get_data()
 	if 'status' in data:

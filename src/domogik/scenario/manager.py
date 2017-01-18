@@ -48,6 +48,11 @@ try:
 except:
     pass
 import traceback
+import time
+
+DATABASE_CONNECTION_NUM_TRY = 50
+DATABASE_CONNECTION_WAIT = 30
+
 
 
 class ScenarioManager:
@@ -62,7 +67,7 @@ class ScenarioManager:
         The test on devices are managed directly by xpl Listeners
         The test on time will be managed by a TimeManager
         The actions will be managed by an ActionManager
-        { 
+        {
          "condition" :
             { "AND" : {
                     "OR" : {
@@ -119,16 +124,41 @@ class ScenarioManager:
         """
         try:
             with self._db.session_scope():
+                ### TEST if database is up
+                nb_test = 0
+                db_ok = False
+                while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
+                    nb_test += 1
+                    try:
+                        self._db.list_user_accounts()
+                        db_ok = True
+                    except:
+                        msg = "The database is not responding. Check your configuration of if the database is up. Test {0}/{1}. The error while trying to connect to the database is : {2}".format(nb_test, DATABASE_CONNECTION_NUM_TRY, traceback.format_exc())
+                        self.log.error(msg)
+                        msg = "Waiting for {0} seconds".format(DATABASE_CONNECTION_WAIT)
+                        self.log.info(msg)
+                        time.sleep(DATABASE_CONNECTION_WAIT)
+
+                if nb_test >= DATABASE_CONNECTION_NUM_TRY:
+                    msg = "Exiting scenario!"
+                    self.log.error(msg)
+                    self.force_leave()
+                    return
+
+                ### Do the stuff
+                msg = "Connected to the database"
+                self.log.info(msg)
                 for scenario in self._db.list_scenario():
-                    self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description, scenario.state, scenario.trigger_mode)
+                    self.create_scenario(scenario.name, scenario.json, int(scenario.id), scenario.disabled, scenario.description, scenario.state)
         except:
             self.log.error(u"Error while loading the scenarios! The error is : {0}".format(traceback.format_exc()))
 
     def shutdown(self):
         """ Callback to shut down all parameters
         """
-        for cond in self._conditions.keys():
-            self.delete_scenario(cond, db_delete=False)
+        for cid, inst in self._instances.items():
+            self._instances[cid]['instance'].destroy()
+            del(self._instances[cid])
 
     def get_parsed_condition(self, name):
         """ Call cond.get_parsed_condition on the cond with name 'name'
@@ -141,13 +171,13 @@ class ScenarioManager:
             parsed = self._conditions[name].get_parsed_condition()
             return {'name': name, 'data': parsed}
 
-    def update_scenario(self, cid, name, json_input, dis, desc, tmode):
+    def update_scenario(self, cid, name, json_input, dis, desc):
         cid = int(cid)
         # TODO get the current state and store it
         state = True
         if cid != 0:
             self.del_scenario(cid, False)
-        return self.create_scenario(name, json_input, cid, dis, desc, state, tmode, True)
+        return self.create_scenario(name, json_input, cid, dis, desc, state, True)
 
     def del_scenario(self, cid, doDB=True):
         try:
@@ -167,7 +197,7 @@ class ScenarioManager:
             self.log.error(msg)
             return {'status': 'ERROR', 'msg': msg}
 
-    def create_scenario(self, name, json_input, cid=0, dis=False, desc=None, state=False, tmode='always', update=False):
+    def create_scenario(self, name, json_input, cid=0, dis=False, desc=None, state=False, update=False):
         """ Create a Scenario from the provided json.
         @param name : A name for the condition instance
         @param json_input : JSON representation of the condition
@@ -186,27 +216,27 @@ class ScenarioManager:
             self.log.error(u"Error is : {0}".format(tracebeck.format_exc()))
             return {'status': 'ERROR', 'msg': 'invallid json'}
 
-        if 'IF' not in payload.keys() \
-                or 'DO' not in payload.keys():
-            msg = u"the json for the scenario does not contain condition or actions for scenario {0}".format(name)
-            self.log.error(msg)
-            return {'status': 'ERROR', 'msg': msg}
+        #if 'IF' not in payload.keys():
+        #        or 'DO' not in payload.keys():
+        #    msg = u"the json for the scenario does not contain condition or actions for scenario {0}".format(name)
+        #    self.log.error(msg)
+        #    return {'status': 'ERROR', 'msg': msg}
         # db storage
         if int(ocid) == 0:
             with self._db.session_scope():
-                scen = self._db.add_scenario(name, json_input, dis, desc, tmode, False)
+                scen = self._db.add_scenario(name, json_input, dis, desc, False)
                 cid = scen.id
         elif update:
             with self._db.session_scope():
-                self._db.update_scenario(cid, name, json_input, dis, desc, tmode=tmode)
+                self._db.update_scenario(cid, name, json_input, dis, desc)
 
         # create the condition itself
         try:
-            scen = ScenarioInstance(self.log, cid, name, payload, dis, tmode, state, self._db)
-            self._instances[cid] = {'name': name, 'json': payload, 'instance': scen, 'disabled': dis } 
-            self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload['IF']))
+            scen = ScenarioInstance(self.log, cid, name, payload, dis, state, self._db)
+            self._instances[cid] = {'name': name, 'json': payload, 'instance': scen, 'disabled': dis }
+            self.log.debug(u"Create scenario instance {0} with payload {1}".format(name, payload))
             self._instances[cid]['instance'].eval_condition()
-        except Exception as e:  
+        except Exception as e:
             if int(ocid) == 0:
                 with self._db.session_scope():
                     self._db.del_scenario(cid)
@@ -280,6 +310,7 @@ class ScenarioManager:
                             })
 
                 res[name] = {"parameters": params,
+                             "blockly": inst.get_blockly(),
                              "description": inst.get_description()}
         return res
 
@@ -310,7 +341,7 @@ class ScenarioManager:
             msg = u"Error while enabling the scenario id='{0}'. Error is : {1}".format(cid, traceback.format_exc())
             self.log.error(msg)
             return {'status': 'ERROR', 'msg': msg}
- 
+
     def disable_scenario(self, cid):
         try:
             if cid == '' or int(cid) not in self._instances.keys():

@@ -16,10 +16,7 @@ def timeline():
 def timeline_device(device_id):
     return timeline_generic(the_device_id = device_id)
 
-
-
-
-def timeline_generic(the_device_id = None):
+def timeline_generic(the_device_id = None, the_client_id = None, asDict = False):
 
     # datatypes
     datatypes = {}
@@ -40,7 +37,7 @@ def timeline_generic(the_device_id = None):
     # timeline
     with app.db.session_scope():
         timeline = []
-        data = app.db.get_timeline(device_id = the_device_id)
+        data = app.db.get_timeline(device_id = the_device_id, client_id = the_client_id)
         previous_device_id = 0
         previous_date = None
         sensors_changes_for_the_device = []
@@ -49,9 +46,15 @@ def timeline_generic(the_device_id = None):
             print(elt)
             (device_name, device_id, client, sensor_name, sensor_dt_type, sensor_id, date_of_value, value) = elt
    
-            if "unit" in datatypes[sensor_dt_type]:
-                unit = datatypes[sensor_dt_type]["unit"]
+            if sensor_dt_type in datatypes:
+                if "unit" in datatypes[sensor_dt_type]:
+                    unit = datatypes[sensor_dt_type]["unit"]
+                else:
+                    unit = None
+            # datatype not known : new plugin with an old datatype file on domogik side.
+            # this should happen only in dev mode
             else:
+                datatypes[sensor_dt_type] = None
                 unit = None
 
             if device_id == previous_device_id and date_of_value == previous_date:
@@ -85,12 +88,16 @@ def timeline_generic(the_device_id = None):
     else:
         the_device_name = None
 
-         
-
-    return render_template('timeline.html',
-        mactive="timeline",
-        device_name=the_device_name,
-        timeline=timeline,
-        datatypes = datatypes
-        )
+    if asDict:
+        return {
+                "timeline": timeline,
+                "datatypes": datatypes
+                }
+    else:
+        return render_template('timeline.html',
+            mactive="timeline",
+            device_name=the_device_name,
+            timeline=timeline,
+            datatypes = datatypes
+            )
 

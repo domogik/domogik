@@ -85,8 +85,8 @@
          maxBlocks: 5,
          toolbox: document.getElementById('toolbox')});
 
-    function onchange() {
-      document.getElementById('capacity').innerHTML =
+    function onchange(event) {
+      document.getElementById('capacity').textContent =
           workspace.remainingCapacity();
     }
 

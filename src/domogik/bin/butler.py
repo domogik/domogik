@@ -111,6 +111,9 @@ class Butler(Plugin):
 
             self.lang = conf['lang']
             self.butler_name = conf['name']
+            self.log.debug(u"The butler configured name is '{0}'".format(self.butler_name))
+            self.butler_name_cleaned = clean_input(conf['name'])
+            self.log.debug(u"The butler cleaned name is '{0}'".format(self.butler_name_cleaned))
             self.butler_sex = conf['sex']
             self.butler_mood = None
             if self.butler_sex not in SEX_ALLOWED:
@@ -136,8 +139,8 @@ class Butler(Plugin):
 
         # Configure bot variables
         # all must be lower case....
-        self.log.info(u"Configuring name and sex : {0}, {1}".format(self.butler_name.lower(), self.butler_sex.lower()))
-        self.brain.set_variable(u"name", self.butler_name.lower())
+        self.log.info(u"Configuring name and sex : {0}, {1}".format(self.butler_name_cleaned.lower(), self.butler_sex.lower()))
+        self.brain.set_variable(u"name", self.butler_name_cleaned.lower())
         self.brain.set_variable(u"fullname", self.butler_name.lower())
         self.brain.set_variable(u"sex", self.butler_sex.lower())
 
@@ -219,7 +222,7 @@ class Butler(Plugin):
 
     def _mdp_reply_butler_discuss(self, message):
         """ Discuss over req/rep
-            this should not be called with a 10 seconds timeout...
+            this should NOT be called with a 10 seconds timeout...
         """
         # TODO : merge with the on_message function !!!
 
@@ -239,8 +242,10 @@ class Butler(Plugin):
                              "location" : content['location'],
                              "sex" : self.butler_sex,
                              "mood" : self.butler_mood,
+                             "is_reply" : True,
                              "reply_to" : content['source'],
                              "identity" : self.butler_name,
+                             "lang" : self.lang,
                              "text" : reply}
         self.log.info(u"Send response over MQ : {0}".format(data))
 
@@ -515,8 +520,10 @@ class Butler(Plugin):
                                  "location" : content['location'],
                                  "sex" : self.butler_sex,
                                  "mood" : self.butler_mood,
+                                 "is_reply" : True,
                                  "reply_to" : content['source'],
                                  "identity" : self.butler_name,
+                                 "lang" : self.lang,
                                  "text" : reply}
             self.log.info(u"Send response over MQ : {0}".format(data))
             self.pub.send_event('interface.output',

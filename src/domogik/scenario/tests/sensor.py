@@ -27,16 +27,15 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.scenario.tests.abstract import AbstractTest
 from domogik.common.database import DbHelper
-from domogikmq.pubsub.subscriber import MQAsyncSub
-from time import sleep
+from time import sleep, time
 import zmq
 
-class AbstractSensorTest(AbstractTest, MQAsyncSub):
+class AbstractSensorTest(AbstractTest):
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
-        self.sub = MQAsyncSub.__init__(self, zmq.Context(), 'scenario-sensor', ['device-stats'])
+        self._subMessages.append( 'device-stats' )
         self._sensorId = params
-        self.set_description("Check if value/date changes for a sensor with id {0}".format(self._sensorId))
+        self.set_description(u"Check if value/date changes for a sensor with id {0}".format(self._sensorId))
         self.log = log
         self._db = DbHelper()
         self._res = None
@@ -65,20 +64,31 @@ class AbstractSensorTest(AbstractTest, MQAsyncSub):
         if self._sensorId:
             if 'sensor_id' in msg:
                 if int(msg['sensor_id']) == int(self._sensorId):
+                    self.log.debug(u"{0} : received MQ message : {1}. Please notice that if a scenario which use several of this sensor block is currently being evaluated, only one value is processed (in case the sensor values change too fast!)".format(self.__class__.__name__, msg))
                     self.handle_message(did, msg)
 
 
+
 class SensorTest(AbstractSensorTest):
-    """ Sensor test : evaluate a sensor value when it changes
+    """ Sensor test : evaluate a sensor
     # params == the sensorId to check the value for
     """
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractSensorTest.__init__(self, log, trigger, cond, params)
+        self.add_parameter(u"usage", "sensor_usage.SensorUsageParameter")
         self._res = self._convert(self._res)
+        self._time = time()
+        self._res_old = None
+        self._time_old = None
+        self._dummies = []
 
     def handle_message(self, did, msg):
+        self._time = time()
         self._res = self._convert(msg['stored_value'])
+        self.log.debug(u"{0} : Set sensor value = '{1}' for sensor id '{2}'. Trigger raised! Please notice that if a scenario which use several of this sensor block is currently being evaluated, only one trigger is processed to avoid running several times the same test.".format(self.__class__.__name__, self._res, self._sensorId))
+        for dummy in self._dummies :
+            dummy.handle_message(did, msg, self._time)
         self._trigger(self)
 
     def _convert(self, val):
@@ -86,114 +96,117 @@ class SensorTest(AbstractSensorTest):
             if val != None:
                 return float(val)
             else:
-                return None
+                return 0
+        elif self._dt_parent == "DT_Bool":
+            if val == "1":
+                return True
+            else:
+                return False
         elif self._dataType == "DT_Time":
             if val != None:
                 tmp = val.split(":")
                 if len(tmp) < 2:   # bad value
-                    return None
+                    return 0
                 else:
                     try:
                         new =  int(tmp[0]) * 60 + int(tmp[1])
                         #self.log.debug("DT_Time : convert '{0}' to '{1}'".format(val, new))
                         return new
                     except:
-                        self.log.debug("Error while converting DT_Time value in mminutes. Value='{0}'".format(val))
-                        return None
+                        self.log.debug(u"Error while converting DT_Time value in mminutes. Value='{0}'".format(val))
+                        return 0
             else:
-                return None
+                return 0
         else:
             return val
 
     def evaluate(self):
         """ Evaluate the sensor value
         """
-        self.log.debug("Evaluate SensorTest '{0}' to '{1}'. Type is '{2}'".format(self._sensorId, self._res, type(self._res))) 
-        return self._res
+        p = self.get_raw_parameters()
+        u = p["usage"]
+        usage = u.evaluate()
 
-class SensorChangedTest(AbstractSensorTest):
-    """ Sensor test : raise True when the value/date change
+        if usage == "value":
+            self.log.debug(u"Evaluate {0} '{1}' in mode '{2}' to '{3}'. Type is '{4}'".format(self.__class__.__name__,self._sensorId, usage, self._res, type(self._res)))
+            self._res_old = self._res
+            self._time_old = self._time
+            return self._res
+        elif usage == "trigger_on_change":
+            if self._res_old != None and self._res != self._res_old:   # not sensor startup or sensor value changed
+                has_changed = True
+            else:
+                has_changed = False
+            self.log.debug(u"Evaluate {0} '{1}' in mode '{2}' to '{3}'. Type is '{4}'".format(self.__class__.__name__,self._sensorId, usage, has_changed, type(has_changed)))
+            self._res_old = self._res
+            self._time_old = self._time
+            return has_changed
+        elif usage == "trigger_on_all":
+            #print("R vs Ro : {0} vs {1}".format(self._res, self._res_old))
+            #print("T vs To : {0} vs {1}".format(self._time, self._time_old))
+            if self._res_old != None and ((self._res != self._res_old) or (self._time != self._time_old)):   # not sensor startup or sensor value changed or date changed
+                self.log.debug(u"Evaluate {0} '{1}' in mode '{2}' to '{3}'. Type is '{4}'".format(self.__class__.__name__, self._sensorId, usage, True, type(True)))
+                self._res_old = self._res
+                self._time_old = self._time
+                return True
+            else:    # init of the sensor block
+                self._res_old = self._res
+                self._time_old = self._time
+                return False
+        else:
+            self.log.error(u"Bad usage used for sensorTest! Usage choosed ='{0}'".format(usage))
+            return None
+
+    def register_dummy(self, dummy):
+        """ Register a dummy test to push updted value """
+        if dummy not in self._dummies :
+            self._dummies.append(dummy)
+
+class SensorTestDummy(SensorTest):
+    """ Sensor test : evaluate a sensor by cloning (dummy) a main SensorTest
     # params == the sensorId to check the value for
     """
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
-        AbstractSensorTest.__init__(self, log, trigger, cond, params)
-        self._old_res = self._res
+        SensorTest.__init__(self, log, trigger, cond, params)
+        self._subMessages = [] # disable  'device-stats'   MQ Message
+
+    def on_message(self, did, msg):
+        pass
+
+    def handle_message(self, did, msg, time=0):
+        self._time = time
+        self._res = self._convert(msg['stored_value'])
+        self.log.debug(u"{0} : Set sensor value = '{1}' for sensor id '{2}'.".format(self.__class__.__name__, self._res, self._sensorId))
+
+class SensorValue(SensorTest):
+    """ Sensor Value : evaluate a sensor without triggering scenario evaluation
+    # params == the sensorId to check the value for
+    """
+
+    def __init__(self, log = None, trigger = None, cond = None, params = None):
+        SensorTest.__init__(self, log, trigger, cond, params)
 
     def handle_message(self, did, msg):
-        self._res = msg['stored_value']
-        # Trigger only if the value changed
-        if self._res != self._old_res:
-            self._trigger(self)
-        self._old_res = self._res
+        self._time = time()
+        self._res = self._convert(msg['stored_value'])
+        self.log.debug(u"{0} : Set sensor value = '{1}' for sensor id '{2}'. No trigger evaluation need.".format(self.__class__.__name__, self._res, self._sensorId))
+        for dummy in self._dummies :
+            dummy.handle_message(did, msg, self._time)
 
-    def evaluate(self):
-        """ Evaluate the sensor value
-        """
-        self.log.debug("Evaluate SensorChangedTest '{0}' : value changed. Return True.".format(self._sensorId, self._res)) 
-        return True
+class SensorValueDummy(SensorValue):
+    """ Sensor Value : evaluate a sensor by cloning (dummy) a main SensorValue
+    # params == the sensorId to check the value for
+    """
 
+    def __init__(self, log = None, trigger = None, cond = None, params = None):
+        SensorValue.__init__(self, log, trigger, cond, params)
+        self._subMessages = [] # disable  'device-stats'   MQ Message
 
-if __name__ == "__main__":
-    import logging
+    def on_message(self, did, msg):
+        pass
 
-    def mytrigger(test):
-        print("Trigger called by test {0}, refreshing state".format(test))
-        print("state is {0}".format(st))
-
-    ### create logger
-    FORMAT = "%(asctime)-15s %(message)s"
-
-    logger = logging.getLogger('simple_example')
-    logger.setLevel(logging.DEBUG)
-
-    # create console handler and set level to debug
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-
-    # create formatter
-    formatter = logging.Formatter(FORMAT)
-
-    # add formatter to ch
-    ch.setFormatter(formatter)
-
-    # add ch to logger
-    logger.addHandler(ch)
-
-    logger.info("------------------")
-
-
-    ### test the class
-    st = SensorTest(logger, trigger = mytrigger)
-    p = st.get_parameters()
-
-    logger.info("==== Evaluate without parameters values ====")
-    st.evaluate()
-
-    logger.info("==== Evaluate with parameters values that does not match ====")
-    logger.debug("Set values")
-    data = { "sensor": { "sensor_id" : 2 },
-             "value":  { "text" : "on" }
-    }
-    logger.debug("Set parameters values")
-    st.fill_parameters(data)
-    logger.debug("I sleep 5s")
-
-    st.evaluate()
-
-    ######### TODO : finish the below part 
-    print("updating with good text")
-    data = { "url": { "urlpath" : "http://people.dunnewind.net/maxence/domogik/test.txt",
-                    "interval": "5"
-    },
-    "text": {
-        "text" : "randomtext"
-    }
-    }
-    print("====")
-    TEST.fill_parameters(data)
-    print("====")
-    print("I sleep 5s")
-    sleep(5)
-    print("Trying to evaluate : {0}".format(TEST.evaluate()))
-    TEST.destroy()
+    def handle_message(self, did, msg, time=0):
+        self._time = time
+        self._res = self._convert(msg['stored_value'])
+        self.log.debug(u"{0} : Set sensor value = '{1}' for sensor id '{2}'.".format(self.__class__.__name__, self._res, self._sensorId))

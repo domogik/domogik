@@ -39,9 +39,9 @@ goog.require('goog.userAgent');
 
 /**
  * Class for an editable dropdown field.
- * @param {(!Array.<!Array.<string>>|!Function)} menuGenerator An array of options
- *     for a dropdown list, or a function which generates these options.
- * @param {Function=} opt_changeHandler A function that is executed when a new
+ * @param {(!Array.<!Array.<string>>|!Function)} menuGenerator An array of
+ *     options for a dropdown list, or a function which generates these options.
+ * @param {Function=} opt_validator A function that is executed when a new
  *     option is selected, with the newly selected value as its sole argument.
  *     If it returns a value, that value (which must be one of the options) will
  *     become selected in place of the newly selected option, unless the return
@@ -49,15 +49,14 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldDropdown = function(menuGenerator, opt_changeHandler) {
+Blockly.FieldDropdown = function(menuGenerator, opt_validator) {
   this.menuGenerator_ = menuGenerator;
-  this.setChangeHandler(opt_changeHandler);
   this.trimOptions_();
   var firstTuple = this.getOptions_()[0];
-  this.value_ = firstTuple[1];
 
   // Call parent's constructor.
-  Blockly.FieldDropdown.superClass_.constructor.call(this, firstTuple[0]);
+  Blockly.FieldDropdown.superClass_.constructor.call(this, firstTuple[1],
+      opt_validator);
 };
 goog.inherits(Blockly.FieldDropdown, Blockly.Field);
 
@@ -77,22 +76,27 @@ Blockly.FieldDropdown.ARROW_CHAR = goog.userAgent.ANDROID ? '\u25BC' : '\u25BE';
 Blockly.FieldDropdown.prototype.CURSOR = 'default';
 
 /**
- * Install this dropdown on a block.
- * @param {!Blockly.Block} block The block containing this text.
+ * Language-neutral currently selected string.
+ * @type {string}
+ * @private
  */
-Blockly.FieldDropdown.prototype.init = function(block) {
-  if (this.sourceBlock_) {
+Blockly.FieldDropdown.prototype.value_ = '';
+
+/**
+ * Install this dropdown on a block.
+ */
+Blockly.FieldDropdown.prototype.init = function() {
+  if (this.fieldGroup_) {
     // Dropdown has already been initialized once.
     return;
   }
-
   // Add dropdown arrow: "option ▾" (LTR) or "▾ אופציה" (RTL)
   this.arrow_ = Blockly.createSvgElement('tspan', {}, null);
-  this.arrow_.appendChild(document.createTextNode(
-      block.RTL ? Blockly.FieldDropdown.ARROW_CHAR + ' ' :
-          ' ' + Blockly.FieldDropdown.ARROW_CHAR));
+  this.arrow_.appendChild(document.createTextNode(this.sourceBlock_.RTL ?
+      Blockly.FieldDropdown.ARROW_CHAR + ' ' :
+      ' ' + Blockly.FieldDropdown.ARROW_CHAR));
 
-  Blockly.FieldDropdown.superClass_.init.call(this, block);
+  Blockly.FieldDropdown.superClass_.init.call(this);
   // Force a reset of the text to add the arrow.
   var text = this.text_;
   this.text_ = null;
@@ -108,20 +112,10 @@ Blockly.FieldDropdown.prototype.showEditor_ = function() {
   var thisField = this;
 
   function callback(e) {
+    var menu = this;
     var menuItem = e.target;
     if (menuItem) {
-      var value = menuItem.getValue();
-      if (thisField.sourceBlock_ && thisField.changeHandler_) {
-        // Call any change handler, and allow it to override.
-        var override = thisField.changeHandler_(value);
-        if (override !== undefined) {
-          value = override;
-        }
-      }
-      if (value !== null) {
-        thisField.sourceBlock_.setShadow(false);
-        thisField.setValue(value);
-      }
+      thisField.onItemSelected(menu, menuItem);
     }
     Blockly.WidgetDiv.hideIfOwner(thisField);
   }
@@ -129,9 +123,9 @@ Blockly.FieldDropdown.prototype.showEditor_ = function() {
   var menu = new goog.ui.Menu();
   menu.setRightToLeft(this.sourceBlock_.RTL);
   var options = this.getOptions_();
-  for (var x = 0; x < options.length; x++) {
-    var text = options[x][0];  // Human-readable text.
-    var value = options[x][1]; // Language-neutral value.
+  for (var i = 0; i < options.length; i++) {
+    var text = options[i][0];  // Human-readable text.
+    var value = options[i][1]; // Language-neutral value.
     var menuItem = new goog.ui.MenuItem(text);
     menuItem.setRightToLeft(this.sourceBlock_.RTL);
     menuItem.setValue(value);
@@ -200,6 +194,22 @@ Blockly.FieldDropdown.prototype.showEditor_ = function() {
 };
 
 /**
+ * Handle the selection of an item in the dropdown menu.
+ * @param {!goog.ui.Menu} menu The Menu component clicked.
+ * @param {!goog.ui.MenuItem} menuItem The MenuItem selected within menu.
+ */
+Blockly.FieldDropdown.prototype.onItemSelected = function(menu, menuItem) {
+  var value = menuItem.getValue();
+  if (this.sourceBlock_) {
+    // Call any validation function, and allow it to override.
+    value = this.callValidator(value);
+  }
+  if (value !== null) {
+    this.setValue(value);
+  }
+}
+
+/**
  * Factor out common words in statically defined options.
  * Create prefix and/or suffix labels.
  * @private
@@ -230,11 +240,11 @@ Blockly.FieldDropdown.prototype.trimOptions_ = function() {
   }
   // Remove the prefix and suffix from the options.
   var newOptions = [];
-  for (var x = 0; x < options.length; x++) {
-    var text = options[x][0];
-    var value = options[x][1];
+  for (var i = 0; i < options.length; i++) {
+    var text = options[i][0];
+    var value = options[i][1];
     text = text.substring(prefixLength, text.length - suffixLength);
-    newOptions[x] = [text, value];
+    newOptions[i] = [text, value];
   }
   this.menuGenerator_ = newOptions;
 };
@@ -265,13 +275,20 @@ Blockly.FieldDropdown.prototype.getValue = function() {
  * @param {string} newValue New value to set.
  */
 Blockly.FieldDropdown.prototype.setValue = function(newValue) {
+  if (newValue === null || newValue === this.value_) {
+    return;  // No change if null.
+  }
+  if (this.sourceBlock_ && Blockly.Events.isEnabled()) {
+    Blockly.Events.fire(new Blockly.Events.Change(
+        this.sourceBlock_, 'field', this.name, this.value_, newValue));
+  }
   this.value_ = newValue;
   // Look up and display the human-readable text.
   var options = this.getOptions_();
-  for (var x = 0; x < options.length; x++) {
+  for (var i = 0; i < options.length; i++) {
     // Options are tuples of human-readable text and language-neutral values.
-    if (options[x][1] == newValue) {
-      this.setText(options[x][0]);
+    if (options[i][1] == newValue) {
+      this.setText(options[i][0]);
       return;
     }
   }
@@ -308,7 +325,6 @@ Blockly.FieldDropdown.prototype.setText = function(text) {
   if (this.sourceBlock_ && this.sourceBlock_.rendered) {
     this.sourceBlock_.render();
     this.sourceBlock_.bumpNeighbours_();
-    this.sourceBlock_.workspace.fireChangeEvent();
   }
 };
 

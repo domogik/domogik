@@ -73,7 +73,7 @@ STATUS_INVALID = "invalid"
 STATUS_HBEAT = 15
 
 # core components
-CORE_COMPONENTS = ['manager', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin', 'butler']
+CORE_COMPONENTS = ['manager', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin', 'butler']
 
 # folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "domogik_packages"
@@ -117,7 +117,10 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         @param log_on_stdout : If set to True, allow to read the logs on both stdout and log file
         '''
         BasePlugin.__init__(self, name, stop_cb, parser, daemonize, log_prefix, log_on_stdout)
-        Watcher(self)
+        ioloop = IOLoop.instance()
+        signal.signal(signal.SIGINT, lambda sig, frame: ioloop.add_callback_from_signal(self.force_leave))
+        signal.signal(signal.SIGTERM, lambda sig, frame: ioloop.add_callback_from_signal(self.force_leave))
+
         self.log.info(u"----------------------------------")
         self.log.info(u"Starting client '{0}' (new manager instance)".format(name))
         self.log.info(u"Python version is {0}".format(sys.version_info))
@@ -172,6 +175,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self.packages_directory = "{0}/{1}".format(self.config['libraries_path'], PACKAGES_DIR)
         self.resources_directory = "{0}/{1}".format(self.config['libraries_path'], RESOURCES_DIR)
         self.products_directory = "{0}/{1}_{2}/{3}".format(self.packages_directory, self._type, self._name, PRODUCTS_DIR)
+        self.publish_directory = "{0}/{1}".format(self.resources_directory, "publish")
 
         # client config
         self._client_config = None
@@ -185,27 +189,45 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             self.force_leave()
             return
 
-        # Create object which get process informations (cpu, memory, etc)
-        # TODO : activate
-        # TODO : use something else that xPL ?????????
-        #self._process_info = ProcessInfo(os.getpid(),
-        #                                 TIME_BETWEEN_EACH_PROCESS_STATUS,
-        #                                 self._send_process_info,
-        #                                 self.log,
-        #                                 self.myxpl)
-        #self._process_info.start()
-
         self.dont_run_ready = False
 
         # for all no core elements, load the json
         # TODO find a way to do it nicer ??
         if self._name not in CORE_COMPONENTS and self._test == False:
             self._load_json()
+            self.client_version = self.json_data['identity']['version']
+        else:
+            self.client_version = None
 
+        # Create object which get process informations (cpu, memory, etc)
+        # TODO : use something else than xPL to store in the database ?
+        if self._name in CORE_COMPONENTS:
+            the_type = "core"
+        else:
+            the_type = self._type
+        self._process_info = ProcessInfo(os.getpid(), "{0}-{1}".format(the_type, self._name),
+                                         self.client_version,
+                                         TIME_BETWEEN_EACH_PROCESS_STATUS,
+                                         self.send_process_info,
+                                         self.log,
+                                         self._stop)
+        thr_send_process_info = threading.Thread(None,
+                                           self._process_info.start,
+                                           "send_process_info",
+                                           (),
+                                           {})
+        thr_send_process_info.start()
+
+        # init dataTypes list from domogik.
+        self._dataTypes = []
         # init an empty devices list
         self.devices = []
+        # internal flag, check if get_devices_list from db has successful
+        self._devices_retrieved = False;
         # init an empty 'new' devices list
         self.new_devices = []
+        # Init method to call after a devices updated
+        self._cb_update_devices = None
 
         # check for products pictures
         if self._name not in CORE_COMPONENTS and self._test == False:
@@ -213,6 +235,21 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
 
         # init finished
         self.log.info(u"End init of the global client part")
+
+    def send_process_info(self, pid, data):
+        """ Send process informations to the manager. See ProcessInfo (common/processinfo.py) class for more informations about the content.
+            These data are used for anonymous metrics analysis by the domogik team : number of releases of domogik, etc
+        """
+        self._pub.send_event('metrics.processinfo', data)
+
+    def register_cb_update_devices(self, cb_update_devices):
+        """ For a client only
+            To be call in the client __init__()
+            Register a callback method called at each device.update received by MQ.
+            @param cb_update_devices : Method to callback.  None to unregister. Methode get devices list as parameter.
+                eg: def my_callback(self, devices):
+        """
+        self._cb_update_devices = cb_update_devices
 
     def add_mq_sub(self, msg):
         self._mq_subscribe_list.append(msg)
@@ -223,7 +260,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             Check in database (over queryconfig) if the key 'configured' is set to True for the client
             if not, stop the client and log this
         """
-        self._client_config = Query(self.zmq, self.log)
+        self._client_config = Query(self.zmq, self.log, self.get_sanitized_hostname())
         configured = self._client_config.query(self._type, self._name, 'configured')
         if configured == '1':
             configured = True
@@ -233,7 +270,6 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             return False
         self.log.info(u"The client is configured. Continuing (hoping that the user applied the appropriate configuration ;)")
         return True
-
 
     def _load_json(self):
         """ Load the client json file
@@ -258,7 +294,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         """ Try to get the config over the MQ. If value is None, get the default value
         """
         if self._client_config == None:
-            self._client_config = Query(self.zmq, self.log)
+            self._client_config = Query(self.zmq, self.log, self.get_sanitized_hostname())
         value = self._client_config.query(self._type, self._name, key)
         if value == None or value == 'None':
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
@@ -317,7 +353,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             if type == "float":
                 return float(value)
             if type == "integer":
-                return float(value)
+                return int(value)
             # type == ipv4 : nothing to do
             # type == multiple choice : nothing to do
             # type == string : nothing to do
@@ -331,8 +367,31 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             return value
         return value
 
+    def _load_data_type(self):
+        """ Request the dbmgr component over MQ to get domogik DT_Types
+        """
+        mq_client  = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('datatype.get')
+        result = mq_client.request('manager', msg.get(), timeout=10)
+        if result :
+            self._dataTypes = result.get_data()['datatypes']
+            self.log.info(u"data_types list loaded.")
+        else :
+            self.log.warning(u"Error on retreive data_types list from MQ.")
+
+    def get_data_type(self, name):
+        """ Return Datatype dict corresponding to name
+            @param name :  the name of DT_Type
+            @return : dict DT_Type himself, empty dict if not find.
+        """
+        if self._dataTypes == [] : self._load_data_type()
+        for dT in self._dataTypes :
+          if dT == name : return self._dataTypes[dT]
+        return {}
+
     def get_device_list(self, quit_if_no_device = False, max_attempt = 2):
-        """ Request the dbmgr component over MQ to get the devices list for this client
+        """ Request the admin component over MQ to get the devices list for this client
             @param quit_if_no_device: if True, exit the client if there is no devices or MQ request fail
             @param max_attempt : number of retry MQ request if it fail
         """
@@ -344,9 +403,10 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         msg.add_data('host', self.get_sanitized_hostname())
         attempt = 1
         result = None
+        self._devices_retrieved = False
         while not result and attempt <= max_attempt :
             mq_client = MQSyncReq(self.zmq)
-            result = mq_client.request('dbmgr', msg.get(), timeout=10)
+            result = mq_client.request('admin', msg.get(), timeout=10)
             if not result:
                 self.log.warn(u"Unable to retrieve the device list (attempt {0}/{1})".format(attempt, max_attempt))
                 attempt += 1
@@ -357,6 +417,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                 self.force_leave()
             return []
         else:
+            self._devices_retrieved = True
             device_list = result.get_data()['devices']
             if device_list == []:
                 self.log.warn(u"There is no device created for this client")
@@ -667,7 +728,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if self.dont_run_ready == True:
             return
 
-        # TODO : why the dbmgr has no self._name defined ???????
+        # TODO : why the  has no self._name defined ???????
         # temporary set as unknown to avoir blocking bugs
         if not hasattr(self, '_name'):
             self._name = "unknown"
@@ -686,7 +747,16 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             IOLoop.instance().start()
 
     def on_message(self, msgid, content):
-        pass
+        """ Handle Published from MQ
+            @param msgid : The message id describing context
+            @param content : The content of message
+
+            You can overwrite it, but at first your on_message method must call this basis part:
+                Plugin.on_message(self, msgid, content).
+        """
+        if msgid == "device.update":
+            self.log.debug(u"Receive pub message {0}, {1}".format(msgid, content))
+            threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
 
     def on_mdp_request(self, msg):
         """ Handle Requests over MQ
@@ -846,6 +916,40 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                                   "host" : self.get_sanitized_hostname(),
                                   "event" : self._status})
 
+    def refresh_devices(self, max_attempt = 2):
+        """ Call get_device_list from MQ, and call the registered callback if necessary.
+            @param max_attempt : number of trying get devices list.
+        """
+        devices = self.get_device_list(quit_if_no_device = False, max_attempt = max_attempt)
+        if self._cb_update_devices is not None and self._devices_retrieved :
+            self._cb_update_devices(devices)
+
+    def udpate_device_param(self, paramId, value):
+        """ Request the dbmgr component over MQ to update a device global parameters for this client
+            @param paramId: db id of global parameters
+            @param value : New parameter value
+            @return : True if success else False.
+        """
+
+        self.log.debug(u"Setting global device parameter {0} with value {1}".format(paramId, value))
+        mq_client = MQSyncReq(self.zmq)
+        msg = MQMessage()
+        msg.set_action('deviceparam.update')
+        msg.add_data('dpid', paramId)
+        msg.add_data('value', value)
+        result = mq_client.request('dbmgr', msg.get(), timeout=10)
+        if result is not None:
+            data = result.get_data()
+            if data["status"]:
+                threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
+                return True
+            else:
+                self.log.warning(u"{0}".format(data["reason"]))
+                return False
+        else :
+            self.log.error(u"Error while updating global parameter id :{0} with value {1}".format(paramId, value))
+            return False
+
     def get_config_files(self):
        """ Return list of config files
        """
@@ -884,7 +988,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
-               os.mkdir(path, 770)
+               os.mkdir(path, 0770)
                self.log.info(u"Create directory {0}.".format(path))
            except:
                raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))
@@ -906,6 +1010,12 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
        #    raise IOError("Can't create a file in directory {0}.".format(path))
        return path
 
+    def get_publish_directory(self):
+       return self.publish_directory
+
+    def get_publish_files_url(self):
+       return "publish://{0}/{1}/".format(self._type, self._name)
+
     def get_publish_files_directory(self):
        """
        Return the directory where a plugin can store files to be published over rest api : /rest/publish/<client type>/<client name>/<file>
@@ -913,17 +1023,131 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
        After that, try to create a file inside it.
        If something goes wrong, generate an explicit exception.
        """
-       path = "{0}/{1}/{2}_{3}/publish/".format(self.libraries_directory, PACKAGES_DIR, self._type, self._name)
+       path = "{0}/{1}/{2}/".format(self.publish_directory, self._type, self._name)
        if os.path.exists(path):
            if not os.access(path, os.W_OK & os.X_OK):
                raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
-               os.mkdir(path, 770)
+               os.makedirs(path, 0777)
                self.log.info(u"Create directory {0}.".format(path))
            except:
                raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))
        return path
+
+    def get_picture_product(self, product):
+        """Return product picture file from json plugin, else None.
+           @param : product : the json dict definition from json plugin.
+           @return : picture product file from products directory plugin, else None
+        """
+        for ext in PRODUCTS_PICTURES_EXTENSIONS:
+            file = "{0}.{1}".format(product['id'], ext)
+            if os.path.isfile("{0}/{1}".format(self.get_products_directory(), file)):
+                return file
+        return None
+
+    def get_product_by_id(self, productId):
+        """ Get the product set in json corresponding to productId.
+            @param productId : productId set in json plugin. Search it in lower case.
+            @return : dict of product defined in json plugin with picture file name added. If not find empty dict.
+                {
+                    "name" : The name of product,
+                    "id" : product id, this is base name of picture,
+                    "documentation" : Link to manufacturer documentation, manual, specification,
+                    "type": Device_type linked to this product,
+                    "picture" : if exist, file name of picture representing product, else None
+                }
+        """
+        productId = productId.lower()
+        for product in self.json_data['products']:
+            if productId.find(product['id'].lower()) != -1:
+                product[u'picture'] = self.get_picture_product(product)
+                return product
+        return {}
+
+    def get_sensor_by_id(self, id):
+        """ get the sensor set in json corresponding to id
+            @param id : sensor id to find set in json plugin.
+            @return : dict of sensor if find else empty dict.
+        """
+        for sensor in self.json_data['sensors']:
+            if sensor == id:
+                return self.json_data['sensors'][sensor]
+        return {}
+
+    def get_sensors_by_name(self, name):
+        """ Get sensor(s) set in json plugin corresponding to name in lower case.
+            @param name : value of key name set in json plugin.
+                sensors" : {
+                    "my_sensor" : {
+                        "name" : "Sensor Name",
+                        ...
+            @return : dict of all sensors with same key name. If not find return empty dict.
+                {
+                "my_sensor1" : {
+                    "name" : "Sensor Name",
+                    ...
+                    },
+                "my_sensor2" : {
+                    "name" : "Sensor Name",
+                    ...
+                    },
+                ...
+                }
+        """
+        sensors = {}
+        name = name.lower()
+        for sensor in self.json_data['sensors']:
+          if self.json_data['sensors'][sensor]['name'].lower() == name :
+              sensors[sensor] = self.json_data['sensors'][sensor]
+        return sensors
+
+    def get_command_by_id(self, id):
+        """ get the command set in json corresponding to id
+            @param id : command id to find set in json plugin.
+            @return : dict of command if find else empty dict.
+        """
+        for cmd in self.json_data['commands']:
+            if cmd == id:
+                return self.json_data['commands'][cmd]
+        return {}
+
+    def get_commands_by_key(self, key):
+        """Get command(s) set in json plugin including a key in lower case.
+            @param key : value of one key parameter set in json plugin.
+                commands" : {
+                    "my_command" : {
+                        "name" : "foo name",
+                        "parameters" : [{
+                                "key" : "my_key",
+                                ...
+                                }]
+            @return : dict of all command include same key. If not find return empty dict.
+                {
+                "my_command1" : {
+                    "name" : "foo name2",
+                        "parameters" : [{
+                                "key" : "my_key",
+                                ...
+                                }]
+                    },
+                "my_command2" : {
+                    "name" : "foo name2",
+                        "parameters" : [{
+                                "key" : "my_key",
+                                ...
+                                }]
+                    },
+                ...
+                }
+        """
+        cmds = {}
+        key = key.lower()
+        for cmd in self.json_data['commands']:
+            for param in self.json_data['commands'][cmd]['parameters']:
+                if param['key'].lower() == key :
+                    cmds[cmd] = self.json_data['commands'][cmd]
+        return cmds
 
     def register_helper(self, action, help_string, callback):
         if action not in self.helpers:
@@ -972,6 +1196,12 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             #for elt in inspect.stack():
             #    self.log.debug(u"    {0}".format(elt))
 
+        # try to stop the thread
+        try:
+            self.get_stop().set()
+        except AttributeError:
+            pass
+
         if return_code != None:
             self.set_return_code(return_code)
             self.log.info("Return code set to {0} when calling force_leave()".format(return_code))
@@ -990,11 +1220,6 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         else:
             self._set_status(STATUS_STOPPED)
 
-        # try to stop the thread
-        try:
-            self.get_stop().set()
-        except AttributeError:
-            pass
 
         if hasattr(self, "_timers"):
             for t in self._timers:
@@ -1034,6 +1259,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
                 self.log.warn(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
+        sys.exit()
 
 
 class Watcher:

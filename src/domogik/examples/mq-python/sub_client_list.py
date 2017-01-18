@@ -36,13 +36,13 @@
         u'type': u'core',
         u'last_seen': 1412625186.012657
     },
-    u'core-dbmgr.darkstar': {
+    u'core-admin.darkstar': {
         u'status': u'alive',
-        u'name': u'dbmgr',
-        u'xpl_source': u'domogik-dbmgr.darkstar',
+        u'name': u'admin',
+        u'xpl_source': u'domogik-admin.darkstar',
         u'configured': None,
         u'pid': 19241,
-        u'package_id': u'core-dbmgr',
+        u'package_id': u'core-admin',
         u'host': u'darkstar',
         u'type': u'core',
         u'last_seen': 1412625183.384482

@@ -26,6 +26,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.actions.abstract import AbstractAction
+from domogik.common.utils import ucode
 import traceback
 try:
     # python3
@@ -45,21 +46,21 @@ class CallUrlAction(AbstractAction):
         AbstractAction.__init__(self, log)
         self.set_description("Call an url.")
 
-    def do_action(self, local_vars):
+    def do_action(self):
         url = self._params['url']
-        # local variables
-        url = self.process_local_vars(local_vars, url)
 
-        self._log.info(u"Calling url : {0}".format(url))
+        self._log.info(u"Calling url : {0}".format(ucode(url)))
         try:
             # encode url
-            url = url.encode('utf-8')
+            url = ucode(url).encode('utf-8')
             url_elts = urlparse(url)
             url_args = url_elts.query.split("&")
             new_url_args = u""
             for arg in url_args:
                 if arg != '':
-                    key, value = arg.split("=")
+                    tmp = arg.split("=")
+                    key = tmp[0]
+                    value = "=".join(tmp[1:])
                     new_url_args += u"{0}={1}&".format(quote(key), quote(value))
             new_url = u"{0}://{1}{2}?{3}".format(url_elts.scheme,
                                                url_elts.netloc,

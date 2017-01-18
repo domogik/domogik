@@ -44,14 +44,15 @@ RUN apt-get install -y \
     wget \
     openssh-server \
     screen \
-    dos2unix    
+    dos2unix \
+    tcpdump
 
 ### Minimum requirements
 RUN apt-get install -y \
     sudo \
     python2.7-dev \
     python-pip \
-    git
+    git 
     
 RUN pip install netifaces \
  && pip install sphinx-better-theme

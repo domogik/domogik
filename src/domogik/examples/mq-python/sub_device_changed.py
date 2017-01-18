@@ -3,7 +3,7 @@
 """
 @api {SUB} device-changed Subscribe to device changes
 @apiVersion 0.4.0
-@apiName device-changed
+@apiName device.update
 @apiGroup Client
 @apiDescription Subscribe to newly stored device stats
 * Source client : n/a (any subscriber)
@@ -13,7 +13,7 @@
      class Test(MQAsyncSub):
      
         def __init__(self):
-            MQAsyncSub.__init__(self, zmq.Context(), 'test', ['device-changed'])
+            MQAsyncSub.__init__(self, zmq.Context(), 'test', ['device.update'])
             IOLoop.instance().start()
      
          def on_message(self, msgid, content):
@@ -38,7 +38,7 @@ from domogikmq.message import MQMessage
 class Test(MQAsyncSub):
 
     def __init__(self):
-        MQAsyncSub.__init__(self, zmq.Context(), 'test', ['device-changed'])
+        MQAsyncSub.__init__(self, zmq.Context(), 'test', ['device.update'])
         IOLoop.instance().start()
 
     def on_message(self, msgid, content):

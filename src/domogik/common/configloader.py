@@ -39,30 +39,27 @@ Implements
 #       DON'T CHANGE ANYTHING AFTER THIS LINE      #
 ####################################################
 import os
-import pwd 
+import fcntl
+import codecs
+import chardet
 try:
     # from python3 onwards
     import configparser
 except ImportError:
     # python 2
     import ConfigParser as configparser
-import threading
-import time
-import fcntl
-import codecs
-import chardet
 
 
 CONFIG_FILE = "/etc/domogik/domogik.cfg"
 CONFIG_LCOATION = "/etc/domogik/"
 LOCK_FILE = "/var/lock/domogik/config.lock"
 
-class Loader():
+class Loader(object):
     '''
     Parse Domogik config files
     '''
 
-    config = None 
+    config = None
 
     def __init__(self, part_name=None, cfile="domogik.cfg"):
         '''
@@ -84,25 +81,28 @@ class Loader():
         if not os.path.exists(os.path.dirname(LOCK_FILE)):
             try:
                 # note : default creation mode : 0777
-                os.mkdir(os.path.dirname(LOCK_FILE)) 
+                os.mkdir(os.path.dirname(LOCK_FILE))
             except:
                 raise Exception("ConfigLoader : unable to create the directory '{0}'".format(os.path.dirname(LOCK_FILE)))
         if not os.path.exists(LOCK_FILE):
             try:
-                file = open(LOCK_FILE, "w")
-                file.write("")
-                file.close()
+                lfile = open(LOCK_FILE, "w")
+                lfile.write("")
+                lfile.close()
             except:
                 raise Exception("ConfigLoader : unable to create the lock file '{0}'".format(LOCK_FILE))
-        file = open(LOCK_FILE, "r+")
-        fcntl.lockf(file, fcntl.LOCK_EX)
+        lfile = open(LOCK_FILE, "r+")
+        fcntl.lockf(lfile, fcntl.LOCK_EX)
 
         # read config file
         self.config = configparser.ConfigParser()
 
         # find the configuration file encoding (default will be ascii, but depending on characters in the butler name it could be different!)
-        tmp = open(self.cfile).read()
-        encoding = chardet.detect(tmp)['encoding']
+        #tmp = open(self.cfile).read()
+        #encoding = chardet.detect(tmp)['encoding']
+
+        encoding = "utf8"
+
         # sample result of detect() :
         #{'confidence': 0.9275988341086866, 'encoding': 'ISO-8859-2'}
 
@@ -112,7 +112,7 @@ class Loader():
 
         # python 3.2+
         try:
-            self.config.read(self.cfile, encoding = encoding)
+            self.config.read(self.cfile, encoding=encoding)
         # python < 3.2
         except TypeError:
             cfg_file = codecs.open(self.cfile, "r", encoding)
@@ -120,31 +120,31 @@ class Loader():
             cfg_file.close()
 
         # release the file lock
-        fcntl.lockf(file, fcntl.LOCK_UN)
-        file.close()
+        fcntl.lockf(lfile, fcntl.LOCK_UN)
+        lfile.close()
 
         # get 'domogik' config part
         domogik_part = {}
         try:
             result = self.config.items('domogik')
-            for k, v in result:
-                domogik_part[k] = v
-        except configparser.NoSectionError as exp:
+            for key, val in result:
+                domogik_part[key] = val
+        except configparser.NoSectionError:
             pass
 
         # no other config part requested
-        if self.part_name == None:
+        if self.part_name is None:
             result = (domogik_part, None)
 
         # Get requested (if so) config part
         if self.part_name:
-            result =  (domogik_part, self.config.items(self.part_name))
+            result = (domogik_part, self.config.items(self.part_name))
 
         return result
 
     def set(self, section, key, value):
         """ Set a key value for a section in config file and write it
-            WARNING : using this function make config fil change : 
+            WARNING : using this function make config fil change :
             - items are reordered
             - comments are lost
             @param section : section of config file
@@ -152,7 +152,7 @@ class Loader():
             @param value : value
         """
         # Check load is called before this function
-        if self.config == None:
+        if self.config is None:
             raise Exception("ConfigLoader : you must use load() before set() function")
         self.config.set(section, key, value)
         with open(self.cfile, "wb") as configfile:

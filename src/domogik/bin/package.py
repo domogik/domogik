@@ -85,7 +85,7 @@ class PackageInstaller():
     def __init__(self):
         """ Init
         """
-        l = logger.Logger("package")
+        l = logger.Logger("package", log_on_stdout=True)
         l.set_format_mode("messageOnly")
         self.log = l.get_logger()
 
@@ -371,11 +371,20 @@ class PackageInstaller():
                         return None, None
     
                     # check the mime type
-                    peek = response.iter_content(256).next()
-                    mime = magic.from_buffer(peek, mime=True)
-                    if mime not in ALLOWED_MIMES:
-                        self.log.error("The package downloaded has not a compliant mime type : {0}. The mime type should be one of these : {1}".format(mime, ALLOWED_MIMES))
-                        return None, None
+                    # TODO : reactivate
+                    # 0.5.0 / dec 2016 : 
+                    # commented because it sucks with python-magic on ubuntu : 
+                    #   Error while downloading the package : Traceback (most recent call last):
+                    #     File "/opt/dmg/domogik/src/domogik/bin/package.py", line 375, in download_from_url
+                    #       mime = magic.from_buffer(peek, mime=True)
+                    #   AttributeError: 'module' object has no attribute 'from_buffer'
+                    mime = MIME_ZIP
+
+                    #peek = response.iter_content(256).next()
+                    #mime = magic.from_buffer(peek, mime=True)
+                    #if mime not in ALLOWED_MIMES:
+                    #    self.log.error("The package downloaded has not a compliant mime type : {0}. The mime type should be one of these : {1}".format(mime, ALLOWED_MIMES))
+                    #    return None, None
     
                     # download
                     # if streaming is activated
@@ -476,6 +485,7 @@ class PackageInstaller():
                     # try to load json
                     is_ok = self.is_json_ok(json_file = os.path.join(path, JSON_FILE))
                     if is_ok == False:
+                        self.log.info("")
                         continue
     
                     # display some informations
@@ -505,6 +515,9 @@ class PackageInstaller():
                 pkg_json = PackageJson(path = json_file)
             elif data != None:
                 pkg_json = PackageJson(data = data)
+        except PackageException as e:
+            self.log.error(u"Invalid json file. Reason : {0}".format(e.value))
+            return False
         except:
             self.log.error(u"Error while reading the json file '{0}' : {1}".format(json_file, traceback.format_exc()))
             return False
@@ -577,6 +590,7 @@ class PackageInstaller():
         makefile = os.path.join(self.resources_path, "sphinx/Makefile")
         # -e if used to use environments vars
         cmd = "cd {0} && export BUILDDIR={1} && export SPHINXOPTS='-c {2}' && make -e -f {3} html".format(doc_path, os.path.join(doc_path, build_doc_dir), conf_py, makefile)
+        self.log.debug("Build doc: {0}".format(cmd))
         subp = Popen(cmd, 
                      shell=True,
                      stdout=PIPE, stderr=PIPE)

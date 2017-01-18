@@ -26,6 +26,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 """
 
 from domogik.scenario.actions.abstract import AbstractAction
+from domogik.common.utils import ucode
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 import zmq
@@ -42,24 +43,23 @@ class CommandAction(AbstractAction):
         self.set_description(u"Start a certain command")
         self._cmdId = params
 
-    def do_action(self, local_vars):
-        self.log.info(u"Do an action...")
+    def do_action(self):
+        self.log.info(u"Command : Do an action...")
 
         # live udate some values
-        self.log.debug(u"Preprocessing on parameters...")
-        self.log.debug(u"Parameters before processing : {0}".format(self._params))
+        self.log.debug(u"Command : Preprocessing on parameters...")
+        self.log.debug(u"Command : Parameters before processing : {0}".format(self._params))
         params = {}
         for key in self._params:
-            self.log.debug(u"Preprocess for param : key={0}, typeofvalue={1}, value={2}".format(key, type(self._params[key]), self._params[key]))
-            # local variables
-            params[key] = self.process_local_vars(local_vars, self._params[key])
-
+            self._params[key] = ucode(self._params[key])
+            self.log.debug(u"Command : Preprocess for param : key={0}, typeofvalue={1}, value={2}".format(key, type(self._params[key]), self._params[key]))
+            params[key] = self._params[key]
             if key == "color" and params[key].startswith("#"):
                 self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
                 params[key] = params[key][1:]
 
-        self.log.debug(u"Parameters after processing : {0}".format(params))
-        self.log.debug(u"Send action command over MQ...")
+        self.log.debug(u"Command : Parameters after processing : {0}".format(params))
+        self.log.debug(u"Command : Send action command over MQ...")
 
         # do the command
         cli = MQSyncReq(zmq.Context())
@@ -68,16 +68,16 @@ class CommandAction(AbstractAction):
         msg.add_data('cmdid', self._cmdId)
         msg.add_data('cmdparams', params)
 
-        self.log.debug(u"Command id = '{0}', command params = '{1}'".format(self._cmdId, params)) 
+        self.log.debug(u"Command : Command id = '{0}', command params = '{1}'".format(self._cmdId, params)) 
         # do the request
         res = cli.request('xplgw', msg.get(), timeout=10)
         if res:
             data = res.get_data()
             if not data['status']:
-                self.log.error(u"Command sending to XPL gw failed: {0}".format(res))
+                self.log.error(u"Command : Command sending to XPL gw failed: {0}".format(res))
         else:
-            self.log.error(u"XPL gw did not respond")
-        self.log.debug(u"Action done")
+            self.log.error(u"Command : XPL gw did not respond")
+        self.log.debug(u"Command : Action done")
 
     def get_expected_entries(self):
         return {

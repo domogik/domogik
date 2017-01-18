@@ -67,6 +67,7 @@ class AbstractAction:
             self._log = log
       
         self._description = ''
+        self._params = {}
 
     def destroy(self):
         pass
@@ -95,10 +96,13 @@ class AbstractAction:
         documentation, params could be {'mail': 'me@mybox.com'}
         """
         # we need to remove type and id => its not needed here
-        del params['type']
-        del params['id']
+        # del params['type']
+        # del params['id']
         self._params = params
         pass
+
+    def set_param(self, param, val):
+        self._params[param] = val
 
     def do_action(self, condition, tests):
         """ This is the most important method of this class. It does nothing by default and *must*
@@ -133,13 +137,3 @@ class AbstractAction:
         @return a Hash of expected parameters, or {} if no parameters are needed
         """
         return {}
-
-    def process_local_vars(self, local_vars, input):
-        # local variables
-        try:
-            for a_var in local_vars:
-                input = input.replace(u"{{{{{0}}}}}".format(a_var), local_vars[a_var])
-        except:
-            self._log.error(u"Error while replacing local variables '{0}' in '{1}'. Error is : {2}".format(local_vars, input, traceback.format_exc()))
-        return input
-

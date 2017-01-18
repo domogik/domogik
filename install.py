@@ -17,6 +17,7 @@ import logging
 import pkg_resources
 from subprocess import Popen, PIPE, STDOUT
 from distutils import version
+import uuid
 
 
 BLUE = '\033[94m'
@@ -197,7 +198,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
                 'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level', \
                 'log_when', 'log_interval', 'log_backup_count'],
         'database': ['prefix', 'pool_recycle'],
-        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth'],
+        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth', 'secret_key'],
     }
     if advanced_mode:
         return True
@@ -233,17 +234,27 @@ def write_domogik_configfile(advanced_mode, intf):
     itf = ['bind_interface', 'interfaces']
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
-        for item in config.items(sect):
-            if item[0] in itf  and not advanced_mode:
-                config.set(sect, item[0], intf)
-                debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
-            elif is_domogik_advanced(advanced_mode, sect, item[0]):
-                print("- {0} [{1}]: ".format(item[0], item[1])),
-                new_value = sys.stdin.readline().rstrip('\n')
-                if new_value != item[1] and new_value != '':
-                    # need to write it to config file
-                    config.set(sect, item[0], new_value)
-                    newvalues = True
+        if sect != "metrics":
+            for item in config.items(sect):
+                if sect == 'admin'and item[0] == 'secret_key':
+                    config.set(sect, item[0], uuid.uuid4())
+                elif item[0] in itf  and not advanced_mode:
+                    config.set(sect, item[0], intf)
+                    debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
+                elif is_domogik_advanced(advanced_mode, sect, item[0]):
+                    print("- {0} [{1}]: ".format(item[0], item[1])),
+                    new_value = sys.stdin.readline().rstrip('\n')
+                    if new_value != item[1] and new_value != '':
+                        # need to write it to config file
+                        config.set(sect, item[0], new_value)
+                        newvalues = True
+
+        # manage metrics section
+        else:
+            config.set(sect, "id", uuid.getnode())   # set an unique id which is hardware dependent
+            print("Set [{0}] : {1} = {2}".format(sect, id, uuid.getnode()))
+            debug("Value {0} in domogik.cfg > [metrics] set to {1}".format(id, uuid.getnode()))
+
     # write the config file
     with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
         ok("Writing the config file")
@@ -287,7 +298,8 @@ def write_domogik_configfile_from_command_line(args):
                 print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                 config.set(sect, item[0], new_value)
                 newvalues = True
-            debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
+            debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
+
     # write the config file
     with open('/etc/domogik/domogik.cfg', 'wb') as configfile:
         ok("Writing the config file")
@@ -307,7 +319,7 @@ def write_xplhub_configfile_from_command_line(args):
                 print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                 config.set(sect, item[0], new_value)
                 newvalues = True
-            debug("Value {0} in comogik.cfg set to {1}".format(item[0], new_value))
+            debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
     with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
         ok("Writing the config file")

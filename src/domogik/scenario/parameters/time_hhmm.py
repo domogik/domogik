@@ -45,7 +45,6 @@ class TimeHHMMParameter(AbstractParameter):
         """ Return string, or none if no string entered yet
         """
         params = self.get_parameters()
-        print params
         tmp = params["time"].split(":")
         if len(tmp) != 2:
             self._log.warning("Bad time format for '{0}'. Expected : 'hh:mm'".format(params["time"]))
@@ -55,7 +54,6 @@ class TimeHHMMParameter(AbstractParameter):
         except:  # bad format!
             self._log.warning("Bad time format for '{0}'. Expected : 'hh:mm'".format(params["time"]))
             self.expr = None
-        print("{0}".format(given_time_in_minutes))
         return int(given_time_in_minutes)
 
     def destroy(self):

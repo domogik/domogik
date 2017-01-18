@@ -6,12 +6,12 @@
   <div class="container">
 
     <div class="row-fluid margin-bottom">
-      <a id="create-device" class="btn btn-info" href="/client/{{ clientid }}/dmg_devices/new"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Create a new Domogik device{% endtrans %}</a> 
+      <a id="create-device" class="btn btn-info" href="/client/{{ clientid }}/dmg_devices/new"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Create a new Domogik device{% endtrans %}</a>
       <button id="detected-devices" type="button" class="btn btn-default" data-toggle="modal" data-target="#detected_modal">
         <span class='glyphicon glyphicon-search' aria-hidden='true'></span> {% trans %}Detected devices{% endtrans %}
       </button>
     </div>
-    
+
     <!-- Modal -->
     <div class="modal fade" id="detected_modal" tabindex="-1" role="dialog" aria-labelledby="detectedModal" aria-hidden="true">
       <div class="modal-dialog">
@@ -26,12 +26,29 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
-            <a class="btn btn-primary" href="/client/{{ clientid }}/dmg_devices/detected">{% trans %}OK, show me the detected devices{% endtrans %}</a> 
+            <a class="btn btn-primary" href="/client/{{ clientid }}/dmg_devices/detected">{% trans %}OK, show me the detected devices{% endtrans %}</a>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Modal for devices deletion -->
+    <div class="modal fade" id="deletion_modal" tabindex="-1" role="dialog" aria-labelledby="deletionModal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans %}Close{% endtrans %}</span></button>
+            <h4 class="modal-title" id="myModalLabel">{% trans %}Deleting a device{% endtrans %}</h4>
+          </div>
+          <div class="modal-body">
+            <p>{% trans %}In this Domogik release the device deletion have been deactivated : deleting devices with an important history is quite long and must be done in a background task. This task will be implemented in the next Domogik release.{% endtrans %}</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     {% if error != None %}
       <div class="alert alert-warning">{{ error | safe }}</div>
@@ -41,7 +58,7 @@
     {% if devices|length > 0 %}
       <div class="container-fluid">
         <div class="row">
-        
+
           <!-- Devices list -->
           <div class="col-md-4">
             <h2>{% trans %}Known Devices{% endtrans %}</h2>
@@ -54,7 +71,7 @@
               {% endfor %}
             </ul>
           </div>
-        
+
           <!-- Devices details -->
           <div class="col-md-8">
             <div class="tab-content">
@@ -67,8 +84,13 @@
                       <div class="panel panel-default">
                         <div class="panel-heading">
                           <h4 class="panel-title">{% trans %}Informations{% endtrans %}
-                            <a class="btn btn-default" href="/client/{{ clientid }}/dmg_devices/edit/{{ data.id }}"><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span> {% trans %}Edit{% endtrans %}</a> 
+                            <a class="btn btn-default" href="/client/{{ clientid }}/dmg_devices/edit/{{ data.id }}"><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span> {% trans %}Edit{% endtrans %}</a>
+                            <!-- to reactivate when device deletion will be finely implemented
                             <a class="btn btn-default" data-toggle="confirmation" data-placement="bottom" data-href="/client/{{ clientid }}/dmg_devices/delete/{{ data.id }}"><span class='glyphicon glyphicon-trash' aria-hidden='true'></span> {% trans %}Delete the device{% endtrans %}</a>
+                            -->
+                            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#deletion_modal">
+                              <span class='glyphicon glyphicon-trash' aria-hidden='true'></span> {% trans %}Delete the device{% endtrans %}
+                            </button>
                           </h4>
                         </div>
                         <div class="panel-body">
@@ -84,7 +106,7 @@
                           </ul>
                         </div>
                       </div>
-    
+
                       {% if data.parameters|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -116,7 +138,7 @@
                           </div>
                         </div>
                       {% endif %}
-    
+
                       {% if data.sensors|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -133,77 +155,97 @@
                                     <tr>
                                       <th>{% trans %}Data Type{% endtrans %}</th>
                                       <td>{{ sen.data_type }}</td>
-                                    <tr>
                                     </tr>
-                                      <th>{% trans %}Last value{% endtrans %}</th>
-                                      <td>
-                                        {% if sen.last_value %}
-                                          {{ sen.last_value }}
-                                          {% if datatypes[sen.data_type].unit %}
-                                            &nbsp;{{ datatypes[sen.data_type].unit }}
+                                    {% if datatypes[sen.data_type] is not defined %}
+                                      <tr>
+                                        <td colspan="2">
+                                          <div class="alert alert-warning" role="alert">
+                                          <strong>{% trans %}Warning{% endtrans %}</strong> : 
+                                          {% trans %}The datatype used by this sensor is no more compliant with this release of Domogik. You may consider to upgrade this plugin and if needed, recreate this device.{% endtrans %}
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    {% else %}
+                                      <tr>
+                                        <th>{% trans %}Last value{% endtrans %}</th>
+                                        <td>
+                                          {% if sen.last_value %}
+                                            {{ sen.last_value }}
+                                            {% if datatypes[sen.data_type].unit %}
+                                              &nbsp;{{ datatypes[sen.data_type].unit }}
+                                            {% endif %}
+                                            {% if sen.data_type == "DT_Bool" or datatypes[sen.data_type]['parent'] == "DT_Bool" %}
+                                              <em>( {{ datatypes[sen.data_type]['labels'][sen.last_value] }} )</em>
+                                            {% elif sen.data_type == "DT_ColorRGBHexa" or datatypes[sen.data_type]['parent'] == "DT_ColorRGBHexa" %}
+                                              <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sen.last_value}}"></span>
+                                            {% elif 'values' in datatypes[sen.data_type] %}
+                                              <em>( {{ datatypes[sen.data_type]['values'] [sen.last_value] }} )</em>
+                                            {% elif sen.data_type == "DT_VideoMjpeg" or sen.data_type == "DT_Image" %}
+                                              <div>
+                                                <img style="max-width: 80%" src="{{sen.last_value | replace("publish://", rest_url + "/publish/")}}"/>
+                                              </div>
+                                            {% elif sen.data_type == "DT_VideoH264" %}
+                                              <div>
+                                                <a class="btn btn-default" href="{{sen.last_value | replace("publish://", rest_url + "/publish/")}}"><span class='glyphicon glyphicon-facetime-video' aria-hidden='true'></span> {% trans %}Read the video file{% endtrans %}</a>
+                                              </div>
+                                            {% endif %}
+                                          {% else %}
+                                            &nbsp;
                                           {% endif %}
-                                          {% if sen.data_type == "DT_Bool" or datatypes[sen.data_type]['parent'] == "DT_Bool" %}
-                                            <em>( {{ datatypes[sen.data_type]['labels'][sen.last_value] }} )</em>
-                                          {% elif sen.data_type == "DT_ColorRGBHexa" or datatypes[sen.data_type]['parent'] == "DT_ColorRGBHexa" %} 
-                                            <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sen.last_value}}"></span>
-                                          {% elif sen.data_type == "DT_VideoMjpeg" %} 
-                                            <div>
-                                              <img style="max-width: 100%" src="{{sen.last_value}}"/>
-                                            </div>
-                                          {% endif %}
-                                        {% else %}
-                                          &nbsp;
-                                        {% endif %}
-                                      </td>
-                                    <tr>
-                                    </tr>
-                                      <th>{% trans %}Last received{% endtrans %}</th>
-                                      <td>{% if sen.last_value %}{{ sen.last_received|datetime }}{% endif %}</td>
-                                    <tr>
-                                    </tr>
-                                      <th>{% trans %}REST URL{% endtrans %}</th>
-                                      {% set sensor_url = rest_url + "/sensorhistory/id/" + sen.id|string + "/last/1" %}
-                                      <td><a href="{{ sensor_url }}">{{ sensor_url }}</a></td>
-                                    </tr>
-                                    <tr>
-                                      <th>{% trans %}Openremote usage{% endtrans %}</th>
-                                      <td>
-                                        <h5>{% trans %}Create the command{% endtrans %}</h5>
-                                        <p>
-                                          <em>{% trans %}To create a sensor, you need to create a command which will grab the value.{% endtrans %}</em>
-                                        </p>
-                                        <p>
-                                          {% trans %}You have to configure the following fields :{% endtrans %}
-                                        </p>
-                                        <ul>
-                                          <li><strong>{% trans %}Url{% endtrans %}</strong> : {{ sensor_url }}</li>
-                                          <li><strong>{% trans %}Polling interval{% endtrans %}</strong> : 1s</li>
-                                          <li><strong>{% trans %}JSONPath expression{% endtrans %}</strong> : $[0].value_str</li>
-                                        </ul>
-
-                                        <h5>{% trans %}Create the sensor{% endtrans %}</h5>
-                                        <p>
-                                          {% trans %}You have to create a <strong>custom sensor</strong>{% endtrans %}
-                                        </p>
-                                        <p>
-                                          {% trans %}Choose the newly created command.{% endtrans %}
-                                        </p>
-                                        {% if sen.data_type == "DT_Bool" or datatypes[sen.data_type]['parent'] == "DT_Bool" %}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <th>{% trans %}Last received{% endtrans %}</th>
+                                        <td>{% if sen.last_value %}{{ sen.last_received|datetime }}{% endif %}</td>
+                                      </tr>
+                                      <tr>
+                                        <th>{% trans %}REST URL{% endtrans %}</th>
+                                        {% set sensor_url = rest_url + "/sensorhistory/id/" + sen.id|string + "/last/1" %}
+                                        <td><a href="{{ sensor_url }}">{{ sensor_url }}</a></td>
+                                      </tr>
+                                      <tr>
+                                        <th>{% trans %}Openremote{% endtrans %}</th>
+                                        <td>
+                                          <a href="#openremote{{ sen.id }}" data-toggle="collapse">{% trans %}Usage{% endtrans %} <span class='glyphicon glyphicon-menu-down' aria-hidden='true'></span></a>
+                                          <div id="openremote{{ sen.id }}" class="collapse">
+                                          <h5>{% trans %}Create the command{% endtrans %}</h5>
                                           <p>
-                                            {% trans %}Configure the <strong>Custom state items</strong> like this :{% endtrans %}
+                                            <em>{% trans %}To create a sensor, you need to create a command which will grab the value.{% endtrans %}</em>
                                           </p>
-                                          <table class="table table-bordered">
-                                            <thead>
-                                              <tr> <th>Name</th><th>Value</th> </tr>
-                                            </thead>
-                                            <tbody>
-                                              <tr> <td>off</td><td>0</td> </tr>
-                                              <tr> <td>on</td><td>1</td> </tr>
-                                            </tbody>
-                                          </table>
-                                        {% endif %}
-                                      </td>
-                                    </tr>
+                                          <p>
+                                            {% trans %}You have to configure the following fields :{% endtrans %}
+                                          </p>
+                                          <ul>
+                                            <li><strong>{% trans %}Url{% endtrans %}</strong> : {{ sensor_url }}</li>
+                                            <li><strong>{% trans %}Polling interval{% endtrans %}</strong> : 1s</li>
+                                            <li><strong>{% trans %}JSONPath expression{% endtrans %}</strong> : $[0].value_str</li>
+                                          </ul>
+  
+                                          <h5>{% trans %}Create the sensor{% endtrans %}</h5>
+                                          <p>
+                                            {% trans %}You have to create a <strong>custom sensor</strong>{% endtrans %}
+                                          </p>
+                                          <p>
+                                            {% trans %}Choose the newly created command.{% endtrans %}
+                                          </p>
+                                          {% if sen.data_type == "DT_Bool" or datatypes[sen.data_type]['parent'] == "DT_Bool" %}
+                                            <p>
+                                              {% trans %}Configure the <strong>Custom state items</strong> like this :{% endtrans %}
+                                            </p>
+                                            <table class="table table-bordered">
+                                              <thead>
+                                                <tr> <th>Name</th><th>Value</th> </tr>
+                                              </thead>
+                                              <tbody>
+                                                <tr> <td>off</td><td>0</td> </tr>
+                                                <tr> <td>on</td><td>1</td> </tr>
+                                              </tbody>
+                                            </table>
+                                          {% endif %}
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    {% endif %}
                                   </tbody>
                                 </table>
                               </div>
@@ -211,7 +253,7 @@
                           </div>
                         </div>
                       {% endif %}
-    
+
                       {% if data.commands|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -232,93 +274,148 @@
                                         <th>{% trans %}Data Type{% endtrans %}</th>
                                         <td>{{ param.data_type }} <!--: {{ datatypes[param.data_type] }}--></td>
                                       </tr>
-                                      <tr>
-                                        <th>{% trans %}REST url{% endtrans %}</th>
-                                        <td>
-                                          {% trans %}Urls{% endtrans %}:
-
-
-                                          {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
-                                            {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
-                                            {% set url_0 = url_sample + "0" %}
-                                            {% set url_1 = url_sample + "1" %}
-                                            <ul>
-                                              <li><strong>{{ datatypes[param.data_type]['labels']['0'] }}</strong> : {{ url_0 }}</li>
-                                              <li><strong>{{ datatypes[param.data_type]['labels']['1'] }}</strong> : {{ url_1 }}</li>
-                                            </ul>
-                                            <div>
-                                              <p>Test it :</p>
-                                              <a class="btn btn-primary" href="{{ url_0 }}">{{ datatypes[param.data_type]['labels']['0'] }} (0)</a> 
-                                              <a class="btn btn-primary" href="{{ url_1 }}">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a> 
+                                      {% if datatypes[param.data_type] is not defined %}
+                                        <tr>
+                                          <td colspan="2">
+                                            <div class="alert alert-warning" role="alert">
+                                            <strong>{% trans %}Warning{% endtrans %}</strong> : 
+                                            {% trans %}The datatype used by this command is no more compliant with this release of Domogik. You may consider to upgrade this plugin and if needed, recreate this device.{% endtrans %}
                                             </div>
-
-
-                                          {% elif param.data_type == "DT_Trigger" or datatypes[param.data_type]['parent'] == "DT_Trigger" %} 
-                                            {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
-                                            <ul>
-                                              <li><strong>{{ datatypes[param.data_type]['labels']['1'] }}</strong> : {{ url_sample }}1</li>
-                                            </ul>
-                                            <div>
-                                              <p>Test it :</p>
-                                              <a class="btn btn-primary" href="{{ url_sample }}1">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a> 
-                                            </div>
-
-
-                                          {% elif param.data_type == "DT_ColorRGBHexa" or datatypes[param.data_type]['parent'] == "DT_ColorRGBHexa" %} 
-                                            {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
-                                            <ul>
-                                              <li><strong>{% trans %}Black (off){% endtrans %}</strong> : {{ url_sample }}000000</li>
-                                              <li><strong>{% trans %}White{% endtrans %}</strong> : {{ url_sample }}ffffff</li>
-                                              <li><strong>{% trans %}Red{% endtrans %}</strong> : {{ url_sample }}ff0000</li>
-                                            </ul>
-                                            <div>
-                                              <p>Test it :</p>
-                                              <a class="btn btn-primary" href="{{ url_sample }}000000">{% trans %}Black (off){% endtrans %}</a>
-                                              <a class="btn btn-primary" href="{{ url_sample }}ffffff">{% trans %}White{% endtrans %}</a>
-                                              <a class="btn btn-primary" href="{{ url_sample }}ff0000">{% trans %}Red{% endtrans %}</a>
-                                              <a class="btn btn-primary" href="{{ url_sample }}00ff00">{% trans %}Green{% endtrans %}</a>
-                                              <a class="btn btn-primary" href="{{ url_sample }}0000ff">{% trans %}Blue{% endtrans %}</a>
-                                            </div>
-
-
-                                          {% else %}
-                                            {{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;key&gt;
-                                          {% endif %}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <th>{% trans %}Openremote usage{% endtrans %}</th>
-                                        <td>
-
-
-                                          {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
-                                            <h5>{% trans %}Create the commands{% endtrans %}</h5>
-                                            <p>
-                                              <em>{% trans %}You only need to configure the URL field.{% endtrans %}</em>
-                                            </p>
-                                            <ul>
-                                              <li><strong>{% trans %}Url for{% endtrans %} : {{ datatypes[param.data_type]['labels']['0'] }}</strong> : {{ url_0 }}</li>
-                                              <li><strong>{% trans %}Url for{% endtrans %} : {{ datatypes[param.data_type]['labels']['1'] }}</strong> : {{ url_1 }}</li>
-                                              <li><strong>{% trans %}Url for : status{% endtrans %}</strong> : {% trans %}see the corresponding sensor{% endtrans %}</li>
-                                            </ul>
-                                            <h5>{% trans %}Create the sensor{% endtrans %}</h5>
-                                            <p>
-                                              {% trans %}You have to create a <strong>custom sensor</strong>{% endtrans %}
-                                            </p>
-                                            <p>
-                                              {% trans %}For the command, select the status command created.{% endtrans %}
-                                            </p>
-                                            <h5>{% trans %}Create the switch{% endtrans %}</h5>
-                                            <p>
-                                              {% trans %}To create the switch, use the commands and the sensor created.{% endtrans %}
-                                            </p>
-
-
-                                          {% else %}
-                                            <em>{% trans %}Not yet documented.{% endtrans %}</em>
-                                          {% endif %}
-                                        </td>
-                                      </tr>
+                                          </td>
+                                        </tr>
+                                      {% else %}
+                                        <tr>
+                                          <th>{% trans %}REST url{% endtrans %}</th>
+                                          <td>
+                                            {% trans %}Urls{% endtrans %}:
+  
+  
+                                            {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
+                                              {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
+                                              {% set url_0 = url_sample + "0" %}
+                                              {% set url_1 = url_sample + "1" %}
+                                              <ul>
+                                                <li><strong>{{ datatypes[param.data_type]['labels']['0'] }}</strong> : {{ url_0 }}</li>
+                                                <li><strong>{{ datatypes[param.data_type]['labels']['1'] }}</strong> : {{ url_1 }}</li>
+                                              </ul>
+                                              <div>
+                                                <p>Test it :</p>
+                                                <a class="btn btn-primary" href="{{ url_0 }}">{{ datatypes[param.data_type]['labels']['0'] }} (0)</a>
+                                                <a class="btn btn-primary" href="{{ url_1 }}">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a>
+                                              </div>
+  
+  
+                                            {% elif param.data_type == "DT_Trigger" or datatypes[param.data_type]['parent'] == "DT_Trigger" %}
+                                              {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
+                                              <ul>
+                                                <li><strong>{{ datatypes[param.data_type]['labels']['1'] }}</strong> : {{ url_sample }}1</li>
+                                              </ul>
+                                              <div>
+                                                <p>Test it :</p>
+                                                <a class="btn btn-primary" href="{{ url_sample }}1">{{ datatypes[param.data_type]['labels']['1'] }} (1)</a>
+                                              </div>
+  
+  
+                                            {% elif param.data_type == "DT_ColorRGBHexa" or datatypes[param.data_type]['parent'] == "DT_ColorRGBHexa" %}
+                                              {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
+                                              <ul>
+                                                <li><strong>{% trans %}Black (off){% endtrans %}</strong> : {{ url_sample }}000000</li>
+                                                <li><strong>{% trans %}White{% endtrans %}</strong> : {{ url_sample }}ffffff</li>
+                                                <li><strong>{% trans %}Red{% endtrans %}</strong> : {{ url_sample }}ff0000</li>
+                                              </ul>
+                                              <div>
+                                                <p>Test it :</p>
+                                                <a class="btn btn-primary" href="{{ url_sample }}000000">{% trans %}Black (off){% endtrans %}</a>
+                                                <a class="btn btn-primary" href="{{ url_sample }}ffffff">{% trans %}White{% endtrans %}</a>
+                                                <a class="btn btn-primary" href="{{ url_sample }}ff0000">{% trans %}Red{% endtrans %}</a>
+                                                <a class="btn btn-primary" href="{{ url_sample }}00ff00">{% trans %}Green{% endtrans %}</a>
+                                                <a class="btn btn-primary" href="{{ url_sample }}0000ff">{% trans %}Blue{% endtrans %}</a>
+                                              </div>
+  
+                                            {% elif param.data_type == "DT_String" %}
+                                              {{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;key&gt;
+                                              {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
+                                              <div class="input-group">
+                                                <input class="form-control" type="text" placeholder="{% trans %}Some string...{% endtrans %}" class="form-control" name="cmd{{ cmd.id }}Input" id="cmd{{ cmd.id }}Input"></input>
+                                                <span class="input-group-btn">
+                                                  <button id="cmd{{ cmd.id }}Button" class="btn btn-primary">{% trans %}Send{% endtrans %}</button>
+                                                </span>
+                                              </div>
+                                              <script type="text/javascript">
+                                                $('#cmd{{ cmd.id }}Button').click(function() {
+                                                  $.ajax({
+                                                        url: '{{ url_sample}}'+$('#cmd{{ cmd.id }}Input').val(),
+                                                        data: {
+                                                           format: 'json'
+                                                        },
+                                                        error: function(xhr, status, error) {
+                                                           var err = eval("(" + xhr.responseText + ")");
+                                                           alert("{% trans %}An error occured while sending the command. Maybe the client did not respond to the command. Please check the client is alive or the client logs.{% endtrans %}");
+                                                        },
+                                                        // dataType: 'jsonp',
+                                                        success: function(data) {
+                                                        },
+                                                        type: 'GET'
+                                                     });
+                                                });
+                                              </script>
+  
+                                            {% elif 'values' in datatypes[param.data_type] %}
+                                              <p>{{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;{{ " / ".join(datatypes[param.data_type]['values'].keys()|sort) }}&gt;</p>
+                                              {% set url_sample = rest_url + "/cmd/id/" + cmd.id|string + "?" + param.key + "=" %}
+                                              <div class="input-group col-md-6">
+                                                  <label for="values_{{ cmd.id }}">Test it :</label>
+                                                  <button type="button" id="values_{{ cmd.id }}" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                  {% trans %}Select Command{% endtrans %} <span class="caret"></span>
+                                                  </button>
+                                                  <ul class="dropdown-menu">
+                                                  {% for val, label in datatypes[param.data_type]['values'] | dictsort %}
+                                                      <li><a href="{{ url_sample }}{{ val }}">{{ val }} - {{ label }}</a></li>
+                                                  {% endfor %}
+                                                  </ul>
+                                              </div>
+  
+                                            {% else %}
+                                              {{ rest_url }}/cmd/id/{{cmd.id}}?{{param.key}}=&lt;key&gt;
+                                            {% endif %}
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <th>{% trans %}Openremote{% endtrans %}</th>
+                                          <td>
+  
+                                              <a href="#openremote{{ cmd.id }}{{param.key}}" data-toggle="collapse">{% trans %}Usage{% endtrans %} <span class='glyphicon glyphicon-menu-down' aria-hidden='true'></span></a>
+                                              <div id="openremote{{ cmd.id }}{{param.key}}" class="collapse">
+                                            {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
+                                              <h5>{% trans %}Create the commands{% endtrans %}</h5>
+                                              <p>
+                                                <em>{% trans %}You only need to configure the URL field.{% endtrans %}</em>
+                                              </p>
+                                              <ul>
+                                                <li><strong>{% trans %}Url for{% endtrans %} : {{ datatypes[param.data_type]['labels']['0'] }}</strong> : {{ url_0 }}</li>
+                                                <li><strong>{% trans %}Url for{% endtrans %} : {{ datatypes[param.data_type]['labels']['1'] }}</strong> : {{ url_1 }}</li>
+                                                <li><strong>{% trans %}Url for : status{% endtrans %}</strong> : {% trans %}see the corresponding sensor{% endtrans %}</li>
+                                              </ul>
+                                              <h5>{% trans %}Create the sensor{% endtrans %}</h5>
+                                              <p>
+                                                {% trans %}You have to create a <strong>custom sensor</strong>{% endtrans %}
+                                              </p>
+                                              <p>
+                                                {% trans %}For the command, select the status command created.{% endtrans %}
+                                              </p>
+                                              <h5>{% trans %}Create the switch{% endtrans %}</h5>
+                                              <p>
+                                                {% trans %}To create the switch, use the commands and the sensor created.{% endtrans %}
+                                              </p>
+  
+  
+                                            {% else %}
+                                              <em>{% trans %}Not yet documented.{% endtrans %}</em>
+                                            {% endif %}
+                                              </div>
+                                          </td>
+                                        </tr>
+                                      {% endif %}
                                     </tbody>
                                   </table>
                                 {% endfor %}
@@ -327,7 +424,7 @@
                           </div>
                         </div>
                       {% endif %}
-    
+
                       {% if data.xpl_stats|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -363,7 +460,7 @@
                           </div>
                         </div>
                       {% endif %}
-    
+
                       {% if data.xpl_commands|length > 0 %}
                         <div class="panel panel-default">
                           <div class="panel-heading">
@@ -387,7 +484,7 @@
                                 </tbody>
                               </table>
                             {% endfor %}
-    
+
                           </div>
                         </div>
                       {% endif %}
@@ -397,11 +494,11 @@
               {% endfor %}
             </div>
           </div>
-        
+
         </div>
         <script type="text/javascript">
         // Enable the Tabs
-        
+
         $('#myDevices a').click(function (e) {
             e.preventDefault()
             $(this).tab('show')

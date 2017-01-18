@@ -56,6 +56,15 @@ class AbstractTest:
         self._description = None
         self._cond = cond
         self._params = params
+        self._subMessages = []
+
+    def get_subMessages(self):
+        return self._subMessages
+
+    def set_trigger(self, trigger):
+        """ Update the trigger callback
+        """
+        self._trigger = trigger
 
     def set_description(self, description):
         """ Update the description of the test
@@ -89,7 +98,7 @@ class AbstractTest:
         """ Callback called by a parameter when the fill() method is called
         Basically, it only calls the underlying ttrigger if exists
         """
-        self.log.warning("Trigger {0} called by parameter {1}".format(self._trigger, param))
+        self.log.debug("Trigger {0} called by parameter {1}".format(self._trigger, param))
         if self._trigger != None:
             self._trigger(self)
 
@@ -180,4 +189,10 @@ class AbstractTest:
         @return a boolean if the evaluation has been done, or None if the evaluation can't be done
         """
         raise NotImplementedError
+
+    def get_blockly(self):
+        return ""
+
+    def on_message(self, did, msg):
+        pass
 

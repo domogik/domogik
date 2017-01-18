@@ -1,0 +1,18 @@
+==============================================
+Core component : administration user interface
+==============================================
+
+Purpose
+=======
+
+Since Domogik 0.4, the administration user interface is no more included in Domoweb. 
+
+It is handling the following functions:
+* The admin interface
+* The rest interface
+* The db access for other components
+
+Technical details
+=================
+
+The administration user interface server is made with Flask, a python framework. Bootstrap is used for the rendering part.

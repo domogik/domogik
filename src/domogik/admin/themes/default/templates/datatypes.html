@@ -1,0 +1,61 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+<script src="{{ theme_static('libraries/treeview/bootstrap-treeview.js') }}"></script>
+<link href="{{ theme_static('libraries/treeview/bootstrap-treeview.css') }}" rel="stylesheet" media="screen">
+<div class="container">
+ <div class="row">
+    <h2>{% trans %}Domogik DataTypes{% endtrans %}</h2>
+    <div class="col-sm-4">
+      <h3>Search</h3>
+	<div class="form-group">
+	  <label for="input-search" class="sr-only">Search Tree:</label>
+	  <input type="input" class="form-control" id="input-search" placeholder="Type to search..." value="">
+	</div>
+	<div class="checkbox">
+	  <label>
+	    <input type="checkbox" class="checkbox" id="chk-ignore-case" value="true">
+	    Ignore Case
+	  </label>
+	</div>
+	<div class="checkbox">
+	  <label>
+	    <input type="checkbox" class="checkbox" id="chk-exact-match" value="false">
+	    Exact Match
+	  </label>
+	</div>
+	<button type="button" class="btn btn-success" id="btn-search">Search</button>
+      <!-- </form> -->
+    </div>
+    <div class="col-sm-4">
+      <h3>Datatypes</h3>
+      <div id="treeview-searchable" class=""></div>
+    </div>
+    <div class="col-sm-4">
+      <h3>Details</h3>
+      <div id="search-output"></div>
+    </div>
+  </div>
+ </div>
+</div>
+<script type="text/javascript">
+    var $searchableTree = $('#treeview-searchable').treeview({
+        data: {{ datatypes|safe }},
+        levels: 10,
+    });
+    var search = function(e) {
+      var pattern = $('#input-search').val();
+      var options = {
+        ignoreCase: $('#chk-ignore-case').is(':checked'),
+        exactMatch: $('#chk-exact-match').is(':checked'),
+        revealResults: 1
+      };
+      $searchableTree.treeview('search', [ pattern, options ]);
+    }
+    $('#treeview-searchable').on('nodeSelected', function(event, data) {
+        $('#search-output').html(JSON.stringify(data));
+    });
+    $('#btn-search').on('click', search);
+    $('#input-search').on('keyup', search);
+</script>
+{% endblock %}

@@ -15,6 +15,12 @@
   <p>&nbsp;</p>
   <p>If you find a bug or need an improvment which is not related to a package (plugin, etc), please <a href="https://github.com/domogik/domogik/issues">open a ticket on our tracker</a>.</p>
   <p>If you find a bug or need an improvment about a package, please open a ticket in the package related GitHub tracker.</p>
-
+  
+  <h1>{% trans %}Configure DomoDroid{% endtrans %}</h1>
+  <div id="qr"></div>
+  <script type="text/javascript" src="static/js/qrcode.js"></script>
+  <script type="text/javascript">
+    $('#qr').qrcode("{{ qrdata|safe }}");
+  </script>
 </div>
 {% endblock %}

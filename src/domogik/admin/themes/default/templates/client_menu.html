@@ -70,6 +70,9 @@
             <li {% if active == "devices" %} class="active" {% endif %} >
               <a href="/client/{{ clientid }}/dmg_devices/known">{% trans %}Domogik devices{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
             </li>
+            <li {% if active == "timeline" %} class="active" {% endif %} >
+                <a href="/client/{{ clientid }}/timeline">{% trans %}Timeline{% endtrans %} <span class="sr-only">({% trans %}current{% endtrans %})</span></a>
+            </li>
             {% endif %}
 
             {% if client_detail.type == "plugin" or client_detail.type == "brain" %}

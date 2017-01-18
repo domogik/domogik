@@ -1,0 +1,10 @@
+====================================================
+Installation - Set up Domogik in a python virtualenv
+====================================================
+
+.. note :: This chapter is for information. For a basic installation, you don't need to apply the content of this chapter.
+
+To install Domogik in a python virtualenv, there are some specific actions to do. As we did this for the continous integration with Travis-ci.org, you can check our travis configuration files and the scripts used:
+
+* .travis.yml
+* src/domogik/tests/travis/*

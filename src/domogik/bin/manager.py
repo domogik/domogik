@@ -24,7 +24,7 @@ Plugin purpose
 
 Domogik manager
 - called with init.d script to start Domogik
-- launch dbmgr and plugins
+- launch core component and plugins
 - manage plugins (start, check for dead plugins) and maintains a list
 - give informations about plugins when requested
 
@@ -64,6 +64,8 @@ import tempfile
 import re
 import signal
 import json
+import requests
+import platform
 
 from threading import Event, Thread, Lock, Semaphore
 from argparse import ArgumentParser
@@ -93,11 +95,12 @@ from domogik.xpl.common.xplconnector import Listener, STATUS_HBEAT_XPL
 ### constants
 
 PYTHON = sys.executable
-WAIT_AFTER_STOP_REQUEST = 15
-CHECK_FOR_NEW_PACKAGES_INTERVAL = 30
+WAIT_AFTER_STOP_REQUEST = 15           # seconds
+CHECK_FOR_NEW_PACKAGES_INTERVAL = 30   # seconds
+SEND_METRICS_INTERVAL = 120            # seconds
 
 
-class Manager(XplPlugin):
+class Manager(XplPlugin, MQAsyncSub):
     """ Domogik manager
     """
 
@@ -120,7 +123,7 @@ class Manager(XplPlugin):
                           help="Start admin interface if not already running.")
         parser.add_argument("-d", 
                           action="store_true", 
-                          dest="start_dbmgr", 
+                          dest="start_admin", 
                           default=False, \
                           help="Start database manager if not already running.")
         parser.add_argument("-x", 
@@ -145,11 +148,13 @@ class Manager(XplPlugin):
         ### Logger
         self.log.info(u"Manager startup")
         self.log.info(u"Host : {0}".format(self.get_sanitized_hostname()))
-        self.log.info(u"Start dbmgr : {0}".format(self.options.start_dbmgr))
         self.log.info(u"Start xpl gateway : {0}".format(self.options.start_xpl))
         self.log.info(u"Start admin interface : {0}".format(self.options.start_admin))
         self.log.info(u"Start scenario manager : {0}".format(self.options.start_scenario))
         self.log.info(u"Start butler : {0}".format(self.options.start_butler))
+
+        ### MQ
+        MQAsyncSub.__init__(self, self.zmq, 'manager', ['metrics.processinfo', 'metrics.browser'])
 
         ### Read the configuration file
         try:
@@ -159,12 +164,49 @@ class Manager(XplPlugin):
 
             # pid dir path
             self._pid_dir_path = conf['pid_dir_path']
+
+            # try to get the metrics installation id
+            # this data may be deleted from the end user in the /etc/domogik.cfg file, so we assume that the values will be None 
+            # in case of error
+            try:
+                cfgm = Loader('metrics')
+                configm = cfgm.load()
+                confm = dict(configm[1])
+                self._metrics_id = confm['id']
+                self._metrics_url = confm['url']
+                if self._metrics_id != '' and self._metrics_url != '':
+                    self.log.info(u"The metrics informations are configured. 'id' = '{0}', 'url' = '{1}'".format(self._metrics_id, self._metrics_url))
+                    self.log.info(u"The metrics informations goal is to help us to have an overview of the Domogik releases fragmentation and performances issues. To disable them, just remove the [metrics] section in the Domogik configuration file ;)")
+                else:
+                    self.log.warning(u"The metrics options are not configured (one or all) : [metrics] > id, [metrics] > url. This is surely an end user wish, we respect this and won't send metrics for analysis!")
+                    self._metrics_id = None
+                    self._metrics_url = None
+            except:
+                self.log.warning(u"The metrics options are not configured (one or all) : [metrics] > id, [metrics] > url. This is surely an end user wish, we respect this and won't send metrics for analysis!")
+                self._metrics_id = None
+                self._metrics_url = None
        
         except:
             self.log.error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
             return
 
         self.log.info(u"Packages path : {0}".format(self.get_packages_directory()))
+
+        ### Metrics
+        self.metrics_processinfo = []
+        self.metrics_browser = []
+        self.distribution = "{0} {1}".format(platform.linux_distribution()[0], platform.linux_distribution()[1])
+
+        # send metrics from time to time
+        if self._metrics_url != None and self._metrics_id != None:
+            thr_send_metrics = Thread(None,
+                                      self._send_metrics,
+                                      "send_metrics",
+                                      (),
+                                      {})
+            thr_send_metrics.start()
+
+
 
         ### MQ
         # self.zmq = zmq.Context() is aleady define in XplPlugin
@@ -190,11 +232,6 @@ class Manager(XplPlugin):
 
         ### Create the interfaces list
         self._interfaces = {}
-
-        ### Start the dbmgr
-        if self.options.start_dbmgr:
-            if not self._start_core_component("dbmgr"):
-                self.log.error(u"Unable to start dbmgr")
 
         ### Start xpl GW
         if self.options.start_xpl:
@@ -374,7 +411,7 @@ class Manager(XplPlugin):
 
     def _start_core_component(self, name):
         """ Start a core component
-            @param name : component name : dbmgr
+            @param name : component name : admin
         """
         component = CoreComponent(name, self.get_sanitized_hostname(), self._clients, self.zmq)
         pid = component.start()
@@ -510,8 +547,11 @@ class Manager(XplPlugin):
         msg = MQMessage()
         msg.set_action('client.list.result')
         clients = self._clients.get_list() 
+        self.log.info("Clients for client.list.get request : {0}".format(clients))
         for key in clients:
             msg.add_data(key, clients[key])
+        if clients == []:
+            self.log.warning("No clients for client.list.get request. The list is empty!")
         self.reply(msg.get())
 
 
@@ -592,6 +632,91 @@ class Manager(XplPlugin):
         self._clients.set_status(message.source, STATUS_ALIVE)
 
 
+    def on_message(self, msgid, content):
+        """ Process publicated messages
+        """
+        if msgid == "metrics.processinfo":
+            ### process the processinfo data
+            # store them in a list so they can be send by group of data from time to time
+            content['id'] = self._metrics_id
+            # some additionnal informations
+            # TODO : do in ProcessInfo ?
+            content['tags']['distribution'] = self.distribution
+            self.metrics_processinfo.append(content)
+
+        elif msgid == "metrics.browser":
+            ### process the processinfo data
+            # store them in a list so they can be send by group of data from time to time
+            content['id'] = self._metrics_id
+            self.metrics_browser.append(content)
+
+    
+    def _send_metrics(self):
+        """ Send the metrics to a REST service. This is related to the ProcessInfo class from common/processinfo.py
+        """
+        while not self._stop.isSet():
+            ratio = 1
+            try:
+
+                # send metrics
+                self.log.debug(u"Send the metrics to '{0}'".format(self._metrics_url))
+                url = self._metrics_url   # just in case of except before first set
+             
+    
+                # We put the metrics in buffers and clean the self.xxx metrics now.
+                # if the send will fail, we will put back "after" the metrics in the self.xxx in order to resend them later on
+                # these buffers allow to avoid cleaning self.xxx with some stuff added during the post actions
+                metrics_processinfo = self.metrics_processinfo
+                self.metrics_processinfo = []
+                metrics_browser = self.metrics_browser
+                self.metrics_browser = []
+                
+                headers = {'content-type': 'application/json'}
+    
+                ### Send process info metrics
+                try:
+                    url = "{0}/metrics/processinfo/".format(self._metrics_url.strip("/"))
+                    response = requests.post(url, data=json.dumps(metrics_processinfo), headers=headers)
+                    self.log.debug(u"Metrics for process info send. Server response (http code) is '{0}'".format(response.status_code))
+    
+                    ok = True
+                except:
+                    ok = False
+                    ratio = 2    # in case the server does not respond because the load on it is too heavy, send data less often
+                    self.log.warning(u"Error while trying to push metrics on '{0}'. The error is : {1}".format(url, traceback.format_exc()))
+                # if ok, do nothing
+                # if not ok, refill self.xxx with buffer metrics
+                if not ok:
+                    #for item in self.metrics_processinfo:
+                    #    self.log.debug("XXXXX {0}".format(json.dumps(item)))
+                    self.metrics_processinfo = metrics_processinfo
+    
+    
+                ### Send browsers metrics
+                try:
+                    url = "{0}/metrics/domoweb-browser/".format(self._metrics_url.strip("/"))
+                    response = requests.post(url, data=json.dumps(metrics_browser), headers=headers)
+                    self.log.debug(u"Metrics for domoweb browser send. Server response (http code) is '{0}'".format(response.status_code))
+    
+                    ok = True
+                except:
+                    ok = False
+                    ratio = 2    # in case the server does not respond because the load on it is too heavy, send data less often
+                    self.log.warning(u"Error while trying to push metrics on '{0}'. The error is : {1}".format(url, traceback.format_exc()))
+                # if ok, do nothing
+                # if not ok, refill self.xxx with buffer metrics
+                if not ok:
+                    #for item in self.metrics_browser:
+                    #    self.log.debug("XXXXX {0}".format(json.dumps(item)))
+                    self.metrics_browser = metrics_browser
+    
+    
+            except:
+                self.log.error(u"Send metrics : error not handled! The error is : {0}".format(traceback.format_exc())) 
+            # wait for the next time to send
+            self._stop.wait(SEND_METRICS_INTERVAL * ratio)
+            
+            
 
 
 
@@ -694,12 +819,6 @@ class GenericComponent():
         log = logger.Logger('manager')
         self.log = log.get_logger('manager')
 
-        #TODEL ?#### config
-        #TODEL ?## used only in the function add_configuration_values_to_data()
-        #TODEL ?## elsewhere, this function is used : self.get_config("xxxx")
-        #TODEL ?#self._config = Query(self.zmq, self.log)
-
-
     def register_component(self):
         """ register the component as a client
         """
@@ -766,7 +885,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
     def __init__(self, name, host, clients, zmq_context):
         """ Init a component
-            @param name : component name (dbmgr)
+            @param name : component name (admin)
             @param host : hostname
             @param clients : clients list 
             @param zmq_context : 0MQ context
@@ -827,13 +946,19 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         """
         ### get python package path for the component
         pkg = "{0}.{1}".format(python_component_basepackage, self.name)
-        self.log.debug(u"Try to import module : {0}".format(pkg))
-        __import__(pkg)
-        component_path = sys.modules[pkg].__file__
+
+        try:
+            the_path = os.path.join(os.path.dirname(__file__), "{0}.py".format(self.name))
+            self.log.debug(u"Path for component '{0}' is : {1}".format(self.name, the_path))
+        except:
+            msg = u"Error while trying to get the module path. The component will not be started !. Error is : {0}".format(traceback.format_exc())
+            self.log.error(msg)
+            return 0
         
         ### Generate command
         # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
-        cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, component_path)
+        #cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, component_path)
+        cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, the_path)
  
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
@@ -859,7 +984,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
-                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.log.debug(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
                 self.set_status(content["event"])
         #        # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
         #        if content["event"] == STATUS_STOP_REQUEST:
@@ -910,7 +1035,7 @@ class Brain(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log)
+        self._config = Query(self.zmq, self.log, host)
 
         ### set package path
         self._packages_directory = packages_directory
@@ -1022,7 +1147,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log)
+        self._config = Query(self.zmq, self.log, host)
 
         ### get the plugin data (from the json file)
         status = None
@@ -1109,7 +1234,7 @@ class Plugin(GenericComponent, MQAsyncSub):
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
-                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.log.debug(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
                 self.set_status(content["event"])
                 # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
                 if content["event"] == STATUS_STOP_REQUEST:
@@ -1299,7 +1424,7 @@ class Interface(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log)
+        self._config = Query(self.zmq, self.log, host)
 
         ### get the interface data (from the json file)
         status = None
@@ -1368,7 +1493,7 @@ class Interface(GenericComponent, MQAsyncSub):
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
-                self.log.info(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
+                self.log.debug(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
                 self.set_status(content["event"])
                 # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
                 if content["event"] == STATUS_STOP_REQUEST:

@@ -52,7 +52,7 @@ class Logger():
 
     logger = {}
 
-    def __init__(self, component_name, domogik_prefix=True, use_filename=None, log_on_stdout = True):
+    def __init__(self, component_name, domogik_prefix=True, use_filename=None, log_on_stdout=True):
         '''
         Get a logger with provided parameters and set config
         @param component_name : component name to log
@@ -79,7 +79,7 @@ class Logger():
 
             if 'log_when' not in config:
                 config['log_when'] = 'D'
-            if 'log_interval 'not in config:
+            if 'log_interval' not in config:
                 config['log_interval'] = 1
             if 'log_backup_count' not in config:
                 config['log_backup_count'] = 10
@@ -96,15 +96,14 @@ class Logger():
             my_logger.propagate = 0
             if not my_logger.handlers:
                 hdlr = TimedRotatingFileHandler(filename, \
-                        when=config['log_when'], interval=config['log_interval'], \
-                        backupCount=config['log_backup_count'])
+                        when=config['log_when'], interval=int(config['log_interval']), \
+                        backupCount=int(config['log_backup_count']))
                 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
                 hdlr.setFormatter(formatter)
                 my_logger.addHandler(hdlr)
 
 	        # if loglevvel is set to debug (all log entries also go to stdout)
-                # TODO : why looking about level=debug ? to clean ?
-                if log_on_stdout and level == 'debug' and component_name.find('sqlalchemy') == -1:
+                if (log_on_stdout or level == 'debug') and component_name.find('sqlalchemy') == -1:
                     dhdlr = logging.StreamHandler(sys.stdout)
                     dhdlr.setFormatter(formatter)
                     my_logger.addHandler(dhdlr)

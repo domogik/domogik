@@ -4,9 +4,9 @@
 @apiVersion 0.4.0
 @apiName device.get
 @apiGroup Devices
-@apiDescription This request is used to ask Domogik's dbmgr the list of all the existing Domogik devices for a client.
+@apiDescription This request is used to ask Domogik's admin the list of all the existing Domogik devices for a client.
 * Source client : Domogik admin, any other interface which can need to get the devices list
-* Target client : always 'dbmgr'
+* Target client : always 'admin'
 
 @apiExample {python} Example usage:
     # to get all devices of one client :
@@ -16,13 +16,13 @@
     msg.add_data('type', 'plugin')
     msg.add_data('name', 'diskfree')
     msg.add_data('host', 'darkstar')
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
+    print(cli.request('admin', msg.get(), timeout=10).get())
 
     # to get all devices of all clients :
     cli = MQSyncReq(zmq.Context())
     msg = MQMessage()
     msg.set_action('device.get')
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
+    print(cli.request('admin', msg.get(), timeout=10).get())
 
 @apiParam {String} [type] The client type
 @apiParam {String} [name] The client name 
@@ -123,5 +123,5 @@ msg.set_action('device.get')
 #msg.add_data('type', 'plugin')
 #msg.add_data('name', 'diskfree')
 #msg.add_data('host', 'darkstar')
-print(cli.request('dbmgr', msg.get(), timeout=10).get())
+print(cli.request('admin', msg.get(), timeout=10).get())
 

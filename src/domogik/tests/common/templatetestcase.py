@@ -72,7 +72,7 @@ class TemplateTestCase(unittest.TestCase):   #, MQAsyncSub):
         msg = MQMessage()
         msg.set_action('device.get')
         mq_client = MQSyncReq(zmq.Context())
-        result = mq_client.request('dbmgr', msg.get(), timeout=10)
+        result = mq_client.request('admin', msg.get(), timeout=10)
         if not result:
             raise RuntimeError(u"Unable to retrieve the device list, max attempt achieved : {0}".format(max_attempt))
             return False

@@ -37,13 +37,12 @@ Implements
 """
 
 from threading import Event
-
-from domogik.common.utils import get_sanitized_hostname 
-
 import zmq
 from domogikmq.message import MQMessage
 from domogikmq.reqrep.client import MQSyncReq
 from domogik.common import logger
+from domogik.common.utils import get_sanitized_hostname
+
 
 QUERY_CONFIG_WAIT = 5
 
@@ -51,8 +50,8 @@ class Query():
     """ Query for core components and plugins
     """
 
-    def __init__(self, zmq, log):
-        self.qry = QueryMQ(zmq, log)
+    def __init__(self, zmq, log, host):
+        self.qry = QueryMQ(zmq, log, host)
 
     def query(self, type, name, key = None):
         return self.qry.query(type, name, key)
@@ -73,10 +72,10 @@ class QueryForBrain():
         zmqc = zmq.Context() 
 
         ### init logger
-        loginst = logger.Logger('manager')
-        log = loginst.get_logger('manager')
+        loginst = logger.Logger('butler')
+        log = loginst.get_logger('butler')
 
-        self.qry = QueryMQ(zmqc, log)
+        self.qry = QueryMQ(zmqc, log, get_sanitized_hostname())
 
     def query(self, type, name, key = None):
         return self.qry.query(type, name, key)
@@ -87,7 +86,7 @@ class QueryMQ():
     '''
     Query to the mq to find the config
     '''
-    def __init__(self, zmq, log):
+    def __init__(self, zmq, log, host):
         '''
         Init the query system and connect it to xPL network
         @param zmq : the zMQ context
@@ -95,6 +94,7 @@ class QueryMQ():
         '''
         self._zmq = zmq
         self._log = log
+        self._host = host
         self._log.debug("Init config query(mq) instance")
         self.cli = MQSyncReq(self._zmq)
 
@@ -113,20 +113,20 @@ class QueryMQ():
         msg.set_action('config.get')
         msg.add_data('type', type)
         msg.add_data('name', name)
-        msg.add_data('host', get_sanitized_hostname())
+        msg.add_data('host', self._host)
         if key != None:
             msg.add_data('key', key)
         else:
             key = "*"
         self._log.info("Request query config for client {0} : key {1}".format(name, key))
-        ret = self.cli.request('dbmgr', msg.get(), timeout=QUERY_CONFIG_WAIT)
+        ret = self.cli.request('admin', msg.get(), timeout=QUERY_CONFIG_WAIT)
 
-        ### no response from dbmgr
+        ### no response from admin
         if ret is None:
-            self._log.error("Query config for client {0} on host {1}, key {2} : no response from dbmgr".format(name, get_sanitized_hostname(), key))
+            self._log.error("Query config for client {0} on host {1}, key {2} : no response from admin".format(name, self._host, key))
             return None
 
-        ### response from dbmgr
+        ### response from admin
         else:
             dat = ret.get_data()
             if dat['status']:

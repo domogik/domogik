@@ -5,7 +5,7 @@ import json
 import sys
 import os
 import time
-from flask import Flask, g, request
+from flask import Flask, g, request, session
 try:
     from flask_wtf import Form, RecaptchaField
 except ImportError:
@@ -30,31 +30,38 @@ else:
     def is_hidden_field_filter(field):
         return isinstance(field, HiddenField)
 from flask.ext.themes2 import Themes, render_theme_template
+from flask.ext.session import Session
 from werkzeug.exceptions import Unauthorized
 from werkzeug import WWWAuthenticate
 import traceback
 
 ### init Flask
+app = Flask(__name__)
+
+### set Flask Config
+app.jinja_env.globals['bootstrap_is_hidden_field'] = is_hidden_field_filter
+app.jinja_env.add_extension('jinja2.ext.do')
+#app.config['SECRET_KEY'] = '12sfjklghort nvlbneropgtbhni won ouiw'
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
+app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Paris'
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_FILE_DIR'] = '/tmp'
+app.config['SESSION_FILE_THRESHOLD'] = 25
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+
+### init extensions and load them
+
+session_manager = Session()
+session_manager.init_app(app)
 
 login_manager = LoginManager()
-babel = Babel()
-
-app = Flask(__name__)
-### next steps...
-
-#app.debug = True
 login_manager.init_app(app)
-babel.init_app(app)
-Themes(app, app_identifier='domogik-admin')
 
-app.debug = True
-app.jinja_env.globals['bootstrap_is_hidden_field'] =\
-    is_hidden_field_filter
-app.jinja_env.add_extension('jinja2.ext.do')
-app.config['SECRET_KEY'] = 'devkey'
-app.config['RECAPTCHA_PUBLIC_KEY'] = \
-'6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
-app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Paris'
+babel = Babel()
+babel.init_app(app)
+
+Themes(app, app_identifier='domogik-admin')
 
 # jinja 2 filters
 def format_babel_datetime(value, format='medium'):
@@ -83,7 +90,7 @@ def write_access_log_after(response):
 @app.before_request
 def write_acces_log_before():
     app.json_stop_at = []
-    app.logger.info('http request for {0} received'.format(request.path))
+    app.logger.info('http request for {0} received'.format(u''.join(request.path).encode('utf-8')))
 
 # render a template, later on we can select the theme it here
 def render_template(template, **context):
@@ -132,7 +139,7 @@ def json_response(action_func):
         # do the actual return
         if app.rest_auth == "True" and rcode == 401:
             resp = Response(status=401)
-            resp.www_authenticate.set_basic(realm = "Domogik REST inetrface" )
+            resp.www_authenticate.set_basic(realm = "Domogik REST interface" )
             return resp
         else:
             if type(app.json_stop_at) is not list:
@@ -151,17 +158,71 @@ def json_response(action_func):
             )
     return create_json_response
 
+# jsonp reponse handler decorator  for jquery requests
+# the url handlers funictions can return
+def jsonp_response(action_func):
+    @wraps(action_func)
+    def create_json_response(*args, **kwargs):
+        ret = action_func(*args, **kwargs)
+        # if list is 3 entries long
+        # - http code
+        # - json data
+        # - callback name
+        if (type(ret) is list or type(ret) is tuple):
+            if len(ret) == 3:
+                # return httpcode data
+                #  code = httpcode
+                #  data = data
+                #  callback = callback
+                rcode = ret[0]
+                rdata = ret[1]
+                rcallback = ret[2]
+            else:
+                # return errorStr
+                #  code = 400
+                #  data = {msg: <errorStr>}
+                rcode = 400
+                rdata = {error: ret[0]}
+        else:
+            # just return
+            # code = 204 = No content
+            # data = empty
+            rcode = 204
+            rdata = None
+            rcallback = None
+        # do the actual return
+        if app.rest_auth == "True" and rcode == 401:
+            resp = Response(status=401)
+            resp.www_authenticate.set_basic(realm = "Domogik REST interface" )
+            return resp
+        else:
+            if type(app.json_stop_at) is not list:
+                app.json_stop_at = []
+            if rdata:
+                if app.clean_json == "False":
+                    resp = json.dumps(rdata, cls=domogik_encoder(stop_at=app.json_stop_at), check_circular=False)
+                else:
+                    resp = json.dumps(rdata, cls=domogik_encoder(stop_at=app.json_stop_at), check_circular=False, indent=4, sort_keys=True)
+            else:
+                resp = None
+            return Response(
+                response=u"{0}({1})".format(rcallback, resp),
+                status=rcode,
+                content_type='application/json'
+            )
+    return create_json_response
+
 ### error pages
 @app.errorhandler(404)
 def page_not_found(e):
-    if str(request.path).startswith('/rest/'):
+    if u''.join(request.path).encode('utf-8').startswith('/rest/'):
         return render_template('404_json.html'), 404
     else:
         return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def server_error(e):
-    if str(request.path).startswith('/rest/'):
+    if u''.join(request.path).encode('utf-8').startswith('/rest/'):
         return render_template('500_json.html'), 500
     else:
         return render_template('500.html'), 500
@@ -205,12 +266,14 @@ from domogik.admin.views.index import *
 from domogik.admin.views.login import *
 from domogik.admin.views.clients import *
 from domogik.admin.views.orphans import *
-from domogik.admin.views.account import *
-from domogik.admin.views.person import *
+from domogik.admin.views.users import *
 from domogik.admin.views.apidoc import *
 from domogik.admin.views.scenario import *
 from domogik.admin.views.timeline import *
 from domogik.admin.views.battery import *
+from domogik.admin.views.datatypes import *
+from domogik.admin.views.locations import *
+from domogik.admin.views.config import *
 
 ### import all rest urls
 import domogik.admin.rest.status
@@ -218,6 +281,8 @@ import domogik.admin.rest.command
 import domogik.admin.rest.datatype
 import domogik.admin.rest.sensorhistory
 import domogik.admin.rest.butler
-import domogik.admin.rest.publish
+from domogik.admin.rest.publish import *
 from domogik.admin.rest.device import *
 from domogik.admin.rest.sensor import sensorAPI
+from domogik.admin.rest.product import *
+from domogik.admin.rest.location import *

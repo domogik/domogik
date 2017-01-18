@@ -34,11 +34,13 @@ Implements
 @organization: Domogik
 """
 
-try:
-    __import__('pkg_resources').declare_namespace(__name__)
-except:
-    # bootstrapping
-    pass
+# TODO : Delete of no impact
+# Commented because it may cause some memory usage
+#try:
+#    __import__('pkg_resources').declare_namespace(__name__)
+#except:
+#    # bootstrapping
+#    pass
 
 # For the format of version numbers please see : http://wiki.domogik.org/Release_numbering
-__version__ = "0.5.0"
+__version__ = "0.6.0"

@@ -294,14 +294,14 @@ case "$RET" in
   $PLACE.3.3)     echo "string"; echo `psinfo manager pmem`;                    exit 0 ;;
   $PLACE.3.4)     echo "string"; echo `psinfo manager rss`;                   exit 0 ;;
   $PLACE.3.5)     echo "string"; echo `psinfo manager size`;                  exit 0 ;;
-  # The dbmgr process
+  # The admin process
   #$PLACE.4.0)     echo "ipaddress"; echo "127.0.0.1";                          exit 0 ;;
-  $PLACE.4.0)     echo "string"; echo "dbmgr";                               exit 0 ;;
-  $PLACE.4.1)     echo "integer"; echo `pidof dbmgr`;                        exit 0 ;;
-  $PLACE.4.2)     echo "string"; echo `psinfo dbmgr pcpu`;                    exit 0 ;;
-  $PLACE.4.3)     echo "string"; echo `psinfo dbmgr pmem`;                    exit 0 ;;
-  $PLACE.4.4)     echo "string"; echo `psinfo dbmgr rss`;                   exit 0 ;;
-  $PLACE.4.5)     echo "string"; echo `psinfo dbmgr size`;                  exit 0 ;;
+  $PLACE.4.0)     echo "string"; echo "admin";                               exit 0 ;;
+  $PLACE.4.1)     echo "integer"; echo `pidof admin`;                        exit 0 ;;
+  $PLACE.4.2)     echo "string"; echo `psinfo admin pcpu`;                    exit 0 ;;
+  $PLACE.4.3)     echo "string"; echo `psinfo admin pmem`;                    exit 0 ;;
+  $PLACE.4.4)     echo "string"; echo `psinfo admin rss`;                   exit 0 ;;
+  $PLACE.4.5)     echo "string"; echo `psinfo admin size`;                  exit 0 ;;
   # The rest process
   #$PLACE.5.0)     echo "counter";   echo "42";                                 exit 0 ;;
   $PLACE.5.0)     echo "string"; echo "rest";                               exit 0 ;;

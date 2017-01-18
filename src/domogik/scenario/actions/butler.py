@@ -27,6 +27,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
 from domogik.scenario.actions.abstract import AbstractAction
 from domogik.common.configloader import Loader, CONFIG_FILE
+from domogik.common.utils import ucode
 from domogikmq.pubsub.publisher import MQPub
 import zmq
 import traceback
@@ -56,21 +57,14 @@ class ButlerAction(AbstractAction):
         self.zmq = zmq.Context()
         self.pub = MQPub(self.zmq, self._mq_name)
 
-    def do_action(self, local_vars):
-        media = self._params['media']
-        location = self._params['location']
+    def do_action(self):
         text = self._params['text']
 
-        # local variables
-        media = self.process_local_vars(local_vars, media)
-        location = self.process_local_vars(local_vars, location)
-        text = self.process_local_vars(local_vars, text)
-
-        self._log.info(u"Make the butler say '{0}'. Media is '{1}', location is '{2}'".format(text, media, location))
+        self._log.info(u"Make the butler say '{0}'. ".format(text))
 
         # publish over MQ
-        data =              {"media" : media,
-                             "location" : location,
+        data =              {"media" : "*",
+                             "location" : "*",
                              "sex" : self.butler_sex,
                              "mood" : None,
                              "reply_to" : None,
@@ -80,14 +74,7 @@ class ButlerAction(AbstractAction):
                             data)
 
     def get_expected_entries(self):
-        return {'media': {'type': 'list',
-                            'description': 'Media target',
-                            'values' : [['*', '*'], ['Audio', 'audio']],
-                            'default': '*'},
-                'location': {'type': 'string',
-                            'description': 'Location',
-                            'default': ''},
-                'text': {'type': 'string',
-                            'description': 'Text',
-                            'default': ''}
+        return {'text': {'type': 'string',
+                         'description': 'Text',
+                         'default': ''}
                }

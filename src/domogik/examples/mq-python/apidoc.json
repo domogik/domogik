@@ -1,6 +1,6 @@
 {
   "name": "Domogik Message Queue (MQ) usage",
-  "version": "0.4.1",
+  "version": "0.6.0",
   "description": "Documentation and examples to used the Domogik Message Queue (MQ). Sources of this documentation and python example files can be found in the sources : src/domogik/examples/mq-python/",
   "title": "Domogik Message Queue (MQ) usage",
   "template" : {
