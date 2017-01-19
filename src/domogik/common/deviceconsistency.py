@@ -32,7 +32,7 @@ DeviceConsistencyException
 from domogik.common.packagejson import PackageJson
 from domogik.common.database import DbHelper
 import json
-
+import pprint
 
 class DeviceConsistencyException(Exception):
     """
@@ -46,6 +46,8 @@ class DeviceConsistencyException(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+
 
 
 class DeviceConsistency():
@@ -63,6 +65,7 @@ class DeviceConsistency():
         self.p_json = plugin_json
         self._type = check_type
         self._result = {}
+        self._globaXplParams = []
 
     def check(self):
         self._validate_identity()
@@ -78,13 +81,23 @@ class DeviceConsistency():
 
     def _raise(self, code, data):
         """ Code
-        0 => nothing needs to be done, we raise anyway, data = string to raise
-         1 => sensor add
-        -1 => sensor remove
-         2 => command add
-        -2 => command remove
-        3 => command param add 
-        4 => xplcommand add
+         0 => nothing needs to be done, we raise anyway, data = string to raise
+         1 DONE => sensor add
+        -1 DONE => sensor remove
+         2 DONE => command add
+        -2 DONE => command remove
+         3 DONE => command param add
+        -3 => command param remove
+         4 DONE => xplcommand add
+        -4 DONE => xplcommand remove
+         5 => xplcommand_param add
+        -5 => xplcommand_param remove
+         6 => xplstat add
+        -6 => xplstat remove
+         7 => xplstat_param add
+        -7 => xplstat_param remove
+         8 DONE => device_params add
+        -8 DONE => device_params remove
         """
         if code == 0:
             raise DeviceConsistencyException(code, data)
@@ -112,14 +125,64 @@ class DeviceConsistency():
                 self._result['command_del'] = data
         elif code == 3:
             if self._type == "raise":
-                raise DeviceConsistencyException(code, "Command ({0}) parameter ({1}) found in the json but not in the db".format(data[0], data[1]))
+                raise DeviceConsistencyException(code, "Command ({0}) parameter ({1}) found in the plugin but not in the db".format(data[0], data[1]))
             else:
                 self._result['command_param_add'] = data
+        elif code == -3:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Command ({0}) parameter ({1}) found in the db but not in the plugin".format(data[0], data[1]))
+            else:
+                self._result['command_param_del'] = data
         elif code == 4:
             if self._type == "raise":
-                raise DeviceConsistencyException(code, "Xpl command ({0}) is in the plugin but not in the device".format(data))
+                raise DeviceConsistencyException(code, "Xpl command ({0}) is in the plugin but not in the db".format(data))
             else:
                 self._result['xplcommand_add'] = data
+        elif code == -4:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Xpl command ({0}) is in db but not in the plugin".format(data))
+            else:
+                self._result['xplcommand_del'] = data
+        elif code == 5:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Xpl command ({0}) parameter ({1}) found in the plugin but not in the db".format(data[0], data[1]))
+            else:
+                self._result['xplcommand_param_add'] = data
+        elif code == -5:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Xpl command ({0}) parameter ({1}) found in the db but not in the plugin".format(data[0], data[1]))
+            else:
+                self._result['xplcommand_param_del'] = data
+        elif code == 6:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Xpl stat ({0}) is in the plugin but not in the db".format(data))
+            else:
+                self._result['xplstat_add'] = data
+        elif code == -6:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Xpl stat ({0}) is in db but not in the plugin".format(data))
+            else:
+                self._result['xplstat_del'] = data
+        elif code == 7:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Xpl stat ({0}) parameter ({1}) found in the plugin but not in the db".format(data[0], data[1]))
+            else:
+                self._result['xplstat_param_add'] = data
+        elif code == -7:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Xpl stat ({0}) parameter ({1}) found in the db but not in the plugin".format(data[0], data[1]))
+            else:
+                self._result['xplstat_param_del'] = data
+        elif code == 8:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Device global param ({0}) is in the plugin but not in the device".format(data))
+            else:
+                self._result['device_param_add'] = data
+        elif code == -8:
+            if self._type == "raise":
+                raise DeviceConsistencyException(code, "Device global param ({0}) is in the device but not in the plugin".format(data))
+            else:
+                self._result['device_param_del'] = data
         else:
             print "{0} = {1}".format(code, data)
 
@@ -130,17 +193,25 @@ class DeviceConsistency():
         # check the versions
         if self.d_json["client_version"] > self.p_json['identity']['version']:
             self._raise(0, "The device ({0}) has a newer client version then the plugin ({1})".format(self.d_json["client_version"], self.p_json['identity']['version']))
-        if self.d_json["client_version"] == self.p_json['identity']['version']:
-            self._raise(0, "The device ({0}) and the plugin ({1}) client version are the same".format(self.d_json["client_version"], self.p_json['identity']['version']))
+        #if self.d_json["client_version"] == self.p_json['identity']['version']:
+        #    self._raise(0, "The device ({0}) and the plugin ({1}) client version are the same".format(self.d_json["client_version"], self.p_json['identity']['version']))
 
     def _validate_device_type(self):
         # check if the device_type exists
         if self.d_json['device_type_id'] not in self.p_json['device_types'].keys():
             self._raise(0, "Device type {0} is not known by this plugin".format(self.d_json['device_type_id']))
-        # TODO non-xpl params
-        print "TODO non-xpl params"
-        # TODO xpl params in every xpl_stat/xpl_command
-        # not sure if this is needed
+        # global params (xpl and no-xpl)
+        for param in self.p_json['device_types'][self.d_json['device_type_id']]['parameters']:
+            if param['xpl']:
+                # xpl params are chacked in the xpl procs, so cache them
+                self._globaXplParams.append(param)
+            elif param['key'] not in self.d_json['parameters'].keys():
+                # a new param is added
+                self._raise(8, param['key'])
+        # removed params, in the db but not in the plugin
+        for param in self.d_json['parameters'].keys():
+            if not filter(lambda n: n['key'] == param, self.p_json['device_types'][self.d_json['device_type_id']]['parameters']):
+                self._raise(-8, param)
 
     def _validate_command(self):
         # check that we need to remove commands
@@ -150,7 +221,7 @@ class DeviceConsistency():
         # check that all commands for a device_type exists
         for cmd in self.p_json['device_types'][self.d_json['device_type_id']]["commands"]:
             if cmd not in self.d_json['commands'].keys():
-                self._raise(2, "Command ({0}) is in the plugin but not in the device".format(cmd))
+                self._raise(2, cmd)
             # check that all parameters for a command are present
             for param in self.p_json['commands'][cmd]['parameters']:
                 found = False
@@ -162,10 +233,15 @@ class DeviceConsistency():
                             found = True
                 if not found:
                     self._raise(3, (cmd, param))
+            print "TODO -3 search for old comamnd params"
             # check that all xpl_commands exists + all params are there
-            if cmd['xpl_command'] not in self.d_json['xpl_commands'].keys():
-                self._raise(4, cmd['xpl_command'])
-            self._validate_xpl_command(cmd['xpl_command'])
+            if 'xpl_command' in cmd:
+                if cmd['xpl_command'] not in self.d_json['xpl_commands'].keys():
+                    self._raise(4, cmd['xpl_command'])
+                self._validate_xpl_command(cmd['xpl_command'])
+        #for cmdid, cmd in self.d_json['commands'].items():
+        #    if cmdid not in self.p_json['device_types'][self.d_json['device_type_id']]["commands"]:
+        #        self._raise(-4, cmdid)
 
     def _validate_sensor(self):
         # check that we need to remove sensors
@@ -176,7 +252,19 @@ class DeviceConsistency():
         for sen in self.p_json['device_types'][self.d_json['device_type_id']]["sensors"]:
             if sen not in self.d_json['sensors'].keys():
                 self._raise(1, sen)
-            print "TODO find xpl stats for this sensor {0}".format(sen)
+            # find an xplstat for this sensor (if there is one)
+            for xplstat, stat in self.p_json['xpl_stats'].items():
+                if filter(lambda n: n['sensor'] == sen, stat['parameters']['dynamic']):
+                    print "6 TODO new linked xplstats for sensor"
+                    self._validate_xpl_stat(xplstat)
+                print "-6 TODO old linked xplstats for sensor"
+            # see if we have old linked xplstats
+            #for xplstatid, xplstat in self.d_json['xpl_stats'].items():
+            #    print xplstat
+            #    print xplstat['parameters']['dynamic']['sensor']
+            #    print self.p_json['device_types'][self.d_json['device_type_id']]["sensors"]
+            #    if xplstat['parameters']['dynamic']['sensor'] not in self.p_json['device_types'][self.d_json['device_type_id']]["sensors"]:
+            #        self._raise(-6, xplstatis)
 
     def _validate_xpl_command(self, cmd):
         print "TODO xpl command {0}".format(cmd)
@@ -190,8 +278,11 @@ class DeviceConsistency():
 if __name__ == "__main__":
     db = DbHelper()
     with db.session_scope():
-        device_json = db.get_device(85)
+        device_json = db.get_device(125)
+        # 100
     device_json = json.loads(json.dumps(device_json))
     plugin_json = PackageJson(name="velbus")
-    dc = DeviceConsistency("raise", device_json, plugin_json.json)
+    # diskfree
+    dc = DeviceConsistency("blah", device_json, plugin_json.json)
     dc.check()
+    print dc.get_result()
