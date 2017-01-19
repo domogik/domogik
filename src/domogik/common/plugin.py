@@ -140,12 +140,14 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         '''
         if self._name in CORE_COMPONENTS:
             self._mq_name = self._name
+            self._mq_subscribe_list = []
         else:
             self._mq_name = "{0}-{1}.{2}".format(self._type, self._name, self.get_sanitized_hostname())
+            # subscribe device.update event to keep device list uptodate
+            self._mq_subscribe_list = ['device.update']
 
         # MQ publisher and REP
         self.zmq = zmq.Context()
-        self._mq_subscribe_list = []
         self._pub = MQPub(self.zmq, self._mq_name)
         self._set_status(STATUS_STARTING)
 
@@ -229,9 +231,6 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         # check for products pictures
         if self._name not in CORE_COMPONENTS and self._test == False:
             self.check_for_pictures()
-
-        # subscribe device.update event to keep device list uptodate
-        self.add_mq_sub('device.update')
 
         # init finished
         self.log.info(u"End init of the global client part")
