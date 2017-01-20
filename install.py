@@ -121,6 +121,15 @@ def build_file_list(user):
     else:
         warning("Can't find firectory for init script: Require manual install")
 
+    if os.path.exists('/etc/cron.d'):
+        debug("Found directory to store the cron config: /etc/cron.d")
+        d_files.append(('/etc/cron.d/', ['root', None], \
+                ['src/domogik/examples/cron/domogik']))
+    else:
+        fail("Can't find directory where i can copy cron config")
+        exit(0)
+
+
     hub = get_c_hub()
     if hub is not None:
         debug("Adding c hub path: {0}".format(hub))
