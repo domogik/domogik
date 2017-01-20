@@ -393,26 +393,26 @@ class DbHelper():
 ###
 # Devices
 ###
-    def list_devices(self):
+    def list_devices(self, d_state=u'active'):
         """Return a list of devices
         @return a list of Device objects (only the devices that are known by this realease)
         """
         device_list = []
-        for device in self.__session.query(Device).all():
+        for device in self.__session.query(Device).filter_by(state=d_state).all():
             device_list.append(self.get_device(device=device))
         return device_list
 
     def list_devices_by_plugin(self, p_id):
         #return self.__session.query(Device).filter_by(client_id=p_id).all()
         device_list = []
-        for device in self.__session.query(Device).filter_by(client_id=p_id).all():
+        for device in self.__session.query(Device).filter_by(state=u'active').filter_by(client_id=p_id).all():
             device_list.append(self.get_device(device=device))
         return device_list
 
     def list_devices_by_timestamp(self, tstamp):
         #return self.__session.query(Device).filter_by(client_id=p_id).all()
         device_list = []
-        for device in self.__session.query(Device).filter(Device.info_changed>datetime.datetime.fromtimestamp(float(tstamp))).all():
+        for device in self.__session.query(Device).filter_by(state=u'active').filter(Device.info_changed>datetime.datetime.fromtimestamp(float(tstamp))).all():
             device_list.append(self.get_device(device=device))
         return device_list
 
@@ -843,6 +843,32 @@ class DbHelper():
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
             self.__raise_dbhelper_exception("Device with id {0} couldn't be found".format(d_id))
+
+        # update the state to deleting, so the system does not start to delete the same device multiple times
+        device.state=u'delete'
+        device.info_changed = func.now()
+        self.__session.add(device)
+        self._do_commit()
+        return device
+
+    def del_device_real(self, d_id):
+        """Delete a device
+
+        @param d_id : device id
+        @return the deleted device
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        device = self.__session.query(Device).filter_by(id=d_id).first()
+        if device is None:
+            self.__raise_dbhelper_exception("Device with id {0} couldn't be found".format(d_id))
+
+        # update the state to deleting, so the system does not start to delete the same device multiple times
+        device.state=u'deleting'
+        device.info_changed = func.now()
+        self.__session.add(device)
+        self._do_commit()
 
         # check if this device i used in a scenario
         llist = []

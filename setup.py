@@ -113,6 +113,7 @@ setup(
             dmg_hub = domogik.bin.hub:main
             dmg_package = domogik.bin.package:main
             dmg_testrunner = domogik.tests.bin.testrunner:main
+            dmg_cron = domogik.bin.cron:main
         """
         ]
     },
