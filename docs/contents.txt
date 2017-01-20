@@ -23,6 +23,8 @@ Table Of Content
     /users/quickstart/clients_status
     /users/quickstart/orphans
 
+    /users/scenarios/index
+
     /users/errors/index
     /users/errors/create_a_ticket
 
