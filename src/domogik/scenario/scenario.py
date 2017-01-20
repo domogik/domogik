@@ -43,6 +43,14 @@ from domogik.common.utils import ucode
 
 
 
+def to_unicode(data):
+    print(u"to_unicode > type='{0}'".format(type(data)))
+    if isinstance(data, unicode):
+        return data
+    else:
+        return unicode(str(data), "utf-8")
+
+
 class ScenarioInstance(MQAsyncSub):
     """ This class provides base methods for the scenarios
     The scenario json looks like:
@@ -292,7 +300,8 @@ class ScenarioInstance(MQAsyncSub):
             for ipart, val in sorted(part.items()):
                 if ipart.startswith('ADD'):
                     addp = self.__parse_part(part[ipart], level, debug, parentPart)
-                    reslst.append(u"str({0})".format(addp))
+                    #reslst.append(u"str({0})".format(addp))
+                    reslst.append(u"to_unicode({0})".format(addp))
             retlist.append( pyObj(u" + ".join(reslst)) )
         # get the length of a string
         elif part['type'] == 'text_length':

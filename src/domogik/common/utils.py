@@ -116,24 +116,51 @@ def ucode(my_string):
     """Convert a string into unicode or return None if None value is passed
 
     @param my_string : string value to convert
+    @return a str string
+
+    """
+    return ucode2(my_string)
+
+
+    #if my_string is not None:
+    #    #print("ucode : {0}".format(type(my_string)))
+    #    if type(my_string) == unicode:
+    #        try:
+    #            # the following line is here to test if an Unicode error would occur...
+    #            foo = "bar{0}".format(my_string)
+    #            return my_string
+    #        except UnicodeEncodeError:
+    #            return my_string.encode('utf8')
+    #    elif not type(my_string) == str:
+    #        return str(my_string).decode("utf-8")
+    #    else:
+    #        return my_string.decode("utf-8")
+    #else:
+    #    return None
+
+def ucode2(my_string):
+    """Convert a string into unicode or return None if None value is passed
+
+    @param my_string : string value to convert
     @return a unicode string
 
     """
-    if my_string is not None:
-        #print("ucode : {0}".format(type(my_string)))
-        if type(my_string) == unicode:
-            try:
-                # the following line is here to test if an Unicode error would occur...
-                foo = "bar{0}".format(my_string)
-                return my_string
-            except UnicodeEncodeError:
-                return my_string.encode('utf8')
-        elif not type(my_string) == str:
-            return str(my_string).decode("utf-8")
-        else:
-            return my_string.decode("utf-8")
-    else:
+    # special case : data is None
+    if my_string is None:
         return None
+    # already in unicode, return unicode
+    elif isinstance(my_string, unicode):
+        return my_string
+
+    # str 
+    elif isinstance(my_string, str):
+        return unicode(my_string, "utf-8")
+
+    # other type (int, float, boolean, ...)
+    else:
+        return unicode(str(my_string), "utf-8")
+
+
 
 def call_package_conversion(log, plugin, method, value):
     """Load the correct module, and encode the value

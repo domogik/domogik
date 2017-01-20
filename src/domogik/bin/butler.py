@@ -47,8 +47,10 @@ from domogik.butler.brain import STAR_FILE
 from domogik.butler.brain import clean_input
 #from domogikmq.reqrep.worker import MQRep
 from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.pubsub.publisher import MQPub
-#import zmq
+import zmq
+import json
 import os
 import sys
 from subprocess import Popen, PIPE
@@ -101,6 +103,8 @@ class Butler(Plugin):
 
         # subscribe the MQ for interfaces inputs
         self.add_mq_sub('interface.input')
+        # devices updates
+        self.add_mq_sub('device.update')
 
 
         ### Configuration elements
@@ -156,12 +160,16 @@ class Butler(Plugin):
         # shortcut to allow the core brain package to reload the brain for learning
         self.brain.reload_butler = self.reload
 
-        # shortcut to allow the core brain package to do logging
+        # shortcut to allow the core brain package to do logging and access the devices in memory
         self.brain.log = self.log
+        self.brain.devices = [] # will be loaded in self.reload_devices()
 
 
         # history
         self.history = []
+ 
+        # load all known devices
+        self.reload_devices()
 
         self.log.info(u"*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
 
@@ -189,6 +197,23 @@ class Butler(Plugin):
 
         self.log.info(u"Butler initialized")
         self.ready()
+
+
+    def reload_devices(self):
+        """ Load or reload the devices list in memory to improve the butler speed (mainly for brain-base package usage)
+        """
+        self.log.info(u"Request the devices list over MQ...")
+        try:
+            cli = MQSyncReq(zmq.Context())
+            msg = MQMessage()
+            msg.set_action('device.get')
+            str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+            self.devices = json.loads(str_devices)['devices']
+            self.log.info(u"{0} devices loaded!".format(len(self.devices)))
+        except:
+            self.log.error(u"Error while getting the devices list over MQ. Error is : {0}".format(traceback.format_exc()))
+            self.devices = []
+        self.brain.devices = self.devices
 
 
     def on_mdp_request(self, msg):
@@ -481,7 +506,9 @@ class Butler(Plugin):
     def on_message(self, msgid, content):
         """ When a message is received from the MQ (pub/sub)
         """
-        if msgid == "interface.input":
+        if msgid == "device.update":
+            self.reload_devices()
+        elif msgid == "interface.input":
             # TODO :
             # merge with the on_mdp_reply_butler_disscuss() function
 
@@ -552,7 +579,7 @@ class Butler(Plugin):
             reply = self.process(msg)
 
             # let Nestor answer in the chat
-            print("{0} > {1}".format(ucode(self.butler_name), ucode(reply)))
+            print(u"{0} > {1}".format(ucode(self.butler_name), ucode(reply)))
 
             # let Nestor speak
             #tts = u"espeak -p 40 -s 140 -v mb/mb-fr1 \"{0}\" | mbrola /usr/share/mbrola/fr1/fr1 - -.au | aplay".format(reply)
