@@ -81,6 +81,11 @@ Quick start guide
 * :doc:`What is an orphan device ? <users/quickstart/orphans>`
 * start a client
 
+Scenarios
+=========
+
+* :doc:`About the scenarios <users/scenarios/index>`
+
 Various informations
 ====================
 

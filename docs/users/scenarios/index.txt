@@ -1,0 +1,9 @@
+=========
+Scenarios
+=========
+
+An help about the scenario is directly available in Domogik administration in a scenario page.
+
+.. note::
+
+    You **must** read this help before starting to create your first scenario.

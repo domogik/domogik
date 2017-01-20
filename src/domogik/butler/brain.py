@@ -113,22 +113,22 @@ def clean_input(data):
 #######################################################################
 # public API
 
-def get_sensor_value(log, user_locale, dt_type, device_name, sensor_reference = None):
-    value, _ = _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference)
+def get_sensor_value(log, devices, user_locale, dt_type, device_name, sensor_reference = None):
+    value, _ = _get_sensor_data(log, devices, user_locale, dt_type, device_name, sensor_reference)
     return value
 
-def get_sensor_value_and_date(log, user_locale, dt_type, device_name, sensor_reference = None):
-    value, date = _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference)
+def get_sensor_value_and_date(log, devices, user_locale, dt_type, device_name, sensor_reference = None):
+    value, date = _get_sensor_data(log, devices, user_locale, dt_type, device_name, sensor_reference)
     return value, date
 
-def get_sensor_last_values_since(log, user_locale, dt_type, device_name, sensor_reference = None, since = None):
-    data, _ = _get_sensor_data(log, user_locale, dt_type, device_name, sensor_reference, since)
+def get_sensor_last_values_since(log, devices, user_locale, dt_type, device_name, sensor_reference = None, since = None):
+    data, _ = _get_sensor_data(log, devices, user_locale, dt_type, device_name, sensor_reference, since)
     return data
 
 # end of public API
 #######################################################################
 
-def _get_sensor_data(log, user_locale, dt_type_list, device_name, sensor_reference = None, since = None):
+def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, sensor_reference = None, since = None):
     """ If sensor_reference = None
             Search for a sensor matching the dt_type and the device name
         Else
@@ -139,6 +139,9 @@ def _get_sensor_data(log, user_locale, dt_type_list, device_name, sensor_referen
         Else
             return <dict of last values>, None
 
+        @param log : butler logger callback
+        @param devices : butler devices in memory
+        @param user_locale : the user locale
         @param dt_type_list : a list of domogik datatype : DT_Temperature, DT_Humidity, ...
         @param device_name : the device name
         @param sensor_reference : the sensor name
@@ -158,7 +161,22 @@ def _get_sensor_data(log, user_locale, dt_type_list, device_name, sensor_referen
         check_preferences = False
     else:
         check_preferences = True
-    candidates = get_sensors_for_datatype(dt_type_list, check_preferences, log)
+
+    # get the devices
+    # TODO : improve : refresh only when some devices are updated and get the last item from history instead
+    #log.debug(u"Request the devices list over MQ...")
+    #try:
+    #    cli = MQSyncReq(zmq.Context())
+    #    msg = MQMessage()
+    #    msg.set_action('device.get')
+    #    str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+    #    devices = json.loads(str_devices)['devices']
+    #except:
+    #    log.error(u"Error while getting the devices list over MQ. Error is : ".format(traceback.format_exc()))
+    #    return None, None
+
+    # filter the candidates from all the devices
+    candidates = get_sensors_for_datatype(devices, dt_type_list, check_preferences, log)
     log.info(u"Candidates for the appropriate datatype : {0}".format(candidates))
 
     if sensor_reference:
@@ -177,9 +195,22 @@ def _get_sensor_data(log, user_locale, dt_type_list, device_name, sensor_referen
     ### corresponding sensor!
     # let's get the sensor value
 
+    # get only the last value
     if since == None:
-        the_value = the_sensor['last_value']
-        last_received = the_sensor['last_received']
+        #the_value = the_sensor['last_value']
+        #last_received = the_sensor['last_received']
+
+        # get the sensor last value over MQ
+        cli = MQSyncReq(zmq.Context())
+        msg = MQMessage()
+        msg.set_action('sensor_history.get')
+        msg.add_data('sensor_id', the_sensor['sensor_id'])
+        msg.add_data('mode', 'last')
+        res = cli.request('dbmgr', msg.get(), timeout=10).get()
+        res = json.loads(res[1])
+        the_value = res['values'][0]['value_str']
+        last_received = res['values'][0]['timestamp']
+
         log.info(u"The value is : '{0}'".format(the_value))
     
         # do some checks to see if we should try to convert as a float or not
@@ -203,6 +234,7 @@ def _get_sensor_data(log, user_locale, dt_type_list, device_name, sensor_referen
                 log.warning(u"Unable to format the value '{0}' as float/int with the locale '{1}'".format(the_value, the_locale))
         return the_value, last_received
 
+    # get all the values since....
     else:
         try:
             # TODO : call a MQ message to get the values since the given parameter
@@ -240,7 +272,7 @@ def is_float_and_not_int(x):
         return a == b
 
 
-def get_sensors_for_datatype(dt_type_list, check_preferences = True, log = None):
+def get_sensors_for_datatype(devices, dt_type_list, check_preferences = True, log = None):
     """ Find the matching devices and features
     """
 
@@ -260,15 +292,13 @@ def get_sensors_for_datatype(dt_type_list, check_preferences = True, log = None)
 
     candidates = []
 
-    cli = MQSyncReq(zmq.Context())
-    msg = MQMessage()
+    # TODO DEL # cli = MQSyncReq(zmq.Context())
+    # TODO DEL # msg = MQMessage()
 
-    # TODO : improve by calling only from time to time and keep in memory
-    msg.set_action('device.get')
+    # TODO DEL # # TODO : improve by calling only from time to time and keep in memory
+    # TODO DEL # msg.set_action('device.get')
 
     try:
-        str_devices = cli.request('admin', msg.get(), timeout=10).get()[1]
-        devices = json.loads(str_devices)['devices']
         for a_device in devices:
             #print a_device
             # search in all sensors
@@ -371,7 +401,7 @@ def learn(rs_code, comment = None):
     with open(LEARN_FILE, "a") as file:
         file.write(utf8_data + "\n\n") 
 
-def do_command(log, user_locale, dt_type_list, device, value, command_reference = None):
+def do_command(log, devices, user_locale, dt_type_list, device, value, command_reference = None):
     """ Execute a command
         @log : logger object
         @user_locale : fr_FR, ...
@@ -389,11 +419,11 @@ def do_command(log, user_locale, dt_type_list, device, value, command_reference 
        
         device_name = device.lower()
         log.debug(u"Command : search device. Device name = {0}".format(device_name))
-        cli = MQSyncReq(zmq.Context())
-        msg = MQMessage()
-        msg.set_action('device.get')
-        str_devices = cli.request('admin', msg.get(), timeout=10).get()[1]
-        devices = json.loads(str_devices)['devices']
+        #cli = MQSyncReq(zmq.Context())
+        #msg = MQMessage()
+        #msg.set_action('device.get')
+        #str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+        #devices = json.loads(str_devices)['devices']
         found = None
         for a_device in devices:
             if clean_input(a_device['name']) == clean_input(device_name):
