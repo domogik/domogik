@@ -39,6 +39,8 @@ import zmq
 import traceback
 import logging
 import ast
+import datetime
+from dateutil import parser
 from domogik.common.utils import ucode
 
 
@@ -248,6 +250,8 @@ class ScenarioInstance(MQAsyncSub):
                 part['type'] = "logic_boolean"
             elif dt_parent == "DT_Number":
                 part['type'] = "math_number"
+            elif dt_parent == "DT_DateTime":
+                part['type'] = "date_time"
             elif dt_parent == "DT_String":
                 part['type'] = "text"
             else:
@@ -291,6 +295,9 @@ class ScenarioInstance(MQAsyncSub):
         # a simple static number
         elif part['type'] == 'math_number':
             retlist.append( pyObj("float(\"{0}\")".format(part['NUM'])) )
+        # a date/time or timestamp
+        elif part['type'] == 'date_time':
+            retlist.append( pyObj("parser.parse(\"{0}\")".format(part['TEXT'])) )
         # a simple text string
         elif part['type'] == 'text':
             retlist.append( pyObj(u"\"{0}\"".format(part['TEXT'])) )
