@@ -47,9 +47,6 @@ class DeviceConsistencyException(Exception):
     def __str__(self):
         return repr(self.value)
 
-
-
-
 class DeviceConsistency():
     """ DeviceConsistency class
         A class that takes as input a deviceId, and a json
@@ -81,18 +78,18 @@ class DeviceConsistency():
 
     def _raise(self, code, data):
         """ Code
-         0 => nothing needs to be done, we raise anyway, data = string to raise
+         0 DONE => nothing needs to be done, we raise anyway, data = string to raise
          1 DONE => sensor add
         -1 DONE => sensor remove
          2 DONE => command add
         -2 DONE => command remove
          3 DONE => command param add
-        -3 => command param remove
+        -3 DONE => command param remove
          4 DONE => xplcommand add
         -4 DONE => xplcommand remove
          5 => xplcommand_param add
         -5 => xplcommand_param remove
-         6 => xplstat add
+         6 DONE => xplstat add
         -6 => xplstat remove
          7 => xplstat_param add
         -7 => xplstat_param remove
@@ -233,15 +230,24 @@ class DeviceConsistency():
                             found = True
                 if not found:
                     self._raise(3, (cmd, param))
-            print "TODO -3 search for old comamnd params"
             # check that all xpl_commands exists + all params are there
             if 'xpl_command' in cmd:
                 if cmd['xpl_command'] not in self.d_json['xpl_commands'].keys():
                     self._raise(4, cmd['xpl_command'])
                 self._validate_xpl_command(cmd['xpl_command'])
-        #for cmdid, cmd in self.d_json['commands'].items():
-        #    if cmdid not in self.p_json['device_types'][self.d_json['device_type_id']]["commands"]:
-        #        self._raise(-4, cmdid)
+        # find old command params
+        for cmdid, cmd in self.d_json['commands'].items():
+            for param in cmd['parameters']:
+                if not filter(lambda n: n['key'] == param['key'], self.p_json['commands'][cmdid]['parameters']):
+                    self._raise(-3, (cmdid, param['key']) )
+        # find old xplcommands
+        for cmdid, cmd in self.d_json['xpl_commands'].items():
+            found = False
+            for pcmd in self.p_json['device_types'][self.d_json['device_type_id']]['commands']:
+                if cmdid in self.p_json['xpl_commands']:
+                    found = True
+            if not found:
+                self._raise(-4, cmdid )
 
     def _validate_sensor(self):
         # check that we need to remove sensors
@@ -255,16 +261,10 @@ class DeviceConsistency():
             # find an xplstat for this sensor (if there is one)
             for xplstat, stat in self.p_json['xpl_stats'].items():
                 if filter(lambda n: n['sensor'] == sen, stat['parameters']['dynamic']):
-                    print "6 TODO new linked xplstats for sensor"
+                    if xplstat not in self.d_json['xpl_stats'].keys():
+                        self._raise(6, xplstat)
                     self._validate_xpl_stat(xplstat)
-                print "-6 TODO old linked xplstats for sensor"
-            # see if we have old linked xplstats
-            #for xplstatid, xplstat in self.d_json['xpl_stats'].items():
-            #    print xplstat
-            #    print xplstat['parameters']['dynamic']['sensor']
-            #    print self.p_json['device_types'][self.d_json['device_type_id']]["sensors"]
-            #    if xplstat['parameters']['dynamic']['sensor'] not in self.p_json['device_types'][self.d_json['device_type_id']]["sensors"]:
-            #        self._raise(-6, xplstatis)
+        print "-6 TODO old linked xplstats for sensor"
 
     def _validate_xpl_command(self, cmd):
         print "TODO xpl command {0}".format(cmd)
@@ -278,10 +278,11 @@ class DeviceConsistency():
 if __name__ == "__main__":
     db = DbHelper()
     with db.session_scope():
-        device_json = db.get_device(125)
+        device_json = db.get_device(166)
+        # 138
         # 100
     device_json = json.loads(json.dumps(device_json))
-    plugin_json = PackageJson(name="velbus")
+    plugin_json = PackageJson(name="test")
     # diskfree
     dc = DeviceConsistency("blah", device_json, plugin_json.json)
     dc.check()
