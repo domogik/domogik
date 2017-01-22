@@ -92,6 +92,7 @@ setup(
           'Flask-Session',
           'tornado >= 4.2',
           'requests >= 0.12.1',
+          'python-dateutil',
           magic,
           'pyzmq >= 2.2.0',
           'ephem'],
