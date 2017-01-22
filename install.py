@@ -123,7 +123,7 @@ def build_file_list(user):
 
     if os.path.exists('/etc/cron.d'):
         debug("Found directory to store the cron config: /etc/cron.d")
-        d_files.append(('/etc/cron.d/', ['root', None], \
+        d_files.append(('/etc/cron.d/', ['root', 0644], \
                 ['src/domogik/examples/cron/domogik']))
     else:
         fail("Can't find directory where i can copy cron config")
