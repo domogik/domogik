@@ -14,7 +14,7 @@ except ImportError:
 @login_required
 def index():
     with app.db.session_scope():
-        if len(app.db.get_core_config()) != 2:
+        if len(app.db.get_core_config()) != 3:
             flash(gettext(gettext("Not all config set, you should first set the basic config")), 'Warning')
             return redirect("/config")
         elif not app.db.get_home_location():

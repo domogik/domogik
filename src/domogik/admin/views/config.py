@@ -23,10 +23,13 @@ def config():
             cfg['external_ip'] = ''
         if 'external_port' not in cfg:
             cfg['external_port'] = ''
+        if 'external_ssl' not in cfg:
+            cfg['external_ssl'] = ''
 
         class F(Form):
             external_ip = TextField("External IP", [Required()], description='External IP or DNS name', default=cfg['external_ip'])
             external_port = TextField("External Port", [Required()], description='Externel Port where admin is listening', default=cfg['external_port'])
+            external_ssl = BooleanField("External use SSL", description='Does external access need ssl', default=cfg['external_ssl'])
             submit = SubmitField("Save")
             pass
         form = F()
