@@ -32,7 +32,35 @@ DeviceConsistencyException
 from domogik.common.packagejson import PackageJson
 from domogik.common.database import DbHelper
 import json
-import pprint
+import thread
+
+class DeviceConsistencyThread(threading.thread):
+    def __init__(self, client_id, stop, log):
+        Thread.__init__(self)
+        self.client_id = client_id
+        self.db = DbHelper()
+        self.stop = stop
+        self.log = log
+
+    def run(self):
+        with self.db.session_scope():
+            plugin_json = PackageJson(name="test")
+            for dev in self.db.list_devices_by_plugin(self.client_id):
+                # this can take some time, so guard with the stop
+                if self._stop.isSet():
+                    break
+                # check the device
+                device_json = json.loads(json.dumps(dev))
+                dc = DeviceConsistency("return", device_json, plugin_json.json)
+                dc.check()
+                res = dc.get_result()
+                if len(dc.keys()) > 0:
+                    # update to set the dev as needs upgrade
+                    self.log.info("Device {0}({1}) needs upgrade".format(dev['name'], dev['id']))
+                    self.log.debug(dc)
+                else:
+                    # all ok
+                    self.log.info("Device {0}({1}) is OK".format(dev['name'], dev['id']))
 
 class DeviceConsistencyException(Exception):
     """
