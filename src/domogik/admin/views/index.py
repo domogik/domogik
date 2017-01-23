@@ -17,6 +17,9 @@ def index():
         if len(app.db.get_core_config()) != 3:
             flash(gettext(gettext("Not all config set, you should first set the basic config")), 'Warning')
             return redirect("/config")
+        elif len(app.db.list_devices(d_state=u'upgrade')) > 0:
+            flash(gettext(gettext("Some devices need your attention")), 'Warning')
+            return redirect("/upgrade")
         elif not app.db.get_home_location():
             flash(gettext(gettext("No home location set, you should configure it first")), 'Warning')
             return redirect("/locations/edit/0")
