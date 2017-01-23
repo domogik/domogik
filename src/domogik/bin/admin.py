@@ -789,6 +789,12 @@ class Admin(Plugin):
             msg.add_data('reason', reason)
         self.log.debug(msg.get())
         self.reply(msg.get())
+        # send the pub message
+        if status and res:
+            dev = self._db.get_device(res.device_id)
+            self._pub.send_event('device.update',
+                    {"device_id" : res.device_id,
+                     "client_id" : dev['client_id']})
 
     def _mdp_reply_devices_update_result(self, data):
         status = True

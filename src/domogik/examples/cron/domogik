@@ -2,4 +2,4 @@
 #  This cron item will help domogik to do some periodic tasks
 #  All these tasks are handled by dmg_cron tool
 
-13 *     * * *     root   [ -x /usr/local/bin/dmg_cron ] && /usr/local/bin/dmg_cron
+13 *     * * *     root   [ -x /usr/local/bin/dmg_cron ] && /usr/local/bin/dmg_cron > /dev/null 2>&1
