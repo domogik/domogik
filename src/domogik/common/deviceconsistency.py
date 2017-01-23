@@ -38,13 +38,18 @@ class DeviceConsistencyThread(threading.thread):
     def __init__(self, client_id, stop, log):
         Thread.__init__(self)
         self.client_id = client_id
-        self.db = DbHelper()
+        # get the plugin name
+        tmp = client_id.split('-')
+        tmp = tmp[1].split('.')
+        self.name = tmp[0]
         self.stop = stop
         self.log = log
+        # start the db connection
+        self.db = DbHelper()
 
     def run(self):
         with self.db.session_scope():
-            plugin_json = PackageJson(name="test")
+            plugin_json = PackageJson(name=self.name)
             for dev in self.db.list_devices_by_plugin(self.client_id):
                 # this can take some time, so guard with the stop
                 if self._stop.isSet():
@@ -58,9 +63,14 @@ class DeviceConsistencyThread(threading.thread):
                     # update to set the dev as needs upgrade
                     self.log.info("Device {0}({1}) needs upgrade".format(dev['name'], dev['id']))
                     self.log.debug(dc)
+                    # set the state to needsupgrade
+                    self.db.update_device(dev['id'], d_state=u'upgrade')
                 else:
+                    new_version = self.p_json['identity']['version']
                     # all ok
-                    self.log.info("Device {0}({1}) is OK".format(dev['name'], dev['id']))
+                    self.log.info("Device {0}({1}) is OK for new version {2}".format(dev['name'], dev['id'], new_version))
+                    # udpate the client version for this device
+                    self.db.update_device(dev['id'], d_client_version=new_version)
 
 class DeviceConsistencyException(Exception):
     """
