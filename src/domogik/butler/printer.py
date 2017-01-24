@@ -38,7 +38,7 @@ import traceback
 from subprocess import Popen, PIPE
 import tempfile
 
-def send_to_printer(log, data):
+def send_postscript_to_printer(log, data):
     if log == None:
         log = Log()
     tmp = tempfile.NamedTemporaryFile(delete=False)
@@ -46,8 +46,26 @@ def send_to_printer(log, data):
         tmp.write(data)
         tmp.close()
         # TODO : grab from config
-        cmd = 'lp -h 192.168.1.10 -d HP_Officejet_Pro_8600 {1}'.format(data, tmp.name)
-        print( cmd)
+        cmd = 'lp -h 192.168.1.10 -d HP_Officejet_Pro_8600 {0}'.format(tmp.name)
+        log.info(u"Print command : {0}".format( cmd))
+        subp = Popen(cmd,
+                     shell=True)
+        pid = subp.pid
+        subp.communicate()
+        log.info(u"Printing action send to printer!")
+        return True
+    except:
+        log.error(u"Error while printing. The error is : {0}".format(traceback.format_exc()))
+        return False
+
+
+def send_file_to_printer(log, filepath):
+    if log == None:
+        log = Log()
+    try:
+        # TODO : grab from config
+        cmd = 'lp -h 192.168.1.10 -o media=A4 -d HP_Officejet_Pro_8600 {0}'.format(filepath)
+        log.info(u"Print command : {0}".format( cmd))
         subp = Popen(cmd,
                      shell=True)
         pid = subp.pid
