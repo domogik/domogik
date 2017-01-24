@@ -97,7 +97,7 @@ def write_acces_log_before():
 def inject_global_errors():
     err = []
     with app.db.session_scope():
-        if len(app.db.get_core_config()) != 4:
+        if len(app.db.get_core_config()) != 5:
             err.append(('Not all config set, you should first set the basic config','/config'))
         if len(app.db.list_devices(d_state=u'upgrade')) > 0:
             err.append(('Some devices need your attention','/upgrade'))
