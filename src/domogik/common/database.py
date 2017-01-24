@@ -175,7 +175,11 @@ class DbHelper():
 
     @contextmanager
     def session_scope(self):
-        self.__session = DbHelper.__session_object()
+        if not self.__session:
+            self.__session = DbHelper.__session_object()
+            doclose = True
+        else:
+            doclose = False
         try:
             yield self.__session
             self.__session.commit()
@@ -183,8 +187,9 @@ class DbHelper():
             self.__session.rollback()
             raise
         finally:
-            self.__session.close()
-            self.__session = None
+            if doclose:
+                self.__session.close()
+                self.__session = None
 
     def get_session(self):
         return self.__session
