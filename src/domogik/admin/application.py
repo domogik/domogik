@@ -37,6 +37,7 @@ import traceback
 
 ### init Flask
 app = Flask(__name__)
+app.debug = True
 
 ### set Flask Config
 app.jinja_env.globals['bootstrap_is_hidden_field'] = is_hidden_field_filter
@@ -91,6 +92,18 @@ def write_access_log_after(response):
 def write_acces_log_before():
     app.json_stop_at = []
     app.logger.info('http request for {0} received'.format(u''.join(request.path).encode('utf-8')))
+
+@app.context_processor
+def inject_global_errors():
+    err = []
+    with app.db.session_scope():
+        if len(app.db.get_core_config()) != 4:
+            err.append(('Not all config set, you should first set the basic config','/config'))
+        if len(app.db.list_devices(d_state=u'upgrade')) > 0:
+            err.append(('Some devices need your attention','/upgrade'))
+        if not app.db.get_home_location():
+            err.append(('No home location set, you should configure it first','/locations/edit/0'))
+    return dict(global_errors=err)
 
 # render a template, later on we can select the theme it here
 def render_template(template, **context):
