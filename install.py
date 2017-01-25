@@ -443,7 +443,7 @@ def install():
         assert os.getcwd().startswith("/root/") == False, "Domogik sources must not be located in the /root/ folder"
 
         # CHECK mysql or mariaDB release
-        do_we_need_mariadb(get_mysql_or_mariadb_release())
+        do_we_need_mariadb(get_mysql_or_mariadb_release(), args.command_line)
 
         # CHECK mq installed
         if not args.mq:
