@@ -430,7 +430,7 @@ def install():
             "src/domogik/xpl/hub/examples/config/xplhub.cfg.sample")
 
     args = parser.parse_args()
-    print args
+    print(args)
     try:
         # CHECK python version
         if sys.version_info < (2, 6):
@@ -439,7 +439,7 @@ def install():
 
         # CHECK sources not in / or /root
         info("Check the sources location (not in /root/ or /")
-        print os.getcwd()
+        print(os.getcwd())
         assert os.getcwd().startswith("/root/") == False, "Domogik sources must not be located in the /root/ folder"
 
         # CHECK mysql or mariaDB release
@@ -567,11 +567,14 @@ def install():
         if not args.test:
             os.system('python test_config.py')
         print("\n\n")
+    except SystemExit:
+        # a sys.exit have been called, do not raise more errors
+        pass
     except:
         import traceback
-        print "========= TRACEBACK ============="
-        print traceback.format_exc()
-        print "================================="
+        print("========= TRACEBACK =============")
+        print(traceback.format_exc())
+        print("=================================")
         fail(sys.exc_info())
 
 def add_arguments_for_config_file(parser, fle):
