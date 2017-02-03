@@ -18,6 +18,7 @@ Fixes
 
 Various fixes (no related isues) :
 
+* The install script now set also the loopback interface in the config to avoid the issue #67 of domoweb
 * The **docs.old** folder have been removed.
 * The function that detects if a component is already launched is improved.
 * The admin component is no more raising a 500 error if a device has a sensor or command with an obsolete data type. A warning will be displayed.
