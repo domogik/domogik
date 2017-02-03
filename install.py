@@ -513,6 +513,9 @@ def install():
             if not args.config and needupdate():
                 # select the correct interface
                 intf = find_interface()
+                # if 'lo' not int intf, add it (because domoweb by default try to catch REST on 127.0.0.1)
+                if 'lo' not in intf:
+                    intf = "lo,{0}".format(intf)
                 # update the config file
                 info("Update the config file : /etc/domogik/domogik.cfg")
                 write_domogik_configfile(args.advanced_mode, intf)
