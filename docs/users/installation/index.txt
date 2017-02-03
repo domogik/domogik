@@ -7,10 +7,10 @@ If you are already a Domogik 0.3 user
 
 You must first `install Domogik 0.4.2 release <http://domogik.readthedocs.io/en/0.4.2/enduser/installation/index.html>`_. Then, you will be able to upgrade to Domogik 0.5.
 
-Important notice about the 0.5 release
-======================================
+Important notice about the 0.5.x release
+========================================
 
-In the 0.5 release, the Rest component has been merged in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
+In the 0.5.x releases, the Rest component has been merged in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
 
 * use the admin port (40406) instead of the previous rest port (40405)
 * add */rest/* in front of all old Rest url. Example : *http://192.168.1.10:40405/device/* become *http://192.168.1.10:40406/rest/device/*.
@@ -188,15 +188,15 @@ Download Domogik-mq : ::
     $ cd /opt/dmg/
     $ wget --content-disposition https://github.com/domogik/domogik-mq/archive/1.4.tar.gz
     $ tar xvzf domogik-mq-1.4.tar.gz
-    $ ln -s domogik-mq-1.4 domogik-mq
+    $ ln -sf domogik-mq-1.4 domogik-mq
     $ cd domogik-mq
 
 Download Domogik : ::
 
     $ cd /opt/dmg/
-    $ wget --content-disposition https://github.com/domogik/domogik/archive/0.5.1.tar.gz
-    $ tar xvzf domogik-0.5.1.tar.gz
-    $ ln -s domogik-0.5.1 domogik
+    $ wget --content-disposition https://github.com/domogik/domogik/archive/0.5.2.tar.gz
+    $ tar xvzf domogik-0.5.2.tar.gz
+    $ ln -sf domogik-0.5.2 domogik
     $ cd domogik
 
 Install Domogik-mq
