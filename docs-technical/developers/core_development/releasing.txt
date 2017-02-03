@@ -20,6 +20,8 @@ In a 0.5-hotfix branch :
 * Merge in master
 * Merge in develop
 * In 0.5-hotfix, change the number to the next release (0.5.2 => 0.5.3 for example)
+* Website : update the download page
+* Website : publish (blog post + download page + index + screenshots)
 
 * Do the same steps if needed for Domoweb
 
