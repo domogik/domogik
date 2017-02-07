@@ -380,7 +380,7 @@ def client_global_edit(client_id, dev_id):
                     else:
                         val = 'y' # in db value stored in lowcase
                 with app.db.session_scope():
-                    res = app.db.udpate_device_param(item["id"], val)
+                    res = app.db.udpate_device_param(item["id"], value=val)
                     if res:
                         flash(gettext("Param update succesfully"), 'success')
                     else:
