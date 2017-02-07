@@ -41,7 +41,7 @@ Fixes related to opened issues :
 * #440 - Scenario unicode issue
 
 New datatypes
--------------
+=============
 
 The **DT_HVACNest** it is similar to other DT_Hvac  : It's specially design to work with Nest Thermostats.
 
