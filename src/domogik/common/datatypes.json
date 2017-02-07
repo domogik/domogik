@@ -666,6 +666,17 @@
         },
         "childs": []
     },
+    "DT_HVACNest": {
+        "childs": [ ],
+        "values": {
+            "0": "Unknown",
+            "1": "Heat-Cool",
+            "2": "Heat",
+            "3": "Cool",
+            "4": "Economy",
+            "5": "Off"
+        }
+    },
     "DT_UPSState": {
         "values": {
             "OL": "mains",
