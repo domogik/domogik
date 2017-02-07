@@ -121,13 +121,13 @@ Create the file **/etc/apt/apt.conf.d/99defaultrelease**. It must contain : ::
 
     APT::Default-Release "stable";
 
-Create the file **/etc/apt/sources.list.d/stable.list**: ::
+Create the file **/etc/apt/sources.list.d/stable.list** : ::
 
     deb     http://ftp.fr.debian.org/debian/    stable main contrib non-free
     deb-src http://ftp.fr.debian.org/debian/    stable main contrib non-free
     deb     http://security.debian.org/         stable/updates  main contrib non-free
 
-Create /etc/apt/sources.list.d/testing.list: ::
+Create the file **/etc/apt/sources.list.d/testing.list** : ::
 
     deb     http://ftp.fr.debian.org/debian/    testing main contrib non-free
     deb-src http://ftp.fr.debian.org/debian/    testing main contrib non-free
