@@ -83,7 +83,13 @@
               {% endif %}
             </div>
             <ul class="battery-informations">
-              <li><strong>{% trans %}Value : </strong>{% endtrans %}{{ elt.last_value }}%</li>
+              <li><strong>{% trans %}Value : </strong>{% endtrans %}
+                {% if elt.last_value is none %}  
+                  {% trans %}n/a{% endtrans %}
+                {% else %}
+                  {{ elt.last_value }}%
+                {% endif %}
+              </li>
               <li><strong>{% trans %}Last udpate : </strong>{% endtrans %}{{ elt.last_received|datetime }}</li>
             </ul>
         {% endfor %}

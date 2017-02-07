@@ -12,6 +12,7 @@ Improvments
 ===========
 
 * #430 - Butler is slow to respond to some queries. This one is quite important as it **breakds the compliance with some packages**. The list of the packages to update is in the installation note.
+* The DT_Battery and DT_Humidity datatypes which are percentages are moved from DT_Number childs to DT_Scaling childs. This way, all DT_Scaling related features can be applyied to these datatypes.
 
 Fixes
 =====
