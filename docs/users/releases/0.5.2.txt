@@ -40,4 +40,9 @@ Fixes related to opened issues :
 * #439 - register_cb_update_devices don't handle "Global parameters" modifications
 * #440 - Scenario unicode issue
 
+New datatypes
+=============
+
+The **DT_HVACNest** it is similar to other DT_Hvac  : It's specially design to work with Nest Thermostats.
+
 
