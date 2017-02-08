@@ -140,12 +140,14 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         '''
         if self._name in CORE_COMPONENTS:
             self._mq_name = self._name
+            self._mq_subscribe_list = []
         else:
             self._mq_name = "{0}-{1}.{2}".format(self._type, self._name, self.get_sanitized_hostname())
+            # subscribe device.update event to keep device list uptodate
+            self._mq_subscribe_list = ['device.update']
 
         # MQ publisher and REP
         self.zmq = zmq.Context()
-        self._mq_subscribe_list = []
         self._pub = MQPub(self.zmq, self._mq_name)
         self._set_status(STATUS_STARTING)
 
@@ -249,7 +251,8 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self._cb_update_devices = cb_update_devices
 
     def add_mq_sub(self, msg):
-        self._mq_subscribe_list.append(msg)
+        if msg not in self._mq_subscribe_list :
+            self._mq_subscribe_list.append(msg)
 
     def check_configured(self):
         """ For a client only
@@ -350,7 +353,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             if type == "float":
                 return float(value)
             if type == "integer":
-                return float(value)
+                return int(value)
             # type == ipv4 : nothing to do
             # type == multiple choice : nothing to do
             # type == string : nothing to do
@@ -466,7 +469,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         return res
 
     def get_sensors(self, devices):
-        """ Return a dict : {"sensor_name1" : id1, "sensor_name2" : id2, ...}
+        """ Return a structure : {device_id : {"sensor_name1" : id1, "sensor_name2" : id2, ...}, device_id2 : {...}, ...}
             @param devices : list of the devices.
                    This is the result of get_device_list(...)
             @param device_id : the device id

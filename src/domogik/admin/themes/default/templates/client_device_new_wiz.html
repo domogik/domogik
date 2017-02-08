@@ -6,29 +6,29 @@
 
 <div class="container">
     <h2>{% trans %}Create a new device{% endtrans %} : {{ dtype }}</h2>
-    <form method="post" role="form" class="form-horizontal">
+    <form method="post" role="form">
       {{ form.csrf_token }}
 
       <h3>{% trans %}Main parameters{% endtrans %}</h3>
-      <div class="form-group ">
-        <label class="control-label col-xs-3">{{ form.name.label }}</label>
-        <div class="col-xs-9">
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.name.label }}</label>
+        <div class="col-md-9">
           {{ form.name(size = 50) }}  
           <span class="help-block">{{ form.name.description }}</span>
         </div>
       </div>
 
-      <div class="form-group ">
-        <label class="control-label col-xs-3">{{ form.description.label }}</label>
-        <div class="col-xs-9">
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.description.label }}</label>
+        <div class="col-md-9">
           {{ form.description(size = 50) }}  
           <span class="help-block">{{ form.description.description }}</span>
         </div>
       </div>
 
-      <div class="form-group ">
-        <label class="control-label col-xs-3">{{ form.reference.label }}</label>
-        <div class="col-xs-9">
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.reference.label }}</label>
+        <div class="col-md-9">
           {{ form.reference(size = 50) }}  
           <span class="help-block">{{ form.reference.description }}</span>
         </div>
@@ -43,15 +43,15 @@
             <span class="help-block">{% trans %}Global parameters are parameters which are not directly related to the device handled by the plugin. They are related to the way the plugin will handle the device.{% endtrans %}</span>
             {% do dont_display_title.append(1) %}
           {% endif %}
-          <div class="form-group ">
-            <label class="control-label col-xs-3">{{ item.label }}</label>
-            <div class="col-xs-9">
+          <div class="row form-group ">
+            <div class="col control-label col-md-2">{{ item.label }}</div>
+            <div class="col control-label col-md-3">{{ item.description }}</div>
+            <div class="col col-md-7">
               {% if item.type == "TextField" %} 
                 {{ item(size = 50) }} 
               {% else %}
                 {{ item }} 
               {% endif %}
-              <span class="help-block">{{ item.description }}</span>
             </div>
           </div>
         {% endif %}
@@ -66,15 +66,15 @@
             <span class="help-block">{% trans %}For xPL plugins or external clients, the xPL parameters are directly related to the device : they are present in the values of each xPL message related to a device.{% endtrans %}</span>
             {% do dont_display_title.append(1) %}
           {% endif %}
-          <div class="form-group ">
-            <label class="control-label col-xs-3">{{ item.label }}</label>
-            <div class="col-xs-9">
+          <div class="row form-group ">
+            <div class="col control-label col-md-2">{{ item.label }}</div>
+            <div class="col control-label col-md-3">{{ item.description }}</div>
+            <div class="col col-md-7">
               {% if item.type == "TextField" %} 
                 {{ item(size = 50) }} 
               {% else %}
                 {{ item }} 
               {% endif %}
-              <span class="help-block">{{ item.description }}</span>
             </div>
           </div>
         {% endif %}
@@ -89,15 +89,15 @@
             <span class="help-block">{% trans %}For xPL plugins or external clients, the xPL command parameters are directly related to the device, but they are used only for commands. They are used in place of xPL parameters when for example, the address for the command part of a device is different (or can be different) for the address of the sensor part of a device.{% endtrans %}</span>
             {% do dont_display_title.append(1) %}
           {% endif %}
-          <div class="form-group ">
-            <label class="control-label col-xs-3">{{ item.label }}</label>
-            <div class="col-xs-9">
+          <div class="row form-group ">
+            <div class="col control-label col-md-2">{{ item.label }}</div>
+            <div class="col control-label col-md-3">{{ item.description }}</div>
+            <div class="col col-md-7">
               {% if item.type == "TextField" %} 
                 {{ item(size = 50) }} 
               {% else %}
                 {{ item }} 
               {% endif %}
-              <span class="help-block">{{ item.description }}</span>
             </div>
           </div>
         {% endif %}
@@ -112,22 +112,22 @@
             <span class="help-block">{% trans %}For xPL plugins or external clients, the xPL stat parameters are directly related to the device, but they are used only for sensors. They are used in place of xPL parameters when for example, the address for the command part of a device is different (or can be different) for the address of the sensor part of a device.{% endtrans %}</span>
             {% do dont_display_title.append(1) %}
           {% endif %}
-          <div class="form-group ">
-            <label class="control-label col-xs-3">{{ item.label }}</label>
-            <div class="col-xs-9">
+          <div class="row form-group ">
+            <div class="col control-label col-md-2">{{ item.label }}</div>
+            <div class="col control-label col-md-3">{{ item.description }}</div>
+            <div class="col col-md-7">
               {% if item.type == "TextField" %} 
                 {{ item(size = 50) }} 
               {% else %}
                 {{ item }} 
               {% endif %}
-              <span class="help-block">{{ item.description }}</span>
             </div>
           </div>
         {% endif %}
       {% endfor %}
 
       <div class="form-group">
-        <div class="col-xs-offset-3 col-xs-9">
+        <div class="col-md-offset-3 col-md-9">
         <input type="submit" value="{% trans %}Create the device {% endtrans %}" class="btn btn-primary">
         </div>
       </div>

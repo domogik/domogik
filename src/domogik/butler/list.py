@@ -48,7 +48,7 @@ class ItemList:
         # load the appropriate list
         res_dir = get_resources_directory()
         self.path = os.path.join(res_dir, "butler", "{0}.json".format(tag))
-        self.log.debug("IemList : storage file is '{0}'".format(self.path))
+        self.log.debug("ItemList : storage file is '{0}'".format(self.path))
         self.data = None
         self._load_json()
 
@@ -146,6 +146,49 @@ class ItemList:
     def get_as_list(self):
         self.log.debug("Get list of items")
         return self.data['list']
+
+    def generate_postscript(self, title):
+        """ Generate postscript data to print the list
+        """
+        # Postscript header
+        data = ""
+        data += "%!PS-Adobe-2.0\n"
+        data += "%%Creator: someone@somewhere\n"
+        data += "%%EndComments\n"
+        data += "/mainfont /Courier findfont 12 scalefont def\n"
+        data += "mainfont setfont\n"
+        data += "%%EndProlog\n"
+        data += "%%Page: ? 1\n"
+
+        # Title
+        yy = 790
+        data += "40 {0} moveto\n".format(yy)
+        data += "({0}) show\n".format(title)
+        yy -= 10
+
+        # Add the items
+        for item in self.get_as_list():
+            # TODO: security if yy < 0
+            yy -= 20
+            data += "60 {0} moveto\n".format(yy)
+            data += "({0}) show\n".format(item)
+            data += "newpath\n"
+            data += "40 {0} moveto\n".format(yy)
+            data += "0 6 rlineto\n"
+            data += "6 0 rlineto\n"
+            data += "0 -6 rlineto\n"
+            data += "-6 0 rlineto\n"
+            data += "1 setlinewidth\n"
+            data += "closepath\n"
+            data += "stroke\n"
+            data += "stroke\n"
+
+        # Postscript Footer
+        data += "showpage\n"
+        data += "%%Pages: 1\n"
+
+        print(data)
+        return data
 
 class Log:
     def __init__(self):

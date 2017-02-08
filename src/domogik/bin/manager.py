@@ -97,7 +97,7 @@ from domogik.xpl.common.xplconnector import Listener, STATUS_HBEAT_XPL
 PYTHON = sys.executable
 WAIT_AFTER_STOP_REQUEST = 15           # seconds
 CHECK_FOR_NEW_PACKAGES_INTERVAL = 30   # seconds
-SEND_METRICS_INTERVAL = 120            # seconds
+SEND_METRICS_INTERVAL = 600            # seconds
 
 
 class Manager(XplPlugin, MQAsyncSub):
@@ -553,8 +553,11 @@ class Manager(XplPlugin, MQAsyncSub):
         msg = MQMessage()
         msg.set_action('client.list.result')
         clients = self._clients.get_list() 
+        self.log.info("Clients for client.list.get request : {0}".format(clients))
         for key in clients:
             msg.add_data(key, clients[key])
+        if clients == []:
+            self.log.warning("No clients for client.list.get request. The list is empty!")
         self.reply(msg.get())
 
 

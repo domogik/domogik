@@ -514,6 +514,12 @@ class DBConnector(Plugin, MQRep):
             msg.add_data('reason', reason)
         self.log.debug(msg.get())
         self.reply(msg.get())
+        # send the pub message
+        if status and res:
+            dev = self._db.get_device(res.device_id)
+            self._pub.send_event('device.update',
+                     {"device_id" : res.device_id,
+                      "client_id" : dev['client_id']})
 
     def _mdp_reply_devices_update_result(self, data):
         status = True
@@ -853,7 +859,8 @@ class DBConnector(Plugin, MQRep):
             try:
                 history = self._db.list_sensor_history(sensor_id, number)
                 if len(history) == 0:
-                    values = None
+                    #values = None
+                    values = self._db.get_last_sensor_value(sensor_id)
                 else: 
                     values = self._db.list_sensor_history(sensor_id, number)
             except:

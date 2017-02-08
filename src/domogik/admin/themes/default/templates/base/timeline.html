@@ -222,19 +222,26 @@
                 {% for sensor in elt.sensors_changes %}
                     <p>
                         {{ sensor.sensor_name }} : {{ sensor.value }} {% if sensor.unit is not none %}{{ sensor.unit }}{% endif %}
+                        {% if datatypes[sensor.dt_type] is not defined %}
+                            <div class="alert alert-warning" role="alert">
+                            <strong>{% trans %}Warning{% endtrans %}</strong> :
+                            {% trans %}The datatype used by this command is no more compliant with this release of Domogik. You may consider to upgrade this plugin and if needed, recreate this device.{% endtrans %}
+                            </div>
+                        {% else %}
 
-                        {% if sensor.dt_type == "DT_Bool" or datatypes[sensor.dt_type]['parent'] == "DT_Bool" %}
-                            <em>( {{ datatypes[sensor.dt_type]['labels'][sensor.value] }} )</em>
-                        {% elif sensor.dt_type == "DT_ColorRGBHexa" or datatypes[sensor.dt_type]['parent'] == "DT_ColorRGBHexa" %} 
-                            <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sensor.value}}"></span>
-                        {% elif sensor.dt_type == "DT_Image" or datatypes[sensor.dt_type]['parent'] == "DT_Image" %} 
-                            <div>
-                              <img class="dt_image" src="{{sensor.value | replace("publish://", "/rest/publish/")}}"/>
-                            </div>
-                        {% elif sensor.dt_type == "DT_VideoH264" %} 
-                            <div>
-                              <a class="btn btn-default" href="{{sensor.value | replace("publish://", "/rest/publish/")}}"><span class='glyphicon glyphicon-facetime-video' aria-hidden='true'></span> {% trans %}Read the video file{% endtrans %}</a>
-                            </div>
+                            {% if sensor.dt_type == "DT_Bool" or datatypes[sensor.dt_type]['parent'] == "DT_Bool" %}
+                                <em>( {{ datatypes[sensor.dt_type]['labels'][sensor.value] }} )</em>
+                            {% elif sensor.dt_type == "DT_ColorRGBHexa" or datatypes[sensor.dt_type]['parent'] == "DT_ColorRGBHexa" %} 
+                                <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sensor.value}}"></span>
+                            {% elif sensor.dt_type == "DT_Image" or datatypes[sensor.dt_type]['parent'] == "DT_Image" %} 
+                                <div>
+                                  <img class="dt_image" src="{{sensor.value | replace("publish://", "/rest/publish/")}}"/>
+                                </div>
+                            {% elif sensor.dt_type == "DT_VideoH264" %} 
+                                <div>
+                                  <a class="btn btn-default" href="{{sensor.value | replace("publish://", "/rest/publish/")}}"><span class='glyphicon glyphicon-facetime-video' aria-hidden='true'></span> {% trans %}Read the video file{% endtrans %}</a>
+                                </div>
+                            {% endif %}
                         {% endif %}
                     </p>
                 {% endfor %}
