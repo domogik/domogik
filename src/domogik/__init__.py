@@ -43,4 +43,4 @@ Implements
 #    pass
 
 # For the format of version numbers please see : http://wiki.domogik.org/Release_numbering
-__version__ = "0.5.2"
+__version__ = "0.5.3"
