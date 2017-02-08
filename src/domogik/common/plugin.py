@@ -472,7 +472,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         return res
 
     def get_sensors(self, devices):
-        """ Return a dict : {"sensor_name1" : id1, "sensor_name2" : id2, ...}
+        """ Return a structure : {device_id : {"sensor_name1" : id1, "sensor_name2" : id2, ...}, device_id2 : {...}, ...}
             @param devices : list of the devices.
                    This is the result of get_device_list(...)
             @param device_id : the device id

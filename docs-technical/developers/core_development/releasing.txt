@@ -2,23 +2,46 @@
 Releasing tasks
 ===============
 
+0.5.x releasing tasks
+=====================
 
-Resources
-=========
+In a 0.5-hotfix branch :
+
+* If needed, update src/domogik/__init__.py (this should already be done!)
+* Check the milestone is finished in the tracker
+* Create a new release note docs/users/releases/
+* Create a blog post in all languages
+* Prepare some artwork for twitter and the website
+* Update the website index and complete the screenshot pages if needed
+* Add the new release note in docs/contents.txt and docs/index.txt and docs/users/installation/index.txt
+* Update docs/users/installation/index.txt with the new packages path
+* Tag
+* Test the install
+* Merge in master
+* Merge in develop
+* In 0.5-hotfix, change the number to the next release (0.5.2 => 0.5.3 for example)
+* Website : update the download page
+* Website : publish (blog post + download page + index + screenshots)
+
+* Do the same steps if needed for Domoweb
+
+
+Obsolete - Resources
+====================
 
 * branching model to follow : http://nvie.com/posts/a-successful-git-branching-model/
 
 
-0.4.0 specific tasks
-====================
+Obsolete - 0.4.0 specific tasks
+===============================
 
 * apply the branching model and communicate on it with all developers! * master => release-0.4 * create develop from master
 * write doc about it for plugins
 * write doc about it for the core (add a dedicated section about core dev in the doc) : hotfixes, features branches, ...
 * set up the new download manager
 
-Before releasing
-================
+Obsolete - Before releasing
+===========================
 
 Here are the tasks to do before releasing a package:
 
@@ -36,8 +59,8 @@ Specific tasks for the final release
 * doc: create the release doc : update banner, create a dedicated cron task which use the release-0.4.0 branch (for example)
 * update the roadmap for the next releases and communicate about it (at least a tweet + mail to ML to the updated page)
 
-Packaging
-=========
+Obsolete - Packaging
+====================
 
 * update package.sh
 * generate the package, check its content
@@ -49,15 +72,3 @@ Packaging
 * create the mail for ML
 * tweet the release : link to the website article
 
-0.5.x releasing tasks
-=====================
-
-In a dedicated branch :
-
-* Update src/domogik/__init__.py
-* Create a new release note docs/users/releases/
-* Add the new release note in docs/contents.txt and docs/index.txt and docs/users/installation/index.txt
-* test
-* update docs/users/installation/index.txt with the new packages path
-* merge in master
-* tag

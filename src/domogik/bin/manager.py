@@ -97,7 +97,7 @@ from domogik.xpl.common.xplconnector import Listener, STATUS_HBEAT_XPL
 PYTHON = sys.executable
 WAIT_AFTER_STOP_REQUEST = 15           # seconds
 CHECK_FOR_NEW_PACKAGES_INTERVAL = 30   # seconds
-SEND_METRICS_INTERVAL = 120            # seconds
+SEND_METRICS_INTERVAL = 600            # seconds
 
 
 class Manager(XplPlugin, MQAsyncSub):

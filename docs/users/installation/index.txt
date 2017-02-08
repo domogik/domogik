@@ -7,15 +7,24 @@ If you are already a Domogik 0.3 user
 
 You must first `install Domogik 0.4.2 release <http://domogik.readthedocs.io/en/0.4.2/enduser/installation/index.html>`_. Then, you will be able to upgrade to Domogik 0.5.
 
-Important notice about the 0.5 release
-======================================
+Important notice about the 0.5.x release
+========================================
 
-In the 0.5 release, the Rest component has been merged in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
+In the 0.5.x releases, the Rest component has been merged in the Admin component. If you were using some user interfaces that uses Rest or any script. Please upgrade them :
 
 * use the admin port (40406) instead of the previous rest port (40405)
 * add */rest/* in front of all old Rest url. Example : *http://192.168.1.10:40405/device/* become *http://192.168.1.10:40406/rest/device/*.
 
-Some core butler functions interfaces have changed. **All brain packages must be upgraded to Domogik 0.5 compliant releases.**
+Some core butler functions interfaces have changed. **All brain packages must be upgraded to Domogik 0.5.2 compliant releases.**
+
+.. note::
+    If you are already a Domogik 0.5.0 or Domogik 0.5.1 user, please **upgrade the following packages to the last releases** for compatibility :
+    
+    * Plugin weather
+    * Plugin caller id
+    * Brain base
+    * Brain shopping
+
 
 If you plan to install Domogik on a Raspberry pi
 ================================================
@@ -29,7 +38,7 @@ Installation
 
 .. note::
     * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to deactivate it before the installation.
-    * In this example, we use a *mysql* database. If you want to use a *postgresql* database, please refer to :doc:`the specific installations steps for postgresql <postgresql>`.
+    * In this example, we use a *MySQL* or *MariaDB* database. If you want to use a *Postgresql* database, please refer to :doc:`the specific installations steps for Postgresql <postgresql>`.
 
 The sudo command
 ----------------
@@ -79,11 +88,11 @@ Here are the needed dependencies. depanding on your Linux distribution, they wil
 * postgresql libraries : **libpq-dev, python-psycopg2**
 * various needed libraries : **python-mako, libffi-dev, python-netifaces**
 * git : **git**
-* MySQL server : **mysql-server**
+* MariaDB server (or MySQL server) : **mariadb-server** (or **mysql-server**)
 * Sphinx and Sphinx theme : **python-sphinx, sphinx-better-theme**
 
 .. note::
-    * Even if you plan to use mysql database instead of postgresql, the *python-psycopg2* package is needed by the *alembic* library.
+    * Even if you plan to use MariaDB (or MySQL) database instead of postgresql, the *python-psycopg2* package is needed by the *alembic* library.
 
 The **install.py** script will install these dependencies for the following distributions:
 
@@ -106,24 +115,47 @@ In minimum debian repo the package **sphinx-better-theme** does not exist::
 About Debian stable (8.6)
 *************************
 
-If you are using a Debian stable, you will need to install a more recent release of the **alembic** package. You can do ::
+If you are using a Debian stable, you will need to install a more recent release of **alembic** related package. You will have to follow these steps.
 
-    $ cd /tmp
-    $ wget http://ftp.fr.debian.org/debian/pool/main/a/alembic/alembic_0.8.8-2_all.deb
-    $ sudo dpkg -i alembic_0.8.8-2_all.deb
+Create the file **/etc/apt/apt.conf.d/99defaultrelease**. It must contain : ::
+
+    APT::Default-Release "stable";
+
+Create the file **/etc/apt/sources.list.d/stable.list** : ::
+
+    deb     http://ftp.fr.debian.org/debian/    stable main contrib non-free
+    deb-src http://ftp.fr.debian.org/debian/    stable main contrib non-free
+    deb     http://security.debian.org/         stable/updates  main contrib non-free
+
+Create the file **/etc/apt/sources.list.d/testing.list** : ::
+
+    deb     http://ftp.fr.debian.org/debian/    testing main contrib non-free
+    deb-src http://ftp.fr.debian.org/debian/    testing main contrib non-free
+    deb     http://security.debian.org/         testing/updates  main contrib non-free
+
+Then run : ::
+
+    $ sudo apt-get update
+    $ sudo apt-get -t testing install python-sqlalchemy python-editor python-sqlalchemy python-alembic
+
+It will install the needed packages from the testing repository.
+
  
 
-Mysql server
-------------
+MariaDB (or MySQL server)
+-------------------------
 
 .. note::
-    * If you have already a Mysql server installed, you will only have to create the Domogik database.
-    * Please note that Domogik does not automatically install the mysql server.
+    Notice that **MariaDB** and **MySQL** are two compliant database engines. We recommend to use MariaDB instead of MySQL. All the instructions will be about MariaDB. Please notice that the MariaDB tools and services are named as **mysql**.
+
+.. note::
+    * If you have already a MariaDB or MySQL server installed, you will only have to create the Domogik database.
+    * Please note that Domogik does not automatically install the MariaDB (or MySQL) server.
     * If you choose to manually create the database, it is highly recommended to use the **innodb engine** (which can be enabled in /etc/mysql/my.cnf)
 
-Install the packages for mysql server: ::
+Install the packages for MariaDB server: ::
 
-    $ sudo apt-get install mysql-server
+    $ sudo apt-get install mariadb-server
 
 During the installation, **Domogik will automatically create the database**, but if you want to create the database yourself, log on the mysql database as root user: ::
 
@@ -176,7 +208,7 @@ Download Domogik-mq : ::
     $ cd /opt/dmg/
     $ wget --content-disposition https://github.com/domogik/domogik-mq/archive/1.4.tar.gz
     $ tar xvzf domogik-mq-1.4.tar.gz
-    $ ln -s domogik-mq-1.4 domogik-mq
+    $ ln -sf domogik-mq-1.4 domogik-mq
     $ cd domogik-mq
 
 Download Domogik : ::
@@ -203,7 +235,7 @@ Give the system user you will use to install Domogik. You can use a dedicated us
 
     Install MQ as master (lib+daemon) or client (lib only) ? [M/s]:
 
-On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.4), on the main server, choose the default option and on the other servers, choose the client option.
+On on single server installation, choose the default option (library and daemon). On a multi server installation (not yet ready in 0.5), on the main server, choose the default option and on the other servers, choose the client option.
 
 Install Domogik 
 ---------------
@@ -226,10 +258,6 @@ Give the system user you will use to install Domogik. You can use a dedicated us
 
 If you already have a configuration file, you could keep it. But the **rest** section will not be used anymore (as Rest and Admin have been merged in the Admin component).
 
-    [ Update the config file : /etc/domogik/domogik.cfg ]
-
-For this 0.4.2 release, you should keep the *debug* level. ::
-
     [ Starting on section database ]
     Key type [mysql]:
     Key user [domogik]:
@@ -238,7 +266,7 @@ For this 0.4.2 release, you should keep the *debug* level. ::
     Key name [domogik]: 
     Key host [127.0.0.1]:
 
-Set up the database credentials. I you created the database as defined in this page, you can keep the default values.
+Set up the database credentials. I you created the database as defined in this page, you can keep the default values. Even for a **MariaDB** database engine, keep the *mysql* value.
 
 You should keep the default values. ::
 
@@ -254,7 +282,7 @@ These are the information about the butler. If you are not a french user, set th
 
 Set the folder you want to use to save Domogik backups. 
 
-During the database installation or update, if needed the mysql administrator password will be asked. ::
+During the database installation or update, if needed the MariaDB administrator password will be asked. ::
 
     [ Installing or upgrading the db ]
     ==> Creating backup
@@ -373,6 +401,7 @@ The default backup folder is **/var/lib/domogik/backup/**. You can change it in 
     ###
     [backup]
     folder=/var/lib/domogik/backup/
+
 
 
 

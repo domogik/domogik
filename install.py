@@ -60,6 +60,35 @@ logging.basicConfig(filename='install.log', level=logging.DEBUG)
 
 ### other functions
 
+def get_mysql_or_mariadb_release():
+    cmd = 'mysqld --version 2>/dev/null | sed "s/^.* \([0-9\.]*\)[- ].*$/\\1/"'
+    subp = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    res = subp.communicate()
+    return res[0].strip()
+
+def do_we_need_mariadb(release, command_line_mode = False):
+    """ Check if the mysql/mariadb release is compliant with Domogik
+        @release : the mysql or mariadb release string : 6.4.2 for example
+        @command_line_mode : args.command_line. If set, don't ask the user if not a valid release and continue install.
+    """
+    if release == "":
+        # no mariadb or mysql installed, the user may used postgresql or anything else.
+        return
+    info(u"Your installed MySQL or MariaDB release is : {0}".format(release))
+    if version.StrictVersion(release) < version.StrictVersion("5.7.5"):
+        fail(u"Your MySQL release is older than 5.7.5. Depending on its configuration, you may encountered some issues. You should use MariaDB instead, which is fully compliant with MySQL.")
+        if not command_line_mode:
+            print("If you plan to use MySQL or MariaDB for Domogik, please stop and install MariaDB. If you plan to use another database engine (PostgreSQL for example), you can continue.\nContinue  ? [y/N]: ")
+            new_value = sys.stdin.readline().rstrip('\n')
+            if new_value == "y" or new_value == "Y":
+                debug("The installation will continue.")
+            else:
+                debug("Installation aborted...")
+                sys.exit(1)
+    else:
+        ok(u"You are running a MySQL or MariaDB compliant with Domogik")
+
+
 def get_c_hub():
     hub = {
         'x86_64' : 'src/domogik/xpl/tools/64bit/xPL_Hub',
@@ -412,7 +441,7 @@ def install():
             "src/domogik/xpl/hub/examples/config/xplhub.cfg.sample")
 
     args = parser.parse_args()
-    print args
+    print(args)
     try:
         # CHECK python version
         if sys.version_info < (2, 6):
@@ -421,8 +450,11 @@ def install():
 
         # CHECK sources not in / or /root
         info("Check the sources location (not in /root/ or /")
-        print os.getcwd()
+        print(os.getcwd())
         assert os.getcwd().startswith("/root/") == False, "Domogik sources must not be located in the /root/ folder"
+
+        # CHECK mysql or mariaDB release
+        do_we_need_mariadb(get_mysql_or_mariadb_release(), args.command_line)
 
         # CHECK mq installed
         if not args.mq:
@@ -492,6 +524,9 @@ def install():
             if not args.config and needupdate():
                 # select the correct interface
                 intf = find_interface()
+                # if 'lo' not int intf, add it (because domoweb by default try to catch REST on 127.0.0.1)
+                if 'lo' not in intf:
+                    intf = "lo,{0}".format(intf)
                 # update the config file
                 info("Update the config file : /etc/domogik/domogik.cfg")
                 write_domogik_configfile(args.advanced_mode, intf)
@@ -546,11 +581,14 @@ def install():
         if not args.test:
             os.system('python test_config.py')
         print("\n\n")
+    except SystemExit:
+        # a sys.exit have been called, do not raise more errors
+        pass
     except:
         import traceback
-        print "========= TRACEBACK ============="
-        print traceback.format_exc()
-        print "================================="
+        print("========= TRACEBACK =============")
+        print(traceback.format_exc())
+        print("=================================")
         fail(sys.exc_info())
 
 def add_arguments_for_config_file(parser, fle):

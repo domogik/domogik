@@ -72,7 +72,7 @@ prefix = core
 # its a HTTP server. Following parameters will indicate REST on which 
 # ip:port it will run
 # * means that it will be available on all network interfaces
-#interfaces = eth0, lo
+#interfaces = eth0,lo
 #interfaces = eth0
 #interfaces = *
 interfaces = lo

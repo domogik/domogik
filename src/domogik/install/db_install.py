@@ -72,6 +72,7 @@ class DbInstall():
             info("The database already exists, we won't create it")
             return
 
+        info("Applying user permissions for {0}...".format(self._db.get_db_user()))
         mysql_script = ""
         mysql_script+= "grant usage on *.* to '{0}'@'localhost' identified by '{1}';\n".format(self._db.get_db_user(), self._db.get_db_password())
         mysql_script+= "grant usage on *.* to '{0}'@'%' identified by '{1}';\n".format(self._db.get_db_user(), self._db.get_db_password())
@@ -79,7 +80,6 @@ class DbInstall():
         mysql_script+= "grant all privileges on {0}.* to '{1}'@'%';\n".format(self._db.get_db_name(), self._db.get_db_user())
         mysql_script+= "flush privileges;\n".format(self._db.get_db_name(), self._db.get_db_user())
         sh_script = "mysql -p -u root << TXT\n"+mysql_script+"TXT\n"
-        ok("Applying user permissions for {0}".format(self._db.get_db_user()))
         print("---------------------------------------------------")
         print(sh_script)
         print("---------------------------------------------------")
@@ -87,10 +87,10 @@ class DbInstall():
         ok("Please entrer {0} root password".format(self._db.get_db_type()))
         res = os.system(sh_script)
         if ( res != 0 ):
-            fail("Cannot apply permissions")
+            fail("Applying user permissions for {0} : done".format(self._db.get_db_user()))
         else:
-            ok("Done!");
-            ok("Create dataabse")
+            ok("Applying user permissions for {0} : done".format(self._db.get_db_user()))
+            info("Creating the database...")
             create_database(self._db.get_engine().url)
             if database_exists(self._db.get_engine().url):
                 ok("Database created sucessfully")
@@ -133,21 +133,30 @@ class DbInstall():
 
         info("Installing or upgrading the db")
         if not sql_schema.Device.__table__.exists(bind=self._engine):
-            sql_schema.metadata.drop_all(self._engine)
-            ok("Droping all existing tables...")
+            # Removed because we are not sure why we did this before... Fritz - Jan 2017
+            #sql_schema.metadata.drop_all(self._engine)
+            #ok("Droping all existing tables...")
+
+            info("Creating all tables...")
             sql_schema.metadata.create_all(self._engine)
-            ok("Creating all tables...")
+            ok("Creating all tables : done")
+
+            info("Creating admin user...")
             with self._db.session_scope():
                 self._db.add_default_user_account()
-            ok("Creating admin user...")
+            ok("Creating admin user : done")
+
+            info("Setting db version to head...")
             command.stamp(self.alembic_cfg, "head")
-            ok("Setting db version to head")
+            ok("Setting db version to head : done")
         else:
             if not skip_backup:
-                ok("Creating backup")
+                info("Creating backup...")
                 self.backup_existing_database()
-            ok("Upgrading")
+                ok("Creating backup : done")
+            info("Upgrading...")
             command.upgrade(self.alembic_cfg, "head")
+            ok("Upgrading : done")
         return 
     
     def backup_existing_database(self, confirm=True):

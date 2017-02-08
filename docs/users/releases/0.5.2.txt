@@ -8,10 +8,36 @@ Purpose
 The **0.5.2 release** is a minor release which includes some fixes about the 0.5.1 release.
 
 
+Improvments
+===========
+
+* #430 - Butler is slow to respond to some queries. This one is quite important as it **breakds the compliance with some packages**. The list of the packages to update is in the installation note.
+* The DT_Battery and DT_Humidity datatypes which are percentages are moved from DT_Number childs to DT_Scaling childs. This way, all DT_Scaling related features can be applyied to these datatypes.
+
 Fixes
 =====
 
+Various fixes (no related isues) :
+
+* The install script now set also the loopback interface in the config to avoid the issue #67 of domoweb
 * The **docs.old** folder have been removed.
-* Scenario : the action *Make the Butler say something* is now fixed. It works with the plugins that listen for incoming messages from the Butler.
 * The function that detects if a component is already launched is improved.
 * The admin component is no more raising a 500 error if a device has a sensor or command with an obsolete data type. A warning will be displayed.
+
+Fixes related to opened issues :
+
+* #394 - Alembic
+* #399 - Scenario : the action *Make the Butler say something* is now fixed. It works with the plugins that listen for incoming messages from the Butler.
+* #400 - mysql get sensor history error (ubuntu 16.04)
+* #402 - Value string to num conversion BUG 
+* #405 - butler from rest not a json in answer
+* #411 - 0.5-hotfix db insertion error
+* #412 - An error occured while adding the device in database
+* #428 - xplgw sometimes not work for xpl sensors
+* #429 - dbmgr does not send the last value for sensor.history.get for sensors with no history
+* #432 - dmg_package : avoid not using the domogik user
+* #438 - Scenario Cron block error
+* #439 - register_cb_update_devices don't handle "Global parameters" modifications
+* #440 - Scenario unicode issue
+
+

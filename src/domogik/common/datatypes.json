@@ -99,7 +99,6 @@
         "max": null,
         "unit": null,
         "childs": [
-            "DT_Scaling",
             "DT_Angle",
             "DT_Brightness",
             "DT_Temp",
@@ -143,7 +142,6 @@
             "DT_GByte",
             "DT_pH",
             "DT_Chlorine",
-            "DT_Battery",
             "DT_Co2",
             "DT_Tvoc",
             "DT_Insolation",
@@ -157,7 +155,10 @@
         "max": 100,
         "unit": "%",
         "parent": "DT_Number",
-        "childs": []
+        "childs": [
+            "DT_Humidity",
+            "DT_Battery"
+        ]
     },
     "DT_Angle": {
         "min": 0,
@@ -219,7 +220,7 @@
         "min": null,
         "max": null,
         "unit": "%",
-        "parent": "DT_Number",
+        "parent": "DT_Scaling",
         "childs": []
     },
     "DT_AirQuality": {
@@ -471,7 +472,7 @@
         "min": 0,
         "max": 100,
         "unit": "%",
-        "parent": "DT_Number",
+        "parent": "Scaling",
         "childs": []
     },
     "DT_Co2": {

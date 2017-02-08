@@ -153,7 +153,13 @@ def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, senso
        
     if isinstance(device_name, list):
         device_name = ' '.join(device_name)
-    log.info(u"Device name = {0}".format(device_name))
+
+    if device_name != None:
+        # keep the 'device_name != None' in the if test, else the strip will fail on a NoneType
+        if device_name == 'None' or device_name.strip() == '':
+            device_name = None
+
+    log.info(u"Device name = '{0}', type = '{1}'".format(device_name, type(device_name)))
     log.info(u"Datatype(s) = {0}".format(dt_type_list))
 
     ### search for all devices of the appropriate dt_type 
