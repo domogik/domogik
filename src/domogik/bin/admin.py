@@ -267,7 +267,7 @@ class Admin(Plugin):
                 self.key_file = ""
                 self.cert_file = ""
                 self.clean_json = False
-                self.log.error("Error while reading configuration for section [admin] : using default values instead")
+                self.log.error("Error while reading configuration for section [admin] : using default values instead. The error is : {0}".format(traceback.format_exc()))
             self.log.info(u"Configuration : interfaces:port = {0}:{1}".format(self.interfaces, self.port))
             self.log.info(u"Configuration : use_ssl = {0}".format(self.use_ssl))
 	    
@@ -359,7 +359,11 @@ class Admin(Plugin):
         """ Stop HTTP Server
         """
         self.log.info('Stopping http server')
-        self.http_server.stop()
+        try:
+            self.http_server.stop()
+        except:
+            # in case of error while stopping the http server (maybe the startup was not fine so the http server does not exists), we don't raise an error to allow continuing to stop
+            pass
  
         self.log.info('Will shutdown in 10 seconds ...' )
         io_loop = IOLoop.instance()
