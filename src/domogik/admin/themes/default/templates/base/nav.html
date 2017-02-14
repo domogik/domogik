@@ -36,7 +36,7 @@
       </ul>
     </div><!-- /.navbar-collapse -->
     {% for item in global_errors: %}
-    <div class="alert alert-danger" role="alert">{{ item[0] }}<a href="{{ item[1] }}" class="btn btn-danger pull-right">Fix</a></div>
+    <div class="alert alert-danger clearfix" role="alert">{{ item[0] }}<a href="{{ item[1] }}" class="btn btn-sm btn-danger pull-right">Fix it</a></div>
     {% endfor %}
   </div><!-- /.container-fluid -->
 </nav>
