@@ -147,7 +147,8 @@
             "DT_Insolation",
             "DT_kgWeight",
             "DT_VolumeLiter",
-            "DT_VolumeM3"
+            "DT_VolumeM3",
+            "DT_Scaling"
         ]
     },
     "DT_Scaling": {
