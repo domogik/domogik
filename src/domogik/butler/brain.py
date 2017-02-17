@@ -212,7 +212,7 @@ def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, senso
         msg.set_action('sensor_history.get')
         msg.add_data('sensor_id', the_sensor['sensor_id'])
         msg.add_data('mode', 'last')
-        res = cli.request('dbmgr', msg.get(), timeout=10).get()
+        res = cli.request('admin', msg.get(), timeout=10).get()
         res = json.loads(res[1])
         the_value = res['values'][0]['value_str']
         last_received = res['values'][0]['timestamp']

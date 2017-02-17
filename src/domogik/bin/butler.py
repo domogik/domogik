@@ -207,7 +207,7 @@ class Butler(Plugin):
             cli = MQSyncReq(zmq.Context())
             msg = MQMessage()
             msg.set_action('device.get')
-            str_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+            str_devices = cli.request('admin', msg.get(), timeout=10).get()[1]
             self.devices = json.loads(str_devices)['devices']
             self.log.info(u"{0} devices loaded!".format(len(self.devices)))
         except:
