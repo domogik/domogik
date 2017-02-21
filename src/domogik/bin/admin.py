@@ -61,7 +61,7 @@ import json
 from tornado import gen
 from tornado.queues import Queue
 from tornado.wsgi import WSGIContainer
-from tornado.ioloop import IOLoop                        #, PeriodicCallback 
+from tornado.ioloop import IOLoop                        #, PeriodicCallback
 from tornado.httpserver import HTTPServer
 from tornado.web import FallbackHandler, Application
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
@@ -114,7 +114,7 @@ class Publisher(MQAsyncSub):
         while True:
             message = yield self.MQmessages.get()
             self.sendToMQ(message)
-    
+
     def sendToMQ(self, message):
         try:
             ctx = zmq.Context()
@@ -155,7 +155,7 @@ class Subscription(WebSocketHandler):
         self.run()
 
     def on_close(self):
-        self._close()        
+        self._close()
 
     def _close(self):
         #print("Subscriber left.")
@@ -178,21 +178,21 @@ class Subscription(WebSocketHandler):
             self.write_message(message)
         except WebSocketClosedError:
             self._close()
-    
+
     def on_message(self, content):
         """ reciev message from websocket and send to MQ """
         #print(u"WS to MQ: {0}".format(content))
         self.publisher.MQmessages.put(content)
 
 class Admin(Plugin):
-    """ Admin Server 
-        - create a HTTP server 
+    """ Admin Server
+        - create a HTTP server
         - handle the admin interface urls
     """
 
     def __init__(self, server_interfaces, server_port):
         """ Initiate DbHelper, Logs and config
-            
+
             Then, start HTTP server and give it initialized data
             @param server_interfaces :  interfaces of HTTP server
             @param server_port :  port of HTTP server
@@ -270,7 +270,7 @@ class Admin(Plugin):
                 self.log.error("Error while reading configuration for section [admin] : using default values instead. The error is : {0}".format(traceback.format_exc()))
             self.log.info(u"Configuration : interfaces:port = {0}:{1}".format(self.interfaces, self.port))
             self.log.info(u"Configuration : use_ssl = {0}".format(self.use_ssl))
-	    
+
 	    # get all datatypes
             cli = MQSyncReq(self.zmq)
             msg = MQMessage()
@@ -287,7 +287,7 @@ class Admin(Plugin):
             self.server = None
             self.start_http()
             # calls the tornado.ioloop.instance().start()
-            
+
             ### Component is ready
             self.ready(0)
             IOLoop.instance().start()
@@ -320,7 +320,7 @@ class Admin(Plugin):
         admin_app.publish_directory = self.get_publish_directory() # publish directory for all packages
         #admin_app.mqpub = self._pub
         admin_app.mqpub = MQPub(zmq.Context(), 'admin-views')
-        
+
         publisher = Publisher()
         tapp = Application([
             (r"/ws", Subscription, dict(publisher=publisher)),
@@ -364,11 +364,11 @@ class Admin(Plugin):
         except:
             # in case of error while stopping the http server (maybe the startup was not fine so the http server does not exists), we don't raise an error to allow continuing to stop
             pass
- 
+
         self.log.info('Will shutdown in 10 seconds ...' )
         io_loop = IOLoop.instance()
         deadline = time.time() + 10
- 
+
         def stop_loop():
             now = time.time()
             if now < deadline and (io_loop._callbacks or io_loop._timeouts):
@@ -536,7 +536,7 @@ class Admin(Plugin):
             msg.add_data('type', type)
             msg.add_data('name', name)
             msg.add_data('host', host)
-            try: 
+            try:
                 # we add a configured key set to true to tell the UIs and plugins that there are some configuration elements
                 self._db.set_plugin_config(type, name, host, "configured", True)
                 for key in msg_data['data']:
@@ -650,7 +650,7 @@ class Admin(Plugin):
                 if not res:
                     status = False
                 else:
-                    status = True 
+                    status = True
             else:
                 status = False
                 reason = "There is no such device"
@@ -727,7 +727,7 @@ class Admin(Plugin):
                 if not res:
                     status = False
                 else:
-                    status = True 
+                    status = True
             else:
                 status = False
                 reason = "There is no such sensor"
@@ -771,7 +771,7 @@ class Admin(Plugin):
                 if not res:
                     status = False
                 else:
-                    status = True 
+                    status = True
             else:
                 status = False
                 reason = "There is no such device param"
@@ -829,7 +829,7 @@ class Admin(Plugin):
                 if not res:
                     status = False
                 else:
-                    status = True 
+                    status = True
             else:
                 status = False
                 reason = "There is no such device"
@@ -872,15 +872,15 @@ class Admin(Plugin):
         del cli
         if res is None:
             status = False
-            reason = "Manager is not replying to the mq request" 
+            reason = "Manager is not replying to the mq request"
         pjson = res.get_data()
         if pjson is None:
             status = False
-            reason = "No data for {0} found by manager".format(params['device_type']) 
+            reason = "No data for {0} found by manager".format(params['device_type'])
         pjson = pjson[params['device_type']]
         if pjson is None:
             status = False
-            reason = "The json for {0} found by manager is empty".format(params['device_type']) 
+            reason = "The json for {0} found by manager is empty".format(params['device_type'])
 
         if status:
             # call the add device function
@@ -916,31 +916,32 @@ class Admin(Plugin):
                     - device_type
         """
         status = True
+        result = {}
+        reason = ""
 
         try:
             # check we have all the needed info
             msg_data = data.get_data()
             if 'device_type' not in msg_data:
                 status = False
-                reason = "Device params request : missing 'cevice_type' field : {0}".format(data)
+                reason = "Device params request : missing 'device_type' field : {0}".format(data)
             else:
                 dev_type_id = msg_data['device_type']
-    
-            # check the received info
-            (result, reason, status) = build_deviceType_from_packageJson(self.zmq, dev_type_id)
+            if 'client_id' not in msg_data:
+                status = False
+                reason = "Device params request : missing 'client_id' field : {0}".format(data)
+            else:
+                client_id = msg_data['client_id']
+            if status :
+                # check the received info
+                (result, reason, status) = build_deviceType_from_packageJson(self.zmq, dev_type_id, client_id)
             msg = MQMessage()
             msg.set_action('device.params.result')
-            if not status:
-                # we don't have all info so exit
-                msg = MQMessage()
-                msg.set_action('device.params.result')
-                msg.add_data('result', 'Failed')
-                msg.add_data('reason', reason)
-                self.log.debug(msg.get())
-                self.reply(msg.get())
-            else:
-                # return the data
-                msg.add_data('result', result)
+            msg.add_data('status', status)
+            msg.add_data('reason', reason)
+            msg.add_data('result', result)
+            self.log.debug(msg.get())
+            # return the data
             self.log.debug(msg.get())
             self.reply(msg.get())
         except:
@@ -1053,7 +1054,7 @@ class Admin(Plugin):
                 history = self._db.list_sensor_history(sensor_id, number)
                 if len(history) == 0:
                     values = self._db.get_last_sensor_value(sensor_id)
-                else: 
+                else:
                     values = self._db.list_sensor_history(sensor_id, number)
             except:
                 self.log.error("ERROR when getting sensor history for id = {0} : {1}".format(sensor_id, traceback.format_exc()))
@@ -1082,7 +1083,7 @@ class Admin(Plugin):
             else:
                 # TODO
                 values = "TODO"
-        
+
 
         msg.add_data('status', status)
         msg.add_data('reason', reason)
