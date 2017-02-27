@@ -202,18 +202,31 @@ class Butler(Plugin):
     def reload_devices(self):
         """ Load or reload the devices list in memory to improve the butler speed (mainly for brain-base package usage)
         """
-        self.log.info(u"Request the devices list over MQ...")
-        try:
-            cli = MQSyncReq(zmq.Context())
-            msg = MQMessage()
-            msg.set_action('device.get')
-            str_devices = cli.request('admin', msg.get(), timeout=10).get()[1]
-            self.devices = json.loads(str_devices)['devices']
-            self.log.info(u"{0} devices loaded!".format(len(self.devices)))
-        except:
-            self.log.error(u"Error while getting the devices list over MQ. Error is : {0}".format(traceback.format_exc()))
-            self.devices = []
-        self.brain.devices = self.devices
+        nb_try = 0
+        max_try = 5
+        interval = 5
+        ok = False
+        while nb_try < max_try and ok == False:
+            nb_try += 1
+            self.log.info(u"Request the devices list over MQ (try {0}/{1})...".format(nb_try, max_try))
+            try:
+                cli = MQSyncReq(zmq.Context())
+                msg = MQMessage()
+                msg.set_action('device.get')
+                str_devices = cli.request('admin', msg.get(), timeout=10).get()[1]
+                self.devices = json.loads(str_devices)['devices']
+                self.log.info(u"{0} devices loaded!".format(len(self.devices)))
+                self.brain.devices = self.devices
+                ok = True
+            except:
+                self.log.warning(u"Error while getting the devices list over MQ. Error is : {0}".format(traceback.format_exc()))
+                self.devices = []
+            if ok == False:
+                time.sleep(interval)    # TODO : improve with a wait ??
+
+        if ok == False:
+            self.brain.devices = []
+            self.log.error(u"Error while getting the devices list over MQ after {0} attemps!!!!".format(nb_try))
 
 
     def on_mdp_request(self, msg):
