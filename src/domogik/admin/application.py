@@ -177,6 +177,7 @@ def jsonp_response(action_func):
     @wraps(action_func)
     def create_json_response(*args, **kwargs):
         ret = action_func(*args, **kwargs)
+        rcallback = None
         # if list is 3 entries long
         # - http code
         # - json data
@@ -195,7 +196,7 @@ def jsonp_response(action_func):
                 #  code = 400
                 #  data = {msg: <errorStr>}
                 rcode = 400
-                rdata = {error: ret[0]}
+                rdata = {"error": ret[0]}
         else:
             # just return
             # code = 204 = No content
