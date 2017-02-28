@@ -96,15 +96,16 @@ def delete_configuration(type, name, host):
     msg.add_data('type', type)
     msg.add_data('host', host)
     msg.add_data('name', name)
-    result = cli.request('admin', msg.get(), timeout=10)
+    result = cli.request('admin', msg.get(), timeout=20)
     if result:
         data = result.get_data()
-    if 'status' in data:
-        if not data['status']:
-            print(result.get())
-            raise RuntimeError("DbMgr did not return status true on a config.delete for {0}-{1}.{2}".format(type, name, host))
+        if 'status' in data:
+            if not data['status']:
+                raise RuntimeError("DbMgr did not return status true on a config.delete for {0}-{1}.{2}: {3}".format(type, name, host), result.get())
+            else:
+                return True
         else:
-            return True
+            raise RuntimeError("DbMgr did bad return status on a config.delete for {0}-{1}.{2}: {3}".format(type, name, host), result.get())
     else:
         raise RuntimeError("Timeout while deleting configuration for {0}-{1}.{2}".format(type, name, host))
 
@@ -116,15 +117,17 @@ def configure(type, name, host, key, value):
     msg.add_data('host', host)
     msg.add_data('name', name)
     msg.add_data('data', {key : value})
-    result = cli.request('admin', msg.get(), timeout=10)
+    result = cli.request('admin', msg.get(), timeout=15)
     if result:
         data = result.get_data()
-    if 'status' in data:
-        if not data['status']:
-            print(result.get())
-            raise RuntimeError("DbMgr did not return status true on a config.set for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
+        if 'status' in data:
+            if not data['status']:
+                print(result.get())
+                raise RuntimeError("DbMgr did not return status true on a config.set for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
+            else:
+                return True
         else:
-            return True
+            raise RuntimeError("DbMgr did bad return status on a config.set for {0}-{1}.{2}: {3}".format(type, name, host), result.get())
     else:
         raise RuntimeError("Error while setting configuration for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, value))
 
@@ -136,23 +139,25 @@ def check_config(type, name, host, key, exp_value):
     msg.add_data('host', host)
     msg.add_data('name', name)
     msg.add_data('key', key)
-    result = cli.request('admin', msg.get(), timeout=10)
+    result = cli.request('admin', msg.get(), timeout=15)
     if result:
         data = result.get_data()
-    if 'status' in data:
-        if not data['status']:
-            print(result.get())
-            raise RuntimeError("DbMgr did not return status true on a config.get for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, exp_value))
-        else:
-            if 'value' in data:
-                if data['value'] != exp_value:
-                    print(result.get())
-                    raise RuntimeError("The returned value is not the expected value for {0}-{1}.{2} : {3} = {4} but received {5}".format(type, name, host, key, exp_value, data['value']))
-                else:
-                    return True
-            else:
+        if 'status' in data:
+            if not data['status']:
                 print(result.get())
-                raise RuntimeError("DbMgr did not return a value on a config.get for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, exp_value))
+                raise RuntimeError("DbMgr did not return status true on a config.get for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, exp_value))
+            else:
+                if 'value' in data:
+                    if data['value'] != exp_value:
+                        print(result.get())
+                        raise RuntimeError("The returned value is not the expected value for {0}-{1}.{2} : {3} = {4} but received {5}".format(type, name, host, key, exp_value, data['value']))
+                    else:
+                        return True
+                else:
+                    print(result.get())
+                    raise RuntimeError("DbMgr did not return a value on a config.get for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, exp_value))
+        else:
+            raise RuntimeError("DbMgr did bad return status on a config.get for {0}-{1}.{2}: {3}".format(type, name, host), result.get())
     else:
         raise RuntimeError("Error while setting configuration for {0}-{1}.{2} : {3} = {4}".format(type, name, host, key, exp_value))
 
