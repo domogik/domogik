@@ -253,6 +253,17 @@ def get_rest_url(noRest=False):
     else:
         return "{0}://{1}:{2}/rest".format(protocol, ip, port)
 
+def get_rest_ssl():
+    """Return false if no ssl option.
+       Or dict {key_file : <ssl_key from admin config>, cert_file : <ssl_certificate from admin config>"""
+    cfg = Loader('admin')
+    config = cfg.load()
+    conf = dict(config[1])
+    ### get SSL option
+    if conf['use_ssl'] :
+        return {'cert_file': conf['ssl_certificate'], 'key_file': conf['ssl_key']}
+    else :
+        return False
 
 def get_rest_doc_path():
     """ return the REST API generated doc path
