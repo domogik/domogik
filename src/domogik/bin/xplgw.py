@@ -867,31 +867,31 @@ class XplManager(XplPlugin):
                         with self._lockUpdate:
                             sen = self.all_sensors[str(senid)]
                             dev = self.all_devices[str(sen['device_id'])]
-                        # check if we need a conversion
-                        if sen['conversion'] is not None and sen['conversion'] != '':
-                            if dev['client_id'] in self._conv() and sen['conversion'] in self._conv()[dev['client_id']]:
-                                self._log.debug( \
-                                    u"Calling conversion {0}".format(sen['conversion']))
-                                exec(self._conv()[dev['client_id']][sen['conversion']])
-                                value = locals()[sen['conversion']](value)
-                        self._log.info( \
-                                u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}) with value '{4}' after conversion." \
-                                .format(dev['name'], dev['id'], sen['name'], sen['id'], value))
-                        try:
-                            # do the store
-                            value = self._db.add_sensor_history(\
-                                    senid, \
-                                    sen, \
-                                    value, \
-                                    current_date)
-                            # publish the result
-                            self._pub.send_event('device-stats', \
-                                  {"timestamp" : current_date, \
-                                  "device_id" : dev['id'], \
-                                  "sensor_id" : senid, \
-                                  "stored_value" : value})
-                        except Exception as exp:
-                            self._log.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
+                            # check if we need a conversion
+                            if sen['conversion'] is not None and sen['conversion'] != '':
+                                if dev['client_id'] in self._conv() and sen['conversion'] in self._conv()[dev['client_id']]:
+                                    self._log.debug( \
+                                        u"Calling conversion {0}".format(sen['conversion']))
+                                    exec(self._conv()[dev['client_id']][sen['conversion']])
+                                    value = locals()[sen['conversion']](value)
+                            self._log.info( \
+                                    u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}) with value '{4}' after conversion." \
+                                    .format(dev['name'], dev['id'], sen['name'], sen['id'], value))
+                            try:
+                                # do the store
+                                value = self._db.add_sensor_history(\
+                                        senid, \
+                                        sen, \
+                                        value, \
+                                        current_date)
+                                # publish the result
+                                self._pub.send_event('device-stats', \
+                                      {"timestamp" : current_date, \
+                                      "device_id" : dev['id'], \
+                                      "sensor_id" : senid, \
+                                      "stored_value" : value})
+                            except Exception as exp:
+                                self._log.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
                 except queue.Empty:
                     # nothing in the queue, sleep for 1 second
                     time.sleep(1)
