@@ -873,14 +873,17 @@ class Admin(Plugin):
         if res is None:
             status = False
             reason = "Manager is not replying to the mq request"
-        pjson = res.get_data()
-        if pjson is None:
-            status = False
-            reason = "No data for {0} found by manager".format(params['device_type'])
-        pjson = pjson[params['device_type']]
-        if pjson is None:
-            status = False
-            reason = "The json for {0} found by manager is empty".format(params['device_type'])
+            pjson = None
+        else :
+            pjson = res.get_data()
+            if pjson is None:
+                status = False
+                reason = "No data for {0} found by manager".format(params['device_type'])
+            else :
+                pjson = pjson[params['device_type']]
+                if pjson is None:
+                    status = False
+                    reason = "The json for {0} found by manager is empty".format(params['device_type'])
 
         if status:
             # call the add device function
