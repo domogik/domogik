@@ -247,7 +247,7 @@ def get_rest_url(noRest=False):
     intf = interfaces.split(',')
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
-    protocol = "https" if conf['use_ssl'] else "http"
+    protocol = "http" if conf['use_ssl'] else "http"
     if noRest:
         return "{0}://{1}:{2}".format(protocol, ip, port)
     else:
