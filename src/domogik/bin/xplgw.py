@@ -849,22 +849,22 @@ class XplManager(XplPlugin):
         def run(self):
             while not self._stop.isSet():
                 try:
-                    store = True
-                    item = self._queue.get(timeout=1)
-                    #self._log.debug(u"Getting item from the store queue, current length = {0}".format(self._queue.qsize()))
-                    self._log.debug(u"Getting item from the store queue, current length = {0}, item = '{1}'".format(self._queue.qsize(), item))
-                    # handle ignore
-                    value = item['value']
-                    senid = item['sensor_id']
-                    current_date = item['time']
-                    # get the sensor and dev
-                    # TODO : DEBUG - LOG TO REMOVE
-                    #self._log.debug(u"DEBUG - BEFORE THE with self._db.session_scope()")
-                    with self._db.session_scope():
+                    with self._lockUpdate:
+                        store = True
+                        item = self._queue.get(timeout=1)
+                        #self._log.debug(u"Getting item from the store queue, current length = {0}".format(self._queue.qsize()))
+                        self._log.debug(u"Getting item from the store queue, current length = {0}, item = '{1}'".format(self._queue.qsize(), item))
+                        # handle ignore
+                        value = item['value']
+                        senid = item['sensor_id']
+                        current_date = item['time']
+                        # get the sensor and dev
+                        # TODO : DEBUG - LOG TO REMOVE
+                        #self._log.debug(u"DEBUG - BEFORE THE with self._db.session_scope()")
+                        with self._db.session_scope():
                         #self._log.debug(u"DEBUG - BEGINNING OF THE with self._db.session_scope()")
                         #sen = self._db.get_sensor(senid)
                         #dev = self._db.get_device(sen.device_id)
-                        with self._lockUpdate:
                             sen = self.all_sensors[str(senid)]
                             dev = self.all_devices[str(sen['device_id'])]
                             # check if we need a conversion
