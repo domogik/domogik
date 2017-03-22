@@ -63,6 +63,8 @@ def locations_edit(lid):
             if app.db.get_home_location() is None:
                 # we can have only one home location
                 locisHome = BooleanField("is Home", [], default=lisHome)
+            else:
+                locisHome = HiddenField("is Home", [], default=lisHome)
             submit = SubmitField("Save")
             pass
         form = F()
