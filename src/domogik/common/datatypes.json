@@ -473,7 +473,7 @@
         "min": 0,
         "max": 100,
         "unit": "%",
-        "parent": "Scaling",
+        "parent": "DT_Scaling",
         "childs": []
     },
     "DT_Co2": {
