@@ -365,6 +365,8 @@ def client_global_edit(client_id, dev_id):
                 field = DateTimeField(item["key"], arguments, default=default)
             elif item["type"] == "float":
                 field = FloatField(item["key"], arguments, default=default)
+            elif item["type"] == "password":
+                field = PasswordField(item["key"], arguments, default=default)
             else:
                 # time, email, ipv4, ipv6, url
                 field = TextField(item["key"], arguments, default=default)
