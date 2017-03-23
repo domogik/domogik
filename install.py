@@ -236,7 +236,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
                 'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level', \
                 'log_when', 'log_interval', 'log_backup_count'],
         'database': ['prefix', 'pool_recycle'],
-        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth', 'secret_key'],
+        'admin': ['port', 'ws_port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth', 'secret_key', 'http_workers_number'],
     }
     if advanced_mode:
         return True

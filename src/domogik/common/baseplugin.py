@@ -82,7 +82,7 @@ class BasePlugin(object):
             self._plugin_name = name
 
         logg = logger.Logger(name, use_filename="{0}{1}".format(log_prefix, name), log_on_stdout=log_on_stdout)
-        self.log = logg.get_logger()
+        self.log = logg.get_logger(name)
 
         ### Check if the plugin is not already launched
         # notice that when the plugin is launched from the manager, this call is not done as the manager already does this test before starting a plugin

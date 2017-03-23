@@ -30,10 +30,41 @@
                     protocol = "ws:"
                 else
                     protocol = "wss:"
-		var ws=new WebSocket(protocol + "//" + location.host + "/ws");
+                var ws=new WebSocket(protocol + "//" + location.hostname + ":{{ ws_port }}/ws");
 	} else {
 		alert('No WS support');
 	}
+
+        function waitForSocketConnection(socket, callback){
+            setTimeout(
+                function () {
+                    if (socket.readyState === 1) {
+                        console.log("WS Connection is made")
+                        if(callback != null){
+                            callback();
+                        }
+                        return;
+        
+                    } else {
+                        console.log("WS wait for connection...")
+                        waitForSocketConnection(socket, callback);
+                    }
+        
+                }, 50); // wait 5 milisecond for the connection...
+        }
+
+    ws.onopen = function(evt) {
+        console.log("WS opened");
+    }
+
+    ws.onerror = function(evt) {
+        console.log("WS in error");
+    }
+
+    ws.onclose = function(evt) {
+        console.log("WS closed");
+    }
+
        </script>
    <script src="{{ theme_static('js/jquery.min.js') }}"></script>
    <script src="{{ theme_static('js/jquery.cookie.js') }}"></script>

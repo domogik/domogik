@@ -1,0 +1,8 @@
+cmd='sudo gunicorn -k flask_sockets.worker -w 1'
+for i in `sudo grep interfaces /etc/domogik/domogik.cfg | cut -d "=" -f 2 | tr -d '[:space:]' | sed "s/,/ /g"`
+do
+    ip=`/sbin/ifconfig $i 2>/dev/null|awk '/inet/ {print $2}'| grep -v "::"`
+    cmd="$cmd -b $ip"
+done
+cmd="$cmd application:app"
+echo $cmd

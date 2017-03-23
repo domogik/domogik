@@ -1,5 +1,6 @@
 from domogik.admin.application import app, json_response, timeit
 from domogik.common.configloader import Loader
+from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import domogik
@@ -41,17 +42,18 @@ def api_root():
     """
     # domogik global version
     global_version = sys.modules["domogik"].__version__
+    rest_version = sys.modules["domogik"].__rest_api_version__
     src_version = global_version
 
     info = {}
-    info["REST_API_version"] = app.apiversion
+    info["REST_API_version"] = rest_version
     info["Domogik_version"] = global_version
     info["Sources_version"] = src_version
-    info["SSL"] = app.use_ssl
-    info["Host"] = app.hostname
+    info["SSL"] = app.dbConfig['use_ssl']
+    info["Host"] = get_sanitized_hostname()
 
     # for compatibility with Rest API < 0.6
-    info["REST_API_release"] = app.apiversion
+    info["REST_API_release"] = rest_version
     info["Domogik_release"] = global_version
     info["Sources_release"] = src_version
 
