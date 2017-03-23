@@ -375,25 +375,25 @@ class Admin(Plugin):
     def _start_http_admin(self):
         self.log.info(u"HTTP Server initialisation...")
         acfg = dict(Loader('admin').load()[1])
-        cmd = []
-        cmd.append( find_executable("gunicorn") )
-        cmd.append('--preload')
-        cmd.append('-k flask_sockets.worker')
-        # number of workers + threads
-        # TODO this should come from the config file
-        cmd.append('-w {0}'.format(self.http_workers))
+        cmd = "{0} --preload -k flask_sockets.worker".format(find_executable("gunicorn"))
+
         # SSL handling
         if acfg['use_ssl'] == "True":
-            cmd.append('--certfile {0}'.format(acfg['ssl_certificate']))
-            cmd.append('--keyfile {0}'.format(acfg['ssl_key']))
-        # append ips to listen on
+            cmd = "{0} --certfile {1} --keyfile {2}".format(cmd, acfg['ssl_certificate'], acfg['ssl_key'])
+
+        # Listening interfaces and port
         for dev in get_ip_for_interfaces(acfg['interfaces'].split(',')):
-            cmd.append('-b {0}:{1}'.format(dev, acfg['port']))
-        # append the application to start
-        cmd.append('domogik.admin.application:app')
-        # start the subprocess
-        self.log.debug(u"Starting webserver as: {0}".format(cmd))
-        self._http = subprocess.Popen(cmd)
+            cmd = "{0} -b {1}:{2}".format(cmd, dev, acfg['port'])
+
+        # Number of workers + threads
+        cmd = "{0} -w {1}".format(cmd, self.http_workers)
+
+        # Append the application to start
+        cmd = "{0} domogik.admin.application:app".format(cmd)
+
+        # Start the subprocess
+        self.log.info(u"Starting webserver as: {0}".format(cmd))
+        self._http = subprocess.Popen(cmd, shell=True)
         self.log.info(u"HTTP Server initialisation: Finished")
 
     def get_exception(self):
