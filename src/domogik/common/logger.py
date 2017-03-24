@@ -126,7 +126,6 @@ class Logger():
         @param logger_name : The name of the logger you want to get.
         If not provided, return the logger if only one exists
         '''
-        print self.__class__.logger
         if logger_name is not None:
             return self.__class__.logger[logger_name]
         elif len(self.__class__.logger.keys()) == 1:
