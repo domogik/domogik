@@ -49,7 +49,7 @@ import sqlalchemy
 from sqlalchemy import Table, MetaData, and_, or_, not_, desc
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import func, extract
-from sqlalchemy.orm import sessionmaker, defer
+from sqlalchemy.orm import sessionmaker, defer, scoped_session
 from sqlalchemy.orm.session import make_transient
 from sqlalchemy.pool import QueuePool
 from domogik.common.utils import ucode, get_sanitized_hostname
@@ -170,7 +170,7 @@ class DbHelper():
                 DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8',
                                                              pool_recycle=pool_recycle, pool_size=20, max_overflow=10)
         if DbHelper.__session_object == None:
-            DbHelper.__session_object = sessionmaker(bind=DbHelper.__engine, autoflush=True)
+            DbHelper.__session_object = scoped_session(sessionmaker(bind=DbHelper.__engine, autoflush=True))
         #self.__session = DbHelper.__session_object()
 
     @contextmanager
@@ -1781,6 +1781,7 @@ class DbHelper():
         if name is not None:
             cmd.name = name
         self.__session.add(cmd)
+        self._do_commit()
         self.update_device(device_id)
         self._do_commit()
         return cmd
@@ -1976,6 +1977,7 @@ class DbHelper():
         if value is not None:
             config.value = ucode(value)
         self.__session.add(config)
+        self.update_device(config.device_id)
         self._do_commit()
         return config
 
