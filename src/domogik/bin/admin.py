@@ -375,7 +375,7 @@ class Admin(Plugin):
     def _start_http_admin(self):
         self.log.info(u"HTTP Server initialisation...")
         acfg = dict(Loader('admin').load()[1])
-        cmd = "{0} --preload -k flask_sockets.worker".format(find_executable("gunicorn"))
+        cmd = "{0} --preload".format(find_executable("gunicorn"))
 
         # SSL handling
         if acfg['use_ssl'] == "True":

@@ -90,7 +90,6 @@ setup(
           'Flask-Babel',
           'Flask-Themes2',
           'Flask-Session',
-          'Flask-Sockets',
           'tornado >= 4.2',
           'gunicorn',
           'requests >= 0.12.1',

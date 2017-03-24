@@ -42,11 +42,6 @@ try:
 except ImportError:
     from flask.ext.session import Session
     pass
-try:
-    from flask_sockets import Sockets
-except ImportError:
-    from flask.ext.sockets import Sockets
-    pass
 from werkzeug.exceptions import Unauthorized
 from werkzeug import WWWAuthenticate
 from domogik.common.database import DbHelper
@@ -96,9 +91,6 @@ else:
     app.datatypes = {}
 
 ### init extensions and load them
-web_sockets = Sockets()
-web_sockets.init_app(app)
-
 session_manager = Session()
 session_manager.init_app(app)
 
@@ -153,7 +145,7 @@ def inject_global_errors():
 
 # render a template, later on we can select the theme it here
 def render_template(template, **context):
-    user = flask_login.current_user
+    user = current_user
     if not hasattr(user, 'skin_used') or user.skin_used == '':
         user.skin_used = 'default'
     return render_theme_template(user.skin_used, template, **context)
