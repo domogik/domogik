@@ -1,9 +1,13 @@
+import re
+import json
+import traceback
+import operator
+import os
 from domogik.common.utils import get_packages_directory
 from domogik.admin.application import app, render_template
 from flask import request, flash, redirect, send_from_directory
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
-import os
 try:
     from flask_wtf import Form
 except ImportError:
@@ -15,11 +19,10 @@ from wtforms import TextField, HiddenField, validators, ValidationError, RadioFi
 from wtforms.validators import Required, InputRequired
 from flask_login import login_required
 try:
-    from flask.ext.babel import gettext, ngettext
-except ImportError:
     from flask_babel import gettext, ngettext
+except ImportError:
+    from flask.ext.babel import gettext, ngettext
     pass
-
 from domogik.common.sql_schema import Device, DeviceParam, Sensor
 from domogik.common.plugin import STATUS_DEAD
 from wtforms.ext.sqlalchemy.orm import model_form
@@ -29,10 +32,6 @@ from domogik.common.utils import get_rest_url
 from operator import itemgetter
 from domogik.common.utils import build_deviceType_from_packageJson
 from domogikmq.pubsub.publisher import MQPub
-import re
-import json
-import traceback
-import operator
 
 try:
     import html.parser

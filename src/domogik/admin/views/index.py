@@ -5,9 +5,9 @@ from domogik.common.utils import get_ip_for_interfaces, ucode
 from flask import request, flash, redirect
 from flask_login import login_required
 try:
-    from flask.ext.babel import gettext, ngettext
-except ImportError:
     from flask_babel import gettext, ngettext
+except ImportError:
+    from flask.ext.babel import gettext, ngettext
     pass
 
 @app.route('/')

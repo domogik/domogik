@@ -1,25 +1,26 @@
-from domogik.common.utils import get_packages_directory, get_libraries_directory
-from domogik.common.jsondata import domogik_encoder
-from domogikmq.message import MQMessage
-from domogikmq.reqrep.client import MQSyncReq
-from functools import wraps
 import json
 import sys
 import os
 import time
+import traceback
+import zmq
+from functools import wraps
 from flask import Flask, g, request, session
 try:
     from flask_wtf import Form, RecaptchaField
 except ImportError:
     from flaskext.wtf import Form, RecaptchaField
     pass
-import flask_login
-from flask_login import LoginManager, current_user
 try:
-        from flask.ext.babel import Babel, get_locale, format_datetime
+    from flask_login import LoginManager, current_user
 except ImportError:
-        from flask_babel import Babel, get_locale, format_datetime
-        pass
+    from flask.ext.login import LoginManager, current_user
+    pass
+try:
+    from flask_babel import Babel, get_locale, format_datetime
+except ImportError:
+    from flask.ext.babel import Babel, get_locale, format_datetime
+    pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField
 from wtforms.validators import Required
@@ -31,17 +32,30 @@ except ImportError:
 else:
     def is_hidden_field_filter(field):
         return isinstance(field, HiddenField)
-from flask.ext.themes2 import Themes, render_theme_template
-from flask.ext.session import Session
-from flask_sockets import Sockets
+try:
+    from flask_themes2 import Themes, render_theme_template
+except ImportError:
+    from flask.ext.themes2 import Themes, render_theme_template
+    pass
+try:
+    from flask_session import Session
+except ImportError:
+    from flask.ext.session import Session
+    pass
+try:
+    from flask_sockets import Sockets
+except ImportError:
+    from flask.ext.sockets import Sockets
+    pass
 from werkzeug.exceptions import Unauthorized
 from werkzeug import WWWAuthenticate
-import traceback
-import zmq
 from domogik.common.database import DbHelper
 from domogik.common.configloader import Loader as dmgLoader
 from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR, PRODUCTS_DIR
-# TODO : DEL #from domogikmq.pubsub.publisher import MQPub
+from domogik.common.utils import get_packages_directory, get_libraries_directory
+from domogik.common.jsondata import domogik_encoder
+from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
 
 ### init Flask
 app = Flask(__name__)

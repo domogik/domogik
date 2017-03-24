@@ -4,7 +4,11 @@ from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from flask_login import login_required, login_user, logout_user, current_user
 from wtforms import form, fields, validators
-from flask.ext.babel import gettext, ngettext, get_locale
+try:
+    from flask_babel import gettext, ngettext
+except ImportError:
+    from flask.ext.babel import gettext, ngettext
+    pass
 
 class LoginForm(form.Form):
     user = fields.TextField('user', [validators.Required()])

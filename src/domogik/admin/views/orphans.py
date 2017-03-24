@@ -1,9 +1,13 @@
-from domogik.admin.application import app, render_template
 from flask import request, flash, redirect
+from flask_login import login_required
+try:
+    from flask_babel import gettext, ngettext
+except ImportError:
+    from flask.ext.babel import gettext, ngettext
+    pass
+from domogik.admin.application import app, render_template
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
-from flask_login import login_required
-from flask.ext.babel import gettext, ngettext
 
 @app.route('/orphans')
 @login_required

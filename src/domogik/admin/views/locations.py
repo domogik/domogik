@@ -7,9 +7,10 @@ except ImportError:
     from flaskext.wtf import Form
     pass
 try:
-    from flask.ext.babel import gettext, ngettext
-except ImportError:
     from flask_babel import gettext, ngettext
+except ImportError:
+    from flask.ext.babel import gettext, ngettext
+    pass
 from wtforms import TextField, HiddenField, BooleanField, SubmitField
 from wtforms.validators import Required, InputRequired
 from domogik.common.utils import ucode
