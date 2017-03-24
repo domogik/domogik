@@ -41,7 +41,7 @@ import zmq
 from domogik.common.database import DbHelper
 from domogik.common.configloader import Loader as dmgLoader
 from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR, PRODUCTS_DIR
-from domogikmq.pubsub.publisher import MQPub
+# TODO : DEL #from domogikmq.pubsub.publisher import MQPub
 
 ### init Flask
 app = Flask(__name__)
@@ -52,7 +52,8 @@ cfg = dmgLoader('admin').load()
 app.globalConfig = dict(cfg[0])
 app.dbConfig = dict(cfg[1]) 
 app.zmq_context = zmq.Context() 
-app.mqpub = MQPub(zmq.Context(), 'admin-views')
+# TODO : DEL ##app.mqpub = MQPub(zmq.Context(), 'admin-views')
+# TODO : DEL #app.mqpub = MQPub(zmq.Context(), 'adminhttp')
 app.libraries_directory = app.globalConfig['libraries_path']
 app.packages_directory = "{0}/{1}".format(app.globalConfig['libraries_path'], PACKAGES_DIR)
 app.resources_directory = "{0}/{1}".format(app.globalConfig['libraries_path'], RESOURCES_DIR)

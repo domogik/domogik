@@ -102,7 +102,7 @@ class MQManager(MQAsyncSub):
     def on_message(self, did, msg):
         """Receive message from MQ sub """
         msg2 = str(msg)
-        print(u"MQManager => on_message({0}, {1})".format(did, msg2[0:50]))
+        #print(u"MQManager => on_message({0}, {1})".format(did, msg2[0:50]))
 
         # For now, all messages from MQ should be sent to the browsers
         yield self.ToWSmessages.put({"msgid": did, "content": msg})
@@ -112,7 +112,7 @@ class MQManager(MQAsyncSub):
         while True:
             message = yield self.ToWSmessages.get()
             if len(self.subscribers) > 0:
-                print(u"Pushing MQ message to {} WS subscribers...".format(len(self.subscribers)))
+                #print(u"Pushing MQ message to {} WS subscribers...".format(len(self.subscribers)))
                 yield [subscriber.submit(message) for subscriber in self.subscribers]
 
     @gen.coroutine
@@ -127,12 +127,12 @@ class MQManager(MQAsyncSub):
             jsons = json.loads(message)
             # req/rep
             if 'mq_request' in jsons and 'data' in jsons:
-                print(u"MQ REQ !")
+                #print(u"MQ REQ !")
                 cli = MQSyncReq(ctx)
                 msg = MQMessage()
                 msg.set_action(str(jsons['mq_request']))
                 msg.set_data(jsons['data'])
-                print(u"REQ : {0}".format(msg.get()))
+                #print(u"REQ : {0}".format(msg.get()))
                 if 'dst' in jsons:
                     dst = str(jsons['dst'])
                 else:
@@ -144,7 +144,7 @@ class MQManager(MQAsyncSub):
                 del cli
             # pub
             elif 'mq_publish' in jsons and 'data' in jsons:
-                print(u"MQ pub !")
+                #print(u"MQ pub !")
                 self.pub.send_event(jsons['mq_publish'],
                                 jsons['data'])
         except Exception as e:
@@ -161,12 +161,12 @@ class WebSocketManager(WebSocketHandler):
         self.finished = False
 
     def open(self):
-        print(u"WebSocketManager > open()")
+        #print(u"WebSocketManager > open()")
         self.publisher.register(self)
         self.run()
 
     def on_close(self):
-        print(u"WebSocketManager > on_close()")
+        #print(u"WebSocketManager > on_close()")
         self._close()        
 
     def _close(self):
@@ -193,7 +193,7 @@ class WebSocketManager(WebSocketHandler):
     
     def on_message(self, content):
         """ receive message from websocket """
-        print(u"WebSocketManager => on_message({0})".format(content))
+        #print(u"WebSocketManager => on_message({0})".format(content))
 
         try:
             # samples :
@@ -205,10 +205,10 @@ class WebSocketManager(WebSocketHandler):
     
             ### Process the simple messages
             if "message" in json_data:
-                print(u"=> message")
+                #print(u"=> message")
     
                 message = json_data["message"]
-                print(message)
+                #print(message)
                 if message.startswith("ping from browser"):
                     browser_info = re.sub("ping from browser", "", message)
                     self.send(json.dumps({"message" : "pong from admin {0}".format(browser_info)}))
@@ -216,11 +216,11 @@ class WebSocketManager(WebSocketHandler):
     
             ### Process the MQ related messages
             elif "mq_request" in json_data:
-                print(u"=> MQ req")
+                #print(u"=> MQ req")
                 self.publisher.ToMQmessages.put(content)
     
             elif "mq_publish" in json_data:
-                print(u"=> MQ pub")
+                #print(u"=> MQ pub")
                 self.publisher.ToMQmessages.put(content)
     
         except:
