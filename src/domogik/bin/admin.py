@@ -253,6 +253,8 @@ class Admin(Plugin):
                 # admin config
                 cfg_admin = Loader('admin')
                 config_admin = cfg_admin.load()
+                conf_global = dict(config_admin[0])
+                self.log_level = conf_global['log_level']
                 conf_admin = dict(config_admin[1])
                 self.interfaces = conf_admin['interfaces']
                 self.port = conf_admin['port']
@@ -375,7 +377,7 @@ class Admin(Plugin):
     def _start_http_admin(self):
         self.log.info(u"HTTP Server initialisation...")
         acfg = dict(Loader('admin').load()[1])
-        cmd = "{0} --preload".format(find_executable("gunicorn"))
+        cmd = "{0} --preload --log-level {1}".format(find_executable("gunicorn"), self.log_level)
 
         # SSL handling
         if acfg['use_ssl'] == "True":
