@@ -28,6 +28,7 @@ from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
 from domogik.common.utils import build_deviceType_from_packageJson
+from domogikmq.pubsub.publisher import MQPub
 import re
 import json
 import traceback
@@ -543,7 +544,8 @@ def client_config(client_id):
                     else:
                         val = 'Y'
                 app.db.set_plugin_config(type, name, host, key, val)
-	app.mqpub.send_event('plugin.configuration',
+        pub = MQPub(app.zmq_context, 'admin-views')
+        pub.send_event('plugin.configuration',
 			 {"type" : type,
 			  "name" : name,
 			  "host" : host,

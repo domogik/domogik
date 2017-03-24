@@ -9,6 +9,7 @@ from subprocess import Popen, PIPE
 from flask import Response, request
 from flask_login import login_required
 import json
+from domogikmq.pubsub.publisher import MQPub
 
 @app.route('/rest/position/<string:person_id>/<string:data>', methods = ["GET"])
 @json_response
@@ -35,7 +36,8 @@ def position_get(person_id, data):
         if person:
             if person.location_sensor:
                 # generate a mq pub message that can be catched by the xplgw
-                app.mqpub.send_event('client.sensor', {person.location_sensor : data})
+                pub = MQPub(app.zmq_context, 'admin-views')
+                pub.send_event('client.sensor', {person.location_sensor : data})
                 data = {"status": "OK"}
             else:
                 data = {"status": "ERROR", "error": "Location not enabled for this person"}
