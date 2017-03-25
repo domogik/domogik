@@ -310,7 +310,7 @@ def client_sensor_edit(client_id, sensor_id):
 	    else:
 		data_type = request.form['data_type']
 	    # do the update
-	    res = self._db.update_sensor(sensor_id, \
+	    res = app.db.update_sensor(sensor_id, \
 		 history_round=hround, \
 		 history_store=hstore, \
 		 history_max=hmax, \
