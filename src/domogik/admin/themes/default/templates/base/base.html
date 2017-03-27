@@ -26,13 +26,13 @@
     <link href="{{ theme_static('css/default.css') }}" rel="stylesheet" media="screen">
        <script type="text/javascript">
 	 if ("WebSocket" in window) {
-                if (window.location.protocol == "http:")
-                    protocol = "ws:"
-                else
-                    protocol = "wss:"
-                var ws=new WebSocket(protocol + "//" + location.hostname + ":{{ ws_port }}/ws");
+            if (window.location.protocol == "http:")
+                protocol = "ws:"
+            else
+                protocol = "wss:"
+            var ws = new WebSocket(protocol + "//" + location.hostname + ":{{ ws_port }}/ws");
 	} else {
-		alert('No WS support');
+            alert('No websocket support in this browser. Please use another browser.');
 	}
 
         function waitForSocketConnection(socket, callback){
