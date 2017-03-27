@@ -2105,6 +2105,14 @@ class DbHelper():
 ###################
 # Location params
 ###################
+    def get_location_param(self, l_id, key):
+        self.__session.expire_all()
+        param = self.__session.query(LocationParam).filter_by(location_id=l_id).filter_by(key=ucode(key)).first()
+        if param is None:
+            return None
+        else:
+            return param.value
+
     def add_location_param(self, l_id, key, value):
         self.__session.expire_all()
         config = LocationParam(location_id=l_id, key=key, value=value)

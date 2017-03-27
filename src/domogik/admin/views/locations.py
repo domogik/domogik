@@ -18,9 +18,41 @@ from domogik.common.utils import ucode
 @app.route('/locations')
 @login_required
 def locations():
+    locations = []
+    persons = []
     with app.db.session_scope():
+        db_locations = app.db.get_all_location()
+        for loc in db_locations:
+            locations.append({'id' : loc.id,
+                              'name' : loc.name,
+                              'isHome' : loc.isHome,
+                              'type' : loc.type,
+                              'radius' : app.db.get_location_param(loc.id, "radius"),
+                              'lat' : app.db.get_location_param(loc.id, "lat"),
+                              'lng' : app.db.get_location_param(loc.id, "lng")})
+
+        db_persons = app.db.list_persons()
+        for per in db_persons:
+            if per.location_sensor:
+                all_res = app.db.get_last_sensor_value(per.location_sensor)
+                res = all_res[0] # by the way, there is only one row result ;)
+                   
+                print(res)
+                last_seen = res['timestamp']
+                if res['value_str'] is None:
+                    # no location yet, no need to display, no need to add in the list ;)
+                    continue
+                lat = res['value_str'].split(",")[0]
+                lng = res['value_str'].split(",")[1]
+                persons.append({'id' : per.id,
+                                'first_name' : per.first_name,
+                                'last_name' : per.last_name,
+                                'lat' : lat,
+                                'lng' : lng})
+
         return render_template('locations.html',
-            locations = app.db.get_all_location(),
+            locations = locations,
+            persons = persons,
             mactive = "locations")
 
 @app.route('/locations/del/<lid>')
