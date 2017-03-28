@@ -183,9 +183,11 @@ class DbInstall():
             answer = raw_input("Do you want to backup your database? [Y/n] ")
             if answer == 'n':
                 return
-        answer = raw_input("Backup file? [{0}] ".format(self.db_backup_file))
-        if answer != '':
-            bfile = answer
+            answer = raw_input("Backup file? [{0}] ".format(self.db_backup_file))
+            if answer != '':
+                bfile = answer
+            else:
+                bfile = self.db_backup_file
         else:
             bfile = self.db_backup_file
         ok("Backing up your database to {0}".format(bfile))
