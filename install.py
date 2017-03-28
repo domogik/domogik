@@ -571,7 +571,7 @@ def install():
             dbi = DbInstall()
             if not args.no_create_database:
                 dbi.create_db()
-            dbi.install_or_upgrade_db(args.skip_database_backup)
+            dbi.install_or_upgrade_db(args.skip_database_backup, args.command_line)
 
             # change permissions to some files created as root during the installation to the domogik user
             os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
