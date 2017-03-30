@@ -101,11 +101,12 @@ class MQManager(MQAsyncSub):
     @gen.coroutine
     def on_message(self, did, msg):
         """Receive message from MQ sub """
-        msg2 = str(msg)
+        #msg2 = str(msg)
         #print(u"MQManager => on_message({0}, {1})".format(did, msg2[0:50]))
 
         # For now, all messages from MQ should be sent to the browsers
         yield self.ToWSmessages.put({"msgid": did, "content": msg})
+
     @gen.coroutine
     def publishToWS(self):
         while True:
@@ -119,6 +120,7 @@ class MQManager(MQAsyncSub):
         while True:
             message = yield self.ToMQmessages.get()
             self.sendToMQ(message)
+
     def sendToMQ(self, message):
         try:
             ctx = zmq.Context()
@@ -165,7 +167,7 @@ class WebSocketManager(WebSocketHandler):
 
     def on_close(self):
         #print(u"WebSocketManager > on_close()")
-        self._close()        
+        self._close()
 
     def _close(self):
         #print("Subscriber left.")
@@ -188,6 +190,7 @@ class WebSocketManager(WebSocketHandler):
             self.write_message(message)
         except WebSocketClosedError:
             self._close()
+
     def on_message(self, content):
         """ receive message from websocket """
         #print(u"WebSocketManager => on_message({0})".format(content))
@@ -199,27 +202,27 @@ class WebSocketManager(WebSocketHandler):
             # test from a dev page :
             #    {"message": "ping from browser (Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36))"}
             json_data = json.loads(content)
-    
+
             ### Process the simple messages
             if "message" in json_data:
                 #print(u"=> message")
-    
+
                 message = json_data["message"]
                 #print(message)
                 if message.startswith("ping from browser"):
                     browser_info = re.sub("ping from browser", "", message)
                     self.send(json.dumps({"message" : "pong from admin {0}".format(browser_info)}))
                     return
-    
+
             ### Process the MQ related messages
             elif "mq_request" in json_data:
                 #print(u"=> MQ req")
                 self.publisher.ToMQmessages.put(content)
-    
+
             elif "mq_publish" in json_data:
                 #print(u"=> MQ pub")
                 self.publisher.ToMQmessages.put(content)
-    
+
         except:
             print(u"Error while processing input websocket message. Message is : '{0}'. Error is : {1}".format(content, traceback.format_exc()))
 
@@ -312,7 +315,7 @@ class Admin(Plugin):
         """ Start HTTP Server
         """
         self.log.info(u"Start WS Server on {0}:{1}...".format(self.interfaces, self.ws_port))
-        
+
         publisher = MQManager()
         tapp = Application([
             (r"/ws", WebSocketManager, dict(publisher=publisher))
@@ -345,6 +348,7 @@ class Admin(Plugin):
             self.http_server.bind(int(self.ws_port))
             self.http_server.start(0)
         yield [publisher.publishToMQ(), publisher.publishToWS()]
+
     def stop_http(self):
         """ Stop HTTP Server
         """
@@ -354,19 +358,19 @@ class Admin(Plugin):
         except:
             # in case of error while stopping the http server (maybe the startup was not fine so the http server does not exists), we don't raise an error to allow continuing to stop
             pass
- 
+
         self.log.info('Will shutdown in 10 seconds ...' )
         io_loop = IOLoop.instance()
         deadline = time.time() + 10
- 
-        def stop_loop():
+
+        def stop_loop(log):
             now = time.time()
             if now < deadline and (io_loop._callbacks or io_loop._timeouts):
                 io_loop.add_timeout(now + 1, stop_loop)
             else:
                 io_loop.stop()
-                logging.info('Shutdown')
-        stop_loop()
+                log.info('Shutdown')
+        stop_loop(self.log)
         return
 
     def _start_http_admin(self):
@@ -933,7 +937,7 @@ class Admin(Plugin):
                     - device_type
         """
         status = True
-        result = {}
+        result = 'Failed'
         reason = ""
 
         try:
