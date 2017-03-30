@@ -271,7 +271,7 @@ class Admin(Plugin):
             self.log.info(u"Configuration : interfaces:port = {0}:{1}".format(self.interfaces, self.port))
             self.log.info(u"Configuration : use_ssl = {0}".format(self.use_ssl))
 
-	    # get all datatypes
+            # get all datatypes
             cli = MQSyncReq(self.zmq)
             msg = MQMessage()
             msg.set_action('datatype.get')
@@ -281,7 +281,7 @@ class Admin(Plugin):
             else:
                 self.datatypes = {}
 
- 	    # Launch server, stats
+            # Launch server, stats
             self.log.info(u"Admin Initialisation OK")
             self.add_stop_cb(self.stop_http)
             self.server = None
@@ -327,7 +327,7 @@ class Admin(Plugin):
             (r".*", FallbackHandler, dict(fallback=WSGIContainer(admin_app)))
             ])
 
-	# create the server
+        # create the server
         # for ssl, extra parameter to HTTPServier init
         if self.use_ssl is True:
             ssl_options = {
@@ -337,7 +337,7 @@ class Admin(Plugin):
             self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
             self.http_server = HTTPServer(tapp)
-	# listen on the interfaces
+        # listen on the interfaces
         if self.interfaces != "":
             # value can be : lo, eth0, ...
             # or also : '*' to catch all interfaces, whatever they are
@@ -375,7 +375,7 @@ class Admin(Plugin):
                 io_loop.add_timeout(now + 1, stop_loop)
             else:
                 io_loop.stop()
-                logging.info('Shutdown')
+                self.log.info('Shutdown')
         stop_loop()
         return
 
@@ -623,8 +623,8 @@ class Admin(Plugin):
                    result.type != type or \
                    result.hostname != host or \
                    result.key != key:
-                    self.log.debug(u"Bad result : {0}-{1}/{2} != {3}/{4}".format(result.id, result.type, result.key, plugin, key))
-                    result = self._db.get_plugin_config(type, name, host, key)
+                        self.log.debug(u"Bad result : {0}-{1}/{2} != {3}/{4}".format(result.id, result.type, result.key, name, key))
+                        result = self._db.get_plugin_config(type, name, host, key)
                 val = result.value
                 if val == '':
                     val = "None"
@@ -635,7 +635,7 @@ class Admin(Plugin):
                 return "None"
         except:
             msg = "No config found host={0}, plugin={1}, key={2}".format(host, name, key)
-            self.log.warn(msg)
+            self.log.warning(msg)
             return "None"
 
     def _mdp_reply_devices_delete_result(self, data):
@@ -872,7 +872,7 @@ class Admin(Plugin):
         del cli
         if res is None:
             status = False
-            reason = "Manager is not replying to the mq request"
+            reason = "Manager is not replying to the <device_types.get> mq request for {0}".format( params['device_type'])
             pjson = None
         else :
             pjson = res.get_data()
@@ -943,7 +943,6 @@ class Admin(Plugin):
             msg.add_data('status', status)
             msg.add_data('reason', reason)
             msg.add_data('result', result)
-            self.log.debug(msg.get())
             # return the data
             self.log.debug(msg.get())
             self.reply(msg.get())
@@ -1127,4 +1126,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
