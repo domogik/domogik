@@ -67,6 +67,9 @@ from domogik.common.sql_schema import (
         Location, LocationParam
 )
 from contextlib import contextmanager
+#from domogik.common.database_cachedata import CacheDevicesList
+from multiprocessing.managers import SyncManager
+import inspect
 
 DEFAULT_RECYCLE_POOL = 3600
 
@@ -79,6 +82,8 @@ for mod in pip.get_installed_distributions():
     if ( mod.key == 'mysql-python' ):
         mysql_suffix = '' # it is debian package, don't use suffix
 
+class DeviceCache(SyncManager):
+    pass
 
 def _make_crypted_password(clear_text_password):
     """Make a crypted password (using sha256)
@@ -132,15 +137,25 @@ class DbHelper():
     __session = None
     __session_object = None
 
-    def __init__(self, echo_output=False, use_test_db=False, engine=None):
+    def __init__(self, echo_output=False, use_test_db=False, engine=None, use_cache=True):
         """Class constructor
 
         @param echo_output : if True displays sqlAlchemy queries (optional, default False)
         @param use_test_db : if True use a test database (optional, default False)
         @param engine : an existing engine, if not provided, a new one will be created
         """
+
         # Here you have to specify twice the logger name as two instances of DbHelper are created
         self.log = logger.Logger('db_api').get_logger('db_api')
+
+        # init cache date multiprocessing for device_list
+        self._cacheDevice = None
+        if use_cache :
+            DeviceCache.register('get_cache')
+            m = DeviceCache(address=('', 50001), authkey=b'abracadabra')
+            m.connect()
+            self.log.info(u"Connected to memory devices cache {0}".format(m))
+            self._cacheDevice = m.get_cache()
 
         cfg = Loader('database')
         config = cfg.load()
@@ -277,7 +292,7 @@ class DbHelper():
         for item in cfg:
             res[item.key] = item.value
         return res
-   
+
     def set_core_config(self, cfg):
         # DELETE all
         config_list = self.__session.query(PluginConfig).filter_by(type=u'core').all()
@@ -322,7 +337,7 @@ class DbHelper():
                     ).filter_by(key=ucode(pl_key)
                     ).first()
         except:
-            self.log.debug(u"oups : {0}".format(traceback.format-exc()))
+            self.log.debug(u"oups : {0}".format(traceback.format_exc()))
         return ret
 
     def set_plugin_config(self, pl_type, pl_id, pl_hostname, pl_key, pl_value):
@@ -400,18 +415,26 @@ class DbHelper():
 ###
     def list_devices(self, d_state=u'active'):
         """Return a list of devices
-        @return a list of Device objects (only the devices that are known by this realease)
+        @return a list of Device objects (only the devices that are known by this release)
         """
+        if d_state==u'active' and self._cacheDevice and self._cacheDevice.uptodate() :
+            return self._cacheDevice.devices_list()
         device_list = []
         for device in self.__session.query(Device).filter_by(state=d_state).all():
             device_list.append(self.get_device(device=device))
+        if d_state==u'active':
+            self.log.debug("Set cache data from : {0}".format(inspect.stack()))
+            if self._cacheDevice : self._cacheDevice.setData(device_list, repr(self))
         return device_list
 
     def list_devices_by_plugin(self, p_id):
         #return self.__session.query(Device).filter_by(client_id=p_id).all()
+        if self._cacheDevice and self._cacheDevice.uptodate(p_id) :
+            return self._cacheDevice.devices_list(client_id=p_id)
         device_list = []
         for device in self.__session.query(Device).filter_by(state=u'active').filter_by(client_id=p_id).all():
             device_list.append(self.get_device(device=device))
+        if self._cacheDevice: self._cacheDevice.updateData(device_list, client_id=p_id)
         return device_list
 
     def list_devices_by_timestamp(self, tstamp):
@@ -419,6 +442,7 @@ class DbHelper():
         device_list = []
         for device in self.__session.query(Device).filter_by(state=u'active').filter(Device.info_changed>datetime.datetime.fromtimestamp(float(tstamp))).all():
             device_list.append(self.get_device(device=device))
+        if self._cacheDevice: self._cacheDevice.updateData(device_list)
         return device_list
 
     def get_device_sql(self, d_id):
@@ -717,6 +741,7 @@ class DbHelper():
 
             ### Finally, commit all !
             self._do_commit()
+            if self._cacheDevice: self._cacheDevice.mark_as_updating(client_id=params['client_id'])
             ### Return the created device as json
             d = self.get_device(device.id)
             return d
@@ -800,6 +825,7 @@ class DbHelper():
                         device_type_id=d_type_id, client_id=d_client_id)
         self.__session.add(device)
         self._do_commit()
+        if self._cacheDevice: self._cacheDevice.mark_as_updating(client_id=d_client_id)
         return device
 
     def update_device(self, d_id, d_name=None, d_description=None, d_reference=None, d_address=None, d_info_changed=None, d_state=None, d_client_version=None):
@@ -829,11 +855,11 @@ class DbHelper():
             if d_reference == '': d_reference = None
             device.reference = ucode(d_reference)
         if d_info_changed is not None:
-            device.info_changed = datetime.datetime.fromtimestamp(info_changed)
+            device.info_changed = datetime.datetime.fromtimestamp(d_info_changed)
         else:
             device.info_changed = func.now()
         if d_state is not None:
-            # can be 
+            # can be
             # - active      => all OK
             # - delete      => we want to delete
             # - deleting    => we are deleting
@@ -843,6 +869,7 @@ class DbHelper():
             device.client_version = ucode(d_client_version)
         self.__session.add(device)
         self._do_commit()
+        if self._cacheDevice: self._cacheDevice.mark_as_updating(device_id=d_id)
         return device
 
     def del_device(self, d_id):
@@ -863,6 +890,7 @@ class DbHelper():
         device.info_changed = func.now()
         self.__session.add(device)
         self._do_commit()
+        if self._cacheDevice: self._cacheDevice.mark_as_updating(client_id=device.client_id)
         return device
 
     def del_device_real(self, d_id):
@@ -883,6 +911,7 @@ class DbHelper():
         device.info_changed = func.now()
         self.__session.add(device)
         self._do_commit()
+        if self._cacheDevice: self._cacheDevice.mark_as_updating(client_id=device.client_id)
 
         # check if this device i used in a scenario
         llist = []
@@ -916,6 +945,7 @@ class DbHelper():
 
         self.__session.delete(device)
         self._do_commit()
+        if self._cacheDevice: self._cacheDevice.mark_as_updating(client_id=device.client_id)
         return device
 
 ####
@@ -1007,6 +1037,7 @@ class DbHelper():
                     h = SensorHistory(sensor['id'], datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
                     self.__session.add(h)
                     self._do_commit()
+                    if self._cacheDevice: self._cacheDevice.mark_as_updating(sensor_id=sensor['id'])
                     # update the info changed
                     #self.update_device(sensor['device_id'])
                     #self._do_commit()
@@ -1047,7 +1078,7 @@ class DbHelper():
                 #self.__session.add(sensor_db)
                 data = ucode(value)
                 self._do_commit()
-
+                if self._cacheDevice: self._cacheDevice.mark_as_updating(sensor_id=sid)
 
                 ### handle the history size in number of items
                 # TODO : move in a dedicated function which would be called each... ??? hours ???
@@ -1069,7 +1100,7 @@ class DbHelper():
                                     ) \
                             .delete(synchronize_session=False)
                         self._do_commit()
-
+                        if self._cacheDevice: self._cacheDevice.mark_as_updating(sensor_id=sensor['id'])
 
                 ### handle the history size in days
                 # TODO : move in a dedicated function which would be called each day or N hours
@@ -1082,7 +1113,7 @@ class DbHelper():
                                 ) \
                         .delete(synchronize_session=False)
                     self._do_commit()
-
+                    if self._cacheDevice: self._cacheDevice.mark_as_updating(sensor_id=sensor['id'])
 
             else:
                 self.__raise_dbhelper_exception("Can not add history to not existing sensor: {0}".format(sid), True)
@@ -1586,7 +1617,7 @@ class DbHelper():
         self._do_commit()
         self._checkPersonLocation(person, p_hasLocation)
         return person
-    
+
     def _checkPersonLocation(self, person, hasLocation):
         # Enable it
         if hasLocation and person.location_sensor is None:
@@ -1830,10 +1861,7 @@ class DbHelper():
         self.__session.add(stat)
         self.update_device(device_id)
         self._do_commit()
-        param = XplCommandParam(cmd_id=cmd_id, key=key, value=value)
-        self.__session.add(param)
-        self._do_commit()
-        return param
+        return stat
 
 ###################
 # XplCommandParam
@@ -1920,22 +1948,22 @@ class DbHelper():
     def get_scenario_by_name(self, s_name):
         return self.__session.query(Scenario).filter(Scenario.name==s_name).first()
 
-    def add_scenario(self, name, json, disabled, desc, state):
+    def add_scenario(self, s_name, s_json, s_disabled, s_desc, s_state):
         self.__session.expire_all()
-        scenario = Scenario(name=name, json=json, disabled=disabled, description=desc, state=state)
+        scenario = Scenario(name=s_name, json=s_json, disabled=s_disabled, description=s_desc, state=s_state)
         self.__session.add(scenario)
         self._do_commit()
         return scenario
 
-    def update_scenario(self, s_id, name=None, json=None, disabled=None, description=None, state=None):
+    def update_scenario(self, s_id, name=None, s_json=None, disabled=None, description=None, state=None):
         self.__session.expire_all()
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is None:
             self.__raise_dbhelper_exception("Scenario with id {0} couldn't be found".format(s_id))
         if name is not None:
             scenario.name = ucode(name)
-        if json is not None:
-            scenario.json = ucode(json)
+        if s_json is not None:
+            scenario.json = ucode(s_json)
         if disabled is not None:
             scenario.disabled = disabled
         if description is not None:
@@ -1970,7 +1998,7 @@ class DbHelper():
         self.__session.expire_all()
         config = self.__session.query(DeviceParam).filter_by(id=dc_id).first()
         if config is None:
-            self.__raise_dbhelper_exception("Global device param with id {0} couldn't be found".format(u_id))
+            self.__raise_dbhelper_exception("Global device param with id {0} couldn't be found".format(dc_id))
         if key is not None:
             config.key = ucode(key)
         if value is not None:
@@ -2042,7 +2070,7 @@ class DbHelper():
 
     def get_location(self, id):
         return self.__session.query(Location).filter_by(id=id).first()
-    
+
     def get_location_by_name(self, name):
         return self.__session.query(Location).filter_by(name=name).first()
 
@@ -2098,7 +2126,7 @@ class DbHelper():
             return loc
         else:
             self.__raise_dbhelper_exception("Location with id {0} couldn't be found".format(lid))
-         
+
 
 ###################
 # Location params
