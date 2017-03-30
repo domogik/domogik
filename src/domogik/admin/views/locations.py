@@ -47,6 +47,7 @@ def locations():
                 persons.append({'id' : per.id,
                                 'first_name' : per.first_name,
                                 'last_name' : per.last_name,
+                                'location_sensor' : per.location_sensor,
                                 'lat' : lat,
                                 'lng' : lng})
 

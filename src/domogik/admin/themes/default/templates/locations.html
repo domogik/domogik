@@ -60,6 +60,10 @@
 
     <script type="text/javascript">
         $( document ).ready( function () {
+            // polylines colors : see https://www.w3schools.com/colors/colors_names.asp
+            colors = ['#ff0000',
+                      '#00ff00',
+                      '#0000ff'];
 
             // Init the map
             var map = new google.maps.Map(document.getElementById('map'), {
@@ -151,9 +155,190 @@
                       infowindowP{{ data.id }}.open(map, markerP{{ data.id }});
                     });
                 {% endif %}
+
+                //********* Grab the history to display a polyline
+                historyLen = 30;
+                var polyline{{ data.id }} = [];
+                var jqxhr = $.getJSON( "/rest/sensorhistory/id/{{ data.location_sensor }}/last/" + historyLen, function() {
+                        console.log( "success" );
+                    })
+                    .done(function(data) {
+                        for(idx=0;idx<data.length;idx++) {
+                            polyline{{ data.id }}.push({lat: parseFloat(data[idx].value_str.split(",")[0]), lng: parseFloat(data[idx].value_str.split(",")[1]) });
+                        }
+
+                        lineColor = colors[{{ data.id }}%colors.length - 1];
+                        /*
+                        var pathOf{{ data.id }} = new google.maps.Polyline({
+                          path: polyline{{ data.id }},
+                          geodesic: true,
+                          strokeColor: lineColor,
+                          strokeOpacity: 1.0,
+                          strokeWeight: 2
+                        });
+                        pathOf{{ data.id }}.setMap(map);
+                        */
+
+                        var colorGradient = generateColor('#ffffff', lineColor , historyLen);
+                        console.log(colorGradient);
+                        for (var i = 0; i < polyline{{ data.id }}.length-1; i++) {
+                          console.log(i);
+                          var PathStyle = new google.maps.Polyline({
+                            path: [polyline{{ data.id }}[i], polyline{{ data.id }}[i+1]],
+                            strokeColor: "#"+colorGradient[i],
+                            strokeOpacity: 1.0,
+                            strokeWeight: 8*(1-(i/historyLen)),
+                            map: map
+                          });
+                        }
+
+                    })
+                    .fail(function() {
+                        console.log( "error" );
+                    })
+                    .always(function() {
+                        console.log( "complete" );
+                    });
+
+
+
             {% endfor %}
 
         });
+
+
+
+
+
+function hex (c) {
+  var s = "0123456789abcdef";
+  var i = parseInt (c);
+  if (i == 0 || isNaN (c))
+    return "00";
+  i = Math.round (Math.min (Math.max (0, i), 255));
+  return s.charAt ((i - i % 16) / 16) + s.charAt (i % 16);
+}
+
+/* Convert an RGB triplet to a hex string */
+function convertToHex (rgb) {
+  return hex(rgb[0]) + hex(rgb[1]) + hex(rgb[2]);
+}
+
+/* Remove '#' in color hex string */
+function trim (s) { return (s.charAt(0) == '#') ? s.substring(1, 7) : s }
+
+/* Convert a hex string to an RGB triplet */
+function convertToRGB (hex) {
+  var color = [];
+  color[0] = parseInt ((trim(hex)).substring (0, 2), 16);
+  color[1] = parseInt ((trim(hex)).substring (2, 4), 16);
+  color[2] = parseInt ((trim(hex)).substring (4, 6), 16);
+  return color;
+}
+
+function generateColor(colorStart,colorEnd,colorCount){
+
+	// The beginning of your gradient
+	var start = convertToRGB (colorStart);    
+
+	// The end of your gradient
+	var end   = convertToRGB (colorEnd);    
+
+	// The number of colors to compute
+	var len = colorCount;
+
+	//Alpha blending amount
+	var alpha = 0.0;
+
+	var saida = [];
+	
+	for (i = 0; i < len; i++) {
+		var c = [];
+		alpha += (1.0/len);
+		
+		c[0] = start[0] * alpha + (1 - alpha) * end[0];
+		c[1] = start[1] * alpha + (1 - alpha) * end[1];
+		c[2] = start[2] * alpha + (1 - alpha) * end[2];
+
+		saida.push(convertToHex (c));
+		
+	}
+	
+	return saida;
+	
+}
+
+
+
+
+///////////////////////// DELETE /////////////////////////
+/**
+ * Converts an RGB color value to HSL. Conversion formula
+ * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes r, g, and b are contained in the set [0, 255] and
+ * returns h, s, and l in the set [0, 1].
+ *
+ * @param   Number  r       The red color value
+ * @param   Number  g       The green color value
+ * @param   Number  b       The blue color value
+ * @return  Array           The HSL representation
+ */
+function rgbToHsl(r, g, b){
+    r /= 255, g /= 255, b /= 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+
+    if(max == min){
+        h = s = 0; // achromatic
+    }else{
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max){
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    return [h, s, l];
+}
+
+/**
+ * Converts an HSL color value to RGB. Conversion formula
+ * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes h, s, and l are contained in the set [0, 1] and
+ * returns r, g, and b in the set [0, 255].
+ *
+ * @param   Number  h       The hue
+ * @param   Number  s       The saturation
+ * @param   Number  l       The lightness
+ * @return  Array           The RGB representation
+ */
+function hslToRgb(h, s, l){
+    var r, g, b;
+
+    if(s == 0){
+        r = g = b = l; // achromatic
+    }else{
+        function hue2rgb(p, q, t){
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
+
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+
+    return [r * 255, g * 255, b * 255];
+}
     </script>
 
 </div>
