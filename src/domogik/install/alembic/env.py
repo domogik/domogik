@@ -39,7 +39,7 @@ def run_migrations_offline():
     """
     # overruled for domogik
     # url = config.get_main_option("sqlalchemy.url")
-    url = database.DbHelper().get_url_connection_string()
+    url = database.DbHelper(use_cache=False).get_url_connection_string()
     context.configure(url=url)
 
     with context.begin_transaction():
@@ -53,7 +53,7 @@ def run_migrations_online():
 
     """
     alembic_config = config.get_section(config.config_ini_section)
-    alembic_config['sqlalchemy.url'] = database.DbHelper().get_url_connection_string()
+    alembic_config['sqlalchemy.url'] = database.DbHelper(use_cache=False).get_url_connection_string()
 
     engine = engine_from_config(
                 alembic_config,
