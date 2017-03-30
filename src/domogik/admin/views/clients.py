@@ -1,9 +1,13 @@
+import re
+import json
+import traceback
+import operator
+import os
 from domogik.common.utils import get_packages_directory
 from domogik.admin.application import app, render_template
 from flask import request, flash, redirect, send_from_directory
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
-import os
 try:
     from flask_wtf import Form
 except ImportError:
@@ -15,11 +19,10 @@ from wtforms import TextField, HiddenField, validators, ValidationError, RadioFi
 from wtforms.validators import Required, InputRequired
 from flask_login import login_required
 try:
-    from flask.ext.babel import gettext, ngettext
-except ImportError:
     from flask_babel import gettext, ngettext
+except ImportError:
+    from flask.ext.babel import gettext, ngettext
     pass
-
 from domogik.common.sql_schema import Device, DeviceParam, Sensor
 from domogik.common.plugin import STATUS_DEAD
 from wtforms.ext.sqlalchemy.orm import model_form
@@ -28,10 +31,7 @@ from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
 from domogik.common.utils import build_deviceType_from_packageJson
-import re
-import json
-import traceback
-import operator
+from domogikmq.pubsub.publisher import MQPub
 
 try:
     import html.parser
@@ -310,7 +310,7 @@ def client_sensor_edit(client_id, sensor_id):
 	    else:
 		data_type = request.form['data_type']
 	    # do the update
-	    res = self._db.update_sensor(sensor_id, \
+	    res = app.db.update_sensor(sensor_id, \
 		 history_round=hround, \
 		 history_store=hstore, \
 		 history_max=hmax, \
@@ -365,6 +365,8 @@ def client_global_edit(client_id, dev_id):
                 field = DateTimeField(item["key"], arguments, default=default)
             elif item["type"] == "float":
                 field = FloatField(item["key"], arguments, default=default)
+            elif item["type"] == "password":
+                field = PasswordField(item["key"], arguments, default=default)
             else:
                 # time, email, ipv4, ipv6, url
                 field = TextField(item["key"], arguments, default=default)
@@ -541,7 +543,8 @@ def client_config(client_id):
                     else:
                         val = 'Y'
                 app.db.set_plugin_config(type, name, host, key, val)
-	app.mqpub.send_event('plugin.configuration',
+        pub = MQPub(app.zmq_context, 'admin-views')
+        pub.send_event('plugin.configuration',
 			 {"type" : type,
 			  "name" : name,
 			  "host" : host,

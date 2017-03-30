@@ -3,7 +3,11 @@ from flask import request, flash, redirect
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from flask_login import login_required
-from flask.ext.babel import gettext, ngettext
+try:
+    from flask_babel import gettext, ngettext
+except ImportError:
+    from flask.ext.babel import gettext, ngettext
+    pass
 from operator import itemgetter
 
 @app.route('/battery')

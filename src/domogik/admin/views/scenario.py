@@ -3,10 +3,10 @@ from flask import request, flash, redirect, Response, jsonify
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 try:
-	from flask.ext.babel import gettext, ngettext
+    from flask_babel import gettext, ngettext
 except ImportError:
-	from flask_babel import gettext, ngettext
-	pass
+    from flask.ext.babel import gettext, ngettext
+    pass
 from flask_login import login_required
 try:
     from flask_wtf import Form

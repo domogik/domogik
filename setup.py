@@ -91,6 +91,7 @@ setup(
           'Flask-Themes2',
           'Flask-Session',
           'tornado >= 4.2',
+          'gunicorn',
           'requests >= 0.12.1',
           'python-dateutil',
           magic,

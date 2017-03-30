@@ -1,0 +1,66 @@
+{% extends theme("base/base.html") %}
+{% block content %}
+<div class="devtools singlebox center-block">
+    <h1>
+        <img src="/static/images/dmg-logo.png" alt="">
+        <strong>Domogik</strong> Admin tools
+    </h1>
+    <div class="box">
+          <h2>Tools - WebSockets</h2>
+          <div class="alert alert-info" role="alert">
+            <p>If all is working as excepting, you should see below : </p>
+            <ul>
+              <li>Ping send to the admin server each 5 seconds and the related pong responses</li>
+              <li>Some various informations coming from the message queue</li>
+            </ul>
+          </div>
+          <p>Events :</p>
+          <ul id="ws"></ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+function sendPing() {
+    msg = JSON.stringify({"message" : "ping from browser (" + navigator.userAgent + ")"});
+    $("#ws").append("<li><strong>Send : " + msg + "</strong></li>");
+    ws.send(msg);
+}
+
+
+$( document ).ready(function() {
+
+    waitForSocketConnection(ws, function(){
+        sendPing();
+    });
+
+    ws.onerror = function(evt) {
+        console.log("WS in error");
+        $("#ws").append("<li>WS in error (see console for more informations)</li>");
+    }
+
+    ws.onclose = function(evt) {
+        console.log("WS closed");
+        $("#ws").append("<li>WS closed</li>");
+
+    }
+
+    ws.onmessage = function(e) {
+        data = JSON.parse(e.data);
+        if ('message' in data) {
+            $("#ws").append("<li><strong>Received : " + e.data + "</strong></li>");
+            if (data.message.startsWith("pong from admin")) {
+                console.log("WS message received : " + e);
+                $("#ws").append("<li>Wait for 5 seconds...</li>");
+                setTimeout(function(){
+                    sendPing();
+                    }.bind(this), 5000);
+            }
+        }
+        else {
+            $("#ws").append("<li>Received : " + e.data + "</li>");
+        }
+    }
+});
+</script>
+
+{% endblock %}

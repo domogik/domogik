@@ -77,6 +77,8 @@ prefix = core
 #interfaces = *
 interfaces = lo
 port = 40406
+http_workers_number = 2
+ws_port = 40405
 # set to True if you want to use rest with ssl (https://....)
 use_ssl = False
 # if rest_use_ssl = True, set here path for ssl certificate/key

@@ -101,7 +101,11 @@ class MQManager(MQAsyncSub):
     @gen.coroutine
     def on_message(self, did, msg):
         """Receive message from MQ sub """
+<<<<<<< HEAD
         #msg2 = str(msg)
+=======
+        msg2 = str(msg)
+>>>>>>> 712124d9290a201aebab4a15f956df5de4d3ab79
         #print(u"MQManager => on_message({0}, {1})".format(did, msg2[0:50]))
 
         # For now, all messages from MQ should be sent to the browsers
@@ -167,7 +171,11 @@ class WebSocketManager(WebSocketHandler):
 
     def on_close(self):
         #print(u"WebSocketManager > on_close()")
+<<<<<<< HEAD
         self._close()
+=======
+        self._close()        
+>>>>>>> 712124d9290a201aebab4a15f956df5de4d3ab79
 
     def _close(self):
         #print("Subscriber left.")
@@ -202,27 +210,47 @@ class WebSocketManager(WebSocketHandler):
             # test from a dev page :
             #    {"message": "ping from browser (Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36))"}
             json_data = json.loads(content)
+<<<<<<< HEAD
 
             ### Process the simple messages
             if "message" in json_data:
                 #print(u"=> message")
 
+=======
+    
+            ### Process the simple messages
+            if "message" in json_data:
+                #print(u"=> message")
+    
+>>>>>>> 712124d9290a201aebab4a15f956df5de4d3ab79
                 message = json_data["message"]
                 #print(message)
                 if message.startswith("ping from browser"):
                     browser_info = re.sub("ping from browser", "", message)
                     self.send(json.dumps({"message" : "pong from admin {0}".format(browser_info)}))
                     return
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 712124d9290a201aebab4a15f956df5de4d3ab79
             ### Process the MQ related messages
             elif "mq_request" in json_data:
                 #print(u"=> MQ req")
                 self.publisher.ToMQmessages.put(content)
+<<<<<<< HEAD
 
             elif "mq_publish" in json_data:
                 #print(u"=> MQ pub")
                 self.publisher.ToMQmessages.put(content)
 
+=======
+    
+            elif "mq_publish" in json_data:
+                #print(u"=> MQ pub")
+                self.publisher.ToMQmessages.put(content)
+    
+>>>>>>> 712124d9290a201aebab4a15f956df5de4d3ab79
         except:
             print(u"Error while processing input websocket message. Message is : '{0}'. Error is : {1}".format(content, traceback.format_exc()))
 
@@ -301,7 +329,11 @@ class Admin(Plugin):
             self.add_stop_cb(self.stop_http)
             self.server = None
             self._start_http_ws()
+<<<<<<< HEAD
             self._start_http_admin()
+=======
+	    self._start_http_admin()
+>>>>>>> 712124d9290a201aebab4a15f956df5de4d3ab79
             # calls the tornado.ioloop.instance().start()
 
             ### Component is ready
@@ -315,7 +347,11 @@ class Admin(Plugin):
         """ Start HTTP Server
         """
         self.log.info(u"Start WS Server on {0}:{1}...".format(self.interfaces, self.ws_port))
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 712124d9290a201aebab4a15f956df5de4d3ab79
         publisher = MQManager()
         tapp = Application([
             (r"/ws", WebSocketManager, dict(publisher=publisher))

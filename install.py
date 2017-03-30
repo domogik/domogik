@@ -236,7 +236,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
                 'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level', \
                 'log_when', 'log_interval', 'log_backup_count'],
         'database': ['prefix', 'pool_recycle'],
-        'admin': ['port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth', 'secret_key'],
+        'admin': ['port', 'ws_port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth', 'secret_key', 'http_workers_number'],
     }
     if advanced_mode:
         return True
@@ -571,7 +571,7 @@ def install():
             dbi = DbInstall()
             if not args.no_create_database:
                 dbi.create_db()
-            dbi.install_or_upgrade_db(args.skip_database_backup)
+            dbi.install_or_upgrade_db(args.skip_database_backup, args.command_line)
 
             # change permissions to some files created as root during the installation to the domogik user
             os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
