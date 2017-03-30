@@ -1,23 +1,26 @@
-from domogik.common.utils import get_packages_directory, get_libraries_directory
-from domogik.common.jsondata import domogik_encoder
-from functools import wraps
 import json
 import sys
 import os
 import time
+import traceback
+import zmq
+from functools import wraps
 from flask import Flask, g, request, session
 try:
     from flask_wtf import Form, RecaptchaField
 except ImportError:
     from flaskext.wtf import Form, RecaptchaField
     pass
-import flask_login
-from flask_login import LoginManager, current_user
 try:
-        from flask.ext.babel import Babel, get_locale, format_datetime
+    from flask_login import LoginManager, current_user
 except ImportError:
-        from flask_babel import Babel, get_locale, format_datetime
-        pass
+    from flask.ext.login import LoginManager, current_user
+    pass
+try:
+    from flask_babel import Babel, get_locale, format_datetime
+except ImportError:
+    from flask.ext.babel import Babel, get_locale, format_datetime
+    pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField
 from wtforms.validators import Required
@@ -29,20 +32,46 @@ except ImportError:
 else:
     def is_hidden_field_filter(field):
         return isinstance(field, HiddenField)
-from flask.ext.themes2 import Themes, render_theme_template
-from flask.ext.session import Session
+try:
+    from flask_themes2 import Themes, render_theme_template
+except ImportError:
+    from flask.ext.themes2 import Themes, render_theme_template
+    pass
+try:
+    from flask_session import Session
+except ImportError:
+    from flask.ext.session import Session
+    pass
 from werkzeug.exceptions import Unauthorized
 from werkzeug import WWWAuthenticate
-import traceback
+from domogik.common.database import DbHelper
+from domogik.common.configloader import Loader as dmgLoader
+from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR, PRODUCTS_DIR
+from domogik.common.utils import get_packages_directory, get_libraries_directory
+from domogik.common.jsondata import domogik_encoder
+from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
 
 ### init Flask
 app = Flask(__name__)
+app.db = DbHelper()
 app.debug = True
+### load config
+cfg = dmgLoader('admin').load()
+app.globalConfig = dict(cfg[0])
+app.dbConfig = dict(cfg[1]) 
+app.zmq_context = zmq.Context() 
+# TODO : DEL ##app.mqpub = MQPub(zmq.Context(), 'admin-views')
+# TODO : DEL #app.mqpub = MQPub(zmq.Context(), 'adminhttp')
+app.libraries_directory = app.globalConfig['libraries_path']
+app.packages_directory = "{0}/{1}".format(app.globalConfig['libraries_path'], PACKAGES_DIR)
+app.resources_directory = "{0}/{1}".format(app.globalConfig['libraries_path'], RESOURCES_DIR)
+app.publish_directory = "{0}/{1}".format(app.resources_directory, "publish")
 
 ### set Flask Config
 app.jinja_env.globals['bootstrap_is_hidden_field'] = is_hidden_field_filter
 app.jinja_env.add_extension('jinja2.ext.do')
-#app.config['SECRET_KEY'] = '12sfjklghort nvlbneropgtbhni won ouiw'
+app.config['SECRET_KEY'] = app.dbConfig['secret_key']
 app.config['RECAPTCHA_PUBLIC_KEY'] = '6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
 app.config['BABEL_DEFAULT_TIMEZONE'] = 'Europe/Paris'
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -51,8 +80,17 @@ app.config['SESSION_FILE_THRESHOLD'] = 25
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 
-### init extensions and load them
+### Load the datatypes
+cli = MQSyncReq(zmq.Context())
+msg = MQMessage()
+msg.set_action('datatype.get')
+res = cli.request('manager', msg.get(), timeout=10)
+if res is not None:
+    app.datatypes = res.get_data()['datatypes']
+else:
+    app.datatypes = {}
 
+### init extensions and load them
 session_manager = Session()
 session_manager.init_app(app)
 
@@ -103,11 +141,11 @@ def inject_global_errors():
             err.append(('Some devices need your attention','/upgrade'))
         if not app.db.get_home_location():
             err.append(('No home location set, you should configure it first','/locations/edit/0'))
-    return dict(global_errors=err)
+    return dict(global_errors=err, ws_port=app.dbConfig['ws_port'])
 
 # render a template, later on we can select the theme it here
 def render_template(template, **context):
-    user = flask_login.current_user
+    user = current_user
     if not hasattr(user, 'skin_used') or user.skin_used == '':
         user.skin_used = 'default'
     return render_theme_template(user.skin_used, template, **context)
@@ -150,7 +188,7 @@ def json_response(action_func):
             rcode = 204
             rdata = None
         # do the actual return
-        if app.rest_auth == "True" and rcode == 401:
+        if app.dbConfig['rest_auth'] == "True" and rcode == 401:
             resp = Response(status=401)
             resp.www_authenticate.set_basic(realm = "Domogik REST interface" )
             return resp
@@ -158,7 +196,7 @@ def json_response(action_func):
             if type(app.json_stop_at) is not list:
                 app.json_stop_at = []
             if rdata:
-                if app.clean_json == "False":
+                if app.dbConfig['clean_json'] == "False":
                     resp = json.dumps(rdata, cls=domogik_encoder(stop_at=app.json_stop_at), check_circular=False)
                 else:
                     resp = json.dumps(rdata, cls=domogik_encoder(stop_at=app.json_stop_at), check_circular=False, indent=4, sort_keys=True)
@@ -205,7 +243,7 @@ def jsonp_response(action_func):
             rdata = None
             rcallback = None
         # do the actual return
-        if app.rest_auth == "True" and rcode == 401:
+        if app.dbConfig['rest_auth'] == "True" and rcode == 401:
             resp = Response(status=401)
             resp.www_authenticate.set_basic(realm = "Domogik REST interface" )
             return resp
@@ -213,7 +251,7 @@ def jsonp_response(action_func):
             if type(app.json_stop_at) is not list:
                 app.json_stop_at = []
             if rdata:
-                if app.clean_json == "False":
+                if app.dbConfig['clean_json'] == "False":
                     resp = json.dumps(rdata, cls=domogik_encoder(stop_at=app.json_stop_at), check_circular=False)
                 else:
                     resp = json.dumps(rdata, cls=domogik_encoder(stop_at=app.json_stop_at), check_circular=False, indent=4, sort_keys=True)
@@ -253,28 +291,6 @@ def register_api(view, endpoint, url, pk='id', pk_type=None):
         app.add_url_rule('{0}<{1}>'.format(url, pk), view_func=view_func,
                      methods=['GET', 'PUT', 'DELETE'])
 
-### packages admin pages
-
-sys.path.append(get_libraries_directory())
-
-from domogik.admin.views.client_advanced_empty import nothing_adm
-for a_client in os.listdir(get_packages_directory()):
-    try:
-        if os.path.isdir(os.path.join(get_packages_directory(), a_client)):
-            # check if there is an "admin" folder with an __init__.py file in it
-            if os.path.isfile(os.path.join(get_packages_directory(), a_client, "admin", "__init__.py")):
-                app.logger.info("Load advanced page for package '{0}'".format(a_client))
-                pkg = "domogik_packages.{0}.admin".format(a_client)
-                pkg_adm = "{0}_adm".format(a_client)
-                the_adm = getattr(__import__(pkg, fromlist=[pkg_adm], level=1), pkg_adm)
-                app.register_blueprint(the_adm, url_prefix="/{0}".format(a_client))
-            # if no admin for the client, include the generic empty page
-            else:
-                app.register_blueprint(nothing_adm, url_prefix="/{0}".format(a_client))
-    except:
-        app.logger.error("Error while trying to load package '{0}' advanced page in the admin. The error is : {1}".format(a_client, traceback.format_exc()))
-
-
 ### import all files inside the view module
 from domogik.admin.views.index import *
 from domogik.admin.views.login import *
@@ -289,6 +305,10 @@ from domogik.admin.views.battery import *
 from domogik.admin.views.datatypes import *
 from domogik.admin.views.locations import *
 from domogik.admin.views.config import *
+from domogik.admin.views.client_advanced_empty import *
+
+### dev/debug urls
+from domogik.admin.views.dev import *
 
 ### import all rest urls
 import domogik.admin.rest.status

@@ -202,27 +202,22 @@ class WebSocketManager(WebSocketHandler):
             # test from a dev page :
             #    {"message": "ping from browser (Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36))"}
             json_data = json.loads(content)
-
             ### Process the simple messages
             if "message" in json_data:
                 #print(u"=> message")
-
                 message = json_data["message"]
                 #print(message)
                 if message.startswith("ping from browser"):
                     browser_info = re.sub("ping from browser", "", message)
                     self.send(json.dumps({"message" : "pong from admin {0}".format(browser_info)}))
                     return
-
             ### Process the MQ related messages
             elif "mq_request" in json_data:
                 #print(u"=> MQ req")
                 self.publisher.ToMQmessages.put(content)
-
             elif "mq_publish" in json_data:
                 #print(u"=> MQ pub")
                 self.publisher.ToMQmessages.put(content)
-
         except:
             print(u"Error while processing input websocket message. Message is : '{0}'. Error is : {1}".format(content, traceback.format_exc()))
 
@@ -302,6 +297,7 @@ class Admin(Plugin):
             self.server = None
             self._start_http_ws()
             self._start_http_admin()
+
             # calls the tornado.ioloop.instance().start()
 
             ### Component is ready
@@ -315,7 +311,6 @@ class Admin(Plugin):
         """ Start HTTP Server
         """
         self.log.info(u"Start WS Server on {0}:{1}...".format(self.interfaces, self.ws_port))
-
         publisher = MQManager()
         tapp = Application([
             (r"/ws", WebSocketManager, dict(publisher=publisher))

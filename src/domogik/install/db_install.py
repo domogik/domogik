@@ -124,7 +124,13 @@ class DbInstall():
                 return False
                 
 
-    def install_or_upgrade_db(self, skip_backup=False):
+    def install_or_upgrade_db(self, skip_backup=False, command_line=False):
+        """
+            @param skip_backup = True/False. If True, don't do the backup
+            @param command_line = True/False. If True, the --command-line option have been passed
+                                              and we should not ask question to the user. So we should
+                                              not ask the user to confirm the backup action or not
+        """
         from domogik.common import sql_schema
         from domogik.common import database
         from sqlalchemy import create_engine, MetaData, Table
@@ -152,14 +158,18 @@ class DbInstall():
         else:
             if not skip_backup:
                 info("Creating backup...")
-                self.backup_existing_database()
+                if command_line:
+                    ask_confirm_backup = False
+                else:
+                    ask_confirm_backup = True
+                self.backup_existing_database(ask_confirm_backup)
                 ok("Creating backup : done")
             info("Upgrading...")
             command.upgrade(self.alembic_cfg, "head")
             ok("Upgrading : done")
         return 
     
-    def backup_existing_database(self, confirm=True):
+    def backup_existing_database(self, ask_confirm=True):
         from domogik.common import sql_schema
         from domogik.common import database
         from sqlalchemy import create_engine, MetaData, Table
@@ -169,13 +179,15 @@ class DbInstall():
         if not self._db.is_db_type_mysql():
             warning("Can't backup your database, only mysql is supported (you have : {0})".format(self._db.get_db_type()))
             return
-        if confirm:
+        if ask_confirm:
             answer = raw_input("Do you want to backup your database? [Y/n] ")
             if answer == 'n':
                 return
-        answer = raw_input("Backup file? [{0}] ".format(self.db_backup_file))
-        if answer != '':
-            bfile = answer
+            answer = raw_input("Backup file? [{0}] ".format(self.db_backup_file))
+            if answer != '':
+                bfile = answer
+            else:
+                bfile = self.db_backup_file
         else:
             bfile = self.db_backup_file
         ok("Backing up your database to {0}".format(bfile))

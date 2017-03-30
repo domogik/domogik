@@ -175,7 +175,7 @@ var PREDEFINED_OPTIONS = [
     ["Midnight","@midnight"],
     ["Hourly","@hourly"]
 ];
-var WEEKDAYS = [["Sunday", "0"], ["Monday", "1"], ["Thuesday", "2"], ["Wednesday", "3"], ["Thursday", "4"], ["Friday", "5"], ["Saturday", "6"]];
+var WEEKDAYS = [["Sunday", "0"], ["Monday", "1"], ["Tuesday", "2"], ["Wednesday", "3"], ["Thursday", "4"], ["Friday", "5"], ["Saturday", "6"]];
 var MONTHS = [["January", "1"], ["Frebruary", "2"], ["March", "3"], ["April", "4"], ["May", "5"], ["June", "6"], ["July", "7"], ["August", "8"], ["September", "9"], ["October", "10"], ["November", "11"], ["December", "12"]];
 
 Blockly.Blocks['cron.CronTest'] = {
@@ -1039,7 +1039,7 @@ Blockly.Blocks['block_day_w_from_to'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_from_to');
     this.setColour(290);
-    this.setTooltip("Used to specify ranges. For example, “2-5” means “all day of week between thuesday to friday”.");
+    this.setTooltip("Used to specify ranges. For example, “2-5” means “all day of week between tuesday to friday”.");
   },
   formatValue_: function() {
       return this.getFieldValue('from')+'-'+this.getFieldValue('to');
@@ -1058,7 +1058,7 @@ Blockly.Blocks['block_day_w_inc'] = {
     this.setInputsInline(true);
     this.setOutput(true, 'block_day_w_inc');
     this.setColour(290);
-    this.setTooltip("Used to specify increments. For example, “1/2” means “the day of week sunday, thuesday, thursday, and saturday”.");
+    this.setTooltip("Used to specify increments. For example, “1/2” means “the day of week sunday, tuesday, thursday, and saturday”.");
   },
   formatValue_: function() {
       return this.getFieldValue('start')+'/'+this.getFieldValue('inc');

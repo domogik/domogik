@@ -5,9 +5,9 @@ from domogik.common.utils import get_ip_for_interfaces, ucode
 from flask import request, flash, redirect
 from flask_login import login_required
 try:
-    from flask.ext.babel import gettext, ngettext
-except ImportError:
     from flask_babel import gettext, ngettext
+except ImportError:
+    from flask.ext.babel import gettext, ngettext
     pass
 
 @app.route('/')
@@ -19,9 +19,9 @@ def index():
     with app.db.session_scope():
         qrCode = app.db.get_core_config()
     qrCode["admin_url"] = str(request.url)
-    qrCode["rest_port"] = int(app.port)
+    qrCode["rest_port"] = int(app.dbConfig['port'])
     qrCode["rest_path"] = "/rest"
-    qrCode["rest_auth"] = bool(app.rest_auth)
+    qrCode["rest_auth"] = bool(app.dbConfig['rest_auth'])
     qrCode["mq_ip"] = str(mqConfig['ip'])
     qrCode["mq_port_sub"] = int( mqConfig['sub_port'])
     qrCode["mq_port_pub"] = int( mqConfig['pub_port'])

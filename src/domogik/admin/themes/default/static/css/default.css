@@ -36,11 +36,15 @@ table td {
 
 /** login **/
 
+.devtools{
+    max-width: 80%;
+}
+
 .login{
     max-width: 350px;
 }
 
-.login .box {
+.box {
     background-color: #FFFFFF;
     border-color: #005774 #D9D9D9 #D9D9D9;
     border-image: none;
@@ -50,14 +54,14 @@ table td {
     padding: 1em 1em 0 1em;
 }
 
-.login h1 {
+.box h1 {
     font-size: 1.4em;
     font-weight: normal;
     display: block;
     text-align: center;
 }
 
-.login .form-title {
+.singlebox .form-title {
     font-size: 1.2em;
     display: block;
     text-align: center;
@@ -396,3 +400,5 @@ iframe {
 .person-info .photo {
     margin-right: 1em;
 }
+
+

@@ -349,6 +349,9 @@ kill_all() {
     for p in $(pgrep "${NAME}" 2>/dev/null); do
         kill -9 $p >/dev/null 2>&1
     done
+    for p in $(pgrep "gunicorn" 2>/dev/null); do
+        kill -9 $p >/dev/null 2>&1
+    done
 }
 
 # Check if the directory for lock exists
