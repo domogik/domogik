@@ -117,7 +117,7 @@ class MQManager(MQAsyncSub):
     @gen.coroutine
     def publishToMQ(self):
         while True:
-            message = yield self.ToWSmessages.get()
+            message = yield self.ToMQmessages.get()
             self.sendToMQ(message)
     def sendToMQ(self, message):
         try:
@@ -165,7 +165,7 @@ class WebSocketManager(WebSocketHandler):
 
     def on_close(self):
         #print(u"WebSocketManager > on_close()")
-        self._close()
+        self._close()        
 
     def _close(self):
         #print("Subscriber left.")
@@ -241,6 +241,7 @@ class Admin(Plugin):
         self.log.debug(u"Init database_manager instance")
         # Check for database connexion
         self._db = DbHelper()
+
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : {0}".format(locale.getdefaultlocale()))
@@ -368,7 +369,7 @@ class Admin(Plugin):
         stop_loop()
         return
 
-        def _start_http_admin(self):
+    def _start_http_admin(self):
         self.log.info(u"HTTP Server initialisation...")
         acfg = dict(Loader('admin').load()[1])
         cmd = "{0} --preload --log-level {1}".format(find_executable("gunicorn"), self.log_level)
