@@ -132,7 +132,7 @@ def build_file_list(user):
                 ['src/domogik/examples/default/domogik']))
     else:
         fail("Can't find directory where i can copy system wide config")
-        exit(0)
+        exit(1)
 
     if os.path.exists('/etc/logrotate.d'):
         debug("Found a directory for the logrotate script: /etc/logrotate.d")
@@ -156,7 +156,7 @@ def build_file_list(user):
                 ['src/domogik/examples/cron/domogik']))
     else:
         fail("Can't find directory where i can copy cron config")
-        exit(0)
+        exit(1)
 
 
     hub = get_c_hub()
@@ -446,7 +446,7 @@ def install():
         # CHECK python version
         if sys.version_info < (2, 6):
             fail("Python version is to low, at least python 2.6 is needed")
-            exit(0)
+            exit(1)
 
         # CHECK sources not in / or /root
         info("Check the sources location (not in /root/ or /")
@@ -463,7 +463,7 @@ def install():
                 import domogikmq
             except ImportError:
                 fail("Please install Domogik MQ first! (https://github.com/domogik/domogik-mq)")
-                exit(0)
+                exit(1)
 
         # Execute database fix for some 0.2/0.3 databases
         #info("Process some database upgrade issues with previous releases")
@@ -540,7 +540,7 @@ def install():
             from alembic import __version__ as alembic_version
             if version.StrictVersion(alembic_version) < version.StrictVersion("0.7.4"):
                 fail("The 'alembic' version installed on this system ({0}) is not recent enough. Please install at least alembic >= 0.7.4".format(alembic_version))
-                exit(0)
+                exit(1)
 
             # do db upgrade
             try:
