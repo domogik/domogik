@@ -101,7 +101,6 @@ class MQManager(MQAsyncSub):
     @gen.coroutine
     def on_message(self, did, msg):
         """Receive message from MQ sub """
-
         #msg2 = str(msg)
         #print(u"MQManager => on_message({0}, {1})".format(did, msg2[0:50]))
 
@@ -219,7 +218,7 @@ class WebSocketManager(WebSocketHandler):
             elif "mq_publish" in json_data:
                 #print(u"=> MQ pub")
                 self.publisher.ToMQmessages.put(content)
-      except:
+        except:
             print(u"Error while processing input websocket message. Message is : '{0}'. Error is : {1}".format(content, traceback.format_exc()))
 
 class Admin(Plugin):
@@ -240,7 +239,6 @@ class Admin(Plugin):
         self.log.debug(u"Init database_manager instance")
         # Check for database connexion
         self._db = DbHelper()
-
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : {0}".format(locale.getdefaultlocale()))
@@ -637,8 +635,8 @@ class Admin(Plugin):
                    result.type != type or \
                    result.hostname != host or \
                    result.key != key:
-                        self.log.debug(u"Bad result : {0}-{1}/{2} != {3}/{4}".format(result.id, result.type, result.key, name, key))
-                        result = self._db.get_plugin_config(type, name, host, key)
+                   self.log.debug(u"Bad result : {0}-{1}/{2} != {3}/{4}".format(result.id, result.type, result.key, name, key))
+                   result = self._db.get_plugin_config(type, name, host, key)
                 val = result.value
                 if val == '':
                     val = "None"
