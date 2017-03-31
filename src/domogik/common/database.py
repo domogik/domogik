@@ -2005,6 +2005,7 @@ class DbHelper():
         if value is not None:
             config.value = ucode(value)
         self.__session.add(config)
+        self._do_commit()
         self.update_device(config.device_id)
         self._do_commit()
         return config
