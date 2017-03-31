@@ -584,6 +584,7 @@ def install():
     except SystemExit:
         # a sys.exit have been called, do not raise more errors
         pass
+        sys.exit(1)
     except:
         import traceback
         print("========= TRACEBACK =============")
