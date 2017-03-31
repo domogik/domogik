@@ -140,7 +140,8 @@ class XplManager(XplPlugin):
         """ Method called on a subscribed message
         """
         try:
-            XplPlugin.on_message(self, msgid, content)
+            if msgid != 'device.update':  # No need to reload device_list of xplgw
+                XplPlugin.on_message(self, msgid, content)
             if msgid == 'client.conversion':
                 self._parse_conversions(content)
             elif msgid == 'client.list':
