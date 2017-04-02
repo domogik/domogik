@@ -44,7 +44,7 @@ import signal
 import sys
 import os
 import pwd
-import inspect
+#import inspect
 import time
 
 class CacheDevicesList(object):
@@ -53,7 +53,7 @@ class CacheDevicesList(object):
     _lockList = multiprocessing.Lock()
 
     def __init__(self):
-                # Here you have to specify twice the logger name as two instances of DbHelper are created
+        # Here you have to specify twice the logger name as two instances of DbHelper are created
         self.log = logger.Logger('cachedevices_api').get_logger('cachedevices_api')
         self.log.debug(u"Cache Data initialized")
 
@@ -65,15 +65,16 @@ class CacheDevicesList(object):
                 for dev in self._devices_list:
                     if dev['client_id'] == client_id :
                       devices_list.append(dict(dev))
-                self.log.debug(u"Read cache with {0} device(s) for client {1} ({2})".format(len(devices_list), client_id, self))
+                self.log.debug(u"Read cache with {0} device(s) for client {1}".format(len(devices_list), client_id))
                 return devices_list
             else :
-                self.log.debug(u"Read cache with {0} device(s) for all ({1})".format(len(self._devices_list), self))
+                self.log.debug(u"Read cache with {0} device(s) for all clients".format(len(self._devices_list)))
                 return list(self._devices_list)
 
     def uptodate(self, client_id = None, device_id = None):
         with self._lockList :
             if device_id is not None :
+                device_id = int(device_id)
                 if device_id in self._to_update_device :
                     return not self._to_update_device[device_id]
                 else :
@@ -88,7 +89,7 @@ class CacheDevicesList(object):
                 return exist
             else :
                 if self._devices_list is None or self._devices_list == []:
-                    self.log.debug(u"Cache empty ({0})".format(self))
+                    self.log.debug(u"Cache is empty.")
                     return False
                 for dev in self._devices_list:
                     uptodate = not self._to_update_device[dev['id']]
@@ -107,19 +108,27 @@ class CacheDevicesList(object):
 #            for i in l :
 #                t += "{0}\n".format(i)
 #            self.log.debug("{0}".format(t))
-            self.log.debug(u"Set cache with {0} device(s). Source : {1}  ({2})".format(len(self._devices_list), source, self))
+            self.log.debug(u"Set cache with {0} device(s). Source : {1}".format(len(self._devices_list), source))
             return True
 
     def updateData(self, device_list, client_id = None, device_id = None):
         with self._lockList :
             if device_id is not None : # Update one device of device_list
+                device_id = int(device_id)
                 for i in range(0, len(self._devices_list)) :
                     if self._devices_list[i]['id'] == device_id :
                         self._devices_list[i] = device_list
                         self._to_update_device[device_id] = False
-                        self.log.debug(u"Update cache, mode device : {0} ({1})".format(device_id, self))
+                        self.log.debug(u"Update cache, mode device : {0}".format(device_id))
                         break
             elif client_id is not None : # Update by client
+#                if not device_list or device_list == [] :
+#                    l = inspect.stack()
+#                    t = ""
+#                    for i in l :
+#                        t += "{0}\n".format(i)
+#                    self.log.debug("{0}".format(t))
+#                self.log.debug(device_list)
                 for dev in list(self._devices_list):
                     # 1st remove all devices for client (assume deleted device)
                     if dev['client_id'] == client_id :
@@ -128,14 +137,14 @@ class CacheDevicesList(object):
                 self._devices_list.extend(device_list)
                 for dev in device_list :
                     self._to_update_device[dev['id']] = False
-                self.log.debug(u"Update cache for {0} device(s), mode client : {1} ({2})".format(len(device_list), client_id, self))
+                self.log.debug(u"Update cache for {0} device(s), mode client : {1}".format(len(device_list), client_id))
             else : #  Update all devices of device_list
                 for dev_n in device_list :
                     for dev in self._devices_list :
                         if dev['id'] == dev_n['id'] :
                             dev = dev_n
                             self._to_update_device[dev['id']] = False
-                self.log.debug(u"Update cache for {0}/{1} device(s), mode all of list. ({2})".format(len(device_list),len(self._devices_list), self))
+                self.log.debug(u"Update cache for {0}/{1} device(s), mode all of list.".format(len(device_list),len(self._devices_list)))
 
     def mark_as_updating(self, client_id = None, device_id = None, sensor_id = None):
         with self._lockList :
@@ -144,23 +153,24 @@ class CacheDevicesList(object):
                     for key in dev['sensors'] :
                         if dev['sensors'][key]['id'] == sensor_id :
                             self._to_update_device[dev['id']] = True
-                            self.log.debug(u"Mark to update cache mode sensor : {0} ({1})".format(sensor_id, self))
+                            self.log.debug(u"Mark to update cache mode sensor : {0}".format(sensor_id))
                             break
             elif device_id is not None : # Mark one device
+                device_id = int(device_id)
                 for dev in self._devices_list :
                     if dev['id'] == device_id :
                         self._to_update_device[dev['id']] = True
-                        self.log.debug(u"Mark to update cache mode device : {0} ({1})".format(device_id, self))
+                        self.log.debug(u"Mark to update cache mode device : {0}".format(device_id))
                         break
             elif client_id is not None : # Mark devices by client
                 for dev in self._devices_list:
                     if dev['client_id'] == client_id :
                         self._to_update_device[dev['id']] = True
-                self.log.debug(u"Mark to update cache mode client : {0} ({1})".format(client_id, self))
+                self.log.debug(u"Mark to update cache mode client : {0}".format(client_id))
             else : #  Mark all devices
                 for dev_n in self._devices_list :
                     self._to_update_device[dev['id']] = True
-                self.log.debug(u"Mark to update cache mode all ({0})".format(self))
+                self.log.debug(u"Mark to update cache mode all clients")
 
 class MyManager(SyncManager): pass
 
@@ -197,7 +207,7 @@ class WorkerCache(object):
     def force_leave(self):
         """ Stop manager cache
         """
-        
+
         selfPID =  current_process().pid
         pPID = os.getppid()
         self.log.info(u"Call force_leave by kill parent process {0} and it self {1} : {2}".format(pPID, selfPID, self))
