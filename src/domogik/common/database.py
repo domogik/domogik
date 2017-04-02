@@ -1730,7 +1730,6 @@ class DbHelper():
         self.__session.add(sensor)
         self._do_commit()
         self.update_device(sensor.device_id)
-        self._do_commit()
         return sensor
 
 
@@ -1814,7 +1813,6 @@ class DbHelper():
         self.__session.add(cmd)
         self._do_commit()
         self.update_device(device_id)
-        self._do_commit()
         return cmd
 
 
@@ -1860,8 +1858,8 @@ class DbHelper():
         if name is not None:
             stat.name = name
         self.__session.add(stat)
-        self.update_device(device_id)
         self._do_commit()
+        self.update_device(device_id)
         return stat
 
 ###################
@@ -2007,7 +2005,6 @@ class DbHelper():
         self.__session.add(config)
         self._do_commit()
         self.update_device(config.device_id)
-        self._do_commit()
         return config
 
 ###################
