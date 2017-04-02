@@ -355,7 +355,7 @@ def client_global_edit(client_id, dev_id):
                     #default = False
                     default = 'n'
                 #field = BooleanField(item["key"], [validators.optional()], default=default) # set to optional field due to WTForm BooleanField return no data for false value (HTML checkbox)
-                field = RadioField( item["key"], 
+                field = RadioField( item["key"],
                                 [validators.optional()],
                                 choices=[('y', 'Yes'), ('n', 'No')], default=default
                               )
@@ -436,13 +436,13 @@ def client_devices_edit(client_id, did):
         form = MyForm(request.form, device)
 
         if request.method == 'POST' and form.validate():
-	    res = app.db.update_device(did, \
-		d_name=request.form['name'], \
-		d_description=request.form['description'], \
-		d_reference=request.form['reference'])
-	    if res:
-		flash(gettext("Device update succesfully"), 'success')
-	    else:
+            res = app.db.update_device(did, \
+            d_name=request.form['name'], \
+            d_description=request.form['description'], \
+            d_reference=request.form['reference'])
+            if res:
+                flash(gettext("Device update succesfully"), 'success')
+            else:
                 flash(gettext("Device update failed"), 'warning')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
         else:
@@ -550,7 +550,7 @@ def client_config(client_id):
 			  "host" : host,
 			  "event" : "updated"})
 	flash(gettext("Config saved successfull"), 'success')
-    
+
     return render_template('client_config.html',
             form = form,
             clientid = client_id,
@@ -643,9 +643,9 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     for item in params["global"]:
         # build the field
         name = "{0}".format(item["key"])
-        try: 
+        try:
             default = request.args.get(name)
-        except: 
+        except:
             if item["type"] == "boolean":
                 default = False
             else:
@@ -661,7 +661,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 default = 'n'
             #field = BooleanField(name, [InputRequired()], description=item["description"], default=default)
             #field = BooleanField(name, [], description=item["description"], default=default)
-            field = RadioField( name, 
+            field = RadioField( name,
                                 [validators.Required()], description=item["description"],
                                 choices=[('y', 'Yes'), ('n', 'No')], default=default
                               )
