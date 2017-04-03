@@ -148,19 +148,19 @@ class DbHelper():
         # Here you have to specify twice the logger name as two instances of DbHelper are created
         self.log = logger.Logger('db_api').get_logger('db_api')
 
-        # init cache date multiprocessing for device_list
-        self._cacheDevice = None
-        if use_cache :
-            DeviceCache.register('get_cache')
-            m = DeviceCache(address=('', 50001), authkey=b'abracadabra')
-            m.connect()
-            self.log.info(u"Connected to memory devices cache {0}".format(m))
-            self._cacheDevice = m.get_cache()
-
         cfg = Loader('database')
         config = cfg.load()
         self.__db_config = dict(config[1])
 
+        # init cache date multiprocessing for device_list
+        self._cacheDevice = None
+        if use_cache :
+            DeviceCache.register('get_cache')
+            port_c = 50001 if not 'portcache' in self.__db_config else int(self.__db_config['portcache'])
+            m = DeviceCache(address=('localhost', port_c), authkey=b'{0}'.format(self.__db_config['password']))
+            m.connect()
+            self.log.info(u"Connected to memory devices cache {0}".format(m))
+            self._cacheDevice = m.get_cache()
         if "recycle_pool" in self.__db_config:
             #self.log.info(u"User value for recycle pool : {0}".format(self.__db_config['recycle_pool']))
             pool_recycle = int(self.__db_config['recycle_pool'])

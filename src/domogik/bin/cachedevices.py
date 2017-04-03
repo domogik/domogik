@@ -34,6 +34,7 @@ Implements
 """
 
 from domogik.common.defaultloader import DefaultLoader
+from domogik.common.configloader import Loader
 from domogik.common import logger
 import multiprocessing
 #import Lock
@@ -191,10 +192,16 @@ class WorkerCache(object):
         self.log = logg.get_logger()
 
         self.log.info(u"Initializing cache worker :{0}".format(self))
+
+        cfg = Loader('database')
+        config = cfg.load()
+        db_config = dict(config[1])
+        port_c = 50001 if not 'portcache' in db_config else int(db_config['portcache'])
+
         self._cache = CacheDevicesList()
         MyManager.register('get_cache', callable=lambda:self._cache)
         MyManager.register('force_leave', callable=lambda:self.force_leave())
-        self.cacheManager = MyManager(address=('', 50001), authkey=b'abracadabra')
+        self.cacheManager = MyManager(address=('localhost', port_c), authkey=b'{0}'.format(db_config['password']))
         self.cacheManager.start()
         self._pPIDs = []
         for p in active_children():
