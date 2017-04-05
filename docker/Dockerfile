@@ -138,7 +138,7 @@ RUN cd /opt/dmg/domogik-mq \
 RUN /bin/bash -c "/usr/bin/mysqld_safe &" \
  && sleep 5 \
  && cd /opt/dmg/domogik \
- && python install.py --user domogik --command-line --no-create-database --admin_interfaces "*"
+ && python install.py --user domogik --command-line --no-create-database --admin_interfaces "*" --admin_secret_key "dockersupersecretkey"
 
 # Domoweb
 RUN cd /opt/dmg/domoweb \
