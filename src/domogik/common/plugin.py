@@ -1197,7 +1197,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             # we guess that if no "log" is defined, the client has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
-    def force_leave(self, status = False, return_code = None):
+    def force_leave(self, status = False, return_code = None, exit=True):
         """ Leave threads & timers
 
             In the XplPLugin class, this function will be completed to also activate the xpl hbeat
@@ -1272,7 +1272,8 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
                 self.log.warn(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
-        sys.exit()
+        if exit :
+            sys.exit()
 
 
 class Watcher:

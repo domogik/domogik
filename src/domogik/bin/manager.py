@@ -92,7 +92,7 @@ from domogik.common.packagejson import PackageJson, PackageException
 from domogik.xpl.common.xplconnector import Listener, STATUS_HBEAT_XPL
 
 from multiprocessing.managers import SyncManager
-from domogik.bin.cachedevices import WorkerCache
+from domogik.bin.cachedb import WorkerCache, CACHE_NAME
 
 
 ### constants
@@ -248,10 +248,7 @@ class Manager(XplPlugin, MQAsyncSub):
                                       (),
                                       {})
         thr__runCacheDevices.start()
-#        self.__cacheData = WorkerCache()
         self.log.info(u"Manager instanciate cache")
-#        if not self._start_core_component("cachedevices"):
-#            self.log.error(u"Unable to start cachedevices")
 
         ### Start xpl GW
         if self.options.start_xpl:
@@ -295,6 +292,8 @@ class Manager(XplPlugin, MQAsyncSub):
         self.ready()
 
     def force_leave(self, status = False, return_code = None):
+        ### Call the XplPlugin init
+        XplPlugin.force_leave(self, status, return_code, exit=False)
         if self._cache_pid is not None :
             cfg = Loader('database')
             config = cfg.load()
@@ -310,8 +309,7 @@ class Manager(XplPlugin, MQAsyncSub):
                 m.force_leave()
             except :
                 pass
-        ### Call the XplPlugin init
-        XplPlugin.force_leave(self, status, return_code)
+        sys.exit()
 
     def _check_available_packages(self):
         """ Check the available packages and get informations on them
@@ -760,8 +758,8 @@ class Manager(XplPlugin, MQAsyncSub):
 #        self.log.info(u"Cache running")
         self._pid_dir_path = self.config['pid_dir_path']
         try:
-            the_path = os.path.join(os.path.dirname(__file__), "{0}.py".format(('cachedevices')))
-            self.log.debug(u"Path for component '{0}' is : {1}".format('cache devices', the_path))
+            the_path = os.path.join(os.path.dirname(__file__), "{0}.py".format(('cachedb')))
+            self.log.debug(u"Path for component '{0}' is : {1}".format('cache_db', the_path))
         except:
             msg = u"Error while trying to get the module path. The component will not be started !. Error is : {0}".format(traceback.format_exc())
             self.log.error(msg)
@@ -780,7 +778,7 @@ class Manager(XplPlugin, MQAsyncSub):
         self.log.info(u"Cache running on pid {0}".format(self._cache_pid))
 #        subp.communicate()
         pid_file = os.path.join(self._pid_dir_path,
-                                "cachedevices_api" + ".pid")
+                                CACHE_NAME + ".pid")
         self.log.debug(u"Write pid file for pid '{0}' in file '{1}'".format(str(self._cache_pid), pid_file))
         fil = open(pid_file, "w")
         fil.write(str(self._cache_pid))
