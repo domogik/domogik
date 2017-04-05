@@ -4,7 +4,7 @@ MAINTAINER Fritz SMH <fritz.smh@gmail.com>
 ### Configuration #################################
 
 ENV domogik_release=develop
-ENV domogikmq_release=1.3
+ENV domogikmq_release=1.4
 ENV domoweb_release=develop
 
 ENV ROOT_PASSWORD=domopass
