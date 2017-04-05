@@ -74,10 +74,14 @@ RUN /bin/bash -c "/usr/bin/mysqld_safe &" \
 RUN useradd -M domogik \
  && mkdir -p /opt/dmg \
  && chown domogik:domogik /opt/dmg
- 
+
 ### Change passwords
 RUN echo "root:$ROOT_PASSWORD" | chpasswd \
  && echo "domogik:$DOMOGIK_PASSWORD" | chpasswd
+
+### Create a fake cron folder to avoid error during install
+RUN mkdir -p /etc/cron.d/
+ 
  
 ### Deploy the sources
 
@@ -154,7 +158,10 @@ RUN pip install npyscreen \
 RUN apt-get clean
 
 ### Expose ports
-EXPOSE 40406 40404 22
+# 40404 : domoweb
+# 40405 : domogik admin websocket
+# 40406 : domogik admin http
+EXPOSE 40404 40405 40404 22
 
 
 ### Volumes
