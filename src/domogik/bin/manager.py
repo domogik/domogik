@@ -296,13 +296,17 @@ class Manager(XplPlugin, MQAsyncSub):
 
     def force_leave(self, status = False, return_code = None):
         if self._cache_pid is not None :
+            cfg = Loader('database')
+            config = cfg.load()
+            dbConfig = dict(config[1])
+            port_c = 50001 if not 'portcache' in dbConfig else int(dbConfig['portcache'])
             DeviceCache.register('force_leave')
-            m = DeviceCache(address=('', 50001), authkey=b'abracadabra')
+            m = DeviceCache(address=('localhost', port_c), authkey=b'{0}'.format(dbConfig['password']))
             m.connect()
             if hasattr(self, "log"):
                 self.log.info(u"force_leave called. Exit to memory devices cache {0}".format(m))
             # Actually Killing all subProcess. Not really academic, but I d'ont find other way ! and raise an exception."
-            try : 
+            try :
                 m.force_leave()
             except :
                 pass
@@ -1098,13 +1102,12 @@ class Brain(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log, host)
+        self._config = Query(self.log, host)
 
         ### set package path
         self._packages_directory = packages_directory
 
         ### get the plugin data (from the json file)
-        status = None
         self.data = {}
         self.fill_data()
 
@@ -1210,10 +1213,9 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log, host)
+        self._config = Query(self.log, host)
 
         ### get the plugin data (from the json file)
-        status = None
         self.data = {}
         self.fill_data()
 
@@ -1501,10 +1503,9 @@ class Interface(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log, host)
+        self._config = Query(self.log, host)
 
         ### get the interface data (from the json file)
-        status = None
         self.data = {}
         self.fill_data()
 

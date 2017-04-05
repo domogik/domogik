@@ -263,7 +263,12 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             Check in database (over queryconfig) if the key 'configured' is set to True for the client
             if not, stop the client and log this
         """
-        self._client_config = Query(self.zmq, self.log, self.get_sanitized_hostname())
+        #  For Plugin not locate on domogik server we must use MQ query mode
+#        self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
+
+        # Query use direct DbHelper access by default (better performance)"""
+        self._client_config = Query(self.log, self.get_sanitized_hostname())
+
         configured = self._client_config.query(self._type, self._name, 'configured')
         if configured == '1':
             configured = True
@@ -297,7 +302,12 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         """ Try to get the config over the MQ. If value is None, get the default value
         """
         if self._client_config == None:
-            self._client_config = Query(self.zmq, self.log, self.get_sanitized_hostname())
+            #  For Plugin not locate on domogik server we must use MQ query mode
+#            self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
+
+            # Query use direct DbHelper access by default (better performance)"""
+            self._client_config = Query(self.log, self.get_sanitized_hostname())
+
         value = self._client_config.query(self._type, self._name, key)
         if value == None or value == 'None':
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
