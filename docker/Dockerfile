@@ -4,7 +4,7 @@ MAINTAINER Fritz SMH <fritz.smh@gmail.com>
 ### Configuration #################################
 
 ENV domogik_release=develop
-ENV domogikmq_release=1.3
+ENV domogikmq_release=1.4
 ENV domoweb_release=develop
 
 ENV ROOT_PASSWORD=domopass
@@ -74,10 +74,14 @@ RUN /bin/bash -c "/usr/bin/mysqld_safe &" \
 RUN useradd -M domogik \
  && mkdir -p /opt/dmg \
  && chown domogik:domogik /opt/dmg
- 
+
 ### Change passwords
 RUN echo "root:$ROOT_PASSWORD" | chpasswd \
  && echo "domogik:$DOMOGIK_PASSWORD" | chpasswd
+
+### Create a fake cron folder to avoid error during install
+RUN mkdir -p /etc/cron.d/
+ 
  
 ### Deploy the sources
 
@@ -134,7 +138,7 @@ RUN cd /opt/dmg/domogik-mq \
 RUN /bin/bash -c "/usr/bin/mysqld_safe &" \
  && sleep 5 \
  && cd /opt/dmg/domogik \
- && python install.py --user domogik --command-line --no-create-database --admin_interfaces "*"
+ && python install.py --user domogik --command-line --no-create-database --admin_interfaces "*" --admin_secret_key "dockersupersecretkey"
 
 # Domoweb
 RUN cd /opt/dmg/domoweb \
@@ -154,7 +158,10 @@ RUN pip install npyscreen \
 RUN apt-get clean
 
 ### Expose ports
-EXPOSE 40406 40404 22
+# 40404 : domoweb
+# 40405 : domogik admin websocket
+# 40406 : domogik admin http
+EXPOSE 40404 40405 40404 22
 
 
 ### Volumes

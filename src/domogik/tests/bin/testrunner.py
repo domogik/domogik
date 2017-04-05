@@ -150,6 +150,8 @@ class TestRunner():
         for test in sorted(self.json):
             config = self.json[test]
             to_run = True
+            if config['automatic'] == False:
+                to_run = False
             if config['need_hardware']:
                 to_run = False
             if (not self.options.allow_alter) and config['alter_configuration_or_setup']:
