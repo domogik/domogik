@@ -48,6 +48,7 @@ def locations():
                                 'first_name' : per.first_name,
                                 'last_name' : per.last_name,
                                 'location_sensor' : per.location_sensor,
+                                'last_seen' : last_seen,
                                 'lat' : lat,
                                 'lng' : lng})
 

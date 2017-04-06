@@ -167,10 +167,11 @@ def position_post(person_id):
                             data = {"status": "ERROR", "error": "Location '{0}' can not be found".format(a_loc_data['location_name'])}
                             return 200, data
                         else:
+                            print(u"Get location from location name...")
                             # get the coordinates
-                            longtitude = filter(lambda n: n.key == 'lng', loc.params)
-                            if len(longtitude) > 0:
-                                longtitude = longtitude[0].value
+                            longitude = filter(lambda n: n.key == 'lng', loc.params)
+                            if len(longitude) > 0:
+                                longitude = longitude[0].value
                             latitude = filter(lambda n: n.key == 'lat', loc.params)
                             if len(latitude) > 0:
                                 latitude = latitude[0].value

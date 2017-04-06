@@ -125,17 +125,20 @@
 
             //********* Place the persons
             {% for data in persons %}
+                // DEBUG : data = {{ data }}
                 {% if data.lat != None and data.lng != None %}
 
                     //****** Add markers
+                    var last_seen = new Date({{ data.last_seen }} * 1000).toLocaleString();
                     var contentStringP{{ data.id }} = '<div id="content">'+
                         '<div id="siteNotice">'+
                         '</div>'+
                         '<h1 id="firstHeading" class="firstHeading">{{ data.first_name }} {{ data.last_name }}</h1>'+
                         '<div id="bodyContent">'+
                         '<ul>'+
+                        '<li>{% trans %}Last seen{% endtrans %} : ' + last_seen + ' </li>'+
                         '<li>{% trans %}Latitude{% endtrans %} : {{ data.lat }} </li>'+
-                        '<li>{% trans %}Longitude{% endtrans %} : {{ data.lgn }} </li>'+
+                        '<li>{% trans %}Longitude{% endtrans %} : {{ data.lng }} </li>'+
                         '</ul>'+
                         '</div>'+
                         '</div>';
