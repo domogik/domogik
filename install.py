@@ -411,6 +411,7 @@ def update_default(user):
 
 def find_interface():
     info("Trying to find an interface to listen on")
+    intf = ""
     try:
         import traceback
         pkg_resources.get_distribution("domogik").activate()
