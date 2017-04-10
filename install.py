@@ -332,7 +332,7 @@ def write_domogik_configfile_from_command_line(args, intf):
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
 
-            # TODO : handle the intf parameter
+            # handle the intf parameter
 
             new_value = eval("args.{0}_{1}".format(sect, item[0]))
             # notice that finally because of network interfaces, the newvalues will always be True... 
@@ -375,13 +375,31 @@ def write_xplhub_configfile_from_command_line(args, intf):
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            new_value = eval("args.{0}_{1}".format(sect, item[0]))
-            if new_value != item[1] and new_value != '' and new_value != None:
-                # need to write it to config file
-                print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
-                config.set(sect, item[0], new_value)
-                newvalues = True
-            debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
+            if item[0] == 'interfaces':
+                # for the interface key, if the user set a value != of the default one, take it. Else take the builded value
+                new_value = eval("args.{0}_{1}".format(sect, item[0]))
+
+                # the user changed the value
+                if new_value != item[1] and new_value != '' and new_value != None:
+                    # need to write it to config file
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    config.set(sect, item[0], new_value)
+                    newvalues = True
+                # the user did not change the value
+                else:
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], intf))
+                    config.set(sect, item[0], intf)
+                    newvalues = True
+               
+                debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
+            else:
+                new_value = eval("args.{0}_{1}".format(sect, item[0]))
+                if new_value != item[1] and new_value != '' and new_value != None:
+                    # need to write it to config file
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    config.set(sect, item[0], new_value)
+                    newvalues = True
+                debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
     with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
         ok("Writing the config file")
