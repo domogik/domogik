@@ -133,7 +133,7 @@ class XplManager(XplPlugin):
                 pass
             if msg.get_action() == "cmd.send":
                 self._send_command(msg)
-        except Exception as exp:
+        except :
             self.log.error(traceback.format_exc())
 
     def on_message(self, msgid, content):
@@ -150,7 +150,7 @@ class XplManager(XplPlugin):
                 self._handle_mq_sensor(content)
             elif msgid == 'device.update':
                 self._handle_mq_device_update(content)
-        except Exception as exp:
+        except :
             self.log.error(traceback.format_exc())
 
     def _handle_mq_device_update(self, content):
@@ -696,7 +696,6 @@ class XplManager(XplPlugin):
             #for xplstat in self._db.get_all_xpl_stat():
             with self._lockUpdate:
                 for xplstat in self.all_xpl_stat:
-                    sensors = 0
                     matching = 0
                     statics = 0
                     if xplstat['schema'] == item["msg"].schema:
@@ -777,7 +776,7 @@ class XplManager(XplPlugin):
                 except queue.Empty:
                     # nothing in the queue, sleep for 1 second
                     time.sleep(1)
-                except Exception as exp:
+                except :
                     self._log.error(traceback.format_exc())
 
     class _SensorStoreThread(threading.Thread):
@@ -808,78 +807,85 @@ class XplManager(XplPlugin):
             """
             with self._lockUpdate:
                 self._log.info("Event : one device changed. Reloading data for _SensorStoreThread")
+                self.__reload_device()
+                self._log.info("Event : one device changed. Reloading data for _SensorStoreThread -- finished")
+
+        def __reload_device(self):
+            """Self._lockUpdate.acquire must be do by caller"""
+
+            with self._db.session_scope():
                 self.all_sensors = {}
                 self.all_devices = {}
-                with self._db.session_scope():
-                    for sen in self._db.get_all_sensor():
-                        #print(sen)
-                        #<Sensor: conversion='', value_min='None', history_round='0.0', reference='adco', data_type='DT_String', history_duplicate='False', last_received='1474968431', incremental='False', id='29', history_expire='0', timeout='180', history_store='True', history_max='0', formula='None', device_id='2', last_value='030928084432', value_max='3.09036843008e+11', name='Electric meter address'>
-                        self.all_sensors[str(sen.id)] = { 'id' : sen.id,
-                                                     'conversion' : sen.conversion,
-                                                     'value_min' : sen.value_min,
-                                                     'history_round' : sen.history_round,
-                                                     'reference' : sen.reference,
-                                                     'data_type' : sen.data_type,
-                                                     'history_duplicate' : sen.history_duplicate,
-                                                     'last_received' : sen.last_received,
-                                                     'incremental' : sen.incremental,
-                                                     'history_expire' : sen.history_expire,
-                                                     'timeout' : sen.timeout,
-                                                     'history_store' : sen.history_store,
-                                                     'history_max' : sen.history_max,
-                                                     'formula' : sen.formula,
-                                                     'device_id' : sen.device_id,
-                                                     'last_value' : sen.last_value,
-                                                     'value_max' : sen.value_max,
-                                                     'name' : sen.name}
-                    #print(self.all_sensors)
+                for sen in self._db.get_all_sensor():
+                    #print(sen)
+                    #<Sensor: conversion='', value_min='None', history_round='0.0', reference='adco', data_type='DT_String', history_duplicate='False', last_received='1474968431', incremental='False', id='29', history_expire='0', timeout='180', history_store='True', history_max='0', formula='None', device_id='2', last_value='030928084432', value_max='3.09036843008e+11', name='Electric meter address'>
+                    self.all_sensors[str(sen.id)] = { 'id' : sen.id,
+                                                 'conversion' : sen.conversion,
+                                                 'value_min' : sen.value_min,
+                                                 'history_round' : sen.history_round,
+                                                 'reference' : sen.reference,
+                                                 'data_type' : sen.data_type,
+                                                 'history_duplicate' : sen.history_duplicate,
+                                                 'last_received' : sen.last_received,
+                                                 'incremental' : sen.incremental,
+                                                 'history_expire' : sen.history_expire,
+                                                 'timeout' : sen.timeout,
+                                                 'history_store' : sen.history_store,
+                                                 'history_max' : sen.history_max,
+                                                 'formula' : sen.formula,
+                                                 'device_id' : sen.device_id,
+                                                 'last_value' : sen.last_value,
+                                                 'value_max' : sen.value_max,
+                                                 'name' : sen.name}
+                #print(self.all_sensors)
 
-
-
-                    for dev in self._db.list_devices():
-                        #print(dev)
-                        #{'xpl_stats': {u'get_total_space': {'json_id': u'get_total_space', 'schema': u'sensor.basic', 'id': 3, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_total_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'total_space', 'key': u'type'}]}, 'name': u'Total space'}, u'get_free_space': {'json_id': u'get_free_space', 'schema': u'sensor.basic', 'id': 4, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_free_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'free_space', 'key': u'type'}]}, 'name': u'Free space'}, u'get_used_space': {'json_id': u'get_used_space', 'schema': u'sensor.basic', 'id': 5, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_used_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'used_space', 'key': u'type'}]}, 'name': u'Used space'}, u'get_percent_used': {'json_id': u'get_percent_used', 'schema': u'sensor.basic', 'id': 6, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_percent_used', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'percent_used', 'key': u'type'}]}, 'name': u'Percent used'}}, 'commands': {}, 'description': u'', 'reference': u'', 'sensors': {u'get_total_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 57, 'reference': u'get_total_space', 'conversion': u'', 'name': u'Total Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'14763409408', 'value_max': 14763409408.0}, u'get_free_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 59, 'reference': u'get_free_space', 'conversion': u'', 'name':u'Free Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'1319346176', 'value_max': 8220349952.0}, u'get_used_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 60, 'reference': u'get_used_space', 'conversion': u'', 'name': u'Used Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'13444063232', 'value_max': 14763409408.0}, u'get_percent_used': {'value_min': None, 'data_type':u'DT_Scaling', 'incremental': False, 'id': 58, 'reference': u'get_percent_used', 'conversion': u'', 'name': u'Percent used', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'91', 'value_max': 100.0}}, 'xpl_commands': {}, 'client_id': u'plugin-diskfree.ambre', 'device_type_id': u'diskfree.disk_usage', 'client_version': u'1.0', 'parameters': {u'interval': {'value': u'5', 'type': u'integer', 'id': 5, 'key': u'interval'}}, 'id': 3, 'name': u'Ambre /'}
-                        self.all_devices[str(dev['id'])] = {
-                                                        'client_id': dev['client_id'],
-                                                        'id': dev['id'],
-                                                        'name': dev['name']
-                                                      }
-                    #print(self.all_devices)
-                self._log.info("Event : one device changed. Reloading data for _SensorStoreThread -- finished")
+                for dev in self._db.list_devices():
+                    #print(dev)
+                    #{'xpl_stats': {u'get_total_space': {'json_id': u'get_total_space', 'schema': u'sensor.basic', 'id': 3, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_total_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'total_space', 'key': u'type'}]}, 'name': u'Total space'}, u'get_free_space': {'json_id': u'get_free_space', 'schema': u'sensor.basic', 'id': 4, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_free_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'free_space', 'key': u'type'}]}, 'name': u'Free space'}, u'get_used_space': {'json_id': u'get_used_space', 'schema': u'sensor.basic', 'id': 5, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_used_space', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'used_space', 'key': u'type'}]}, 'name': u'Used space'}, u'get_percent_used': {'json_id': u'get_percent_used', 'schema': u'sensor.basic', 'id': 6, 'parameters': {'dynamic': [{'ignore_values': u'', 'sensor_name': u'get_percent_used', 'key': u'current'}], 'static': [{'type': u'string', 'value': u'/', 'key': u'device'}, {'type': None, 'value': u'percent_used', 'key': u'type'}]}, 'name': u'Percent used'}}, 'commands': {}, 'description': u'', 'reference': u'', 'sensors': {u'get_total_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 57, 'reference': u'get_total_space', 'conversion': u'', 'name': u'Total Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'14763409408', 'value_max': 14763409408.0}, u'get_free_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 59, 'reference': u'get_free_space', 'conversion': u'', 'name':u'Free Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'1319346176', 'value_max': 8220349952.0}, u'get_used_space': {'value_min': None, 'data_type': u'DT_Byte', 'incremental': False, 'id': 60, 'reference': u'get_used_space', 'conversion': u'', 'name': u'Used Space', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'13444063232', 'value_max': 14763409408.0}, u'get_percent_used': {'value_min': None, 'data_type':u'DT_Scaling', 'incremental': False, 'id': 58, 'reference': u'get_percent_used', 'conversion': u'', 'name': u'Percent used', 'last_received': 1459192737, 'timeout': 0, 'formula': None, 'last_value': u'91', 'value_max': 100.0}}, 'xpl_commands': {}, 'client_id': u'plugin-diskfree.ambre', 'device_type_id': u'diskfree.disk_usage', 'client_version': u'1.0', 'parameters': {u'interval': {'value': u'5', 'type': u'integer', 'id': 5, 'key': u'interval'}}, 'id': 3, 'name': u'Ambre /'}
+                    self.all_devices[str(dev['id'])] = {
+                                                    'client_id': dev['client_id'],
+                                                    'id': dev['id'],
+                                                    'name': dev['name']
+                                                  }
+                #print(self.all_devices)
+                self._log.debug(u"Devices and sensors reloaded for _SensorStoreThread")
 
         def run(self):
             while not self._stop.isSet():
                 try:
+                    store = True
+                    item = self._queue.get(timeout=1)
+                    #self._log.debug(u"Getting item from the store queue, current length = {0}".format(self._queue.qsize()))
+                    self._log.debug(u"Getting item from the store queue, current length = {0}, item = '{1}'".format(self._queue.qsize(), item))
+                    # handle ignore
+                    value = item['value']
+                    senid = item['sensor_id']
+                    current_date = item['time']
+                    # get the sensor and dev
                     with self._lockUpdate:
-                        store = True
-                        item = self._queue.get(timeout=1)
-                        #self._log.debug(u"Getting item from the store queue, current length = {0}".format(self._queue.qsize()))
-                        self._log.debug(u"Getting item from the store queue, current length = {0}, item = '{1}'".format(self._queue.qsize(), item))
-                        # handle ignore
-                        value = item['value']
-                        senid = item['sensor_id']
-                        current_date = item['time']
-                        # get the sensor and dev
-                        # TODO : DEBUG - LOG TO REMOVE
-                        #self._log.debug(u"DEBUG - BEFORE THE with self._db.session_scope()")
-                        with self._db.session_scope():
-                        #self._log.debug(u"DEBUG - BEGINNING OF THE with self._db.session_scope()")
-                        #sen = self._db.get_sensor(senid)
-                        #dev = self._db.get_device(sen.device_id)
+                        if str(senid) not in self.all_sensors :
+                            self._log.debug(u"Sensor not find, reload sensors and device_list at once to be sure of devices_list update")
+                            self.__reload_device()
+                        sen = self.all_sensors[str(senid)]
+                        if str(sen['device_id'])not in self.all_devices :
+                            self._log.debug(u"Device not find, reload sensors and devices_list at once to be sure of devices_list update")
+                            self.__reload_device()
                             sen = self.all_sensors[str(senid)]
-                            dev = self.all_devices[str(sen['device_id'])]
-                            # check if we need a conversion
-                            if sen['conversion'] is not None and sen['conversion'] != '':
-                                if dev['client_id'] in self._conv() and sen['conversion'] in self._conv()[dev['client_id']]:
-                                    self._log.debug( \
-                                        u"Calling conversion {0}".format(sen['conversion']))
-                                    exec(self._conv()[dev['client_id']][sen['conversion']])
-                                    value = locals()[sen['conversion']](value)
-                            self._log.info( \
-                                    u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}) with value '{4}' after conversion." \
-                                    .format(dev['name'], dev['id'], sen['name'], sen['id'], value))
-                            try:
-                                # do the store
+                        dev = self.all_devices[str(sen['device_id'])]
+                    # check if we need a conversion
+                    if sen['conversion'] is not None and sen['conversion'] != '':
+                        if dev['client_id'] in self._conv() and sen['conversion'] in self._conv()[dev['client_id']]:
+                            self._log.debug( \
+                                u"Calling conversion {0}".format(sen['conversion']))
+                            exec(self._conv()[dev['client_id']][sen['conversion']])
+                            value = locals()[sen['conversion']](value)
+                    self._log.info( \
+                            u"Storing stat for device '{0}' ({1}) and sensor '{2}' ({3}) with value '{4}' after conversion." \
+                            .format(dev['name'], dev['id'], sen['name'], sen['id'], value))
+                    try:
+                        # do the store
+                        with self._lockUpdate:
+                            with self._db.session_scope():
                                 value = self._db.add_sensor_history(\
                                         senid, \
                                         sen, \
@@ -891,8 +897,10 @@ class XplManager(XplPlugin):
                                       "device_id" : dev['id'], \
                                       "sensor_id" : senid, \
                                       "stored_value" : value})
-                            except Exception as exp:
-                                self._log.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
+                        # Release CPU for other work
+                        time.sleep(0.1)
+                    except Exception as exp:
+                        self._log.error(u"Error when adding sensor history : {0}".format(traceback.format_exc()))
                 except queue.Empty:
                     # nothing in the queue, sleep for 1 second
                     time.sleep(1)
