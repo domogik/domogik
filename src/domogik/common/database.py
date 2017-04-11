@@ -606,7 +606,6 @@ class DbHelper():
             #print params
             #print json
             created_xpl_stats = {}
-            created_xpl_cmd = {}
             created_sensors = {}
             self.__session.expire_all()
 
@@ -617,6 +616,7 @@ class DbHelper():
                     description=params['description'], reference=params['reference'], info_changed=func.now())
             self.__session.add(device)
             self.__session.flush()
+            if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=params['client_id'])
 
             ### Table code_device_params
             for p in params['global']:
@@ -649,6 +649,7 @@ class DbHelper():
                                 )
                 self.__session.add(sensor)
                 self.__session.flush()
+                if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=params['client_id'])
                 created_sensors[a_sensor] = sensor.id
                 #print("CLIENT_DATA={0}".format(client_data))
                 #print("PARAMS={0}".format(params))
@@ -697,6 +698,7 @@ class DbHelper():
                                       command_param['conversion'])
                     self.__session.add(pa)
                     self.__session.flush()
+                if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=params['client_id'])
 
                 ### Table core_xplcommand
                 if 'xpl_command' in command_in_client_data:
@@ -715,6 +717,7 @@ class DbHelper():
                                             json_id=command_in_client_data['xpl_command'])
                     self.__session.add(xplcommand)
                     self.__session.flush()
+                    if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=params['client_id'])
                     ### Table core_xplcommand_param
                     for p in x_command['parameters']['static']:
                         par = XplCommandParam(cmd_id=xplcommand.id, \
