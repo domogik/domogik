@@ -322,20 +322,44 @@ def write_xplhub_configfile(advanced_mode, intf):
         ok("Writing the config file")
         config.write(configfile)
 
-def write_domogik_configfile_from_command_line(args):
+def write_domogik_configfile_from_command_line(args, intf):
     # read the sample config file
     newvalues = False
     config = configparser.RawConfigParser()
     config.read( ['/etc/domogik/domogik.cfg.sample'] )
+    itf = ['bind_interface', 'interfaces']
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
+
+            # handle the intf parameter
+
             new_value = eval("args.{0}_{1}".format(sect, item[0]))
-            if new_value != item[1] and new_value != '' and new_value != None:
-                # need to write it to config file
-                print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
-                config.set(sect, item[0], new_value)
-                newvalues = True
+            # notice that finally because of network interfaces, the newvalues will always be True... 
+            # TODO : improve
+            if item[0] not in itf:
+                if new_value != item[1] and new_value != '' and new_value != None:
+                    # need to write it to config file
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    config.set(sect, item[0], new_value)
+                    newvalues = True
+            else:
+                # user changed the default value
+                print("{0} vs {1}".format(new_value, item[1]))
+                if new_value != item[1] and new_value != '' and new_value != None:
+                    # need to write it to config file
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    config.set(sect, item[0], new_value)
+                    newvalues = True
+                # user didn't change the default value, we put the found network interfaces instead of the default value
+                else:
+                    # need to write it to config file
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    config.set(sect, item[0], intf)
+                    newvalues = True
+                   
+
+
             debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
 
     # write the config file
@@ -343,7 +367,7 @@ def write_domogik_configfile_from_command_line(args):
         ok("Writing the config file")
         config.write(configfile)
 
-def write_xplhub_configfile_from_command_line(args):
+def write_xplhub_configfile_from_command_line(args, intf):
     # read the sample config file
     newvalues = False
     config = configparser.RawConfigParser()
@@ -351,13 +375,31 @@ def write_xplhub_configfile_from_command_line(args):
     for sect in config.sections():
         info("Starting on section {0}".format(sect))
         for item in config.items(sect):
-            new_value = eval("args.{0}_{1}".format(sect, item[0]))
-            if new_value != item[1] and new_value != '' and new_value != None:
-                # need to write it to config file
-                print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
-                config.set(sect, item[0], new_value)
-                newvalues = True
-            debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
+            if item[0] == 'interfaces':
+                # for the interface key, if the user set a value != of the default one, take it. Else take the builded value
+                new_value = eval("args.{0}_{1}".format(sect, item[0]))
+
+                # the user changed the value
+                if new_value != item[1] and new_value != '' and new_value != None:
+                    # need to write it to config file
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    config.set(sect, item[0], new_value)
+                    newvalues = True
+                # the user did not change the value
+                else:
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], intf))
+                    config.set(sect, item[0], intf)
+                    newvalues = True
+               
+                debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
+            else:
+                new_value = eval("args.{0}_{1}".format(sect, item[0]))
+                if new_value != item[1] and new_value != '' and new_value != None:
+                    # need to write it to config file
+                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    config.set(sect, item[0], new_value)
+                    newvalues = True
+                debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
     with open('/etc/domogik/xplhub.cfg', 'wb') as configfile:
         ok("Writing the config file")
@@ -387,6 +429,7 @@ def update_default(user):
 
 def find_interface():
     info("Trying to find an interface to listen on")
+    intf = ""
     try:
         import traceback
         pkg_resources.get_distribution("domogik").activate()
@@ -514,20 +557,20 @@ def install():
         copy_files(user)
         update_default(user)
 
+        # select the correct interface
+        intf = find_interface()
+        # if 'lo' not int intf, add it (because domoweb by default try to catch REST on 127.0.0.1)
+        if 'lo' not in intf:
+            intf = "lo,{0}".format(intf)
+
         # write config file
         if args.command_line:
             info("Update the config file : /etc/domogik/domogik.cfg")
-            write_domogik_configfile_from_command_line(args)
+            write_domogik_configfile_from_command_line(args, intf)
             info("Update the config file : /etc/domogik/xplhub.cfg")
-            write_xplhub_configfile_from_command_line(args)
+            write_xplhub_configfile_from_command_line(args, intf)
         else:
             if not args.config and needupdate():
-                # select the correct interface
-                intf = find_interface()
-                # if 'lo' not int intf, add it (because domoweb by default try to catch REST on 127.0.0.1)
-                if 'lo' not in intf:
-                    intf = "lo,{0}".format(intf)
-                # update the config file
                 info("Update the config file : /etc/domogik/domogik.cfg")
                 write_domogik_configfile(args.advanced_mode, intf)
                 info("Update the config file : /etc/domogik/xplhub.cfg")
