@@ -80,7 +80,7 @@ for mod in pip.get_installed_distributions():
     if ( mod.key == 'mysql-python' ):
         mysql_suffix = '' # it is debian package, don't use suffix
 
-class DeviceCache(SyncManager):
+class CacheDB(SyncManager):
     pass
 
 def _make_crypted_password(clear_text_password):
@@ -151,14 +151,14 @@ class DbHelper():
         self.__db_config = dict(config[1])
 
         # init cache date multiprocessing for device_list
-        self._cacheDevice = None
+        self._cacheDB = None
         if use_cache :
-            DeviceCache.register('get_cache')
+            CacheDB.register('get_cache')
             port_c = 50001 if not 'portcache' in self.__db_config else int(self.__db_config['portcache'])
-            m = DeviceCache(address=('localhost', port_c), authkey=b'{0}'.format(self.__db_config['password']))
+            m = CacheDB(address=('localhost', port_c), authkey=b'{0}'.format(self.__db_config['password']))
             m.connect()
             self.log.info(u"New client connected to memory cache : {0}".format(m))
-            self._cacheDevice = m.get_cache()
+            self._cacheDB = m.get_cache()
         if "recycle_pool" in self.__db_config:
             #self.log.info(u"User value for recycle pool : {0}".format(self.__db_config['recycle_pool']))
             pool_recycle = int(self.__db_config['recycle_pool'])
@@ -309,8 +309,8 @@ class DbHelper():
         @return a list of PluginConfig objects
 
         """
-        if self._cacheDevice and self._cacheDevice.upToDateConfig(pl_id, pl_hostname) :
-            config = self._cacheDevice.getConfig(pl_id, pl_hostname)
+        if self._cacheDB and self._cacheDB.upToDateConfig(pl_id, pl_hostname) :
+            config = self._cacheDB.getConfig(pl_id, pl_hostname)
             if config != [] :
                return config
         config =  self.__session.query(
@@ -319,9 +319,9 @@ class DbHelper():
                     ).filter_by(id=ucode(pl_id)
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).all()
-        if self._cacheDevice :
+        if self._cacheDB :
             self.log.debug("Set cache config for {0}.{1} : {2} parameter(s)".format( pl_id, pl_hostname, len(config)))
-            self._cacheDevice.setConfigData(config, pl_id, pl_hostname, repr(self))
+            self._cacheDB.setConfigData(config, pl_id, pl_hostname, repr(self))
         return config
 
     def get_plugin_config(self, pl_type, pl_id, pl_hostname, pl_key):
@@ -334,8 +334,8 @@ class DbHelper():
         @return a PluginConfig object
 
         """
-        if self._cacheDevice and self._cacheDevice.upToDateConfig(pl_id, pl_hostname) :
-            return self._cacheDevice.getConfig(pl_id, pl_hostname, pl_key)
+        if self._cacheDB and self._cacheDB.upToDateConfig(pl_id, pl_hostname) :
+            return self._cacheDB.getConfig(pl_id, pl_hostname, pl_key)
         try:
             ret = self.__session.query(
                 PluginConfig
@@ -372,7 +372,7 @@ class DbHelper():
             plugin_config.value = ucode(pl_value)
         self.__session.add(plugin_config)
         self._do_commit()
-        if self._cacheDevice : self._cacheDevice.markAsUpdatingConfig(pl_id, pl_hostname)
+        if self._cacheDB : self._cacheDB.markAsUpdatingConfig(pl_id, pl_hostname)
         return plugin_config
 
     def del_plugin_config(self, pl_type, pl_id, pl_hostname):
@@ -394,7 +394,7 @@ class DbHelper():
         for plc in plugin_config_list:
             self.__session.delete(plc)
         self._do_commit()
-        if self._cacheDevice : self._cacheDevice.markAsUpdatingConfig(pl_id, pl_hostname)
+        if self._cacheDB : self._cacheDB.markAsUpdatingConfig(pl_id, pl_hostname)
         return plugin_config_list
 
     def del_plugin_config_key(self, pl_type, pl_id, pl_hostname, pl_key):
@@ -418,7 +418,7 @@ class DbHelper():
         if plugin_config is not None:
             self.__session.delete(plugin_config)
             self._do_commit()
-        if self._cacheDevice : self._cacheDevice.markAsUpdatingConfig(pl_id, pl_hostname)
+        if self._cacheDB : self._cacheDB.markAsUpdatingConfig(pl_id, pl_hostname)
         return plugin_config
 
 ###
@@ -428,25 +428,25 @@ class DbHelper():
         """Return a list of devices
         @return a list of Device objects (only the devices that are known by this release)
         """
-        if d_state==u'active' and self._cacheDevice and self._cacheDevice.upToDateDevices() :
-            return self._cacheDevice.getDevices()
+        if d_state==u'active' and self._cacheDB and self._cacheDB.upToDateDevices() :
+            return self._cacheDB.getDevices()
         device_list = []
         for device in self.__session.query(Device).filter_by(state=d_state).all():
             device_list.append(self.get_device(device=device))
         if d_state==u'active':
-            if self._cacheDevice :
+            if self._cacheDB :
                 self.log.debug("Set cache devices with {0} devices".format(len(device_list)))
-                self._cacheDevice.setDevices(device_list, repr(self))
+                self._cacheDB.setDevices(device_list, repr(self))
         return device_list
 
     def list_devices_by_plugin(self, p_id):
         #return self.__session.query(Device).filter_by(client_id=p_id).all()
-        if self._cacheDevice and self._cacheDevice.upToDateDevices(p_id) :
-            return self._cacheDevice.getDevices(client_id=p_id)
+        if self._cacheDB and self._cacheDB.upToDateDevices(p_id) :
+            return self._cacheDB.getDevices(client_id=p_id)
         device_list = []
         for device in self.__session.query(Device).filter_by(state=u'active').filter_by(client_id=p_id).all():
             device_list.append(self.get_device(device=device))
-        if self._cacheDevice: self._cacheDevice.updateDevices(device_list, client_id=p_id)
+        if self._cacheDB: self._cacheDB.updateDevices(device_list, client_id=p_id)
         return device_list
 
     def list_devices_by_timestamp(self, tstamp):
@@ -454,7 +454,7 @@ class DbHelper():
         device_list = []
         for device in self.__session.query(Device).filter_by(state=u'active').filter(Device.info_changed>datetime.datetime.fromtimestamp(float(tstamp))).all():
             device_list.append(self.get_device(device=device))
-        if self._cacheDevice: self._cacheDevice.updateDevices(device_list)
+        if self._cacheDB: self._cacheDB.updateDevices(device_list)
         return device_list
 
     def get_device_sql(self, d_id):
@@ -616,7 +616,7 @@ class DbHelper():
                     description=params['description'], reference=params['reference'], info_changed=func.now())
             self.__session.add(device)
             self.__session.flush()
-            if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=params['client_id'])
+            if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=params['client_id'])
 
             ### Table code_device_params
             for p in params['global']:
@@ -649,7 +649,7 @@ class DbHelper():
                                 )
                 self.__session.add(sensor)
                 self.__session.flush()
-                if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=params['client_id'])
+                if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=params['client_id'])
                 created_sensors[a_sensor] = sensor.id
                 #print("CLIENT_DATA={0}".format(client_data))
                 #print("PARAMS={0}".format(params))
@@ -698,7 +698,7 @@ class DbHelper():
                                       command_param['conversion'])
                     self.__session.add(pa)
                     self.__session.flush()
-                if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=params['client_id'])
+                if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=params['client_id'])
 
                 ### Table core_xplcommand
                 if 'xpl_command' in command_in_client_data:
@@ -717,7 +717,7 @@ class DbHelper():
                                             json_id=command_in_client_data['xpl_command'])
                     self.__session.add(xplcommand)
                     self.__session.flush()
-                    if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=params['client_id'])
+                    if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=params['client_id'])
                     ### Table core_xplcommand_param
                     for p in x_command['parameters']['static']:
                         par = XplCommandParam(cmd_id=xplcommand.id, \
@@ -756,7 +756,7 @@ class DbHelper():
 
             ### Finally, commit all !
             self._do_commit()
-            if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=params['client_id'])
+            if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=params['client_id'])
             ### Return the created device as json
             d = self.get_device(device.id)
             return d
@@ -840,7 +840,7 @@ class DbHelper():
                         device_type_id=d_type_id, client_id=d_client_id)
         self.__session.add(device)
         self._do_commit()
-        if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=d_client_id)
+        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=d_client_id)
         return device
 
     def update_device(self, d_id, d_name=None, d_description=None, d_reference=None, d_address=None, d_info_changed=None, d_state=None, d_client_version=None):
@@ -884,7 +884,7 @@ class DbHelper():
             device.client_version = ucode(d_client_version)
         self.__session.add(device)
         self._do_commit()
-        if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(device_id=d_id)
+        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(device_id=d_id)
         return device
 
     def del_device(self, d_id):
@@ -905,7 +905,7 @@ class DbHelper():
         device.info_changed = func.now()
         self.__session.add(device)
         self._do_commit()
-        if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=device.client_id)
+        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=device.client_id)
         return device
 
     def del_device_real(self, d_id):
@@ -926,7 +926,7 @@ class DbHelper():
         device.info_changed = func.now()
         self.__session.add(device)
         self._do_commit()
-        if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=device.client_id)
+        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=device.client_id)
 
         # check if this device i used in a scenario
         llist = []
@@ -960,7 +960,7 @@ class DbHelper():
 
         self.__session.delete(device)
         self._do_commit()
-        if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(client_id=device.client_id)
+        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=device.client_id)
         return device
 
 ####
@@ -1052,7 +1052,7 @@ class DbHelper():
                     h = SensorHistory(sensor['id'], datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
                     self.__session.add(h)
                     self._do_commit()
-                    if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(sensor_id=sensor['id'])
+                    if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sensor['id'])
                     # update the info changed
                     #self.update_device(sensor['device_id'])
                     #self._do_commit()
@@ -1093,7 +1093,7 @@ class DbHelper():
                 #self.__session.add(sensor_db)
                 data = ucode(value)
                 self._do_commit()
-                if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(sensor_id=sid)
+                if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sid)
 
                 ### handle the history size in number of items
                 # TODO : move in a dedicated function which would be called each... ??? hours ???
@@ -1115,7 +1115,7 @@ class DbHelper():
                                     ) \
                             .delete(synchronize_session=False)
                         self._do_commit()
-                        if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(sensor_id=sensor['id'])
+                        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sensor['id'])
 
                 ### handle the history size in days
                 # TODO : move in a dedicated function which would be called each day or N hours
@@ -1128,7 +1128,7 @@ class DbHelper():
                                 ) \
                         .delete(synchronize_session=False)
                     self._do_commit()
-                    if self._cacheDevice: self._cacheDevice.markAsUpdatingDevices(sensor_id=sensor['id'])
+                    if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sensor['id'])
 
             else:
                 self.__raise_dbhelper_exception("Can not add history to not existing sensor: {0}".format(sid), True)

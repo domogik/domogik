@@ -102,7 +102,7 @@ WAIT_AFTER_STOP_REQUEST = 15           # seconds
 CHECK_FOR_NEW_PACKAGES_INTERVAL = 30   # seconds
 SEND_METRICS_INTERVAL = 600            # seconds
 
-class DeviceCache(SyncManager):
+class CacheDB(SyncManager):
     pass
 
 class Manager(XplPlugin, MQAsyncSub):
@@ -299,8 +299,8 @@ class Manager(XplPlugin, MQAsyncSub):
             config = cfg.load()
             dbConfig = dict(config[1])
             port_c = 50001 if not 'portcache' in dbConfig else int(dbConfig['portcache'])
-            DeviceCache.register('force_leave')
-            m = DeviceCache(address=('localhost', port_c), authkey=b'{0}'.format(dbConfig['password']))
+            CacheDB.register('force_leave')
+            m = CacheDB(address=('localhost', port_c), authkey=b'{0}'.format(dbConfig['password']))
             m.connect()
             if hasattr(self, "log"):
                 self.log.info(u"force_leave called. Exit to memory devices cache {0}".format(m))
