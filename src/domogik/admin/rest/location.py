@@ -136,17 +136,6 @@ def position_post(person_id):
         if person:
             if person.location_sensor:
 
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
-                # TODO : find the specs !!!!!
                 # print(request.data)
                 # [{"latitude" : "47.0894508", 
                 #    "longitude" : "-1.3016079",
@@ -162,6 +151,14 @@ def position_post(person_id):
                         sensor_data["atTimestamp"] = a_loc_data["timestamp"]
                         
                     if 'location_name' in a_loc_data:
+                        if a_loc_data['location_name'] == "":
+                            location_name = None
+                        else:
+                            location_name = a_loc_data['location_name']
+                    else:
+                        location_name = None
+
+                    if location_name != None:
                         loc = app.db.get_location_by_name(a_loc_data['location_name'])
                         if loc is None:
                             data = {"status": "ERROR", "error": "Location '{0}' can not be found".format(a_loc_data['location_name'])}
