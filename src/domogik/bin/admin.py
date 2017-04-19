@@ -444,6 +444,9 @@ class Admin(Plugin):
                 # sensor history
                 elif msg.get_action() == "sensor_history.get":
                     self._mdp_reply_sensor_history(msg)
+                # person
+                elif msg.get_action() == "person.get":
+                    self._mdp_reply_person_get(msg)
         except:
             msg = "Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
@@ -1109,6 +1112,50 @@ class Admin(Plugin):
         msg.add_data('mode', mode)
         msg.add_data('values', values)
 
+        self.reply(msg.get())
+
+    def _mdp_reply_person_get(self, data):
+        status = True
+        reason = False
+        res = None
+
+        self.log.debug(u"Get the person list : {0}".format(data))
+        try:
+            res = self._db.list_persons()
+            print(res)
+            if not res:
+                status = False
+            else:
+                status = True
+        except DbHelperException as d:
+            status = False
+            reason = "Error while getting the persons list : {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        except:
+            status = False
+            reason = "Error while deleting device: {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        # send the result
+        msg = MQMessage()
+        msg.set_action('person.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        if res:
+            persons = []
+            for per in res:
+                # print(per)
+                # <Person: first_name='Stephanie', last_name='LR', location_sensor='663', birthdate='1977-09-19', id='5'> 
+                birthdate_ts = None
+                if per.birthdate:
+                    birthdate_ts = time.mktime(per.birthdate.timetuple())
+                persons.append({'first_name' : per.first_name, 
+                                'last_name' : per.last_name,
+                                'location_sensor' : per.location_sensor,
+                                'birthdate' : birthdate_ts,
+                                'id' : per.id})
+            msg.add_data('persons', persons)
+        self.log.debug(msg.get())
         self.reply(msg.get())
 
 
