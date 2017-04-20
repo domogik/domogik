@@ -161,7 +161,7 @@ RUN apt-get clean
 # 40404 : domoweb
 # 40405 : domogik admin websocket
 # 40406 : domogik admin http
-EXPOSE 40404 40405 40404 22
+EXPOSE 40404 40405 40406 22
 
 
 ### Volumes
