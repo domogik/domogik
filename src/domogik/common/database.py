@@ -170,7 +170,7 @@ class DbHelper():
                 DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8',
                                                              pool_recycle=pool_recycle, pool_size=20, max_overflow=10)
         if DbHelper.__session_object == None:
-            DbHelper.__session_object = scoped_session(sessionmaker(bind=DbHelper.__engine, autoflush=True))
+            DbHelper.__session_object = scoped_session(sessionmaker(bind=DbHelper.__engine, autoflush=True, expire_on_commit=False))
         #self.__session = DbHelper.__session_object()
 
     @contextmanager
