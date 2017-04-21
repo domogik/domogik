@@ -383,6 +383,9 @@ class Admin(Plugin):
         # Number of workers + threads
         cmd = "{0} -w {1}".format(cmd, self.http_workers)
 
+        # Number of max request line up to 8190 (MAX gunicorn setting)
+        cmd = "{0} --limit-request-line {1}".format(cmd, 8190)
+
         # Append the application to start
         cmd = "{0} domogik.admin.application:app".format(cmd)
 
