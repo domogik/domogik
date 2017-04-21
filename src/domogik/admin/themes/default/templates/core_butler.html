@@ -5,12 +5,12 @@
 
 <div class="container">
 
-  <h1>{% trans %}Core component {% endtrans %}{{ clientid }}</h1>
+  <!--  <h1>{% trans %}Core component {% endtrans %}{{ clientid }}</h1>  -->
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-4">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h2>{% trans %}Butler details{% endtrans %}</h2>
+          <h2>{% trans %}The butler{% endtrans %}</h2>
         </div>
         <div class="panel-body">
           <blockquote>
@@ -22,57 +22,23 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h2>{% trans %}Brain packages installed{% endtrans %}</h2>
+          <h2>{% trans %}Speak with the butler{% endtrans %}</h2>
         </div>
         <div class="panel-body">
-          <ul>
-            {% for a_client in client_list %}
-              {% if client_list[a_client]['type'] == "brain" %}
-                <li><a href="/client/{{ a_client }}">{{ client_list[a_client]['name'] }}</a></li>
-              {% endif %}
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-    </div>
 
-    <div class="col-md-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2>{% trans %}Interface packages installed{% endtrans %}</h2>
-        </div>
-        <div class="panel-body">
-          <ul>
-            {% for a_client in client_list %}
-              {% if client_list[a_client]['type'] == "interface" %}
-                <li><a href="/client/{{ a_client }}">{{ client_list[a_client]['name'] }}</a></li>
-              {% endif %}
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<div class="container"">
-    <div class="row">
-      <div class="col-md-12" id="butlerChatSend">
-        <input type="text" placeholder="Speak here with the butler..." class="form-control" name="chatInput" id="chatInput"></input>
-      </div>
-    </div>
-</div>
-
-
+          <input type="text" placeholder="Speak here with the butler..." class="form-control" name="chatInput" id="chatInput"></input>
 <div class="container" id="butlerChat">
 </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 <p></p>
 

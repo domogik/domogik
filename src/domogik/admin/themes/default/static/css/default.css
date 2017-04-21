@@ -198,6 +198,7 @@ table td {
 /* butler */
 
 #butlerChat {
+    width: 100%;
 }
 
 #butlerChat .row {
