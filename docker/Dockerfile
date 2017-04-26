@@ -161,7 +161,8 @@ RUN apt-get clean
 # 40404 : domoweb
 # 40405 : domogik admin websocket
 # 40406 : domogik admin http
-EXPOSE 40404 40405 40406 22
+# 3865 : xpl hub
+EXPOSE 40404 40405 40406 22 3865
 
 
 ### Volumes
