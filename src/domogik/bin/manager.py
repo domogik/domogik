@@ -66,7 +66,8 @@ import signal
 import json
 import requests
 import platform
-
+import pprint
+from collections import OrderedDict
 from threading import Event, Thread, Lock, Semaphore
 from argparse import ArgumentParser
 from subprocess import Popen, PIPE
@@ -532,11 +533,12 @@ class Manager(XplPlugin, MQAsyncSub):
 
 
         json_file = "{0}/datatypes.json".format(self.get_resources_directory())
-        data = None
+        data = OrderedDict()
         try:
-            data = json.load(open(json_file))
+            data = json.load(open(json_file), object_pairs_hook=OrderedDict)
         except:
             self.log.error("Error while reading datatypes json file '{0}'. Error is : {1}".format(json_file, traceback.format_exc()))
+       
         msg.add_data("datatypes", data)
         self.reply(msg.get())
 
