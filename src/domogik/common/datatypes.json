@@ -1,11 +1,15 @@
 {
     "DT_Trigger": {
+        "usage" : "The trigger can be used to execute some actions which returns no status. For example : request to execute a given script.",
+        "example" : "",
         "labels": {
             "1": "Triggered"
         },
         "childs": []
     },
     "DT_Bool": {
+        "usage" : "The Bool can be used for a command to change the state of a device (open/close, on/off, ...) and the sensor can be used to get the state of a device (opened/closed, empty/filled, ...). When you can, use one of its childs.",
+        "example" : "0 | 1",
         "labels": {
             "0": "False",
             "1": "True"
@@ -23,6 +27,8 @@
         ]
     },
     "DT_Switch": {
+        "usage" : "The Switch can be used to control or get the state of lights, appliances, ...",
+        "example" : "0 (Off) | 1 (On)",
         "labels": {
             "0": "Off",
             "1": "On"
@@ -31,6 +37,8 @@
         "childs": []
     },
     "DT_Enable": {
+        "usage" : "Enable will allow you to enable or disable some features and get their state. For example a virtual device could be used to enable or disable an alarm.",
+        "example" : "0 (Disable) | 1 (Enable)",
         "labels": {
             "0": "Disable",
             "1": "Enable"
@@ -39,6 +47,8 @@
         "childs": []
     },
     "DT_Binary": {
+        "usage" : "You can use Binary for low level binary devices.",
+        "example" : "0 (Low) | 1 (High)",
         "labels": {
             "0": "Low",
             "1": "High"
@@ -47,6 +57,8 @@
         "childs": []
     },
     "DT_Step": {
+        "usage" : "",
+        "example" : "0 (Decrease) | 1 (Increase)",
         "labels": {
             "0": "Decrease",
             "1": "Increase"
@@ -55,6 +67,8 @@
         "childs": []
     },
     "DT_UpDown": {
+        "usage" : "Use Updown to control or get the status of devices that can be up or down (rolling shutter, barrier, ...)",
+        "example" : "0 (Up) | 1 (Down)",
         "labels": {
             "0": "Up",
             "1": "Down"
@@ -63,6 +77,8 @@
         "childs": []
     },
     "DT_OpenClose": {
+        "usage" : "OpenClose will be used to control door locks, garage doors, shutters. You can also use it to get the state of doors, windows, locks, ...",
+        "example" : "0 (Open) | 1 (Close)",
         "labels": {
             "0": "Open",
             "1": "Close"
@@ -71,6 +87,8 @@
         "childs": []
     },
     "DT_Start": {
+        "usage" : "You can use Start to control and get the state of some motors",
+        "example" : "0 (Stop) | 1 (Start)",
         "labels": {
             "0": "Stop",
             "1": "Start"
@@ -79,6 +97,8 @@
         "childs": []
     },
     "DT_State": {
+        "usage" : "With State, you can control and get the state of stuff that can be active or inactive.",
+        "example" : "0 (Inactive) | 1 (Active)",
         "labels": {
             "0": "Inactive",
             "1": "Active"
@@ -87,6 +107,8 @@
         "childs": []
     },
     "DT_Motion": {
+        "usage" : "The Motion can be used for all motion sensors.",
+        "example" : "0 (No motion) | 1 (Motion)",
         "labels": {
             "0": "No motion",
             "1": "Motion"
@@ -95,6 +117,8 @@
         "childs": []
     },
     "DT_Number": {
+        "usage" : "Number can be used for all kind of sensor which measure something (temperature, humidity, ...). You can also use it to control some things (a motor speed, ...). The float separator is the point, whatever language you will configure your Domogik system. When you can, use one of its childs. ",
+        "example" : "1.23 | 42 | 1000",
         "min": null,
         "max": null,
         "unit": null,
@@ -152,6 +176,8 @@
         ]
     },
     "DT_Scaling": {
+        "usage" : "Scaling can be used for sensors about percent values and to control a dimmable light, and anything that can have a state between on and off, opened and closed, ... If you want to manage device for which the range of allowed values is [0..255] (or whatever else), you should consider to convert this range to [0..100] by using the conversion feature of the plugins. When you can, use one of its childs. ",
+        "example" : "0 | 25 | 50 | 100",
         "min": 0,
         "max": 100,
         "unit": "%",
@@ -161,7 +187,27 @@
             "DT_Battery"
         ]
     },
+    "DT_Humidity": {
+        "usage" : "Humidity can be used to measure the humidity of the air.",
+        "example" : "0 | 50 | 100",
+        "min": 0,
+        "max": 100,
+        "unit": "%",
+        "parent": "DT_Scaling",
+        "childs": []
+    },
+    "DT_Battery": {
+        "usage" : "Battery can be used to monitor a battery level in percent.",
+        "example" : "0 (empty) | 10 (nearly empty) | 50 | 100 (full)",
+        "min": 0,
+        "max": 100,
+        "unit": "%",
+        "parent": "DT_Scaling",
+        "childs": []
+    },
     "DT_Angle": {
+        "usage" : "The Angle must be used for any device that use angles in degrees. The wind direction is a good example. Notice that 0 = 360.",
+        "example" : "0 | 90 | 180 | 270 | 360",
         "min": 0,
         "max": 360,
         "unit": "°",
@@ -169,6 +215,8 @@
         "childs": []
     },
     "DT_Brightness": {
+        "usage" : "Brightness can be used to control a light brightness in the lux unit. It can also be used by devices that measure the brightness.",
+        "example" : "0.5 (a full moon night) | 200 to 400 (a house with lights on) | 50 000 to 100 000 (outside with full sunlight)",
         "min": null,
         "max": null,
         "unit": "lux",
@@ -176,6 +224,8 @@
         "childs": []
     },
     "DT_Temp": {
+        "usage" : "Use the Temp for all temperature sensors in degrees.",
+        "example" : "-5 | 0 | 17 | 23",
         "min": null,
         "max": null,
         "unit": "°C",
@@ -183,6 +233,8 @@
         "childs": []
     },
     "DT_TempK": {
+        "usage" : "Use the TempK for all temperature sensors in kelvin.",
+        "example" : "0 | 27 | 100",
         "min": null,
         "max": null,
         "unit": "K",
@@ -190,6 +242,8 @@
         "childs": []
     },
     "DT_TempF": {
+        "usage" : "Use the TempF for all temperature sensors in fahrenheit.",
+        "example" : "0 | 27 | 100",
         "min": null,
         "max": null,
         "unit": "°F",
@@ -197,6 +251,8 @@
         "childs": []
     },
     "DT_Pressure": {
+        "usage" : "The Pressure can be used for measuring a pressure in Pascal.",
+        "example" : "345",
         "min": null,
         "max": null,
         "unit": "Pa",
@@ -204,6 +260,8 @@
         "childs": []
     },
     "DT_mbarPressure": {
+        "usage" : "The mbarPressure can be used for measuring a pressure in milliBar. This is the unit used by the barometers.",
+        "example" : "345",
         "min": null,
         "max": null,
         "unit": "mbar",
@@ -211,20 +269,17 @@
         "childs": []
     },
     "DT_barPressure": {
+        "usage" : "The barPressure can be used for measuring a pressure in Bar.",
+        "example" : "345",
         "min": null,
         "max": null,
         "unit": "bar",
         "parent": "DT_Number",
         "childs": []
     },
-    "DT_Humidity": {
-        "min": null,
-        "max": null,
-        "unit": "%",
-        "parent": "DT_Scaling",
-        "childs": []
-    },
     "DT_AirQuality": {
+        "usage" : "AirQuality can be used for sensors that measure the air quality.",
+        "example" : "400",
         "min": null,
         "max": null,
         "unit": "ppm",
@@ -232,6 +287,8 @@
         "childs": []
     },
     "DT_Volt": {
+        "usage" : "With Volt, you can measure voltages in Volts.",
+        "example" : "3.3 | 5 | 12 | 24 | 110 | 220",
         "min": null,
         "max": null,
         "unit": "V",
@@ -239,6 +296,8 @@
         "childs": []
     },
     "DT_mVolt": {
+        "usage" : "With mVolt, you can measure voltages in milliVolts.",
+        "example" : "100 | 200",
         "min": null,
         "max": null,
         "unit": "mV",
@@ -246,6 +305,8 @@
         "childs": []
     },
     "DT_kVolt": {
+        "usage" : "With kVolt, you can measure voltages in kiloVolts.",
+        "example" : "100 | 200",
         "min": null,
         "max": null,
         "unit": "kV",
@@ -253,6 +314,8 @@
         "childs": []
     },
     "DT_Current": {
+        "usage" : "With Current, you can measure a current in Ampere.",
+        "example" : "16 | 32",
         "min": null,
         "max": null,
         "unit": "A",
@@ -260,6 +323,8 @@
         "childs": []
     },
     "DT_mCurrent": {
+        "usage" : "With mCurrent, you can measure a current in milliAmpere.",
+        "example" : "200 | 300",
         "min": null,
         "max": null,
         "unit": "mA",
@@ -267,6 +332,8 @@
         "childs": []
     },
     "DT_kCurrent": {
+        "usage" : "With kCurrent, you can measure a current in kiloAmpere.",
+        "example" : "5 | 10",
         "min": null,
         "max": null,
         "unit": "kA",
@@ -274,6 +341,8 @@
         "childs": []
     },
     "DT_Power": {
+        "usage" : "The Power can be used to measure a power in Watt",
+        "example" : "100 | 1000",
         "min": null,
         "max": null,
         "unit": "W",
@@ -281,6 +350,8 @@
         "childs": []
     },
     "DT_mPower": {
+        "usage" : "The mPower can be used to measure a power in milliWatt",
+        "example" : "100 | 1000",
         "min": null,
         "max": null,
         "unit": "mW",
@@ -288,6 +359,8 @@
         "childs": []
     },
     "DT_kPower": {
+        "usage" : "The kPower can be used to measure a power in kiloWatt",
+        "example" : "100 | 1000",
         "min": null,
         "max": null,
         "unit": "kW",
@@ -295,6 +368,8 @@
         "childs": []
     },
     "DT_ActiveEnergy": {
+        "usage" : "ActiveEnergy can be used to measure the active energy in Watt per hour",
+        "example" : "20 | 50",
         "min": null,
         "max": null,
         "unit": "Wh",
@@ -302,6 +377,8 @@
         "childs": []
     },
     "DT_mActiveEnergy": {
+        "usage" : "mActiveEnergy can be used to measure the active energy in milliWatt per hour",
+        "example" : "20 | 50",
         "min": null,
         "max": null,
         "unit": "mWh",
@@ -309,6 +386,8 @@
         "childs": []
     },
     "DT_kActiveEnergy": {
+        "usage" : "kActiveEnergy can be used to measure the active energy in kiloWatt per hour",
+        "example" : "20 | 50",
         "min": null,
         "max": null,
         "unit": "kWh",
@@ -316,6 +395,8 @@
         "childs": []
     },
     "DT_ApparantEnergy": {
+        "usage" : "ApparantEnergy can be used for devices that measure the Apparent Energy in VAh.",
+        "example" : "1 | 3",
         "min": null,
         "max": null,
         "unit": "VAh",
@@ -323,6 +404,8 @@
         "childs": []
     },
     "DT_Speed": {
+        "usage" : "With Speed you can measure some speed in meters per second.",
+        "example" : "1 | 7 | 34",
         "min": null,
         "max": null,
         "unit": "m/s",
@@ -330,6 +413,8 @@
         "childs": []
     },
     "DT_kmhSpeed": {
+        "usage" : "With kmhSpeed you can measure some speed in kilometers per hour. It can be use for a cas movement.",
+        "example" : "1 | 7 | 34",
         "min": null,
         "max": null,
         "unit": "km/h",
@@ -337,6 +422,8 @@
         "childs": []
     },
     "DT_rpmSpeed": {
+        "usage" : "With rpmSpeed you can measure some speed in rotation per minute. It can be use for a motor speed.",
+        "example" : "1 | 7 | 34",
         "min": null,
         "max": null,
         "unit": "rpm",
@@ -344,6 +431,8 @@
         "childs": []
     },
     "DT_ktsSpeed": {
+        "usage" : "With ktsSpeed you can measure some speed in knots. It can be use for wind speed in the sea.",
+        "example" : "1 | 7 | 34",
         "min": null,
         "max": null,
         "unit": "kts",
@@ -351,6 +440,8 @@
         "childs": []
     },
     "DT_Year": {
+        "usage" : "Used for a Year information",
+        "example" : "2017",
         "min": null,
         "max": null,
         "unit": "Year",
@@ -358,6 +449,8 @@
         "childs": []
     },
     "DT_Month": {
+        "usage" : "Used for a Month information",
+        "example" : "1 (january) | 12 (december)",
         "min": 1,
         "max": 12,
         "unit": "Month",
@@ -365,6 +458,8 @@
         "childs": []
     },
     "DT_Day": {
+        "usage" : "Used for a day of the month",
+        "example" : "1 | 10 | 31",
         "min": 1,
         "max": 31,
         "unit": "Day",
@@ -372,6 +467,8 @@
         "childs": []
     },
     "DT_Hour": {
+        "usage" : "User for an hour from 0 to 23",
+        "example" : "0 | 23",
         "min": 0,
         "max": 23,
         "unit": "h",
@@ -379,6 +476,8 @@
         "childs": []
     },
     "DT_Minute": {
+        "usage" : "Used for a number of minute from 0 to 59",
+        "example" : "0 | 59",
         "min": 0,
         "max": 59,
         "unit": "min",
@@ -386,6 +485,8 @@
         "childs": []
     },
     "DT_Second": {
+        "usage" : "Used for a number of second from 0 to 59",
+        "example" : "0 | 59",
         "min": 0,
         "max": 59,
         "unit": "s",
@@ -393,6 +494,8 @@
         "childs": []
     },
     "DT_mSecond": {
+        "usage" : "Used for a number of millisecond from 0 to 999",
+        "example" : "0 | 500 | 999",
         "min": 0,
         "max": 999,
         "unit": "ms",
@@ -400,6 +503,8 @@
         "childs": []
     },
     "DT_Timestamp": {
+        "usage" : "Use Timestamp to store a time in timestamp format. For example the last update event time of a device on device point of view. The timestamp is in seconds.",
+        "example" : "1493132287",
         "min": null,
         "max": null,
         "unit": null,
@@ -407,13 +512,26 @@
         "childs": []
     },
     "DT_mMeter": {
+        "usage" : "Use mMeter for sensors that measure distances in millimeters.",
+        "example" : "25 | 55",
         "min": null,
         "max": null,
         "unit": "mm",
         "parent": "DT_Number",
         "childs": []
     },
+    "DT_Meter": {
+        "usage" : "Use Meter for sensors that measure distances in meters.",
+        "example" : "25 | 55",
+        "min": null,
+        "max": null,
+        "unit": "m",
+        "parent": "DT_Number",
+        "childs": []
+    },
     "DT_kMeter": {
+        "usage" : "Use kMeter for sensors that measure distances in kilometers.",
+        "example" : "25 | 55",
         "min": null,
         "max": null,
         "unit": "km",
@@ -421,6 +539,8 @@
         "childs": []
     },
     "DT_mMeterHour": {
+        "usage" : "Use mMeterHour for sensors that measure for example rain falls.",
+        "example" : "5 | 8",
         "min": null,
         "max": null,
         "unit": "mm/h",
@@ -428,6 +548,8 @@
         "childs": []
     },
     "DT_Byte": {
+        "usage" : "Use Byte to measure a size in bytes.",
+        "example" : "128 | 512 | 1024",
         "min": null,
         "max": null,
         "unit": "b",
@@ -435,6 +557,8 @@
         "childs": []
     },
     "DT_kByte": {
+        "usage" : "Use kByte to measure a size in kilobytes.",
+        "example" : "128 | 512 | 1024",
         "min": null,
         "max": null,
         "unit": "kb",
@@ -442,6 +566,8 @@
         "childs": []
     },
     "DT_MByte": {
+        "usage" : "Use MByte to measure a size in megabytes.",
+        "example" : "128 | 512 | 1024",
         "min": null,
         "max": null,
         "unit": "Mb",
@@ -449,6 +575,8 @@
         "childs": []
     },
     "DT_GByte": {
+        "usage" : "Use GByte to measure a size in gigabytes.",
+        "example" : "128 | 512 | 1024",
         "min": null,
         "max": null,
         "unit": "Gb",
@@ -456,6 +584,8 @@
         "childs": []
     },
     "DT_pH": {
+        "usage" : "Use pH to mesure a pH. This can be used for a pool sensor.",
+        "example" : "7",
         "min": null,
         "max": null,
         "unit": "pH",
@@ -463,20 +593,17 @@
         "childs": []
     },
     "DT_Chlorine": {
+        "usage" : "Use Chlorine to measure the amount of chlore. This can be used for a pool sensor.",
+        "example" : "4",
         "min": null,
         "max": null,
         "unit": "mg/l",
         "parent": "DT_Number",
         "childs": []
     },
-    "DT_Battery": {
-        "min": 0,
-        "max": 100,
-        "unit": "%",
-        "parent": "DT_Scaling",
-        "childs": []
-    },
     "DT_Co2": {
+        "usage" : "Use Co2 to measure the amount of Co².",
+        "example" : "405 (average value for ait quality)",
         "min": 0,
         "max": null,
         "unit": "ppm",
@@ -484,6 +611,8 @@
         "childs": []
     },
     "DT_Tvoc": {
+        "usage" : "Use Tvoc to measure the total volatile organic compounds in indoor ait quality.",
+        "example" : "100",
         "min": 0,
         "max": null,
         "unit": "ppb",
@@ -491,6 +620,8 @@
         "childs": []
     },
     "DT_Insolation": {
+        "usage" : "Use Insolation to measure the solar irradiance in W/m².",
+        "example" : "",
         "min": 0,
         "max": null,
         "unit": "W/m²",
@@ -498,6 +629,8 @@
         "childs": []
     },
     "DT_kgWeight": {
+        "usage" : "Use kgWeight to measure a weight, for example someone's weaight in a health related plugin.",
+        "example" : "",
         "min": 0,
         "max": null,
         "unit": "kg",
@@ -505,6 +638,8 @@
         "childs": []
     },
     "DT_VolumeLiter": {
+        "usage" : "Use VolumeLiter to measure a volume in Liters.",
+        "example" : "1 | 10",
         "min": 0,
         "max": null,
         "unit": "L",
@@ -512,19 +647,21 @@
         "childs": []
     },
     "DT_VolumeM3": {
+        "usage" : "Use VolumeM3 to measure a volume in m3.",
+        "example" : "",
         "min": 0,
         "max": null,
         "unit": "m3",
         "parent": "DT_Number",
         "childs": []
     },
-    "DT_Char": {
-        "childs": []
-    },
     "DT_String": {
+        "usage" : "Use String to store any kind of data which is a string. When you can, use one of its childs.",
+        "example" : "a | hello | ADCO123456789 | Rainfalls",
         "maxLengh": null,
         "format": null,
         "childs": [
+            "DT_Char",
             "DT_Phone",
             "DT_Hexa",
             "DT_ColorRGBHexa",
@@ -533,13 +670,23 @@
             "DT_CoordDMS"
         ]
     },
+    "DT_Char": {
+        "usage" : "Use Char for sensors that contains only 1 character.",
+        "example" : "a | Y | #",
+        "parent": "DT_String",
+        "childs": []
+    },
     "DT_Phone": {
+        "usage" : "Use Phone to store a phone number.",
+        "example" : "+33212345678 (a french phone number)",
         "maxLengh": null,
         "format": "+00000000000",
         "parent": "DT_String",
         "childs": []
     },
     "DT_Hexa": {
+        "usage" : "Use DT_Hexa to store any hexadecimal data.",
+        "example" : "FF | A1B2C3 | 0123456789ABCDEF",
         "maxLengh": null,
         "format": null,
         "parent": "DT_String",
@@ -548,12 +695,26 @@
         ]
     },
     "DT_ColorRGBHexa": {
+        "usage" : "Use ColorRGBHexa to store a color in RGB hexadecimal format without the #.",
+        "example" : "000000 (black) | FFFFFF (white) | FF0000 (red) | 00FF00 (green) | 0000FF (blue)",
         "maxLengh": 6,
         "format": "RRGGBB",
         "parent": "DT_Hexa",
         "childs": []
     },
+    "DT_DateTime": {
+        "usage" : "Use Datetime for any datetime storage. For more limited informations, use one of its childs.",
+        "example" : "2023-04-28T09:34:55.3",
+        "format": "YYYY-MM-DDThh:mm:ss.s",
+        "childs": [
+            "DT_DayOfWeek",
+            "DT_Date",
+            "DT_Time"
+        ]
+    },
     "DT_DayOfWeek": {
+        "usage" : "Use DayOfWeek to store a day number",
+        "example" : "",
         "values": {
             "0": "no day",
             "1": "Monday",
@@ -564,66 +725,113 @@
             "6": "Saturday",
             "7": "Sunday"
         },
-        "childs": []
-    },
-    "DT_HVACMode": {
-        "values": {
-            "0": "Auto",
-            "1": "Comfort",
-            "2": "Standby",
-            "3": "Economy",
-            "4": "Building Protection"
-        },
-        "childs": []
-    },
-    "DT_ColorCII": {
-        "values": {
-            "W": "White",
-            "O": "Orange",
-            "R": "Red",
-            "Y": "Yellow",
-            "B": "Blue",
-            "G": "Green",
-            "Bk": "Black",
-            "Br": "Brown"
-        },
-        "childs": []
-    },
-    "DT_DateTime": {
-        "format": "YYYY-MM-DDThh:mm:ss.s",
-        "childs": [
-            "DT_Date",
-            "DT_Time"
-        ]
+        "childs": [],
+        "parent": "DT_DateTime"
     },
     "DT_Date": {
+        "usage" : "Use Date for a date only.",
+        "example" : "2019-03-09",
         "format": "YYYY-MM-DD",
         "parent": "DT_DateTime",
         "childs": []
     },
     "DT_Time": {
+        "usage" : "Use Time for a time",
+        "example" : "01:45:32.6",
         "format": "hh:mm:ss.s",
         "parent": "DT_DateTime",
         "childs": []
     },
     "DT_List": {
+        "usage" : "Use List for all sensors that needs several values separated with a comma. For example some colors, some coordinates, ... When you can, use one of its childs.",
+        "example" : "",
         "format": null,
         "childs": [
             "DT_ColorRGB",
-            "DT_ColorCMYK"
+            "DT_ColorCMYK",
+            "DT_CoordD",
+            "DT_CoordDM",
+            "DT_CoordDMS"
         ]
     },
     "DT_ColorRGB": {
+        "usage" : "Use ColorRGB for a color in the format R, G, B.",
+        "example" : "255, 0, 0 (red) | 0, 255, 0 (green)",
         "format": "(R 0-255),(G 0-255),(B 0-255)",
         "parent": "DT_List",
         "childs": []
     },
     "DT_ColorCMYK": {
+        "usage" : "Use ColorCMYK for a color in the format C, M, Y, K.",
+        "example" : "50, 30, 45, 90",
         "format": "(C 0-100%),(M 0-100%),(Y 0-100%),(K 0-100%)",
         "parent": "DT_List",
         "childs": []
     },
-    "DT_HVACHeat": {
+    "DT_CoordD": {
+        "usage" : "Use CoordD for coordinates in the format DD.dddddd,DD.dddddd",
+        "example" : "48.8588377,2.2775176 (Paris, France)",
+        "format": "DD.dddddd,DD.dddddd",
+        "parent": "DT_List",
+        "childs": []
+    },
+    "DT_CoordDM": {
+        "usage" : "Use CoordDM for coordinates in the format (N|S) DD MM.mmm,(E|W) DD MM.mmm.",
+        "example" : "",
+        "format": "(N|S) DD MM.mmm,(E|W) DD MM.mmm",
+        "parent": "DT_List",
+        "childs": []
+    },
+    "DT_CoordDMS": {
+        "usage" : "Use CoordDMS for coordinates in the format (N|S) DD MM SS.s,(E|W) DD MM SS.s.",
+        "example" : "",
+        "format": "(N|S) DD MM SS.s,(E|W) DD MM SS.s",
+        "parent": "DT_List",
+        "childs": []
+    },
+    "DT_Video": {
+        "usage" : "Use Video for a sensor with the uri of a video file. Please use one of its childs.",
+        "example" : "/media/videos/myvideo.avi | http://mycamera/video.mjpeg",
+        "childs": ["DT_VideoMjpeg", "DT_VideoH264"]
+    },
+    "DT_VideoMjpeg": {
+        "usage" : "Use VideoMjpeg for a sensor with the uri of a video file in the Mjpeg format.",
+        "example" : "/media/videos/myvideo.mjpeg | http://mycamera/video.mjpeg",
+        "format": "",
+        "parent": "DT_Video",
+        "childs": []
+    },
+    "DT_VideoH264": {
+        "usage" : "Use VideoH264 for a sensor with the uri of a video file in the H264 format.",
+        "example" : "/media/videos/myvideo.avi | http://mycamera/video.h264",
+        "format": "",
+        "parent": "DT_Video",
+        "childs": []
+    },
+    "DT_Image": {
+        "usage" : "Use Image for a sensor with the uri of an image.",
+        "example" : "/media/images/myimage.jpg | http://somewebsite.com/image.jpg",
+        "format": "",
+        "childs": []
+    },
+
+
+
+    "DT_Experimental": {
+        "usage" : "All the datatypes under this Experimental one are not yet stable. Use them with caution as they could be renamed/suppressed/updated/merged in the next releases of Domogik!",
+        "example" : "",
+        "format": "",
+        "childs": ["DT_HVACMode", 
+                   "DT_HVACHeat", 
+                   "DT_HVACVent", 
+                   "DT_HVACFan", 
+                   "DT_HeatingPilotWire", 
+                   "DT_UPSState", 
+                   "DT_UPSEvent"]
+    },
+    "DT_HVACMode": {
+        "usage" : "TODO",
+        "example" : "",
         "values": {
             "0": "Auto",
             "1": "Comfort",
@@ -631,9 +839,25 @@
             "3": "Economy",
             "4": "Building Protection"
         },
-        "childs": []
+        "childs": [],
+        "parent" : "DT_Experimental"
+    },
+    "DT_HVACHeat": {
+        "usage" : "TODO",
+        "example" : "",
+        "values": {
+            "0": "Auto",
+            "1": "Comfort",
+            "2": "Standby",
+            "3": "Economy",
+            "4": "Building Protection"
+        },
+        "childs": [],
+        "parent" : "DT_Experimental"
     },
     "DT_HVACVent": {
+        "usage" : "TODO",
+        "example" : "",
         "values": {
             "0": "Auto",
             "1": "Heat",
@@ -641,9 +865,12 @@
             "3": "Fan only",
             "4": "Dry"
         },
-        "childs": []
+        "childs": [],
+        "parent" : "DT_Experimental"
     },
     "DT_HVACFan": {
+        "usage" : "TODO",
+        "example" : "",
         "values": {
             "0": "Unknown",
             "1": "Auto",
@@ -654,9 +881,12 @@
             "6": "Speed 4",
             "7": "Speed 5"
         },
-        "childs": []
+        "childs": [],
+        "parent" : "DT_Experimental"
     },
     "DT_HeatingPilotWire": {
+        "usage" : "TODO",
+        "example" : "",
         "values": {
             "1": "Comfort",
             "2": "Comfort -1",
@@ -665,17 +895,23 @@
             "5": "Building Protection",
             "6": "Off/Unballasting"
         },
-        "childs": []
+        "childs": [],
+        "parent" : "DT_Experimental"
     },
     "DT_UPSState": {
+        "usage" : "TODO",
+        "example" : "",
         "values": {
             "OL": "mains",
             "OB": "battery",
             "LB": "unknown"
         },
-        "childs": []
+        "childs": [],
+        "parent" : "DT_Experimental"
     },
     "DT_UPSEvent": {
+        "usage" : "TODO",
+        "example" : "",
         "values": {
             "onmains": "Mains power",
             "onbattery": "Battery power",
@@ -699,38 +935,23 @@
             "temp_high": "UPS temperature too high",
             "temp_ok": "UPS temperature returns ok"
         },
-        "childs": []
+        "childs": [],
+        "parent" : "DT_Experimental"
     },
-    "DT_CoordD": {
-        "format": "DD.dddddd,DD.dddddd",
-        "parent": "DT_String",
-        "childs": []
-    },
-    "DT_CoordDM": {
-        "format": "(N|S) DD MM.mmm,(E|W) DD MM.mmm",
-        "parent": "DT_String",
-        "childs": []
-    },
-    "DT_CoordDMS": {
-        "format": "(N|S) DD MM SS.s,(E|W) DD MM SS.s",
-        "parent": "DT_String",
-        "childs": []
-    },
-    "DT_Video": {
-        "childs": ["DT_VideoMjpeg", "DT_VideoH264"]
-    },
-    "DT_VideoMjpeg": {
-        "format": "",
-        "parent": "DT_Video",
-        "childs": []
-    },
-    "DT_VideoH264": {
-        "format": "",
-        "parent": "DT_Video",
-        "childs": []
-    },
-    "DT_Image": {
-        "format": "",
+
+
+
+    "DT_ColorCII": {
+        "values": {
+            "W": "White",
+            "O": "Orange",
+            "R": "Red",
+            "Y": "Yellow",
+            "B": "Blue",
+            "G": "Green",
+            "Bk": "Black",
+            "Br": "Brown"
+        },
         "childs": []
     }
 }
