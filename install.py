@@ -622,6 +622,7 @@ def install():
 
 
         if not args.test:
+            print("Running test_config.py...")
             os.system('python test_config.py')
         print("\n\n")
     except SystemExit:
