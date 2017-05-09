@@ -536,7 +536,7 @@ def install():
         # RUN setup.py
         if not args.setup:
             info("Run setup.py")
-            subp = Popen('python setup.py develop', shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+            subp = Popen('python setup.py develop', shell=True)
             res = subp.communicate()
             rc = subp.returncode
             if rc != 0:
