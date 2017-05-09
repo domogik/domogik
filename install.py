@@ -635,6 +635,7 @@ def install():
         print(traceback.format_exc())
         print("=================================")
         fail(sys.exc_info())
+        sys.exit(1)
 
 def add_arguments_for_config_file(parser, fle):
     # read the sample config file
