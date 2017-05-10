@@ -16,7 +16,7 @@ echo "==== RUNNING SETUP.py"
 pip install .
 
 echo "==== RUNNING pip install -r requirement.txt"
-pip install -r requirement.txt"
+pip install -r requirement.txt
 
 echo "==== RUNNING INSTALL.py"
 sudo python install.py --no-setup --no-test --user $LOGNAME --command-line --daemon
