@@ -16,7 +16,6 @@ pytz==2012c
 requests==2.8.1
 Twisted==15.5.0
 Pygments==2.0.1
-Domogik_MQ.egg==info
 SQLAlchemy==1.0.9
 pyOpenSSL==17.0.0
 Pillow==4.1.1
