@@ -15,8 +15,8 @@ cd domogik-mq-master
 echo "==== RUNNING SETUP.py"
 pip install .
 
-echo "==== RUNNING pip install -r requirement.txt"
-pip install -r requirement.txt
+echo "==== RUNNING pip install -r requirements.txt"
+pip install -r requirements.txt
 
 echo "==== RUNNING INSTALL.py"
 sudo python install.py --no-setup --no-test --user $LOGNAME --command-line --daemon
