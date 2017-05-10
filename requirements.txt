@@ -32,3 +32,4 @@ tornado==4.5.1
 PyYAML==3.12
 pyzmq==16.0.2
 alembic==0.9.1
+PyMySQL=0.7.11
