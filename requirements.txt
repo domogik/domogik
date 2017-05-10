@@ -20,7 +20,6 @@ SQLAlchemy==1.0.9
 pyOpenSSL==17.0.0
 Pillow==4.1.1
 python_dateutil==2.6.0
-easy_install==1
 pyephem==3.7.6.0
 flask_session==0.3.1
 Flask_Bcrypt==0.7.1
