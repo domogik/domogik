@@ -40,6 +40,11 @@ Installation
     * Domogik includes its own xPL hub.  If you are running another xPL hub on your target machine (xpl-perl, etc), you will have to deactivate it before the installation.
     * In this example, we use a *MySQL* or *MariaDB* database. If you want to use a *Postgresql* database, please refer to :doc:`the specific installations steps for Postgresql <postgresql>`.
 
+The Linux kernel
+----------------
+
+You need at least a kernel in release 3.9 to install and run Domogik. You can use the command **uname -r** to get your kernel release.
+
 The sudo command
 ----------------
 

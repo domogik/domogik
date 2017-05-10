@@ -1,12 +1,14 @@
 {% extends theme("base/base.html") %}
 
 {% block content %}
-<script src="{{ theme_static('libraries/treeview/bootstrap-treeview.js') }}"></script>
 <link href="{{ theme_static('libraries/treeview/bootstrap-treeview.css') }}" rel="stylesheet" media="screen">
 <div class="container">
  <div class="row">
     <h2>{% trans %}Domogik DataTypes{% endtrans %}</h2>
-    <div class="col-sm-4">
+    <a class="btn btn-info" href="https://github.com/domogik/domogik/blob/develop/src/domogik/common/datatypes.md">{% trans %}Online help about the datatypes{% endtrans %}</a>
+ </div>
+ <div class="row">
+    <div class="col">
       <h3>Search</h3>
 	<div class="form-group">
 	  <label for="input-search" class="sr-only">Search Tree:</label>
@@ -27,21 +29,44 @@
 	<button type="button" class="btn btn-success" id="btn-search">Search</button>
       <!-- </form> -->
     </div>
-    <div class="col-sm-4">
+  </div>
+  <div class="row">
+    <div class="col-md-4">
       <h3>Datatypes</h3>
       <div id="treeview-searchable" class=""></div>
     </div>
-    <div class="col-sm-4">
+    <div class="col-md-8">
+      <div id="detail">
       <h3>Details</h3>
       <div id="search-output"></div>
+      </div>
     </div>
   </div>
  </div>
 </div>
+<script src="{{ theme_static('libraries/treeview/bootstrap-treeview.js') }}"></script>
 <script type="text/javascript">
+    /* move detail when scrolling down */
+
+    /* deactivated for now (don't work on smartphone in 1 column mode *******
+    function fixDiv() {
+        var $cache = $('#detail'); 
+        if ($(window).scrollTop() > initPos) 
+            $('#detail').css({'position': 'fixed', 'top': '10px'}); 
+        else
+            $('#detail').css({'position': 'relative', 'top': 'auto'});
+    }
+    $(window).scroll(fixDiv);
+    initPos = $('#detail').offset().top;   //.position.top;
+    console.log(initPos);
+    fixDiv();
+    */
+</script>
+<script type="text/javascript">
+    /* search in tree */
     var $searchableTree = $('#treeview-searchable').treeview({
-        data: {{ datatypes|safe }},
-        levels: 10,
+        data: {{ datatypes|safe }}// ,
+        // levels: 10,
     });
     var search = function(e) {
       var pattern = $('#input-search').val();
@@ -53,7 +78,58 @@
       $searchableTree.treeview('search', [ pattern, options ]);
     }
     $('#treeview-searchable').on('nodeSelected', function(event, data) {
-        $('#search-output').html(JSON.stringify(data));
+        content = "";
+        //content += "<p>" + JSON.stringify(data) + "</p>";
+        content += "<ul>";
+        content += "<li><strong>{% trans %}Name{% endtrans %} : </strong>" + data.text + "</li>";
+        if (data.usage) {
+            content += "<li><strong>{% trans %}Usage{% endtrans %} : </strong>" + data.usage + "</li>";
+        }
+        if (data.example) {
+            content += "<li><strong>{% trans %}Example values{% endtrans %} : </strong>" + data.example + "</li>";
+        }
+        if (data.unit) {
+            content += "<li><strong>{% trans %}Unit{% endtrans %} : </strong>" + data.unit + "</li>";
+        }
+        if (data.labels) {
+            content += "<li><strong>{% trans %}Labels{% endtrans %} : </strong>";
+            content += "<table class='table'>";
+            content += "<thead>";
+            content += "<tr><th>{% trans %}Value{% endtrans %}</th><th>{% trans %}Label{% endtrans %}</th></tr>";
+            content += "</thead>";
+            content += "<tbody>";
+            for (val in data.labels) {
+                content += "<tr><td>" + val + "</td><td>" + data.labels[val] + "</td></tr>";
+            }
+            content += "</tbody>";
+            content += "</table>";
+            content += "</li>";
+        }
+        if ((data.min) || (data.min == 0)) {
+            content += "<li><strong>{% trans %}Minimum value{% endtrans %} : </strong>" + data.min + "</li>";
+        }
+        if (data.max) {
+            content += "<li><strong>{% trans %}Maximum value{% endtrans %} : </strong>" + data.max + "</li>";
+        }
+        if (data.format) {
+            content += "<li><strong>{% trans %}Format{% endtrans %} : </strong>" + data.format + "</li>";
+        }
+        if (data.values) {
+            content += "<li><strong>{% trans %}Allowed values{% endtrans %} : </strong>";
+            content += "<table class='table'>";
+            content += "<thead>";
+            content += "<tr><th>{% trans %}Value{% endtrans %}</th><th>{% trans %}Corresponding status{% endtrans %}</th></tr>";
+            content += "</thead>";
+            content += "<tbody>";
+            for (val in data.values) {
+                content += "<tr><td>" + val + "</td><td>" + data.values[val] + "</td></tr>";
+            }
+            content += "</tbody>";
+            content += "</table>";
+            content += "</li>";
+        }
+        content += "</ul>";
+        $('#search-output').html(content);
     });
     $('#btn-search').on('click', search);
     $('#input-search').on('keyup', search);

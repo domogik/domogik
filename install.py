@@ -536,8 +536,13 @@ def install():
         # RUN setup.py
         if not args.setup:
             info("Run setup.py")
-            if os.system('python setup.py develop') !=  0:
+            subp = Popen('python setup.py develop', shell=True)
+            res = subp.communicate()
+            rc = subp.returncode
+            if rc != 0:
                 raise OSError("setup.py doesn't finish correctly")
+            #if os.system('python setup.py develop') !=  0:
+            #    raise OSError("setup.py doesn't finish correctly")
 
         # ask for the domogik user
         if args.user == None or args.user == '':
@@ -622,6 +627,7 @@ def install():
 
 
         if not args.test:
+            print("Running test_config.py...")
             os.system('python test_config.py')
         print("\n\n")
     except SystemExit:
@@ -634,6 +640,7 @@ def install():
         print(traceback.format_exc())
         print("=================================")
         fail(sys.exc_info())
+        sys.exit(1)
 
 def add_arguments_for_config_file(parser, fle):
     # read the sample config file
