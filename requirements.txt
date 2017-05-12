@@ -1,6 +1,6 @@
 cffi==1.10.0
 setuptools==33.1.1
-Flask=0.12
+Flask==0.12
 Flask_Babel==1.0
 Flask-Login==0.4.0
 Flask_Bcrypt==0.7.1
