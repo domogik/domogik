@@ -1,12 +1,19 @@
 #!/bin/bash 
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
+echo ""
+echo "********** Processes *************"
 ps -ef | grep dmg
+ps -ef | grep admin
 if [ ! -z $DMG_PLUGIN ] ; then 
     ps -ef | grep $DMG_PLUGIN
     echo "********** /var/log/domogik/$DMG_PLUGIN.log *******************"
     cat /var/log/domogik/$DMG_PLUGIN.log
 fi
+
+echo ""
+echo "********** Gunicorn *************"
+which gunicorn
 
 echo ""
 echo "********** List of logs file **********************"

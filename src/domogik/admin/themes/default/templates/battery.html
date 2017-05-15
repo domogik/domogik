@@ -90,7 +90,12 @@
                   {{ elt.last_value }}%
                 {% endif %}
               </li>
-              <li><strong>{% trans %}Last udpate : </strong>{% endtrans %}{{ elt.last_received|datetime }}</li>
+              <li><strong>{% trans %}Last udpate : </strong>{% endtrans %}
+                {% if elt.last_received is none %}  
+                  {% trans %}n/a{% endtrans %}
+                {% else %}
+                  {{ elt.last_received|datetimeformat }}</li>
+                {% endif %}
             </ul>
         {% endfor %}
         </ul>
