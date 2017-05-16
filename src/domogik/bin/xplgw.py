@@ -310,7 +310,7 @@ class XplManager(XplPlugin):
                 self._parse_xpl_target(response.get_data())
                 ok = True
             else:
-                self.log.error(\
+                self.log.info(\
                     u"Updating client list failed, no response from manager (try number {0}/{1})".format(nb_try, max_try))
                 # We fail to load the client list, so we wait to get something
                 time.sleep(5)
