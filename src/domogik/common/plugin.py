@@ -264,10 +264,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             if not, stop the client and log this
         """
         #  For Plugin not locate on domogik server we must use MQ query mode
-#        self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
-
-        # Query use direct DbHelper access by default (better performance)"""
-        self._client_config = Query(self.log, self.get_sanitized_hostname())
+        self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
 
         configured = self._client_config.query(self._type, self._name, 'configured')
         if configured == '1':
@@ -303,10 +300,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         """
         if self._client_config == None:
             #  For Plugin not locate on domogik server we must use MQ query mode
-#            self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
-
-            # Query use direct DbHelper access by default (better performance)"""
-            self._client_config = Query(self.log, self.get_sanitized_hostname())
+            self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
 
         value = self._client_config.query(self._type, self._name, key)
         if value == None or value == 'None':

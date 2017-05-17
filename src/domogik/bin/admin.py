@@ -57,7 +57,7 @@ import subprocess
 #import datetime
 #import random
 #import uuid
-#from threading import Thread       #, Lock
+from threading import Thread       #, Lock
 from tornado import gen
 from tornado.queues import Queue
 from tornado.wsgi import WSGIContainer
@@ -315,7 +315,7 @@ class Admin(Plugin):
             (r"/ws", WebSocketManager, dict(publisher=publisher))
             ])
 
-	# create the server
+        # create the server
         # for ssl, extra parameter to HTTPServier init
         if self.use_ssl is True:
             ssl_options = {
@@ -325,7 +325,7 @@ class Admin(Plugin):
             self.http_server = HTTPServer(tapp, ssl_options=ssl_options)
         else:
             self.http_server = HTTPServer(tapp)
-	# listen on the interfaces
+        # listen on the interfaces
         if self.interfaces != "":
             # value can be : lo, eth0, ...
             # or also : '*' to catch all interfaces, whatever they are
@@ -400,54 +400,82 @@ class Admin(Plugin):
         my_exception =  str(traceback.format_exc()).replace('"', "'")
         return my_exception
 
+    def get_a_dbHelper(self):
+        """ Handle a multi DbHelper. Create a DbHelper object if necessary who is deleted after use
+            @return dbHelper : new DbHelper object or self ._db if not used
+        """
+        if self._db is None :
+            self._db = DbHelper()
+        if self._db.get_session is None :
+               return self._db
+        return DbHelper()
+
     def on_mdp_request(self, msg):
-        """ Handle Requests over MQ
+        """ Handle Requests over MQ on multi-thread
             @param msg : MQ req message
         """
         try:
-            with self._db.session_scope():
-                # Plugin handles MQ Req/rep also
-                Plugin.on_mdp_request(self, msg)
-
-                # configuration
-                if msg.get_action() == "config.get":
-                    self._mdp_reply_config_get(msg)
-                elif msg.get_action() == "config.set":
-                    self._mdp_reply_config_set(msg)
-                elif msg.get_action() == "config.delete":
-                    self._mdp_reply_config_delete(msg)
-                # devices list
-                elif msg.get_action() == "device.get":
-                    self._mdp_reply_devices_result(msg)
-                # device get params
-                elif msg.get_action() == "device.params":
-                    self._mdp_reply_devices_params_result(msg)
-                # device create
-                elif msg.get_action() == "device.create":
-                    self._mdp_reply_devices_create_result(msg)
-                # device delete
-                elif msg.get_action() == "device.delete":
-                    self._mdp_reply_devices_delete_result(msg)
-                # device update
-                elif msg.get_action() == "device.update":
-                    self._mdp_reply_devices_update_result(msg)
-                # deviceparam update
-                elif msg.get_action() == "deviceparam.update":
-                    self._mdp_reply_deviceparam_update_result(msg)
-                # sensor update
-                elif msg.get_action() == "sensor.update":
-                    self._mdp_reply_sensor_update_result(msg)
-                # sensor history
-                elif msg.get_action() == "sensor_history.get":
-                    self._mdp_reply_sensor_history(msg)
-                # person
-                elif msg.get_action() == "person.get":
-                    self._mdp_reply_person_get(msg)
+            # Plugin handles MQ Req/rep also
+            Plugin.on_mdp_request(self, msg)
+            # start a thread only if needed
+            if msg.get_action() in ['device.params', 'config.get', 'config.set', 'config.delete', 'device.get', 'device.create', 'device.delete',
+                                    'device.update', 'deviceparam.update', 'sensor.update', 'sensor_history.get', 'person.get']:
+                Thread(None,
+                        self.__on_mdp_request,
+                        "on_mdp_request",
+                        (msg, ),
+                        {}).start()
         except:
             msg = "Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
 
-    def _mdp_reply_config_get(self, data):
+    def __on_mdp_request(self, msg):
+        """ Handle Requests over MQ
+            @param msg : MQ req message
+        """
+        try:
+            # device get params, no need db access
+            if msg.get_action() == "device.params":
+                self._mdp_reply_devices_params_result(msg)
+            else :
+                db = self.get_a_dbHelper()
+                with db.session_scope():
+                    # configuration
+                    if msg.get_action() == "config.get":
+                        self._mdp_reply_config_get(msg, db)
+                    elif msg.get_action() == "config.set":
+                        self._mdp_reply_config_set(msg, db)
+                    elif msg.get_action() == "config.delete":
+                        self._mdp_reply_config_delete(msg, db)
+                    # devices list
+                    elif msg.get_action() == "device.get":
+                        self._mdp_reply_devices_result(msg, db)
+                    # device create
+                    elif msg.get_action() == "device.create":
+                        self._mdp_reply_devices_create_result(msg, db)
+                    # device delete
+                    elif msg.get_action() == "device.delete":
+                        self._mdp_reply_devices_delete_result(msg, db)
+                    # device update
+                    elif msg.get_action() == "device.update":
+                        self._mdp_reply_devices_update_result(msg, db)
+                    # deviceparam update
+                    elif msg.get_action() == "deviceparam.update":
+                        self._mdp_reply_deviceparam_update_result(msg, db)
+                    # sensor update
+                    elif msg.get_action() == "sensor.update":
+                        self._mdp_reply_sensor_update_result(msg, db)
+                    # sensor history
+                    elif msg.get_action() == "sensor_history.get":
+                        self._mdp_reply_sensor_history(msg, db)
+                    # person
+                    elif msg.get_action() == "person.get":
+                        self._mdp_reply_person_get(msg, db)
+        except:
+            msg = "Error while processing thread request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
+            self.log.error(msg)
+
+    def _mdp_reply_config_get(self, data, db):
         """ Reply to config.get MQ req
             @param data : MQ req message
         """
@@ -491,14 +519,14 @@ class Admin(Plugin):
             msg.add_data('key', key)  # we let this here to display key or * depending on the case
             try:
                 if get_all_keys == True:
-                    config = self._db.list_plugin_config(type, name, host)
+                    config = db.list_plugin_config(type, name, host)
                     self.log.info(u"Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, config))
                     json_config = {}
                     for elt in config:
                         json_config[elt.key] = self.convert(elt.value)
                     msg.add_data('data', json_config)
                 else:
-                    value = self._fetch_techno_config(name, type, host, key)
+                    value = self._fetch_techno_config(name, type, host, key, db)
                     # temporary fix : should be done in a better way (on db side)
                     value = self.convert(value)
                     self.log.info(u"Get config for {0} {1} with key '{2}' : value = {3}".format(type, name, key, value))
@@ -515,7 +543,7 @@ class Admin(Plugin):
         self.reply(msg.get())
 
 
-    def _mdp_reply_config_set(self, data):
+    def _mdp_reply_config_set(self, data, db):
         """ Reply to config.set MQ req
             @param data : MQ req message
         """
@@ -556,9 +584,9 @@ class Admin(Plugin):
             msg.add_data('host', host)
             try:
                 # we add a configured key set to true to tell the UIs and plugins that there are some configuration elements
-                self._db.set_plugin_config(type, name, host, "configured", True)
+                db.set_plugin_config(type, name, host, "configured", True)
                 for key in msg_data['data']:
-                    self._db.set_plugin_config(type, name, host, key, data[key])
+                    db.set_plugin_config(type, name, host, key, data[key])
                 self.publish_config_updated(type, name, host)
             except:
                 reason = "Error while setting configuration for '{0} {1} on {2}' : {3}".format(type, name, host, traceback.format_exc())
@@ -572,7 +600,7 @@ class Admin(Plugin):
         self.reply(msg.get())
 
 
-    def _mdp_reply_config_delete(self, data):
+    def _mdp_reply_config_delete(self, data, db):
         """ Reply to config.delete MQ req
             Delete all the config items for the given type, name and host
             @param data : MQ req message
@@ -608,7 +636,7 @@ class Admin(Plugin):
             msg.add_data('name', name)
             msg.add_data('host', host)
             try:
-                self._db.del_plugin_config(type, name, host)
+                db.del_plugin_config(type, name, host)
                 self.log.info(u"Delete config for {0} {1}".format(type, name))
                 self.publish_config_updated(type, name, host)
             except:
@@ -623,7 +651,7 @@ class Admin(Plugin):
         self.reply(msg.get())
 
 
-    def _fetch_techno_config(self, name, type, host, key):
+    def _fetch_techno_config(self, name, type, host, key, db):
         '''
         Fetch a plugin global config value in the database
         @param name : the plugin of the element
@@ -632,7 +660,7 @@ class Admin(Plugin):
         '''
         try:
             try:
-                result = self._db.get_plugin_config(type, name, host, key)
+                result = db.get_plugin_config(type, name, host, key)
                 # tricky loop as workaround for a (sqlalchemy?) bug :
                 # sometimes the given result is for another plugin/key
                 # so while we don't get the good data, we loop
@@ -642,7 +670,7 @@ class Admin(Plugin):
                    result.hostname != host or \
                    result.key != key:
                    self.log.debug(u"Bad result : {0}-{1}/{2} != {3}/{4}".format(result.id, result.type, result.key, name, key))
-                   result = self._db.get_plugin_config(type, name, host, key)
+                   result = db.get_plugin_config(type, name, host, key)
                 val = result.value
                 if val == '':
                     val = "None"
@@ -656,7 +684,7 @@ class Admin(Plugin):
             self.log.warning(msg)
             return "None"
 
-    def _mdp_reply_devices_delete_result(self, data):
+    def _mdp_reply_devices_delete_result(self, data, db):
         status = True
         reason = False
 
@@ -664,7 +692,7 @@ class Admin(Plugin):
         try:
             did = data.get_data()['did']
             if did:
-                res = self._db.del_device(did)
+                res = db.del_device(did)
                 if not res:
                     status = False
                 else:
@@ -696,7 +724,7 @@ class Admin(Plugin):
                      {"device_id" : did,
                       "client_id" : res.client_id})
 
-    def _mdp_reply_sensor_update_result(self, data):
+    def _mdp_reply_sensor_update_result(self, data, db):
         status = True
         reason = False
 
@@ -734,7 +762,7 @@ class Admin(Plugin):
                 else:
                     data_type = data['data_type']
                 # do the update
-                res = self._db.update_sensor(sid, \
+                res = db.update_sensor(sid, \
                      history_round=hround, \
                      history_store=hstore, \
                      history_max=hmax, \
@@ -769,12 +797,12 @@ class Admin(Plugin):
         self.reply(msg.get())
         # send the pub message
         if status and res:
-            dev = self._db.get_device(res.device_id)
+            dev = db.get_device(res.device_id)
             self._pub.send_event('device.update',
                      {"device_id" : res.device_id,
                       "client_id" : dev['client_id']})
 
-    def _mdp_reply_deviceparam_update_result(self, data):
+    def _mdp_reply_deviceparam_update_result(self, data, db):
         status = True
         reason = False
 
@@ -785,7 +813,7 @@ class Admin(Plugin):
                 dpid = data['dpid']
                 val = data['value']
                 # do the update
-                res = self._db.udpate_device_param(dpid, value=val)
+                res = db.udpate_device_param(dpid, value=val)
                 if not res:
                     status = False
                 else:
@@ -813,12 +841,12 @@ class Admin(Plugin):
         self.reply(msg.get())
         # send the pub message
         if status and res:
-            dev = self._db.get_device(res.device_id)
+            dev = db.get_device(res.device_id)
             self._pub.send_event('device.update',
                     {"device_id" : res.device_id,
                      "client_id" : dev['client_id']})
 
-    def _mdp_reply_devices_update_result(self, data):
+    def _mdp_reply_devices_update_result(self, data, db):
         status = True
         reason = False
 
@@ -840,7 +868,7 @@ class Admin(Plugin):
                 else:
                     desc = data['description']
                 # do the update
-                res = self._db.update_device(did, \
+                res = db.update_device(did, \
                     d_name=name, \
                     d_description=desc, \
                     d_reference=ref)
@@ -875,7 +903,7 @@ class Admin(Plugin):
                      {"device_id" : res.id,
                       "client_id" : res.client_id})
 
-    def _mdp_reply_devices_create_result(self, data):
+    def _mdp_reply_devices_create_result(self, data, db):
         status = True
         reason = False
         result = False
@@ -905,7 +933,7 @@ class Admin(Plugin):
 
         if status:
             # call the add device function
-            res = self._db.add_full_device(params, pjson)
+            res = db.add_full_device(params, pjson)
             if not res:
                 status = False
                 reason = "An error occured while adding the device in database. Please check the file admin.log for more informations"
@@ -967,7 +995,7 @@ class Admin(Plugin):
         except:
             self.log.error("Error when replying to device.params for data={0}. Error: {1}".format(data, traceback.format_exc()))
 
-    def _mdp_reply_devices_result(self, data):
+    def _mdp_reply_devices_result(self, data, db):
         """ Reply to device.get MQ req
             @param data : MQ req message
         """
@@ -984,7 +1012,7 @@ class Admin(Plugin):
 
             reason = ""
             status = True
-            dev_list = self._db.list_devices()
+            dev_list = db.list_devices()
 
             dev_json = dev_list
             msg.add_data('status', status)
@@ -1012,7 +1040,7 @@ class Admin(Plugin):
                 type = msg_data['type']
                 name = msg_data['name']
                 host = msg_data['host']
-                dev_list = self._db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
+                dev_list = db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
 
             #dev_json = json.dumps(dev_list, cls=domogik_encoder(), check_circular=False),
             dev_json = dev_list
@@ -1025,7 +1053,7 @@ class Admin(Plugin):
 
         self.reply(msg.get())
 
-    def _mdp_reply_sensor_history(self, data):
+    def _mdp_reply_sensor_history(self, data, db):
         """ Reply to sensor_history.get MQ req
             @param data : MQ req message
 
@@ -1071,11 +1099,11 @@ class Admin(Plugin):
                 number = 1
 
             try:
-                history = self._db.list_sensor_history(sensor_id, number)
+                history = db.list_sensor_history(sensor_id, number)
                 if len(history) == 0:
-                    values = self._db.get_last_sensor_value(sensor_id)
+                    values = db.get_last_sensor_value(sensor_id)
                 else:
-                    values = self._db.list_sensor_history(sensor_id, number)
+                    values = db.list_sensor_history(sensor_id, number)
             except:
                 self.log.error("ERROR when getting sensor history for id = {0} : {1}".format(sensor_id, traceback.format_exc()))
                 reason = "ERROR : {0}".format(traceback.format_exc())
@@ -1097,7 +1125,7 @@ class Admin(Plugin):
                 to = None
 
             if frm != None and to == None:
-                values = self._db.list_sensor_history_between(sensor_id, frm)
+                values = db.list_sensor_history_between(sensor_id, frm)
                 print(values)
 
             else:
@@ -1113,14 +1141,14 @@ class Admin(Plugin):
 
         self.reply(msg.get())
 
-    def _mdp_reply_person_get(self, data):
+    def _mdp_reply_person_get(self, data, db):
         status = True
         reason = False
         res = None
 
         self.log.debug(u"Get the person list : {0}".format(data))
         try:
-            res = self._db.list_persons()
+            res = db.list_persons()
             print(res)
             if not res:
                 status = False
@@ -1144,11 +1172,11 @@ class Admin(Plugin):
             persons = []
             for per in res:
                 # print(per)
-                # <Person: first_name='Stephanie', last_name='LR', location_sensor='663', birthdate='1977-09-19', id='5'> 
+                # <Person: first_name='Stephanie', last_name='LR', location_sensor='663', birthdate='1977-09-19', id='5'>
                 birthdate_ts = None
                 if per.birthdate:
                     birthdate_ts = time.mktime(per.birthdate.timetuple())
-                persons.append({'first_name' : per.first_name, 
+                persons.append({'first_name' : per.first_name,
                                 'last_name' : per.last_name,
                                 'location_sensor' : per.location_sensor,
                                 'birthdate' : birthdate_ts,
