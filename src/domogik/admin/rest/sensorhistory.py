@@ -190,7 +190,6 @@ def sensorHistory_from(sid, ftime):
         HTTTP/1.1 404 Not Found
     """
     app.db.open_session()
-    b = app.db.list_sensor_history_between(sid, ftime)
     res = app.db.list_sensor_history_between(sid, ftime)
     app.db.close_session()
     return 200, res
