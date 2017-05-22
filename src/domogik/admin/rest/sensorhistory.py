@@ -191,8 +191,9 @@ def sensorHistory_from(sid, ftime):
     """
     app.db.open_session()
     b = app.db.list_sensor_history_between(sid, ftime)
+    res = app.db.list_sensor_history_between(sid, ftime)
     app.db.close_session()
-    return 200, app.db.list_sensor_history_between(sid, ftime)
+    return 200, res
 
 @app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/to/<int:ttime>')
 @json_response

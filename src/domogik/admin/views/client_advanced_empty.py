@@ -5,6 +5,7 @@ from domogik.common.utils import get_packages_directory, get_libraries_directory
 from jinja2 import TemplateNotFound
 import sys
 import os
+import traceback
 
 package = "nothing"
 nothing_adm = Blueprint(package, __name__)
