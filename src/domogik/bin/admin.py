@@ -67,6 +67,7 @@ from tornado.web import FallbackHandler, Application
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from distutils.spawn import find_executable
 import re
+import os
 
 zmq.eventloop.ioloop.install()
 
@@ -255,6 +256,8 @@ class Admin(Plugin):
                 config_admin = cfg_admin.load()
                 conf_global = dict(config_admin[0])
                 self.log_level = conf_global['log_level']
+                self.log_folder = conf_global['log_dir_path']
+                self.http_log_file = os.path.join(self.log_folder, "core_admin_http.log")
                 conf_admin = dict(config_admin[1])
                 self.interfaces = conf_admin['interfaces']
                 self.port = conf_admin['port']
@@ -377,7 +380,7 @@ class Admin(Plugin):
     def _start_http_admin(self):
         self.log.info(u"HTTP Server initialisation...")
         acfg = dict(Loader('admin').load()[1])
-        cmd = "{0} --preload --log-level {1}".format(find_executable("gunicorn"), self.log_level)
+        cmd = "{0} --preload --access-logfile {1} --error-logfile {1} --log-level {2}".format(find_executable("gunicorn"), self.http_log_file, self.log_level)
 
         # SSL handling
         if acfg['use_ssl'] == "True":
