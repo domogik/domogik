@@ -56,6 +56,8 @@ def api_ncommand(cid):
         if response['status']:
             return 204, None
         else:
+            app.logger.error(u"{0}".format(response['reason']))
             return 400, {'msg': response['reason']}
     else:
+        app.logger.error(u"XPL gateway does not respond")
         return 400, {'msg': "XPL gateway does not respond"}

@@ -50,10 +50,11 @@ def api_datatype():
             ...
         }
     """
-    #cfg = Loader('domogik')
-    #config = cfg.load()
-    #conf = dict(config[1])
-    json_file = "{0}/datatypes.json".format(app.resources_directory)
-    data = json.load(open(json_file))
-
+    try:
+        json_file = "{0}/datatypes.json".format(app.resources_directory)
+        data = json.load(open(json_file))
+    except:
+        msg = u"Error while getting the datatypes. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        return 500, {'msg': msg}
     return 200, data

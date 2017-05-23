@@ -2,6 +2,7 @@ from domogik.admin.application import app
 from domogik.common.plugin import PRODUCTS_PICTURES_EXTENSIONS
 import os
 from flask import send_from_directory, redirect
+import traceback
 
 @app.route('/rest/product/<client_id>/<image>')
 def product_image(client_id, image):
