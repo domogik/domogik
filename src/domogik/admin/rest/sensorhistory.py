@@ -289,7 +289,7 @@ def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
     @apiParam {Number} tstampFrom The unixtimestamp from what time you want the history to start
     @apiParam {Number} tstampTo The unixtimestamp to what time you want the history to show up
     @apiParam {String} interval The interval that we want to filter, can be week, day, hour
-    @apiParam {String} selector The selector to calculate the values, can be min, max or avg
+    @apiParam {String} selector The selector to calculate the values, can be min, max, avg or sum
 
     @apiSuccess {json} result The json representing the latest value
 
@@ -334,7 +334,8 @@ def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
             "global_values": {
                 "max": 652.0,
                 "avg": 121.74901423084457,
-                "min": 54.0
+                "min": 54.0,
+                "sum": 3507.848652
             }
         }
     
@@ -367,7 +368,7 @@ def sensorHistory_from_to_filter(sid, ftime, interval, selector):
     @apiParam {Number} id The id of the sensor we want to retrieve the history from
     @apiParam {Number} tstampFrom The unixtimestamp from what time you want the history to start
     @apiParam {String} interval The interval that we want to filter, can be week, day, hour
-    @apiParam {String} selector The selector to calculate the values, can be min, max or avg
+    @apiParam {String} selector The selector to calculate the values, can be min, max, avg or sum
 
     @apiSuccess {json} result The json representing the latest value
 
@@ -412,7 +413,8 @@ def sensorHistory_from_to_filter(sid, ftime, interval, selector):
             "global_values": {
                 "max": 652.0,
                 "avg": 121.7495103299099,
-                "min": 54.0
+                "min": 54.0,
+                "sum": 3507.848652
             }
         }
     

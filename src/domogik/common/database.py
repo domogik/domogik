@@ -1126,14 +1126,15 @@ class DbHelper():
                 self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
         else:
             to = int(time.time())
-        if function_used is None or function_used.lower() not in ('min', 'max', 'avg'):
-            self.__raise_dbhelper_exception("'function_used' parameter should be one of : min, max, avg")
+        if function_used is None or function_used.lower() not in ('min', 'max', 'avg', 'sum'):
+            self.__raise_dbhelper_exception("'function_used' parameter should be one of : min, max, avg, sum")
         if step_used is None or step_used.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
             self.__raise_dbhelper_exception("'period' parameter should be one of : minute, hour, day, week, month, year")
         function = {
             'min': func.min(SensorHistory.value_num),
             'max': func.max(SensorHistory.value_num),
             'avg': func.avg(SensorHistory.value_num),
+            'sum': func.sum(SensorHistory.value_num),
         }
         sql_query = {
             'minute' : {
@@ -1219,6 +1220,21 @@ class DbHelper():
                             sqlalchemy.asc('year_c')
                         )
             },
+            'month' : {
+                'mysql': self.__session.query(
+                            func.year(SensorHistory.date), func.month(SensorHistory.date),function[function_used]
+                        ).group_by(
+                            func.year(SensorHistory.date), func.month(SensorHistory.date)
+                        ),
+                'postgresql': self.__session.query(
+                            extract('year', SensorHistory.date).label('year_c'), extract('month', SensorHistory.date),function[function_used]
+                        ).group_by(
+                            extract('year', SensorHistory.date), extract('month', SensorHistory.date)
+                        ).order_by(
+                            sqlalchemy.asc('year_c')
+                        )
+            },
+
             'year' : {
                 'mysql': self.__session.query(
                             func.year(SensorHistory.date), function[function_used]
@@ -1234,7 +1250,7 @@ class DbHelper():
                         )
             },
             'global' : self.__session.query(
-                            function['min'], function['max'], function['avg']
+                            function['min'], function['max'], function['avg'], function['sum']
                         )
         }
         if self.get_db_type() in ('mysql', 'postgresql'):
@@ -1253,7 +1269,8 @@ class DbHelper():
                 'global_values': {
                     'min': results_global[0],
                     'max': results_global[1],
-                    'avg': results_global[2]
+                    'avg': results_global[2],
+                    'sum': results_global[3]
                 }
             }
 
