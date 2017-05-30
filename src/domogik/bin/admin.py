@@ -1102,11 +1102,9 @@ class Admin(Plugin):
 
             if frm != None and to == None:
                 values = self._db.list_sensor_history_between(sensor_id, frm)
-                print(values)
 
             else:
-                # TODO
-                values = "TODO"
+                values = self._db.list_sensor_history_between(sensor_id, frm, to)
         
 
         msg.add_data('status', status)
