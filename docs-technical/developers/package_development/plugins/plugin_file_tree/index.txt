@@ -25,7 +25,7 @@ The plugin file tree will at least contains (assuming the plugin name is *myplug
   * **conversion/from_foo_to_bar.py** : a python conversion function
   * **conversion/from_fii_to_bur.py** : another python conversion function
 
-* **doc/** : the sphynx documentation in ReST format
+* **docs/** : the sphynx documentation in ReST format
 * **design/** : this folder will contain all graphical resources (icons, ...)
 
   * **design/icon.png** : the plugin icon (png, 96px * 96px). This file must always be named like this!
