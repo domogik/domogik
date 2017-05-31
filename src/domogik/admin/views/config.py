@@ -33,7 +33,7 @@ def config():
 
     class F(Form):
         external_ip = TextField("External IP", [Required()], description='External IP or DNS name', default=cfg['external_ip'])
-        external_port = TextField("External Port", [Required()], description='Externel Port where admin is listening', default=cfg['external_port'])
+        external_port = TextField("External Port", [Required()], description='External Port where admin is listening', default=cfg['external_port'])
         external_ssl = BooleanField("External use SSL", description='Does external access need ssl', default=cfg['external_ssl'])
         printer_ip = TextField("Printer IP", [Optional()], description='Printer IP', default=cfg['printer_ip'])
         printer_name = TextField("Printer Name", [Optional()], description='Printer name', default=cfg['printer_name'])
