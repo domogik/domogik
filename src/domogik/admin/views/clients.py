@@ -564,7 +564,7 @@ def client_config(client_id):
                           "name" : name,
                           "host" : host,
                           "event" : "updated"})
-        flash(gettext("Config saved successfull"), 'success')
+        flash(gettext("Config saved successfully"), 'success')
     
     return render_template('client_config.html',
             form = form,
