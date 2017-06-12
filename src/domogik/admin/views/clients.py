@@ -543,28 +543,37 @@ def client_config(client_id):
         form = None
 
     if request.method == 'POST' and form.validate():
-        with app.db.session_scope():
-            tmp = client_id.split('-')
-            type = tmp[0]
-            tmp = tmp[1].split('.')
-            host = tmp[1]
-            name = tmp[0]
-            app.db.set_plugin_config(type, name, host, "configured", True)
-            for key, typ in known_items.items():
-                val = getattr(form, key).data
-                if typ == "boolean":
-                    if val == False:
-                        val = 'N'
-                    else:
-                        val = 'Y'
-                app.db.set_plugin_config(type, name, host, key, val)
-        pub = MQPub(app.zmq_context, 'admin-views')
-        pub.send_event('plugin.configuration',
-                         {"type" : type,
-                          "name" : name,
-                          "host" : host,
-                          "event" : "updated"})
-        flash(gettext("Config saved successfully"), 'success')
+        try:
+            app.logger.debug(u"Set configuration for the package...")
+            with app.db.session_scope():
+                tmp = client_id.split('-')
+                type = tmp[0]
+                tmp = tmp[1].split('.')
+                host = tmp[1]
+                name = tmp[0]
+                app.db.set_plugin_config(type, name, host, "configured", True)
+                app.logger.debug(u"List of configuration elements :")
+                for key, typ in known_items.items():
+                    val = getattr(form, key).data
+                    app.logger.debug(u"- key='{0}', type='{1}', value='{2}'".format(key, typ, val))
+                    if typ == "boolean":
+                        app.logger.debug(u"  => Boolean")
+                        if val == False:
+                            val = 'N'
+                        else:
+                            val = 'Y'
+                        app.logger.debug(u"  => converted val={0}".format(val))
+                    app.db.set_plugin_config(type, name, host, key, val)
+            pub = MQPub(app.zmq_context, 'admin-views')
+            pub.send_event('plugin.configuration',
+                             {"type" : type,
+                              "name" : name,
+                              "host" : host,
+                              "event" : "updated"})
+            flash(gettext("Config saved successfully"), 'success')
+        except:
+            flash(gettext("Error while saving the configuration"), 'error')
+            app.logger.error(u"Error while saving the configuration. Error is : {0}".format(traceback.format_exc()))
     
     return render_template('client_config.html',
             form = form,
