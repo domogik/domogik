@@ -37,6 +37,7 @@ Implements
 
 from domogik.common import logger
 from domogik.common.database import DbHelper
+from domogik.common.utils import is_already_launched
 
 class CronSystem():
     """ Package installer class
@@ -46,7 +47,8 @@ class CronSystem():
         """
         l = logger.Logger("core_cron", log_on_stdout=True)
         self.log = l.get_logger()
-        self.db = DbHelper()
+        withCache = is_already_launched(self.log, "core", "cachedb", False)
+        self.db = DbHelper(use_cache=withCache[0])
         self.run()
 
     def run(self):

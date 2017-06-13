@@ -29,9 +29,9 @@ log_interval = 1
 log_backup_count = 10
 
 # This parameter defines which interface the Domogik xPL plugins should listen for xPL
-# If you have only one computer to run the Domogik installation (of course, 
-# the one used to browse the interface is not important), you can set it 
-# on 'lo', so that xPL won't polute your network. If you use more than 
+# If you have only one computer to run the Domogik installation (of course,
+# the one used to browse the interface is not important), you can set it
+# on 'lo', so that xPL won't polute your network. If you use more than
 # one computer, you have to set it to your public interface, for example 'eth0'
 # Using '*' as value will use :
 # - lo if this is the only interface available
@@ -54,13 +54,16 @@ password = domopass
 port = 3306
 name = domogik
 host = 127.0.0.1
-# This is the prefix used in database. All tables will start by it. Do *not* 
+# This is the prefix used in database. All tables will start by it. Do *not*
 # modify it unless you really know what you are doing
 prefix = core
 
-# In case you get some "OperationalError: MySQL server has gone away" errors, 
+# In case you get some "OperationalError: MySQL server has gone away" errors,
 # you may need to adapt this value to your mysql configuration.
 #pool_recycle = 3600
+
+# port used by internal memory db cache system
+portcache = 50001
 
 ###
 # Admin interface
@@ -69,7 +72,7 @@ prefix = core
 # Admin is the component that handles 2 things:
 # 1- the admin UI
 # 2- the rest inetrface
-# its a HTTP server. Following parameters will indicate REST on which 
+# its a HTTP server. Following parameters will indicate REST on which
 # ip:port it will run
 # * means that it will be available on all network interfaces
 #interfaces = eth0,lo
@@ -89,7 +92,7 @@ clean_json = False
 # if set to True, all the /rest/ urls need basic authentication
 rest_auth = False
 # A secret key used as a salt for the session storage
-secret_key = 
+secret_key =
 
 ###
 # Butler configuration
@@ -108,7 +111,7 @@ sex = female
 folder=/var/lib/domogik/backup/
 
 
-### 
+###
 # Metrics configuration
 ###
 
@@ -119,7 +122,7 @@ folder=/var/lib/domogik/backup/
 # - technical informations about each Domogik process : cpu and memory usage, ...
 
 # the id is generated during Domogik installation based on some system properties. It should be unique. You can freely change its value to something more fun like your github username for example ;)
-id = 
+id =
 
 # this is the url on which the metrics are sent. Don't change this value!
 url = http://metrics.domogik.org/

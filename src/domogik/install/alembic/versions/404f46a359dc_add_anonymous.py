@@ -15,11 +15,11 @@ import sqlalchemy as sa
 from domogik.common.database import DbHelper
 
 def upgrade():
-    db = DbHelper()
+    db = DbHelper(use_cache=False)
     with db.session_scope():
         db.add_user_account_with_person('Anonymous', 'Anonymous', 'Rest', 'Anonymous')
     del db
-        
+
     pass
 
 
