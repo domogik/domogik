@@ -10,7 +10,7 @@ These 2 files are needed in package root directory:
 README.md
 =========
 
-The **README.md** file should contain a quick description of the plugin, and invite the user to find more informations on http://docs.domogik/org/
+The **README.md** file should contain a quick description of the plugin, and invite the user to find more informations on http://docs.domogik.org/
 
 The **.md** extension is for *Markdown* which is a text markup language. You can find `more information about Markdown on wikipedia <http://en.wikipedia.org/wiki/Markdown>`_
 

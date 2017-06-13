@@ -2,31 +2,61 @@
 
 {% block content %}
 <div class="container">
-  <h1>Global Domogik config</h1>
-  <form id="location_form" method="post" role="form" class="form-horizontal">
-  {% for item in form %}
-    {% if item.type == "HiddenField" or item.name == "csrf_token" %}
-        {{ item }}
-    {% elif item.name == "submit" %}
-      <div class="form-group">
-        <div class="col-xs-offset-3 col-xs-9">
-        <input type="submit" value="{% trans %}Save{% endtrans %}" class="btn btn-primary">
+    <h2>{% trans %}Domogik configuration{% endtrans %}</h2>
+    <form method="post" role="form">
+      {{ form.csrf_token }}
+
+      <h3>{% trans %}External access{% endtrans %}</h3>
+
+      <div class="alert alert-info" role="alert">{% trans %}If you use Domogik from internet, you surely use a different url to access Domogik from internet and your local network. To allow applications like Domodroid to use the appropriate url depending on where you are, you can configure here your external access informations. {% endtrans %}</div>
+
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.external_ip.label }}</label>
+        <div class="col-md-9">
+          {{ form.external_ip(size = 50) }}
+          <span class="help-block">{{ form.external_ip.description }}</span>
         </div>
       </div>
-    {% else %}
-      <div class="form-group">
-        <label class="control-label col-xs-3">{{ item.label }}</label>
-        <div class="col-xs-9">
-          {% if item.type == "TextField" %}
-            {{ item(size = 50) }}
-          {% else %}
-            {{ item }}
-          {% endif %}
-          <span class="help-block">{{ item.description }}</span>
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.external_port.label }}</label>
+        <div class="col-md-9">
+          {{ form.external_port(size = 50) }}
+          <span class="help-block">{{ form.external_port.description }}</span>
         </div>
       </div>
-    {% endif %}
-  {% endfor %}
-  </form>
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.external_ssl.label }}</label>
+        <div class="col-md-9">
+          {{ form.external_ssl }}
+          <span class="help-block">{{ form.external_ssl.description }}</span>
+        </div>
+      </div>
+
+      <h3>{% trans %}Printer configuration{% endtrans %}</h3>
+ 
+      <div class="alert alert-info" role="alert">{% trans %}Some Butler features may use the printer (to print a shopping list for example). If you want to use this kind of features, please feel the printer informations.{% endtrans %}</div>
+
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.printer_ip.label }}</label>
+        <div class="col-md-9">
+          {{ form.printer_ip(size = 50) }}
+          <span class="help-block">{{ form.printer_ip.description }}</span>
+        </div>
+      </div>
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.printer_name.label }}</label>
+        <div class="col-md-9">
+          {{ form.printer_name(size = 50) }}
+          <span class="help-block">{{ form.printer_name.description }}</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-offset-3 col-md-9">
+        <input type="submit" value="{% trans %}Save the configuration {% endtrans %}" class="btn btn-primary">
+        </div>
+      </div>
+    </form>
 </div>
+
 {% endblock %}

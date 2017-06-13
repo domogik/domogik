@@ -61,12 +61,19 @@ cfg = dmgLoader('admin').load()
 app.globalConfig = dict(cfg[0])
 app.dbConfig = dict(cfg[1]) 
 app.zmq_context = zmq.Context() 
-# TODO : DEL ##app.mqpub = MQPub(zmq.Context(), 'admin-views')
-# TODO : DEL #app.mqpub = MQPub(zmq.Context(), 'adminhttp')
 app.libraries_directory = app.globalConfig['libraries_path']
 app.packages_directory = "{0}/{1}".format(app.globalConfig['libraries_path'], PACKAGES_DIR)
 app.resources_directory = "{0}/{1}".format(app.globalConfig['libraries_path'], RESOURCES_DIR)
 app.publish_directory = "{0}/{1}".format(app.resources_directory, "publish")
+
+### logging to stdout (to get logs in gunicorn logs...)
+import logging
+gunicorn_error_logger = logging.getLogger('gunicorn.error')
+app.logger.handlers.extend(gunicorn_error_logger.handlers)
+app.logger.setLevel(logging.DEBUG)
+#stream_handler = logging.StreamHandler()
+#stream_handler.setLevel(logging.DEBUG)
+#app.logger.addHandler(stream_handler)
 
 ### set Flask Config
 app.jinja_env.globals['bootstrap_is_hidden_field'] = is_hidden_field_filter

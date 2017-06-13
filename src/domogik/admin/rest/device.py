@@ -9,6 +9,7 @@ import json
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from flask_login import login_required
+import traceback
 
 @app.route('/rest/device/since/<timestamp>', methods=['GET'])
 @json_response
@@ -100,9 +101,15 @@ def device_since(timestamp):
     @apiErrorExample Error-Response:
 	HTTTP/1.1 404 Not Found
     """
-    app.db.open_session()
-    b = app.db.list_devices_by_timestamp(timestamp)
-    app.db.close_session()
+    try:
+        app.db.open_session()
+        b = app.db.list_devices_by_timestamp(timestamp)
+        app.db.close_session()
+    except:
+        msg = u"Error while getting the devices list. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        return 500, {'msg': msg}
+
     return 200, b
 
 @app.route('/rest/device/params/<client_id>/<dev_type_id>', methods=['GET'])
@@ -158,7 +165,12 @@ def device_params(client_id, dev_type_id):
     @apiErrorExample Error-Response:
         HTTTP/1.1 404 Not Found
     """
-    (result, reason, status) = build_deviceType_from_packageJson(app.zmq_context, dev_type_id, client_id)
+    try:
+        (result, reason, status) = build_deviceType_from_packageJson(app.zmq_context, dev_type_id, client_id)
+    except:
+        msg = u"Error while getting the device parameters. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        return 500, {'msg': msg}
     # return the info
     return 200, result
 
@@ -249,16 +261,21 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        app.db.open_session()
-        if did != None:
-            b = app.db.get_device(did)
-        else:
-            b = app.db.list_devices()
-        app.db.close_session()
-        if b == None:
-            return 404, b
-        else:
-            return 200, b
+        try:
+            app.db.open_session()
+            if did != None:
+                b = app.db.get_device(did)
+            else:
+                b = app.db.list_devices()
+            app.db.close_session()
+            if b == None:
+                return 404, b
+            else:
+                return 200, b
+        except:
+            msg = u"Error while getting the devices list. Error is : {0}".format(traceback.format_exc())
+            app.logger.error(msg)
+            return 500, {'msg' : msg}
 
     def delete(self, did):
         """
@@ -276,12 +293,19 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 500 INTERNAL SERVER ERROR
         """
-        with app.db.session_scope():
-            res = app.db.del_device(did)
-            if not res:
-                return 500, "Device deleted failed"
-            else:
-                return 201, None
+        try:
+            with app.db.session_scope():
+                res = app.db.del_device(did)
+                if not res:
+                    msg = u"Device deletion failed"
+                    app.logger.error(msg)
+                    return 500, {'msg' : msg }
+                else:
+                    return 201, None
+        except:
+            msg = u"Error while deleting the device. Error is : {0}".format(traceback.format_exc())
+            app.logger.error(msg)
+            return 500, {'msg': msg}
 
     def post(self):
         """
@@ -368,42 +392,47 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 500 Internal Server Error
         """
-        params = json.loads(request.form.get('params'))
-        status = True
-        print params
-        cli = MQSyncReq(app.zmq_context)
-        msg = MQMessage()
-        msg.set_action('device_types.get')
-        msg.add_data('device_type', params['device_type'])
-        res = cli.request('manager', msg.get(), timeout=10)
-        del cli
-        if res is None:
-            status = False
-            reason = "Manager is not replying to the mq request"
-        pjson = res.get_data()
-        if pjson is None:
-            status = False
-            reason = "No data for {0} found by manager".format(params['device_type'])
-        pjson = pjson[params['device_type']]
-        if pjson is None:
-            status = False
-            reason = "The json for {0} found by manager is empty".format(params['device_type'])
-
-	with app.db.session_scope():
-	    if status:
-		# call the add device function
-		res = app.db.add_full_device(params, pjson)
-		if not res:
-		    status = False
-		    reason = "An error occured while adding the device in database. Please check the file admin.log for more informations"
-		else:
-		    status = True
-		    reason = False
-		    result = res
-	    if status:
-		return 201, result
-	    else:
-		return 500, reason
+        try:
+            params = json.loads(request.form.get('params'))
+            status = True
+            print params
+            cli = MQSyncReq(app.zmq_context)
+            msg = MQMessage()
+            msg.set_action('device_types.get')
+            msg.add_data('device_type', params['device_type'])
+            res = cli.request('manager', msg.get(), timeout=10)
+            del cli
+            if res is None:
+                status = False
+                reason = "Manager is not replying to the mq request"
+            pjson = res.get_data()
+            if pjson is None:
+                status = False
+                reason = "No data for {0} found by manager".format(params['device_type'])
+            pjson = pjson[params['device_type']]
+            if pjson is None:
+                status = False
+                reason = "The json for {0} found by manager is empty".format(params['device_type'])
+    
+            with app.db.session_scope():
+                if status:
+                    # call the add device function
+                    res = app.db.add_full_device(params, pjson)
+                    if not res:
+                        status = False
+                        reason = "An error occured while adding the device in database. Please check the file admin.log for more informations"
+                    else:
+                        status = True
+                        reason = False
+                        result = res
+                if status:
+                    return 201, result
+                else:
+                    return 500, {'msg' : reason}
+        except:
+            msg = u"Error while creating the device. Error is : {0}".format(traceback.format_exc())
+            app.logger.error(msg)
+            return 500, {'msg': msg}
 
     def put(self, did):
         """
@@ -494,25 +523,30 @@ class deviceAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        if 'name' in request.form:
-            name = request.form['name']
-        else:
-            name = None
-        if 'description' in request.form:
-            desc = request.form['description']
-        else:
-            desc = None
-        if 'reference' in request.form:
-            ref = request.form['reference']
-        else:
-            ref = None
-        res = app.db.update_device(did, \
-            d_name=name, \
-            d_description=desc, \
-            d_reference=ref)
-        if res:
-            return 201, app.db.get_device(did)
-        else:
-            return 500, None
+        try:
+            if 'name' in request.form:
+                name = request.form['name']
+            else:
+                name = None
+            if 'description' in request.form:
+                desc = request.form['description']
+            else:
+                desc = None
+            if 'reference' in request.form:
+                ref = request.form['reference']
+            else:
+                ref = None
+            res = app.db.update_device(did, \
+                d_name=name, \
+                d_description=desc, \
+                d_reference=ref)
+            if res:
+                return 201, app.db.get_device(did)
+            else:
+                return 500, {'msg' : u"Error while updating the device"}
+        except:
+            msg = u"Error while updating the device. Error is : {0}".format(traceback.format_exc())
+            app.logger.error(msg)
+            return 500, {'msg': msg}
 
 register_api(deviceAPI, 'device', '/rest/device/', pk='did', pk_type='int')

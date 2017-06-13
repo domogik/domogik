@@ -281,50 +281,50 @@ def client_sensor_edit(client_id, sensor_id):
                 hstore = 1
             else:
                 hstore = 0
-	    if 'history_round' not in request.form:
-		hround = None
-	    else:
-		hround = request.form['history_round']
-	    if 'history_store' not in request.form:
-		hstore = None
-	    else:
-		hstore = request.form['history_store']
-	    if 'history_max' not in request.form:
-		hmax = None
-	    else:
-		hmax = request.form['history_max']
-	    if 'history_expire' not in request.form:
-		hexpire = None
-	    else:
-		hexpire = request.form['history_expire']
-	    if 'timeout' not in request.form:
-		timeout = None
-	    else:
-		timeout = request.form['timeout']
-	    if 'formula' not in request.form:
-		formula = None
-	    else:
-		formula = request.form['formula']
-	    if 'data_type' not in request.form:
-		data_type = None
-	    else:
-		data_type = request.form['data_type']
-	    # do the update
-	    res = app.db.update_sensor(sensor_id, \
-		 history_round=hround, \
-		 history_store=hstore, \
-		 history_max=hmax, \
-		 history_expire=hexpire, \
-		 timeout=timeout, \
-		 formula=formula, \
-		 data_type=data_type)
-	    if res:
-		flash(gettext("Sensor update succesfully"), 'success')
-	    else:
-		flash(gettext("Senor update failed"), 'warning')
+            if 'history_round' not in request.form:
+                hround = None
+            else:
+                hround = request.form['history_round']
+            if 'history_store' not in request.form:
+                hstore = None
+            else:
+                hstore = request.form['history_store']
+            if 'history_max' not in request.form:
+                hmax = None
+            else:
+                hmax = request.form['history_max']
+            if 'history_expire' not in request.form:
+                hexpire = None
+            else:
+                hexpire = request.form['history_expire']
+            if 'timeout' not in request.form:
+                timeout = None
+            else:
+                timeout = request.form['timeout']
+            if 'formula' not in request.form:
+                formula = None
+            else:
+                formula = request.form['formula']
+            if 'data_type' not in request.form:
+                data_type = None
+            else:
+                data_type = request.form['data_type']
+            # do the update
+            res = app.db.update_sensor(sensor_id, \
+                 history_round=hround, \
+                 history_store=hstore, \
+                 history_max=hmax, \
+                 history_expire=hexpire, \
+                 timeout=timeout, \
+                 formula=formula, \
+                 data_type=data_type)
+            if res:
+                flash(gettext("Sensor update succesfully"), 'success')
+            else:
+                flash(gettext("Senor update failed"), 'warning')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
         else:
-	    return render_template('client_sensor.html',
+            return render_template('client_sensor.html',
                 form = form,
                 clientid = client_id,
                 mactive="clients",
@@ -387,6 +387,11 @@ def client_global_edit(client_id, dev_id):
                         flash(gettext("Param update succesfully"), 'success')
                     else:
                         flash(gettext("Param update failed"), 'warning')
+                    # in all case we send an update event (in case of partial success...)
+                    pub = MQPub(app.zmq_context, 'admin-views')
+                    pub.send_event('device.update',
+                                   {"device_id" : dev_id,
+                                    "client_id" : client_id})
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
             pass
         else:
@@ -437,13 +442,18 @@ def client_devices_edit(client_id, did):
 
         if request.method == 'POST' and form.validate():
             res = app.db.update_device(did, \
-            d_name=request.form['name'], \
-            d_description=request.form['description'], \
-            d_reference=request.form['reference'])
+                d_name=request.form['name'], \
+                d_description=request.form['description'], \
+                d_reference=request.form['reference'])
             if res:
                 flash(gettext("Device update succesfully"), 'success')
             else:
                 flash(gettext("Device update failed"), 'warning')
+            # in all case we send an update event (in case of partial success...)
+            pub = MQPub(app.zmq_context, 'admin-views')
+            pub.send_event('device.update',
+                           {"device_id" : did,
+                            "client_id" : client_id})
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
         else:
             return render_template('client_device_edit.html',
@@ -463,6 +473,11 @@ def client_devices_delete(client_id, did):
             flash(gettext("Device deleted failed"), 'warning')
         else:
             flash(gettext("Device deleted succesfully"), 'success')
+        # in all case we send an update event (in case of partial success...)
+        pub = MQPub(app.zmq_context, 'admin-views')
+        pub.send_event('device.update',
+                       {"device_id" : did,
+                        "client_id" : res.client_id})
     return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
@@ -477,7 +492,9 @@ def client_config(client_id):
     class F(Form):
         submit = SubmitField("Send")
         pass
+    app.logger.debug(u"Display configuration for '{0}' : ".format(client_id))
     for item in config:
+        app.logger.debug(u"- key='{0}', type='{1}', value='{2}'".format(item["key"], item["type"], item["value"]))
         # keep track of the known fields
         known_items[item["key"]] = item["type"]
         # handle required
@@ -528,29 +545,37 @@ def client_config(client_id):
         form = None
 
     if request.method == 'POST' and form.validate():
-        with app.db.session_scope():
-            tmp = client_id.split('-')
-            type = tmp[0]
-            tmp = tmp[1].split('.')
-            host = tmp[1]
-            name = tmp[0]
-            app.db.set_plugin_config(type, name, host, "configured", True)
-            for key, typ in known_items.items():
-                val = getattr(form, key).data
-                if typ == "boolean":
-                    if val == False:
-                        val = 'N'
-                    else:
-                        val = 'Y'
-                app.db.set_plugin_config(type, name, host, key, val)
-        pub = MQPub(app.zmq_context, 'admin-views')
-        pub.send_event('plugin.configuration',
-			 {"type" : type,
-			  "name" : name,
-			  "host" : host,
-			  "event" : "updated"})
-	flash(gettext("Config saved successfull"), 'success')
-
+        try:
+            app.logger.debug(u"Set configuration for the package...")
+            with app.db.session_scope():
+                tmp = client_id.split('-')
+                type = tmp[0]
+                tmp = tmp[1].split('.')
+                host = tmp[1]
+                name = tmp[0]
+                app.db.set_plugin_config(type, name, host, "configured", True)
+                app.logger.debug(u"List of configuration elements :")
+                for key, typ in known_items.items():
+                    val = getattr(form, key).data
+                    app.logger.debug(u"- key='{0}', type='{1}', value='{2}'".format(key, typ, val))
+                    if typ == "boolean":
+                        app.logger.debug(u"  => Boolean")
+                        if val == False:
+                            val = 'N'
+                        else:
+                            val = 'Y'
+                        app.logger.debug(u"  => converted val={0}".format(val))
+                    app.db.set_plugin_config(type, name, host, key, val)
+            pub = MQPub(app.zmq_context, 'admin-views')
+            pub.send_event('plugin.configuration',
+                             {"type" : type,
+                              "name" : name,
+                              "host" : host,
+                              "event" : "updated"})
+            flash(gettext("Config saved successfully"), 'success')
+        except:
+            flash(gettext("Error while saving the configuration"), 'error')
+            app.logger.error(u"Error while saving the configuration. Error is : {0}".format(traceback.format_exc()))
     return render_template('client_config.html',
             form = form,
             clientid = client_id,
@@ -835,67 +860,76 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     form_xpl_stat = F_xpl_stat()
 
     if request.method == 'POST' and form.validate():
-        # aprams hold the stucture,
-        # append a vlaue key everywhere with the value submitted
-        # or fill in the key
-        params['client_id'] = client_id
-        for item in request.form:
-            if item in ["name", "reference", "description"]:
-                # handle the global things
-                params[item] = request.form.get(item)
-            elif item.startswith('xpl') or item.startswith('glob'):
-                # handle the global params
-                if item.startswith('xpl'):
-                    key = 'xpl'
+        try:
+            # aprams hold the stucture,
+            # append a vlaue key everywhere with the value submitted
+            # or fill in the key
+            params['client_id'] = client_id
+            for item in request.form:
+                if item in ["name", "reference", "description"]:
+                    # handle the global things
+                    params[item] = request.form.get(item)
+                elif item.startswith('xpl') or item.startswith('glob'):
+                    # handle the global params
+                    if item.startswith('xpl'):
+                        key = 'xpl'
+                    else:
+                        key = 'global'
+                    par = item.split('|')[1]
+                    i = 0
+                    while i < len(params[key]):
+                        param = params[key][i]
+                        if par == param['key']:
+                            params[key][i]['value'] = request.form.get(item)
+                        i = i + 1
+                elif item.startswith('stat') or item.startswith('cmd'):
+                    if item.startswith('stat'):
+                        key = "xpl_stats"
+                    else:
+                        key = "xpl_commands"
+                    name = item.split('|')[1]
+                    par = item.split('|')[2]
+                    i = 0
+                    while i < len(params[key][name]):
+                        param = params[key][name][i]
+                        if par == param['key']:
+                            params[key][name][i]['value'] = request.form.get(item)
+                        i = i + 1
+            # we now have the json to return
+            reason = False
+            cli = MQSyncReq(app.zmq_context)
+            msg = MQMessage()
+            msg.set_action('device_types.get')
+            msg.add_data('device_type', params['device_type'])
+            res = cli.request('manager', msg.get(), timeout=10)
+            del cli
+            if res is None:
+                status = False
+                reason = "Manager is not replying to the mq request"
+            pjson = res.get_data()
+            if pjson is None:
+                status = False
+                reason = "No data for {0} found by manager".format(params['device_type'])
+            pjson = pjson[params['device_type']]
+            if pjson is None:
+                status = False
+                reason = "The json for {0} found by manager is empty".format(params['device_type'])
+            with app.db.session_scope():
+                res = app.db.add_full_device(params, pjson)
+                if res:
+                    flash(gettext("Device created succesfully"), 'success')
                 else:
-                    key = 'global'
-                par = item.split('|')[1]
-                i = 0
-                while i < len(params[key]):
-                    param = params[key][i]
-                    if par == param['key']:
-                        params[key][i]['value'] = request.form.get(item)
-                    i = i + 1
-            elif item.startswith('stat') or item.startswith('cmd'):
-                if item.startswith('stat'):
-                    key = "xpl_stats"
-                else:
-                    key = "xpl_commands"
-                name = item.split('|')[1]
-                par = item.split('|')[2]
-                i = 0
-                while i < len(params[key][name]):
-                    param = params[key][name][i]
-                    if par == param['key']:
-                        params[key][name][i]['value'] = request.form.get(item)
-                    i = i + 1
-        # we now have the json to return
-	reason = False
-        cli = MQSyncReq(app.zmq_context)
-        msg = MQMessage()
-        msg.set_action('device_types.get')
-        msg.add_data('device_type', params['device_type'])
-        res = cli.request('manager', msg.get(), timeout=10)
-        del cli
-        if res is None:
-            status = False
-            reason = "Manager is not replying to the mq request"
-        pjson = res.get_data()
-        if pjson is None:
-            status = False
-            reason = "No data for {0} found by manager".format(params['device_type'])
-        pjson = pjson[params['device_type']]
-        if pjson is None:
-            status = False
-            reason = "The json for {0} found by manager is empty".format(params['device_type'])
-        with app.db.session_scope():
-            res = app.db.add_full_device(params, pjson)
-            if res:
-                flash(gettext("Device created succesfully"), 'success')
-            else:
-                flash(gettext("Device creation failed"), 'warning')
-		if reason:
-		    flash(reason, 'warning')
+                    flash(gettext("Device creation failed"), 'warning')
+                    if reason:
+                        flash(reason, 'warning')
+                # in all case we send an update event (in case of partial success...)
+                pub = MQPub(app.zmq_context, 'admin-views')
+                pub.send_event('device.update',
+                               {"device_id" : res['id'],
+                                "client_id" : client_id})
+        except:
+            app.logger.error(u"Error while creating the device. The error is : {0}".format(traceback.format_exc()))
+            flash(gettext("Device creation failed. Please check the logs for more details."), 'warning')
         return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
     return render_template('client_device_new_wiz.html',

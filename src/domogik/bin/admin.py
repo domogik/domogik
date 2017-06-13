@@ -67,6 +67,7 @@ from tornado.web import FallbackHandler, Application
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from distutils.spawn import find_executable
 import re
+import os
 
 zmq.eventloop.ioloop.install()
 
@@ -249,6 +250,8 @@ class Admin(Plugin):
                 config_admin = cfg_admin.load()
                 conf_global = dict(config_admin[0])
                 self.log_level = conf_global['log_level']
+                self.log_folder = conf_global['log_dir_path']
+                self.http_log_file = os.path.join(self.log_folder, "core_admin_http.log")
                 conf_admin = dict(config_admin[1])
                 self.interfaces = conf_admin['interfaces']
                 self.port = conf_admin['port']
@@ -370,7 +373,7 @@ class Admin(Plugin):
     def _start_http_admin(self):
         self.log.info(u"HTTP Server initialisation...")
         acfg = dict(Loader('admin').load()[1])
-        cmd = "{0} --preload --log-level {1}".format(find_executable("gunicorn"), self.log_level)
+        cmd = "{0} --preload --access-logfile {1} --error-logfile {1} --log-level {2}".format(find_executable("gunicorn"), self.http_log_file, self.log_level)
 
         # SSL handling
         if acfg['use_ssl'] == "True":
@@ -903,7 +906,8 @@ class Admin(Plugin):
                      {"device_id" : res.id,
                       "client_id" : res.client_id})
 
-    def _mdp_reply_devices_create_result(self, data, db):
+    def _mdp_reply_devices_create_result(self, data):
+        self.log.info("Request tp create a device over MQ...")
         status = True
         reason = False
         result = False
@@ -937,10 +941,12 @@ class Admin(Plugin):
             if not res:
                 status = False
                 reason = "An error occured while adding the device in database. Please check the file admin.log for more informations"
+                self.log.error(reason)
             else:
                 status = True
                 reason = False
                 result = res
+                self.log.info("Device created")
 
         msg = MQMessage()
         msg.set_action('device.create.result')
@@ -1125,14 +1131,9 @@ class Admin(Plugin):
                 to = None
 
             if frm != None and to == None:
-                values = db.list_sensor_history_between(sensor_id, frm)
-                print(values)
-
+                values = self._db.list_sensor_history_between(sensor_id, frm)
             else:
-                # TODO
-                values = "TODO"
-
-
+                values = self._db.list_sensor_history_between(sensor_id, frm, to)
         msg.add_data('status', status)
         msg.add_data('reason', reason)
         msg.add_data('sensor_id', sensor_id)

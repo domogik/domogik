@@ -69,6 +69,7 @@ def api_butler_discuss_get():
         else:
             callback = "callback_not_defined"
     except:
+        app.logger.error(u"Error while decoding received json data. Error is : {0}".format(traceback.format_exc()))
         return 400, {'msg': u"Error while decoding received json data. Error is : {0}".format(traceback.format_exc())}, "None"
 
     cli = MQSyncReq(app.zmq_context)
@@ -86,9 +87,11 @@ def api_butler_discuss_get():
             response = resp.get_data()
             return 200, response, callback
         except:
-            return 400, {'msg': u"error while parsing butler response : {0}".format(resp) }, callback
+            app.logger.error(u"Error while parsing butler response : {0}".format(resp))
+            return 400, {'msg': u"Error while parsing butler response : {0}".format(resp) }, callback
     else:
-        return 400, {'msg': "butler does not respond"}, callback
+        app.logger.error(u"The butler does not respond")
+        return 400, {'msg': "The butler does not respond"}, callback
 
 
 
@@ -144,6 +147,7 @@ def api_butler_discuss_post():
     try:
         json_data = json.loads(request.data)
     except:
+        app.logger.error(u"Error while decoding received json data. Error is : {0}".format(traceback.format_exc()))
         return 400, {'msg': u"Error while decoding received json data. Error is : {0}".format(traceback.format_exc())}
 
     cli = MQSyncReq(app.zmq_context)
@@ -161,6 +165,8 @@ def api_butler_discuss_post():
             response = resp.get_data()
             return 200, response
         except:
-            return 400, {'msg': u"error while parsing butler response : {0}".format(resp) }
+            app.logger.error(u"Error while parsing butler response : {0}".format(resp))
+            return 400, {'msg': u"Error while parsing butler response : {0}".format(resp) }
     else:
-        return 400, {'msg': "butler does not respond"}
+        app.logger.error(u"The butler does not respond")
+        return 400, {'msg': "The butler does not respond"}

@@ -2,6 +2,7 @@ from domogik.admin.application import app, json_response, register_api
 from flask import request
 from flask.views import MethodView
 from flask_login import login_required
+import traceback
 
 @app.route('/rest/sensor/since/<timestamp>', methods=['GET'])
 @json_response
@@ -47,11 +48,16 @@ def sensor_since(timestamp):
     @apiErrorExample Error-Response:
 	HTTTP/1.1 404 Not Found
     """
-    app.json_stop_at = ["core_device"]
-    app.db.open_session()
-    b = app.db.get_all_sensor_since(timestamp)
-    app.db.close_session()
-    return 200, b
+    try:
+        app.json_stop_at = ["core_device"]
+        app.db.open_session()
+        b = app.db.get_all_sensor_since(timestamp)
+        app.db.close_session()
+        return 200, b
+    except:
+        msg = u"Error while getting the sensors. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        return 500, {'msg': msg}
 
 class sensorAPI(MethodView):
     decorators = [login_required, json_response]
@@ -93,14 +99,19 @@ class sensorAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        app.json_stop_at = ["core_device"]
-        app.db.open_session()
-        if id != None:
-            b = app.db.get_sensor(id)
-        else:
-            b = app.db.get_all_sensor()
-        app.db.close_session()
-        return 200, b
+        try:
+            app.json_stop_at = ["core_device"]
+            app.db.open_session()
+            if id != None:
+                b = app.db.get_sensor(id)
+            else:
+                b = app.db.get_all_sensor()
+            app.db.close_session()
+            return 200, b
+        except:
+            msg = u"Error while getting the sensor(s). Error is : {0}".format(traceback.format_exc())
+            app.logger.error(msg)
+            return 500, {'msg': msg}
 
     def put(self, id):
         """
@@ -147,48 +158,53 @@ class sensorAPI(MethodView):
         @apiErrorExample Error-Response:
             HTTTP/1.1 404 Not Found
         """
-        with app.db.session_scope():
-            sid = data['sid']
-            if 'history_round' not in request.get:
-                hround = None
-            else:
-                hround = request.get['history_round']
-            if 'history_store' not in request.get:
-                hstore = None
-            else:
-                hstore = request.get['history_store']
-            if 'history_max' not in request.get:
-                hmax = None
-            else:
-                hmax = request.get['history_max']
-            if 'history_expire' not in request.get:
-                hexpire = None
-            else:
-                hexpire = request.get['history_expire']
-            if 'timeout' not in request.get:
-                timeout = None
-            else:
-                timeout = request.get['timeout']
-            if 'formula' not in request.get:
-                formula = None
-            else:
-                formula = request.get['formula']
-            if 'data_type' not in request.get:
-                data_type = None
-            else:
-                data_type = request.get['data_type']
-            # do the update
-            res = app.db.update_sensor(id, \
-                 history_round=hround, \
-                 history_store=hstore, \
-                 history_max=hmax, \
-                 history_expire=hexpire, \
-                 timeout=timeout, \
-                 formula=formula, \
-                 data_type=data_type)
-            if res:
-                return 201, app.db.get_sensor(id)
-            else:
-                return 500, None
+        try:
+            with app.db.session_scope():
+                sid = data['sid']
+                if 'history_round' not in request.get:
+                    hround = None
+                else:
+                    hround = request.get['history_round']
+                if 'history_store' not in request.get:
+                    hstore = None
+                else:
+                    hstore = request.get['history_store']
+                if 'history_max' not in request.get:
+                    hmax = None
+                else:
+                    hmax = request.get['history_max']
+                if 'history_expire' not in request.get:
+                    hexpire = None
+                else:
+                    hexpire = request.get['history_expire']
+                if 'timeout' not in request.get:
+                    timeout = None
+                else:
+                    timeout = request.get['timeout']
+                if 'formula' not in request.get:
+                    formula = None
+                else:
+                    formula = request.get['formula']
+                if 'data_type' not in request.get:
+                    data_type = None
+                else:
+                    data_type = request.get['data_type']
+                # do the update
+                res = app.db.update_sensor(id, \
+                     history_round=hround, \
+                     history_store=hstore, \
+                     history_max=hmax, \
+                     history_expire=hexpire, \
+                     timeout=timeout, \
+                     formula=formula, \
+                     data_type=data_type)
+                if res:
+                    return 201, app.db.get_sensor(id)
+                else:
+                    return 500, None
+        except:
+            msg = u"Error while updating the sensor. Error is : {0}".format(traceback.format_exc())
+            app.logger.error(msg)
+            return 500, {'msg': msg}
 
 register_api(sensorAPI, 'sensor_api', '/rest/sensor/', pk='id')
