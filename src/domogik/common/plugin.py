@@ -263,7 +263,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             Check in database (over queryconfig) if the key 'configured' is set to True for the client
             if not, stop the client and log this
         """
-        self._client_config = Query(self.zmq, self.log, self.get_sanitized_hostname())
+        #  For Plugin not locate on domogik server we must use MQ query mode
+        self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
+
         configured = self._client_config.query(self._type, self._name, 'configured')
         if configured == '1':
             configured = True
@@ -297,7 +299,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         """ Try to get the config over the MQ. If value is None, get the default value
         """
         if self._client_config == None:
-            self._client_config = Query(self.zmq, self.log, self.get_sanitized_hostname())
+            #  For Plugin not locate on domogik server we must use MQ query mode
+            self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
+
         value = self._client_config.query(self._type, self._name, key)
         if value == None or value == 'None':
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
@@ -1187,7 +1191,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             # we guess that if no "log" is defined, the client has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
-    def force_leave(self, status = False, return_code = None):
+    def force_leave(self, status = False, return_code = None, exit=True):
         """ Leave threads & timers
 
             In the XplPLugin class, this function will be completed to also activate the xpl hbeat
@@ -1262,7 +1266,8 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
                 self.log.warn(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
-        sys.exit()
+        if exit :
+            sys.exit()
 
 
 class Watcher:

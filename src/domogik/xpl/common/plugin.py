@@ -85,7 +85,7 @@ class XplPlugin(Plugin):
         # define the source (in can be used in some plugins)
         if source == None:
             self.source = "{0}-{1}.{2}".format(DMG_VENDOR_ID, self.get_plugin_name(), self.get_sanitized_hostname())
-        # in case we overwrite the source : 
+        # in case we overwrite the source :
             self.source = source
         self.log.info(u"End of the xPL init")
 
@@ -150,7 +150,7 @@ class XplPlugin(Plugin):
         """
         self.myxpl._network.join()
 
-    def force_leave(self, status = False, return_code = None):
+    def force_leave(self, status = False, return_code = None, exit=True):
         """ Leave threads & timers
         """
         ### Do the xPL related tasks
@@ -160,6 +160,6 @@ class XplPlugin(Plugin):
 
         ### finally call the function from the Plugin class to do the common things
         # this is called as the end ad the MQ IOLoop is a blocking call
-        Plugin.force_leave(self, status, return_code)
+        Plugin.force_leave(self, status, return_code, exit)
 
 
