@@ -105,7 +105,7 @@ def interface_has_ip(interface):
         return True
 
 def get_sanitized_hostname():
-    """ Get the sanitized hostname of the host 
+    """ Get the sanitized hostname of the host
     This will lower it and keep only the part before the first dot
     """
     #print(">>>>>> get_sanitized_hostname()")
@@ -152,7 +152,7 @@ def ucode2(my_string):
     elif isinstance(my_string, unicode):
         return my_string
 
-    # str 
+    # str
     elif isinstance(my_string, str):
         return unicode(my_string, "utf-8")
 
@@ -170,7 +170,7 @@ def call_package_conversion(log, plugin, method, value):
     @param method: what methode to load from the conversion class
     @param value: the value to convert
     @return the converted value or None on error
- 
+
     """
     modulename = 'packages.plugin_{0}.conversions.{0}'.format(plugin)
     classname = '{0}Conversions'.format(plugin)
@@ -198,7 +198,7 @@ def is_already_launched(log, type, id, manager=True):
                   pid_list : list of the already launched processes pid
     """
     my_pid = os.getpid()
- 
+
     # the manager add the STARTED_BY_MANAGER useless command to allow the client to ignore this command line when it checks if it is already laucnehd or not
     # the final 'grep -v sudo' is here to exclude the lines launched by sudo from the search : using sudo make 2 results be in the grep result : one with sudo and the other one with the command (but this second one is filtered thanks to its pid)
     # the grep -v mprof is there to allow run of memory profiler
@@ -208,7 +208,7 @@ def is_already_launched(log, type, id, manager=True):
     else:
         cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su | grep -v sysadmin".format(id)
     # the grep python is needed to avoid a client to not start because someone is editing the client with vi :)
-    
+
     if log:
         log.info("Looking for launched instances of '{0}'".format(id))
     is_launched = False
@@ -225,7 +225,7 @@ def is_already_launched(log, type, id, manager=True):
         the_pid = REGEXP_PS_SEPARATOR.split(line)[1]
         pid_list.append(the_pid)
         #pid_list.append(line.rstrip("\n").split(" ")[0])
-    subp.wait()  
+    subp.wait()
     if is_launched:
         if log:
             log.info("There are already existing processes.")
@@ -247,12 +247,23 @@ def get_rest_url(noRest=False):
     intf = interfaces.split(',')
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
-
+    protocol = "http" if conf['use_ssl'] else "http"
     if noRest:
-        return "http://{0}:{1}".format(ip, port)
+        return "{0}://{1}:{2}".format(protocol, ip, port)
     else:
-        return "http://{0}:{1}/rest".format(ip, port)
+        return "{0}://{1}:{2}/rest".format(protocol, ip, port)
 
+def get_rest_ssl():
+    """Return false if no ssl option.
+       Or dict {key_file : <ssl_key from admin config>, cert_file : <ssl_certificate from admin config>"""
+    cfg = Loader('admin')
+    config = cfg.load()
+    conf = dict(config[1])
+    ### get SSL option
+    if conf['use_ssl'] :
+        return {'cert_file': conf['ssl_certificate'], 'key_file': conf['ssl_key']}
+    else :
+        return False
 
 def get_rest_doc_path():
     """ return the REST API generated doc path
@@ -332,12 +343,12 @@ def build_deviceType_from_packageJson(zmq, dev_type_id, client_id):
         pjson = res.get_data()
         if pjson is None:
             status = False
-            reason = "No data for {0} found by manager".format(msg_data['device_type'])
+            reason = "No data for {0} found by manager".format(dev_type_id)
     if status:
         pjson = pjson[dev_type_id]
         if pjson is None:
             status = False
-            reason = "The json for {0} found by manager is empty".format(msg_data['device_type'])
+            reason = "The json for {0} found by manager is empty".format(dev_type_id)
     if status:
         # build the device params
         stats = []

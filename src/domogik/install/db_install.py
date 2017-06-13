@@ -57,7 +57,7 @@ class DbInstall():
         self.db_backup_file = "{0}/domogik-{1}.sql".format(tempfile.gettempdir(), int(time.time()))
         self.alembic_cfg = Config("alembic.ini")
 
-        self._db = database.DbHelper()
+        self._db = database.DbHelper(use_cache=False)
         self._url = self._db.get_url_connection_string()
         self._engine = create_engine(self._url)
 
@@ -122,7 +122,7 @@ class DbInstall():
             except:
                 info("Database does not exist or user grants not yet applied")
                 return False
-                
+
 
     def install_or_upgrade_db(self, skip_backup=False, command_line=False):
         """
@@ -167,8 +167,8 @@ class DbInstall():
             info("Upgrading...")
             command.upgrade(self.alembic_cfg, "head")
             ok("Upgrading : done")
-        return 
-    
+        return
+
     def backup_existing_database(self, ask_confirm=True):
         from domogik.common import sql_schema
         from domogik.common import database
@@ -201,7 +201,7 @@ class DbInstall():
             #mysqldump_cmd.append(self.db_backup_file)
             mysqldump_cmd.append(bfile)
             os.system(" ".join(mysqldump_cmd))
-    
+
 if __name__ == "__main__":
     dbi = DbInstall()
     dbi.install_or_upgrade_db()

@@ -12,9 +12,10 @@
     cli = MQSyncReq(zmq.Context())
     msg = MQMessage()
     msg.set_action('device.params')
-    msg.set_data({'device_type': 'diskfree.disk_usage'})
+    msg.add_data('device_type', 'diskfree.disk_usage')
+    msg.add_data('client_id', 'plugin-diskfree.darkstar')
     print(cli.request('admin', msg.get(), timeout=10).get())
-    
+
 @apiParam {String} device_type The device type
 
 @apiSuccessExample {json} Success-Response:
@@ -23,7 +24,7 @@
     '{
         "result": {
             "xpl_stats": {
-                
+
             },
             "name": "",
             "reference": "",
@@ -35,7 +36,7 @@
                 }
             ],
             "xpl_commands": {
-                
+
             },
             "global": [
                 {
@@ -59,6 +60,7 @@ from domogikmq.message import MQMessage
 cli = MQSyncReq(zmq.Context())
 msg = MQMessage()
 msg.set_action('device.params')
-msg.set_data({'device_type': 'velbus.dimmer'})
+msg.add_data('device_type', 'velbus.dimmer')
+msg.add_data('client_id', 'plugin-velbus.darkstar')
 print(cli.request('admin', msg.get(), timeout=10).get())
 

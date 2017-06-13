@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -92,6 +92,9 @@ from domogik.common.packagejson import PackageJson, PackageException
 
 from domogik.xpl.common.xplconnector import Listener, STATUS_HBEAT_XPL
 
+from multiprocessing.managers import SyncManager
+from domogik.bin.cachedb import WorkerCache, CACHE_NAME
+
 
 ### constants
 
@@ -100,6 +103,8 @@ WAIT_AFTER_STOP_REQUEST = 15           # seconds
 CHECK_FOR_NEW_PACKAGES_INTERVAL = 30   # seconds
 SEND_METRICS_INTERVAL = 600            # seconds
 
+class CacheDB(SyncManager):
+    pass
 
 class Manager(XplPlugin, MQAsyncSub):
     """ Domogik manager
@@ -117,19 +122,19 @@ class Manager(XplPlugin, MQAsyncSub):
 
         ### Option parser
         parser = ArgumentParser()
-        parser.add_argument("-a", 
-                          action="store_true", 
-                          dest="start_admin", 
+        parser.add_argument("-a",
+                          action="store_true",
+                          dest="start_admin",
                           default=False, \
                           help="Start admin interface if not already running.")
-        parser.add_argument("-d", 
-                          action="store_true", 
-                          dest="start_admin", 
+        parser.add_argument("-d",
+                          action="store_true",
+                          dest="start_admin",
                           default=False, \
                           help="Start database manager if not already running.")
-        parser.add_argument("-x", 
-                          action="store_true", 
-                          dest="start_xpl", 
+        parser.add_argument("-x",
+                          action="store_true",
+                          dest="start_xpl",
                           default=False, \
                           help="Start xpl gateway if not already running.")
         parser.add_argument("-s",
@@ -143,7 +148,7 @@ class Manager(XplPlugin, MQAsyncSub):
                           default=False, \
                           help="Start butler if not already running.")
 
-        ### Call the XplPlugin init  
+        ### Call the XplPlugin init
         XplPlugin.__init__(self, name = 'manager', parser=parser, log_prefix = "core_", nohub=True)
 
         ### Logger
@@ -167,7 +172,7 @@ class Manager(XplPlugin, MQAsyncSub):
             self._pid_dir_path = conf['pid_dir_path']
 
             # try to get the metrics installation id
-            # this data may be deleted from the end user in the /etc/domogik.cfg file, so we assume that the values will be None 
+            # this data may be deleted from the end user in the /etc/domogik.cfg file, so we assume that the values will be None
             # in case of error
             try:
                 cfgm = Loader('metrics')
@@ -186,7 +191,7 @@ class Manager(XplPlugin, MQAsyncSub):
                 self.log.warning(u"The metrics options are not configured (one or all) : [metrics] > id, [metrics] > url. This is surely an end user wish, we respect this and won't send metrics for analysis!")
                 self._metrics_id = None
                 self._metrics_url = None
-       
+
         except:
             self.log.error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
             return
@@ -234,6 +239,18 @@ class Manager(XplPlugin, MQAsyncSub):
         ### Create the interfaces list
         self._interfaces = {}
 
+        ### Start cachedevice system
+#        if self.options.start_cachedevice:
+        self.log.info(u"Manager init cache")
+        self._cache_pid = None
+        thr__runCacheDevices = Thread(None,
+                                      self._runCacheDevices,
+                                      "run_cache_devices",
+                                      (),
+                                      {})
+        thr__runCacheDevices.start()
+        self.log.info(u"Manager instanciate cache")
+
         ### Start xpl GW
         if self.options.start_xpl:
             if not self._start_core_component("xplgw"):
@@ -275,7 +292,25 @@ class Manager(XplPlugin, MQAsyncSub):
         ### Component is ready
         self.ready()
 
-
+    def force_leave(self, status = False, return_code = None):
+        ### Call the XplPlugin init
+        XplPlugin.force_leave(self, status, return_code, exit=False)
+        if self._cache_pid is not None :
+            cfg = Loader('database')
+            config = cfg.load()
+            dbConfig = dict(config[1])
+            port_c = 50001 if not 'portcache' in dbConfig else int(dbConfig['portcache'])
+            CacheDB.register('force_leave')
+            m = CacheDB(address=('localhost', port_c), authkey=b'{0}'.format(dbConfig['password']))
+            m.connect()
+            if hasattr(self, "log"):
+                self.log.info(u"force_leave called. Exit to memory devices cache {0}".format(m))
+            # Actually Killing all subProcess. Not really academic, but I d'ont find other way ! and raise an exception."
+            try :
+                m.force_leave()
+            except :
+                pass
+        sys.exit()
 
     def _check_available_packages(self):
         """ Check the available packages and get informations on them
@@ -295,7 +330,7 @@ class Manager(XplPlugin, MQAsyncSub):
                 except:
                     self.log.warning(u"Invalid package : {0} (should be named like this : <type>_<name> (plugin_ipx800, ...)".format(pkg))
                     continue
-              
+
                 ### is the package already registered ?
                 pkg_id = "{0}-{1}".format(type, name)
                 if pkg_id not in self._packages:
@@ -330,9 +365,9 @@ class Manager(XplPlugin, MQAsyncSub):
                                 self._plugins[name].reload_data()
                             else:
                                 self.log.info(u"New plugin available : {0}".format(name))
-                                self._plugins[name] = Plugin(name, 
-                                                           self.get_sanitized_hostname(), 
-                                                           self._clients, 
+                                self._plugins[name] = Plugin(name,
+                                                           self.get_sanitized_hostname(),
+                                                           self._clients,
                                                            self.get_libraries_directory(),
                                                            self.get_packages_directory(),
                                                            self.zmq,
@@ -355,9 +390,9 @@ class Manager(XplPlugin, MQAsyncSub):
                                 self._brains[name].reload_data()
                             else:
                                 self.log.info(u"New brain available : {0}".format(name))
-                                self._brains[name] = Brain(name, 
-                                                           self.get_sanitized_hostname(), 
-                                                           self._clients, 
+                                self._brains[name] = Brain(name,
+                                                           self.get_sanitized_hostname(),
+                                                           self._clients,
                                                            self.get_libraries_directory(),
                                                            self.get_packages_directory(),
                                                            self.zmq,
@@ -371,9 +406,9 @@ class Manager(XplPlugin, MQAsyncSub):
                                 self._interfaces[name].reload_data()
                             else:
                                 self.log.info(u"New interface available : {0}".format(name))
-                                self._interfaces[name] = Interface(name, 
-                                                           self.get_sanitized_hostname(), 
-                                                           self._clients, 
+                                self._interfaces[name] = Interface(name,
+                                                           self.get_sanitized_hostname(),
+                                                           self._clients,
                                                            self.get_libraries_directory(),
                                                            self.get_packages_directory(),
                                                            self.zmq,
@@ -381,14 +416,14 @@ class Manager(XplPlugin, MQAsyncSub):
                                                            self.get_sanitized_hostname())
                                 # The automatic startup is handled in the Interface class in __init__
 
-    
+
             # finally, check if some packages has been uninstalled/removed
             pkg_to_unregister = []
             for pkg in self._packages:
                 # we build an id in the same format as the folders in the /var/lib/domogik/domogik_packages folder
                 if not self._packages[pkg].get_folder_basename() in pkg_list:
                     pkg_to_unregister.append(pkg)
-            
+
             # and unregister some packages if needed
             for pkg in pkg_to_unregister:
                 type = self._packages[pkg].get_type()
@@ -404,7 +439,7 @@ class Manager(XplPlugin, MQAsyncSub):
                 msg_data = {}
                 for pkg in self._packages:
                     msg_data[pkg] = self._packages[pkg].get_json()
-                self._pub.send_event('package.detail', 
+                self._pub.send_event('package.detail',
                                      msg_data)
 
             # wait before next check
@@ -441,51 +476,51 @@ class Manager(XplPlugin, MQAsyncSub):
 
 
     def on_mdp_request(self, msg):
-        """ Handle Requests over MQ 
+        """ Handle Requests over MQ
             @param msg : MQ req message
         """
         try:
             # XplPlugin handles MQ Req/rep also
             XplPlugin.on_mdp_request(self, msg)
-    
+
             ### packages details
             # retrieve the packages details
             if msg.get_action() == "package.detail.get":
                 self.log.info(u"Packages details request : {0}".format(msg))
                 self._mdp_reply_packages_detail()
-    
+
             ### device_types
             # retrieve the device_types
             elif msg.get_action() == "device_types.get":
                 self.log.info(u"Device types request : {0}".format(msg))
                 self._mdp_reply_device_types(msg)
-    
+
             ### clients list and details
             # retrieve the clients list
             elif msg.get_action() == "client.list.get":
                 self.log.info(u"Clients list request : {0}".format(msg))
                 self._mdp_reply_clients_list()
-    
+
             # retrieve the clients details
             elif msg.get_action() == "client.detail.get":
                 self.log.info(u"Clients details request : {0}".format(msg))
                 self._mdp_reply_clients_detail()
-    
+
             # retrieve the clients conversions
             elif msg.get_action() == "client.conversion.get":
                 self.log.info(u"Clients conversion request : {0}".format(msg))
                 self._mdp_reply_clients_conversion()
-    
+
             # retrieve the datatypes
             elif msg.get_action() == "datatype.get":
                 self.log.info(u"Clients datatype request : {0}".format(msg))
                 self._mdp_reply_datatype()
-    
+
             # start clients
             elif msg.get_action() == "plugin.start.do":
                 self.log.info(u"Plugin startup request : {0}".format(msg))
                 self._mdp_reply_plugin_start(msg)
-    
+
             # stop clients
             # nothing is done in the manager directly :
             # a stop request is sent to a plugin
@@ -548,7 +583,7 @@ class Manager(XplPlugin, MQAsyncSub):
         """
         msg = MQMessage()
         msg.set_action('client.list.result')
-        clients = self._clients.get_list() 
+        clients = self._clients.get_list()
         self.log.info("Clients for client.list.get request : {0}".format(clients))
         for key in clients:
             msg.add_data(key, clients[key])
@@ -562,7 +597,7 @@ class Manager(XplPlugin, MQAsyncSub):
         """
         msg = MQMessage()
         msg.set_action('client.detail.result')
-        clients = self._clients.get_detail() 
+        clients = self._clients.get_detail()
         for key in clients:
             msg.add_data(key, clients[key])
         self.reply(msg.get())
@@ -573,7 +608,7 @@ class Manager(XplPlugin, MQAsyncSub):
         """
         msg = MQMessage()
         msg.set_action('client.conversion.result')
-        conv = self._clients.get_conversions() 
+        conv = self._clients.get_conversions()
         for key in conv:
             msg.add_data(key, conv[key])
         self.reply(msg.get())
@@ -599,6 +634,7 @@ class Manager(XplPlugin, MQAsyncSub):
             msg.add_data('host', host)
 
             # try to start the client
+            #
             try:
                 if type == "plugin":
                     pid = self._plugins[name].start()
@@ -606,7 +642,7 @@ class Manager(XplPlugin, MQAsyncSub):
                     pid = self._interfaces[name].start()
                 else:
                     pid = 0
-                    
+
                 if pid != 0:
                     status = True
                     reason = ""
@@ -614,10 +650,10 @@ class Manager(XplPlugin, MQAsyncSub):
                     status = False
                     reason = "{0} '{1}' startup failed".format(type, name)
             except KeyError:
-                # plugin doesn't exist 
+                # plugin doesn't exist
                 status = False
                 reason = "{0} '{1}' does not exist on this host".format(type, name)
-                
+
         msg.add_data('status', status)
         msg.add_data('reason', reason)
         self.reply(msg.get())
@@ -629,7 +665,7 @@ class Manager(XplPlugin, MQAsyncSub):
         if message.source_vendor_id == DMG_VENDOR_ID:
             return
 
-        # process external clients 
+        # process external clients
         self._clients.add(message.source_instance_id, "xpl_client", "{0}-{1}".format(message.source_vendor_id, message.source_device_id), message.source, message.source, None, None, None)
         self._clients.set_status(message.source, STATUS_ALIVE)
 
@@ -652,7 +688,7 @@ class Manager(XplPlugin, MQAsyncSub):
             content['id'] = self._metrics_id
             self.metrics_browser.append(content)
 
-    
+
     def _send_metrics(self):
         """ Send the metrics to a REST service. This is related to the ProcessInfo class from common/processinfo.py
         """
@@ -663,8 +699,8 @@ class Manager(XplPlugin, MQAsyncSub):
                 # send metrics
                 self.log.debug(u"Send the metrics to '{0}'".format(self._metrics_url))
                 url = self._metrics_url   # just in case of except before first set
-             
-    
+
+
                 # We put the metrics in buffers and clean the self.xxx metrics now.
                 # if the send will fail, we will put back "after" the metrics in the self.xxx in order to resend them later on
                 # these buffers allow to avoid cleaning self.xxx with some stuff added during the post actions
@@ -672,15 +708,15 @@ class Manager(XplPlugin, MQAsyncSub):
                 self.metrics_processinfo = []
                 metrics_browser = self.metrics_browser
                 self.metrics_browser = []
-                
+
                 headers = {'content-type': 'application/json'}
-    
+
                 ### Send process info metrics
                 try:
                     url = "{0}/metrics/processinfo/".format(self._metrics_url.strip("/"))
                     response = requests.post(url, data=json.dumps(metrics_processinfo), headers=headers)
                     self.log.debug(u"Metrics for process info send. Server response (http code) is '{0}'".format(response.status_code))
-    
+
                     ok = True
                 except:
                     ok = False
@@ -692,14 +728,14 @@ class Manager(XplPlugin, MQAsyncSub):
                     #for item in self.metrics_processinfo:
                     #    self.log.debug("XXXXX {0}".format(json.dumps(item)))
                     self.metrics_processinfo = metrics_processinfo
-    
-    
+
+
                 ### Send browsers metrics
                 try:
                     url = "{0}/metrics/domoweb-browser/".format(self._metrics_url.strip("/"))
                     response = requests.post(url, data=json.dumps(metrics_browser), headers=headers)
                     self.log.debug(u"Metrics for domoweb browser send. Server response (http code) is '{0}'".format(response.status_code))
-    
+
                     ok = True
                 except:
                     ok = False
@@ -711,15 +747,44 @@ class Manager(XplPlugin, MQAsyncSub):
                     #for item in self.metrics_browser:
                     #    self.log.debug("XXXXX {0}".format(json.dumps(item)))
                     self.metrics_browser = metrics_browser
-    
-    
+
+
             except:
-                self.log.error(u"Send metrics : error not handled! The error is : {0}".format(traceback.format_exc())) 
+                self.log.error(u"Send metrics : error not handled! The error is : {0}".format(traceback.format_exc()))
             # wait for the next time to send
             self._stop.wait(SEND_METRICS_INTERVAL * ratio)
-            
-            
 
+    def _runCacheDevices(self):
+        self.log.info(u"Manager run cache")
+#        self.__cacheData = WorkerCache()
+#        self.log.info(u"Cache running")
+        self._pid_dir_path = self.config['pid_dir_path']
+        try:
+            the_path = os.path.join(os.path.dirname(__file__), "{0}.py".format(('cachedb')))
+            self.log.debug(u"Path for component '{0}' is : {1}".format('cache_db', the_path))
+        except:
+            msg = u"Error while trying to get the module path. The component will not be started !. Error is : {0}".format(traceback.format_exc())
+            self.log.error(msg)
+            return 0
+
+        ### Generate command
+        # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
+#        cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, the_path)
+        cmd = "{0} {1}".format(PYTHON, the_path)
+
+        ### Execute command
+        self.log.info(u"Execute command : {0}".format(cmd))
+        subp = Popen(cmd,
+                     shell=True)
+        self._cache_pid = subp.pid
+        self.log.info(u"Cache running on pid {0}".format(self._cache_pid))
+#        subp.communicate()
+        pid_file = os.path.join(self._pid_dir_path,
+                                CACHE_NAME + ".pid")
+        self.log.debug(u"Write pid file for pid '{0}' in file '{1}'".format(str(self._cache_pid), pid_file))
+        fil = open(pid_file, "w")
+        fil.write(str(self._cache_pid))
+        fil.close()
 
 
 
@@ -729,7 +794,7 @@ class Package():
     """
 
     def __init__(self, type, name):
-        """ Init a plugin 
+        """ Init a plugin
             @param type : package type
             @param name : package name
         """
@@ -800,10 +865,10 @@ class GenericComponent():
     """
 
     def __init__(self, name, host, clients):
-        """ Init a component 
+        """ Init a component
             @param name : plugin name (ipx800, onewire, ...)
             @param host : hostname
-            @param clients : clients list 
+            @param clients : clients list
         """
         ### init vars
         self.name = name
@@ -827,7 +892,7 @@ class GenericComponent():
         self._clients.add(self.host, self.type, self.name, self.client_id, self.xpl_source, self.data, self.conversions, self.configured)
 
     def unregister(self):
-        """ unregister the component 
+        """ unregister the component
         """
         self._clients.remove(self.client_id)
 
@@ -889,7 +954,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         """ Init a component
             @param name : component name (admin)
             @param host : hostname
-            @param clients : clients list 
+            @param clients : clients list
             @param zmq_context : 0MQ context
         """
         GenericComponent.__init__(self, name = name, host = host, clients = clients)
@@ -936,7 +1001,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
             # But as the IOLoop is not started when core components are launched with -r, -d or -x options, we don't
             # have the plugin.status message.
             self.set_status(STATUS_ALIVE)
-       
+
         # no need to add a step to check if the component is started as the status is given to the user directly by the pub/sub 'plugin.status'
 
         return pid
@@ -956,15 +1021,15 @@ class CoreComponent(GenericComponent, MQAsyncSub):
             msg = u"Error while trying to get the module path. The component will not be started !. Error is : {0}".format(traceback.format_exc())
             self.log.error(msg)
             return 0
-        
+
         ### Generate command
         # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
         #cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, component_path)
         cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, the_path)
- 
+
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
-        subp = Popen(cmd, 
+        subp = Popen(cmd,
                      shell=True)
         pid = subp.pid
         subp.communicate()
@@ -972,9 +1037,9 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
 
     def on_message(self, msgid, content):
-        """ when a message is received from the MQ 
+        """ when a message is received from the MQ
 
-            WARNING : for core components : 
+            WARNING : for core components :
             notice that this function is not called when the manager starts with -r, -d, -x options as the IOLoop is not yet started. This function is only used after manager startup
         """
 
@@ -1009,10 +1074,10 @@ class Brain(GenericComponent, MQAsyncSub):
     """
 
     def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
-        """ Init a plugin 
+        """ Init a plugin
             @param name : brain name (ipx800, onewire, ...)
             @param host : hostname
-            @param clients : clients list 
+            @param clients : clients list
             @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
             @param packages_directory : path in which are stored the packages : /var/lib/domogik/packages/
             @param zmq_context : zmq context
@@ -1037,13 +1102,12 @@ class Brain(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log, host)
+        self._config = Query(self.log, host)
 
         ### set package path
         self._packages_directory = packages_directory
 
         ### get the plugin data (from the json file)
-        status = None
         self.data = {}
         self.fill_data()
 
@@ -1058,7 +1122,7 @@ class Brain(GenericComponent, MQAsyncSub):
 
 
     def on_message(self, msgid, content):
-        """ when a message is received from the MQ 
+        """ when a message is received from the MQ
         """
         self.log.debug(u"{0}".format(content))
         if msgid == "plugin.configuration":
@@ -1092,12 +1156,12 @@ class Brain(GenericComponent, MQAsyncSub):
 
 class Plugin(GenericComponent, MQAsyncSub):
     """ This helps to handle plugins discovered on the host filesystem
-        The MQAsyncSub helps to set the status 
+        The MQAsyncSub helps to set the status
 
         Notice that some actions can't be done if the plugin host is not the server host! :
         * check if a plugin has stopped and kill it if needed
         * start the plugin
- 
+
         Notice also that all brain parts are to be hosted on the master Domogik
 
         TODO : create a parent class PythonClient
@@ -1106,10 +1170,10 @@ class Plugin(GenericComponent, MQAsyncSub):
     """
 
     def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
-        """ Init a plugin 
+        """ Init a plugin
             @param name : plugin name (core, datatype, ...)
             @param host : hostname
-            @param clients : clients list 
+            @param clients : clients list
             @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
             @param packages_directory : path in which are stored the packages : /var/lib/domogik/packages/
             @param zmq_context : zmq context
@@ -1149,10 +1213,9 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log, host)
+        self._config = Query(self.log, host)
 
         ### get the plugin data (from the json file)
-        status = None
         self.data = {}
         self.fill_data()
 
@@ -1170,10 +1233,10 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### get udev rules informations
         udev_rules = {}
         udev_dir = "{0}/{1}/udev_rules/".format(self._packages_directory, self.folder)
-        
+
         # parse all udev files
         try:
-            for udev_file in os.listdir(udev_dir): 
+            for udev_file in os.listdir(udev_dir):
                 if udev_file.endswith(".rules"):
                     self.log.info("Udev rule discovered for '{0}' : {1}".format(self.client_id, udev_file))
                     # read the content of the file
@@ -1192,10 +1255,10 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### get conversion informations
         self.conversions = {}
         conv_dir = "{0}/{1}/conversion/".format(self._packages_directory, self.folder)
-        
+
         # parse all conversion files
         try:
-            for conv_file in os.listdir(conv_dir): 
+            for conv_file in os.listdir(conv_dir):
                 if conv_file.endswith(".py") and conv_file != "__init__.py":
                     self.log.info("Conversion discovered for '{0}' : {1}".format(self.client_id, conv_file))
                     # read the content of the file
@@ -1219,18 +1282,22 @@ class Plugin(GenericComponent, MQAsyncSub):
         if startup == '1' or startup == 'Y':
             startup = True
         if startup == True:
-            self.log.info(u"Plugin {0} configured to be started on manager startup. Starting...".format(name))
-            pid = self.start()
-            if pid:
-                self.log.info(u"Plugin {0} started".format(name))
-            else:
-                self.log.error(u"Plugin {0} failed to start".format(name))
+            res, pid_list = is_already_launched(self.log, self.type, self.name)
+            if res:
+                self.log.error(u"Plugin {0} failed to start, Process already running (pid :{1})".format(name, pid_list))
+            else :
+                self.log.info(u"Plugin {0} configured to be started on manager startup. Starting...".format(name))
+                pid = self.__start()
+                if pid:
+                    self.log.info(u"Plugin {0} started".format(name))
+                else:
+                    self.log.error(u"Plugin {0} failed to start".format(name))
         else:
             self.log.info(u"Plugin {0} not configured to be started on manager startup.".format(name))
 
 
     def on_message(self, msgid, content):
-        """ when a message is received from the MQ 
+        """ when a message is received from the MQ
         """
         #self.log.debug(u"New pub message received {0}".format(msgid))
         #self.log.debug(u"{0}".format(content))
@@ -1301,9 +1368,10 @@ class Plugin(GenericComponent, MQAsyncSub):
     #                    self.log.warning(u"A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.name, self.host))
 
     def start(self):
-        """ to call to start the plugin
+        """ to call to start the plugin, Call real start in a thread
             @return : None if ko
-                      the pid if ok
+                      0 if already started
+                      1 if starting is launch
         """
         ### Check if the plugin is not already launched
         # notice that this test is not really needed as the plugin also test this in startup...
@@ -1312,12 +1380,23 @@ class Plugin(GenericComponent, MQAsyncSub):
         res, pid_list = is_already_launched(self.log, self.type, self.name)
         if res:
             return 0
+        Thread(None,
+              self.__start,
+              "th_Start_{0}".format(self.name),
+              (),
+              {}).start()
+        return 1
 
+    def __start(self):
+        """ to call to start the plugin in a thread and don't lock MQ response.
+            Don't recheck already launched
+            @return : Nothing
+        """
         ### Actions for test mode
         test_mode = self._config.query(self.type, self.name, "test_mode")
         test_option = self._config.query(self.type, self.name, "test_option")
         test_args = ""
-        if test_mode == True: 
+        if test_mode == True:
             self.log.info("The plugin {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))
             test_args = "-T {0}".format(test_option)
 
@@ -1325,13 +1404,11 @@ class Plugin(GenericComponent, MQAsyncSub):
         self.log.info(u"Request to start plugin : {0} {1}".format(self.name, test_args))
         pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py {3}".format(self._packages_directory, self.name, self.name, test_args), \
                                   env_pythonpath = self._libraries_directory)
-        pid = pid
 
         # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way
 
         self.set_pid(pid)
         return pid
-
 
     def exec_component(self, py_file, env_pythonpath = None):
         """ to call to start a component
@@ -1344,10 +1421,10 @@ class Plugin(GenericComponent, MQAsyncSub):
         if env_pythonpath:
             cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
         cmd += "{0} {1}".format(PYTHON, py_file.strip())
- 
+
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
-        subp = Popen(cmd, 
+        subp = Popen(cmd,
                      shell=True)
         pid = subp.pid
         subp.communicate()
@@ -1374,19 +1451,19 @@ class Plugin(GenericComponent, MQAsyncSub):
 
 class Interface(GenericComponent, MQAsyncSub):
     """ This helps to handle interfaces discovered on the host filesystem
-        The MQAsyncSub helps to set the status 
+        The MQAsyncSub helps to set the status
 
         Notice that some actions can't be done if the plugin host is not the server host! :
         * check if a plugin has stopped and kill it if needed
         * start the plugin
- 
+
     """
 
     def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
         """ Init an interface
-            @param name : interface name 
+            @param name : interface name
             @param host : hostname
-            @param clients : clients list 
+            @param clients : clients list
             @param libraries_directory : path for the base python module for packages : /var/lib/domogik/
             @param packages_directory : path in which are stored the packages : /var/lib/domogik/packages/
             @param zmq_context : zmq context
@@ -1426,10 +1503,9 @@ class Interface(GenericComponent, MQAsyncSub):
         ### config
         # used only in the function add_configuration_values_to_data()
         # elsewhere, this function is used : self.get_config("xxxx")
-        self._config = Query(self.zmq, self.log, host)
+        self._config = Query(self.log, host)
 
         ### get the interface data (from the json file)
-        status = None
         self.data = {}
         self.fill_data()
 
@@ -1445,10 +1521,10 @@ class Interface(GenericComponent, MQAsyncSub):
         ### get udev rules informations
         udev_rules = {}
         udev_dir = "{0}/{1}/udev_rules/".format(self._packages_directory, self.folder)
-        
+
         # parse all udev files
         try:
-            for udev_file in os.listdir(udev_dir): 
+            for udev_file in os.listdir(udev_dir):
                 if udev_file.endswith(".rules"):
                     self.log.info("Udev rule discovered for '{0}' : {1}".format(self.client_id, udev_file))
                     # read the content of the file
@@ -1489,7 +1565,7 @@ class Interface(GenericComponent, MQAsyncSub):
 
 
     def on_message(self, msgid, content):
-        """ when a message is received from the MQ 
+        """ when a message is received from the MQ
         """
         #self.log.debug(u"New pub message received {0}".format(msgid))
         #self.log.debug(u"{0}".format(content))
@@ -1553,7 +1629,7 @@ class Interface(GenericComponent, MQAsyncSub):
         test_mode = self._config.query(self.type, self.name, "test_mode")
         test_option = self._config.query(self.type, self.name, "test_option")
         test_args = ""
-        if test_mode == True: 
+        if test_mode == True:
             self.log.info("The interface {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))
             test_args = "-T {0}".format(test_option)
 
@@ -1580,10 +1656,10 @@ class Interface(GenericComponent, MQAsyncSub):
         if env_pythonpath:
             cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
         cmd += "{0} {1}".format(PYTHON, py_file.strip())
- 
+
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
-        subp = Popen(cmd, 
+        subp = Popen(cmd,
                      shell=True)
         pid = subp.pid
         subp.communicate()
@@ -1614,7 +1690,7 @@ class Clients():
     """ The clients list
           client_id : for a domogik plugin : plugin-<name>.<hostname>
                       for an external member : <vendor id>-<device id>.<instance>
-        { client_id = { 
+        { client_id = {
                         xpl_source : vendorid-deviceid.instance
                         host : hostname or ip
                         type : plugin, ...
@@ -1622,7 +1698,7 @@ class Clients():
                         package_id : [type]+[name]
                         status : alive, stopped, dead, unknown
                         configured : True/False (plugins) or None (other types)
-                        data : { 
+                        data : {
                                  ....
                                }
                        },
@@ -1636,7 +1712,7 @@ class Clients():
     """
 
     def __init__(self, stop):
-        """ prepare an empty package list 
+        """ prepare an empty package list
         """
         ### init vars
         self._stop = stop
@@ -1711,7 +1787,7 @@ class Clients():
                 except KeyError:
                     # data is empty for core components
                     xpl_clients_only = []
-            else: 
+            else:
                 compliant_xpl_clients = []
                 xpl_clients_only = []
             client = { "host" : host,
@@ -1783,7 +1859,7 @@ class Clients():
         self._clients[client_id]['status'] = new_status
         self._clients_with_details[client_id]['status'] = new_status
         self.log.info(u"Status set : {0} => {1}".format(client_id, new_status))
-        # in case the client is dead, it means that it could have been killed or anything else. 
+        # in case the client is dead, it means that it could have been killed or anything else.
         # so the client was not able to send itself the plugin.status message with status 'dead'...
         # so the manager will do it for the client!
         if new_status == STATUS_DEAD:
@@ -1791,7 +1867,7 @@ class Clients():
             try:
                 package, host = client_id.split(".")
                 type, name = package.split("-")
-                self._pub.send_event('plugin.status', 
+                self._pub.send_event('plugin.status',
                                      {"type" : type,
                                       "name" : name,
                                       "host" : host,
@@ -1829,11 +1905,11 @@ class Clients():
         """ Publish the clients list update over the MQ
         """
         # MQ publisher
-        self._pub.send_event('client.list', 
+        self._pub.send_event('client.list',
                              self._clients)
-        self._pub.send_event('client.detail', 
+        self._pub.send_event('client.detail',
                              self._clients_with_details)
-        self._pub.send_event('client.conversion', 
+        self._pub.send_event('client.conversion',
                              self._conversions)
 
 
