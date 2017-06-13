@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -238,6 +239,7 @@ class WorkerCache(object):
         cfg = Loader('database')
         config = cfg.load()
         db_config = dict(config[1])
+ 
         port_c = 50001 if not 'portcache' in db_config else int(db_config['portcache'])
 
         self._cache = CacheData()
@@ -245,6 +247,7 @@ class WorkerCache(object):
         MyManager.register('force_leave', callable=lambda:self.force_leave())
         self.cacheManager = MyManager(address=('localhost', port_c), authkey=b'{0}'.format(db_config['password']))
         self.cacheManager.start()
+        self.log.info(u"Listening on port '{0}' [BIND]...".format(port_c))
         self._pPIDs = []
         for p in active_children():
             self._pPIDs.append(p.pid)
