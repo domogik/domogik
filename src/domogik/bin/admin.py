@@ -68,6 +68,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from distutils.spawn import find_executable
 import re
 import os
+import logging
 
 zmq.eventloop.ioloop.install()
 
@@ -252,6 +253,7 @@ class Admin(Plugin):
                 self.log_level = conf_global['log_level']
                 self.log_folder = conf_global['log_dir_path']
                 self.http_log_file = os.path.join(self.log_folder, "core_admin_http.log")
+                self.websocket_log_file = os.path.join(self.log_folder, "core_admin_websocket.log")
                 conf_admin = dict(config_admin[1])
                 self.interfaces = conf_admin['interfaces']
                 self.port = conf_admin['port']
@@ -318,6 +320,19 @@ class Admin(Plugin):
             (r"/ws", WebSocketManager, dict(publisher=publisher))
             ])
 
+        # logging
+        stdout_handler = logging.StreamHandler()
+        file_handler = logging.FileHandler(self.websocket_log_file)
+        access_log = logging.getLogger("tornado.application")
+        access_log.addHandler(stdout_handler)
+        access_log.addHandler(file_handler)
+        gen_log = logging.getLogger("tornado.application")
+        gen_log.addHandler(stdout_handler)
+        gen_log.addHandler(file_handler)
+        app_log = logging.getLogger("tornado.application")
+        app_log.addHandler(stdout_handler)
+        app_log.addHandler(file_handler)
+
         # create the server
         # for ssl, extra parameter to HTTPServier init
         if self.use_ssl is True:
@@ -333,7 +348,7 @@ class Admin(Plugin):
             # value can be : lo, eth0, ...
             # or also : '*' to catch all interfaces, whatever they are
             intf = self.interfaces.split(',')
-            self.log.info("The admin will be available on the below addresses : ")
+            self.log.info("The admin will be available on the below addresses : '{0}'".format(intf))
             num_int = 0
             for ip in get_ip_for_interfaces(intf, log = self.log):
                 self.log.info(" - {0}:{1} [BIND]".format(ip, self.ws_port))
