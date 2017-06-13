@@ -492,7 +492,9 @@ def client_config(client_id):
     class F(Form):
         submit = SubmitField("Send")
         pass
+    app.logger.debug(u"Display configuration for '{0}' : ".format(client_id))
     for item in config:
+        app.logger.debug(u"- key='{0}', type='{1}', value='{2}'".format(item["key"], item["type"], item["value"]))
         # keep track of the known fields
         known_items[item["key"]] = item["type"]
         # handle required
