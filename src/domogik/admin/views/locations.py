@@ -123,7 +123,7 @@ def locations_edit(lid):
                 loc = app.db.add_full_location(request.form['locname'], 'location', isHome, params)
             else:
                 loc = app.db.update_full_location(int(lid), request.form['locname'], 'location', isHome, params)
-            flash(gettext("Location update successfull"), 'info')
+            flash(gettext("Location updated successfully"), 'info')
             return redirect("/locations")
 
         return render_template('locations_edit.html',

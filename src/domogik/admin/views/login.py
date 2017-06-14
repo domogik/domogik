@@ -85,7 +85,7 @@ def login():
                 if user.is_admin:
                     login_user(user)
                     # as we see the page after the login, there is no need to tell this is a success ;)
-                    #flash(gettext("Login successfull"), "success")
+                    #flash(gettext("Login successful"), "success")
                     return redirect('/')
                 else:
                     flash(gettext("This user is not an admin"), "warning")
