@@ -277,18 +277,22 @@ def client_sensor_edit(client_id, sensor_id):
         form = F()
 
         if request.method == 'POST' and form.validate():
-            if request.form['history_store'] == 'y':
-                hstore = 1
+            app.logger.debug(u"Update sensor. Values : {0}".format(request.form))
+            app.logger.debug(request.form['history_store'])
+            app.logger.debug(request.form['history_store'] == 'y')
+
+            if 'history_store' not in request.form:
+                hstore = None
             else:
-                hstore = 0
+                if request.form['history_store'] == 'y':
+                    hstore = 1
+                else:
+                    hstore = 0
             if 'history_round' not in request.form:
                 hround = None
             else:
                 hround = request.form['history_round']
-            if 'history_store' not in request.form:
-                hstore = None
-            else:
-                hstore = request.form['history_store']
+
             if 'history_max' not in request.form:
                 hmax = None
             else:
@@ -310,6 +314,7 @@ def client_sensor_edit(client_id, sensor_id):
             else:
                 data_type = request.form['data_type']
             # do the update
+            app.logger.debug("hstore={0}".format(hstore))
             res = app.db.update_sensor(sensor_id, \
                  history_round=hround, \
                  history_store=hstore, \
