@@ -7,15 +7,19 @@ import collections
 @app.route('/datatypes')
 @login_required
 def datatypes():
+    app.logger.debug(u"Display the datatypes page...")
     if app.datatypes == {}:
+        app.logger.debug(u"No datatype in memory (app.datatypes), loading them from MQ...")
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
         msg.set_action('datatype.get')
         res = cli.request('manager', msg.get(), timeout=10)
         if res is not None:
             app.datatypes = res.get_data()['datatypes']
+            app.logger.debug(u"Loading done!")
         else:
             app.datatypes = {}
+            app.logger.warning(u"Loading failed : empty response o_O ?")
 
     def formatDT( dt ):
         tmp = {}
@@ -61,6 +65,7 @@ def datatypes():
 
     #dt_tree = {}
     dt_tree = collections.OrderedDict()
+    app.logger.debug(u"Loop over all the datatypes...")
     for dt in app.datatypes:
         if 'parent' not in app.datatypes[dt]:
             no_parent = True
@@ -68,19 +73,12 @@ def datatypes():
             no_parent = True
         else:
             no_parent = False
+        app.logger.debug(u"- '{0}' (has no parent (bool) : '{1}'".format(dt, no_parent))
         # recursive call for the top datatypes (the ones with no parents)
         if no_parent:
+            app.logger.debug("  => No parent : adding in the tree")
             add_in_tree(dt, dt_tree)
 
-        # TODO : reprendre dans l'autre sens : pour ceux qui ont parent null, ajouter recursivement en tenant en compte les childs
-        # TODO : reprendre dans l'autre sens : pour ceux qui ont parent null, ajouter recursivement en tenant en compte les childs
-        # TODO : reprendre dans l'autre sens : pour ceux qui ont parent null, ajouter recursivement en tenant en compte les childs
-        # TODO : reprendre dans l'autre sens : pour ceux qui ont parent null, ajouter recursivement en tenant en compte les childs
-        # TODO : reprendre dans l'autre sens : pour ceux qui ont parent null, ajouter recursivement en tenant en compte les childs
-        #add_in_tree(dt)
-        #print dt
-            
-        #dt_tree[dt] = formatDT(dt)
         
     #pp = pprint.PrettyPrinter(indent=4)
     #pp.pprint(dt_tree)

@@ -323,10 +323,10 @@ class Admin(Plugin):
         # logging
         stdout_handler = logging.StreamHandler()
         file_handler = logging.FileHandler(self.websocket_log_file)
-        access_log = logging.getLogger("tornado.application")
+        access_log = logging.getLogger("tornado.access")
         access_log.addHandler(stdout_handler)
         access_log.addHandler(file_handler)
-        gen_log = logging.getLogger("tornado.application")
+        gen_log = logging.getLogger("tornado.general")
         gen_log.addHandler(stdout_handler)
         gen_log.addHandler(file_handler)
         app_log = logging.getLogger("tornado.application")
@@ -393,6 +393,17 @@ class Admin(Plugin):
         # SSL handling
         if acfg['use_ssl'] == "True":
             cmd = "{0} --certfile {1} --keyfile {2}".format(cmd, acfg['ssl_certificate'], acfg['ssl_key'])
+            # Get the available cipher son the system
+            # We do this manually because on some systems, gunicorn provides only the 00000 cipher, so ssl is unusable!
+            cmd_ciphers = "{0} ciphers".format(find_executable("openssl"))
+            self._ciphers = subprocess.Popen(cmd_ciphers, shell=True, 
+                                             stdout=subprocess.PIPE, 
+                                             stderr=subprocess.PIPE)
+            out, err = self._ciphers.communicate()
+            CIPHERS = out.strip()
+            # Example result : 
+            #CIPHERS = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA:RSA-PSK-AES256-GCM-SHA384:DHE-PSK-AES256-GCM-SHA384:RSA-PSK-CHACHA20-POLY1305:DHE-PSK-CHACHA20-POLY1305:ECDHE-PSK-CHACHA20-POLY1305:AES256-GCM-SHA384:PSK-AES256-GCM-SHA384:PSK-CHACHA20-POLY1305:RSA-PSK-AES128-GCM-SHA256:DHE-PSK-AES128-GCM-SHA256:AES128-GCM-SHA256:PSK-AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:ECDHE-PSK-AES256-CBC-SHA384:ECDHE-PSK-AES256-CBC-SHA:SRP-RSA-AES-256-CBC-SHA:SRP-AES-256-CBC-SHA:RSA-PSK-AES256-CBC-SHA384:DHE-PSK-AES256-CBC-SHA384:RSA-PSK-AES256-CBC-SHA:DHE-PSK-AES256-CBC-SHA:AES256-SHA:PSK-AES256-CBC-SHA384:PSK-AES256-CBC-SHA:ECDHE-PSK-AES128-CBC-SHA256:ECDHE-PSK-AES128-CBC-SHA:SRP-RSA-AES-128-CBC-SHA:SRP-AES-128-CBC-SHA:RSA-PSK-AES128-CBC-SHA256:DHE-PSK-AES128-CBC-SHA256:RSA-PSK-AES128-CBC-SHA:DHE-PSK-AES128-CBC-SHA:AES128-SHA:PSK-AES128-CBC-SHA256:PSK-AES128-CBC-SHA"
+            cmd = "{0} --ciphers {1}".format(cmd, CIPHERS)
 
         # Listening interfaces and port
         for dev in get_ip_for_interfaces(acfg['interfaces'].split(',')):
