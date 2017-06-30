@@ -15,22 +15,6 @@ from operator import itemgetter
 @login_required
 def battery():
 
-    # datatypes
-    datatypes = {}
-    used_datatypes = []
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('datatype.get')
-    res = cli.request('manager', msg.get(), timeout=10)
-    if res is not None:
-        res = res.get_data()
-        if 'datatypes' in res:
-            datatypes = res['datatypes']
-    else:
-        print("Error : no datatypes found!")
-        datatypes = {}
-
-
     # TODO : improve by getting directly all devices instead of all sensors ?
     with app.db.session_scope():
         sensors = []
