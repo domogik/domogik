@@ -9,6 +9,7 @@ from flask import Response
 from flask_login import login_required
 
 @app.route('/rest/')
+@login_required
 @json_response
 def api_root():
     """
