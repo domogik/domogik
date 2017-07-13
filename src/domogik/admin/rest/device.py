@@ -393,6 +393,7 @@ class deviceAPI(MethodView):
             HTTTP/1.1 500 Internal Server Error
         """
         try:
+            app.logger.debug(u"Form params : {0}".format(request.form))
             params = json.loads(request.form.get('params'))
             status = True
             print params
