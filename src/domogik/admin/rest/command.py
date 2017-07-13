@@ -51,12 +51,13 @@ def api_ncommand(cid):
     msg.add_data('cmdparams', cmdparams)
     # do the request
     resp = cli.request('xplgw', msg.get(), timeout=10)
+
     if resp:
         response = resp.get_data()
         if response['status']:
             return 204, None
         else:
-            app.logger.error(u"{0}".format(response['reason']))
+            app.logger.error(u"Error : {0}".format(response['reason']))
             return 400, {'msg': response['reason']}
     else:
         app.logger.error(u"XPL gateway does not respond")
