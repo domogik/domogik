@@ -16,11 +16,12 @@
       <ul class="nav navbar-nav">
         <li{% if mactive == "clients" %} class="active" {% endif %} id="clients"><a href="/clients"><i class="fa fa-cubes"></i> {% trans %}Clients{% endtrans %}</a></li>
         <li{% if mactive == "scenario" %} class="active" {% endif %}><a href="/scenario"><i class="fa fa-cog"></i> {% trans %}Scenarios{% endtrans %}</a></li>
-        <li class="dropdown{% if mactive == "timeline" or mactive == "battery" or mactive == "orphans" or mactive == "datatypes" %} active{% endif %}" id="views">
+        <li class="dropdown{% if mactive == "timeline" or mactive == "battery" or mactive == "camera" or mactive == "orphans" or mactive == "datatypes" %} active{% endif %}" id="views">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-list"></i> {% trans %}Views{% endtrans %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li{% if mactive == "timeline" %} class="active" {% endif %} id="timeline"><a href="/timeline"><i class="fa fa-clock-o"></i> {% trans %}Timeline{% endtrans %}</a></li>
             <li{% if mactive == "battery" %} class="active" {% endif %} id="battery"><a href="/battery"><i class="fa fa-battery-full"></i> {% trans %}Battery{% endtrans %}</a></li>
+            <li{% if mactive == "camera" %} class="active" {% endif %} id="camera"><a href="/camera"><i class="fa fa-video-camera"></i> {% trans %}Camera{% endtrans %}</a></li>
             <li{% if mactive == "orphans" %} class="active" {% endif %} id="orphans"><a href="/orphans"><i class="fa fa-chain-broken"></i> {% trans %}Orphan Domogik devices{% endtrans %}</a></li>
             <li{% if mactive == "upgrade" %} class="active" {% endif %} id="orphans"><a href="/upgrade"><i class="fa fa-exchange"></i> {% trans %}Upgrade Domogik devices{% endtrans %}</a></li>
             <li{% if mactive == "datatypes" %} class="active" {% endif %} id="datatypes"><a href="/datatypes"><i class="fa fa-database"></i> {% trans %}Domogik Data Types{% endtrans %}</a></li>

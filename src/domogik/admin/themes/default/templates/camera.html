@@ -1,0 +1,58 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+<style>
+
+</style>
+
+<script type="text/javascript">
+    function get_video_url(url) {
+        var ip = url.split('/')[2].split(':')[0];
+        console.log("hostname=" + location.hostname + ", resource ip=" + ip);
+        if (!location.hostname.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)){
+            console.log("hostname is an ip and not a private one OR hostname is a dns so I can't known if we are on the LAN or internet...");
+            if (ip.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)){
+                if (url.startsWith('{{ rest_url }}')) {
+                    // don't proxyfy rest urls !
+                    return url
+                }
+                console.log('Private ip :' + ip)
+                newUrl = "{{ rest_url }}/proxy/" + url;
+                console.log('Using proxyfied url :' + newUrl);
+                return newUrl;
+            }else {
+                console.log('Public ip :' + ip);
+                return url;
+            }
+        }
+        else {
+            console.log("We are accessing the admin from the LAN");
+            return url;
+        }
+    }
+</script>
+
+
+<div class="container">
+    <h2>{% trans %}Mjpeg cameras{% endtrans %}</h2>
+
+    {% if video_mjpeg|length > 0 %}
+      <div class="camera-page">
+        {% for elt in video_mjpeg %}
+            <div class="camera">
+              <h3 class="name">{{ elt.device_name }} - {{ elt.name }}</h3>
+              <div class="client">({{ elt.client_id }})</div>
+              <img id="video_{{ elt.id }}" class="img-responsive" src="/static/images/nocamera.png">
+              <script type="text/javascript">
+                d = new Date();
+                $("#video_{{ elt.id }}").attr("src", get_video_url('{{elt.last_value | replace("publish://", rest_url + "/publish/")}}') + "?dummy=" + d.getTime());
+              </script>
+            </div>
+
+        {% endfor %}
+      </div>
+    {% else %}
+        <div class="alert alert-warning">{% trans %}No mjpeg camera to display!{% endtrans %}</div>
+    {% endif %}
+</div>
+{% endblock %}

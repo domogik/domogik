@@ -102,6 +102,7 @@ def timeline_generic(the_device_id = None, the_client_id = None, asDict = False)
             mactive="timeline",
             device_name=the_device_name,
             timeline=timeline,
-            datatypes = datatypes
+            datatypes = datatypes,
+            rest_url = request.url_root + "rest"
             )
 
