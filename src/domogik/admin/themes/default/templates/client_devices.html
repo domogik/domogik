@@ -3,6 +3,35 @@
 {% block content %}
 {% include theme("client_menu.html") %}
 
+
+
+  <script type="text/javascript">
+    function get_video_url(url) {
+        var ip = url.split('/')[2].split(':')[0];
+        console.log("hostname=" + location.hostname + ", resource ip=" + ip);
+        if (!location.hostname.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)){
+            console.log("hostname is an ip and not a private one OR hostname is a dns so I can't known if we are on the LAN or internet...");
+            if (ip.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)){
+                if (url.startsWith('{{ rest_url }}')) {
+                    // don't proxyfy rest urls !
+                    return url
+                }
+                console.log('Private ip :' + ip)
+                newUrl = "{{ rest_url }}/proxy/" + url;
+                console.log('Using proxyfied url :' + newUrl);
+                return newUrl;
+            }else {
+                console.log('Public ip :' + ip);
+                return url;
+            }
+        }
+        else {
+            console.log("We are accessing the admin from the LAN");
+            return url;
+        }
+    }
+  </script>
+
   <div class="container">
 
     <div class="row-fluid margin-bottom">
@@ -160,7 +189,15 @@
                                               <em>( {{ datatypes[sen.data_type]['values'] [sen.last_value] }} )</em>
                                             {% elif sen.data_type == "DT_VideoMjpeg" or sen.data_type == "DT_Image" %}
                                               <div>
+                                                <!-- original image 
                                                 <img style="max-width: 80%" src="{{sen.last_value | replace("publish://", rest_url + "/publish/")}}"/>
+                                                -->
+                                                <img id="video_{{ sen.id }}" style="max-width: 80%" src="#">
+                                                <script type="text/javascript">
+                                                  //$("#video_{{ sen.id }}").attr("src", get_video_url('{{ sen.last_value }}'));
+                                                  d = new Date();
+                                                  $("#video_{{ sen.id }}").attr("src", get_video_url('{{sen.last_value | replace("publish://", rest_url + "/publish/")}}') + "?dummy=" + d.getTime());
+                                                </script>
                                               </div>
                                             {% elif sen.data_type == "DT_VideoH264" %}
                                               <div>
