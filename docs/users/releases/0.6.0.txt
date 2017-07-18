@@ -11,6 +11,12 @@ Removed watcher
 Previous all plugins and core components where forked, with this change we removed the need of the fork
 
 
+MQ
+==
+
+TODO : new domogik-mq release to use
+
+
 Nico improvments
 ================
 
@@ -23,6 +29,7 @@ TODO
 * gunicorn
 * ssl ciphers
 * new log
+* new layout for commands
 
 
 REST
