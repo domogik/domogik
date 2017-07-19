@@ -413,7 +413,7 @@ def client_global_edit(client_id, dev_id):
 @login_required
 def client_devices_detected(client_id):
     detail = get_client_detail(client_id)
-
+    
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('device.new.get')
@@ -649,7 +649,9 @@ def client_devices_new_wiz(client_id, device_type_id, product):
 
     # dynamically generate the wtfform
     class F(Form):
-        name = TextField("Device name", [Required()], description=gettext("The display name for this device"))
+        try: default = request.args.get('Name')     
+        except: default = None                      
+        name = TextField("Device name", [Required()], description=gettext("The display name for this device"), default=default)      
         try: default = request.args.get('Description')
         except: default = None
         description = TextField("Description", description=gettext("A description for this device"), default=default)
@@ -681,7 +683,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 default = False
             else:
                 default = None
-        if 'default' in item:
+        if not default and 'default' in item:     
             default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
@@ -726,7 +728,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         name = "{0}".format(item["key"])
         try: default = request.args.get(name)
         except: default = None
-        if 'default' in item:
+        if not default and 'default' in item:
             default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
@@ -767,7 +769,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             name = "{0} - {1}".format(cmd, item["key"])
             try: default = request.args.get(name)
             except: default = None
-            if 'default' in item:
+            if not default and 'default' in item:
                 default = item['default']
             if item["type"] == "boolean":
                 if default == 'Y' or default == 1 or default == True:
@@ -809,7 +811,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             name = "{0} - {1}".format(cmd, item["key"])
             try: default = request.args.get(name)
             except: default = None
-            if 'default' in item:
+            if not default and 'default' in item:
                 default = item['default']
             desc = item["description"]
             if 'multiple' in item and len(item['multiple']) == 1:

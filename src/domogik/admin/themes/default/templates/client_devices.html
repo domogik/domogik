@@ -3,7 +3,48 @@
 {% block content %}
 {% include theme("client_menu.html") %}
 
-
+    <style>
+        .gly-spin {
+            -webkit-animation: spin 2s infinite linear;
+            -moz-animation: spin 2s infinite linear;
+            -o-animation: spin 2s infinite linear;
+            animation: spin 2s infinite linear;
+        }
+        @-moz-keyframes spin {
+            0% {
+                -moz-transform: rotate(0deg);
+            }
+            100% {
+                -moz-transform: rotate(359deg);
+            }
+        }
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(359deg);
+            }
+        }
+        @-o-keyframes spin {
+            0% {
+                -o-transform: rotate(0deg);
+            }
+            100% {
+                -o-transform: rotate(359deg);
+            }
+        }
+        @keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(359deg);
+                transform: rotate(359deg);
+            }
+        }
+    </style>
 
   <script type="text/javascript">
     function get_video_url(url) {
@@ -30,37 +71,24 @@
             return url;
         }
     }
+    
+    $(document).ready(function(){
+        $('#detected-device').click(function() {
+            $("#detected-device").html("<span class='glyphicon glyphicon-refresh gly-spin' aria-hidden='true'></span> {% trans %}Loading detected device list ...{% endtrans %}");
+        })
+    });
   </script>
 
   <div class="container">
 
     <div class="row-fluid margin-bottom">
       <a id="create-device" class="btn btn-info" href="/client/{{ clientid }}/dmg_devices/new"><span class='glyphicon glyphicon-plus' aria-hidden='true'></span> {% trans %}Create a new Domogik device{% endtrans %}</a>
-      <button id="detected-devices" type="button" class="btn btn-default" data-toggle="modal" data-target="#detected_modal">
-        <span class='glyphicon glyphicon-search' aria-hidden='true'></span> {% trans %}Detected devices{% endtrans %}
-      </button>
+      {% if client_detail.status == "alive" %}
+        <a id="detected-device" class="btn btn-default" href="/client/{{ clientid }}/dmg_devices/detected"><span class='glyphicon glyphicon-search' aria-hidden='true'></span> {% trans %}Detected devices{% endtrans %}</a>
+      {% else %}
+        <a id="detected-device" class="btn btn-default disabled" href="/client/{{ clientid }}/dmg_devices/detected"><span class='glyphicon glyphicon-search' aria-hidden='true'></span> {% trans %}Detected devices{% endtrans %}</a>
+      {% endif %}
     </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="detected_modal" tabindex="-1" role="dialog" aria-labelledby="detectedModal" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans %}Close{% endtrans %}</span></button>
-            <h4 class="modal-title" id="myModalLabel">{% trans %}Detected devices{% endtrans %}</h4>
-          </div>
-          <div class="modal-body">
-            <p>{% trans %}Some plugins can detect devices that are not yet created on Domogik as Domogik devices. If you continue, you will see the list of these detected devices.{% endtrans %}</p>
-            <p>{% trans %}This feature works only when the plugin is started! Keep also in mind that each time the plugin is stopped, the list is reseted. You should wait a few minutes after the plugin startup before looking for detected devices.{% endtrans %}</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
-            <a class="btn btn-primary" href="/client/{{ clientid }}/dmg_devices/detected">{% trans %}OK, show me the detected devices{% endtrans %}</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
 
     {% if error != None %}
       <div class="alert alert-warning">{{ error | safe }}</div>
