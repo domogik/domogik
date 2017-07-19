@@ -4,26 +4,43 @@
 {% include theme("client_menu.html") %}
 <div class="container">
     <h2>{% trans %}Detected devices{% endtrans %}</h2>
-    {% for dev in devices %}
-      <div class="panel panel-default">
-        <!--
-        <div class="panel-heading">
-        <h3>{% trans %}Device type{% endtrans %} : {{ dev.data.device_type }} <small>{% trans %}Reference{% endtrans %} : {{ dev.data.reference }}</small></h3>
+        <div class="alert alert-info">
+        <p>{% trans %}You should wait a few minutes after the plugin startup before looking for detected devices. Keep also in mind that each time the plugin is stopped, the list is reseted.{% endtrans %}</p>
         </div>
-        -->
+    {% if devices %}
+     {% for dev in devices %}
+      <div class="panel panel-default">
         <div class="panel-body">
-  
+          {% if dev.data.name %}
+            {% set devicename = dev.data.name %}
+          {% else %}
+            {% set devicename = "" %}
+          {% endif %}
+          {% if dev.data.description %}
+            {% set devicedescription = dev.data.description %}
+          {% else %}
+            {% set devicedescription = "" %}
+          {% endif %}
+          
+          {% set newdevice_url = "/client/" + clientid + "/dmg_devices/new/type/" + dev.data.device_type + "?Name=" + devicename + "&Description=" + devicedescription + "&Reference=" + dev.data.reference %}  
+          {% set dev_param = [] %}
+          
           <h3>{% trans %}Device informations{% endtrans %}</h3>
           <ul>
             <li><strong>{% trans %}Device type{% endtrans %} :</strong> {{ dev.data.device_type }}</li>
+            <li><strong>{% trans %}Name{% endtrans %} :</strong> {{ devicename }}</li>                   
             <li><strong>{% trans %}Reference{% endtrans %} :</strong> {{ dev.data.reference }}</li>
+            <li><strong>{% trans %}Description{% endtrans %} :</strong> {{ devicedescription }}</li>     
           </ul>
 
           {% if dev.data['global']|length != 0 %}
-            <h3>{% trans %}Main parameters{% endtrans %}</h3>
+            <h3>{% trans %}Global parameters{% endtrans %}</h3>
+            {% set glob_param = "" %}
             <ul>
             {% for a_param in dev.data['global'] %}
               <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+              {% set key_value = "&" + a_param['key'] + "=" + a_param['value']|string %}     
+              {% if dev_param.append(key_value) %}{% endif %} 
             {% endfor %}
             </ul>
           {% endif %}
@@ -33,6 +50,8 @@
             <ul>
             {% for a_param in dev.data['xpl'] %}
               <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+              {% set key_value = "&" + a_param['key'] + "=" + a_param['value']|string %}     
+              {% if dev_param.append(key_value) %}{% endif %} 
             {% endfor %}
             </ul>
           {% endif %}
@@ -44,6 +63,8 @@
               <ul>
                 {% for a_param in dev.data['xpl_commands'][item] %}
                   <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+                  {% set key_value = "&" + a_param['key'] + "=" + a_param['value']|string %}     
+                  {% if dev_param.append(key_value) %}{% endif %} 
                 {% endfor %}
               <ul>
             {% endfor %}
@@ -56,14 +77,21 @@
               <ul>
                 {% for a_param in dev.data['xpl_stats'][item] %}
                   <li><strong>{{ a_param['key'] }} :</strong> {{ a_param['value'] }}</li>
+                  {% set key_value = "&" + a_param['key'] + "=" + a_param['value']|string %}     
+                  {% if dev_param.append(key_value) %}{% endif %} 
                 {% endfor %}
               </ul>
             {% endfor %}
           {% endif %}
+          <a class="btn btn-primary btn-sm" href="{{ newdevice_url }}{% for item in dev_param -%}{{ item }}{%- endfor %}">Add detected device</a>     
         </div>
       </div>
-    {% endfor %}
-
+     {% endfor %}
+    {% else %}
+     No detected devices found !
+    {% endif %}
+    
+    
     <script type="text/javascript">
         /*
         TODO : review to make it work
