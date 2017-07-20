@@ -15,6 +15,7 @@ from operator import itemgetter
 @login_required
 def camera():
 
+    app.logger.debug(u"Display the view camera")
     # TODO : improve by getting directly all devices instead of all sensors ?
     with app.db.session_scope():
         video_mjpeg = []
