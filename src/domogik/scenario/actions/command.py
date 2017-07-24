@@ -51,7 +51,7 @@ class CommandAction(AbstractAction):
         self.log.debug(u"Command : Parameters before processing : {0}".format(self._params))
         params = {}
         for key in self._params:
-	    if type(self._params[key]) is str:œ
+	    if type(self._params[key]) is str:
                 self._params[key] = ucode(self._params[key])
             self.log.debug(u"Command : Preprocess for param : key={0}, typeofvalue={1}, value={2}".format(key, type(self._params[key]), self._params[key]))
             params[key] = self._params[key]
