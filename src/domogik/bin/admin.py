@@ -1110,13 +1110,15 @@ class Admin(Plugin):
                 mode = "last"
             elif msg_data['mode'] == "period":
                 mode = "period"
+            elif msg_data['mode'] == "filter":
+                mode = "filter"
             else:
-                reason = "ERROR when getting sensor history. No valid type (last, from) declared in the message"
+                reason = "ERROR when getting sensor history. No valid mode (last, period, filter) declared in the message"
                 self.log.error(reason)
                 status = False
                 mode = None
         else:
-            reason = "ERROR when getting sensor history. No type (last, from) declared in the message"
+            reason = "ERROR when getting sensor history. No mode (last, from, filter) declared in the message"
             self.log.error(reason)
             status = False
             sensor_id = None
@@ -1161,7 +1163,53 @@ class Admin(Plugin):
 
             else:
                 values = db.list_sensor_history_between(sensor_id, frm, to)
-        
+
+        ### filter
+        elif mode == "filter":
+            if 'from' in msg_data:
+                frm = msg_data['from']
+            else:
+                reason = "ERROR when getting sensor history. No key 'from' defined for mode = 'filter'!"
+                self.log.error(reason)
+                status = False
+                frm = None
+
+            if 'to' in msg_data:
+                to = msg_data['to']
+            else:
+                to = None
+
+            if 'interval' in msg_data:
+                interval = msg_data['interval']
+                if interval not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
+                    reason = "ERROR when getting sensor history. key 'interval' should be one of : minute, hour, day, week, month, year for mode = 'filter'!"
+                    self.log.error(reason)
+                    status = False
+                    interval = None
+            else:
+                reason = "ERROR when getting sensor history. No key 'interval' defined for mode = 'filter'!"
+                self.log.error(reason)
+                status = False
+                interval = None
+
+            if 'selector' in msg_data:
+                selector = msg_data['selector']
+                if selector not in ('min', 'max', 'avg', 'sum'):
+                    reason = "ERROR when getting sensor history. key 'selector' should be one of : min, max, avg, sum for mode = 'filter'!"
+                    self.log.error(reason)
+                    status = False
+                    selector = None
+            else:
+                reason = "ERROR when getting sensor history. No key 'selector' defined for mode = 'filter'!"
+                self.log.error(reason)
+                status = False
+                interval = None
+
+            if frm != None and interval != None and selector != None:
+                values = db.list_sensor_history_filter(sensor_id, frm, to, interval, selector)  # fonctions dans database.py
+            else:
+                values = None
+
         msg.add_data('status', status)
         msg.add_data('reason', reason)
         msg.add_data('sensor_id', sensor_id)

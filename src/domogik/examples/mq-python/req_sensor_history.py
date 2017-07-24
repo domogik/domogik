@@ -110,3 +110,13 @@ msg.add_data('mode', 'period')
 msg.add_data('from', 1449178465)
 print(cli.request('admin', msg.get(), timeout=10).get())
 
+# example 4 : get the filtered and calculated history starting from/to a certain timestamp
+msg = MQMessage()
+msg.set_action('sensor_history.get')
+msg.add_data('sensor_id', 141)
+msg.add_data('mode', 'filter')      # Like REST functions sensorHistory_from_filter and sensorHistory_from_to_filter
+msg.add_data('from', 1483225200)    #
+msg.add_data('to', 1500847199)      # Optionnal
+msg.add_data('interval', 'day')     # 'minute|hour|day|week|month|year'
+msg.add_data('selector', 'min')     # 'min|max|avg|sum'
+print(cli.request('admin', msg.get(), timeout=10).get())
