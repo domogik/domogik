@@ -140,8 +140,12 @@ class XplManager(XplPlugin):
         """ Method called on a subscribed message
         """
         try:
-            if msgid != 'device.update':  # No need to reload device_list of xplgw
+            # No need to reload device_list of xplgw
+            # => xplgw does not use self.devices from the Plugin class but its own self.all_devices.
+            #    As self.devices is not used/needed, we don't call the XplPlugon.on_message for device.update
+            if msgid != 'device.update':  
                 XplPlugin.on_message(self, msgid, content)
+
             if msgid == 'client.conversion':
                 self._parse_conversions(content)
             elif msgid == 'client.list':
@@ -367,9 +371,7 @@ class XplManager(XplPlugin):
         Send a command, first find out if its an xpl or mq command
         TODO move convertion to here
         """
-        # TODO : clean the 2 linew below
-        #with self._db.session_scope():
-        if 1 == 1:
+        try:
             self.log.info(u"Received new cmd request: {0}".format(data))
             failed = False
             status = False
@@ -398,14 +400,19 @@ class XplManager(XplPlugin):
             else:
                 status = False
             self.log.debug("   => status: {0}, uuid: {1}, msg: {2}".format(status, uuid, failed))
-            # reply
-            reply_msg = MQMessage()
-            reply_msg.set_action('cmd.send.result')
-            reply_msg.add_data('uuid', str(uuid))
-            reply_msg.add_data('status', status)
-            reply_msg.add_data('reason', failed)
-            self.log.debug(u"   => mq reply to requestor")
-            self.reply(reply_msg.get())
+        except:
+            status = False
+            failed = u"Technical error. See logs for more details"
+            self.log.error("   => status: {0}, uuid: {1}, msg: {2}. Error is : {3}".format(status, uuid, failed, traceback.format_exc()))
+
+        # reply
+        reply_msg = MQMessage()
+        reply_msg.set_action('cmd.send.result')
+        reply_msg.add_data('uuid', str(uuid))
+        reply_msg.add_data('status', status)
+        reply_msg.add_data('reason', failed)
+        self.log.debug(u"   => mq reply to requestor")
+        self.reply(reply_msg.get())
 
     def _send_mq_command(self, cmd, request):
         """
@@ -444,10 +451,10 @@ class XplManager(XplPlugin):
                 status = False
         # send to the plugin
         cli = MQSyncReq(self.zmq)
-        self.log.debug(u"   => Sending MQ message to the plugin")
+        self.log.debug(u"   => Sending MQ message to the plugin '{0}'".format(dev['client_id']))
         response = cli.request(str(dev['client_id']), msg.get(), timeout=10)
         if not response:
-            failed = "Sending the command to the client failed"
+            failed = "Sending the command to the client failed."
             status = False
         else:
             data = response.get_data()
