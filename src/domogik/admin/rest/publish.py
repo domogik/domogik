@@ -3,7 +3,7 @@ import sys
 import os
 import domogik
 import json
-from flask import Response, request, send_from_directory
+from flask import Response, request, send_from_directory, abort
 import traceback
 from flask_login import login_required
 
@@ -31,8 +31,8 @@ def publish_get(client_type, client_name, path):
         HTTTP/1.1 200 
         ... some content ....
 
-    @apiErrorExample No so published data
-        HTTTP/1.1 404 Not foundst
+    @apiErrorExample No published data
+        HTTTP/1.1 404 Not found
     
     """
     try:
@@ -45,4 +45,4 @@ def publish_get(client_type, client_name, path):
     except:
         msg = u"Error while getting the published data. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 404, msg
+        abort(404)

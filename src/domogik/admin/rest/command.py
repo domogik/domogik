@@ -29,15 +29,15 @@ def api_ncommand(cid):
         HTTTP/1.1 204 No Content 
 
     @apiErrorExample Gateway Timeout
-        HTTTP/1.1 400 No Bad Request
+        HTTTP/1.1 500
         {
-            msg: 'XPL gateway does not respond'
+            'error': 'XPL gateway does not respond'
         }
     
-    @apiErrorExample Other error
-        HTTTP/1.1 400 No Bad Request
+    @apiErrorExample Error
+        HTTTP/1.1 500
         {
-            msg: 'Bad command Id'
+            'error': '...'
         }
     """
     cli = MQSyncReq(app.zmq_context)
@@ -58,7 +58,7 @@ def api_ncommand(cid):
             return 204, None
         else:
             app.logger.error(u"Error : {0}".format(response['reason']))
-            return 400, {'msg': response['reason']}
+            return 500, {'error': response['reason']}
     else:
         app.logger.error(u"XPL gateway does not respond")
-        return 400, {'msg': "XPL gateway does not respond"}
+        return 500, {'error': "XPL gateway does not respond"}

@@ -98,8 +98,14 @@ def device_since(timestamp):
             "name": "Temp elentrik"
         }
 
-    @apiErrorExample Error-Response:
+    @apiErrorExample Data not found
 	HTTTP/1.1 404 Not Found
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
     try:
         app.db.open_session()
@@ -108,7 +114,7 @@ def device_since(timestamp):
     except:
         msg = u"Error while getting the devices list. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
 
     return 200, b
 
@@ -162,15 +168,21 @@ def device_params(client_id, dev_type_id):
             "description": ""
         }
 
-    @apiErrorExample Error-Response:
+    @apiErrorExample Data not found
         HTTTP/1.1 404 Not Found
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
     try:
         (result, reason, status) = build_deviceType_from_packageJson(app.zmq_context, dev_type_id, client_id)
     except:
         msg = u"Error while getting the device parameters. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
     # return the info
     return 200, result
 
@@ -258,8 +270,14 @@ class deviceAPI(MethodView):
                 "name": "Temp elentrik"
             }
 
-        @apiErrorExample Error-Response:
+        @apiErrorExample Data not found
             HTTTP/1.1 404 Not Found
+
+        @apiErrorExample Error
+            HTTTP/1.1 500
+            {
+                'error': '...'
+            }
         """
         try:
             app.db.open_session()
@@ -275,7 +293,7 @@ class deviceAPI(MethodView):
         except:
             msg = u"Error while getting the devices list. Error is : {0}".format(traceback.format_exc())
             app.logger.error(msg)
-            return 500, {'msg' : msg}
+            return 500, {'error' : msg}
 
     def delete(self, did):
         """
@@ -290,8 +308,11 @@ class deviceAPI(MethodView):
         @apiSuccessExample Success-Response:
             HTTTP/1.1 200 OK
 
-        @apiErrorExample Error-Response:
-            HTTTP/1.1 500 INTERNAL SERVER ERROR
+        @apiErrorExample Error
+            HTTTP/1.1 500
+            {
+                'error': '...'
+            }
         """
         try:
             with app.db.session_scope():
@@ -299,13 +320,13 @@ class deviceAPI(MethodView):
                 if not res:
                     msg = u"Device deletion failed"
                     app.logger.error(msg)
-                    return 500, {'msg' : msg }
+                    return 500, {'error' : msg }
                 else:
                     return 201, None
         except:
             msg = u"Error while deleting the device. Error is : {0}".format(traceback.format_exc())
             app.logger.error(msg)
-            return 500, {'msg': msg}
+            return 500, {'error': msg}
 
     def post(self):
         """
@@ -389,8 +410,11 @@ class deviceAPI(MethodView):
                 "name": "Temp elentrik"
             }
 
-        @apiErrorExample Error-Response:
-            HTTTP/1.1 500 Internal Server Error
+        @apiErrorExample Error
+            HTTTP/1.1 500
+            {
+                'error': '...'
+            }
         """
         try:
             app.logger.debug(u"Form params : {0}".format(request.form))
@@ -429,11 +453,11 @@ class deviceAPI(MethodView):
                 if status:
                     return 201, result
                 else:
-                    return 500, {'msg' : reason}
+                    return 500, {'error' : reason}
         except:
             msg = u"Error while creating the device. Error is : {0}".format(traceback.format_exc())
             app.logger.error(msg)
-            return 500, {'msg': msg}
+            return 500, {'error': msg}
 
     def put(self, did):
         """
@@ -521,8 +545,11 @@ class deviceAPI(MethodView):
                 "name": "Temp elentrik"
             }
 
-        @apiErrorExample Error-Response:
-            HTTTP/1.1 404 Not Found
+        @apiErrorExample Error
+            HTTTP/1.1 500
+            {
+                'error': '...'
+            }
         """
         try:
             if 'name' in request.form:
@@ -544,10 +571,10 @@ class deviceAPI(MethodView):
             if res:
                 return 201, app.db.get_device(did)
             else:
-                return 500, {'msg' : u"Error while updating the device"}
+                return 500, {'error' : u"Error while updating the device"}
         except:
             msg = u"Error while updating the device. Error is : {0}".format(traceback.format_exc())
             app.logger.error(msg)
-            return 500, {'msg': msg}
+            return 500, {'error': msg}
 
 register_api(deviceAPI, 'device', '/rest/device/', pk='did', pk_type='int')

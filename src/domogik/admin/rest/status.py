@@ -40,6 +40,12 @@ def api_root():
                 "pub_port": "40411"
             }
         }
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
     try:
         # domogik global version
@@ -73,7 +79,7 @@ def api_root():
     except:
         msg = u"Error while getting the status. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
 
 @app.route('/rest/map')
 @json_response
@@ -91,4 +97,4 @@ def api_map():
     except:
         msg = u"Error while getting the api map. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
