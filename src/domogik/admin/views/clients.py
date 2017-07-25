@@ -4,7 +4,7 @@ import traceback
 import operator
 import os
 from domogik.common.utils import get_packages_directory
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from flask import request, flash, redirect, send_from_directory
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -31,6 +31,7 @@ from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
 from domogik.common.utils import build_deviceType_from_packageJson
+from domogik.common.database import DbHelperException
 from domogikmq.pubsub.publisher import MQPub
 
 try:
@@ -98,6 +99,7 @@ def get_clients_list():
 
 @app.route('/clients')
 @login_required
+@timeit
 def clients():
     #cli = MQSyncReq(app.zmq_context)
     #msg = MQMessage()
@@ -152,6 +154,7 @@ def clients():
 
 @app.route('/client/<client_id>')
 @login_required
+@timeit
 def client_detail(client_id):
     detail = get_client_detail(client_id)
 
@@ -164,6 +167,7 @@ def client_detail(client_id):
 
 @app.route('/client/<client_id>/timeline')
 @login_required
+@timeit
 def client_timeline(client_id):
     from domogik.admin.views.timeline import timeline_generic
     temp = timeline_generic(the_client_id = client_id, asDict = True)
@@ -180,6 +184,7 @@ def client_timeline(client_id):
 
 @app.route('/client/<client_id>/dmg_devices/known')
 @login_required
+@timeit
 def client_devices_known(client_id):
     detail = get_client_detail(client_id)
 
@@ -239,6 +244,7 @@ def client_devices_known(client_id):
 
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_sensor_edit(client_id, sensor_id):
     if app.datatypes == {}:
         cli = MQSyncReq(app.zmq_context)
@@ -339,6 +345,7 @@ def client_sensor_edit(client_id, sensor_id):
 
 @app.route('/client/<client_id>/global/edit/<dev_id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_global_edit(client_id, dev_id):
     with app.db.session_scope():
         dev = app.db.get_device(dev_id)
@@ -393,7 +400,7 @@ def client_global_edit(client_id, dev_id):
                     else:
                         flash(gettext("Param update failed"), 'warning')
                     # in all case we send an update event (in case of partial success...)
-                    pub = MQPub(app.zmq_context, 'admin-views')
+                    pub = MQPub(app.zmq_context, 'adminhttp')
                     pub.send_event('device.update',
                                    {"device_id" : dev_id,
                                     "client_id" : client_id})
@@ -411,9 +418,10 @@ def client_global_edit(client_id, dev_id):
 
 @app.route('/client/<client_id>/dmg_devices/detected')
 @login_required
+@timeit
 def client_devices_detected(client_id):
     detail = get_client_detail(client_id)
-
+    
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('device.new.get')
@@ -433,6 +441,7 @@ def client_devices_detected(client_id):
 
 @app.route('/client/<client_id>/dmg_devices/edit/<did>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_devices_edit(client_id, did):
     detail = get_client_detail(client_id)
     with app.db.session_scope():
@@ -455,7 +464,7 @@ def client_devices_edit(client_id, did):
             else:
                 flash(gettext("Device update failed"), 'warning')
             # in all case we send an update event (in case of partial success...)
-            pub = MQPub(app.zmq_context, 'admin-views')
+            pub = MQPub(zmq.Context(), 'adminhttp')
             pub.send_event('device.update',
                            {"device_id" : did,
                             "client_id" : client_id})
@@ -471,22 +480,34 @@ def client_devices_edit(client_id, did):
 
 @app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required
+@timeit
 def client_devices_delete(client_id, did):
-    with app.db.session_scope():
-        res = app.db.del_device(did)
-        if not res:
-            flash(gettext("Device deleted failed"), 'warning')
-        else:
-            flash(gettext("Device deleted succesfully"), 'success')
-        # in all case we send an update event (in case of partial success...)
-        pub = MQPub(app.zmq_context, 'admin-views')
-        pub.send_event('device.update',
-                       {"device_id" : did,
-                        "client_id" : res.client_id})
+    app.logger.info(u"Request to delete the device id='{0}' for the client '{1}'".format(did, client_id))
+    try:
+        with app.db.session_scope():
+            res = app.db.del_device(did)
+            if not res:
+                flash(gettext("Device deleted failed"), 'warning')
+                app.logger.error(u"Error while deleting the device (no result)...")
+            else:
+                flash(gettext("Device deleted succesfully"), 'success')
+                app.logger.debug(u"Device deleted succesfully")
+            # in all case we send an update event (in case of partial success...)
+            pub = MQPub(app.zmq_context, 'adminhttp')
+            pub.send_event('device.update',
+                           {"device_id" : did,
+                            "client_id" : res.client_id})
+    except DbHelperException as e:
+        flash(gettext("Device deletion not allowed. {0}".format(e.value)), 'warning')
+        app.logger.warning(u"Unable to delete the device. Reason is : {0}".format(traceback.format_exc()))
+    except:
+        flash(gettext("Device deletion failed"), 'warning')
+        app.logger.error(u"Error while deleting the device. Error is : {0}".format(traceback.format_exc()))
     return redirect("/client/{0}/dmg_devices/known".format(client_id))
 
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_config(client_id):
     cli = MQSyncReq(app.zmq_context)
     detail = get_client_detail(client_id)
@@ -499,7 +520,10 @@ def client_config(client_id):
         pass
     app.logger.debug(u"Display configuration for '{0}' : ".format(client_id))
     for item in config:
-        app.logger.debug(u"- key='{0}', type='{1}', value='{2}'".format(item["key"], item["type"], item["value"]))
+        if 'value' in item:
+            app.logger.debug(u"- key='{0}', type='{1}', value='{2}'".format(item["key"], item["type"], item["value"]))
+        else:
+            app.logger.debug(u"- key='{0}', type='{1}', value='{2}'".format(item["key"], item["type"], "-- no value --"))
         # keep track of the known fields
         known_items[item["key"]] = item["type"]
         # handle required
@@ -571,7 +595,7 @@ def client_config(client_id):
                             val = 'Y'
                         app.logger.debug(u"  => converted val={0}".format(val))
                     app.db.set_plugin_config(type, name, host, key, val)
-            pub = MQPub(app.zmq_context, 'admin-views')
+            pub = MQPub(app.zmq_context, 'adminhttp')
             pub.send_event('plugin.configuration',
                              {"type" : type,
                               "name" : name,
@@ -591,6 +615,7 @@ def client_config(client_id):
 
 @app.route('/client/<client_id>/dmg_devices/new')
 @login_required
+@timeit
 def client_devices_new(client_id):
     detail = get_client_detail(client_id)
     data = detail['data']
@@ -631,12 +656,14 @@ def client_devices_new(client_id):
 
 @app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_devices_new_type(client_id, device_type_id):
     return client_devices_new_wiz(client_id, device_type_id, None)
 
 
 @app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_devices_new_prod(client_id, device_type_id, product):
     return client_devices_new_wiz(client_id,
                                   device_type_id,
@@ -649,7 +676,9 @@ def client_devices_new_wiz(client_id, device_type_id, product):
 
     # dynamically generate the wtfform
     class F(Form):
-        name = TextField("Device name", [Required()], description=gettext("The display name for this device"))
+        try: default = request.args.get('Name')     
+        except: default = None                      
+        name = TextField("Device name", [Required()], description=gettext("The display name for this device"), default=default)      
         try: default = request.args.get('Description')
         except: default = None
         description = TextField("Description", description=gettext("A description for this device"), default=default)
@@ -681,7 +710,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                 default = False
             else:
                 default = None
-        if 'default' in item:
+        if not default and 'default' in item:     
             default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
@@ -726,7 +755,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         name = "{0}".format(item["key"])
         try: default = request.args.get(name)
         except: default = None
-        if 'default' in item:
+        if not default and 'default' in item:
             default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
@@ -767,7 +796,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             name = "{0} - {1}".format(cmd, item["key"])
             try: default = request.args.get(name)
             except: default = None
-            if 'default' in item:
+            if not default and 'default' in item:
                 default = item['default']
             if item["type"] == "boolean":
                 if default == 'Y' or default == 1 or default == True:
@@ -809,7 +838,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
             name = "{0} - {1}".format(cmd, item["key"])
             try: default = request.args.get(name)
             except: default = None
-            if 'default' in item:
+            if not default and 'default' in item:
                 default = item['default']
             desc = item["description"]
             if 'multiple' in item and len(item['multiple']) == 1:
@@ -929,7 +958,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                     if reason:
                         flash(reason, 'warning')
                 # in all case we send an update event (in case of partial success...)
-                pub = MQPub(app.zmq_context, 'admin-views')
+                pub = MQPub(app.zmq_context, 'adminhttp')
                 pub.send_event('device.update',
                                {"device_id" : res['id'],
                                 "client_id" : client_id})
@@ -1011,6 +1040,7 @@ def get_brain_content(client_id):
 
 @app.route('/client/<client_id>/brain')
 @login_required
+@timeit
 def client_brain(client_id):
     detail = get_client_detail(client_id)
     brain = get_brain_content(client_id)
@@ -1027,6 +1057,7 @@ def client_brain(client_id):
 
 @app.route('/client/<client_id>/doc')
 @login_required
+@timeit
 def client_doc(client_id):
     detail = get_client_detail(client_id)
 
@@ -1041,6 +1072,7 @@ def client_doc(client_id):
 
 @app.route('/client/<client_id>/doc_static/<path:path>')
 @login_required
+@timeit
 def client_doc_static(client_id, path):
     pkg = client_id.split(".")[0].replace("-", "_")
     root_path = os.path.join(get_packages_directory(), pkg)
@@ -1051,6 +1083,7 @@ def client_doc_static(client_id, path):
 
 @app.route('/brain/reload')
 @login_required
+@timeit
 def brain_reload():
     """ To be called by ajax
         Send a MQ request to reload the butler brain
@@ -1069,6 +1102,7 @@ def brain_reload():
 
 @app.route('/core/<client_id>')
 @login_required
+@timeit
 def core(client_id):
     tmp = client_id.split(".")
     name = tmp[0].split("-")[1]
@@ -1096,6 +1130,7 @@ def core(client_id):
 
 @app.route('/core/<client_id>/butler_learn')
 @login_required
+@timeit
 def core_butler_learned(client_id):
     brain = get_brain_content("learn")
     return render_template('core_butler_learned.html',
@@ -1108,6 +1143,7 @@ def core_butler_learned(client_id):
 
 @app.route('/core/<client_id>/butler_not_understood')
 @login_required
+@timeit
 def core_butler_not_understood(client_id):
     brain = get_brain_content("not_understood")
     return render_template('core_butler_not_understood.html',

@@ -5,7 +5,7 @@ import time
 import traceback
 import zmq
 from functools import wraps
-from flask import Flask, g, request, session
+from flask import Flask, g, request, session, Response
 try:
     from flask_wtf import Form, RecaptchaField
 except ImportError:
@@ -56,15 +56,23 @@ from domogikmq.reqrep.client import MQSyncReq
 app = Flask(__name__)
 app.db = DbHelper()
 app.debug = True
+
 ### load config
 cfg = dmgLoader('admin').load()
 app.globalConfig = dict(cfg[0])
 app.dbConfig = dict(cfg[1]) 
 app.zmq_context = zmq.Context() 
+
+
 app.libraries_directory = app.globalConfig['libraries_path']
 app.packages_directory = "{0}/{1}".format(app.globalConfig['libraries_path'], PACKAGES_DIR)
 app.resources_directory = "{0}/{1}".format(app.globalConfig['libraries_path'], RESOURCES_DIR)
 app.publish_directory = "{0}/{1}".format(app.resources_directory, "publish")
+
+# butler config (lang for butler's rest urls
+cfg_butler = dmgLoader('butler').load()
+app.butlerConfig = dict(cfg_butler[1])
+app.lang = app.butlerConfig['lang']
 
 ### logging to stdout (to get logs in gunicorn logs...)
 import logging
@@ -142,8 +150,10 @@ def write_acces_log_before():
 def inject_global_errors():
     err = []
     with app.db.session_scope():
+        # TODO : review this part by checking only for the mandatory fields
         if len(app.db.get_core_config()) != 5:
             err.append(('Not all config set, you should first set the basic config','/config'))
+
         if len(app.db.list_devices(d_state=u'upgrade')) > 0:
             err.append(('Some devices need your attention','/upgrade'))
         if not app.db.get_home_location():
@@ -175,6 +185,7 @@ def json_response(action_func):
     def create_json_response(*args, **kwargs):
         ret = action_func(*args, **kwargs)
         # if list is 2 entries long
+        app.logger.debug(u"Json response : type = '{0}'".format(type(ret)))
         if (type(ret) is list or type(ret) is tuple):
             if len(ret) == 2:
                 # return httpcode data
@@ -188,6 +199,11 @@ def json_response(action_func):
                 #  data = {msg: <errorStr>}
                 rcode = 400
                 rdata = {error: ret[0]}
+        # In cas we get a Response objet, we return it as is
+        # (because it means the url may return json or something else sometimes)
+        elif isinstance(ret, Response):
+            app.logger.debug(u"The response given by the url is not json but an already buit-in Response : we return it as is.")
+            return ret
         else:
             # just return
             # code = 204 = No content
@@ -309,6 +325,7 @@ from domogik.admin.views.apidoc import *
 from domogik.admin.views.scenario import *
 from domogik.admin.views.timeline import *
 from domogik.admin.views.battery import *
+from domogik.admin.views.camera import *
 from domogik.admin.views.datatypes import *
 from domogik.admin.views.locations import *
 from domogik.admin.views.config import *
@@ -328,3 +345,4 @@ from domogik.admin.rest.device import *
 from domogik.admin.rest.sensor import sensorAPI
 from domogik.admin.rest.product import *
 from domogik.admin.rest.location import *
+from domogik.admin.rest.proxy import *

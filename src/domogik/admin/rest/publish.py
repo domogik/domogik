@@ -1,9 +1,9 @@
-from domogik.admin.application import app, json_response
+from domogik.admin.application import app, json_response, timeit
 import sys
 import os
 import domogik
 import json
-from flask import Response, request, send_from_directory
+from flask import Response, request, send_from_directory, abort
 import traceback
 from flask_login import login_required
 
@@ -14,6 +14,7 @@ from flask_login import login_required
 # TODO : security issue !!!!!
 # Why the fuck the login_required is not working here ?????????
 #@login_required
+@timeit
 def publish_get(client_type, client_name, path):
     """
     @api {get} /butler/publish View content published by some clients
@@ -31,8 +32,8 @@ def publish_get(client_type, client_name, path):
         HTTTP/1.1 200 
         ... some content ....
 
-    @apiErrorExample No so published data
-        HTTTP/1.1 404 Not foundst
+    @apiErrorExample No published data
+        HTTTP/1.1 404 Not found
     
     """
     try:
@@ -45,4 +46,4 @@ def publish_get(client_type, client_name, path):
     except:
         msg = u"Error while getting the published data. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 404, msg
+        abort(404)

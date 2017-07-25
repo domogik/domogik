@@ -10,3 +10,32 @@ Removed watcher
 
 Previous all plugins and core components where forked, with this change we removed the need of the fork
 
+
+MQ
+==
+
+TODO : new domogik-mq release to use
+
+
+Nico improvments
+================
+
+TODO : cache, ...
+
+Admin
+=====
+
+TODO
+* gunicorn
+* ssl ciphers
+* new log
+* new layout for commands
+
+
+REST
+====
+
+TODO
+* New audio butler url
+* and other new urls related to butler
+* wit.ai for butler discuss on low capablitties hardware

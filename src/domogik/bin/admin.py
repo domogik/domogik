@@ -274,6 +274,7 @@ class Admin(Plugin):
                     self.rest_auth = True
                 else:
                     self.rest_auth = False
+
             except KeyError:
                 # default parameters
                 self.interfaces = server_interfaces
@@ -389,6 +390,14 @@ class Admin(Plugin):
         self.log.info(u"HTTP Server initialisation...")
         acfg = dict(Loader('admin').load()[1])
         cmd = "{0} --preload --access-logfile {1} --error-logfile {1} --log-level {2}".format(find_executable("gunicorn"), self.http_log_file, self.log_level)
+
+        # Try gevent to allow streaming
+        # Not working with the cache component... See #509 for more details
+        #cmd = "{0}  -k gevent".format(cmd)
+   
+        # Increase the timeout to allow 2 min of data streaming
+        # As all UIs should refresh each video stream each minute in case of stream error, it should do the trick
+        cmd = "{0}  -t 120".format(cmd)
 
         # SSL handling
         if acfg['use_ssl'] == "True":
@@ -1110,13 +1119,15 @@ class Admin(Plugin):
                 mode = "last"
             elif msg_data['mode'] == "period":
                 mode = "period"
+            elif msg_data['mode'] == "filter":
+                mode = "filter"
             else:
-                reason = "ERROR when getting sensor history. No valid type (last, from) declared in the message"
+                reason = "ERROR when getting sensor history. No valid mode (last, period, filter) declared in the message"
                 self.log.error(reason)
                 status = False
                 mode = None
         else:
-            reason = "ERROR when getting sensor history. No type (last, from) declared in the message"
+            reason = "ERROR when getting sensor history. No mode (last, from, filter) declared in the message"
             self.log.error(reason)
             status = False
             sensor_id = None
@@ -1161,7 +1172,53 @@ class Admin(Plugin):
 
             else:
                 values = db.list_sensor_history_between(sensor_id, frm, to)
-        
+
+        ### filter
+        elif mode == "filter":
+            if 'from' in msg_data:
+                frm = msg_data['from']
+            else:
+                reason = "ERROR when getting sensor history. No key 'from' defined for mode = 'filter'!"
+                self.log.error(reason)
+                status = False
+                frm = None
+
+            if 'to' in msg_data:
+                to = msg_data['to']
+            else:
+                to = None
+
+            if 'interval' in msg_data:
+                interval = msg_data['interval']
+                if interval not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
+                    reason = "ERROR when getting sensor history. key 'interval' should be one of : minute, hour, day, week, month, year for mode = 'filter'!"
+                    self.log.error(reason)
+                    status = False
+                    interval = None
+            else:
+                reason = "ERROR when getting sensor history. No key 'interval' defined for mode = 'filter'!"
+                self.log.error(reason)
+                status = False
+                interval = None
+
+            if 'selector' in msg_data:
+                selector = msg_data['selector']
+                if selector not in ('min', 'max', 'avg', 'sum'):
+                    reason = "ERROR when getting sensor history. key 'selector' should be one of : min, max, avg, sum for mode = 'filter'!"
+                    self.log.error(reason)
+                    status = False
+                    selector = None
+            else:
+                reason = "ERROR when getting sensor history. No key 'selector' defined for mode = 'filter'!"
+                self.log.error(reason)
+                status = False
+                interval = None
+
+            if frm != None and interval != None and selector != None:
+                values = db.list_sensor_history_filter(sensor_id, frm, to, interval, selector)  # fonctions dans database.py
+            else:
+                values = None
+
         msg.add_data('status', status)
         msg.add_data('reason', reason)
         msg.add_data('sensor_id', sensor_id)

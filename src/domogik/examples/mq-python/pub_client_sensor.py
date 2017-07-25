@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-                                                                           
 """
-@api {SUB} client.sensor Subscribe to the sensor data
-@apiVersion 0.4.0
+@api {PUB} client.sensor Publish some client sansors values
+@apiVersion 0.6.0
 @apiName client.sensor
 @apiGroup Client
-@apiDescription Subscribe to new sensor values
+@apiDescription Publish new sensor values
 * Source client : Any plugin
 * Target client : Domogik xplgw
 This is a key/value pair, where the key is the sensorId and the value is the value to store.

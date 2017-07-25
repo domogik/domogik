@@ -38,6 +38,7 @@ Implements
 from domogik.common import logger
 from domogik.common.database import DbHelper
 from domogik.common.utils import is_already_launched
+import traceback
 
 class CronSystem():
     """ Package installer class
@@ -52,18 +53,20 @@ class CronSystem():
         self.run()
 
     def run(self):
-        self.log.info("START Cron system run")
+        self.log.info(u"START Cron system run")
         self._delete_devices()
-        self.log.info("END   Cron system run")
+        self.log.info(u"END   Cron system run")
 
     def _delete_devices(self):
-        self.log.info("=> START device deleting")
+        self.log.info(u"=> START device deleting")
         with self.db.session_scope():
-            devs = self.db.list_devices(d_state=u'delete')
             for dev in self.db.list_devices(d_state=u'delete'):
-                self.log.info("   => Deleting device '{0}' from plugin '{1}'".format(dev['name'], dev['client_id']))
-                self.db.del_device_real(dev['id'])
-        self.log.info("=> END device deleting")
+                try:
+                    self.log.info(u"   => Deleting device '{0}' from plugin '{1}'".format(dev['name'], dev['client_id']))
+                    self.db.del_device_real(dev['id'])
+                except:
+                    self.log.error(u"     Unable to delete the device. Please check the error message for the reason. Error is : {0}".format(traceback.format_exc()))
+        self.log.info(u"=> END device deleting")
 
 
 def main():

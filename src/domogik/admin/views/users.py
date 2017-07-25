@@ -1,4 +1,4 @@
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from flask import request, flash, redirect
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -24,6 +24,7 @@ import traceback
 
 @app.route('/users')
 @login_required
+@timeit
 def users():
     with app.db.session_scope():
         persons = []
@@ -51,6 +52,7 @@ def users():
 
 @app.route('/user/del/<pid>')
 @login_required
+@timeit
 def user_delete(pid):
     with app.db.session_scope():
         account = app.db.get_user_account_by_person(pid)
@@ -65,6 +67,7 @@ def user_delete(pid):
 
 @app.route('/user/<person_id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def user_edit(person_id):
     with app.db.session_scope():
         the_first_name = None
@@ -197,6 +200,7 @@ def user_edit(person_id):
 
 @app.route('/user/password/<person_id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def user_password(person_id):
     with app.db.session_scope():
         the_first_name = None

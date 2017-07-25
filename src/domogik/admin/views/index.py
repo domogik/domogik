@@ -1,4 +1,4 @@
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from domogikmq.configloader import Loader as mqLoader
 from domogik.common.configloader import Loader as dmgLoader
 from domogik.common.utils import get_ip_for_interfaces, ucode
@@ -12,6 +12,7 @@ except ImportError:
 
 @app.route('/')
 @login_required
+@timeit
 def index():
     mqConfig = mqLoader('mq').load()[0]
     butlerConfig = dict(dmgLoader('butler').load()[1])

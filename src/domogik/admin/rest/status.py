@@ -9,7 +9,9 @@ from flask import Response
 from flask_login import login_required
 
 @app.route('/rest/')
+@login_required
 @json_response
+@timeit
 def api_root():
     """
     @api {get} /rest/ Get the status of the REST server
@@ -38,6 +40,12 @@ def api_root():
                 "req_rep_port": "40410",
                 "pub_port": "40411"
             }
+        }
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
         }
     """
     try:
@@ -72,7 +80,7 @@ def api_root():
     except:
         msg = u"Error while getting the status. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
 
 @app.route('/rest/map')
 @json_response
@@ -90,4 +98,4 @@ def api_map():
     except:
         msg = u"Error while getting the api map. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}

@@ -30,8 +30,14 @@ def sensorHistory_latest(sid):
         HTTTP/1.1 200 OK
         [{"timestamp": 1449216514.0, "value_str": "0688459268", "value_num": 688459000.0}]
 
-    @apiErrorExample Error-Response:
+    @apiErrorExample Data not found
         HTTTP/1.1 404 Not Found
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
 
     """
@@ -70,7 +76,7 @@ def sensorHistory_latest(sid):
     except:
         msg = u"Error while getting the sensor history. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
 
 @app.route('/rest/sensorhistory/id/<int:sid>/last/<int:num>')
 @json_response
@@ -94,8 +100,14 @@ def sensorHistory_last(sid, num):
         HTTTP/1.1 200 OK
         [{"timestamp": 1449216514.0, "value_str": "0688459268", "value_num": 688459000.0}, {"timestamp": 1449181378.0, "value_str": "0688459268", "value_num": 688459000.0}, {"timestamp": 1449178485.0, "value_str": "0102030405", "value_num": 102030000.0}]
 
-    @apiErrorExample Error-Response:
+    @apiErrorExample Data not found
         HTTTP/1.1 404 Not Found
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
 
     """
@@ -151,7 +163,7 @@ def sensorHistory_last(sid, num):
     except:
         msg = u"Error while getting the sensor history. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
 
 @app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>')
 @json_response
@@ -200,8 +212,14 @@ def sensorHistory_from(sid, ftime):
             }
         ]
 
-    @apiErrorExample Error-Response:
+    @apiErrorExample Data not found
         HTTTP/1.1 404 Not Found
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
     try:
         app.db.open_session()
@@ -211,7 +229,7 @@ def sensorHistory_from(sid, ftime):
     except:
         msg = u"Error while getting the sensor history. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
 
 @app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/to/<int:ttime>')
 @json_response
@@ -261,8 +279,14 @@ def sensorHistory_from_to(sid, ftime, ttime):
             }
         ]
 
-    @apiErrorExample Error-Response:
+    @apiErrorExample Data not found
         HTTTP/1.1 404 Not Found
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
     try:
         app.db.open_session()
@@ -272,7 +296,7 @@ def sensorHistory_from_to(sid, ftime, ttime):
     except:
         msg = u"Error while getting the sensor history. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
 
 @app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/to/<int:ttime>/interval/<interval>/selector/<selector>')
 @json_response
@@ -339,8 +363,14 @@ def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
             }
         }
     
-    @apiErrorExample Error-Response:
+    @apiErrorExample Data not found
         HTTTP/1.1 404 Not Found
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
     try:
         app.db.open_session()
@@ -352,7 +382,7 @@ def sensorHistory_from_filter(sid, ftime, ttime, interval, selector):
     except:
         msg = u"Error while getting the sensor history. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
 
 @app.route('/rest/sensorhistory/id/<int:sid>/from/<int:ftime>/interval/<interval>/selector/<selector>')
 @json_response
@@ -418,8 +448,14 @@ def sensorHistory_from_to_filter(sid, ftime, interval, selector):
             }
         }
     
-    @apiErrorExample Error-Response:
+    @apiErrorExample Data not found
         HTTTP/1.1 404 Not Found
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
     try:
         app.db.open_session()
@@ -431,4 +467,4 @@ def sensorHistory_from_to_filter(sid, ftime, interval, selector):
     except:
         msg = u"Error while getting the sensor history. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}

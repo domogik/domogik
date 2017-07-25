@@ -50,11 +50,19 @@ class CommandAction(AbstractAction):
         self.log.debug(u"Command : Preprocessing on parameters...")
         self.log.debug(u"Command : Parameters before processing : {0}".format(self._params))
         params = {}
+        # self.log.debug(u"Params = {0}".format(self._params))
+        # Params = {'color1': '#ffff33', 'color2': '#ff0000'}
         for key in self._params:
-            self._params[key] = ucode(self._params[key])
+	    if type(self._params[key]) is str:
+                self._params[key] = ucode(self._params[key])
             self.log.debug(u"Command : Preprocess for param : key={0}, typeofvalue={1}, value={2}".format(key, type(self._params[key]), self._params[key]))
             params[key] = self._params[key]
-            if key == "color" and params[key].startswith("#"):
+            # For the colors, we need to remove the first character if this is a #
+            # But we should not affect other variables...
+            # For now, if the first character is a # we remove it
+            # TODO : try improving by getting the real param type from blockly or json or whatever
+            #if key == "color" and params[key].startswith("#"):
+            if params[key].startswith("#"):
                 self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
                 params[key] = params[key][1:]
 

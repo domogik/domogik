@@ -5,12 +5,13 @@ try:
 except ImportError:
     from flask.ext.babel import gettext, ngettext
     pass
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 
 @app.route('/orphans')
 @login_required
+@timeit
 def orphans():
     # get all clients
     cli = MQSyncReq(app.zmq_context)
@@ -37,6 +38,7 @@ def orphans():
 
 @app.route('/orphans/delete/<did>')
 @login_required
+@timeit
 def orphans_delete(did):
     with app.db.session_scope():
         res = app.db.del_device(did)

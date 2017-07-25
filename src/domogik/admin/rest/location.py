@@ -15,12 +15,15 @@ import traceback
 @app.route('/rest/position/<string:person_id>/<string:data>', methods = ["GET"])
 @json_response
 @login_required
+@timeit
 def position_get(person_id, data):
     """
     @api {get} /rest/position/<person id or login>/<location data>  Store a position for a person
     @apiName storePosition
     @apiGroup Position
     @apiVersion 0.6.0
+
+    @apiSampleRequest /rest/position/john/47.47,-1.5050
 
     @apiSuccess {json} result A json result
 
@@ -30,7 +33,12 @@ def position_get(person_id, data):
             "status": "OK"
         }
 
-    @apiSampleRequest /rest/position/john/47.47,-1.5050
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
+
     """
     try:
         with app.db.session_scope():
@@ -42,32 +50,25 @@ def position_get(person_id, data):
                     pub.send_event('client.sensor', {person.location_sensor : data})
                     data = {"status": "OK"}
                 else:
-                    data = {"status": "ERROR", "error": "Location not enabled for this person"}
+                    data = {"error": "Location not enabled for this person"}
             else:
-                data = {"status": "ERROR", "error": "Person not found"}
+                data = {"error": "Person not found"}
             return 200, data
     except:
         msg = u"Error while storing the location. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {"status": "ERROR", 'error': msg}
+        return 500, {'error': msg}
 
 @app.route('/rest/position/<string:person_id>/', methods = ["POST"])
 @json_response
 @login_required
+@timeit
 def position_post(person_id):
     """ 
     @api {post} /rest/position/<person id or login>/  Store a position for a person
     @apiName storePosition
     @apiGroup Position
     @apiVersion 0.6.0
-
-    @apiSuccess {json} result A json result
-
-    @apiSuccessExample Success-Response:
-        HTTTP/1.1 200 OK
-        {
-            "status": "OK"
-        }
 
     @apiSampleRequest:
         The last current position
@@ -121,6 +122,20 @@ def position_post(person_id):
           },
           ...
         ]
+
+    @apiSuccess {json} result A json result
+
+    @apiSuccessExample Success-Response:
+        HTTTP/1.1 200 OK
+        {
+            "status": "OK"
+        }
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
     try:
         mqpub = MQPub(zmq.Context(), 'adminhttp')
@@ -140,6 +155,7 @@ def position_post(person_id):
     
             # process the person id
             person = app.db.get_person(person_id)
+            http_code = 200
             if person:
                 if person.location_sensor:
     
@@ -168,8 +184,8 @@ def position_post(person_id):
                         if location_name != None:
                             loc = app.db.get_location_by_name(a_loc_data['location_name'])
                             if loc is None:
-                                data = {"status": "ERROR", "error": "Location '{0}' can not be found".format(a_loc_data['location_name'])}
-                                return 200, data
+                                data = {"error": "Location '{0}' can not be found".format(a_loc_data['location_name'])}
+                                return 500, data
                             else:
                                 print(u"Get location from location name...")
                                 # get the coordinates
@@ -192,13 +208,15 @@ def position_post(person_id):
     
                     data = {"status": "OK"}
                 else:
-                    data = {"status": "ERROR", "error": "Location not enabled for this person"}
+                    data = {"error": "Location not enabled for this person"}
+                    http_code = 500
             else:
-                data = {"status": "ERROR", "error": "Person Not found"}
-            return 200, data
+                data = {"error": "Person Not found"}
+                http_code = 500
+            return http_code, data
     except:
         msg = u"Error while storing the location. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {"status": "ERROR", 'error': msg}
+        return 500, {'error': msg}
     
 

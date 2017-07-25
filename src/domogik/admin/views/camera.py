@@ -10,24 +10,25 @@ except ImportError:
     pass
 from operator import itemgetter
 
-@app.route('/battery')
-@app.route('/battery/')
+@app.route('/camera')
+@app.route('/camera/')
 @login_required
 @timeit
-def battery():
+def camera():
 
+    app.logger.debug(u"Display the view camera")
     # TODO : improve by getting directly all devices instead of all sensors ?
     with app.db.session_scope():
-        sensors = []
+        video_mjpeg = []
         data = app.db.get_all_sensor()
         for item in data:
-            if item.data_type == "DT_Battery":
+            if item.data_type == "DT_VideoMjpeg":
                 dev = app.db.get_device(item.device_id)
                 try:
-                    last_value = int(item.last_value)
+                    last_value = item.last_value
                 except:
                     last_value = None
-                sensors.append({"name" : item.name,
+                video_mjpeg.append({"name" : item.name,
                                 "last_value" : last_value,
                                 "last_received" : item.last_received,
                                 "device_id" : item.device_id,
@@ -35,10 +36,11 @@ def battery():
                                 "client_id" : dev['client_id'],
                                 "id" : item.id })
          
-        sensors = sorted(sensors, key=itemgetter("last_value", "device_name"))
+        sensors = sorted(video_mjpeg, key=itemgetter("device_name"))
 
-    return render_template('battery.html',
-        mactive="battery",
-        sensors=sensors
+    return render_template('camera.html',
+        mactive="camera",
+        video_mjpeg=video_mjpeg,
+        rest_url = request.url_root + "rest"
         )
 

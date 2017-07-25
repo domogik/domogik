@@ -1,11 +1,12 @@
 import json
 import pprint
 from flask_login import login_required
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 import collections
 
 @app.route('/datatypes')
 @login_required
+@timeit
 def datatypes():
     app.logger.debug(u"Display the datatypes page...")
     if app.datatypes == {}:

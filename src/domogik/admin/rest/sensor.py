@@ -1,4 +1,4 @@
-from domogik.admin.application import app, json_response, register_api
+from domogik.admin.application import app, json_response, register_api, timeit
 from flask import request
 from flask.views import MethodView
 from flask_login import login_required
@@ -7,6 +7,7 @@ import traceback
 @app.route('/rest/sensor/since/<timestamp>', methods=['GET'])
 @json_response
 @login_required
+@timeit
 def sensor_since(timestamp):
     """
     @api {get} /rest/sensor/since/<timestamp> Returns all sensors changed since this timestamp
@@ -45,8 +46,14 @@ def sensor_since(timestamp):
 	    }
 	]
 
-    @apiErrorExample Error-Response:
-	HTTTP/1.1 404 Not Found
+    @apiErrorExample Data not found
+        HTTTP/1.1 404 Not Found
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
     try:
         app.json_stop_at = ["core_device"]
@@ -57,10 +64,10 @@ def sensor_since(timestamp):
     except:
         msg = u"Error while getting the sensors. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)
-        return 500, {'msg': msg}
+        return 500, {'error': msg}
 
 class sensorAPI(MethodView):
-    decorators = [login_required, json_response]
+    decorators = [login_required, json_response, timeit]
 
     def get(self, id):
         """
@@ -96,8 +103,14 @@ class sensorAPI(MethodView):
                 "device_id": 2
             }
 
-        @apiErrorExample Error-Response:
+        @apiErrorExample Data not found
             HTTTP/1.1 404 Not Found
+    
+        @apiErrorExample Error
+            HTTTP/1.1 500
+            {
+                'error': '...'
+            }
         """
         try:
             app.json_stop_at = ["core_device"]
@@ -111,11 +124,11 @@ class sensorAPI(MethodView):
         except:
             msg = u"Error while getting the sensor(s). Error is : {0}".format(traceback.format_exc())
             app.logger.error(msg)
-            return 500, {'msg': msg}
+            return 500, {'error': msg}
 
     def put(self, id):
         """
-        @api {put} /rest/sensor/id Update a specifick sensor
+        @api {put} /rest/sensor/id Update a specific sensor
         @apiName putSensor
         @apiGroup Sensor
         @apiVersion 0.4.1
@@ -155,8 +168,14 @@ class sensorAPI(MethodView):
                 "device_id": 2
             }
 
-        @apiErrorExample Error-Response:
+        @apiErrorExample Data not found
             HTTTP/1.1 404 Not Found
+    
+        @apiErrorExample Error
+            HTTTP/1.1 500
+            {
+                'error': '...'
+            }
         """
         try:
             with app.db.session_scope():
@@ -201,10 +220,12 @@ class sensorAPI(MethodView):
                 if res:
                     return 201, app.db.get_sensor(id)
                 else:
-                    return 500, None
+                    msg = u"Error while updating the sensor."
+                    app.logger.error(msg)
+                    return 500, {'error' : msg}
         except:
             msg = u"Error while updating the sensor. Error is : {0}".format(traceback.format_exc())
             app.logger.error(msg)
-            return 500, {'msg': msg}
+            return 500, {'error': msg}
 
 register_api(sensorAPI, 'sensor_api', '/rest/sensor/', pk='id')

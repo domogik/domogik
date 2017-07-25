@@ -1,5 +1,5 @@
 from flask import Blueprint, abort
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from domogik.admin.views.clients import get_client_detail
 from domogik.common.utils import get_packages_directory, get_libraries_directory
 from jinja2 import TemplateNotFound
@@ -28,6 +28,7 @@ for a_client in os.listdir(get_packages_directory()):
         app.logger.error("Error while trying to load package '{0}' advanced page in the admin. The error is : {1}".format(a_client, traceback.format_exc()))
 
 @nothing_adm.route('/<client_id>')
+@timeit
 def index(client_id):
     detail = get_client_detail(client_id)
     try:

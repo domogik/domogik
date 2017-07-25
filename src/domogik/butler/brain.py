@@ -80,6 +80,9 @@ STAR_FILE = os.path.join(get_resources_directory(), "butler", "butler_not_unders
 def clean_input(data):
     """ Remove some characters, accents, ...
     """
+    if data == None:
+        data = ""
+
     if isinstance(data, str):
         data = unicode(data, 'utf-8')
 

@@ -272,7 +272,7 @@ class DbHelper():
         try:
             self.__session.commit()
         except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception))
+            self.__raise_dbhelper_exception(u"SQL exception (commit) : {0}".format(sql_exception))
 ####
 # Plugin config
 ####
@@ -284,11 +284,17 @@ class DbHelper():
         """
         return self.__session.query(PluginConfig).all()
 
-    def get_core_config(self):
+    def get_core_config(self, key = None):
         cfg = self.__session.query(PluginConfig).filter_by(type=u'core').all()
-        res = {}
-        for item in cfg:
-            res[item.key] = item.value
+        if key == None:
+            res = {}
+            for item in cfg:
+                res[item.key] = item.value
+        else:
+            res = None
+            for item in cfg:
+                if item.key == key:
+                    res = item.value
         return res
 
     def set_core_config(self, cfg):
@@ -320,7 +326,7 @@ class DbHelper():
                     ).filter_by(hostname=ucode(pl_hostname)
                     ).all()
         if self._cacheDB :
-            self.log.debug("Set cache config for {0}.{1} : {2} parameter(s)".format( pl_id, pl_hostname, len(config)))
+            self.log.debug(u"Set cache config for {0}.{1} : {2} parameter(s)".format( pl_id, pl_hostname, len(config)))
             self._cacheDB.setConfigData(config, pl_id, pl_hostname, repr(self))
         return config
 
@@ -435,7 +441,7 @@ class DbHelper():
             device_list.append(self.get_device(device=device))
         if d_state==u'active':
             if self._cacheDB :
-                self.log.debug("Set cache devices with {0} devices".format(len(device_list)))
+                self.log.debug(u"Set cache devices with {0} devices".format(len(device_list)))
                 self._cacheDB.setDevices(device_list, repr(self))
         return device_list
 
@@ -497,7 +503,7 @@ class DbHelper():
                                }
                 json_device['parameters'][a_param.key] = json_param
             except:
-                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
+                self.log.error(u"Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # complete with sensors informations
         json_device['sensors'] = {}
@@ -518,7 +524,7 @@ class DbHelper():
                               }
                 json_device['sensors'][a_sensor.reference] = json_sensor
             except:
-                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
+                self.log.error(u"Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # complete with commands information
         json_device['commands'] = {}
@@ -539,7 +545,7 @@ class DbHelper():
                                                     })
                 json_device['commands'][a_cmd.reference] = json_command
             except:
-                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
+                self.log.error(u"Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # complete for each xpl_stat information
         json_device['xpl_stats'] = {}
@@ -578,7 +584,7 @@ class DbHelper():
 
                 json_device['xpl_stats'][a_xplstat.json_id] = json_xplstat
             except:
-                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
+                self.log.error(u"Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # xpl_commands
         json_device['xpl_commands'] = {}
@@ -596,7 +602,7 @@ class DbHelper():
                                                     })
                 json_device['xpl_commands'][a_xplcmd.json_id] = json_xplcmd
             except:
-                self.log.error("Error while getting device informations : {0}".format(traceback.format_exc()))
+                self.log.error(u"Error while getting device informations : {0}".format(traceback.format_exc()))
 
         # global parameters
         return json_device
@@ -761,7 +767,7 @@ class DbHelper():
             d = self.get_device(device.id)
             return d
         except:
-            self.log.error("Error when adding a device. Params = {0}      | Client_data = {1}    | Error : {2}".format(params, client_data, traceback.format_exc()))
+            self.log.error(u"Error when adding a device. Params = {0}      | Client_data = {1}    | Error : {2}".format(params, client_data, traceback.format_exc()))
 
     def add_device_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data, params):
         self.log.debug(u"Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
@@ -858,7 +864,7 @@ class DbHelper():
         self.__session.expire_all()
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
-            self.__raise_dbhelper_exception("Device with id {0} couldn't be found".format(d_id))
+            self.__raise_dbhelper_exception(u"Device with id {0} couldn't be found".format(d_id))
         if d_name is not None:
             device.name = ucode(d_name)
         if d_address is not None:
@@ -888,17 +894,20 @@ class DbHelper():
         return device
 
     def del_device(self, d_id):
-        """Delete a device
+        """Mark a device to be deleted. 
 
         @param d_id : device id
-        @return the deleted device
+        @return the 'marked to delete' device
 
         """
+        # Before doing anything, we check if the device is used in a scenario or not
+        self.raise_if_device_used_in_scenario(d_id)
+
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
-            self.__raise_dbhelper_exception("Device with id {0} couldn't be found".format(d_id))
+            self.__raise_dbhelper_exception(u"Device with id {0} couldn't be found".format(d_id))
 
         # update the state to deleting, so the system does not start to delete the same device multiple times
         device.state=u'delete'
@@ -909,17 +918,20 @@ class DbHelper():
         return device
 
     def del_device_real(self, d_id):
-        """Delete a device
+        """Delete a device for real
 
         @param d_id : device id
         @return the deleted device
 
         """
+        # Before doing anything, we check if the device is used in a scenario or not
+        self.raise_if_device_used_in_scenario(d_id)
+
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         device = self.__session.query(Device).filter_by(id=d_id).first()
         if device is None:
-            self.__raise_dbhelper_exception("Device with id {0} couldn't be found".format(d_id))
+            self.__raise_dbhelper_exception(u"Device with id {0} couldn't be found".format(d_id))
 
         # update the state to deleting, so the system does not start to delete the same device multiple times
         device.state=u'deleting'
@@ -928,6 +940,26 @@ class DbHelper():
         self._do_commit()
         if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=device.client_id)
 
+        # delete sensor history data
+        ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
+        meta = MetaData(bind=DbHelper.__engine)
+        t_hist = Table(SensorHistory.__tablename__, meta, autoload=True)
+        for sen in ssens:
+            self.__session.execute(
+                t_hist.delete().where(t_hist.c.sensor_id == sen.id)
+            )
+
+        self.__session.delete(device)
+        self._do_commit()
+        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=device.client_id)
+        return device
+
+    def raise_if_device_used_in_scenario(self, d_id):
+        """ Check if a given device is used in a scenario or not
+            Raise an exception if the device is used in a scenario
+            Return : nothing
+        """
+ 
         # check if this device i used in a scenario
         llist = []
         fdo = False
@@ -943,25 +975,12 @@ class DbHelper():
                 tmp = []
                 for x in scens:
                     tmp.append(x.name)
-                self.__raise_dbhelper_exception("Can not delete device with id {0}, its sensors or commands are used in the following scenarios: {1}".format(d_id, ", ".join(tmp)))
+                self.__raise_dbhelper_exception(u"You cannot delete the device with id '{0}', its sensors or commands are used in the following scenarios : {1}".format(d_id, ", ".join(tmp)))
                 del tmp
             del scens
         del llist
         del fdo
 
-        # delete sensor history data
-        ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
-        meta = MetaData(bind=DbHelper.__engine)
-        t_hist = Table(SensorHistory.__tablename__, meta, autoload=True)
-        for sen in ssens:
-            self.__session.execute(
-                t_hist.delete().where(t_hist.c.sensor_id == sen.id)
-            )
-
-        self.__session.delete(device)
-        self._do_commit()
-        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=device.client_id)
-        return device
 
 ####
 # Sensor history
@@ -1131,7 +1150,7 @@ class DbHelper():
                     if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sensor['id'])
 
             else:
-                self.__raise_dbhelper_exception("Can not add history to not existing sensor: {0}".format(sid), True)
+                self.__raise_dbhelper_exception(u"Can not add history to not existing sensor: {0}".format(sid), True)
         except:
             self.__raise_dbhelper_exception(u"Error when adding data to sensor history. Sensor id = {0}  | Value = {1}  | Date = {2}. Error is {3}".format(sid, value, date, traceback.format_exc()))
         return data
@@ -1149,7 +1168,7 @@ class DbHelper():
     def list_sensor_history_between(self, sid, frm, to=None):
         if to:
             if to < frm:
-                self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
+                self.__raise_dbhelper_exception(u"'end_date' can't be prior to 'start_date'")
         else:
             to = int(time.time())
         values = []
@@ -1166,16 +1185,16 @@ class DbHelper():
 
     def list_sensor_history_filter(self, sid, frm, to, step_used, function_used):
         if not frm:
-            self.__raise_dbhelper_exception("You have to provide a start date")
+            self.__raise_dbhelper_exception(u"You have to provide a start date")
         if to:
             if to < frm:
-                self.__raise_dbhelper_exception("'end_date' can't be prior to 'start_date'")
+                self.__raise_dbhelper_exception(u"'end_date' can't be prior to 'start_date'")
         else:
             to = int(time.time())
         if function_used is None or function_used.lower() not in ('min', 'max', 'avg', 'sum'):
-            self.__raise_dbhelper_exception("'function_used' parameter should be one of : min, max, avg, sum")
+            self.__raise_dbhelper_exception(u"'function_used' parameter should be one of : min, max, avg, sum")
         if step_used is None or step_used.lower() not in ('minute', 'hour', 'day', 'week', 'month', 'year'):
-            self.__raise_dbhelper_exception("'period' parameter should be one of : minute, hour, day, week, month, year")
+            self.__raise_dbhelper_exception(u"'period' parameter should be one of : minute, hour, day, week, month, year")
         function = {
             'min': func.min(SensorHistory.value_num),
             'max': func.max(SensorHistory.value_num),
@@ -1408,10 +1427,10 @@ class DbHelper():
                             ).filter_by(login=ucode(a_login)
                             ).first()
         if user_account is not None:
-            self.__raise_dbhelper_exception("Error {0} login already exists".format(a_login))
+            self.__raise_dbhelper_exception(u"Error {0} login already exists".format(a_login))
         person = self.__session.query(Person).filter_by(id=a_person_id).first()
         if person is None:
-            self.__raise_dbhelper_exception("Person id '{0}' does not exist".format(a_person_id))
+            self.__raise_dbhelper_exception(u"Person id '{0}' does not exist".format(a_person_id))
         user_account = UserAccount(login=a_login, password=_make_crypted_password(a_password),
                                    person_id=a_person_id, is_admin=a_is_admin, skin_used=a_skin_used, lock_edit=a_lock_edit, lock_delete=a_lock_delete)
         self.__session.add(user_account)
@@ -1451,13 +1470,13 @@ class DbHelper():
         self.__session.expire_all()
         user_acc = self.__session.query(UserAccount).filter_by(id=a_id).first()
         if user_acc is None:
-            self.__raise_dbhelper_exception("UserAccount with id {0} couldn't be found".format(a_id))
+            self.__raise_dbhelper_exception(u"UserAccount with id {0} couldn't be found".format(a_id))
         if a_new_login is not None:
             user_acc.login = ucode(a_new_login)
         if a_person_id is not None:
             person = self.__session.query(Person).filter_by(id=a_person_id).first()
             if person is None:
-                self.__raise_dbhelper_exception("Person id '{0}' does not exist".format(a_person_id))
+                self.__raise_dbhelper_exception(u"Person id '{0}' does not exist".format(a_person_id))
             user_acc.person_id = a_person_id
         if a_is_admin is not None:
             user_acc.is_admin = a_is_admin
@@ -1576,7 +1595,7 @@ class DbHelper():
             self._do_commit()
             return user_account
         else:
-            self.__raise_dbhelper_exception("Couldn't delete user account with id {0} : it doesn't exist".format(a_id))
+            self.__raise_dbhelper_exception(u"Couldn't delete user account with id {0} : it doesn't exist".format(a_id))
 
 ####
 # Persons
@@ -1636,7 +1655,7 @@ class DbHelper():
         # Make sure previously modified objects outer of this method won't be commited
         person = self.__session.query(Person).filter_by(id=p_id).first()
         if person is None:
-            self.__raise_dbhelper_exception("Person with id {0} couldn't be found".format(p_id))
+            self.__raise_dbhelper_exception(u"Person with id {0} couldn't be found".format(p_id))
         if p_first_name is not None:
             person.first_name = ucode(p_first_name)
         if p_last_name is not None:
@@ -1709,7 +1728,7 @@ class DbHelper():
             self._do_commit()
             return person
         else:
-            self.__raise_dbhelper_exception("Couldn't delete person with id {0} : it doesn't exist".format(p_id))
+            self.__raise_dbhelper_exception(u"Couldn't delete person with id {0} : it doesn't exist".format(p_id))
 
 ###################
 # sensor
@@ -1744,7 +1763,7 @@ class DbHelper():
             formula=None, data_type=None):
         sensor = self.__session.query(Sensor).filter_by(id=sid).first()
         if sensor is None:
-            self.__raise_dbhelper_exception("Sensor with id {0} couldn't be found".format(sid))
+            self.__raise_dbhelper_exception(u"Sensor with id {0} couldn't be found".format(sid))
         if history_round is not None:
             sensor.history_round = history_round
         if history_max is not None:
@@ -1822,7 +1841,7 @@ class DbHelper():
             self._do_commit()
             return cmd
         else:
-            self.__raise_dbhelper_exception("Couldn't delete xpl-command with id {0} : it doesn't exist".format(id))
+            self.__raise_dbhelper_exception(u"Couldn't delete xpl-command with id {0} : it doesn't exist".format(id))
 
     def update_xpl_command(self, id, cmd_id=None, name=None, schema=None, device_id=None, stat_id=None):
         """Update a xpl_stat
@@ -1831,7 +1850,7 @@ class DbHelper():
         self.__session.expire_all()
         cmd = self.__session.query(XplCommand).filter_by(id=id).first()
         if cmd is None:
-            self.__raise_dbhelper_exception("XplCommand with id {0} couldn't be found".format(id))
+            self.__raise_dbhelper_exception(u"XplCommand with id {0} couldn't be found".format(id))
         if cmd_id is not None:
             cmd.cmd_id = cmd_id
         if schema is not None:
@@ -1875,14 +1894,14 @@ class DbHelper():
             self._do_commit()
             return stat
         else:
-            self.__raise_dbhelper_exception("Couldn't delete xpl-stat with id {0} : it doesn't exist".foramt(id))
+            self.__raise_dbhelper_exception(u"Couldn't delete xpl-stat with id {0} : it doesn't exist".foramt(id))
 
     def update_xpl_stat(self, id, name=None, schema=None, device_id=None):
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         stat = self.__session.query(XplStat).filter_by(id=id).first()
         if stat is None:
-            self.__raise_dbhelper_exception("XplStat with id {0} couldn't be found".format(id))
+            self.__raise_dbhelper_exception(u"XplStat with id {0} couldn't be found".format(id))
         if schema is not None:
             stat.schema = ucode(schema)
         if device_id is not None:
@@ -1908,7 +1927,7 @@ class DbHelper():
         self.__session.expire_all()
         param = self.__session.query(XplCommandParam).filter_by(xplcmd_id=cmd_id).filter_by(key=key).first()
         if param is None:
-            self.__raise_dbhelper_exception("XplCommandParam with id {0} and key {1} couldn't be found".format(cmd_id, key))
+            self.__raise_dbhelper_exception(u"XplCommandParam with id {0} and key {1} couldn't be found".format(cmd_id, key))
         if value is not None:
             param.value = ucode(value)
         # TODO info_changed
@@ -1924,7 +1943,7 @@ class DbHelper():
             self._do_commit()
             return param
         else:
-            self.__raise_dbhelper_exception("Couldn't delete xpl-command-param with id {0} : it doesn't exist".format(id))
+            self.__raise_dbhelper_exception(u"Couldn't delete xpl-command-param with id {0} : it doesn't exist".format(id))
 
 ###################
 # XplStatParam
@@ -1943,7 +1962,7 @@ class DbHelper():
         self.__session.expire_all()
         param = self.__session.query(XplStatParam).filter_by(xplstat_id=stat_id).filter_by(key=key).first()
         if param is None:
-            self.__raise_dbhelper_exception("XplStatParam with id {0} couldn't be found".format(id))
+            self.__raise_dbhelper_exception(u"XplStatParam with id {0} couldn't be found".format(id))
         if value is not None:
             param.value = ucode(value)
         if static is not None:
@@ -1965,7 +1984,7 @@ class DbHelper():
             self._do_commit()
             return param
         else:
-            self.__raise_dbhelper_exception("Couldn't delete xpl-stat-param with id {0} : it doesn't exist".format(id))
+            self.__raise_dbhelper_exception(u"Couldn't delete xpl-stat-param with id {0} : it doesn't exist".format(id))
 
 ###################
 # Scenario
@@ -1990,7 +2009,7 @@ class DbHelper():
         self.__session.expire_all()
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is None:
-            self.__raise_dbhelper_exception("Scenario with id {0} couldn't be found".format(s_id))
+            self.__raise_dbhelper_exception(u"Scenario with id {0} couldn't be found".format(s_id))
         if name is not None:
             scenario.name = ucode(name)
         if s_json is not None:
@@ -2013,7 +2032,7 @@ class DbHelper():
             self._do_commit()
             return scenario
         else:
-            self.__raise_dbhelper_exception("Couldn't delete scenario with id {0} : it doesn't exist".format(s_id))
+            self.__raise_dbhelper_exception(u"Couldn't delete scenario with id {0} : it doesn't exist".format(s_id))
 
 ###################
 # Device Config
@@ -2029,7 +2048,7 @@ class DbHelper():
         self.__session.expire_all()
         config = self.__session.query(DeviceParam).filter_by(id=dc_id).first()
         if config is None:
-            self.__raise_dbhelper_exception("Global device param with id {0} couldn't be found".format(dc_id))
+            self.__raise_dbhelper_exception(u"Global device param with id {0} couldn't be found".format(dc_id))
         if key is not None:
             config.key = ucode(key)
         if value is not None:
@@ -2138,7 +2157,7 @@ class DbHelper():
         self.__session.expire_all()
         config = self.__session.query(Location).filter_by(id=l_id).first()
         if config is None:
-            self.__raise_dbhelper_exception("Location with id {0} couldn't be found".format(l_id))
+            self.__raise_dbhelper_exception(u"Location with id {0} couldn't be found".format(l_id))
         if name is not None:
             config.name = ucode(name)
         if type is not None:
@@ -2157,7 +2176,7 @@ class DbHelper():
             self._do_commit()
             return loc
         else:
-            self.__raise_dbhelper_exception("Location with id {0} couldn't be found".format(lid))
+            self.__raise_dbhelper_exception(u"Location with id {0} couldn't be found".format(lid))
 
 
 ###################

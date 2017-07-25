@@ -403,3 +403,29 @@ iframe {
 }
 
 
+/*** camera blocs for camera page ***/
+
+.camera-page {
+    width: 100%;
+}
+
+.camera {
+    display: inline-block;
+    width: 46%;
+    margin: 2%;
+    background-color: #2D2C2F;
+    float: left;
+    padding: 1ex;
+}
+
+.camera .name {
+    padding: 0px;
+    margin: 0px;
+    color: white;
+}
+
+.camera .client  {
+    color: white;
+    text-align: left;
+    margin-bottom: 1ex;
+}
