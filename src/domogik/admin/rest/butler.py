@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from domogik.admin.application import app, json_response, jsonp_response
+from domogik.admin.application import app, json_response, jsonp_response, timeit
 import sys
 import os
 import domogik
@@ -21,6 +21,7 @@ from distutils.spawn import find_executable
 @app.route('/rest/butler/discuss', methods=['GET'])
 @jsonp_response
 @login_required
+@timeit
 def api_butler_discuss_get():
     """
     @api {get} /butler/discuss Discuss with the butler with a GET request
@@ -111,6 +112,7 @@ def api_butler_discuss_get():
 @app.route('/rest/butler/discuss', methods=['POST'])
 @json_response
 @login_required
+@timeit
 def api_butler_discuss_post():
     """
     @api {post} /butler/discuss Discuss with the butler with a POST request
@@ -200,6 +202,7 @@ def api_butler_discuss_post():
 @app.route('/rest/butler/audio_input_discuss', methods=['POST'])
 @json_response
 @login_required
+@timeit
 def api_butler_audio_input_discuss_post():
     """
     @api {post} /butler/audio_input_discuss Discuss with the butler by sending it directly an audio file. The response will be the text response in a json object
@@ -373,6 +376,7 @@ def api_butler_audio_input_discuss_post():
 
 @app.route('/rest/butler/audio_discuss', methods=['POST'])
 @login_required
+@timeit
 def api_butler_audio_discuss_post():
     """
     @api {post} /butler/audio_discuss Discuss with the butler by sending it directly an audio file. The response will be another audio file.
@@ -566,6 +570,7 @@ def api_butler_audio_discuss_post():
 
 @app.route('/rest/tts/<string:text>', methods=['GET'])
 @login_required
+@timeit
 def api_tts(text):
     """
     @api {get} /tts/ Send some text and get the corresponding speech in wav format in response.

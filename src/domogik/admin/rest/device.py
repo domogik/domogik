@@ -14,6 +14,7 @@ import traceback
 @app.route('/rest/device/since/<timestamp>', methods=['GET'])
 @json_response
 @login_required
+@timeit
 def device_since(timestamp):
     """
     @api {get} /rest/device/since/<timestamp> Returns all devices changed since this timestamp
@@ -121,6 +122,7 @@ def device_since(timestamp):
 @app.route('/rest/device/params/<client_id>/<dev_type_id>', methods=['GET'])
 @json_response
 @login_required
+@timeit
 def device_params(client_id, dev_type_id):
     """
     @api {get} /rest/device/params/<clientId>/<device_type> Retrieve the needed parameter for creating a device
@@ -187,7 +189,7 @@ def device_params(client_id, dev_type_id):
     return 200, result
 
 class deviceAPI(MethodView):
-    decorators = [login_required, json_response]
+    decorators = [login_required, json_response, timeit]
 
     def get(self, did):
         """

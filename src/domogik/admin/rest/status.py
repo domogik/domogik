@@ -11,6 +11,7 @@ from flask_login import login_required
 @app.route('/rest/')
 @login_required
 @json_response
+@timeit
 def api_root():
     """
     @api {get} /rest/ Get the status of the REST server

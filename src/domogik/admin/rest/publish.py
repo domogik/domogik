@@ -1,4 +1,4 @@
-from domogik.admin.application import app, json_response
+from domogik.admin.application import app, json_response, timeit
 import sys
 import os
 import domogik
@@ -14,6 +14,7 @@ from flask_login import login_required
 # TODO : security issue !!!!!
 # Why the fuck the login_required is not working here ?????????
 #@login_required
+@timeit
 def publish_get(client_type, client_name, path):
     """
     @api {get} /butler/publish View content published by some clients

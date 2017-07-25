@@ -15,6 +15,7 @@ import traceback
 @app.route('/rest/position/<string:person_id>/<string:data>', methods = ["GET"])
 @json_response
 @login_required
+@timeit
 def position_get(person_id, data):
     """
     @api {get} /rest/position/<person id or login>/<location data>  Store a position for a person
@@ -61,6 +62,7 @@ def position_get(person_id, data):
 @app.route('/rest/position/<string:person_id>/', methods = ["POST"])
 @json_response
 @login_required
+@timeit
 def position_post(person_id):
     """ 
     @api {post} /rest/position/<person id or login>/  Store a position for a person

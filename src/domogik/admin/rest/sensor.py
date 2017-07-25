@@ -1,4 +1,4 @@
-from domogik.admin.application import app, json_response, register_api
+from domogik.admin.application import app, json_response, register_api, timeit
 from flask import request
 from flask.views import MethodView
 from flask_login import login_required
@@ -7,6 +7,7 @@ import traceback
 @app.route('/rest/sensor/since/<timestamp>', methods=['GET'])
 @json_response
 @login_required
+@timeit
 def sensor_since(timestamp):
     """
     @api {get} /rest/sensor/since/<timestamp> Returns all sensors changed since this timestamp
@@ -66,7 +67,7 @@ def sensor_since(timestamp):
         return 500, {'error': msg}
 
 class sensorAPI(MethodView):
-    decorators = [login_required, json_response]
+    decorators = [login_required, json_response, timeit]
 
     def get(self, id):
         """
