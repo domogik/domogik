@@ -1,4 +1,4 @@
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from flask import request, flash, redirect
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -12,11 +12,13 @@ except ImportError:
 @app.route('/timeline')
 @app.route('/timeline/')
 @login_required
+@timeit
 def timeline():
     return timeline_generic()
 
 @app.route('/timeline/device/<int:device_id>')
 @login_required
+@timeit
 def timeline_device(device_id):
     return timeline_generic(the_device_id = device_id)
 

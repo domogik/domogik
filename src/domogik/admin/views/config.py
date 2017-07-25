@@ -1,6 +1,6 @@
 from flask_login import login_required
 from flask import request, flash, redirect
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 try:
     from flask_wtf import Form
 except ImportError:
@@ -17,6 +17,7 @@ from domogik.common.utils import ucode
 
 @app.route('/config', methods=['GET', 'POST'])
 @login_required
+@timeit
 def config():
     with app.db.session_scope():
         cfg = app.db.get_core_config()

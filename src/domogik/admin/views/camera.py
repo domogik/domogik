@@ -1,4 +1,4 @@
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from flask import request, flash, redirect
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -13,6 +13,7 @@ from operator import itemgetter
 @app.route('/camera')
 @app.route('/camera/')
 @login_required
+@timeit
 def camera():
 
     app.logger.debug(u"Display the view camera")

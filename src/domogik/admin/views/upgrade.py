@@ -1,4 +1,4 @@
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from flask import request, flash, redirect
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -11,6 +11,7 @@ except ImportError:
 
 @app.route('/upgrade')
 @login_required
+@timeit
 def upgrade():
     with app.db.session_scope():
         devs = app.db.list_devices(d_state=u'upgrade')
@@ -22,6 +23,7 @@ def upgrade():
 
 @app.route('/upgrade/<int:devid>')
 @login_required
+@timeit
 def upgrade_dev(devid):
     return render_template('upgrade_input.html',
         mactive="upgrade"

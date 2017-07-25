@@ -4,7 +4,7 @@ import traceback
 import operator
 import os
 from domogik.common.utils import get_packages_directory
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from flask import request, flash, redirect, send_from_directory
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -98,6 +98,7 @@ def get_clients_list():
 
 @app.route('/clients')
 @login_required
+@timeit
 def clients():
     #cli = MQSyncReq(app.zmq_context)
     #msg = MQMessage()
@@ -152,6 +153,7 @@ def clients():
 
 @app.route('/client/<client_id>')
 @login_required
+@timeit
 def client_detail(client_id):
     detail = get_client_detail(client_id)
 
@@ -164,6 +166,7 @@ def client_detail(client_id):
 
 @app.route('/client/<client_id>/timeline')
 @login_required
+@timeit
 def client_timeline(client_id):
     from domogik.admin.views.timeline import timeline_generic
     temp = timeline_generic(the_client_id = client_id, asDict = True)
@@ -180,6 +183,7 @@ def client_timeline(client_id):
 
 @app.route('/client/<client_id>/dmg_devices/known')
 @login_required
+@timeit
 def client_devices_known(client_id):
     detail = get_client_detail(client_id)
 
@@ -239,6 +243,7 @@ def client_devices_known(client_id):
 
 @app.route('/client/<client_id>/sensors/edit/<sensor_id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_sensor_edit(client_id, sensor_id):
     if app.datatypes == {}:
         cli = MQSyncReq(app.zmq_context)
@@ -339,6 +344,7 @@ def client_sensor_edit(client_id, sensor_id):
 
 @app.route('/client/<client_id>/global/edit/<dev_id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_global_edit(client_id, dev_id):
     with app.db.session_scope():
         dev = app.db.get_device(dev_id)
@@ -411,6 +417,7 @@ def client_global_edit(client_id, dev_id):
 
 @app.route('/client/<client_id>/dmg_devices/detected')
 @login_required
+@timeit
 def client_devices_detected(client_id):
     detail = get_client_detail(client_id)
     
@@ -433,6 +440,7 @@ def client_devices_detected(client_id):
 
 @app.route('/client/<client_id>/dmg_devices/edit/<did>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_devices_edit(client_id, did):
     detail = get_client_detail(client_id)
     with app.db.session_scope():
@@ -471,6 +479,7 @@ def client_devices_edit(client_id, did):
 
 @app.route('/client/<client_id>/dmg_devices/delete/<did>')
 @login_required
+@timeit
 def client_devices_delete(client_id, did):
     app.logger.info(u"Request to delete the device id='{0}' for the client '{1}'".format(did, client_id))
     try:
@@ -494,6 +503,7 @@ def client_devices_delete(client_id, did):
 
 @app.route('/client/<client_id>/config', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_config(client_id):
     cli = MQSyncReq(app.zmq_context)
     detail = get_client_detail(client_id)
@@ -601,6 +611,7 @@ def client_config(client_id):
 
 @app.route('/client/<client_id>/dmg_devices/new')
 @login_required
+@timeit
 def client_devices_new(client_id):
     detail = get_client_detail(client_id)
     data = detail['data']
@@ -641,12 +652,14 @@ def client_devices_new(client_id):
 
 @app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_devices_new_type(client_id, device_type_id):
     return client_devices_new_wiz(client_id, device_type_id, None)
 
 
 @app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def client_devices_new_prod(client_id, device_type_id, product):
     return client_devices_new_wiz(client_id,
                                   device_type_id,
@@ -1023,6 +1036,7 @@ def get_brain_content(client_id):
 
 @app.route('/client/<client_id>/brain')
 @login_required
+@timeit
 def client_brain(client_id):
     detail = get_client_detail(client_id)
     brain = get_brain_content(client_id)
@@ -1039,6 +1053,7 @@ def client_brain(client_id):
 
 @app.route('/client/<client_id>/doc')
 @login_required
+@timeit
 def client_doc(client_id):
     detail = get_client_detail(client_id)
 
@@ -1053,6 +1068,7 @@ def client_doc(client_id):
 
 @app.route('/client/<client_id>/doc_static/<path:path>')
 @login_required
+@timeit
 def client_doc_static(client_id, path):
     pkg = client_id.split(".")[0].replace("-", "_")
     root_path = os.path.join(get_packages_directory(), pkg)
@@ -1063,6 +1079,7 @@ def client_doc_static(client_id, path):
 
 @app.route('/brain/reload')
 @login_required
+@timeit
 def brain_reload():
     """ To be called by ajax
         Send a MQ request to reload the butler brain
@@ -1081,6 +1098,7 @@ def brain_reload():
 
 @app.route('/core/<client_id>')
 @login_required
+@timeit
 def core(client_id):
     tmp = client_id.split(".")
     name = tmp[0].split("-")[1]
@@ -1108,6 +1126,7 @@ def core(client_id):
 
 @app.route('/core/<client_id>/butler_learn')
 @login_required
+@timeit
 def core_butler_learned(client_id):
     brain = get_brain_content("learn")
     return render_template('core_butler_learned.html',
@@ -1120,6 +1139,7 @@ def core_butler_learned(client_id):
 
 @app.route('/core/<client_id>/butler_not_understood')
 @login_required
+@timeit
 def core_butler_not_understood(client_id):
     brain = get_brain_content("not_understood")
     return render_template('core_butler_not_understood.html',

@@ -1,4 +1,4 @@
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from flask import request, flash, redirect, Response, jsonify
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -32,6 +32,7 @@ import os
 
 @app.route('/scenario')
 @login_required
+@timeit
 def scenario():
     scenarios = []
     cli = MQSyncReq(app.zmq_context)
@@ -55,12 +56,14 @@ def scenario():
 
 @app.route('/scenario/examples')
 @login_required
+@timeit
 def scenario_examples():
     return render_template('scenario_examples.html',
         mactive = u"scenario")
 
 @app.route('/scenario/del/<id>')
 @login_required
+@timeit
 def scenario_del(id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -73,6 +76,7 @@ def scenario_del(id):
 
 @app.route('/scenario/enable/<id>')
 @login_required
+@timeit
 def scenario_enable(id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -85,6 +89,7 @@ def scenario_enable(id):
 
 @app.route('/scenario/disable/<id>')
 @login_required
+@timeit
 def scenario_disable(id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -99,6 +104,7 @@ def scenario_disable(id):
 @app.route('/scenario/clone/<id>', methods=['GET', 'POST'])
 @app.route('/scenario/edit/<id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def scenario_edit(id):
     if str(request.path).find('/clone/') > -1:
         clone = True
@@ -184,6 +190,7 @@ def scenario_edit(id):
 
 @app.route('/scenario/cronruletest/checkdate')
 @login_required
+@timeit
 def scenario_croncheckdate():
     data = {}
     try :
@@ -206,6 +213,7 @@ def scenario_croncheckdate():
 
 @app.route('/scenario/cronruletest/getephemdate')
 @login_required
+@timeit
 def scenario_croncephemdate():
     data = {}
     try :

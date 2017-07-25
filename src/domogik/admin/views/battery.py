@@ -1,4 +1,4 @@
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from flask import request, flash, redirect
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -13,6 +13,7 @@ from operator import itemgetter
 @app.route('/battery')
 @app.route('/battery/')
 @login_required
+@timeit
 def battery():
 
     # TODO : improve by getting directly all devices instead of all sensors ?

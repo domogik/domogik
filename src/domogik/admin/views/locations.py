@@ -1,6 +1,6 @@
 from flask_login import login_required
 from flask import request, flash, redirect
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 try:
     from flask_wtf import Form
 except ImportError:
@@ -17,6 +17,7 @@ from domogik.common.utils import ucode
 
 @app.route('/locations')
 @login_required
+@timeit
 def locations():
     locations = []
     persons = []
@@ -59,6 +60,7 @@ def locations():
 
 @app.route('/locations/del/<lid>')
 @login_required
+@timeit
 def locations_del(lid):
     with app.db.session_scope():
         app.db.del_location(lid)
@@ -66,6 +68,7 @@ def locations_del(lid):
 
 @app.route('/locations/edit/<lid>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def locations_edit(lid):
     with app.db.session_scope():
         if int(lid) == 0:

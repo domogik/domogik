@@ -1,4 +1,4 @@
-from domogik.admin.application import app, login_manager, babel, render_template
+from domogik.admin.application import app, login_manager, babel, render_template, timeit
 from flask import request, flash, redirect, Response
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -17,6 +17,7 @@ class LoginForm(form.Form):
         pass
 
 @login_manager.user_loader
+@timeit
 def load_user(userid):
     # Used if we already have a cookie
     with app.db.session_scope():
@@ -28,6 +29,7 @@ def load_user(userid):
             return None
 
 @login_manager.unauthorized_handler
+@timeit
 def rediret_to_login():
     if str(request.path).startswith('/rest/'):
         if app.dbConfig['rest_auth'] == True or app.dbConfig['rest_auth'] == 'True':
@@ -39,6 +41,7 @@ def rediret_to_login():
         return redirect('/login')
 
 @login_manager.request_loader
+@timeit
 def load_user_from_request(request):
     if str(request.path).startswith('/rest/'):
         app.logger.debug("rest_auth = '{0}' (type='{1}')".format(app.dbConfig['rest_auth'], type(app.dbConfig['rest_auth'])))
@@ -77,6 +80,7 @@ def get_locale():
 
 
 @app.route('/login', methods=('GET', 'POST'))
+@timeit
 def login():
     fform = LoginForm(request.form)
     if request.method == 'POST' and fform.validate():
@@ -98,6 +102,7 @@ def login():
 
 @app.route('/logout')
 @login_required
+@timeit
 def logout():
     logout_user()
     return redirect("/login")
