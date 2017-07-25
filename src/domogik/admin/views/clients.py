@@ -393,7 +393,7 @@ def client_global_edit(client_id, dev_id):
                     else:
                         flash(gettext("Param update failed"), 'warning')
                     # in all case we send an update event (in case of partial success...)
-                    pub = MQPub(app.zmq_context, 'adminv')
+                    pub = MQPub(app.zmq_context, 'adminhttp')
                     pub.send_event('device.update',
                                    {"device_id" : dev_id,
                                     "client_id" : client_id})
@@ -455,9 +455,7 @@ def client_devices_edit(client_id, did):
             else:
                 flash(gettext("Device update failed"), 'warning')
             # in all case we send an update event (in case of partial success...)
-            #pub = MQPub(app.zmq_context, 'adminv')
-            import zmq
-            pub = MQPub(zmq.Context(), 'adminv')
+            pub = MQPub(zmq.Context(), 'adminhttp')
             pub.send_event('device.update',
                            {"device_id" : did,
                             "client_id" : client_id})
@@ -485,7 +483,7 @@ def client_devices_delete(client_id, did):
                 flash(gettext("Device deleted succesfully"), 'success')
                 app.logger.debug(u"Device deleted succesfully")
             # in all case we send an update event (in case of partial success...)
-            pub = MQPub(app.zmq_context, 'adminviews')
+            pub = MQPub(app.zmq_context, 'adminhttp')
             pub.send_event('device.update',
                            {"device_id" : did,
                             "client_id" : res.client_id})
@@ -583,7 +581,7 @@ def client_config(client_id):
                             val = 'Y'
                         app.logger.debug(u"  => converted val={0}".format(val))
                     app.db.set_plugin_config(type, name, host, key, val)
-            pub = MQPub(app.zmq_context, 'adminv')
+            pub = MQPub(app.zmq_context, 'adminhttp')
             pub.send_event('plugin.configuration',
                              {"type" : type,
                               "name" : name,
@@ -943,7 +941,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
                     if reason:
                         flash(reason, 'warning')
                 # in all case we send an update event (in case of partial success...)
-                pub = MQPub(app.zmq_context, 'adminv')
+                pub = MQPub(app.zmq_context, 'adminhttp')
                 pub.send_event('device.update',
                                {"device_id" : res['id'],
                                 "client_id" : client_id})
