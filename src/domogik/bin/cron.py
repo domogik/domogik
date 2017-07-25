@@ -60,7 +60,6 @@ class CronSystem():
     def _delete_devices(self):
         self.log.info(u"=> START device deleting")
         with self.db.session_scope():
-            devs = self.db.list_devices(d_state=u'delete')
             for dev in self.db.list_devices(d_state=u'delete'):
                 try:
                     self.log.info(u"   => Deleting device '{0}' from plugin '{1}'".format(dev['name'], dev['client_id']))

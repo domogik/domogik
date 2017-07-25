@@ -31,6 +31,7 @@ from collections import OrderedDict
 from domogik.common.utils import get_rest_url
 from operator import itemgetter
 from domogik.common.utils import build_deviceType_from_packageJson
+from domogik.common.database import DbHelperException
 from domogikmq.pubsub.publisher import MQPub
 
 try:
@@ -496,8 +497,11 @@ def client_devices_delete(client_id, did):
             pub.send_event('device.update',
                            {"device_id" : did,
                             "client_id" : res.client_id})
+    except DbHelperException as e:
+        flash(gettext("Device deletion not allowed. {0}".format(e.value)), 'warning')
+        app.logger.warning(u"Unable to delete the device. Reason is : {0}".format(traceback.format_exc()))
     except:
-        flash(gettext("Device deleted failed"), 'warning')
+        flash(gettext("Device deletion failed"), 'warning')
         app.logger.error(u"Error while deleting the device. Error is : {0}".format(traceback.format_exc()))
     return redirect("/client/{0}/dmg_devices/known".format(client_id))
 

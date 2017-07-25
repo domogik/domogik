@@ -894,12 +894,15 @@ class DbHelper():
         return device
 
     def del_device(self, d_id):
-        """Delete a device
+        """Mark a device to be deleted. 
 
         @param d_id : device id
-        @return the deleted device
+        @return the 'marked to delete' device
 
         """
+        # Before doing anything, we check if the device is used in a scenario or not
+        self.raise_if_device_used_in_scenario(d_id)
+
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         device = self.__session.query(Device).filter_by(id=d_id).first()
@@ -915,12 +918,15 @@ class DbHelper():
         return device
 
     def del_device_real(self, d_id):
-        """Delete a device
+        """Delete a device for real
 
         @param d_id : device id
         @return the deleted device
 
         """
+        # Before doing anything, we check if the device is used in a scenario or not
+        self.raise_if_device_used_in_scenario(d_id)
+
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
         device = self.__session.query(Device).filter_by(id=d_id).first()
@@ -934,6 +940,26 @@ class DbHelper():
         self._do_commit()
         if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=device.client_id)
 
+        # delete sensor history data
+        ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
+        meta = MetaData(bind=DbHelper.__engine)
+        t_hist = Table(SensorHistory.__tablename__, meta, autoload=True)
+        for sen in ssens:
+            self.__session.execute(
+                t_hist.delete().where(t_hist.c.sensor_id == sen.id)
+            )
+
+        self.__session.delete(device)
+        self._do_commit()
+        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=device.client_id)
+        return device
+
+    def raise_if_device_used_in_scenario(self, d_id):
+        """ Check if a given device is used in a scenario or not
+            Raise an exception if the device is used in a scenario
+            Return : nothing
+        """
+ 
         # check if this device i used in a scenario
         llist = []
         fdo = False
@@ -949,25 +975,12 @@ class DbHelper():
                 tmp = []
                 for x in scens:
                     tmp.append(x.name)
-                self.__raise_dbhelper_exception(u"Can not delete device with id {0}, its sensors or commands are used in the following scenarios: {1}".format(d_id, ", ".join(tmp)))
+                self.__raise_dbhelper_exception(u"You cannot delete the device with id '{0}', its sensors or commands are used in the following scenarios : {1}".format(d_id, ", ".join(tmp)))
                 del tmp
             del scens
         del llist
         del fdo
 
-        # delete sensor history data
-        ssens = self.__session.query(Sensor).filter_by(device_id=d_id).all()
-        meta = MetaData(bind=DbHelper.__engine)
-        t_hist = Table(SensorHistory.__tablename__, meta, autoload=True)
-        for sen in ssens:
-            self.__session.execute(
-                t_hist.delete().where(t_hist.c.sensor_id == sen.id)
-            )
-
-        self.__session.delete(device)
-        self._do_commit()
-        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(client_id=device.client_id)
-        return device
 
 ####
 # Sensor history
