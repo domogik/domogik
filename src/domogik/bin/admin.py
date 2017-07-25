@@ -274,6 +274,7 @@ class Admin(Plugin):
                     self.rest_auth = True
                 else:
                     self.rest_auth = False
+
             except KeyError:
                 # default parameters
                 self.interfaces = server_interfaces
@@ -389,6 +390,14 @@ class Admin(Plugin):
         self.log.info(u"HTTP Server initialisation...")
         acfg = dict(Loader('admin').load()[1])
         cmd = "{0} --preload --access-logfile {1} --error-logfile {1} --log-level {2}".format(find_executable("gunicorn"), self.http_log_file, self.log_level)
+
+        # Try gevent to allow streaming
+        # Not working with the cache component... See #509 for more details
+        #cmd = "{0}  -k gevent".format(cmd)
+   
+        # Increase the timeout to allow 2 min of data streaming
+        # As all UIs should refresh each video stream each minute in case of stream error, it should do the trick
+        cmd = "{0}  -t 120".format(cmd)
 
         # SSL handling
         if acfg['use_ssl'] == "True":
