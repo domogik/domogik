@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import sys
 import os
@@ -174,7 +175,7 @@ def timeit(action_func):
         ts = time.time()
         result = action_func(*args, **kw)
         te = time.time()
-        app.logger.debug('performance|{0}|{1}|{2}|{3}'.format(action_func.__name__, args, kw, te-ts))
+        app.logger.debug(u"performance|{0}|{1}|{2}".format(action_func.__name__, kw, te-ts))
         return result
     return timed
 
