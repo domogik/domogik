@@ -368,6 +368,9 @@ class UnknownImageFormat(Exception):
 
 if __name__ == "__main__":
     # Folder
+    if len(sys.argv) != 2:
+        print("Usage : {0} <path to a package folder>".format(sys.argv[0]))
+        sys.exit(1)
     pkg_dir = sys.argv[1]
     R = Review(pkg_dir)
 
