@@ -45,7 +45,7 @@ from domogik.common.utils import get_sanitized_hostname
 from domogik.common.database import DbHelper, DbHelperException
 import traceback
 
-QUERY_CONFIG_WAIT = 5
+QUERY_CONFIG_WAIT = 15
 
 class Query():
     """ Query for core components and plugins
