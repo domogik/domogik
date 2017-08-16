@@ -1024,7 +1024,7 @@ class Admin(Plugin):
                 client_id = msg_data['client_id']
             if status :
                 # check the received info
-                (result, reason, status) = build_deviceType_from_packageJson(self.zmq, dev_type_id, client_id)
+                (result, reason, status) = build_deviceType_from_packageJson(self.log, self.zmq, dev_type_id, client_id)
             msg = MQMessage()
             msg.set_action('device.params.result')
             msg.add_data('status', status)

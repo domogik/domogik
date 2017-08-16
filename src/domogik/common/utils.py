@@ -325,7 +325,8 @@ def remove_accents(input_str):
     return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
-def build_deviceType_from_packageJson(zmq, dev_type_id, client_id):
+def build_deviceType_from_packageJson(log, zmq, dev_type_id, client_id):
+    log.debug(u"Calling build_deviceType_from_packageJson for client '{0}' and device type '{1}'...".format(client_id, dev_type_id))
     result = {}
     status = True
     reason = ""
@@ -339,16 +340,19 @@ def build_deviceType_from_packageJson(zmq, dev_type_id, client_id):
     if res is None:
         status = False
         reason = "Manager is not replying to the mq request"
+        log.error(reason)
     if status:
         pjson = res.get_data()
         if pjson is None:
             status = False
             reason = "No data for {0} found by manager".format(dev_type_id)
+            log.error(reason)
     if status:
         pjson = pjson[dev_type_id]
         if pjson is None:
             status = False
             reason = "The json for {0} found by manager is empty".format(dev_type_id)
+            log.error(reason)
     if status:
         # build the device params
         stats = []
@@ -407,6 +411,7 @@ def build_deviceType_from_packageJson(zmq, dev_type_id, client_id):
             result['xpl_stats'][xstatn] = []
             for param in xstat['parameters']['device']:
                 result['xpl_stats'][xstatn].append(param)
+    log.debug(u"build_deviceType_from_packageJson > result = '{0}'".format(result))
     return (result, reason, status)
 
 if __name__ == "__main__":
