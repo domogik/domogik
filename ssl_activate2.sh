@@ -124,19 +124,6 @@ keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1 = localhost
-IP.1 = 192.168.1.50" > $DIR/ssl/v3.ext
-[ $? -ne 0 ] && abort "Error"
-
-
-
-
-echo "authorityKeyIdentifier=keyid,issuer
-basicConstraints=CA:TRUE
-keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
-subjectAltName = @alt_names
-
-[alt_names]
 DNS.1 = localhost" > $DIR/ssl/v3.ext
 [ $? -ne 0 ] && abort "Error"
 ip_idx=1
