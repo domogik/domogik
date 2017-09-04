@@ -65,7 +65,7 @@ DN_O=Domogik
 DN_OU=Domogik
 DN_emailAddress=none@domogik.org
 
-mkdir -p $DIR/ssl_test/
+mkdir -p $DIR/ssl/
 
 info "Step 1 : search your public ip from 'ipinfo.io/ip' to add it in the certificates..."
 public_ip=$(get_public_ip)
@@ -98,10 +98,6 @@ ok "Done"
 
 ### Step 4 : create a root CA cert
 
-# TODO : skip if it already exists
-# TODO : skip if it already exists
-# TODO : skip if it already exists
-
 info "Step 4 : create a root CA cert"
 if [[ ! -f $DIR/ssl/rootCA.key || ! -f $DIR/ssl/rootCA.pem ]] ; then
     info "There is no existing root CA in the folder '$DIR'. Creating it..."
@@ -122,10 +118,6 @@ fi
 ### Step 5 : create the $DIR/ssl/v3.ext file in order to create a X509 v3 certificate instead of a v1 which is the default when not specifying a extension file
 info "Step 5 : create the $DIR/ssl/v3.ext file in order to create a X509 v3 certificate instead of a v1 which is the default when not specifying a extension file"
 
-# TODO : fill dynamically the private ip and public ip (get it from myip.com or something like that)
-# TODO : fill dynamically the private ip and public ip (get it from myip.com or something like that)
-# TODO : fill dynamically the private ip and public ip (get it from myip.com or something like that)
-
 echo "authorityKeyIdentifier=keyid,issuer
 basicConstraints=CA:TRUE
 keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
@@ -135,6 +127,33 @@ subjectAltName = @alt_names
 DNS.1 = localhost
 IP.1 = 192.168.1.50" > $DIR/ssl/v3.ext
 [ $? -ne 0 ] && abort "Error"
+
+
+
+
+echo "authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:TRUE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost" > $DIR/ssl/v3.ext
+[ $? -ne 0 ] && abort "Error"
+ip_idx=1
+for ip in $public_ip
+  do
+    echo "IP.${ip_idx} = ${ip}" >> $DIR/ssl/v3.ext
+    [ $? -ne 0 ] && abort "Error"
+    ip_idx=$(( $ip_idx + 1 ))
+    [ $? -ne 0 ] && abort "Error"
+done
+for ip in $server_ip
+  do
+    echo "IP.${ip_idx} = ${ip}" >> $DIR/ssl/v3.ext
+    [ $? -ne 0 ] && abort "Error"
+    ip_idx=$(( $ip_idx + 1 ))
+    [ $? -ne 0 ] && abort "Error"
+done
 ok "Done"
 
 
