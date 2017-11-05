@@ -114,7 +114,7 @@ def locations_edit(lid):
             del(params['csrf_token'])
             del(params['locid'])
             if 'locisHome' in params:
-                if params['locisHome'] == 'True': 
+                if params['locisHome'] == 'y': 
                     isHome = True
                 else:
                     isHome = False
