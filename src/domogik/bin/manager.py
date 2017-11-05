@@ -75,6 +75,7 @@ from subprocess import Popen, PIPE
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
 from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
+from domogik.common.deviceconsistency import DeviceConsistencyThread
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID, STATUS_HBEAT
 from domogik.common.queryconfig import Query
@@ -1324,8 +1325,17 @@ class Plugin(GenericComponent, MQAsyncSub):
     def reload_data(self):
         """ Just reload the client data
         """
+        # store old version
+        oldversion = self.data["identity"]["version"]
+        # clear the data
         self.data = {}
+        # reload the data
         self.fill_data()
+        # if oldversion != new version
+        #   Start the deviceconsistency thread for this plugin
+        if oldversion < self.data["identity"]["version"]:
+            self.log.info(u"The version of this plugin is newer then the already known version, starting device uprgade process")
+            DeviceConsistencyThread(self.client_id, self._stop, self.log).start()
 
     def fill_data(self):
         """ Fill the client data by reading the json file

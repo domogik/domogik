@@ -32,9 +32,9 @@ DeviceConsistencyException
 from domogik.common.packagejson import PackageJson
 from domogik.common.database import DbHelper
 import json
-import thread
+from threading import Thread
 
-class DeviceConsistencyThread(threading.thread):
+class DeviceConsistencyThread(Thread):
     def __init__(self, client_id, stop, log):
         Thread.__init__(self)
         self.client_id = client_id
@@ -42,31 +42,33 @@ class DeviceConsistencyThread(threading.thread):
         tmp = client_id.split('-')
         tmp = tmp[1].split('.')
         self.name = tmp[0]
-        self.stop = stop
-        self.log = log
+        self._stop = stop
+        self.log = log.getChild("upgrade.{0}".format(client_id))
         # start the db connection
         self.db = DbHelper()
 
     def run(self):
+        self.log.info("Checking devices for plugin {0}".format(self.client_id))
         with self.db.session_scope():
             plugin_json = PackageJson(name=self.name)
             for dev in self.db.list_devices_by_plugin(self.client_id):
                 # this can take some time, so guard with the stop
                 if self._stop.isSet():
                     break
+                self.log.info("Checking device {0}({1})".format(dev['name'], dev['id']))
                 # check the device
                 device_json = json.loads(json.dumps(dev))
                 dc = DeviceConsistency("return", device_json, plugin_json.json)
                 dc.check()
                 res = dc.get_result()
-                if len(dc.keys()) > 0:
+                if len(res.keys()) > 0:
                     # update to set the dev as needs upgrade
                     self.log.info("Device {0}({1}) needs upgrade".format(dev['name'], dev['id']))
-                    self.log.debug(dc)
+                    self.log.debug(res)
                     # set the state to needsupgrade
                     self.db.update_device(dev['id'], d_state=u'upgrade')
                 else:
-                    new_version = self.p_json['identity']['version']
+                    new_version = dc.p_json['identity']['version']
                     # all ok
                     self.log.info("Device {0}({1}) is OK for new version {2}".format(dev['name'], dev['id'], new_version))
                     # udpate the client version for this device
