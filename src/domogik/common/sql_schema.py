@@ -236,7 +236,7 @@ class Sensor(DomogikBase):
 
 class SensorHistory(DomogikBase):
     __tablename__ = '{0}_sensor_history'.format(_db_prefix)
-    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    __table_args__ = (Index('siddate', 'sensor_id', 'date'),{'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'})
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
     sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
