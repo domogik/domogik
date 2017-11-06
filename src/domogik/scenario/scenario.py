@@ -280,6 +280,20 @@ class ScenarioInstance(MQAsyncSub):
                 incLev -= 1 # decrease elif level for final else, could be 0 if no elif
                 retlist.append( pyObj(u"else:\r\n", level+incLev) )
                 retlist.append( pyObj(self.__parse_part(part['ELSE'], (level+incLev+1), debug, parentPart), (level)) )
+        # loop control
+        elif part['type'] == 'controls_whileUntil':
+            # MODE = UNTIL => while not
+            # MODE = WHILE => while
+            if part['MODE'] == 'UNTIL':
+                mode = ' NOT '
+            else:
+                mode = ' '
+            # parse
+            whilep = self.__parse_part(part["BOOL"], level, debug, parentPart)
+            dop = self.__parse_part(part["DO"], level, debug, parentPart)
+            # reply
+            retlist.append( pyObj(u"while{0}{1}:\r\n".format(mode, whilep), level) )
+            retlist.append( pyObj(u"{0}\r\n".format(dop), (level+1)) )
         # Set a local variable
         elif part['type'] == 'variables_set':
             retlist.append( pyObj(u"{0}={1}\r\n".format(part['VAR'], self.__parse_part(part["VALUE"], level, debug, parentPart)), level) )
