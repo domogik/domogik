@@ -139,6 +139,15 @@ def build_file_list(user):
         d_files.append(('/etc/logrotate.d', ['root', None], \
                 ['src/domogik/xpl/hub/examples/logrotate/xplhub']))
 
+    # /etc/systemd/system
+    # domogik-mq-broker.service  domogik-mq-forwarder.service  domogik.service  domogik-xpl.service
+    # src/domogik/examples/systemd/system/
+    if os.path.exists('/etc/systemd/system'):
+        debug("SystemD found, copyinf giles")
+        for f in ["domogik-mq-broker.service", "domogik-mq-forwarder.service", "domogik.service", "domogik-xpl.service"]:
+            d_files.append(('/etc/systemd/system', [user, 0755], \
+                    ['src/domogik/examples/systemd/system/{0}'.format(f)]))
+
     if os.path.exists('/etc/init.d'):
         debug("Init script path is /etc/init.d")
         d_files.append(('/etc/init.d/', [user, 0755], \
