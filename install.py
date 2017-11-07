@@ -103,11 +103,10 @@ def get_c_hub():
     else:
         return None
 
-def build_file_list(user):
+def build_file_list(user, noXpl):
     d_files = [
         ('/etc/domogik', [user, 0755], \
-                ['src/domogik/examples/config/domogik.cfg.sample', \
-                'src/domogik/xpl/hub/examples/config/xplhub.cfg.sample']),
+                ['src/domogik/examples/config/domogik.cfg.sample']),
         ('/var/cache/domogik', [user, None], []),
         ('/var/cache/domogik/pkg-cache', [user, None], []),
         ('/var/cache/domogik/cache', [user, None], []),
@@ -123,8 +122,11 @@ def build_file_list(user):
                  'docs/conf-packages.py']),
         ('/var/lock/domogik', [user, 0755], []),
         ('/var/log/domogik', [user, 0755], []),
-        ('/var/log/xplhub', [user, None], []),
     ]
+
+    if not noXpl:
+        d_files.append(('/var/log/xplhub', [user, None], []))
+        d_files.append(('/etc/domogik', [user, 0755], ['src/domogik/xpl/hub/examples/config/xplhub.cfg.sample']))
 
     if os.path.exists('/etc/default'):
         debug("Found directory to store the system wide config: /etc/default")
@@ -134,7 +136,7 @@ def build_file_list(user):
         fail("Can't find directory where i can copy system wide config")
         exit(1)
 
-    if os.path.exists('/etc/logrotate.d'):
+    if os.path.exists('/etc/logrotate.d') and not noXpl:
         debug("Found a directory for the logrotate script: /etc/logrotate.d")
         d_files.append(('/etc/logrotate.d', ['root', None], \
                 ['src/domogik/xpl/hub/examples/logrotate/xplhub']))
@@ -167,6 +169,7 @@ def build_file_list(user):
         fail("Can't find directory where i can copy cron config")
         exit(1)
 
+    print d_files
 
     hub = get_c_hub()
     if hub is not None:
@@ -175,10 +178,10 @@ def build_file_list(user):
 
     return d_files
 
-def copy_files(user):
+def copy_files(user, noXpl):
     info("Copy files")
     try:
-        for directory, perm, files in build_file_list(user):
+        for directory, perm, files in build_file_list(user, noXpl):
             if not os.path.exists(directory):
                 if perm[1] != None:
                     res = os.makedirs(directory, int(perm[1]))
@@ -475,6 +478,8 @@ def install():
                    default=False, help='Don\'t check the mq package')
     parser.add_argument('--no-db-backup', dest='skip_database_backup', action="store_true",
                    default=False, help='Don\'t do a db backup')
+    parser.add_argument('--no-xpl-hub', dest='skip_xpl_hub', action="store_true",
+                   default=False, help='Don\'t install an xpl hub')
     parser.add_argument("--user",
                    help="Set the domogik user")
     parser.add_argument("--user-shell", dest="user_shell",
@@ -568,7 +573,7 @@ def install():
                 create_user(user)
 
         # Copy files
-        copy_files(user)
+        copy_files(user, args.skip_xpl_hub)
         update_default(user)
 
         # select the correct interface
@@ -581,14 +586,16 @@ def install():
         if args.command_line:
             info("Update the config file : /etc/domogik/domogik.cfg")
             write_domogik_configfile_from_command_line(args, intf)
-            info("Update the config file : /etc/domogik/xplhub.cfg")
-            write_xplhub_configfile_from_command_line(args, intf)
+            if not args.skip_xpl_hub:
+                info("Update the config file : /etc/domogik/xplhub.cfg")
+                write_xplhub_configfile_from_command_line(args, intf)
         else:
             if not args.config and needupdate():
                 info("Update the config file : /etc/domogik/domogik.cfg")
                 write_domogik_configfile(args.advanced_mode, intf)
-                info("Update the config file : /etc/domogik/xplhub.cfg")
-                write_xplhub_configfile(args.advanced_mode, intf)
+                if not args.skip_xpl_hub:
+                    info("Update the config file : /etc/domogik/xplhub.cfg")
+                    write_xplhub_configfile(args.advanced_mode, intf)
 
         # upgrade db
         if not args.db:
