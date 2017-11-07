@@ -318,7 +318,7 @@ class Admin(Plugin):
         self.log.info(u"Start WS Server on {0}:{1}...".format(self.interfaces, self.ws_port))
         publisher = MQManager()
         tapp = Application([
-            (r"/ws", WebSocketManager, dict(publisher=publisher))
+            (r"/ws/", WebSocketManager, dict(publisher=publisher))
             ])
 
         # logging
