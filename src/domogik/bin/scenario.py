@@ -37,7 +37,7 @@ Implements
 import traceback
 
 from domogik.scenario.manager import ScenarioManager
-from domogik.xpl.common.plugin import Plugin
+from domogik.common.plugin import Plugin
 #from domogikmq.reqrep.worker import MQRep
 from domogikmq.message import MQMessage
 from domogikmq.reqrep.client import MQSyncReq

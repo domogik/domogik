@@ -1,5 +1,4 @@
 from domogik.admin.application import app, json_response, timeit
-from domogik.xpl.common.xplmessage import XplMessage
 from domogik.common.configloader import Loader
 import sys
 import os
