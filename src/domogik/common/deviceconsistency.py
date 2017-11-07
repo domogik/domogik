@@ -116,6 +116,13 @@ class DeviceConsistency():
         else:
             return self._result
 
+    def _addToResult(self, t, a, d):
+        if not a in self._result:
+            self._result[a] = dict()
+        if not t in self._result[a]:
+            self._result[a][t] = list()
+        self._result[a][t].append(d)
+
     def _raise(self, code, data):
         """ Code
          0 DONE => nothing needs to be done, we raise anyway, data = string to raise
@@ -143,83 +150,83 @@ class DeviceConsistency():
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Sensor ({0}) is in the plugin but not in the device".format(data))
             else:
-                self._result['sensor_add'] = data
+                self._addToResult('sensor', 'add', data)
         elif code == -1:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Sensor ({0}) is in the device but not in the plugin".format(data))
             else:
-                self._result['sensor_del'] = data
+                self._addToResult('sensor', 'del', data)
         # COMMAND stuff
         elif code == 2:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Command ({0}) is in the plugin but not in the device".format(data))
             else:
-                self._result['command_add'] = data
+                self._addToResult('command', 'add', data)
         elif code == -2:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Command ({0}) is in the device but not in the plugin".format(data))
             else:
-                self._result['command_del'] = data
+                self._addToResult('command', 'del', data)
         elif code == 3:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Command ({0}) parameter ({1}) found in the plugin but not in the db".format(data[0], data[1]))
             else:
-                self._result['command_param_add'] = data
+                self._addToResult('command_param', 'add', data)
         elif code == -3:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Command ({0}) parameter ({1}) found in the db but not in the plugin".format(data[0], data[1]))
             else:
-                self._result['command_param_del'] = data
+                self._addToResult('command_param', 'del', data)
         elif code == 4:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl command ({0}) is in the plugin but not in the db".format(data))
             else:
-                self._result['xplcommand_add'] = data
+                self._addToResult('xpl_command', 'add', data)
         elif code == -4:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl command ({0}) is in db but not in the plugin".format(data))
             else:
-                self._result['xplcommand_del'] = data
+                self._addToResult('xpl_command', 'del', data)
         elif code == 5:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl command ({0}) parameter ({1}) found in the plugin but not in the db".format(data[0], data[1]))
             else:
-                self._result['xplcommand_param_add'] = data
+                self._addToResult('xpl_command_param', 'add', data)
         elif code == -5:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl command ({0}) parameter ({1}) found in the db but not in the plugin".format(data[0], data[1]))
             else:
-                self._result['xplcommand_param_del'] = data
+                self._addToResult('xpl_command_param', 'del', data)
         elif code == 6:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl stat ({0}) is in the plugin but not in the db".format(data))
             else:
-                self._result['xplstat_add'] = data
+                self._addToResult('xpl_stat', 'add', data)
         elif code == -6:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl stat ({0}) is in db but not in the plugin".format(data))
             else:
-                self._result['xplstat_del'] = data
+                self._addToResult('xpl_stat', 'del', data)
         elif code == 7:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl stat ({0}) parameter ({1}) found in the plugin but not in the db".format(data[0], data[1]))
             else:
-                self._result['xplstat_param_add'] = data
+                self._addToResult('xpl_stat_param', 'add', data)
         elif code == -7:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl stat ({0}) parameter ({1}) found in the db but not in the plugin".format(data[0], data[1]))
             else:
-                self._result['xplstat_param_del'] = data
+                self._addToResult('xpl_stat_param', 'del', data)
         elif code == 8:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Device global param ({0}) is in the plugin but not in the device".format(data))
             else:
-                self._result['device_param_add'] = data
+                self._addToResult('device_param', 'add', data)
         elif code == -8:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Device global param ({0}) is in the device but not in the plugin".format(data))
             else:
-                self._result['device_param_del'] = data
+                self._addToResult('device_param', 'del', data)
         else:
             print "{0} = {1}".format(code, data)
 

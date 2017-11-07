@@ -3,5 +3,31 @@
 {% block content %}
 <div class="container">
     <h2>{% trans %}Upgrade Device{% endtrans %}</h2>
+    Actions To Take<br />
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Item</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ac in ['add', 'del'] %}
+            {% for data in actions[ac].items() %}
+                {% for data2 in data[1] %}
+                    <tr>
+                        <td>{{ ac }}</td>
+                        <td>{{ data[0] }}</td>
+                        <td>{{ data2 }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+    <br />
+    <br />
+    {{ actions }}
 </div>
 {% endblock %}
