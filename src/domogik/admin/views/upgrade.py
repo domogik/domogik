@@ -40,23 +40,22 @@ def upgrade_dev(devid):
         dc = DeviceConsistency("return", device_json, pjson.json)
         actions = dc.get_result()
         # calculate the step
-        # step 1 ( default)
-        # => nothing in migration table
-        # step 2
-        # => found this device in the migrate.oldid with type device and newid != 0
-        # step = 4
-        # => found this device in the migrate.oldid with type device and newid == 0
         mig = app.db.get_migration('device', devid)
-        if mig.newId > 0:
-            step = 2
-            # step 3
-            # => found sensors in the migration table that are linked to this device
-            sens = app.db.get_migration_all_sensors(devid)
-            print sens
-            if sens:
-                step = 3
+        if mig:
+            if mig.newId > 0:
+                # => found this device in the migrate.oldid with type device and newid != 0
+                step = 2
+                # step 3
+                sens = app.db.get_migration_all_sensors(devid)
+                if sens:
+                    # => found sensors in the migration table that are linked to this device
+                    step = 3
+            else:
+                # => found this device in the migrate.oldid with type device and newid == 0
+                step = 4
         else:
-            step = 4
+            # Nothing in migration table, so nothign started
+            step = 1
 
     return render_template('upgrade_input.html',
         actions=actions,
