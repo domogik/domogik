@@ -51,6 +51,7 @@ from sqlalchemy.orm import relation, backref, relationship
 
 from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
+import enum as pyEnum
 
 _cfg = Loader('database')
 _config = None
@@ -449,3 +450,20 @@ class LocationParam(DomogikBase):
         self.location_id = location_id
         self.key = ucode(key)
         self.value = ucode(value)
+
+class MigrateType(pyEnum.Enum):
+    DEVICE = "device"
+    SENSOR = "sensor"
+
+class Migrate(DomogikBase):
+    __tablename__ = '{0}_migrate'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    type = Column(Enum(MigrateType))
+    oldId = Column(Integer, primary_key=True, nullable=False, autoincrement=False)
+    newId = Column(Integer, primary_key=True, nullable=False, autoincrement=False)
+
+    def __init__(self, type, oldId, newId):
+        self.type = type
+        self.oldId = oldId
+        self.newId = newId
+

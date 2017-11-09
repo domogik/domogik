@@ -64,7 +64,7 @@ from domogik.common.sql_schema import (
         Command, CommandParam,
         Sensor, SensorHistory,
         XplCommand, XplStat, XplStatParam, XplCommandParam,
-        Location, LocationParam
+        Location, LocationParam, Migrate
 )
 from contextlib import contextmanager
 from multiprocessing.managers import SyncManager
@@ -1783,8 +1783,6 @@ class DbHelper():
         self.update_device(sensor.device_id)
         return sensor
 
-
-
 ###################
 # command
 ###################
@@ -2178,7 +2176,6 @@ class DbHelper():
         else:
             self.__raise_dbhelper_exception(u"Location with id {0} couldn't be found".format(lid))
 
-
 ###################
 # Location params
 ###################
@@ -2196,6 +2193,26 @@ class DbHelper():
         self.__session.add(config)
         self._do_commit()
         return config
+
+###################
+# Migration get
+###################
+    def get_migration(self, type, oldid):
+        return self.__session.query(Migrate).filter_by(type=type).filter_by(oldId=oldid).first()
+
+    def get_migration_one_sensor(self):
+        return self.__session.query(Migrate).filter_by(type='SENSOR').first()
+
+    def get_migration_all_sensors(self, devid=None):
+        if devid:
+            inlst = list()
+            sens = self.get_sensor_by_device_id(devid)
+            for sen in sens:
+                inlst.append( sen.id )
+            print inlst
+            return self.__session.query(Migrate).filter_by(type='sensor').filter(Migrate.oldId.in_(inlst)).all()
+        else:
+            return self.__session.query(Migrate).filter_by(type='sensor').all()
 
 ###################
 # helper functions

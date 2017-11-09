@@ -60,11 +60,10 @@ class DeviceConsistencyThread(Thread):
                 device_json = json.loads(json.dumps(dev))
                 dc = DeviceConsistency("return", device_json, plugin_json.json)
                 dc.check()
-                res = dc.get_result()
-                if len(res.keys()) > 0:
+                if not dc.isOk:
                     # update to set the dev as needs upgrade
                     self.log.info("Device {0}({1}) needs upgrade".format(dev['name'], dev['id']))
-                    self.log.debug(res)
+                    self.log.debug(dc.get_result())
                     # set the state to needsupgrade
                     self.db.update_device(dev['id'], d_state=u'upgrade')
                 else:
@@ -102,13 +101,18 @@ class DeviceConsistency():
         self.p_json = plugin_json
         self._type = check_type
         self._result = {}
+        self._isOk = True
         self._globaXplParams = []
+        self.check()
 
     def check(self):
         self._validate_identity()
         self._validate_device_type()
         self._validate_command()
         self._validate_sensor()
+
+    def isOk(self):
+        return self._isOk
 
     def get_result(self):
         if self._type == "raise":
@@ -124,6 +128,7 @@ class DeviceConsistency():
         self._result[a][t].append(d)
 
     def _raise(self, code, data):
+        self._isOk = False
         """ Code
          0 DONE => nothing needs to be done, we raise anyway, data = string to raise
          1 DONE => sensor add

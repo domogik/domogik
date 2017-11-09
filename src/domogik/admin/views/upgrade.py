@@ -1,6 +1,6 @@
 import json
 from domogik.admin.application import app, render_template, timeit
-from flask import request, flash, redirect
+from flask import request, flash, redirect, jsonify
 from domogikmq.reqrep.client import MQSyncReq
 from domogik.common.packagejson import PackageJson
 from domogik.common.deviceconsistency import DeviceConsistency
@@ -28,7 +28,9 @@ def upgrade():
 @login_required
 @timeit
 def upgrade_dev(devid):
+    step = 1
     with app.db.session_scope():
+        # get a list of what needs to be done
         dev = app.db.get_device(devid)
         device_json = json.loads(json.dumps(dev))
         name = dev['client_id']
@@ -36,10 +38,33 @@ def upgrade_dev(devid):
         name = name.split('.')[0]
         pjson = PackageJson(name)
         dc = DeviceConsistency("return", device_json, pjson.json)
-        dc.check();
         actions = dc.get_result()
+        # calculate the step
+        # step 1 ( default)
+        # => nothing in migration table
+        # step 2
+        # => found this device in the migrate.oldid with type device and newid != 0
+        # step = 4
+        # => found this device in the migrate.oldid with type device and newid == 0
+        mig = app.db.get_migration('device', devid)
+        if mig.newId > 0:
+            step = 2
+            # step 3
+            # => found sensors in the migration table that are linked to this device
+            sens = app.db.get_migration_all_sensors(devid)
+            print sens
+            if sens:
+                step = 3
+        else:
+            step = 4
 
     return render_template('upgrade_input.html',
         actions=actions,
+        devid=devid,
+        step=step,
+        clientid=dev['client_id'],
+        devtype=dev['device_type_id'],
+        oldversion=dev['client_version'],
+        newversion=pjson.json['identity']['version'],
         mactive="upgrade"
         )

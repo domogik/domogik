@@ -55,6 +55,7 @@ class CronSystem():
     def run(self):
         self.log.info(u"START Cron system run")
         self._delete_devices()
+        self._migrate_sensor()
         self.log.info(u"END   Cron system run")
 
     def _delete_devices(self):
@@ -68,6 +69,12 @@ class CronSystem():
                     self.log.error(u"     Unable to delete the device. Please check the error message for the reason. Error is : {0}".format(traceback.format_exc()))
         self.log.info(u"=> END device deleting")
 
+    def _migrate_sensor(self):
+        self.log.info(u"=> START sensor migration")
+        with self.db.session_scope():
+            for sensor in self.db.get_migration_all_sensors():
+                print sensor
+        self.log.info(u"=> END sensor migration")
 
 def main():
     cron = CronSystem()

@@ -660,6 +660,11 @@ def client_devices_new(client_id):
 def client_devices_new_type(client_id, device_type_id):
     return client_devices_new_wiz(client_id, device_type_id, None)
 
+@app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>/base/<devid>', methods=['GET', 'POST'])
+@login_required
+@timeit
+def client_devices_new_type_base(client_id, device_type_id, devid):
+    return client_devices_new_wiz(client_id, device_type_id, None, devid)
 
 @app.route('/client/<client_id>/dmg_devices/new/type/<device_type_id>/prod/<product>', methods=['GET', 'POST'])
 @login_required
@@ -670,19 +675,29 @@ def client_devices_new_prod(client_id, device_type_id, product):
                                   product)
 
 
-def client_devices_new_wiz(client_id, device_type_id, product):
+def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
+    print request.args
+    args = request.args.to_dict()
+    if based_on:
+        with app.db.session_scope():
+            dev = app.db.get_device(based_on)
+            args['Name'] = dev['name']
+            args['Description'] = dev['description']
+            args['Reference'] = dev['reference']
+            print dev
+    print args
     detail = get_client_detail(client_id)
     (params, reason, status) = build_deviceType_from_packageJson(app.logger, app.zmq_context, device_type_id, client_id)
 
     # dynamically generate the wtfform
     class F(Form):
-        try: default = request.args.get('Name')     
+        try: default = args.get('Name')     
         except: default = None                      
         name = TextField("Device name", [Required()], description=gettext("The display name for this device"), default=default)      
-        try: default = request.args.get('Description')
+        try: default = args.get('Description')
         except: default = None
         description = TextField("Description", description=gettext("A description for this device"), default=default)
-        try: default = request.args.get('Reference')
+        try: default = args.get('Reference')
         except: default = None
         reference = TextField("Reference", description=gettext("A reference for this device"), default=default)
         pass
@@ -704,7 +719,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         # build the field
         name = "{0}".format(item["key"])
         try:
-            default = request.args.get(name)
+            default = args.get(name)
         except:
             if item["type"] == "boolean":
                 default = False
@@ -753,7 +768,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
     for item in params["xpl"]:
         # build the field
         name = "{0}".format(item["key"])
-        try: default = request.args.get(name)
+        try: default = args.get(name)
         except: default = None
         if not default and 'default' in item:
             default = item['default']
@@ -794,7 +809,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         for item in params["xpl_commands"][cmd]:
             # build the field
             name = "{0} - {1}".format(cmd, item["key"])
-            try: default = request.args.get(name)
+            try: default = args.get(name)
             except: default = None
             if not default and 'default' in item:
                 default = item['default']
@@ -836,7 +851,7 @@ def client_devices_new_wiz(client_id, device_type_id, product):
         for item in params["xpl_stats"][cmd]:
             # build the field
             name = "{0} - {1}".format(cmd, item["key"])
-            try: default = request.args.get(name)
+            try: default = args.get(name)
             except: default = None
             if not default and 'default' in item:
                 default = item['default']
