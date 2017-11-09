@@ -20,7 +20,7 @@ pytz==2012c
 requests==2.8.1
 Twisted==15.5.0
 Pygments==2.0.1
-SQLAlchemy==1.0.9
+SQLAlchemy>=1.1
 pyOpenSSL==17.0.0
 python_dateutil==2.6.0
 pyephem==3.7.6.0
