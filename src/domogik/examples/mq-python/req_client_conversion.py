@@ -19,7 +19,7 @@
     'client.conversion.result',
     '{
         "core-scenario.darkstar": null,
-        "core-dbmgr.darkstar": null,
+        "core-admin.darkstar": null,
         "core-xplgw.darkstar": null,
         "core-rest.darkstar": null,
         "plugin-diskfree.darkstar": {

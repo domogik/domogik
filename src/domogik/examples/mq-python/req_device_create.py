@@ -4,16 +4,16 @@
 @apiVersion 0.4.0
 @apiName device.create
 @apiGroup Devices
-@apiDescription This request is used to ask Domogik's dbmgr to create a new Domogik device in database. This is a quite complex command to use as you need before to get the list of parameters that can be set for a device, request the user to set these parameters and then create a json structure to send over the MQ.
+@apiDescription This request is used to ask Domogik's admin to create a new Domogik device in database. This is a quite complex command to use as you need before to get the list of parameters that can be set for a device, request the user to set these parameters and then create a json structure to send over the MQ.
 * Source client : Domogik admin, any other interface which can create some devices
-* Target client : always 'dbmgr'
+* Target client : always 'admin'
 
 @apiExample {python} Example usage:
     cli = MQSyncReq(zmq.Context())
     msg = MQMessage()
     msg.set_action('device.create')
     msg.set_data({'data': {...}})
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
+    print(cli.request('admin', msg.get(), timeout=10).get())
         
     Here is a json example:
     {
@@ -63,5 +63,5 @@ cli = MQSyncReq(zmq.Context())
 msg = MQMessage()
 msg.set_action('device.create')
 msg.set_data({'data': {'some' : 'json content'}})
-print(cli.request('dbmgr', msg.get(), timeout=10).get())
+print(cli.request('admin', msg.get(), timeout=10).get())
 

@@ -44,3 +44,4 @@ Implements
 
 # For the format of version numbers please see : http://wiki.domogik.org/Release_numbering
 __version__ = "0.6.0"
+__rest_api_version__ = "0.9"

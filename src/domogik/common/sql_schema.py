@@ -51,6 +51,7 @@ from sqlalchemy.orm import relation, backref, relationship
 
 from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
+import enum as pyEnum
 
 _cfg = Loader('database')
 _config = None
@@ -101,7 +102,7 @@ class Device(DomogikBase):
 
     __tablename__ = '{0}_device'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     name = Column(Unicode(128), nullable=False)
     description = Column(UnicodeText())
     reference = Column(Unicode(30))
@@ -109,13 +110,14 @@ class Device(DomogikBase):
     client_id = Column(Unicode(80), nullable=False, index=True)
     client_version = Column(Unicode(32), nullable=False)
     info_changed = Column(DateTime, nullable=False, index=True)
+    state = Column(Unicode(30), nullable=False, index=True, default=u'active')
     params = relationship("DeviceParam", backref=__tablename__, cascade="all", passive_deletes=True)
     commands = relationship("Command", backref=__tablename__, cascade="all", passive_deletes=True)
     sensors = relationship("Sensor", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_commands = relationship("XplCommand", backref=__tablename__, cascade="all", passive_deletes=True)
     xpl_stats = relationship("XplStat", backref=__tablename__, cascade="all", passive_deletes=True)
 
-    def __init__(self, name, reference, device_type_id, client_id, client_version, description=None, info_changed=None):
+    def __init__(self, name, reference, device_type_id, client_id, client_version, description=None, info_changed=None, state='active'):
         """Class constructor
 
         @param name : short name of the device
@@ -139,7 +141,7 @@ class DeviceParam(DomogikBase):
 
     __tablename__ = '{0}_device_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
@@ -158,85 +160,10 @@ class DeviceParam(DomogikBase):
         self.value = ucode(value)
         self.type = ucode(type)
 
-class Person(DomogikBase):
-    """Persons registered in the app"""
-
-    __tablename__ = '{0}_person'.format(_db_prefix)
-    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
-    first_name = Column(Unicode(20), nullable=False)
-    last_name = Column(Unicode(20), nullable=False)
-    birthdate = Column(Date)
-    user_accounts = relation("UserAccount", backref=__tablename__, cascade="all")
-
-    def __init__(self, first_name, last_name, birthdate):
-        """Class constructor
-
-        @param first_name : first name
-        @param last_name : last name
-        @param birthdate : birthdate
-
-        """
-        self.first_name = ucode(first_name)
-        self.last_name = ucode(last_name)
-        self.birthdate = birthdate
-
-class UserAccount(DomogikBase):
-    """User account for persons : it is only used by the UI"""
-
-    __tablename__ = '{0}_user_account'.format(_db_prefix)
-    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
-    login = Column(Unicode(20), nullable=False, unique=True)
-    password = Column("password", Unicode(255), nullable=False)
-    person_id = Column(Integer, ForeignKey('{0}.id'.format(Person.get_tablename())))
-    person = relation(Person)
-    is_admin = Column(Boolean, nullable=False, default=False)
-    skin_used = Column(Unicode(80), nullable=False, default=Unicode('default'))
-    lock_edit = Column(Boolean, nullable=False, default=False)
-    lock_delete = Column(Boolean, nullable=False, default=False)
-
-    def __init__(self, login, password, is_admin, skin_used, person_id, lock_edit, lock_delete):
-        """Class constructor
-
-        @param login : login
-        @param password : password
-        @param person_id : id of the person associated to this account
-        @param is_admin : True if the user has administrator privileges
-        @param skin_used : skin used in the UI (default value = 'default')
-        @param lock_edit: True id the account is locked for editing
-        @param lock_delete: True id the account is locked for deleting
-
-        """
-        self.login = ucode(login)
-        self.password = ucode(password)
-        self.person_id = person_id
-        self.is_admin = is_admin
-        self.skin_used = ucode(skin_used)
-        self.lock_edit = lock_edit
-        self.lock_delete = lock_delete
-
-    def set_password(self, password):
-        """Set a password for the user"""
-        self.password = ucode(password)
-
-   # Flask-Login integration
-    def is_authenticated(self):
-        return True
-    def is_active(self):
-        return True
-    def is_anonymous(self):
-        return False
-    def get_id(self):
-        return self.id
-    # Required for administrative interface
-    def __unicode__(self):
-        return self.login
-
 class Command(DomogikBase):
     __tablename__ = '{0}_command'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True) 
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255), nullable=False)
     reference = Column(Unicode(64))
@@ -268,7 +195,7 @@ class CommandParam(DomogikBase):
 class Sensor(DomogikBase):
     __tablename__ = '{0}_sensor'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True) 
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
@@ -306,8 +233,8 @@ class Sensor(DomogikBase):
 
 class SensorHistory(DomogikBase):
     __tablename__ = '{0}_sensor_history'.format(_db_prefix)
-    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True) 
+    __table_args__ = (Index('siddate', 'sensor_id', 'date'),{'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'})
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
     sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
     value_num = Column(Float(53), nullable=True)
@@ -329,7 +256,7 @@ class SensorHistory(DomogikBase):
 class XplStat(DomogikBase):
     __tablename__ = '{0}_xplstat'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
     name = Column(Unicode(64), nullable=False)
@@ -368,7 +295,7 @@ class XplStatParam(DomogikBase):
 class XplCommand(DomogikBase):
     __tablename__ = '{0}_xplcommand'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     cmd_id = Column(Integer, ForeignKey('{0}.id'.format(Command.get_tablename()), ondelete="cascade"), nullable=False)
     json_id = Column(Unicode(64), nullable=False)
@@ -415,3 +342,124 @@ class Scenario(DomogikBase):
         self.disabled = disabled
         self.description = description
         self.state = state
+
+class Person(DomogikBase):
+    """Persons registered in the app"""
+
+    __tablename__ = '{0}_person'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    first_name = Column(Unicode(20), nullable=False)
+    last_name = Column(Unicode(20), nullable=False)
+    birthdate = Column(Date)
+    location_sensor = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=True)
+    user_accounts = relation("UserAccount", backref=__tablename__, cascade="all")
+
+    def __init__(self, first_name, last_name, birthdate, location_sensor=None):
+        """Class constructor
+
+        @param first_name : first name
+        @param last_name : last name
+        @param birthdate : birthdate
+
+        """
+        self.first_name = ucode(first_name)
+        self.last_name = ucode(last_name)
+        self.birthdate = birthdate
+        self.location_sensor = location_sensor
+
+class UserAccount(DomogikBase):
+    """User account for persons : it is only used by the UI"""
+
+    __tablename__ = '{0}_user_account'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    login = Column(Unicode(20), nullable=False, unique=True)
+    password = Column("password", Unicode(255), nullable=False)
+    person_id = Column(Integer, ForeignKey('{0}.id'.format(Person.get_tablename())))
+    person = relation(Person)
+    is_admin = Column(Boolean, nullable=False, default=False)
+    skin_used = Column(Unicode(80), nullable=False, default=Unicode('default'))
+    lock_edit = Column(Boolean, nullable=False, default=False)
+    lock_delete = Column(Boolean, nullable=False, default=False)
+
+    def __init__(self, login, password, is_admin, skin_used, person_id, lock_edit, lock_delete):
+        """Class constructor
+
+        @param login : login
+        @param password : password
+        @param person_id : id of the person associated to this account
+        @param is_admin : True if the user has administrator privileges
+        @param skin_used : skin used in the UI (default value = 'default')
+        @param lock_edit: True id the account is locked for editing
+        @param lock_delete: True id the account is locked for deleting
+
+        """
+        self.login = ucode(login)
+        self.password = ucode(password)
+        self.person_id = person_id
+        self.is_admin = is_admin
+        self.skin_used = ucode(skin_used)
+        self.lock_edit = lock_edit
+        self.lock_delete = lock_delete
+
+    def set_password(self, password):
+        """Set a password for the user"""
+        self.password = ucode(password)
+
+   # Flask-Login integration
+    def is_authenticated(self):
+        return True
+    def is_active(self):
+        return True
+    def is_anonymous(self):
+        return False
+    def get_id(self):
+        return self.id
+    # Required for administrative interface
+    def __unicode__(self):
+        return self.login
+
+
+class Location(DomogikBase):
+    __tablename__ = '{0}_location'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = Column(Unicode(32), nullable=False, autoincrement=False)
+    isHome = Column(Boolean, nullable=False, default=False)
+    type = Column(Unicode(10), nullable=True)
+    params = relationship("LocationParam", backref=__tablename__, cascade="all", passive_deletes=True)
+
+    def __init__(self, name, type, isHome=False):
+        self.name = ucode(name)
+        self.type = type
+        self.isHome = isHome
+
+class LocationParam(DomogikBase):
+    __tablename__ = '{0}_location_param'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    location_id = Column(Integer, ForeignKey('{0}.id'.format(Location.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
+    key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
+    value = Column(Unicode(255), nullable=True)
+
+    def __init__(self, location_id, key, value):
+        self.location_id = location_id
+        self.key = ucode(key)
+        self.value = ucode(value)
+
+class MigrateType(pyEnum.Enum):
+    DEVICE = "device"
+    SENSOR = "sensor"
+
+class Migrate(DomogikBase):
+    __tablename__ = '{0}_migrate'.format(_db_prefix)
+    __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
+    type = Column(Enum(MigrateType))
+    oldId = Column(Integer, primary_key=True, nullable=False, autoincrement=False)
+    newId = Column(Integer, primary_key=True, nullable=False, autoincrement=False)
+
+    def __init__(self, type, oldId, newId):
+        self.type = type
+        self.oldId = oldId
+        self.newId = newId
+

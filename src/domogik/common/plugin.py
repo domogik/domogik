@@ -73,7 +73,7 @@ STATUS_INVALID = "invalid"
 STATUS_HBEAT = 15
 
 # core components
-CORE_COMPONENTS = ['manager', 'dbmgr', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin', 'butler']
+CORE_COMPONENTS = ['manager', 'xplgw', 'send', 'dump_xpl', 'scenario', 'admin', 'butler']
 
 # folder for the packages in library_path folder (/var/lib/domogik/)
 PACKAGES_DIR = "domogik_packages"
@@ -143,12 +143,14 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         '''
         if self._name in CORE_COMPONENTS:
             self._mq_name = self._name
+            self._mq_subscribe_list = []
         else:
             self._mq_name = "{0}-{1}.{2}".format(self._type, self._name, self.get_sanitized_hostname())
+            # subscribe device.update event to keep device list uptodate
+            self._mq_subscribe_list = ['device.update']
 
         # MQ publisher and REP
         self.zmq = zmq.Context()
-        self._mq_subscribe_list = []
         self._pub = MQPub(self.zmq, self._mq_name)
         self._set_status(STATUS_STARTING)
 
@@ -252,7 +254,8 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self._cb_update_devices = cb_update_devices
 
     def add_mq_sub(self, msg):
-        self._mq_subscribe_list.append(msg)
+        if msg not in self._mq_subscribe_list :
+            self._mq_subscribe_list.append(msg)
 
     def check_configured(self):
         """ For a client only
@@ -260,7 +263,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             Check in database (over queryconfig) if the key 'configured' is set to True for the client
             if not, stop the client and log this
         """
-        self._client_config = Query(self.zmq, self.log, self.get_sanitized_hostname())
+        #  For Plugin not locate on domogik server we must use MQ query mode
+        self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
+
         configured = self._client_config.query(self._type, self._name, 'configured')
         if configured == '1':
             configured = True
@@ -294,7 +299,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         """ Try to get the config over the MQ. If value is None, get the default value
         """
         if self._client_config == None:
-            self._client_config = Query(self.zmq, self.log, self.get_sanitized_hostname())
+            #  For Plugin not locate on domogik server we must use MQ query mode
+            self._client_config = Query(self.log, self.get_sanitized_hostname(), zmq=self.zmq)
+
         value = self._client_config.query(self._type, self._name, key)
         if value == None or value == 'None':
             self.log.info(u"Value for '{0}' is None or 'None' : trying to get the default value instead...".format(key))
@@ -353,7 +360,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             if type == "float":
                 return float(value)
             if type == "integer":
-                return float(value)
+                return int(value)
             # type == ipv4 : nothing to do
             # type == multiple choice : nothing to do
             # type == string : nothing to do
@@ -391,7 +398,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         return {}
 
     def get_device_list(self, quit_if_no_device = False, max_attempt = 2):
-        """ Request the dbmgr component over MQ to get the devices list for this client
+        """ Request the admin component over MQ to get the devices list for this client
             @param quit_if_no_device: if True, exit the client if there is no devices or MQ request fail
             @param max_attempt : number of retry MQ request if it fail
         """
@@ -406,7 +413,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self._devices_retrieved = False
         while not result and attempt <= max_attempt :
             mq_client = MQSyncReq(self.zmq)
-            result = mq_client.request('dbmgr', msg.get(), timeout=10)
+            result = mq_client.request('admin', msg.get(), timeout=10)
             if not result:
                 self.log.warn(u"Unable to retrieve the device list (attempt {0}/{1})".format(attempt, max_attempt))
                 attempt += 1
@@ -469,7 +476,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         return res
 
     def get_sensors(self, devices):
-        """ Return a dict : {"sensor_name1" : id1, "sensor_name2" : id2, ...}
+        """ Return a structure : {device_id : {"sensor_name1" : id1, "sensor_name2" : id2, ...}, device_id2 : {...}, ...}
             @param devices : list of the devices.
                    This is the result of get_device_list(...)
             @param device_id : the device id
@@ -728,7 +735,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if self.dont_run_ready == True:
             return
 
-        # TODO : why the dbmgr has no self._name defined ???????
+        # TODO : why the  has no self._name defined ???????
         # temporary set as unknown to avoir blocking bugs
         if not hasattr(self, '_name'):
             self._name = "unknown"
@@ -1184,7 +1191,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             # we guess that if no "log" is defined, the client has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
-    def force_leave(self, status = False, return_code = None):
+    def force_leave(self, status = False, return_code = None, exit=True):
         """ Leave threads & timers
 
             In the XplPLugin class, this function will be completed to also activate the xpl hbeat
@@ -1259,7 +1266,8 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
                 self.log.warn(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
-        sys.exit()
+        if exit :
+            sys.exit()
 
 
 class Watcher:

@@ -4,9 +4,9 @@
 @apiVersion 0.5.0
 @apiName sensor_history.get
 @apiGroup Sensors
-@apiDescription This request is used to ask Domogik's dbmgr the last values of the history of a sensor.
+@apiDescription This request is used to ask Domogik's admin the last values of the history of a sensor.
 * Source client : Domogik admin, any other interface which can need to get the sensor last value
-* Target client : always 'dbmgr'
+* Target client : always 'admin'
 
 @apiExample {python} Example usage:
     cli = MQSyncReq(zmq.Context())
@@ -17,7 +17,7 @@
     msg.add_data('sensor_id', 3)
     msg.add_data('mode', 'last')
     msg.add_data('number', 1)
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
+    print(cli.request('admin', msg.get(), timeout=10).get())
     
     # example 2 : get the last N values
     msg = MQMessage()
@@ -25,7 +25,7 @@
     msg.add_data('sensor_id', 3)
     msg.add_data('mode', 'last')
     msg.add_data('number', 3)
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
+    print(cli.request('admin', msg.get(), timeout=10).get())
     
     # example 3 : get the values since a timestamp
     msg = MQMessage()
@@ -33,7 +33,7 @@
     msg.add_data('sensor_id', 3)
     msg.add_data('mode', 'period')
     msg.add_data('from', 1449178465)
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
+    print(cli.request('admin', msg.get(), timeout=10).get())
 
 @apiParam {String} sensor_id The sensor id
 @apiParam {String} mode The mode : 'last' to get the last values, 'period' to get the values rom a period.
@@ -50,16 +50,16 @@
 @apiVersion 0.4.0
 @apiName sensor_history.get
 @apiGroup Sensors
-@apiDescription This request is used to ask Domogik's dbmgr the last value of the history of a sensor.
+@apiDescription This request is used to ask Domogik's admin the last value of the history of a sensor.
 * Source client : Domogik admin, any other interface which can need to get the sensor last value
-* Target client : always 'dbmgr'
+* Target client : always 'admin'
 
 @apiExample {python} Example usage:
     cli = MQSyncReq(zmq.Context())
     msg = MQMessage()
     msg.set_action('sensor_history.get')
     msg.add_data('sensor_id', 190)
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
+    print(cli.request('admin', msg.get(), timeout=10).get())
     
 
 
@@ -92,7 +92,7 @@ msg.set_action('sensor_history.get')
 msg.add_data('sensor_id', 3)
 msg.add_data('mode', 'last')
 msg.add_data('number', 1)
-print(cli.request('dbmgr', msg.get(), timeout=10).get())
+print(cli.request('admin', msg.get(), timeout=10).get())
 
 # example 2 : get the last N values
 msg = MQMessage()
@@ -100,7 +100,7 @@ msg.set_action('sensor_history.get')
 msg.add_data('sensor_id', 3)
 msg.add_data('mode', 'last')
 msg.add_data('number', 3)
-print(cli.request('dbmgr', msg.get(), timeout=10).get())
+print(cli.request('admin', msg.get(), timeout=10).get())
 
 # example 3 : get the values since a timestamp
 msg = MQMessage()
@@ -108,5 +108,15 @@ msg.set_action('sensor_history.get')
 msg.add_data('sensor_id', 3)
 msg.add_data('mode', 'period')
 msg.add_data('from', 1449178465)
-print(cli.request('dbmgr', msg.get(), timeout=10).get())
+print(cli.request('admin', msg.get(), timeout=10).get())
 
+# example 4 : get the filtered and calculated history starting from/to a certain timestamp
+msg = MQMessage()
+msg.set_action('sensor_history.get')
+msg.add_data('sensor_id', 141)
+msg.add_data('mode', 'filter')      # Like REST functions sensorHistory_from_filter and sensorHistory_from_to_filter
+msg.add_data('from', 1483225200)    #
+msg.add_data('to', 1500847199)      # Optionnal
+msg.add_data('interval', 'day')     # 'minute|hour|day|week|month|year'
+msg.add_data('selector', 'min')     # 'min|max|avg|sum'
+print(cli.request('admin', msg.get(), timeout=10).get())

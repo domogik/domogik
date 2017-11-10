@@ -4,7 +4,7 @@
 [hub]
 # The list of the interfaces on which you want the xpl hub to work. Don't use any spaces characters in the list!
 # Examples :
-#interfaces = eth0, lo
+#interfaces = eth0,lo
 #interfaces = eth0
 #interfaces = *
 interfaces = lo

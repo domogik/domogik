@@ -49,7 +49,7 @@ class SensorIdParameter(AbstractParameter):
             cli = MQSyncReq(zmq.Context())
             msg = MQMessage()
             msg.set_action('device.get')
-            json_devices = cli.request('dbmgr', msg.get(), timeout=10).get()[1]
+            json_devices = cli.request('admin', msg.get(), timeout=10).get()[1]
             devices = json.loads(json_devices)['devices']
             print(devices)
             sensors_list = []

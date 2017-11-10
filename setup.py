@@ -66,33 +66,13 @@ print("******************************************")
 
 setup(
     name = 'Domogik',
-    version = '0.5.0',
+    version = '0.6.0',
     url = 'http://www.domogik.org/',
     description = 'OpenSource home automation software',
     author = 'Domogik team',
     author_email = 'domogik-general@lists.labs.libre-entreprise.org',
     install_requires=['setuptools',
-          'sqlalchemy >= 1.0.0',
-          'alembic >= 0.7.4',
-          'simplejson >= 1.9.2',
-          'pyOpenSSL >= 0.10',
-          'psutil >= 2.0.0',
-           mysql,
-          'psycopg2',
-          'pip >= 1.0',
-          'pyserial >= 2.5',
-          'netifaces >= 0.10',
-          'Twisted >= 12.0.0',
-          'Flask >= 0.8',
-          'Flask-WTF >= 0.6',
-          'Flask-Login >= 0.3.2',
-          'Flask-Babel',
-          'Flask-Themes2',
-          'tornado >= 4.2',
-          'requests >= 0.12.1',
-          magic,
-          'pyzmq >= 2.2.0',
-          'ephem'],
+          ],
     zip_safe = False,
     license = 'GPL v3',
     #include_package_data = True,
@@ -111,6 +91,8 @@ setup(
             dmg_hub = domogik.bin.hub:main
             dmg_package = domogik.bin.package:main
             dmg_testrunner = domogik.tests.bin.testrunner:main
+            dmg_cron = domogik.bin.cron:main
+            dmg_review = domogik.tools.packages.review:main
         """
         ]
     },

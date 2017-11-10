@@ -42,6 +42,8 @@ from domogik.common.configloader import Loader, CONFIG_FILE
 import datetime
 import time
 import unicodedata
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
 
 # used by is_already_launched
 STARTED_BY_MANAGER = "NOTICE=THIS_PLUGIN_IS_STARTED_BY_THE_MANAGER"
@@ -103,7 +105,7 @@ def interface_has_ip(interface):
         return True
 
 def get_sanitized_hostname():
-    """ Get the sanitized hostname of the host 
+    """ Get the sanitized hostname of the host
     This will lower it and keep only the part before the first dot
     """
     #print(">>>>>> get_sanitized_hostname()")
@@ -114,21 +116,51 @@ def ucode(my_string):
     """Convert a string into unicode or return None if None value is passed
 
     @param my_string : string value to convert
+    @return a str string
+
+    """
+    return ucode2(my_string)
+
+
+    #if my_string is not None:
+    #    #print("ucode : {0}".format(type(my_string)))
+    #    if type(my_string) == unicode:
+    #        try:
+    #            # the following line is here to test if an Unicode error would occur...
+    #            foo = "bar{0}".format(my_string)
+    #            return my_string
+    #        except UnicodeEncodeError:
+    #            return my_string.encode('utf8')
+    #    elif not type(my_string) == str:
+    #        return str(my_string).decode("utf-8")
+    #    else:
+    #        return my_string.decode("utf-8")
+    #else:
+    #    return None
+
+def ucode2(my_string):
+    """Convert a string into unicode or return None if None value is passed
+
+    @param my_string : string value to convert
     @return a unicode string
 
     """
-    if my_string is not None:
-        if sys.version < '3':
-            if isinstance(my_string, unicode):
-                return my_string
-            elif not isinstance(my_string, str):
-                return str(my_string).decode("utf-8")
-            else:
-                return my_string.decode("utf-8")
-        else:
-            return my_string
-    else:
+    # special case : data is None
+    if my_string is None:
         return None
+    # already in unicode, return unicode
+    elif isinstance(my_string, unicode):
+        return my_string
+
+    # str
+    elif isinstance(my_string, str):
+        return unicode(my_string, "utf-8")
+
+    # other type (int, float, boolean, ...)
+    else:
+        return unicode(str(my_string), "utf-8")
+
+
 
 def call_package_conversion(log, plugin, method, value):
     """Load the correct module, and encode the value
@@ -138,7 +170,7 @@ def call_package_conversion(log, plugin, method, value):
     @param method: what methode to load from the conversion class
     @param value: the value to convert
     @return the converted value or None on error
- 
+
     """
     modulename = 'packages.plugin_{0}.conversions.{0}'.format(plugin)
     classname = '{0}Conversions'.format(plugin)
@@ -166,17 +198,17 @@ def is_already_launched(log, type, id, manager=True):
                   pid_list : list of the already launched processes pid
     """
     my_pid = os.getpid()
- 
+
     # the manager add the STARTED_BY_MANAGER useless command to allow the client to ignore this command line when it checks if it is already laucnehd or not
     # the final 'grep -v sudo' is here to exclude the lines launched by sudo from the search : using sudo make 2 results be in the grep result : one with sudo and the other one with the command (but this second one is filtered thanks to its pid)
     # the grep -v mprof is there to allow run of memory profiler
     if manager:
         #cmd = "pgrep -lf {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner".format(id, STARTED_BY_MANAGER, my_pid)
-        cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v mprof | grep -v update".format(id, STARTED_BY_MANAGER, my_pid)
+        cmd = "ps aux | grep {0} | grep -v {1} | grep python | grep -v ps | grep -v {2} | grep -v sudo | grep -v su | grep -v testrunner | grep -v mprof | grep -v update | grep -v sysadmin".format(id, STARTED_BY_MANAGER, my_pid)
     else:
-        cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su".format(id)
+        cmd = "ps aux | grep {0} | grep python | grep -v ps | grep -v sudo | grep -v su | grep -v sysadmin".format(id)
     # the grep python is needed to avoid a client to not start because someone is editing the client with vi :)
-    
+
     if log:
         log.info("Looking for launched instances of '{0}'".format(id))
     is_launched = False
@@ -193,7 +225,7 @@ def is_already_launched(log, type, id, manager=True):
         the_pid = REGEXP_PS_SEPARATOR.split(line)[1]
         pid_list.append(the_pid)
         #pid_list.append(line.rstrip("\n").split(" ")[0])
-    subp.wait()  
+    subp.wait()
     if is_launched:
         if log:
             log.info("There are already existing processes.")
@@ -215,12 +247,23 @@ def get_rest_url(noRest=False):
     intf = interfaces.split(',')
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
-
+    protocol = "http" if conf['use_ssl'] else "http"
     if noRest:
-        return "http://{0}:{1}".format(ip, port)
+        return "{0}://{1}:{2}".format(protocol, ip, port)
     else:
-        return "http://{0}:{1}/rest".format(ip, port)
+        return "{0}://{1}:{2}/rest".format(protocol, ip, port)
 
+def get_rest_ssl():
+    """Return false if no ssl option.
+       Or dict {key_file : <ssl_key from admin config>, cert_file : <ssl_certificate from admin config>"""
+    cfg = Loader('admin')
+    config = cfg.load()
+    conf = dict(config[1])
+    ### get SSL option
+    if conf['use_ssl'] :
+        return {'cert_file': conf['ssl_certificate'], 'key_file': conf['ssl_key']}
+    else :
+        return False
 
 def get_rest_doc_path():
     """ return the REST API generated doc path
@@ -280,6 +323,96 @@ def remove_accents(input_str):
     """
     nfkd_form = unicodedata.normalize('NFKD', input_str)
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+
+def build_deviceType_from_packageJson(log, zmq, dev_type_id, client_id):
+    log.debug(u"Calling build_deviceType_from_packageJson for client '{0}' and device type '{1}'...".format(client_id, dev_type_id))
+    result = {}
+    status = True
+    reason = ""
+    # request the packagejson from manager
+    cli = MQSyncReq(zmq)
+    msg = MQMessage()
+    msg.set_action('device_types.get')
+    msg.add_data('device_type', dev_type_id)
+    res = cli.request('manager', msg.get(), timeout=10)
+    del cli
+    if res is None:
+        status = False
+        reason = "Manager is not replying to the mq request"
+        log.error(reason)
+    if status:
+        pjson = res.get_data()
+        if pjson is None:
+            status = False
+            reason = "No data for {0} found by manager".format(dev_type_id)
+            log.error(reason)
+    if status:
+        pjson = pjson[dev_type_id]
+        if pjson is None:
+            status = False
+            reason = "The json for {0} found by manager is empty".format(dev_type_id)
+            log.error(reason)
+    if status:
+        # build the device params
+        stats = []
+        result['device_type'] = dev_type_id
+        result['client_id'] = client_id
+        result['name'] = ""
+        result['reference'] = ""
+        result['description'] = ""
+        # append the global xpl and on-xpl params
+        result['xpl'] = []
+        result['global'] = []
+        for param in pjson['device_types'][dev_type_id]['parameters']:
+            if param['xpl']:
+                del param['xpl']
+                result['xpl'].append(param)
+            else:
+                del param['xpl']
+                result['global'].append(param)
+        # find the xplCommands
+        result['xpl_commands'] = {}
+        for cmdn in pjson['device_types'][dev_type_id]['commands']:
+            cmd = pjson['commands'][cmdn]
+            if 'xpl_command'in cmd:
+                xcmdn = cmd['xpl_command']
+                xcmd = pjson['xpl_commands'][xcmdn]
+                result['xpl_commands'][xcmdn] = []
+                stats.append( xcmd['xplstat_name'] )
+                for param in xcmd['parameters']['device']:
+                    result['xpl_commands'][xcmdn].append(param)
+        # find the xplStats
+        sensors = pjson['device_types'][dev_type_id]['sensors']
+        #print("SENSORS = {0}".format(sensors))
+        for xstatn in pjson['xpl_stats']:
+            #print("XSTATN = {0}".format(xstatn))
+            xstat = pjson['xpl_stats'][xstatn]
+            for sparam in xstat['parameters']['dynamic']:
+                #print("XSTATN = {0}, SPARAM = {1}".format(xstatn, sparam))
+                #if 'sensor' in sparam and xstatn in sensors:
+                # => This condition was used to fix a bug which occurs while creating complexe devices for rfxcom
+                #    But is introduced a bug for the geoloc plugin...
+                #    In fact we had to fix the rfxcom info.json file (open_close uses now rssi_open_close instead of
+                #    rssi_lighting2
+                #    So, this one is NOT the good one.
+                if 'sensor' in sparam:
+                # => this condition was the original one restored to make the geoloc pluin ok for tests
+                #    Strangely, there is no issue while using the admin (which uses only mq)
+                #    but is sucks with test library which uses rest...
+                #    This one is the good one
+                    if sparam['sensor'] in sensors:
+                        #print("ADD")
+                        stats.append(xstatn)
+        result['xpl_stats'] = {}
+        #print("STATS = {0}".format(stats))
+        for xstatn in stats:
+            xstat = pjson['xpl_stats'][xstatn]
+            result['xpl_stats'][xstatn] = []
+            for param in xstat['parameters']['device']:
+                result['xpl_stats'][xstatn].append(param)
+    log.debug(u"build_deviceType_from_packageJson > result = '{0}'".format(result))
+    return (result, reason, status)
 
 if __name__ == "__main__":
     print(get_seconds_since_midnight())

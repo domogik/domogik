@@ -33,6 +33,9 @@
     <a id="examples" type="button" class="btn btn-default" href="/scenario/examples">
       <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {% trans %}Help - examples{% endtrans %}
     </a>
+    <a id="fullscreen" type="button" class="btn btn-default" href="#">
+      <span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span> {% trans %}Fullscreen{% endtrans %}
+    </a>
     </div>
     </div>
   <div class="form-group">
@@ -64,6 +67,7 @@
   <xml id="toolbox" style="display: none">
     <category name="Logic">
         <block type="controls_if"></block>
+        <block type="controls_whileUntil"></block>
         <block type="logic_compare"></block>
         <block type="trigger.Hysteresis"></block>
         <block type="logic_operation"></block>
@@ -417,6 +421,18 @@
     window.addEventListener('resize', onresize, false);
     onresize();
     Blockly.svgResize(workspace);
+    $('#fullscreen').click(function() {
+        var element = $('#blocklyDiv').get(0);
+        if (element.requestFullscreen) {
+              element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) {
+              element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) {
+              element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        } else if (element.msRequestFullscreen) {
+              element.msRequestFullscreen();
+        }
+    });
   </script>
 
 </div>

@@ -26,7 +26,7 @@
 @apiSuccessExample {json} Success-Response:
 {
     u'core-scenario.darkstar': None,
-    u'core-dbmgr.darkstar': None,
+    u'core-admin.darkstar': None,
     u'core-xplgw.darkstar': None,
     u'core-rest.darkstar': None,
     u'plugin-diskfree.darkstar': {

@@ -55,29 +55,20 @@ Assuming the Domogik user is *domogik*, do the following checks:
 
         domogik    32605     1  0 14:12 ?        00:00:06 /usr/bin/python /usr/local/bin/dmg_hub
 
-    You must have 2 processes for the administration web interface: ::
+    Check the manager is running: ::
 
-        domogik      329     1  0 14:12 ?        00:00:00 /usr/bin/python /usr/local/bin/dmg_admin
-        domogik      336   329  0 14:12 ?        00:00:06 /usr/bin/python /usr/local/bin/dmg_admin
+        domogik    32642      1  0 14:12 ?        00:00:09 /usr/bin/python /usr/local/bin/dmg_manager -d -r -x -s
 
-    You must have 2 processes for the manager: ::
+    See if the admin interface is running: ::
 
-        domogik    32635     1  0 14:12 ?        00:00:00 /usr/bin/python /usr/local/bin/dmg_manager -d -r -x -s
-        domogik    32642 32635  0 14:12 ?        00:00:09 /usr/bin/python /usr/local/bin/dmg_manager -d -r -x -s
-
-    Check if dbmgr is up: ::
-
-        $ ps -fu domogik | grep dbmgr
-        domogik    32669     1  0 14:12 ?        00:00:00 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/dbmgr.py
-        domogik    32678 32669  0 14:12 ?        00:00:13 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/dbmgr.py
-
+        domogik      336      1  0 14:12 ?        00:00:06 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/admin.py
+    
     Check if xplgw is up: ::
 
         $ ps -fu domogik | grep xplgw
-        domogik    32726     1  0 14:12 ?        00:00:00 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/xplgw.py
-        domogik    32735 32726  0 14:12 ?        00:00:13 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/xplgw.py
+        domogik    32735      1  0 14:12 ?        00:00:13 /usr/bin/python /media/stock/domotique/git/domogik/src/domogik/bin/xplgw.py
 
-    If one component is not up, check its log files. If the component is *rest*, *dbmgr* or *xplgw* and you find no logs, check in the *manager* logs.
+    If one component is not up, check its log files. If the component is *admin*, *scenario*, *butler* or *xplgw* and you find no logs, check in the *manager* logs.
 
 Check if services are available
 -------------------------------
@@ -123,9 +114,6 @@ If the following lines appears always, it means that the xPL hub is not found. S
     2013-12-06 14:13:39,436 domogik-xplgw INFO HUB discovery > looking for the hub. I hope there is one hub, Domogik won't work without the hub!
 
 The python xPL hub configuration is set in **/etc/domogik/xplhub.cfg**. The logs are in **/var/log/xplhub/**
-
-
-
 
 
 

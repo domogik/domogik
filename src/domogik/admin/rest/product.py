@@ -1,10 +1,11 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-from domogik.admin.application import app      
+from domogik.admin.application import app, timeit
 from domogik.common.plugin import PRODUCTS_PICTURES_EXTENSIONS
 import os
 from flask import send_from_directory, redirect
+import traceback
 
 @app.route('/rest/product/<client_id>/<image>')
+@timeit
 def product_image(client_id, image):
     """
     @api {get} /product/<clientID>/<image> Get a product image

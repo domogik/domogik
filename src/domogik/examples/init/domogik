@@ -184,11 +184,6 @@ function status_manager {
     else
         echo " * manager is not running"
     fi
-    if [ -f ${PIDDIR}/dbmgr.pid ] && [ $(/bin/ps `cat ${PIDDIR}/dbmgr.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
-        echo " * dbmgr is running"
-    else
-        echo " * dbmgr is not running"
-    fi
     if [ -f ${PIDDIR}/admin.pid ] && [ $(/bin/ps `cat ${PIDDIR}/admin.pid 2>/dev/null` | /bin/grep -c "$" 2>/dev/null) -gt 1 ] ; then
         echo " * admin is running"
     else
@@ -352,6 +347,9 @@ kill_all() {
         rm -f $f 2>/dev/null
     done
     for p in $(pgrep "${NAME}" 2>/dev/null); do
+        kill -9 $p >/dev/null 2>&1
+    done
+    for p in $(pgrep "gunicorn" 2>/dev/null); do
         kill -9 $p >/dev/null 2>&1
     done
 }

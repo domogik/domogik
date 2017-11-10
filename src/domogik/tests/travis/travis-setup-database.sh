@@ -3,4 +3,5 @@
 
 mysql -e 'create database domogik;'
 echo "USE mysql;\nUPDATE user SET password=PASSWORD('domopass') WHERE user='travis';\nFLUSH PRIVILEGES;\n" | mysql -u root
+echo "GRANT ALL PRIVILEGES ON domogik.* TO 'travis'@'%' WITH GRANT OPTION;\n" | mysql -u root
 

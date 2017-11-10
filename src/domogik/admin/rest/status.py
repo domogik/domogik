@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from domogik.admin.application import app, json_response, timeit
 from domogik.common.configloader import Loader
+from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import domogik
@@ -9,7 +10,9 @@ from flask import Response
 from flask_login import login_required
 
 @app.route('/rest/')
+@login_required
 @json_response
+@timeit
 def api_root():
     """
     @api {get} /rest/ Get the status of the REST server
@@ -39,44 +42,61 @@ def api_root():
                 "pub_port": "40411"
             }
         }
+
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
     """
-    # domogik global version
-    global_version = sys.modules["domogik"].__version__
-    src_version = global_version
-
-    info = {}
-    info["REST_API_version"] = app.apiversion
-    info["Domogik_version"] = global_version
-    info["Sources_version"] = src_version
-    info["SSL"] = app.use_ssl
-    info["Host"] = app.hostname
-
-    # for compatibility with Rest API < 0.6
-    info["REST_API_release"] = app.apiversion
-    info["Domogik_release"] = global_version
-    info["Sources_release"] = src_version
-
-    # mq part
-    mqconfig = Loader('mq', 'domogik-mq.cfg')
-    config = dict(mqconfig.load()[1])
-    mq = {}
-    mq["sub_port"] = config["sub_port"]
-    mq["ip"] = config["ip"]
-    mq["req_rep_port"] = config["req_rep_port"]
-    mq["pub_port"] = config["pub_port"]
-
-    data = {"info" : info, "mq": mq}
-    return 200, data
+    try:
+        # domogik global version
+        global_version = sys.modules["domogik"].__version__
+        rest_version = sys.modules["domogik"].__rest_api_version__
+        src_version = global_version
+    
+        info = {}
+        info["REST_API_version"] = rest_version
+        info["Domogik_version"] = global_version
+        info["Sources_version"] = src_version
+        info["SSL"] = app.dbConfig['use_ssl']
+        info["Host"] = get_sanitized_hostname()
+    
+        # for compatibility with Rest API < 0.6
+        info["REST_API_release"] = rest_version
+        info["Domogik_release"] = global_version
+        info["Sources_release"] = src_version
+    
+        # mq part
+        mqconfig = Loader('mq', 'domogik-mq.cfg')
+        config = dict(mqconfig.load()[1])
+        mq = {}
+        mq["sub_port"] = config["sub_port"]
+        mq["ip"] = config["ip"]
+        mq["req_rep_port"] = config["req_rep_port"]
+        mq["pub_port"] = config["pub_port"]
+    
+        data = {"info" : info, "mq": mq}
+        return 200, data
+    except:
+        msg = u"Error while getting the status. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        return 500, {'error': msg}
 
 @app.route('/rest/map')
 @json_response
 @timeit
 def api_map():
-    rules = []
-    for rule in app.url_map.iter_rules():
-        rules.append({\
-            'url': rule.rule, \
-            'method': list(rule.methods), \
-            'arguments': list(rule.arguments), \
-        })
-    return 200, rules
+    try:
+        rules = []
+        for rule in app.url_map.iter_rules():
+            rules.append({\
+                'url': rule.rule, \
+                'method': list(rule.methods), \
+                'arguments': list(rule.arguments), \
+            })
+        return 200, rules
+    except:
+        msg = u"Error while getting the api map. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        return 500, {'error': msg}

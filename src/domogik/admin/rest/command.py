@@ -1,6 +1,4 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-from domogik.admin.application import app, json_response
-from domogik.xpl.common.xplmessage import XplMessage
+from domogik.admin.application import app, json_response, timeit
 from domogik.common.configloader import Loader
 import sys
 import os
@@ -16,6 +14,7 @@ from flask_login import login_required
 @app.route('/rest/cmd/id/<int:cid>', methods=['GET'])
 @json_response
 @login_required
+@timeit
 def api_ncommand(cid):
     """
     @api {get} /rest/cmd/id/<int:cid> Trigger a command
@@ -30,15 +29,15 @@ def api_ncommand(cid):
         HTTTP/1.1 204 No Content 
 
     @apiErrorExample Gateway Timeout
-        HTTTP/1.1 400 No Bad Request
+        HTTTP/1.1 500
         {
-            msg: 'XPL gateway does not respond'
+            'error': 'XPL gateway does not respond'
         }
     
-    @apiErrorExample Other error
-        HTTTP/1.1 400 No Bad Request
+    @apiErrorExample Error
+        HTTTP/1.1 500
         {
-            msg: 'Bad command Id'
+            'error': '...'
         }
     """
     cli = MQSyncReq(app.zmq_context)
@@ -52,11 +51,14 @@ def api_ncommand(cid):
     msg.add_data('cmdparams', cmdparams)
     # do the request
     resp = cli.request('xplgw', msg.get(), timeout=10)
+
     if resp:
         response = resp.get_data()
         if response['status']:
             return 204, None
         else:
-            return 400, {'msg': response['reason']}
+            app.logger.error(u"Error : {0}".format(response['reason']))
+            return 500, {'error': response['reason']}
     else:
-        return 400, {'msg': "XPL gateway does not respond"}
+        app.logger.error(u"XPL gateway does not respond")
+        return 500, {'error': "XPL gateway does not respond"}

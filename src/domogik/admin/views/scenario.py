@@ -1,13 +1,12 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-from domogik.admin.application import app, render_template
+from domogik.admin.application import app, render_template, timeit
 from flask import request, flash, redirect, Response, jsonify
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 try:
-	from flask.ext.babel import gettext, ngettext
+    from flask_babel import gettext, ngettext
 except ImportError:
-	from flask_babel import gettext, ngettext
-	pass
+    from flask.ext.babel import gettext, ngettext
+    pass
 from flask_login import login_required
 try:
     from flask_wtf import Form
@@ -33,6 +32,7 @@ import os
 
 @app.route('/scenario')
 @login_required
+@timeit
 def scenario():
     scenarios = []
     cli = MQSyncReq(app.zmq_context)
@@ -56,12 +56,14 @@ def scenario():
 
 @app.route('/scenario/examples')
 @login_required
+@timeit
 def scenario_examples():
     return render_template('scenario_examples.html',
         mactive = u"scenario")
 
 @app.route('/scenario/del/<id>')
 @login_required
+@timeit
 def scenario_del(id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -74,6 +76,7 @@ def scenario_del(id):
 
 @app.route('/scenario/enable/<id>')
 @login_required
+@timeit
 def scenario_enable(id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -86,6 +89,7 @@ def scenario_enable(id):
 
 @app.route('/scenario/disable/<id>')
 @login_required
+@timeit
 def scenario_disable(id):
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -100,12 +104,13 @@ def scenario_disable(id):
 @app.route('/scenario/clone/<id>', methods=['GET', 'POST'])
 @app.route('/scenario/edit/<id>', methods=['GET', 'POST'])
 @login_required
+@timeit
 def scenario_edit(id):
     if str(request.path).find('/clone/') > -1:
         clone = True
     else:
         clone = False
-    default_json = '{"type":"controls_if","id":"CXeRaH*|O;%(XRY0~0(d"}'
+    default_json = ''
     # laod the json
     if int(id) == 0:
         name = u""
@@ -185,6 +190,7 @@ def scenario_edit(id):
 
 @app.route('/scenario/cronruletest/checkdate')
 @login_required
+@timeit
 def scenario_croncheckdate():
     data = {}
     try :
@@ -207,6 +213,7 @@ def scenario_croncheckdate():
 
 @app.route('/scenario/cronruletest/getephemdate')
 @login_required
+@timeit
 def scenario_croncephemdate():
     data = {}
     try :
@@ -319,18 +326,8 @@ def scenario_blocks_js():
         datatypes = {}
 
     # devices
-    cli = MQSyncReq(app.zmq_context)
-    msg = MQMessage()
-    msg.set_action('device.get')
-    res = cli.request('dbmgr', msg.get(), timeout=10)
-    if res is not None:
-        res = res.get_data()
-        if 'devices' in res:
-            devices = res['devices']
-    else:
-        print(u"Error : no devices found!")
-        devices = []
-
+    with app.db.session_scope():
+        devices = app.db.list_devices()
 
     ### Now start the javascript generation
     js = ""

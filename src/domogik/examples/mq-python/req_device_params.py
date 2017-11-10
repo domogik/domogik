@@ -4,17 +4,18 @@
 @apiVersion 0.4.0
 @apiName device.params
 @apiGroup Devices
-@apiDescription This request is used to ask Domogik's dbmgr the list of the params (key, description, type) that are needed to create a new device for a give device type (which is defined by a client)
+@apiDescription This request is used to ask Domogik's admin the list of the params (key, description, type) that are needed to create a new device for a give device type (which is defined by a client)
 * Source client : Domogik admin, any other interface which can create some devices
-* Target client : always 'dbmgr'
+* Target client : always 'admin'
 
 @apiExample {python} Example usage:
     cli = MQSyncReq(zmq.Context())
     msg = MQMessage()
     msg.set_action('device.params')
-    msg.set_data({'device_type': 'diskfree.disk_usage'})
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
-    
+    msg.add_data('device_type', 'diskfree.disk_usage')
+    msg.add_data('client_id', 'plugin-diskfree.darkstar')
+    print(cli.request('admin', msg.get(), timeout=10).get())
+
 @apiParam {String} device_type The device type
 
 @apiSuccessExample {json} Success-Response:
@@ -23,7 +24,7 @@
     '{
         "result": {
             "xpl_stats": {
-                
+
             },
             "name": "",
             "reference": "",
@@ -35,7 +36,7 @@
                 }
             ],
             "xpl_commands": {
-                
+
             },
             "global": [
                 {
@@ -59,6 +60,7 @@ from domogikmq.message import MQMessage
 cli = MQSyncReq(zmq.Context())
 msg = MQMessage()
 msg.set_action('device.params')
-msg.set_data({'device_type': 'velbus.dimmer'})
-print(cli.request('dbmgr', msg.get(), timeout=10).get())
+msg.add_data('device_type', 'velbus.dimmer')
+msg.add_data('client_id', 'plugin-velbus.darkstar')
+print(cli.request('admin', msg.get(), timeout=10).get())
 

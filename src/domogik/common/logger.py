@@ -52,7 +52,7 @@ class Logger():
 
     logger = {}
 
-    def __init__(self, component_name, domogik_prefix=True, use_filename=None, log_on_stdout = True):
+    def __init__(self, component_name, domogik_prefix=True, use_filename=None, log_on_stdout=True):
         '''
         Get a logger with provided parameters and set config
         @param component_name : component name to log
@@ -103,8 +103,7 @@ class Logger():
                 my_logger.addHandler(hdlr)
 
 	        # if loglevvel is set to debug (all log entries also go to stdout)
-                # TODO : why looking about level=debug ? to clean ?
-                if log_on_stdout and level == 'debug' and component_name.find('sqlalchemy') == -1:
+                if (log_on_stdout or level == 'debug') and component_name.find('sqlalchemy') == -1:
                     dhdlr = logging.StreamHandler(sys.stdout)
                     dhdlr.setFormatter(formatter)
                     my_logger.addHandler(dhdlr)

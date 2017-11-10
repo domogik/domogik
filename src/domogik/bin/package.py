@@ -38,12 +38,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from domogik import __version__ as DMG_VERSION
 from domogik.common import logger
 from domogik.common.configloader import Loader
+from domogik.common.defaultloader import DefaultLoader
 from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR
 from domogik.common.packagejson import PackageJson, PackageException
 from argparse import ArgumentParser
 from subprocess import Popen, PIPE
 import re
 import os
+import pwd
 import sys
 import traceback
 import zipfile
@@ -85,7 +87,7 @@ class PackageInstaller():
     def __init__(self):
         """ Init
         """
-        l = logger.Logger("package")
+        l = logger.Logger("package", log_on_stdout=True)
         l.set_format_mode("messageOnly")
         self.log = l.get_logger()
 
@@ -616,6 +618,16 @@ class PackageInstaller():
 
 
 def main():
+
+    ### First, check if the user is allowed to launch the plugin. The user must be the same as the one defined
+    # in the file /etc/default/domogik : DOMOGIK_USER
+    default = DefaultLoader()
+    dmg_user = default.get("DOMOGIK_USER")
+    logname = pwd.getpwuid(os.getuid())[0]
+    if dmg_user != logname:
+        print(u"ERROR : this Domogik tool must be run with the user defined in /etc/default/domogik as DOMOGIK_USER : {0}".format(dmg_user))
+        sys.exit(1)
+
     pkg = PackageInstaller()
 
 if __name__ == "__main__":

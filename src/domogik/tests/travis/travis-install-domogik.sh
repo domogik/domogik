@@ -10,6 +10,10 @@ sudo chown $LOGNAME:root /var/lock/domogik/config.lock
 echo "==== RUNNING SETUP.py"
 pip install .
 
+echo "==== RUNNING pip install -r requirements.txt"
+pip install -r requirements.txt
+
+
 echo "==== RUNNING INSTALL.py"
 # notice : we use --no-setup and --no-db-upgrade because a virtualenv is used in Travis. 
 # If we don't set these flags, these actions will be done as root user and so, 

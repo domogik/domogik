@@ -39,7 +39,6 @@ from argparse import ArgumentParser
 from threading import Thread
 
 from domogik.common.configloader import Loader, CONFIG_FILE
-from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import Plugin
 from domogik.butler.rivescript.rivescript import RiveScript
 from domogik.butler.brain import LEARN_FILE
@@ -47,8 +46,10 @@ from domogik.butler.brain import STAR_FILE
 from domogik.butler.brain import clean_input
 #from domogikmq.reqrep.worker import MQRep
 from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.pubsub.publisher import MQPub
-#import zmq
+import zmq
+import json
 import os
 import sys
 from subprocess import Popen, PIPE
@@ -75,7 +76,7 @@ SEX_ALLOWED = [SEX_MALE, SEX_FEMALE]
 class Butler(Plugin):
     """ Butler component
 
-        TODO : 
+        TODO :
         * /quit /reload commands
         * interact with domogik : commands
     """
@@ -84,9 +85,9 @@ class Butler(Plugin):
 
         ### Option parser
         parser = ArgumentParser()
-        parser.add_argument("-i", 
-                          action="store_true", 
-                          dest="interactive", 
+        parser.add_argument("-i",
+                          action="store_true",
+                          dest="interactive",
                           default=False, \
                           help="Butler interactive mode (must be used WITH -f).")
 
@@ -101,6 +102,8 @@ class Butler(Plugin):
 
         # subscribe the MQ for interfaces inputs
         self.add_mq_sub('interface.input')
+        # devices updates
+        self.add_mq_sub('device.update')
 
 
         ### Configuration elements
@@ -120,7 +123,7 @@ class Butler(Plugin):
                 self.log.error(u"Exiting : the butler sex configured is not valid : '{0}'. Expecting : {1}".format(self.butler_sex, SEX_ALLOWED))
                 self.force_leave()
                 return
-       
+
         except:
             self.log.error(u"Exiting : error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
             self.force_leave()
@@ -156,12 +159,17 @@ class Butler(Plugin):
         # shortcut to allow the core brain package to reload the brain for learning
         self.brain.reload_butler = self.reload
 
-        # shortcut to allow the core brain package to do logging
+        # shortcut to allow the core brain package to do logging and access the devices in memory
         self.brain.log = self.log
+        self.brain.devices = [] # will be loaded in self.reload_devices()
 
 
         # history
         self.history = []
+
+        # load all known devices
+        self._updating_devices = False # flag to preserve from mult reload_devices in concurrent time.
+        self.reload_devices()
 
         self.log.info(u"*** Welcome in {0} world, your digital assistant! ***".format(self.butler_name))
 
@@ -182,7 +190,7 @@ class Butler(Plugin):
             thr_run_chat.start()
         else:
             self.log.info(u"Not launched in interactive mode")
-        
+
 
         ### TODO
         #self.add_stop_cb(self.shutdown)
@@ -191,8 +199,45 @@ class Butler(Plugin):
         self.ready()
 
 
+    def reload_devices(self):
+        """ Load or reload the devices list in memory to improve the butler speed (mainly for brain-base package usage)
+        """
+        # Quit if updating process is running
+        if self._updating_devices : return
+        self._updating_devices = True
+        nb_try = 0
+        max_try = 5
+        interval = 5
+        ok = False
+        while nb_try < max_try and ok == False:
+            nb_try += 1
+            self.log.info(u"Request the devices list over MQ (try {0}/{1})...".format(nb_try, max_try))
+            try:
+                cli = MQSyncReq(zmq.Context())
+                msg = MQMessage()
+                msg.set_action('device.get')
+                res = cli.request('admin', msg.get(), timeout=10)
+                if res is not None :
+                    self._updating_devices = False # Result presumed ok so free new update in case of speed device change
+                    str_devices=res.get()[1]
+                    self.devices = json.loads(str_devices)['devices']
+                    self.log.info(u"{0} devices loaded!".format(len(self.devices)))
+                    self.brain.devices = self.devices
+                    ok = True
+            except:
+                self._updating_devices = True # assume lock if exception after res
+                self.log.warning(u"Error while getting the devices list over MQ. Error is : {0}".format(traceback.format_exc()))
+                self.devices = []
+            if ok == False:
+                self._stop.wait(interval)
+        self._updating_devices = False # Finally unlock
+        if ok == False:
+            self.brain.devices = []
+            self.log.error(u"Error while getting the devices list over MQ after {0} attemps!!!!".format(nb_try))
+
+
     def on_mdp_request(self, msg):
-        """ Handle Requests over MQ 
+        """ Handle Requests over MQ
             @param msg : MQ req message
         """
         try:
@@ -218,7 +263,7 @@ class Butler(Plugin):
                 self._mdp_reply_butler_features(msg)
         except:
             self.log.error(u"Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
-   
+
 
     def _mdp_reply_butler_discuss(self, message):
         """ Discuss over req/rep
@@ -277,7 +322,7 @@ class Butler(Plugin):
 
 
     def _mdp_reply_butler_reload(self, message):
-        """ Reload the brain 
+        """ Reload the brain
         """
         msg = MQMessage()
         msg.set_action('butler.reload.result')
@@ -401,8 +446,8 @@ class Butler(Plugin):
             else:
                 self.learn_content = u""
                 self.log.info(u"Learn file NOT found : {0}. This is not an error. You just have learn nothing to your butler ;)".format(learn_file))
-            
-                              
+
+
             # to finish, find all the tagged features
             # and all the tagged suggestions
             self.get_brain_features_and_suggestions()
@@ -443,7 +488,7 @@ class Butler(Plugin):
             self.brain.the_suggestions = self.butler_suggestions
         except:
             self.log.error(u"Error while extracting the features : {0}".format(traceback.format_exc()))
-                 
+
 
 
     def process(self, query):
@@ -481,7 +526,10 @@ class Butler(Plugin):
     def on_message(self, msgid, content):
         """ When a message is received from the MQ (pub/sub)
         """
-        if msgid == "interface.input":
+        if msgid == "device.update":
+            # do to long work, make it in thread
+            Thread(None, self.reload_devices, "th_reload_devices", (), {}).start()
+        elif msgid == "interface.input":
             # TODO :
             # merge with the on_mdp_reply_butler_disscuss() function
 
@@ -503,7 +551,7 @@ class Butler(Plugin):
             # * text (from voice recognition)
             # * location (the input element location : this is configured on the input element : kitchen, garden, bedroom, ...)
             # * reply_to (from face recognition)
-            
+
             #self.context = {"media" : "irc",
             #                "location" : "internet",
             #                "reply_to" : content['identity']
@@ -552,7 +600,7 @@ class Butler(Plugin):
             reply = self.process(msg)
 
             # let Nestor answer in the chat
-            print("{0} > {1}".format(ucode(self.butler_name), ucode(reply)))
+            print(u"{0} > {1}".format(ucode(self.butler_name), ucode(reply)))
 
             # let Nestor speak
             #tts = u"espeak -p 40 -s 140 -v mb/mb-fr1 \"{0}\" | mbrola /usr/share/mbrola/fr1/fr1 - -.au | aplay".format(reply)

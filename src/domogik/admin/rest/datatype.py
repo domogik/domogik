@@ -1,5 +1,4 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-from domogik.admin.application import app, json_response
+from domogik.admin.application import app, json_response, timeit
 #from domogik.common.configloader import Loader
 import sys
 import os
@@ -10,6 +9,7 @@ import json
 
 @app.route('/rest/datatype')
 @json_response
+@timeit
 def api_datatype():
     """
     @api {get} /rest/datatype Retrieve all datatypes
@@ -50,11 +50,18 @@ def api_datatype():
             },
             ...
         }
-    """
-    #cfg = Loader('domogik')
-    #config = cfg.load()
-    #conf = dict(config[1])
-    json_file = "{0}/datatypes.json".format(app.resources_directory)
-    data = json.load(open(json_file))
 
+    @apiErrorExample Error
+        HTTTP/1.1 500
+        {
+            'error': '...'
+        }
+    """
+    try:
+        json_file = "{0}/datatypes.json".format(app.resources_directory)
+        data = json.load(open(json_file))
+    except:
+        msg = u"Error while getting the datatypes. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        return 500, {'error': msg}
     return 200, data

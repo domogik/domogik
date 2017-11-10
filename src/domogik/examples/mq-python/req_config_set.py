@@ -4,9 +4,9 @@
 @apiVersion 0.4.0
 @apiName config.set
 @apiGroup Clients configuration
-@apiDescription This request is used to ask Domogik's dbmgr the value of a configuration item
+@apiDescription This request is used to ask Domogik's admin the value of a configuration item
 * Source client : Domogik admin, any other interface which can manage the clients
-* Target client : always 'dbmgr' 
+* Target client : always 'admin' 
 
 @apiExample {python} Example usage:
     cli = MQSyncReq(zmq.Context())
@@ -16,7 +16,7 @@
     msg.add_data('host', 'darkstar')
     msg.add_data('name', 'diskfree')
     msg.add_data('data', {'interval' : 6})
-    print(cli.request('dbmgr', msg.get(), timeout=10).get())
+    print(cli.request('admin', msg.get(), timeout=10).get())
     
 @apiParam {String} type The client type
 @apiParam {String} host The host on which is hosted the client
@@ -50,5 +50,5 @@ msg.add_data('type', 'plugin')
 msg.add_data('host', 'darkstar')
 msg.add_data('name', 'diskfree')
 msg.add_data('data', {'interval' : 6})
-print(cli.request('dbmgr', msg.get(), timeout=10).get())
+print(cli.request('admin', msg.get(), timeout=10).get())
 

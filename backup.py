@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -69,7 +69,7 @@ def get_backup_dir():
         config = cfg.load()
         conf = dict(config[1])
         return conf['folder']
-   
+
     except:
         print(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
         return None
@@ -81,7 +81,7 @@ def get_packages_dir():
         config = cfg.load()
         conf = dict(config[1])
         return os.path.join(conf['libraries_path'], PACKAGES_DIR)
-   
+
     except:
         print(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
         return None
@@ -98,12 +98,12 @@ def backup_database(folder):
     title(u"Backup of the database")
     now = time.strftime("%Y%m%d-%H%M")
     db_backup_file = "{0}/domogik-database-{1}.sql.gz".format(folder, now)
-    _db = database.DbHelper()
+    _db = database.DbHelper(use_cache=False)
     if not _db.is_db_type_mysql():
         print("Can't backup your database, only mysql is supported (you have : {0})".format(_db.get_db_type()))
         return
     print("Backing up your database to {0}".format(db_backup_file))
- 
+
     mysqldump_cmd = ['mysqldump', '-u', _db.get_db_user()]
     if _db.get_db_password():
         mysqldump_cmd.extend(('-p{0}'.format(_db.get_db_password()), _db.get_db_name()))
@@ -140,7 +140,7 @@ def backup_packages(folder):
                'dst' : 'domogik-all-packages-{0}.tgz'.format(now)}]
     backup_some_files(files)
 
-    
+
 if __name__ == "__main__":
     folder = get_backup_dir()
     if folder != None:
@@ -156,5 +156,5 @@ if __name__ == "__main__":
             backup_packages(folder)
         except:
             print("Error while doing the backup : {0}".format(traceback.format_exc()))
-            
+
 

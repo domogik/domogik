@@ -32,16 +32,16 @@
             "type": "core",
             "last_seen": 1412278855.706537
         },
-        "core-dbmgr.darkstar": {
+        "core-admin.darkstar": {
             "status": "alive",
-            "name": "dbmgr",
-            "xpl_source": "domogik-dbmgr.darkstar",
+            "name": "admin",
+            "xpl_source": "domogik-admin.darkstar",
             "data": {
                 
             },
             "configured": null,
             "pid": 15935,
-            "package_id": "core-dbmgr",
+            "package_id": "core-admin",
             "host": "darkstar",
             "type": "core",
             "last_seen": 1412278852.989411

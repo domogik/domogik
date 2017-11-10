@@ -392,7 +392,7 @@ class CronExpression(object):
                         raise ValueError("Invalid bounds: \"{0}\"".format(parse))
                 elif subrange == '*':
                     # Include all values with the given range
-                    prefix, suffix = minmax, parse, minmax
+                    prefix, suffix = minmax[0], minmax[1]
                 else:
                     try :
                         prefix = int(subrange)
@@ -467,4 +467,8 @@ if __name__ == "__main__":
     job = CronExpression(("10 12-15 ? 1-6 5 205"))
     print("cron valid : {0}".format(job.isValidate()))
     print(job.check_trigger((2017, 2, 13, 10 , 6)))
+    print("")
+    job = CronExpression(("*/10 */2 * * *"))
+    print("cron valid : {0}".format(job.isValidate()))
+    print(job.check_trigger((2017, 2, 13, 10 , 20)))
     print("")

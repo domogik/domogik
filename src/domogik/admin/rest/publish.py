@@ -1,17 +1,11 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-from domogik.admin.application import app, json_response
+from domogik.admin.application import app, json_response, timeit
 import sys
 import os
 import domogik
 import json
-from flask import Response, request, send_from_directory
+from flask import Response, request, send_from_directory, abort
 import traceback
 from flask_login import login_required
-
-#@app.route("/rest/publish/")
-#@login_required
-#def tst():
-#    return "Hello World!"
 
 @app.route('/rest/publish/<client_type>/<client_name>/<path>', methods=['GET'])
 # TODO : security issue !!!!!
@@ -20,6 +14,7 @@ from flask_login import login_required
 # TODO : security issue !!!!!
 # Why the fuck the login_required is not working here ?????????
 #@login_required
+@timeit
 def publish_get(client_type, client_name, path):
     """
     @api {get} /butler/publish View content published by some clients
@@ -37,13 +32,18 @@ def publish_get(client_type, client_name, path):
         HTTTP/1.1 200 
         ... some content ....
 
-    @apiErrorExample No so published data
-        HTTTP/1.1 404 Not foundst
+    @apiErrorExample No published data
+        HTTTP/1.1 404 Not found
     
     """
-    data = "{0}, {1}, {2}".format(client_type, client_name, path)
-    # basic security
-    path = path.replace("..", "")
-    root = app.publish_directory
-    root_client = os.path.join(root, "{0}/{1}".format(client_type, client_name))
-    return send_from_directory(directory = root_client, filename = path)
+    try:
+        data = "{0}, {1}, {2}".format(client_type, client_name, path)
+        # basic security
+        path = path.replace("..", "")
+        root = app.publish_directory
+        root_client = os.path.join(root, "{0}/{1}".format(client_type, client_name))
+        return send_from_directory(directory = root_client, filename = path)
+    except:
+        msg = u"Error while getting the published data. Error is : {0}".format(traceback.format_exc())
+        app.logger.error(msg)
+        abort(404)

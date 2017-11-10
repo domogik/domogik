@@ -203,7 +203,7 @@ class PackageJson():
             self._validate_02()
             if 'identity' in self.json.keys() and 'domogik_min_version' in self.json['identity']:
                 if self.json['identity']['domogik_min_version'] > DMG_VERSION:
-                    raise PackageException("Domogik version check failed! min_version={0} current varion={1}".format(self.json['identity']['domogik_min_version'], DMG_VERSION));
+                    raise PackageException("Domogik version check failed! min_version={0} current version={1}".format(self.json['identity']['domogik_min_version'], DMG_VERSION));
         else:
             return False
 

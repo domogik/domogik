@@ -1,0 +1,75 @@
+{% extends theme("base/base.html") %}
+
+{% block content %}
+<div class="container">
+    <h2>{% trans %}Domogik configuration{% endtrans %}</h2>
+    <form method="post" role="form">
+      {{ form.csrf_token }}
+
+      <h3>{% trans %}External access{% endtrans %}</h3>
+
+      <div class="alert alert-info" role="alert">{% trans %}If you use Domogik from internet, you surely use a different url to access Domogik from internet and your local network. To allow applications like Domodroid to use the appropriate url depending on where you are, you can configure here your external access informations. {% endtrans %}</div>
+
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.external_ip.label }}</label>
+        <div class="col-md-9">
+          {{ form.external_ip(size = 50) }}
+          <span class="help-block">{{ form.external_ip.description }}</span>
+        </div>
+      </div>
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.external_port.label }}</label>
+        <div class="col-md-9">
+          {{ form.external_port(size = 50) }}
+          <span class="help-block">{{ form.external_port.description }}</span>
+        </div>
+      </div>
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.external_ssl.label }}</label>
+        <div class="col-md-9">
+          {{ form.external_ssl }}
+          <span class="help-block">{{ form.external_ssl.description }}</span>
+        </div>
+      </div>
+
+      <h3>{% trans %}Printer configuration{% endtrans %}</h3>
+ 
+      <div class="alert alert-info" role="alert">{% trans %}Some Butler features may use the printer (to print a shopping list for example). If you want to use this kind of features, please feel the printer informations.{% endtrans %}</div>
+
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.printer_ip.label }}</label>
+        <div class="col-md-9">
+          {{ form.printer_ip(size = 50) }}
+          <span class="help-block">{{ form.printer_ip.description }}</span>
+        </div>
+      </div>
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.printer_name.label }}</label>
+        <div class="col-md-9">
+          {{ form.printer_name(size = 50) }}
+          <span class="help-block">{{ form.printer_name.description }}</span>
+        </div>
+      </div>
+
+      <h3>{% trans %}Online services configuration{% endtrans %}</h3>
+ 
+      <div class="alert alert-info" role="alert">{% trans %}Some Domogik advanced features may need to use some online services (cloud based services for example). If you need to use them, you will have to fill some below informations. If you don't need them, skip this part.{% endtrans %}</div>
+
+      <h4>{% trans %}Wit.ai{% endtrans %}</h4>
+      <div class="form-group form-horizontal">
+        <label class="control-label col-md-3">{{ form.wit_token.label }}</label>
+        <div class="col-md-9">
+          {{ form.wit_token(size = 50) }}
+          <span class="help-block">{{ form.wit_token.description }}</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-offset-3 col-md-9">
+        <input type="submit" value="{% trans %}Save the configuration {% endtrans %}" class="btn btn-primary">
+        </div>
+      </div>
+    </form>
+</div>
+
+{% endblock %}

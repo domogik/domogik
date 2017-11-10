@@ -126,7 +126,6 @@ class ScenarioManager:
         try:
             with self._db.session_scope():
                 ### TEST if database is up
-                # TODO : move in a function and use it (also used in dbmgr)
                 nb_test = 0
                 db_ok = False
                 while not db_ok and nb_test < DATABASE_CONNECTION_NUM_TRY:
@@ -142,7 +141,7 @@ class ScenarioManager:
                         time.sleep(DATABASE_CONNECTION_WAIT)
 
                 if nb_test >= DATABASE_CONNECTION_NUM_TRY:
-                    msg = "Exiting dbmgr!"
+                    msg = "Exiting scenario!"
                     self.log.error(msg)
                     self.force_leave()
                     return
@@ -215,7 +214,7 @@ class ScenarioManager:
             payload = json.loads(json_input)  # quick test to check if json is valid
         except Exception as e:
             self.log.error(u"Creation of a scenario failed, invallid json: {0}".format(json_input))
-            self.log.error(u"Error is : {0}".format(tracebeck.format_exc()))
+            self.log.error(u"Error is : {0}".format(traceback.format_exc()))
             return {'status': 'ERROR', 'msg': 'invallid json'}
 
         #if 'IF' not in payload.keys():

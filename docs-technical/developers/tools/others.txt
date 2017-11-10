@@ -29,7 +29,6 @@ Example (we assert $DOMOGIK_HOME is the root of your Domogik repository): ::
     ./xbmc_not.py;9,51;OK                                                           
     Bad files :                                                                     
     ./dawndusk.py;3,17;KO                                                           
-    ./dbmgr.py;7,67;KO                                                              
     ./dump_xpl.py;7,50;KO                                                           
     ./module_sample.py;7,14;KO                                                      
     ./rest.py;7,18;KO                                                               

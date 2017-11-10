@@ -1,0 +1,23 @@
+[Unit]
+Description=Domogik daemon
+Documentation=http://domogik.readthedocs.io/en/master/
+Before=shutdown.target
+After=domogik-mq-broker.service domogik-mq-forwarder.service domogik-xpl.service
+Requires=domogik-mq-broker.service domogik-mq-forwarder.service domogik-xpl.service
+BindsTo=domogik-mq-broker.service domogik-mq-forwarder.service domogik-xpl.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/default/domogik
+ExecStart=/usr/local/bin/dmg_manager -a -d -x -s -b
+User=domogik
+RuntimeDirectory=domogik
+PIDFile=/var/run/domogik/manager.pid
+Environment=PATH=$PATH:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+StandardOutput=null
+StandardError=null
+
+
+[Install]
+WantedBy=multi-user.target

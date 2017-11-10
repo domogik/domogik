@@ -208,6 +208,33 @@
 }
 </style>
 
+<script type="text/javascript">
+    function get_video_url(url) {
+        var ip = url.split('/')[2].split(':')[0];
+        console.log("hostname=" + location.hostname + ", resource ip=" + ip);
+        if (!location.hostname.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)){
+            console.log("hostname is an ip and not a private one OR hostname is a dns so I can't known if we are on the LAN or internet...");
+            if (ip.match(/^(192\.168\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01]))/)){
+                if (url.startsWith('{{ rest_url }}')) {
+                    // don't proxyfy rest urls !
+                    return url
+                }
+                console.log('Private ip :' + ip)
+                newUrl = "{{ rest_url }}/proxy/" + url;
+                console.log('Using proxyfied url :' + newUrl);
+                return newUrl;
+            }else {
+                console.log('Public ip :' + ip);
+                return url;
+            }
+        }
+        else {
+            console.log("We are accessing the admin from the LAN");
+            return url;
+        }
+    }
+</script>
+
 <div class="container">
     <h2>{% trans %}Timeline{% endtrans %}{% if device_name is not none %} - {{ device_name }}{% endif %}</h2>
 
@@ -222,19 +249,30 @@
                 {% for sensor in elt.sensors_changes %}
                     <p>
                         {{ sensor.sensor_name }} : {{ sensor.value }} {% if sensor.unit is not none %}{{ sensor.unit }}{% endif %}
+                        {% if datatypes[sensor.dt_type] is not defined %}
+                            <div class="alert alert-warning" role="alert">
+                            <strong>{% trans %}Warning{% endtrans %}</strong> :
+                            {% trans %}The datatype used by this command is no more compliant with this release of Domogik. You may consider to upgrade this plugin and if needed, recreate this device.{% endtrans %}
+                            </div>
+                        {% else %}
 
-                        {% if sensor.dt_type == "DT_Bool" or datatypes[sensor.dt_type]['parent'] == "DT_Bool" %}
-                            <em>( {{ datatypes[sensor.dt_type]['labels'][sensor.value] }} )</em>
-                        {% elif sensor.dt_type == "DT_ColorRGBHexa" or datatypes[sensor.dt_type]['parent'] == "DT_ColorRGBHexa" %} 
-                            <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sensor.value}}"></span>
-                        {% elif sensor.dt_type == "DT_Image" or datatypes[sensor.dt_type]['parent'] == "DT_Image" %} 
-                            <div>
-                              <img class="dt_image" src="{{sensor.value | replace("publish://", "/rest/publish/")}}"/>
-                            </div>
-                        {% elif sensor.dt_type == "DT_VideoH264" %} 
-                            <div>
-                              <a class="btn btn-default" href="{{sensor.value | replace("publish://", "/rest/publish/")}}"><span class='glyphicon glyphicon-facetime-video' aria-hidden='true'></span> {% trans %}Read the video file{% endtrans %}</a>
-                            </div>
+                            {% if sensor.dt_type == "DT_Bool" or datatypes[sensor.dt_type]['parent'] == "DT_Bool" %}
+                                <em>( {{ datatypes[sensor.dt_type]['labels'][sensor.value] }} )</em>
+                            {% elif sensor.dt_type == "DT_ColorRGBHexa" or datatypes[sensor.dt_type]['parent'] == "DT_ColorRGBHexa" %} 
+                                <span class='glyphicon glyphicon-tint' aria-hidden='true' style="color:#{{sensor.value}}"></span>
+                            {% elif sensor.dt_type == "DT_Image" or datatypes[sensor.dt_type]['parent'] == "DT_Image" %} 
+                                <div>
+                                  <img class="dt_image" id="img_{{elt.device_name|replace(" ", "_")}}_{{sensor.sensor_name|replace(" ", "_")}}_{{ elt.datetime|datetimeformat('Ymd_HMS') }}" style="max-width: 80%" src="#">
+                                  <script type="text/javascript">
+                                    d = new Date();
+                                    $("#img_{{elt.device_name|replace(" ", "_")}}_{{sensor.sensor_name|replace(" ", "_")}}_{{ elt.datetime|datetimeformat('Ymd_HMS') }}").attr("src", get_video_url('{{sensor.value | replace("publish://", rest_url + "/publish/")}}') + "?dummy=" + d.getTime());
+                                  </script>
+                                </div>
+                            {% elif sensor.dt_type == "DT_VideoH264" %} 
+                                <div>
+                                  <a class="btn btn-default" href="{{sensor.value | replace("publish://", "/rest/publish/")}}"><span class='glyphicon glyphicon-facetime-video' aria-hidden='true'></span> {% trans %}Read the video file{% endtrans %}</a>
+                                </div>
+                            {% endif %}
                         {% endif %}
                     </p>
                 {% endfor %}

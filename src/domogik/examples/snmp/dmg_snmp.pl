@@ -220,7 +220,7 @@ sub compute_core_order {
     #
     # (
     #     0 => 'manager',
-    #     1 => 'dbmgr',
+    #     1 => 'admin',
     #     ... => ...,
     # )
     my $HoH_core_order = $cache->get("core_order");
@@ -257,7 +257,7 @@ sub compute_core_pid {
     #         'plugin' => 'manager',
     #     },
     #     pid2 => {
-    #         'plugin' => 'dbmgr',
+    #         'plugin' => 'admin',
     #     },
     #     ... => {
     #         ...,
