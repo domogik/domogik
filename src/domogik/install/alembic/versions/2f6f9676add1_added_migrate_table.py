@@ -20,7 +20,7 @@ def upgrade():
         sa.Column('type', sa.Enum('DEVICE', 'SENSOR', name='migratetype'), nullable=True),
         sa.Column('oldId', sa.Integer(), autoincrement=False, nullable=False),
         sa.Column('newId', sa.Integer(), autoincrement=False, nullable=False),
-        sa.PrimaryKeyConstraint('odlId', 'newId'),
+        sa.PrimaryKeyConstraint('oldId', 'newId'),
         mysql_character_set='utf8',
         mysql_engine='InnoDB'
     )

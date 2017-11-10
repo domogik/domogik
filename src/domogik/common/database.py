@@ -2209,10 +2209,22 @@ class DbHelper():
             sens = self.get_sensor_by_device_id(devid)
             for sen in sens:
                 inlst.append( sen.id )
-            print inlst
-            return self.__session.query(Migrate).filter_by(type='sensor').filter(Migrate.oldId.in_(inlst)).all()
+            return self.__session.query(Migrate).filter_by(type='SENSOR').filter(Migrate.oldId.in_(inlst)).all()
         else:
-            return self.__session.query(Migrate).filter_by(type='sensor').all()
+            return self.__session.query(Migrate).filter_by(type='SENSOR').all()
+
+    def do_migration_sensor(self, mObj):
+        self.__session.expire_all()
+        # do the bulk update
+        self.__session.execute(SensorHistory.__table__
+                                .update()
+                                .values(sensor_id=mObj.newId)
+                                .where(SensorHistory.sensor_id=mObj.oldId))
+        # set the migrate object as Done
+        self.__session.delete(mObj)
+        # commit
+        self._do_commit()
+
 
 ###################
 # helper functions

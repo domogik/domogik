@@ -54,8 +54,8 @@ class CronSystem():
 
     def run(self):
         self.log.info(u"START Cron system run")
-        self._delete_devices()
         self._migrate_sensor()
+        self._delete_devices()
         self.log.info(u"END   Cron system run")
 
     def _delete_devices(self):
@@ -73,7 +73,8 @@ class CronSystem():
         self.log.info(u"=> START sensor migration")
         with self.db.session_scope():
             for sensor in self.db.get_migration_all_sensors():
-                print sensor
+                self.log.debug( sensor );
+                self.db.do_migration_sensor( sensor )
         self.log.info(u"=> END sensor migration")
 
 def main():
