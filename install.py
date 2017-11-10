@@ -169,8 +169,6 @@ def build_file_list(user, noXpl):
         fail("Can't find directory where i can copy cron config")
         exit(1)
 
-    print d_files
-
     hub = get_c_hub()
     if hub is not None:
         debug("Adding c hub path: {0}".format(hub))
