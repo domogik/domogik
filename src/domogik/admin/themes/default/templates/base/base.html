@@ -30,7 +30,7 @@
                 protocol = "ws:"
             else
                 protocol = "wss:"
-            var ws = new WebSocket(protocol + "//" + location.hostname + ":{{ ws_port }}/ws");
+            var ws = new WebSocket(protocol + "//" + location.hostname + ":{{ ws_port }}/ws/");
 	} else {
             alert('No websocket support in this browser. Please use another browser.');
 	}

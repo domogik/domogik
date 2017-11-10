@@ -36,17 +36,8 @@ Implements
 import ez_setup
 ez_setup.use_setuptools()
 
-import os
 from setuptools import setup, find_packages
-import platform
-import sys
 
-if sys.version_info[0] == 3:
-    netifaces = 'netifaces-py3'
-else:
-    netifaces = 'netifaces'
-
-pyzmq_found = False
 mysql = 'pymysql'
 magic = 'python-magic >= 0.4.3'
 
@@ -56,8 +47,6 @@ for mod in pip.get_installed_distributions():
         mysql = 'mysql-python'
     if ( mod.key == 'magic-file-extensions' ):
         magic = 'magic-file-extensions'
-    if ( mod.key == 'pyzmq' ):
-        pyzmq_found = True
 
 print("******************************************")
 print("use: {0}".format(mysql))
