@@ -2219,7 +2219,7 @@ class DbHelper():
         self.__session.execute(SensorHistory.__table__
                                 .update()
                                 .values(sensor_id=mObj.newId)
-                                .where(SensorHistory.sensor_id=mObj.oldId))
+                                .where(sensor_id=mObj.oldId))
         # set the migrate object as Done
         self.__session.delete(mObj)
         # commit
