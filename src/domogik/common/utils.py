@@ -145,6 +145,10 @@ def ucode2(my_string):
     @return a unicode string
 
     """
+    # in Py3 all is uunicode
+    if sys.version_info[0] == 3:
+        return my_string
+
     # special case : data is None
     if my_string is None:
         return None
