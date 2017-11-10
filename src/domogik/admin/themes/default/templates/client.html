@@ -105,5 +105,27 @@
     </div>
   {% endif %}
 
+    <div class="row">
+      <div class="col-md-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h2>{% trans %}Developer{% endtrans %}</h2>
+          </div>
+          <div class="panel-body">
+            <a id="reload" type="button" class="btn btn-default">
+               <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> {% trans %}Reload plugin json{% endtrans %}
+           </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
 </div>
+<script type="text/javascript">
+    $("#reload").click(function() {
+        console.log("reload request");
+        ws.send('{"mq_request": "plugin.reload", "data": {"type" : "{{ client_detail.type }}", "name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
+        console.log("ws send done");
+    });
+</script>
 {% endblock %}
