@@ -37,7 +37,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 import datetime, hashlib, time
 from pytz import utc, timezone
 from time import mktime
