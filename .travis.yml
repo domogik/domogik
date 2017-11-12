@@ -28,6 +28,14 @@ python:
   - "3.6"
   - "3.7-dev"
   - "nightly"
+matrix:
+  allow_failures:
+    - "3.3"
+    - "3.4"
+    - "3.5"
+    - "3.6"
+    - "3.7-dev"
+    - "nightly"
 mysql:
   adapter: mysql2
   database: domogik
