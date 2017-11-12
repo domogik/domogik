@@ -215,7 +215,7 @@ def main():
         testr.run_testcases()
         cr = testr.get_result()
     except Exception as exp:
-        print exp
+        print(exp)
         cr = 1
     sys.exit(cr)
 
