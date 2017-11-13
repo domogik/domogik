@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 from flask import Blueprint, abort
 from domogik.admin.application import app, render_template, timeit
 from domogik.admin.views.clients import get_client_detail

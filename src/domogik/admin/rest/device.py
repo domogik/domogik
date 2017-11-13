@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.common.utils import build_deviceType_from_packageJson
 from domogik.admin.application import app, json_response, register_api, timeit
@@ -423,7 +423,6 @@ class deviceAPI(MethodView):
             app.logger.debug(u"Form params : {0}".format(request.form))
             params = json.loads(request.form.get('params'))
             status = True
-            print params
             cli = MQSyncReq(app.zmq_context)
             msg = MQMessage()
             msg.set_action('device_types.get')
