@@ -8,9 +8,9 @@ sudo touch /var/lock/domogik/config.lock
 sudo chown $LOGNAME:root /var/lock/domogik/config.lock
 
 echo "==== RUNNING installer"
-wget https://raw.githubusercontent.com/domogik/domogik-installation/master/install-develop.sh -O install.sh
-chmod +x install.sh
-sudo ./install.sh
+wget https://raw.githubusercontent.com/domogik/domogik-installation/master/install-develop.sh -O /tmp/install.sh
+chmod +x /tmp/install.sh
+sudo /tmp/install.sh
 
 echo "==== SOME CLEANUP stuff"
 sudo chown $LOGNAME:root /var/lock/domogik
