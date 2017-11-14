@@ -42,7 +42,7 @@ mysql:
   username: travis
   encoding: utf8
 install:
-  - ./$TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install.sh
+  - .$TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install.sh
 before_script:
   - sudo $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-start-domogik.sh
 script:
