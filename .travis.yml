@@ -43,7 +43,8 @@ mysql:
   encoding: utf8
 install:
   - ls -al $TRAVIS_BUILD_DIR/src/domogik/tests/travis/
-  - cat $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install.sh
+  - chmod +x BUILD_DIR/src/domogik/tests/travis/travis-install.sh
+  - ls -al $TRAVIS_BUILD_DIR/src/domogik/tests/travis/
   - sudo $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install.sh
 script:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-run-domogik-tests.sh
