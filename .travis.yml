@@ -42,10 +42,9 @@ mysql:
   username: travis
   encoding: utf8
 install:
-  - ls -al $TRAVIS_BUILD_DIR/src/domogik/tests/travis/
-  - chmod +x BUILD_DIR/src/domogik/tests/travis/travis-install.sh
-  - ls -al $TRAVIS_BUILD_DIR/src/domogik/tests/travis/
-  - sudo $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install.sh
+  - wget https://raw.githubusercontent.com/domogik/domogik-installation/master/install-develop.sh -O /tmp/install.sh
+  - chmod +x /tmp/install.sh
+  - sudo /tmp/install.sh
 script:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-run-domogik-tests.sh
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-run-test-plugin.sh
