@@ -36,6 +36,8 @@ matrix:
     - "3.6"
     - "3.7-dev"
     - "nightly"
+addons:
+  mariadb: "10.0"
 install:
   - wget https://raw.githubusercontent.com/domogik/domogik-installation/master/install-develop.sh -O /tmp/install.sh
   - chmod +x /tmp/install.sh
