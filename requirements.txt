@@ -8,6 +8,7 @@ Flask-Themes2==0.1.4
 Flask_WTF==0.14
 WTForms==2.0.2
 Werkzeug==0.10.4
+sphinx
 sphinx_better_theme==0.13
 linux_metrics==0.1.4
 netifaces>=0.10.5
