@@ -39,10 +39,7 @@ matrix:
 addons:
   mariadb: "10.0"
 install:
-  - wget https://raw.githubusercontent.com/domogik/domogik-installation/master/install-develop.sh -O /tmp/install.sh
-  - chmod +x /tmp/install.sh
-  - sudo /tmp/install.sh
-  - sudo chown -R domogik /var/lock/domogik
+  - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik.sh
 script:
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-run-domogik-tests.sh
   - $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-run-test-plugin.sh
