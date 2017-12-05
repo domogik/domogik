@@ -11,7 +11,7 @@ VENV=$VIRTUAL_ENV
 echo $VENV
 
 echo "==== Launch the installer"
-sudo "VENV=$VENV; $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik-root.sh"
+sudo "VENV=$VENV; echo $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik-root.sh; sh $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik-root.sh"
 
 echo "==== SOME CLEANUP stuff"
 sudo chown $LOGNAME:root /var/lock/domogik
