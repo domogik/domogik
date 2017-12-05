@@ -11,7 +11,7 @@ VENV=$VIRTUAL_ENV
 echo $VENV
 
 echo "==== Launch the installer"
-sudo "source VENV/bin/activate; /tmp/install.sh"
+sudo "source $VENV/bin/activate; /tmp/install.sh"
 
 echo "==== SOME CLEANUP stuff"
 sudo chown $LOGNAME:root /var/lock/domogik
