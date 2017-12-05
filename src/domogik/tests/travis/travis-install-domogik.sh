@@ -5,13 +5,8 @@ echo "==== Downloading and preparing the install script"
 wget https://raw.githubusercontent.com/domogik/domogik-installation/master/install-develop.sh -O /tmp/install.sh
 chmod +x /tmp/install.sh
 
-echo "==== Copy over the virtual env to root"
-export
-VENV=$VIRTUAL_ENV
-echo $VENV
-
 echo "==== Launch the installer"
-sudo "VENV=$VENV; echo $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik-root.sh; sh $TRAVIS_BUILD_DIR/src/domogik/tests/travis/travis-install-domogik-root.sh"
+sudo /tmp/install.sh --venv $VIRTUAL_ENV
 
 echo "==== SOME CLEANUP stuff"
 sudo chown $LOGNAME:root /var/lock/domogik
