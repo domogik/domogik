@@ -62,9 +62,10 @@ class CommandAction(AbstractAction):
             # For now, if the first character is a # we remove it
             # TODO : try improving by getting the real param type from blockly or json or whatever
             #if key == "color" and params[key].startswith("#"):
-            if params[key].startswith("#"):
-                self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
-                params[key] = params[key][1:]
+            if isinstance(params[key], str) or isinstance(params[key], unicode):
+                if params[key].startswith("#"):
+                    self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
+                    params[key] = params[key][1:]
 
         self.log.debug(u"Command : Parameters after processing : {0}".format(params))
         self.log.debug(u"Command : Send action command over MQ...")

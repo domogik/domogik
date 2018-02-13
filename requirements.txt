@@ -10,7 +10,7 @@ WTForms==2.0.2
 Werkzeug==0.10.4
 sphinx_better_theme==0.13
 linux_metrics==0.1.4
-netifaces==0.10.4
+netifaces>=0.10.5
 Jinja2==2.8
 six==1.10.0
 chardet==2.3.0
@@ -20,7 +20,7 @@ pytz==2012c
 requests==2.8.1
 Twisted==15.5.0
 Pygments==2.0.1
-SQLAlchemy==1.0.9
+SQLAlchemy>=1.1
 pyOpenSSL==17.0.0
 python_dateutil==2.6.0
 pyephem==3.7.6.0

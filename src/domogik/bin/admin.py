@@ -318,7 +318,7 @@ class Admin(Plugin):
         self.log.info(u"Start WS Server on {0}:{1}...".format(self.interfaces, self.ws_port))
         publisher = MQManager()
         tapp = Application([
-            (r"/ws", WebSocketManager, dict(publisher=publisher))
+            (r"/ws/", WebSocketManager, dict(publisher=publisher))
             ])
 
         # logging
@@ -1024,7 +1024,7 @@ class Admin(Plugin):
                 client_id = msg_data['client_id']
             if status :
                 # check the received info
-                (result, reason, status) = build_deviceType_from_packageJson(self.zmq, dev_type_id, client_id)
+                (result, reason, status) = build_deviceType_from_packageJson(self.log, self.zmq, dev_type_id, client_id)
             msg = MQMessage()
             msg.set_action('device.params.result')
             msg.add_data('status', status)

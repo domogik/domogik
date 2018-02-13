@@ -1,0 +1,17 @@
+[Unit]
+Description=Domogik MQ Broker
+Documentation=http://domogik.readthedocs.io/en/master/
+Before=domogik.service domogik-mq-forwarder.service domogik-xpl.service
+PartOf=domogik.service
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/default/domogik-mq
+ExecStart=/usr/local/bin/dmg_broker
+User=domogik
+StandardOutput=null
+StandardError=null
+KillSignal=15
+
+[Install]
+WantedBy=multi-user.target

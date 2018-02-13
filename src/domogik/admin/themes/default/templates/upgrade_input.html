@@ -3,5 +3,89 @@
 {% block content %}
 <div class="container">
     <h2>{% trans %}Upgrade Device{% endtrans %}</h2>
+    Device inconsistencies between Domogik ({{ oldversion }}) and the plugin ({{ newversion }})<br />
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Item</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ac in actions.keys() %}
+            {% for data in actions[ac].items() %}
+                {% for data2 in data[1] %}
+                    <tr>
+                        <td>{{ ac }}</td>
+                        <td>{{ data[0] }}</td>
+                        <td>{{ data2 }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+    <br />
+    <h3>How to upgrade this device</h3>
+    <div id="accordion" role="tablist" class="panel-group">
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingOne">
+          <h4 class="panel-title"><a data-toggle="collapse" href="#collapseOne" data-parent="#accordion">
+                1- Create a new device{% if step > 1 %}<div class="pull-right"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></div>{% endif %}
+          </a></h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse{% if step == 1 %} in{% endif %}" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
+          <div class="panel-body">
+              We first create a new device with all the new info, so the new device will be compatible with the new plugin version.<br />
+              In the new device wizard we will pre-fill all the fields we can pre-fil<br /><br />
+              <a class="btn btn-default" href="/client/{{ clientid }}/dmg_devices/new/type/{{ devtype }}/base/{{ devid }}">
+                <span class="glyphicon glyphicon-copy" aria-hidden="true"></span> {% trans %}Copy device{% endtrans %}
+              </a>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingTwo">
+          <h4 class="panel-title"><a data-toggle="collapse" href="#collapse2" data-parent="#accordion">
+                2- Migrate sensors{% if step > 2 %}<div class="pull-right"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></div>{% endif %}
+          </a></h4>
+        </div>
+        <div id="collapse2" class="panel-collapse collapse{% if step == 2 %} in{% endif %}" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
+          <div class="panel-body">
+              TODO
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingTwo">
+          <h4 class="panel-title"><a data-toggle="collapse" href="#collapse3" data-parent="#accordion">
+                3- Wait for cron trigger{% if step > 3 %}}<div class="pull-right"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></div>{% endif %}
+          </a></h4>
+        </div>
+        <div id="collapse3" class="panel-collapse collapse{% if step == 3 %} in{% endif %}" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
+          <div class="panel-body">
+              Now the domogic cron system will take over, once the cron has migrated all the sensors to the new device this section will be marked done.<br />
+              Once its Done you can continue to the next step.
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingThree">
+          <h4 class="panel-title"><a data-toggle="collapse" href="#collapse4" data-parent="#accordion">
+                4- Delete the old device{% if step > 4 %}}<div class="pull-right"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></div>{% endif %}
+          </a></h4>
+        </div>
+        <div id="collapse4" class="panel-collapse collapse{% if step == 4 %} in{% endif %}" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+          <div class="panel-body">
+              In this step we delete the old device, as this device has no linked sensors anymore we will not loose data.<br />
+              If you delete the device before the previous (step 3) step is completed you will lose some data.<br /><br />
+              <a class="btn btn-default" data-toggle="confirmation" data-placement="bottom" data-href="/client/{{ clientid }}/dmg_devices/delete/{{ devid }}">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans %}Delete device{% endtrans %}
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
 {% endblock %}

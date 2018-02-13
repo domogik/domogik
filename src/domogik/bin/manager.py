@@ -75,6 +75,7 @@ from subprocess import Popen, PIPE
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogik.common import logger
 from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
+from domogik.common.deviceconsistency import DeviceConsistencyThread
 from domogik.xpl.common.plugin import XplPlugin
 from domogik.common.plugin import STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID, STATUS_HBEAT
 from domogik.common.queryconfig import Query
@@ -521,6 +522,11 @@ class Manager(XplPlugin, MQAsyncSub):
                 self.log.info(u"Plugin startup request : {0}".format(msg))
                 self._mdp_reply_plugin_start(msg)
 
+            # reload clients
+            elif msg.get_action() == "plugin.reload":
+                self.log.info(u"Plugin reload request : {0}".format(msg))
+                self._mdp_reply_plugin_reload(msg)
+
             # stop clients
             # nothing is done in the manager directly :
             # a stop request is sent to a plugin
@@ -530,6 +536,39 @@ class Manager(XplPlugin, MQAsyncSub):
         except:
             self.log.error("Error while processing MQ message : '{0}'. Error is : {1}".format(msg, traceback.format_exc()))
 
+    def _mdp_reply_plugin_reload(self, data):
+        msg = MQMessage()
+        msg.set_action('plugin.reload.result')
+
+        if 'name' not in data.get_data().keys():
+            status = False
+            reason = "Plugin reload request : missing 'name' field"
+            self.log.error(reason)
+        else:
+            type = data.get_data()['type']
+            msg.add_data('type', type)
+            name = data.get_data()['name']
+            msg.add_data('name', name)
+            host = data.get_data()['host']
+            msg.add_data('host', host)
+
+            # try to start the client
+            #
+            try:
+                if type == "plugin":
+                    self._plugins[name].reload_data()
+                elif type == "interface":
+                    self._interfaces[name].reload_data()
+                status = True
+                reason = "{0} '{1}' reload finished".format(type, name)
+            except KeyError:
+                # plugin doesn't exist
+                status = False
+                reason = "{0} '{1}' does not exist on this host".format(type, name)
+
+        msg.add_data('status', status)
+        msg.add_data('reason', reason)
+        self.reply(msg.get())
 
     def _mdp_reply_packages_detail(self):
         """ Reply on the MQ
@@ -1323,8 +1362,17 @@ class Plugin(GenericComponent, MQAsyncSub):
     def reload_data(self):
         """ Just reload the client data
         """
+        # store old version
+        oldversion = self.data["identity"]["version"]
+        # clear the data
         self.data = {}
+        # reload the data
         self.fill_data()
+        # if oldversion != new version
+        #   Start the deviceconsistency thread for this plugin
+        if oldversion < self.data["identity"]["version"]:
+            self.log.info(u"The version of this plugin is newer then the already known version, starting device uprgade process")
+            DeviceConsistencyThread(self.client_id, self._stop, self.log).start()
 
     def fill_data(self):
         """ Fill the client data by reading the json file

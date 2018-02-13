@@ -63,7 +63,7 @@ prefix = core
 #pool_recycle = 3600
 
 # port used by internal memory db cache system
-portcache = 50001
+portcache = 40409
 
 ###
 # Admin interface

@@ -180,7 +180,7 @@ def device_params(client_id, dev_type_id):
         }
     """
     try:
-        (result, reason, status) = build_deviceType_from_packageJson(app.zmq_context, dev_type_id, client_id)
+        (result, reason, status) = build_deviceType_from_packageJson(app.logger, app.zmq_context, dev_type_id, client_id)
     except:
         msg = u"Error while getting the device parameters. Error is : {0}".format(traceback.format_exc())
         app.logger.error(msg)

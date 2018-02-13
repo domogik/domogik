@@ -110,7 +110,7 @@ def scenario_edit(id):
         clone = True
     else:
         clone = False
-    default_json = '{"type":"controls_if","id":"CXeRaH*|O;%(XRY0~0(d"}'
+    default_json = ''
     # laod the json
     if int(id) == 0:
         name = u""

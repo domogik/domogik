@@ -32,9 +32,9 @@ DeviceConsistencyException
 from domogik.common.packagejson import PackageJson
 from domogik.common.database import DbHelper
 import json
-import thread
+from threading import Thread
 
-class DeviceConsistencyThread(threading.thread):
+class DeviceConsistencyThread(Thread):
     def __init__(self, client_id, stop, log):
         Thread.__init__(self)
         self.client_id = client_id
@@ -42,31 +42,32 @@ class DeviceConsistencyThread(threading.thread):
         tmp = client_id.split('-')
         tmp = tmp[1].split('.')
         self.name = tmp[0]
-        self.stop = stop
-        self.log = log
+        self._stop = stop
+        self.log = log.getChild("upgrade.{0}".format(client_id))
         # start the db connection
         self.db = DbHelper()
 
     def run(self):
+        self.log.info("Checking devices for plugin {0}".format(self.client_id))
         with self.db.session_scope():
             plugin_json = PackageJson(name=self.name)
             for dev in self.db.list_devices_by_plugin(self.client_id):
                 # this can take some time, so guard with the stop
                 if self._stop.isSet():
                     break
+                self.log.info("Checking device {0}({1})".format(dev['name'], dev['id']))
                 # check the device
                 device_json = json.loads(json.dumps(dev))
                 dc = DeviceConsistency("return", device_json, plugin_json.json)
                 dc.check()
-                res = dc.get_result()
-                if len(dc.keys()) > 0:
+                if not dc.isOk:
                     # update to set the dev as needs upgrade
                     self.log.info("Device {0}({1}) needs upgrade".format(dev['name'], dev['id']))
-                    self.log.debug(dc)
+                    self.log.debug(dc.get_result())
                     # set the state to needsupgrade
                     self.db.update_device(dev['id'], d_state=u'upgrade')
                 else:
-                    new_version = self.p_json['identity']['version']
+                    new_version = dc.p_json['identity']['version']
                     # all ok
                     self.log.info("Device {0}({1}) is OK for new version {2}".format(dev['name'], dev['id'], new_version))
                     # udpate the client version for this device
@@ -100,7 +101,9 @@ class DeviceConsistency():
         self.p_json = plugin_json
         self._type = check_type
         self._result = {}
+        self._isOk = True
         self._globaXplParams = []
+        self.check()
 
     def check(self):
         self._validate_identity()
@@ -108,13 +111,24 @@ class DeviceConsistency():
         self._validate_command()
         self._validate_sensor()
 
+    def isOk(self):
+        return self._isOk
+
     def get_result(self):
         if self._type == "raise":
             return None
         else:
             return self._result
 
+    def _addToResult(self, t, a, d):
+        if not a in self._result:
+            self._result[a] = dict()
+        if not t in self._result[a]:
+            self._result[a][t] = list()
+        self._result[a][t].append(d)
+
     def _raise(self, code, data):
+        self._isOk = False
         """ Code
          0 DONE => nothing needs to be done, we raise anyway, data = string to raise
          1 DONE => sensor add
@@ -141,83 +155,83 @@ class DeviceConsistency():
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Sensor ({0}) is in the plugin but not in the device".format(data))
             else:
-                self._result['sensor_add'] = data
+                self._addToResult('sensor', 'add', data)
         elif code == -1:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Sensor ({0}) is in the device but not in the plugin".format(data))
             else:
-                self._result['sensor_del'] = data
+                self._addToResult('sensor', 'del', data)
         # COMMAND stuff
         elif code == 2:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Command ({0}) is in the plugin but not in the device".format(data))
             else:
-                self._result['command_add'] = data
+                self._addToResult('command', 'add', data)
         elif code == -2:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Command ({0}) is in the device but not in the plugin".format(data))
             else:
-                self._result['command_del'] = data
+                self._addToResult('command', 'del', data)
         elif code == 3:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Command ({0}) parameter ({1}) found in the plugin but not in the db".format(data[0], data[1]))
             else:
-                self._result['command_param_add'] = data
+                self._addToResult('command_param', 'add', data)
         elif code == -3:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Command ({0}) parameter ({1}) found in the db but not in the plugin".format(data[0], data[1]))
             else:
-                self._result['command_param_del'] = data
+                self._addToResult('command_param', 'del', data)
         elif code == 4:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl command ({0}) is in the plugin but not in the db".format(data))
             else:
-                self._result['xplcommand_add'] = data
+                self._addToResult('xpl_command', 'add', data)
         elif code == -4:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl command ({0}) is in db but not in the plugin".format(data))
             else:
-                self._result['xplcommand_del'] = data
+                self._addToResult('xpl_command', 'del', data)
         elif code == 5:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl command ({0}) parameter ({1}) found in the plugin but not in the db".format(data[0], data[1]))
             else:
-                self._result['xplcommand_param_add'] = data
+                self._addToResult('xpl_command_param', 'add', data)
         elif code == -5:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl command ({0}) parameter ({1}) found in the db but not in the plugin".format(data[0], data[1]))
             else:
-                self._result['xplcommand_param_del'] = data
+                self._addToResult('xpl_command_param', 'del', data)
         elif code == 6:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl stat ({0}) is in the plugin but not in the db".format(data))
             else:
-                self._result['xplstat_add'] = data
+                self._addToResult('xpl_stat', 'add', data)
         elif code == -6:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl stat ({0}) is in db but not in the plugin".format(data))
             else:
-                self._result['xplstat_del'] = data
+                self._addToResult('xpl_stat', 'del', data)
         elif code == 7:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl stat ({0}) parameter ({1}) found in the plugin but not in the db".format(data[0], data[1]))
             else:
-                self._result['xplstat_param_add'] = data
+                self._addToResult('xpl_stat_param', 'add', data)
         elif code == -7:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Xpl stat ({0}) parameter ({1}) found in the db but not in the plugin".format(data[0], data[1]))
             else:
-                self._result['xplstat_param_del'] = data
+                self._addToResult('xpl_stat_param', 'del', data)
         elif code == 8:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Device global param ({0}) is in the plugin but not in the device".format(data))
             else:
-                self._result['device_param_add'] = data
+                self._addToResult('device_param', 'add', data)
         elif code == -8:
             if self._type == "raise":
                 raise DeviceConsistencyException(code, "Device global param ({0}) is in the device but not in the plugin".format(data))
             else:
-                self._result['device_param_del'] = data
+                self._addToResult('device_param', 'del', data)
         else:
             print "{0} = {1}".format(code, data)
 
