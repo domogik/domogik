@@ -52,6 +52,7 @@ from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker, defer, scoped_session
 from sqlalchemy.orm.session import make_transient
 from sqlalchemy.pool import QueuePool
+#from sqlalchemy.cprocessors import str_to_datetime
 from domogik.common.utils import ucode, get_sanitized_hostname
 from domogik.common import logger
 #from domogik.common.packagejson import PackageJson
@@ -894,7 +895,7 @@ class DbHelper():
         return device
 
     def del_device(self, d_id):
-        """Mark a device to be deleted. 
+        """Mark a device to be deleted.
 
         @param d_id : device id
         @return the 'marked to delete' device
@@ -959,7 +960,7 @@ class DbHelper():
             Raise an exception if the device is used in a scenario
             Return : nothing
         """
- 
+
         # check if this device i used in a scenario
         llist = []
         fdo = False
@@ -1172,10 +1173,12 @@ class DbHelper():
         else:
             to = int(time.time())
         values = []
+        self.log.debug(u"Query sensor {0} history between {1} and {2}".format(sid, _datetime_string_from_tstamp(frm), _datetime_string_from_tstamp(to)))
         for a_value in self.__session.query(SensorHistory
-                  ).filter(SensorHistory.sensor_id==sid
+#                  ).filter(SensorHistory.date.between(_datetime_string_from_tstamp(frm), _datetime_string_from_tstamp(to))
                   ).filter(SensorHistory.date>=_datetime_string_from_tstamp(frm)
                   ).filter(SensorHistory.date<=_datetime_string_from_tstamp(to)
+                  ).filter(SensorHistory.sensor_id==sid
                   ).order_by(sqlalchemy.asc(SensorHistory.date)
                   ).all():
             values.append({"value_str" : a_value.value_str,
@@ -1318,9 +1321,12 @@ class DbHelper():
                             function['min'], function['max'], function['avg'], function['sum']
                         )
         }
+        self.log.debug(u"Query sensor {0} history filter : {1}".format(sid, sql_query))
         if self.get_db_type() in ('mysql', 'postgresql'):
             cond_min = "date >= '" + _datetime_string_from_tstamp(frm) + "'"
             cond_max = "date < '" + _datetime_string_from_tstamp(to) + "'"
+#            cond_min = "date >= STR_TO_DATE('" + _datetime_string_from_tstamp(frm) + "','%Y-%m-%d %H:%i:%s')"
+#            cond_max = "date < STR_TO_DATE('" + _datetime_string_from_tstamp(to) + "','%Y-%m-%d %H:%i:%s')"
             query = sql_query[step_used][self.get_db_type()]
             query = query.filter_by(sensor_id=sid
                         ).filter(cond_min
@@ -1329,6 +1335,30 @@ class DbHelper():
                                                ).filter(cond_min
                                                ).filter(cond_max
                                                ).first()
+#            query = query.filter(cond_min
+#                        ).filter(cond_max
+#                        ).filter(SensorHistory.sensor_id==sid)
+#            results_global = sql_query['global'].filter(cond_min
+#                                               ).filter(cond_max
+#                                               ).filter(SensorHistory.sensor_id==sid
+#                                               ).first()
+# STR_TO_DATE("2017-01-01 23:00:00", '%Y-%m-%d %H:%i:%s')
+#            query = query.with_hint(SensorHistory, 'FORCE INDEX (PRIMARY)'
+#                        ).filter(SensorHistory.sensor_id==sid
+#                        ).filter(SensorHistory.date.between(str_to_datetime(_datetime_string_from_tstamp(frm)), str_to_datetime(_datetime_string_from_tstamp(to))))
+#            results_global = sql_query['global'].with_hint(SensorHistory, 'FORCE INDEX (PRIMARY)'
+#                                            ).filter(SensorHistory.sensor_id==sid
+#                                            ).filter(SensorHistory.date.between(str_to_datetime(_datetime_string_from_tstamp(frm)), str_to_datetime(_datetime_string_from_tstamp(to)))
+#                                            ).first()
+#            query = query.with_hint(SensorHistory, 'FORCE INDEX (PRIMARY)'
+#                        ).filter(cond_min
+#                        ).filter(cond_max
+#                        ).filter(SensorHistory.sensor_id==sid)
+#            results_global = sql_query['global'].with_hint(SensorHistory, 'FORCE INDEX (PRIMARY)'
+#                                            ).filter(cond_min
+#                                            ).filter(cond_max
+#                                            ).filter(SensorHistory.sensor_id==sid
+#                                            ).first()
             return {
                 'values': query.all(),
                 'global_values': {
