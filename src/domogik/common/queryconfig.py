@@ -160,7 +160,7 @@ class QueryDB():
         @param log : a Logger instance (usually took from self.log)
         @param host : client hostname
         '''
-        self._db = DbHelper()
+        self._db = DbHelper(owner="Query db for host {0}".format(host))
         self._log = log
         self._host = host
         self._log.debug("Init config query(DB) instance")

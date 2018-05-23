@@ -196,7 +196,7 @@ if __name__ == "__main__":
     stats_filter = False
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hs:I", ["help", "stats=", "noinsert"])
-        _db = DbHelper(use_test_db=True)
+        _db = DbHelper(use_test_db=True, owner="Stats benchmarks main")
         print(u"Using %s database" % _db.get_db_type())
 
         for opt, arg_list in opts:

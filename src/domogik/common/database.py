@@ -126,7 +126,7 @@ class DbHelperException(Exception):
         return repr(self.value)
 
 
-class DbHelper():
+class DbHelper(object):
     """This class provides methods to fetch and put informations on the Domogik database
 
     The user should only use methods from this class and don't access the database directly
@@ -136,7 +136,7 @@ class DbHelper():
     __session = None
     __session_object = None
 
-    def __init__(self, echo_output=False, use_test_db=False, engine=None, use_cache=True):
+    def __init__(self, echo_output=False, use_test_db=False, engine=None, use_cache=True, owner=None):
         """Class constructor
 
         @param echo_output : if True displays sqlAlchemy queries (optional, default False)
@@ -150,7 +150,7 @@ class DbHelper():
         cfg = Loader('database')
         config = cfg.load()
         self.__db_config = dict(config[1])
-
+        self._owner = owner
         # init cache date multiprocessing for device_list
         self._cacheDB = None
         if use_cache :
@@ -158,7 +158,7 @@ class DbHelper():
             port_c = 50001 if not 'portcache' in self.__db_config else int(self.__db_config['portcache'])
             m = CacheDB(address=('localhost', port_c), authkey=b'{0}'.format(self.__db_config['password']))
             m.connect()
-            self.log.info(u"New client connected to memory cache : {0}".format(m))
+            self.log.info(u"New client connected to memory cache : {0}".format(self._owner))
             self._cacheDB = m.get_cache()
         if "recycle_pool" in self.__db_config:
             #self.log.info(u"User value for recycle pool : {0}".format(self.__db_config['recycle_pool']))
@@ -328,7 +328,7 @@ class DbHelper():
                     ).all()
         if self._cacheDB :
             self.log.debug(u"Set cache config for {0}.{1} : {2} parameter(s)".format( pl_id, pl_hostname, len(config)))
-            self._cacheDB.setConfigData(config, pl_id, pl_hostname, repr(self))
+            self._cacheDB.setConfigData(config, pl_id, pl_hostname, self._owner)
         return config
 
     def get_plugin_config(self, pl_type, pl_id, pl_hostname, pl_key):
@@ -443,7 +443,7 @@ class DbHelper():
         if d_state==u'active':
             if self._cacheDB :
                 self.log.debug(u"Set cache devices with {0} devices".format(len(device_list)))
-                self._cacheDB.setDevices(device_list, repr(self))
+                self._cacheDB.setDevices(device_list, self._owner)
         return device_list
 
     def list_devices_by_plugin(self, p_id):
@@ -1072,7 +1072,6 @@ class DbHelper():
                     h = SensorHistory(sensor['id'], datetime.datetime.fromtimestamp(date), value, orig_value=orig_value)
                     self.__session.add(h)
                     self._do_commit()
-                    if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sensor['id'])
                     # update the info changed
                     #self.update_device(sensor['device_id'])
                     #self._do_commit()
@@ -1086,8 +1085,6 @@ class DbHelper():
                 value_max = None
                 try:
                     val = float(value)
-                except ValueError:
-                    pass
                 except ValueError:
                     pass
                 except TypeError:
@@ -1113,7 +1110,9 @@ class DbHelper():
                 #self.__session.add(sensor_db)
                 data = ucode(value)
                 self._do_commit()
-                if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sid)
+                self.log.debug(u"Query sensor {0} stored last receive {1} : {2}".format(sid, date, ucode(value)))
+                if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sensor['id'])
+#                self.log.debug(u"markAsUpdatingDevices sensor {0} <stored last receive> : {1}".format(sensor['id'], value))
 
                 ### handle the history size in number of items
                 # TODO : move in a dedicated function which would be called each... ??? hours ???
@@ -1135,7 +1134,6 @@ class DbHelper():
                                     ) \
                             .delete(synchronize_session=False)
                         self._do_commit()
-                        if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sensor['id'])
 
                 ### handle the history size in days
                 # TODO : move in a dedicated function which would be called each day or N hours
@@ -1148,7 +1146,6 @@ class DbHelper():
                                 ) \
                         .delete(synchronize_session=False)
                     self._do_commit()
-                    if self._cacheDB: self._cacheDB.markAsUpdatingDevices(sensor_id=sensor['id'])
 
             else:
                 self.__raise_dbhelper_exception(u"Can not add history to not existing sensor: {0}".format(sid), True)
@@ -1778,8 +1775,8 @@ class DbHelper():
         values.append({"value_str" : a_value.last_value,
                        "value_num" : a_value.last_value,
                        "timestamp" : a_value.last_received })
+        self.log.debug(u"get_last_sensor_value for {0} : {1} , {2}".format( sid, values, a_value))
         return values
-
 
     def get_sensor_by_device_id(self, did):
         return self.__session.query(Sensor).filter_by(device_id=did).all()

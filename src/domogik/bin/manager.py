@@ -612,6 +612,7 @@ class Manager(XplPlugin, MQAsyncSub):
             data = json.load(open(json_file), object_pairs_hook=OrderedDict)
         except:
             self.log.error("Error while reading datatypes json file '{0}'. Error is : {1}".format(json_file, traceback.format_exc()))
+
         msg.add_data("datatypes", data)
         self.reply(msg.get())
 
@@ -1971,4 +1972,3 @@ if __name__ == "__main__":
     main()
 
 # this is a test.
-

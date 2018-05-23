@@ -115,7 +115,7 @@ class ScenarioManager:
         # an instance of the logger
         self.log = log
         # load all scenarios from the DB
-        self._db = DbHelper()
+        self._db = DbHelper(owner="Scenario manager")
         self.load_scenarios()
 
     def load_scenarios(self):
@@ -213,7 +213,7 @@ class ScenarioManager:
             payload = json.loads(json_input)  # quick test to check if json is valid
         except Exception as e:
             self.log.error(u"Creation of a scenario failed, invallid json: {0}".format(json_input))
-            self.log.error(u"Error is : {0}".format(traceback.format_exc()))
+            self.log.error(u"Error is : {0}".format(tracebeck.format_exc()))
             return {'status': 'ERROR', 'msg': 'invallid json'}
 
         #if 'IF' not in payload.keys():
