@@ -240,7 +240,7 @@ class WorkerCache(object):
         config = cfg.load()
         db_config = dict(config[1])
 
-        port_c = 50001 if not 'portcache' in db_config else int(db_config['portcache'])
+        port_c = 40409 if not 'portcache' in db_config else int(db_config['portcache'])
 
         self._cache = CacheData()
         MyManager.register('get_cache', callable=lambda:self._cache)

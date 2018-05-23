@@ -300,7 +300,7 @@ class Manager(XplPlugin, MQAsyncSub):
             cfg = Loader('database')
             config = cfg.load()
             dbConfig = dict(config[1])
-            port_c = 50001 if not 'portcache' in dbConfig else int(dbConfig['portcache'])
+            port_c = 40409 if not 'portcache' in dbConfig else int(dbConfig['portcache'])
             CacheDB.register('force_leave')
             m = CacheDB(address=('localhost', port_c), authkey=b'{0}'.format(dbConfig['password']))
             m.connect()

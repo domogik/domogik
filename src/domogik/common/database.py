@@ -155,7 +155,7 @@ class DbHelper(object):
         self._cacheDB = None
         if use_cache :
             CacheDB.register('get_cache')
-            port_c = 50001 if not 'portcache' in self.__db_config else int(self.__db_config['portcache'])
+            port_c = 40409 if not 'portcache' in self.__db_config else int(self.__db_config['portcache'])
             m = CacheDB(address=('localhost', port_c), authkey=b'{0}'.format(self.__db_config['password']))
             m.connect()
             self.log.info(u"New client connected to memory cache : {0}".format(self._owner))
