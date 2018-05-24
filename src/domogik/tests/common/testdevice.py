@@ -66,7 +66,10 @@ class TestDevice():
         url = "{0}/device/params/{1}/{2}".format(self.rest_url, client_id, device_type)
         print(u"Getting device_type params {0}".format(device_type))
         print(u"Url called is {0}".format(url))
-
+        
+        # Fix SSL exception for travis-ci
+        url = url.replace('https', 'https')
+        
         response = requests.get(url, verify=False)
         #print(u"Response : [{0}]".format(response.status_code))
         print(u"Response : [{0}] : {1}".format(response.status_code, response.text))
