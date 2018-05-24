@@ -240,7 +240,7 @@ class Admin(Plugin):
         Plugin.__init__(self, name = 'admin', log_prefix='core_')
         self.log.debug(u"Init database_manager instance")
         # Check for database connexion
-        self._db = DbHelper()
+        self._db = DbHelper(owner="Admin core")
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : {0}".format(locale.getdefaultlocale()))
@@ -394,7 +394,7 @@ class Admin(Plugin):
         # Try gevent to allow streaming
         # Not working with the cache component... See #509 for more details
         #cmd = "{0}  -k gevent".format(cmd)
-   
+
         # Increase the timeout to allow 2 min of data streaming
         # As all UIs should refresh each video stream each minute in case of stream error, it should do the trick
         cmd = "{0}  -t 120".format(cmd)
@@ -405,12 +405,12 @@ class Admin(Plugin):
             # Get the available cipher son the system
             # We do this manually because on some systems, gunicorn provides only the 00000 cipher, so ssl is unusable!
             cmd_ciphers = "{0} ciphers".format(find_executable("openssl"))
-            self._ciphers = subprocess.Popen(cmd_ciphers, shell=True, 
-                                             stdout=subprocess.PIPE, 
+            self._ciphers = subprocess.Popen(cmd_ciphers, shell=True,
+                                             stdout=subprocess.PIPE,
                                              stderr=subprocess.PIPE)
             out, err = self._ciphers.communicate()
             CIPHERS = out.strip()
-            # Example result : 
+            # Example result :
             #CIPHERS = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA:RSA-PSK-AES256-GCM-SHA384:DHE-PSK-AES256-GCM-SHA384:RSA-PSK-CHACHA20-POLY1305:DHE-PSK-CHACHA20-POLY1305:ECDHE-PSK-CHACHA20-POLY1305:AES256-GCM-SHA384:PSK-AES256-GCM-SHA384:PSK-CHACHA20-POLY1305:RSA-PSK-AES128-GCM-SHA256:DHE-PSK-AES128-GCM-SHA256:AES128-GCM-SHA256:PSK-AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:ECDHE-PSK-AES256-CBC-SHA384:ECDHE-PSK-AES256-CBC-SHA:SRP-RSA-AES-256-CBC-SHA:SRP-AES-256-CBC-SHA:RSA-PSK-AES256-CBC-SHA384:DHE-PSK-AES256-CBC-SHA384:RSA-PSK-AES256-CBC-SHA:DHE-PSK-AES256-CBC-SHA:AES256-SHA:PSK-AES256-CBC-SHA384:PSK-AES256-CBC-SHA:ECDHE-PSK-AES128-CBC-SHA256:ECDHE-PSK-AES128-CBC-SHA:SRP-RSA-AES-128-CBC-SHA:SRP-AES-128-CBC-SHA:RSA-PSK-AES128-CBC-SHA256:DHE-PSK-AES128-CBC-SHA256:RSA-PSK-AES128-CBC-SHA:DHE-PSK-AES128-CBC-SHA:AES128-SHA:PSK-AES128-CBC-SHA256:PSK-AES128-CBC-SHA"
             cmd = "{0} --ciphers {1}".format(cmd, CIPHERS)
 
@@ -437,16 +437,6 @@ class Admin(Plugin):
         """
         my_exception =  str(traceback.format_exc()).replace('"', "'")
         return my_exception
-
-    def get_a_dbHelper(self):
-        """ Handle a multi DbHelper. Create a DbHelper object if necessary who is deleted after use
-            @return dbHelper : new DbHelper object or self ._db if not used
-        """
-        if self._db is None :
-            self._db = DbHelper()
-        if self._db.get_session is None :
-               return self._db
-        return DbHelper()
 
     def on_mdp_request(self, msg):
         """ Handle Requests over MQ on multi-thread
@@ -476,7 +466,7 @@ class Admin(Plugin):
             if msg.get_action() == "device.params":
                 self._mdp_reply_devices_params_result(msg)
             else :
-                db = self.get_a_dbHelper()
+                db = DbHelper(owner="Admin core (temporary duplicate for MQ request : {0})".format(msg.get_action()))
                 with db.session_scope():
                     # configuration
                     if msg.get_action() == "config.get":
@@ -1081,8 +1071,7 @@ class Admin(Plugin):
                 type = msg_data['type']
                 name = msg_data['name']
                 host = msg_data['host']
-                dev_list = db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
-
+                dev_list = db.list_devices_by_plugin(u"{0}-{1}.{2}".format(type, name, host))
             #dev_json = json.dumps(dev_list, cls=domogik_encoder(), check_circular=False),
             dev_json = dev_list
             msg.add_data('status', status)

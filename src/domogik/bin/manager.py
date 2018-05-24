@@ -300,7 +300,7 @@ class Manager(XplPlugin, MQAsyncSub):
             cfg = Loader('database')
             config = cfg.load()
             dbConfig = dict(config[1])
-            port_c = 50001 if not 'portcache' in dbConfig else int(dbConfig['portcache'])
+            port_c = 40409 if not 'portcache' in dbConfig else int(dbConfig['portcache'])
             CacheDB.register('force_leave')
             m = CacheDB(address=('localhost', port_c), authkey=b'{0}'.format(dbConfig['password']))
             m.connect()
@@ -612,7 +612,7 @@ class Manager(XplPlugin, MQAsyncSub):
             data = json.load(open(json_file), object_pairs_hook=OrderedDict)
         except:
             self.log.error("Error while reading datatypes json file '{0}'. Error is : {1}".format(json_file, traceback.format_exc()))
-       
+
         msg.add_data("datatypes", data)
         self.reply(msg.get())
 
@@ -1972,4 +1972,3 @@ if __name__ == "__main__":
     main()
 
 # this is a test.
-

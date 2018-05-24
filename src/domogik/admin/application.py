@@ -55,14 +55,14 @@ from domogikmq.reqrep.client import MQSyncReq
 
 ### init Flask
 app = Flask(__name__)
-app.db = DbHelper()
+app.db = DbHelper(owner="Admin Application")
 app.debug = True
 
 ### load config
 cfg = dmgLoader('admin').load()
 app.globalConfig = dict(cfg[0])
-app.dbConfig = dict(cfg[1]) 
-app.zmq_context = zmq.Context() 
+app.dbConfig = dict(cfg[1])
+app.zmq_context = zmq.Context()
 
 
 app.libraries_directory = app.globalConfig['libraries_path']

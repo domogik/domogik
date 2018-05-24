@@ -69,7 +69,7 @@ class XplManager(XplPlugin):
         self.add_mq_sub('device.update')
 
         self.log.info(u"XPL manager initialisation...")
-        self._db = DbHelper()
+        self._db = DbHelper(owner="xplgw core")
         self.pub = MQPub(zmq.Context(), 'xplgw')
         # some initial data sets
         self.client_xpl_map = {}
@@ -143,7 +143,7 @@ class XplManager(XplPlugin):
             # No need to reload device_list of xplgw
             # => xplgw does not use self.devices from the Plugin class but its own self.all_devices.
             #    As self.devices is not used/needed, we don't call the XplPlugon.on_message for device.update
-            if msgid != 'device.update':  
+            if msgid != 'device.update':
                 XplPlugin.on_message(self, msgid, content)
 
             if msgid == 'client.conversion':
@@ -650,7 +650,7 @@ class XplManager(XplPlugin):
         """
         def __init__(self, log, stop, queue, storeQueue):
             threading.Thread.__init__(self, name="XplSensorThread")
-            self._db = DbHelper()
+            self._db = DbHelper(owner="xpl sensor queue {0}".format(queue))
             self._log = log
             self._queue = queue
             self._queue_store = storeQueue
@@ -799,7 +799,7 @@ class XplManager(XplPlugin):
         def __init__(self, queue, log, get_conversion_map, pub, stop):
             threading.Thread.__init__(self, name="SensorStoreThread")
             self._log = log
-            self._db = DbHelper()
+            self._db = DbHelper(owner="Sensor Store queue {0}".format(queue))
             self._conv = get_conversion_map
             self._queue = queue
             self._pub = pub

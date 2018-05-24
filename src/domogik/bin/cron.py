@@ -49,7 +49,7 @@ class CronSystem():
         l = logger.Logger("core_cron", log_on_stdout=True)
         self.log = l.get_logger()
         withCache = is_already_launched(self.log, "core", "cachedb", False)
-        self.db = DbHelper(use_cache=withCache[0])
+        self.db = DbHelper(use_cache=withCache[0], owner="Cron core")
         self.run()
 
     def run(self):
