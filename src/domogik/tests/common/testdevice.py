@@ -67,7 +67,7 @@ class TestDevice():
         print(u"Getting device_type params {0}".format(device_type))
         print(u"Url called is {0}".format(url))
 
-        response = requests.get(url)
+        response = requests.get(URL, verify=False)
         #print(u"Response : [{0}]".format(response.status_code))
         print(u"Response : [{0}] : {1}".format(response.status_code, response.text))
         if response.status_code != 200:
