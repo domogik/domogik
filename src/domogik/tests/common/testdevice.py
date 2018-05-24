@@ -50,9 +50,11 @@ class TestDevice():
         """ Construtor
             @param rest_url : url of the rest server
         """
-        # rest url
-        self.rest_url = get_rest_url()
-
+        # rest url        
+        # Fix SSL exception for travis-ci TODO: Find why get_rest_url() concider use_ssl ?         
+        # self.rest_url = get_rest_url()
+        self.rest_url = get_rest_url().replace('https', 'http')
+        
         # package informations
         self.client_id = None
 
@@ -64,10 +66,6 @@ class TestDevice():
         """CALL GET /device/params/<device_Type>
         """
         url = "{0}/device/params/{1}/{2}".format(self.rest_url, client_id, device_type)
-        
-        # Fix SSL exception for travis-ci
-        url = url.replace('https', 'http')
-        
         print(u"Getting device_type params {0}".format(device_type))
         print(u"Url called is {0}".format(url))
         
