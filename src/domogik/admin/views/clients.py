@@ -399,11 +399,11 @@ def client_global_edit(client_id, dev_id):
                         flash(gettext("Param update succesfully"), 'success')
                     else:
                         flash(gettext("Param update failed"), 'warning')
-                    # in all case we send an update event (in case of partial success...)
-                    pub = MQPub(app.zmq_context, 'adminhttp')
-                    pub.send_event('device.update',
-                                   {"device_id" : dev_id,
-                                    "client_id" : client_id})
+            # in all case we send an update event (in case of partial success...)
+            pub = MQPub(app.zmq_context, 'adminhttp')
+            pub.send_event('device.update',
+                           {"device_id" : dev_id,
+                            "client_id" : client_id})
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
             pass
         else:
@@ -421,7 +421,7 @@ def client_global_edit(client_id, dev_id):
 @timeit
 def client_devices_detected(client_id):
     detail = get_client_detail(client_id)
-    
+
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
     msg.set_action('device.new.get')
@@ -605,7 +605,7 @@ def client_config(client_id):
         except:
             flash(gettext("Error while saving the configuration"), 'error')
             app.logger.error(u"Error while saving the configuration. Error is : {0}".format(traceback.format_exc()))
-    
+
     return render_template('client_config.html',
             form = form,
             clientid = client_id,
@@ -691,9 +691,9 @@ def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
 
     # dynamically generate the wtfform
     class F(Form):
-        try: default = args.get('Name')     
-        except: default = None                      
-        name = TextField("Device name", [Required()], description=gettext("The display name for this device"), default=default)      
+        try: default = args.get('Name')
+        except: default = None
+        name = TextField("Device name", [Required()], description=gettext("The display name for this device"), default=default)
         try: default = args.get('Description')
         except: default = None
         description = TextField("Description", description=gettext("A description for this device"), default=default)
@@ -725,7 +725,7 @@ def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
                 default = False
             else:
                 default = None
-        if not default and 'default' in item:     
+        if not default and 'default' in item:
             default = item['default']
         if item["type"] == "boolean":
             if default == 'Y' or default == 1 or default == True:
