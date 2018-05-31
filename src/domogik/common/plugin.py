@@ -761,9 +761,15 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             You can overwrite it, but at first your on_message method must call this basis part:
                 Plugin.on_message(self, msgid, content).
         """
+        toReload = ""
         if msgid == "device.update":
-            self.log.debug(u"Receive pub message {0}, {1}".format(msgid, content))
-            threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
+            if 'client_id' not in content :
+                toReload = "no Client defined"
+            elif content['client_id'] == self._mq_name :
+                toReload = "this client"
+            if toReload != "" :
+                self.log.debug(u"Receive pub message {0} for {1}, {2}".format(msgid, toReload, content))
+                threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
 
     def on_mdp_request(self, msg):
         """ Handle Requests over MQ
