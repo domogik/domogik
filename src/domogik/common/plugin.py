@@ -937,7 +937,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if self._cb_update_devices is not None and self._devices_retrieved :
             self._cb_update_devices(devices)
 
-    def udpate_device_param(self, paramId, value):
+    def udpate_device_param(self, paramId, value, topublish=True):
         """ Request the dbmgr component over MQ to update a device global parameters for this client
             @param paramId: db id of global parameters
             @param value : New parameter value
@@ -950,11 +950,11 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         msg.set_action('deviceparam.update')
         msg.add_data('dpid', paramId)
         msg.add_data('value', value)
-        result = mq_client.request('dbmgr', msg.get(), timeout=10)
+        msg.add_data('topublish', topublish)
+        result = mq_client.request('admin', msg.get(), timeout=10)
         if result is not None:
             data = result.get_data()
             if data["status"]:
-                threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
                 return True
             else:
                 self.log.warning(u"{0}".format(data["reason"]))

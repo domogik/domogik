@@ -833,6 +833,7 @@ class Admin(Plugin):
     def _mdp_reply_deviceparam_update_result(self, data, db):
         status = True
         reason = False
+        publish_update = True
 
         self.log.debug(u"Updating device param : {0}".format(data))
         try:
@@ -840,6 +841,7 @@ class Admin(Plugin):
             if 'dpid' in data:
                 dpid = data['dpid']
                 val = data['value']
+                publish_update = True if 'topublish' not in data else data['topublish']
                 # do the update
                 res = db.udpate_device_param(dpid, value=val)
                 if not res:
@@ -868,7 +870,7 @@ class Admin(Plugin):
         self.log.debug(msg.get())
         self.reply(msg.get())
         # send the pub message
-        if status and res:
+        if status and res and publish_update :
             dev = db.get_device(res.device_id)
             self._pub.send_event('device.update',
                     {"device_id" : res.device_id,
