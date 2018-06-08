@@ -244,8 +244,19 @@ class BasePlugin(object):
         self._stop_cb.append(callback)
         self._lock_add_cb.release()
 
+    def remove_stop_cb(self, callback):
+        '''
+        Remove an additionnal callback to call when a stop request is received
+        '''
+        self._lock_add_cb.acquire()
+        try :
+            self._stop_cb.remove(callback)
+        except :
+            pass
+        self._lock_add_cb.release()
+
     def set_sanitized_hostname(self):
-        """ Get the sanitized hostname of the host 
+        """ Get the sanitized hostname of the host
         This will lower it and keep only the part before the first dot
 
         """
