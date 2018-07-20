@@ -7,8 +7,8 @@ ps -ef | grep dmg
 ps -ef | grep admin
 if [ ! -z $DMG_PLUGIN ] ; then 
     ps -ef | grep $DMG_PLUGIN
-    echo "********** /var/log/domogik/$DMG_PLUGIN.log *******************"
-    cat /var/log/domogik/$DMG_PLUGIN.log
+    echo "********** /var/log/domogik/plugin_$DMG_PLUGIN.log *******************"
+    cat /var/log/domogik/plugin_$DMG_PLUGIN.log
 fi
 
 echo ""
