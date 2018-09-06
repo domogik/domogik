@@ -75,9 +75,12 @@ DEFAULT_RECYCLE_POOL = 3600
 #For packages provided by pip sqlalchemy load wrong python modules.
 #So it is not already installed on system, we need to select good one
 #by this connector suffix.
-import pip
+
+import pkg_resources
+
 mysql_suffix='+pymysql'
-for mod in pip.get_installed_distributions():
+dists = [d for d in pkg_resources.working_set]
+for mod in dists:
     if ( mod.key == 'mysql-python' ):
         mysql_suffix = '' # it is debian package, don't use suffix
 
