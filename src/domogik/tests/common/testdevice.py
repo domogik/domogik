@@ -52,8 +52,8 @@ class TestDevice():
         """
         # rest url        
         # Fix SSL exception for travis-ci TODO: Find why get_rest_url() concider use_ssl ?         
-        # self.rest_url = get_rest_url()
-        self.rest_url = get_rest_url().replace('https', 'http')
+        self.rest_url = get_rest_url()
+        #self.rest_url = get_rest_url().replace('https', 'http')
         
         # package informations
         self.client_id = None
