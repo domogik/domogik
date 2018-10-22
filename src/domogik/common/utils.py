@@ -241,6 +241,8 @@ def get_rest_url(noRest=False):
     cfg = Loader('admin')
     config = cfg.load()
     conf = dict(config[1])
+    print(u"*** get_rest_url config : {0}".format(conf))
+    print(u"    conf['use_ssl'] type = {0}.format(type(conf['use_ssl'])))
     ### get REST ip and port
     port = conf['port']
     interfaces = conf['interfaces']
