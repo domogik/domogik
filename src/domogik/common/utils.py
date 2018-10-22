@@ -241,15 +241,13 @@ def get_rest_url(noRest=False):
     cfg = Loader('admin')
     config = cfg.load()
     conf = dict(config[1])
-    print(u"*** get_rest_url config : {0}".format(conf))
-    print(u"    conf['use_ssl'] type = {0}".format(type(conf['use_ssl'])))
     ### get REST ip and port
     port = conf['port']
     interfaces = conf['interfaces']
     intf = interfaces.split(',')
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
-    protocol = "https" if conf['use_ssl'] else "http"
+    protocol = "https" if conf['use_ssl'] == 'True' else "http"
     if noRest:
         return "{0}://{1}:{2}".format(protocol, ip, port)
     else:
@@ -262,7 +260,7 @@ def get_rest_ssl():
     config = cfg.load()
     conf = dict(config[1])
     ### get SSL option
-    if conf['use_ssl'] :
+    if conf['use_ssl'] == 'True' :
         return {'cert_file': conf['ssl_certificate'], 'key_file': conf['ssl_key']}
     else :
         return False
