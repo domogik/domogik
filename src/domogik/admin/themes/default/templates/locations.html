@@ -1,6 +1,14 @@
 {% extends theme("base/base.html") %}
 
 {% block content %}
+<style>
+.coords {
+    background-color: black;
+    color: white;
+    padding: 5px;
+}
+</style>
+
 <link rel="stylesheet" href="/_themes/default/libraries/leaflet/leaflet.css"/>
 <script type="text/javascript" src="/_themes/default/libraries/leaflet/leaflet.js"></script>
 <div class="container">
@@ -57,6 +65,7 @@
     {% endif %}
 
     <div id="map" style="width:100%; height:400px"></div>
+    <div id="coordinates" class="coords">lat: 0.0000, lng: 0.0000</div>
 
     <script type="text/javascript">
         $( document ).ready( function () {
@@ -72,6 +81,14 @@
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
+
+            // Show the lat and lng under the mouse cursor.
+            var coordsDiv = document.getElementById('coordinates');
+            map.on('mousemove', function(event) {
+                coordsDiv.textContent =
+                    'lat: ' + event.latlng.lat.toFixed(6)+ ', ' +
+                    'lng: ' + event.latlng.lng.toFixed(6);
+                });
 
             var totalBound;
             //********* Place the locations
@@ -104,8 +121,8 @@
                         '<div id="bodyContent">'+
                         '<ul>'+
                         '<li>{% trans %}Latitude{% endtrans %} : {{ data.lat }} </li>'+
-                        '<li>{% trans %}Longitude{% endtrans %} : {{ data.lgn }} </li>'+
-                        '<li>{% trans %}Radius{% endtrans %} : {{ data.radius }}m </li>'+
+                        '<li>{% trans %}Longitude{% endtrans %} : {{ data.lng }} </li>'+
+                        '<li>{% trans %}Radius{% endtrans %} : {{ data.radius }} m </li>'+
                         '</ul>'+
                         '</div>'+
                         '</div>';
@@ -114,8 +131,8 @@
                       {% if data.isHome == True %}
                           icon: L.icon({iconUrl: '/static/images/map_house.png',
                               iconSize:     [48, 48], // size of the icon
-                              iconAnchor:   [24, 24], // point of the icon which will correspond to marker's location
-                              popupAnchor:  [0, -10] // point from which the popup should open relative to the iconAnchor
+                              iconAnchor:   [24, 46], // point of the icon which will correspond to marker's location
+                              popupAnchor:  [0, -40] // point from which the popup should open relative to the iconAnchor
                             }),
                       {% endif %}
                       title: '{{ data.name }}'
@@ -149,8 +166,8 @@
                     var markerP{{ data.id }} = L.marker([{{ data.lat }}, {{ data.lng }}], {
                       icon: L.icon({iconUrl: '/static/images/map_person-'+idColor+'.png',
                               iconSize:     [42, 42], // size of the icon
-                              iconAnchor:   [21, 21], // point of the icon which will correspond to marker's location
-                              popupAnchor:  [0, -8] // point from which the popup should open relative to the iconAnchor
+                              iconAnchor:   [21, 40], // point of the icon which will correspond to marker's location
+                              popupAnchor:  [0, -36] // point from which the popup should open relative to the iconAnchor
                             }),
                       label: '{{ data.first_name[0] }}',
                       title: '{{ data.first_name }} {{ data.last_name }}'
