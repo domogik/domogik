@@ -5,8 +5,8 @@ Flask_Babel==0.11.2
 Flask-Login==0.4.0
 Flask_Bcrypt==0.7.1
 Flask-Themes2==0.1.4
-Flask_WTF==0.14
-WTForms==2.0.2
+Flask_WTF==0.13.1
+WTForms==2.2.1
 Werkzeug==0.10.4
 sphinx_better_theme==0.1.5
 linux_metrics==0.1.4
