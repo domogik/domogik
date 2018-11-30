@@ -13,6 +13,7 @@ except ImportError:
     pass
 from wtforms import TextField, HiddenField, BooleanField, SubmitField
 from wtforms.validators import Required, InputRequired
+
 from domogik.common.utils import ucode
 
 @app.route('/locations')
@@ -37,7 +38,7 @@ def locations():
             if per.location_sensor:
                 all_res = app.db.get_last_sensor_value(per.location_sensor)
                 res = all_res[0] # by the way, there is only one row result ;)
-                   
+
                 print(res)
                 last_seen = res['timestamp']
                 if res['value_str'] is None:
@@ -72,32 +73,34 @@ def locations_del(lid):
 def locations_edit(lid):
     with app.db.session_scope():
         if int(lid) == 0:
+            llat = '46.860191'
+            llng =  '2.373655'
             formatted_address = ''
             lname = ''
-            lrad = 1
+            lrad = 10
             lisHome = 1
+            lzoom = 5
         else:
             loc = app.db.get_location(lid)
             formatted_address = filter(lambda n: n.key == 'formatted_address', loc.params)[0].value
             lrad = filter(lambda n: n.key == 'radius', loc.params)[0].value
             lname = loc.name
             lisHome = loc.isHome
-
-        lisHomeDisabled = False
-        if app.db.get_home_location():
-            lisHomeDisabled = True
+            llat = filter(lambda n: n.key == 'lat', loc.params)[0].value
+            llng = filter(lambda n: n.key == 'lng', loc.params)[0].value
+            lzoom = 10
 
         class F(Form):
             locid = HiddenField("lid", default=lid)
-            lat = HiddenField("lat")
-            lng = HiddenField("lng")
+            lat = HiddenField("lat", default=llat)
+            lng = HiddenField("lng", default=llng)
             formatted_address = HiddenField("formatted_address")
             postal_code = HiddenField("postal_code")
             locality = HiddenField("locality")
             country = HiddenField("country")
             country_short = HiddenField("country_short")
             locname = TextField("Name", [Required()], default=lname)
-            radius = TextField("Radius", [Required()], default=lrad)
+            radius = TextField("Radius", [Required()], default=lrad, description=gettext('Detection distance in meters'))
             if app.db.get_home_location() is None:
                 # we can have only one home location
                 locisHome = BooleanField("is Home", [], default=lisHome)
@@ -114,7 +117,7 @@ def locations_edit(lid):
             del(params['csrf_token'])
             del(params['locid'])
             if 'locisHome' in params:
-                if params['locisHome'] == 'y': 
+                if params['locisHome'] in ['y', 'true', 'True']:
                     isHome = True
                 else:
                     isHome = False
@@ -132,5 +135,6 @@ def locations_edit(lid):
         return render_template('locations_edit.html',
             form = form,
             formatted_address = formatted_address,
+            map_zoom = lzoom,
             mactive = "locations")
 

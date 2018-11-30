@@ -1,58 +1,201 @@
 {% extends theme("base/base.html") %}
 
 {% block content %}
-<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyD43wvlTg66qR_yPOQOgEG4zeSOMC_ubu4"></script>
-<script src="{{ theme_static('libraries/geolocation/jquery.geocomplete.min.js') }}"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="/_themes/default/libraries/leaflet/leaflet.css"/>
+<link rel="stylesheet" href="/_themes/default/libraries/L.Control.Locate.min.css"/>
+<script type="text/javascript" src="/_themes/default/libraries/leaflet/leaflet.js"></script>
+<script type="text/javascript" src="/_themes/default/libraries/L.Control.Locate.min.js"></script>
 <div class="container">
     <h1>{% trans %}Location Edit{% endtrans %}</h1>
-  <form id="location_form" method="post" role="form" class="form-horizontal">
-  {% for item in form %}
-    {% if item.type == "HiddenField" or item.name == "csrf_token" %}
-        {{ item }}
-    {% elif item.name == "submit" %}
-      <div class="form-group">
-	<div class="col-xs-offset-3 col-xs-9">
-	<input type="submit" value="{% trans %}Save{% endtrans %}" class="btn btn-primary">
-	</div>
-      </div>
-    {% else %}
-      <div class="form-group">
-	<label class="control-label col-xs-3">{{ item.label }}</label>
-	<div class="col-xs-9">
-	  {% if item.type == "TextField" %}
-	    {{ item(size = 50) }}
-	  {% else %}
-	    {{ item }}
-	  {% endif %}
-	  <span class="help-block">{{ item.description }}</span>
-	</div>
-      </div>
-    {% endif %}
-  {% endfor %}
-    <div class="form-group">
-        <div class="col-xs-offset-3 col-xs-9">
-            <input id="geocomplete" type="text" placeholder="Type in an address" size="50" value="{{ formatted_address }}" />
-            <input id="find" type="button" value="find" />
-            <div id="map_canvas" style="width:400px; height:400px"></div>
+    <form id="location_form" method="post" role="form" class="form-horizontal">
+    {% for item in form %}
+        {% if item.type == "HiddenField" or item.name == "csrf_token" %}
+            {{ item }}
+        {% elif item.name == "submit" %}
+        <div class="form-group">
+            <div class="col-xs-offset-3 col-xs-9">
+                <input type="submit" value="{% trans %}Save{% endtrans %}" class="btn btn-primary">
+            </div>
         </div>
-    </div>
-  </form>
+        {% else %}
+        <div class="form-group">
+            <label class="control-label col-xs-3">{{ item.label }}</label>
+            <div class="col-xs-9">
+            {% if item.type == "TextField" %}
+                {{ item(size = 50) }}
+            {% else %}
+                {{ item }}
+            {% endif %}
+                <span class="help-block">{{ item.description }}</span>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+        <div class="form-group">
+            <div class="col-xs-offset-3 col-xs-9">
+                <div class="input-group">
+                    <input id="searchLocation" type="text" class="form-control" placeholder="Type in an address" size="50" value="{{ formatted_address }}" />
+                    <span class="input-group-btn">
+                        <button id="find" class="btn btn-default" type="button">
+                          <i class="fa fa-search"></i>
+                        </button>
+                    </span>
+                </div>
+                <select id="searchResult" class="form-control" placeholder="No result">
+                    <option value=0 disabled>No result</option>
+                </select>
+                <div id="map_canvas" style="width:100%; height:400px"></div>
+            </div>
+        </div>
+    </form>
     <script>
+      var searchLocResult = [];
+      var markerResult = [];
+      var map = null;
+      var layerGroup = null;
+      var layerSelect = null;
+
+      function updateLocation() {
+        if (!layerSelect.selectMarker.actived) {
+            layerSelect.selectMarker.setIcon(L.icon({iconUrl: '/static/images/marker-icon_selected.png'}));
+            layerSelect.selectMarker.actived = true;
+        }
+        let latlng = layerSelect.selectMarker.getLatLng();
+        document.getElementById('lat').value = latlng.lat;
+        document.getElementById('lng').value = latlng.lng;
+        if (layerSelect.circleArea) layerSelect.circleArea.setLatLng(latlng);
+      }
+
+      function updateSelectMarker(latLng, edit) {
+        let img = edit ? 'marker-icon_selected.png' : 'marker-icon_current.png';
+        if (layerSelect.circleArea) {
+            layerSelect.circleArea.setLatLng(latLng);
+        } else {
+            layerSelect.circleArea = L.circle(latLng, {radius: document.getElementById('radius').value, color:'red', dashArray: "4, 1, 2"})
+            layerSelect.addLayer(layerSelect.circleArea);
+        }
+        if (layerSelect.selectMarker) {
+            layerSelect.selectMarker.setLatLng(latLng);
+        } else {
+            layerSelect.selectMarker = L.marker(latLng, {icon: L.icon({iconUrl: `/static/images/${img}`,
+                                                          iconSize:     [25, 45], // size of the icon
+                                                          iconAnchor:   [12, 45], // point of the icon which will correspond to marker's location
+                                                          popupAnchor:  [0, -10] // point from which the popup should open relative to the iconAnchor
+                                                    }), 'draggable': true});
+            layerSelect.addLayer(layerSelect.selectMarker);
+            layerSelect.selectMarker.on('drag', function(){ updateLocation();})
+        }
+      }
+
       $(function(){
+        var latLng = [document.getElementById('lat').value, document.getElementById('lng').value];
+        // Init the map
+        map = L.map(document.getElementById('map_canvas'), {editable: true}).setView(latLng, {{ map_zoom }});
+        // Init tiles source layer
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        layerGroup = new L.layerGroup().addTo(map);
+        layerSelect = new L.layerGroup().addTo(map);
+        if (document.getElementById('locid').value != "0") {
+            updateSelectMarker(latLng);
+            map.fitBounds(L.latLngBounds(layerSelect.circleArea.getBounds()));
+        }
+
+        L.control.locate().addTo(map);
+
+        $("#radius").keyup(function(){
+            layerSelect.circleArea.setRadius(this.value);
+        });
+
         var options = {
           map: "#map_canvas",
           details: "#location_form"
         };
-        $("#geocomplete").geocomplete(options);
         $("#find").click(function(){
-          $("#geocomplete").trigger("geocode");
+            searchLocation(document.getElementById('searchLocation').value);
+        $('#searchLocation').submit(function(e){
+            searchLocation(document.getElementById('searchLocation').value);
+            e.preventDefault();
         });
-        $("#examples a").click(function(){
-          $("#geocomplete").val($(this).text()).trigger("geocode");
-          return false;
         });
-        $("#geocomplete").trigger("geocode");
+        $("#searchResult").change(function(){
+            map.setView(L.latLng([searchLocResult[this.value].lat, searchLocResult[this.value].lon]), 10);
+            highlight_result(searchLocResult[this.value]);
+        });
       });
+
+      function searchLocation(value) {
+        let url = encodeURI(`https://nominatim.openstreetmap.org/search?q=${value}&format=json&polygon=1&addressdetails=1`);
+        var jqxhr = $.getJSON( url, function() {
+                        console.log( "success" );
+            })
+            .done(function(data) {
+                console.log(data);
+                searchLocResult = data;
+                let result = document.getElementById('searchResult');
+                result.options.length = 0;
+                for (i=0; i < data.length; i++) {
+                    result.options[i] = new Option(data[i].display_name, i);
+                }
+                if (result.options.length == 0) {
+                    result.options[0] =  new Option("No result", 0);
+                    result.options[0].setAttribute('disabled', "");
+                } else {
+                    result.options[0].selected = true;
+                    map.setView(L.latLng([searchLocResult[0].lat, searchLocResult[0].lon]), 10);
+                    highlight_result(searchLocResult[0]);
+                }
+            })
+            .fail(function(e) {
+                let result = document.getElementById('searchResult');
+                result.options.length = 0;
+                searchLocResult = [];
+                console.log( "error" );
+            })
+            .always(function(e) {
+                console.log( "complete" );
+            });
+      }
+
+    function circle_for_result(result){
+        return L.circleMarker([result.lat,result.lon], { radius: 10, weight: 2, fillColor: '#ff7800', color: 'blue', opacity: 0.75});
+    }
+
+    function highlight_result(result){
+        if (!result){ return }
+
+        layerGroup.clearLayers();
+
+        if (result.lat){
+
+            var circle = circle_for_result(result);
+            circle.on('click', function(){
+                updateSelectMarker([result.lat, result.lon], true);
+            });
+        }
+        if (result.polygonpoints){
+            result.asgeojson = [];
+            for (i=0; i < result.polygonpoints.length; i++) {
+                result.asgeojson.push([result.polygonpoints[i][1], result.polygonpoints[i][0]])
+            }
+
+            let geojson_layer = L.polygon(result.asgeojson, {color: 'blue', fill: true, fillColor: 'blue', fillOpacity: 0.2});
+            layerGroup.addLayer(geojson_layer);
+            let bounds = [[result.boundingbox[0]*1,result.boundingbox[2]*1], [result.boundingbox[1]*1,result.boundingbox[3]*1]];
+            map.fitBounds(bounds);
+        }
+        else {
+            let bounds = [[result.boundingbox[0]*1,result.boundingbox[2]*1], [result.boundingbox[1]*1,result.boundingbox[3]*1]];
+            let geojson_layer = L.rectangle(bounds, {color: 'blue', fill: true, fillColor: 'blue', fillOpacity: 0.2});
+            layerGroup.addLayer(geojson_layer);
+            map.fitBounds(bounds);
+            }
+        if (circle) { layerGroup.addLayer(circle);}
+    }
+
     </script>
 </div>
 {% endblock %}
