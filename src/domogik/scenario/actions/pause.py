@@ -37,27 +37,35 @@ class PauseAction(AbstractAction):
 
     def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log)
-        self.set_description("Do a pause.")
+        self.set_description(u"Do a pause (>=1s).")
 
     def do_action(self):
-        delay = self._params['delay']
-
-        self._log.info("Do a pause of {0} seconds".format(delay))
         try:
-            #time.sleep(int(delay))
+            delay = float(self._params['delay'])
+            self._log.info(u"Do a pause of {0} seconds".format(delay))
             self.the_end = threading.Event()
             threading.Timer(int(delay), self.end_waiting, []).start()
+            started = time.time()
+            __delay = 0.1
+            __subdelay = (delay / 10)
+            if __subdelay < 1 : __subdelay = 1
+            __factdelay = __subdelay/ __delay
+            __cpt = 0
             while not self.the_end.is_set():
-                self._log.debug("...")
-                self.the_end.wait(1)  # 1s is the little pause we can do
+                if __cpt % (__factdelay) == 0.0 : # Display only seconds
+                    self._log.debug(u"Paused since {0} s / {1} s ...".format(int(time.time() - started), delay))
+                self.the_end.wait(__delay)
+                __cpt += 1;
         except:
-            self._log.error("Error while casting delay '{0}' to int value. Full error is : {1}".format(delay, traceback.format_exc()))
-        self._log.info("Pause of {0} seconds finished".format(delay))
+            self._log.error(u"Error while casting delay '{0}' to int value. Full error is : {1}".format(delay, traceback.format_exc()))
+        self._log.info(u"Pause of {0} seconds finished".format(delay))
 
     def end_waiting(self):
-        self._log.debug("End waiting...")
-        self.the_end.set()
-     
+        self._log.debug(u"End waiting...")
+        if self.the_end : self.the_end.set()
+
+    def destroy(self):
+        self.end_waiting()
 
     def get_expected_entries(self):
         return {'delay': {'type': 'integer',
