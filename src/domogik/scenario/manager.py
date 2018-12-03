@@ -55,7 +55,7 @@ DATABASE_CONNECTION_WAIT = 30
 
 
 
-class ScenarioManager:
+class ScenarioManager(object):
     """ Manage scenarios : create them, evaluate them, etc ...
         A scenario instance contains a condition, which is a boolean
         combination of many tests,

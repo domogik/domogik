@@ -38,6 +38,8 @@ from domogikmq.pubsub.subscriber import MQAsyncSub
 import zmq
 import traceback
 import logging
+import time
+from threading import Thread
 import ast
 import datetime
 from dateutil import parser
@@ -430,19 +432,33 @@ class ScenarioInstance(MQAsyncSub):
             self._log.debug(u"get_parsed_condition called but parsed_condition is empty, try to parse condition first")
         return self._parsed_condition
 
-    def eval_condition(self):
+    def _eval_condition(self):
         """ Evaluate the condition.
         @raise ValueError if no parsed condition is avaiable
         @return a boolean representing result of evaluation
         """
-        self._log.debug(u"Eval the condition!")
-        if self._compiled_condition is None:
-            return None
+        self._log.debug(u"Start eval the condition in thread !")
         try:
             exec(self._compiled_condition)
         except Exception as a:
             self._log.error(u"Error while evaluating condition '{0}'. Error is : {1}".format(self._compiled_condition, traceback.format_exc()))
             raise
+
+    def eval_condition(self):
+        """ Evaluate the condition.
+        @raise ValueError if no parsed condition is avaiable
+        @return a boolean representing result of evaluation
+        """
+        self._log.debug(u"Eval the condition !")
+        if self._compiled_condition is None:
+            return None
+        eval = Thread(target=self._eval_condition,  name=self._name)
+        eval.start()
+#        try:
+#            exec(self._compiled_condition)
+#        except Exception as a:
+#            self._log.error(u"Error while evaluating condition '{0}'. Error is : {1}".format(self._compiled_condition, traceback.format_exc()))
+#            raise
 
     def on_message(self, did, msg):
         for (uid, item) in self._mapping['test'].items():
