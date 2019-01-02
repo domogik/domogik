@@ -66,7 +66,7 @@ class RepresentableBase(object):
     def __repr__(self):
         items = ("{0}='{1}'".format(k, v) for k, v in self.__dict__.items() if not k.startswith('_'))
         return "<{0}: {1}>".format(self.__class__.__name__, ', '.join(items))
-    
+
     @classmethod
     def get_tablename(self):
         return self.__tablename__
@@ -154,7 +154,7 @@ class DeviceParam(DomogikBase):
     def __init__(self, device_id, key, value, type):
         """Class constructor
 
-        @param device_id : The device where this parameter is linked to 
+        @param device_id : The device where this parameter is linked to
         @param key : The param name
         @param value : The param value
         @param type : The type param
@@ -167,7 +167,7 @@ class DeviceParam(DomogikBase):
 class Command(DomogikBase):
     __tablename__ = '{0}_command'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255), nullable=False)
     reference = Column(Unicode(64))
@@ -184,7 +184,7 @@ class Command(DomogikBase):
 class CommandParam(DomogikBase):
     __tablename__ = '{0}_command_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    cmd_id = Column(Integer, ForeignKey('{0}.id'.format(Command.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
+    cmd_id = Column(Integer, ForeignKey('{0}.id'.format(Command.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement='ignore_fk')
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
@@ -199,12 +199,12 @@ class CommandParam(DomogikBase):
 class Sensor(DomogikBase):
     __tablename__ = '{0}_sensor'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     device_id = Column(Integer, ForeignKey('{0}.id'.format(Device.get_tablename()), ondelete="cascade"), nullable=False)
     name = Column(Unicode(255))
     reference = Column(Unicode(64))
     incremental = Column(Boolean, nullable=False)
-    formula = Column(UnicodeText(), nullable=True) 
+    formula = Column(UnicodeText(), nullable=True)
     data_type = Column(Unicode(32), nullable=False)
     conversion = Column(Unicode(255), nullable=True)
     last_value = Column(Unicode(255), nullable=True)
@@ -238,7 +238,7 @@ class Sensor(DomogikBase):
 class SensorHistory(DomogikBase):
     __tablename__ = '{0}_sensor_history'.format(_db_prefix)
     __table_args__ = (Index('siddate', 'sensor_id', 'date'),{'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'})
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False) 
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=False, index=True)
     date = Column(DateTime, nullable=False, index=True)
     value_num = Column(Float(53), nullable=True)
@@ -266,7 +266,7 @@ class XplStat(DomogikBase):
     name = Column(Unicode(64), nullable=False)
     schema = Column(Unicode(32), nullable=False)
     params = relationship("XplStatParam", backref=__tablename__, cascade="all", passive_deletes=True)
-    
+
     def __init__(self, device_id, name, schema, json_id):
         self.device_id = device_id
         self.name = ucode(name)
@@ -276,12 +276,12 @@ class XplStat(DomogikBase):
 class XplStatParam(DomogikBase):
     __tablename__ = '{0}_xplstat_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    xplstat_id = Column(Integer, ForeignKey('{0}.id'.format(XplStat.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
+    xplstat_id = Column(Integer, ForeignKey('{0}.id'.format(XplStat.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255), nullable=True)
     multiple = Column(Unicode(1), nullable=True)
     static = Column(Boolean, nullable=True)
-    sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=True) 
+    sensor_id = Column(Integer, ForeignKey('{0}.id'.format(Sensor.get_tablename()), ondelete="cascade"), nullable=True)
     ignore_values = Column(Unicode(255), nullable=True)
     type = Column(Unicode(32), nullable=True)
     UniqueConstraint('xplstat_id', 'key', name='uix_1')
@@ -320,7 +320,7 @@ class XplCommand(DomogikBase):
 class XplCommandParam(DomogikBase):
     __tablename__ = '{0}_xplcommand_param'.format(_db_prefix)
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
-    xplcmd_id = Column(Integer, ForeignKey('{0}.id'.format(XplCommand.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False) 
+    xplcmd_id = Column(Integer, ForeignKey('{0}.id'.format(XplCommand.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
     value = Column(Unicode(255))
     UniqueConstraint('xplcmd_id', 'key', name='uix_1')
@@ -444,7 +444,7 @@ class LocationParam(DomogikBase):
     __table_args__ = {'mysql_engine':'InnoDB', 'mysql_character_set':'utf8'}
     location_id = Column(Integer, ForeignKey('{0}.id'.format(Location.get_tablename()), ondelete="cascade"), primary_key=True, nullable=False, autoincrement=False)
     key = Column(Unicode(32), nullable=False, primary_key=True, autoincrement=False)
-    value = Column(Unicode(255), nullable=True)
+    value = Column(Unicode(32765), nullable=True)
 
     def __init__(self, location_id, key, value):
         self.location_id = location_id
