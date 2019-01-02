@@ -447,14 +447,14 @@ class Admin(Plugin):
             Plugin.on_mdp_request(self, msg)
             # start a thread only if needed
             if msg.get_action() in ['device.params', 'config.get', 'config.set', 'config.delete', 'device.get', 'device.create', 'device.delete',
-                                    'device.update', 'deviceparam.update', 'sensor.update', 'sensor_history.get', 'person.get']:
+                                    'device.update', 'deviceparam.update', 'sensor.update', 'sensor_history.get', 'person.get', 'location.get']:
                 Thread(None,
                         self.__on_mdp_request,
                         "on_mdp_request",
                         (msg, ),
                         {}).start()
         except:
-            msg = "Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
+            msg = u"Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
 
     def __on_mdp_request(self, msg):
@@ -499,6 +499,9 @@ class Admin(Plugin):
                     # person
                     elif msg.get_action() == "person.get":
                         self._mdp_reply_person_get(msg, db)
+                    # location
+                    elif msg.get_action() == "location.get":
+                        self._mdp_reply_location_get(msg, db)
         except:
             msg = "Error while processing thread request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
@@ -1237,7 +1240,7 @@ class Admin(Plugin):
             self.log.error(reason)
         except:
             status = False
-            reason = "Error while deleting device: {0}".format(traceback.format_exc())
+            reason = "Error while getting the persons list: {0}".format(traceback.format_exc())
             self.log.error(reason)
         # send the result
         msg = MQMessage()
@@ -1262,6 +1265,51 @@ class Admin(Plugin):
         self.log.debug(msg.get())
         self.reply(msg.get())
 
+    def _mdp_reply_location_get(self, data, db):
+        status = True
+        reason = False
+        res = None
+
+        self.log.debug(u"Get the location list : {0}".format(data))
+        try:
+            res = db.get_all_location()
+            if not res:
+                status = False
+            else:
+                status = True
+        except DbHelperException as d:
+            status = False
+            reason = u"Error while getting the location list : {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        except:
+            status = False
+            reason = u"Error while getting the location list: {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        # send the result
+        msg = MQMessage()
+        msg.set_action('location.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        if res:
+            locations = []
+            for loc in res:
+                # <Location: isHome='True', type='location', name='Maison', id='1'>
+                location = {'is_home' : loc.isHome,
+                                'type' : loc.type,
+                                'name' : loc.name,
+                                'id' : loc.id,
+                                'params': {}}
+                try:
+                    params = db.get_location_all_param(loc.id)
+                    for p in params :
+                        location['params'][p.key] = p.value
+                except:
+                     self.log.error(u"Error while getting the location parameters for {0} id={1} : {2}".format(loc.name, loc.id, traceback.format_exc()))
+                locations.append(location)
+            msg.add_data('locations', locations)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
 
     def convert(self, data):
         """ Do some conversions on data

@@ -2209,6 +2209,9 @@ class DbHelper(object):
 ###################
 # Location params
 ###################
+    def get_location_all_param(self, l_id):
+        return self.__session.query(LocationParam).filter_by(location_id=l_id).all()
+
     def get_location_param(self, l_id, key):
         self.__session.expire_all()
         param = self.__session.query(LocationParam).filter_by(location_id=l_id).filter_by(key=ucode(key)).first()
