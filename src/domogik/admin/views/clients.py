@@ -464,7 +464,7 @@ def client_devices_edit(client_id, did):
             else:
                 flash(gettext("Device update failed"), 'warning')
             # in all case we send an update event (in case of partial success...)
-            pub = MQPub(zmq.Context(), 'adminhttp')
+            pub = MQPub(app.zmq_context, 'adminhttp')
             pub.send_event('device.update',
                            {"device_id" : did,
                             "client_id" : client_id})
