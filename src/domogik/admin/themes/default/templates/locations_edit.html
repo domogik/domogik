@@ -11,9 +11,11 @@
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<link rel="stylesheet" href="/_themes/default/libraries/leaflet/leaflet.css"/>
+<link rel="stylesheet" href="/static/libraries/leaflet/leaflet.css"/>
 <link rel="stylesheet" href="/_themes/default/libraries/L.Control.Locate.min.css"/>
-<script type="text/javascript" src="/_themes/default/libraries/leaflet/leaflet.js"></script>
+<script type="text/javascript" src="/static/libraries/leaflet/leaflet.js"></script>
+<script type="text/javascript" src="/static/libraries/leaflet/Leaflet.Editable.js"></script>
+<script type="text/javascript" src="/static/libraries/leaflet/Path.Drag.js"></script>
 <script type="text/javascript" src="/_themes/default/libraries/L.Control.Locate.min.js"></script>
 <div class="container">
     <h1>{% trans %}Location Edit{% endtrans %}</h1>
@@ -65,48 +67,130 @@
       var map = null;
       var layerGroup = null;
       var layerSelect = null;
+      var markerPosOk;
 
-      function updateLocation() {
-        if (!layerSelect.selectMarker.actived) {
-            layerSelect.selectMarker.setIcon(L.icon({iconUrl: '/static/images/marker-icon_selected.png',
-                                                          iconSize:     [25, 45], // size of the icon
-                                                          iconAnchor:   [12, 45], // point of the icon which will correspond to marker's location
-                                                          popupAnchor:  [0, -40] // point from which the popup should open relative to the iconAnchor
-                                                          }));
-            layerSelect.selectMarker.actived = true;
-        }
+      function updateFormParams() {
         let latlng = layerSelect.selectMarker.getLatLng();
         document.getElementById('lat').value = latlng.lat;
         document.getElementById('lng').value = latlng.lng;
-        if (layerSelect.circleArea) layerSelect.circleArea.setLatLng(latlng);
+        document.getElementById('ctrl_type').value = layerSelect.ctrlType;
+        switch (layerSelect.ctrlType) {
+            case "circle" :
+                document.getElementById('ctrl_area').value = parseInt(layerSelect.areaCtrl.getRadius());
+                break;
+            case "polygon" :
+                let geojson = layerSelect.areaCtrl.toGeoJSON().geometry.coordinates;
+                // Switch lat <-> lng
+                let asgeojson = [];
+                for (i=0; i < geojson.length; i++) {
+                    let subjson = [];
+                    for (ii=0; ii < geojson[i].length; ii++) {
+                        subjson.push([geojson[i][ii][1], geojson[i][ii][0]])
+                    }
+                    asgeojson.push(subjson);
+                }
+                document.getElementById('ctrl_area').value = JSON.stringify(asgeojson);
+                ;
+                break;
+        }
+      }
+      function updateLocation() {
+        let latlng = layerSelect.selectMarker.getLatLng();
+        if (layerSelect.areaCtrl && layerSelect.ctrlType == "circle") {
+            let editable = layerSelect.areaCtrl.editEnabled;
+            if (editable) layerSelect.areaCtrl.disableEdit();
+            layerSelect.areaCtrl.setLatLng(latlng);
+            if (editable) layerSelect.areaCtrl.enableEdit();
+            layerSelect.areaCtrl.dragging.disable();
+        }
       }
 
-      function updateSelectMarker(latLng, edit) {
-        let img = edit ? 'marker-icon_selected.png' : 'marker-icon_current.png';
-        if (layerSelect.circleArea) {
-            layerSelect.circleArea.setLatLng(latLng);
+      function updateSelectMarker(latLng) {
+        if (layerSelect.areaCtrl && layerSelect.ctrlType == "circle") {
+            layerSelect.areaCtrl.setLatLng(latLng);
         } else {
-            layerSelect.circleArea = L.circle(latLng, {radius: document.getElementById('radius').value, color:'red', dashArray: "4, 1, 2"})
-            layerSelect.addLayer(layerSelect.circleArea);
+            switch (layerSelect.ctrlType) {
+                case "circle" :
+                    layerSelect.areaCtrl = L.circle(latLng, {radius: document.getElementById('ctrl_area').value,
+                        color:'red', fill: true, fillColor: 'red', fillOpacity: 0.2, dashArray: "4, 1, 2",
+                        draggable:false});
+                    break;
+                case "polygon" :
+                    let geojson = JSON.parse(document.getElementById('ctrl_area').value);
+                    layerSelect.areaCtrl = L.polygon(geojson, {color: 'red', fill: true, fillColor: 'red', fillOpacity: 0.2, dashArray: "4, 1, 2", draggable: true});
+                    break;
+            }
+            if (layerSelect.areaCtrl) {
+                layerSelect.addLayer(layerSelect.areaCtrl);
+                layerSelect.areaCtrl.enableEdit();
+            }
         }
         if (layerSelect.selectMarker) {
-            layerSelect.selectMarker.setLatLng(latLng);
+            if ( !layerSelect.selectMarker.getLatLng().equals(latLng)) {
+                layerSelect.selectMarker.setLatLng(latLng);
+                layerSelect.changed = true;
+            }
+            let img = layerSelect.changed ? 'marker-icon_selected.png' : 'marker-icon_current.png';
+            if (layerSelect.selectMarker._icon.attributes["0"].nodeValue.search(img) == -1) {
+                layerSelect.selectMarker.setIcon(L.icon({iconUrl: `/static/images/${img}`,
+                                                          iconSize:     [25, 45], // size of the icon
+                                                          iconAnchor:   [12, 45], // point of the icon which will correspond to marker's location
+                                                          popupAnchor:  [0, -40] // point from which the popup should open relative to the iconAnchor
+                                                    }));
+            }
         } else {
+            let img = layerSelect.changed ? 'marker-icon_selected.png' : 'marker-icon_current.png';
             layerSelect.selectMarker = L.marker(latLng, {icon: L.icon({iconUrl: `/static/images/${img}`,
                                                           iconSize:     [25, 45], // size of the icon
                                                           iconAnchor:   [12, 45], // point of the icon which will correspond to marker's location
                                                           popupAnchor:  [0, -40] // point from which the popup should open relative to the iconAnchor
                                                     }), 'draggable': true});
             layerSelect.addLayer(layerSelect.selectMarker);
-            layerSelect.selectMarker.bindPopup(function(){return '<div>'+
-                    '</div>'+
-                    '<ul>'+
-                    '<li>Latitude : '+this.getLatLng().lat+' </li>'+
-                    '<li>Longitude : '+this.getLatLng().lng+' </li>'+
-                    '<li>Radius : '+layerSelect.circleArea.getRadius()+' m </li>'+
-                    '</ul>'+
-                    '</div>';})
-            layerSelect.selectMarker.on('drag', function(){ updateLocation();})
+            layerSelect.selectMarker.bindPopup(function(){
+                        let popup =  '<div><ul>'+
+                            '<li>Latitude : '+this.getLatLng().lat+' </li>'+
+                            '<li>Longitude : '+this.getLatLng().lng+' </li>';
+                        switch (layerSelect.ctrlType) {
+                            case "circle" :
+                                popup += '<li>Radius : '+parseInt(layerSelect.areaCtrl.getRadius())+' m </li>';
+                                break;
+                            case "polygon" :
+                                popup += '<li>Use polygone</li>';
+                                break;
+                            default :
+                                popup += '<li>Unknow area ctrl</li>';
+                                break;
+                        }
+                        popup += '</ul></div>';
+                        return popup})
+            layerSelect.selectMarker.on('dragend ', function(){
+                if (!layerSelect.selectMarker.actived) {
+                    layerSelect.selectMarker.setIcon(L.icon({iconUrl: '/static/images/marker-icon_selected.png',
+                                                          iconSize:     [25, 45], // size of the icon
+                                                          iconAnchor:   [12, 45], // point of the icon which will correspond to marker's location
+                                                          popupAnchor:  [0, -40] // point from which the popup should open relative to the iconAnchor
+                                                          }));
+                    layerSelect.selectMarker.actived = true;
+                }
+            });
+            layerSelect.selectMarker.on('dragend', function(e){
+                        console.log("dragend");
+                        updateLocation();
+                        updateFormParams();
+            });
+            markerPosOk = layerSelect.selectMarker.getLatLng();
+            layerSelect.selectMarker.on('drag', function(e){
+                        let inside = true;
+                        if (layerSelect.ctrlType != "circle") inside = isMarkerInsidePolygon(this, layerSelect.areaCtrl);
+                        console.log("drag marker inside : "+inside);
+                        if (inside) {
+                            markerPosOk = layerSelect.selectMarker.getLatLng();
+                            updateLocation();
+                            updateFormParams();
+                        } else {
+                            this.setLatLng(markerPosOk);
+                        }
+            });
         }
       }
 
@@ -128,14 +212,15 @@
 
         layerGroup = new L.layerGroup().addTo(map);
         layerSelect = new L.layerGroup().addTo(map);
-        edit =  (document.getElementById('locid').value != "0") ? false : true;
-        updateSelectMarker(latLng, edit);
-        map.fitBounds(L.latLngBounds(layerSelect.circleArea.getBounds()));
+        layerSelect.changed =  (document.getElementById('locid').value != "0") ? false : true;
+        layerSelect.ctrlType = document.getElementById('ctrl_type').value;
+        updateSelectMarker(latLng);
+        map.fitBounds(L.latLngBounds(layerSelect.areaCtrl.getBounds()));
 
         L.control.locate().addTo(map);
 
         $("#radius").keyup(function(){
-            layerSelect.circleArea.setRadius(this.value);
+            layerSelect.areaCtrl.setRadius(this.value);
         });
 
         var options = {
@@ -153,9 +238,128 @@
             map.setView(L.latLng([searchLocResult[this.value].lat, searchLocResult[this.value].lon]), 10);
             highlight_result(searchLocResult[this.value]);
         });
-      });
+        L.EditControl = L.Control.extend({
 
-      function searchLocation(value) {
+            options: {
+                position: 'topleft',
+                callback: null,
+                kind: '',
+                html: ''
+            },
+
+            onAdd: function (map) {
+                var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar'),
+                    link = L.DomUtil.create('a', '', container);
+
+                link.href = '#';
+                link.title = 'Create a new ' + this.options.kind + ' to replace area control';
+                link.innerHTML = this.options.html;
+                L.DomEvent.on(link, 'click', L.DomEvent.stop)
+                          .on(link, 'click', function () {
+                            window.LAYER = this.options.callback.call(map.editTools);
+                          }, this);
+
+                return container;
+            }
+
+        });
+        L.NewPolygonControl = L.EditControl.extend({
+
+            options: {
+                position: 'topleft',
+                callback: startNewPolygon,
+                kind: 'polygon',
+                html: '▰'
+            }
+
+        });
+
+        L.NewCircleControl = L.EditControl.extend({
+
+            options: {
+                position: 'topleft',
+                callback: startNewCircle,
+                kind: 'circle',
+                html: '⬤'
+            }
+
+        });
+
+        map.addControl(new L.NewPolygonControl());
+        map.addControl(new L.NewCircleControl());
+
+        map.on('editable:created', function (e) {
+            console.log('editable:created');
+            let drag = (layerSelect.ctrlType == "circle") ? false : true;
+            e.layer.setStyle({color: 'red', fill: true, fillColor: 'red', fillOpacity: 0.2, dashArray: "4, 1, 2", draggable: drag});
+            layerSelect.areaCtrl = e.layer;
+        });
+        var tempPoly;
+        map.on('editable:vertex:drag', function (e) {
+            let inside = true;
+            if (layerSelect.ctrlType != "circle") inside = isMarkerInsidePolygon(layerSelect.selectMarker, layerSelect.areaCtrl);
+            console.log("editable:vertex:drag : "+inside);
+            if (!inside) {
+                markerPosOk = getLatLngInPolygone(markerPosOk, layerSelect.areaCtrl.getLatLngs());
+                layerSelect.selectMarker.setLatLng(markerPosOk);
+            }
+        });
+        map.on('editable:editing', function (e) {
+            let inside = true;
+            if (layerSelect.ctrlType != "circle") inside = isMarkerInsidePolygon(layerSelect.selectMarker, layerSelect.areaCtrl);
+            console.log("editable:editing marker inside : "+inside);
+            updateFormParams();
+        });
+        map.on('editable:drawing:end', function (e) {
+            console.log('editable:drawing:end');
+            if (layerSelect.ctrlType == "circle") {
+                e.layer.dragging.disable();
+                updateSelectMarker(e.layer.getLatLng());
+                updateFormParams();
+            }
+        });
+        map.on('editable:drag', function (e) {
+            let inside = true;
+            if (layerSelect.ctrlType != "circle") inside = isMarkerInsidePolygon(layerSelect.selectMarker, layerSelect.areaCtrl);
+            console.log("editable:drag : "+inside);
+            if (!inside) {
+                markerPosOk = getLatLngInPolygone(markerPosOk, layerSelect.areaCtrl.getLatLngs());
+                layerSelect.selectMarker.setLatLng(markerPosOk);
+            }
+        });
+    });
+    // Hack leaflet.Editable plugin to hidden vertex center control to avoid circle drag
+    L.Editable.VertexMarker.prototype.onAdd = function (map) {
+        L.Marker.prototype.onAdd.call(this, map);
+        if (this.editor.feature.options.radius !== undefined && this.getIndex() === 0) {
+            this.getElement().style.display = 'none';
+        } else {
+            this.on('drag', this.onDrag);
+            this.on('dragstart', this.onDragStart);
+            this.on('dragend', this.onDragEnd);
+            this.on('mouseup', this.onMouseup);
+            this.on('click', this.onClick);
+            this.on('contextmenu', this.onContextMenu);
+            this.on('mousedown touchstart', this.onMouseDown);
+            this.on('mouseover', this.onMouseOver);
+            this.on('mouseout', this.onMouseOut);
+        }
+        this.addMiddleMarkers();
+    }
+
+    function startNewPolygon() {
+        if (layerSelect.areaCtrl) map.removeLayer(layerSelect.areaCtrl);
+        layerSelect.ctrlType = "polygon";
+        map.editTools.startPolygon();
+    }
+
+    function startNewCircle() {
+        if (layerSelect.areaCtrl) map.removeLayer(layerSelect.areaCtrl);
+        layerSelect.ctrlType = "circle";
+        map.editTools.startCircle();
+    }
+
+    function searchLocation(value) {
         let url = encodeURI(`https://nominatim.openstreetmap.org/search?q=${value}&format=json&polygon=1&addressdetails=1`);
         var jqxhr = $.getJSON( url, function() {
                         console.log( "success" );
@@ -199,9 +403,13 @@
 
         if (result.lat){
 
-            var circle = circle_for_result(result);
-            circle.on('click', function(){
-                updateSelectMarker([result.lat, result.lon], true);
+            circle = circle_for_result(result);
+            circle.bindPopup(function(){return '<div> <span class="input-group-btn">'+
+                            '<button id="setselect" class="btn btn-primary" type="button" onclick="makeCircleRef(circle);"> set as location  '+
+                                '<i class="glyphicon glyphicon-ok-sign"></i>'+
+                            '</button>'+
+                        '</span>'+
+                    '</div>';
             });
         }
         if (result.polygonpoints){
@@ -214,6 +422,17 @@
             layerGroup.addLayer(geojson_layer);
             let bounds = [[result.boundingbox[0]*1,result.boundingbox[2]*1], [result.boundingbox[1]*1,result.boundingbox[3]*1]];
             map.fitBounds(bounds);
+            if (!geojson_layer.isSelected) {
+                poly = geojson_layer;
+                geojson_layer.isSelected = true;
+                geojson_layer.bindPopup(function(){return '<div> <span class="input-group-btn">'+
+                            '<button id="seteditable" class="btn btn-primary" type="button" onclick="makePolyEditable(poly);"> use as shape reference  '+
+                                '<i class="glyphicon glyphicon-ok-sign"></i>'+
+                            '</button>'+
+                        '</span>'+
+                    '</div>';
+                })
+            }
         }
         else {
             let bounds = [[result.boundingbox[0]*1,result.boundingbox[2]*1], [result.boundingbox[1]*1,result.boundingbox[3]*1]];
@@ -222,6 +441,121 @@
             map.fitBounds(bounds);
             }
         if (circle) { layerGroup.addLayer(circle);}
+    }
+    function makeCircleRef(circle) {
+        circle.closePopup();
+        updateSelectMarker(circle.getLatLng());
+        updateFormParams();
+    }
+    function makePolyEditable(poly) {
+        poly.closePopup().unbindPopup();
+        layerGroup.clearLayers();
+        layerSelect.removeLayer(layerSelect.areaCtrl);
+        poly.setStyle({color: 'red', fill: true, fillColor: 'red', fillOpacity: 0.2, dashArray: "4, 1, 2", draggable:true}).addTo(map);
+        poly.enableEdit();
+        layerSelect.ctrlType = "polygon";
+        layerSelect.areaCtrl = poly;
+    }
+// utils positionning calcul
+    function isMarkerInsidePolygon(marker, poly) {
+        return isPointInsidePolygon(marker.getLatLng(), poly.getLatLngs());
+   /**     var inside = false;
+        var x = marker.getLatLng().lat, y = marker.getLatLng().lng;
+        for (var ii=0;ii<poly.getLatLngs().length;ii++){
+            var polyPoints = poly.getLatLngs()[ii];
+            for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+                var xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+                var xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+                var intersect = ((yi > y) != (yj > y))
+                    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+        }
+        return inside; **/
+    }
+
+    function isPointInsidePolygon(latlng, poly) {
+        var inside = false;
+        var x = latlng.lat, y = latlng.lng;
+        for (var ii=0;ii<poly.length;ii++){
+            var polyPoints = poly[ii];
+            for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+                var xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+                var xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+                var intersect = ((yi > y) != (yj > y))
+                    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+        }
+        return inside;
+    }
+
+    function getLatLngInPolygone(latlng, poly) {
+        var newLatLng = latlng;
+        let step = 0.00001;
+        let inside = false;
+        while (!inside || step >= 0.01) {
+            let points = spiral(newLatLng, step, step);
+            for (i=0; i < points.length; i++) {
+                inside = isPointInsidePolygon(points[i], poly);
+                if (inside) {
+                    newLatLng = points[i];
+                    break;
+                }
+            }
+            step = step * 2;
+        }
+        return newLatLng;
+    }
+
+    function spiral(latlng, a, b) {
+        var points = [];
+        for (i = 0; i < 720; i++) {
+            angle = 0.1 * i;
+            x = latlng.lng + (a + b * angle) * Math.cos(angle);
+            y = latlng.lat + (a + b * angle) * Math.sin(angle);
+
+            points.push({lng: x, lat: y});
+        }
+        return points;
+    }
+
+    function hull (polygons, d) {
+        var polygon = polygons[0];
+        var hull, i, xA, yA, xB, yB, xC, yC, AB, BC, xI, yI, k, xM, yM;
+        if (polygon.length < 3)
+            return (null);
+        hull = new Array ();
+        polygon.push (polygon[0]);
+        xA = polygon[polygon.length - 2].lng;
+        yA = polygon[polygon.length - 2].lat;
+        xB = polygon[0].lng;
+        yB = polygon[0].lat;
+        AB = Math.sqrt ((xB - xA) * (xB - xA) + (yB - yA) * (yB - yA));
+        i = 1;
+        while (true) {
+            xC = polygon[i].lng;
+            yC = polygon[i].lat;
+            BC = Math.sqrt ((xC - xB) * (xC - xB) + (yC - yB) * (yC - yB));
+            xI = 0.5 * ((yA - yB) / AB + xB - (yC - yB) / BC + xB);
+            yI = 0.5 * (- (xA - xB) / AB + yB + (xC - xB) / BC + yB);
+            k = d / ((xI - xB) * (xI - xB) + (yI - yB) * (yI - yB));
+            xM = k * (xI - xB) + xB;
+            yM = k * (yI - yB) + yB;
+            hull.push ({lng:xM, lat:yM});
+            i ++;
+            if (i == polygon.length)
+                break;
+            xA = xB;
+            yA = yB;
+            xB = xC;
+            yB = yC;
+            AB = BC;
+        }
+        polygon.pop ();
+        return (hull);
     }
 
     </script>

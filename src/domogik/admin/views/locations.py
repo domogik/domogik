@@ -15,6 +15,8 @@ from wtforms import TextField, HiddenField, BooleanField, SubmitField
 from wtforms.validators import Required, InputRequired
 
 from domogik.common.utils import ucode
+from domogikmq.pubsub.publisher import MQPub
+
 
 @app.route('/locations')
 @login_required
@@ -77,21 +79,28 @@ def locations_edit(lid):
             llng =  '2.373655'
             formatted_address = ''
             lname = ''
-            lrad = 10
             lisHome = 1
             lzoom = 5
+            lctrl_type = "circle"
+            lctrl_area = 10
         else:
             loc = app.db.get_location(lid)
             formatted_address = filter(lambda n: n.key == 'formatted_address', loc.params)[0].value
-            lrad = filter(lambda n: n.key == 'radius', loc.params)[0].value
             lname = loc.name
             lisHome = loc.isHome
             llat = filter(lambda n: n.key == 'lat', loc.params)[0].value
             llng = filter(lambda n: n.key == 'lng', loc.params)[0].value
             lzoom = 10
+            try : # maintain backward compatibility with radius key
+                lctrl_type = filter(lambda n: n.key == 'ctrl_type', loc.params)[0].value
+                lctrl_area = filter(lambda n: n.key == 'ctrl_area', loc.params)[0].value
+            except :
+                lctrl_type = "circle"
+                lctrl_area = filter(lambda n: n.key == 'radius', loc.params)[0].value
 
         class F(Form):
             locid = HiddenField("lid", default=lid)
+            ctrl_type = HiddenField("ctrl_type", default=lctrl_type)
             lat = HiddenField("lat", default=llat)
             lng = HiddenField("lng", default=llng)
             formatted_address = HiddenField("formatted_address")
@@ -99,8 +108,8 @@ def locations_edit(lid):
             locality = HiddenField("locality")
             country = HiddenField("country")
             country_short = HiddenField("country_short")
+            ctrl_area = HiddenField("ctrl_area", default=lctrl_area)
             locname = TextField("Name", [Required()], default=lname)
-            radius = TextField("Radius", [Required()], default=lrad, description=gettext('Detection distance in meters'))
             if app.db.get_home_location() is None:
                 # we can have only one home location
                 locisHome = BooleanField("is Home", [], default=lisHome)
@@ -129,9 +138,14 @@ def locations_edit(lid):
                 loc = app.db.add_full_location(request.form['locname'], 'location', isHome, params)
             else:
                 loc = app.db.update_full_location(int(lid), request.form['locname'], 'location', isHome, params)
+            pub = MQPub(app.zmq_context, 'adminhttp')
+            pub.send_event('location.update',
+                           {"location_id" : lid,
+                            "params" : params})
             flash(gettext("Location updated successfully"), 'info')
             return redirect("/locations")
-
+        print(u"*********************************************")
+        print(form.data, lctrl_type, lctrl_area)
         return render_template('locations_edit.html',
             form = form,
             formatted_address = formatted_address,
