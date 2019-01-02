@@ -38,6 +38,7 @@ class PauseAction(AbstractAction):
     def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log)
         self.set_description(u"Do a pause (>=1s).")
+        self.the_end = None
 
     def do_action(self):
         try:
@@ -61,8 +62,9 @@ class PauseAction(AbstractAction):
         self._log.info(u"Pause of {0} seconds finished".format(delay))
 
     def end_waiting(self):
-        self._log.debug(u"End waiting...")
-        if self.the_end : self.the_end.set()
+        if self.the_end is not None:
+            self._log.debug(u"End waiting...")
+            self.the_end.set()
 
     def destroy(self):
         self.end_waiting()
