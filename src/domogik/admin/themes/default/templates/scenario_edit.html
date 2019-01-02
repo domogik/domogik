@@ -73,6 +73,7 @@
         <block type="logic_operation"></block>
         <block type="logic_negate"></block>
         <block type="math_arithmetic"></block>
+        <block type="geoinlocation.GeoInLocTest"></block>
     </category>
     <category name="Constants">
         <block type="logic_boolean"></block>
@@ -214,6 +215,13 @@
             </category>
         {% endfor %}
     </category>
+    <category name="Locations">
+        {% for loc in locations %}
+            <category name="{{ locations[loc]['name'] }}">
+                <block type="location.LocationTest.{{ loc }}"></block>
+            </category>
+        {% endfor %}
+    </category>
     <category name="Devices">
         {% for dev_client in devices_per_clients %}
             <category name="{{ dev_client }}">
@@ -240,7 +248,7 @@
     </category>
     <category name="Other sensors">
         {% for t in tests %}
-            {% if t != "trigger.Hysteresis" %}
+            {% if t != "trigger.Hysteresis" and t != "geoinlocation.GeoInLocTest" %}
                 <block type="{{ t }}"></block>
             {% endif %}
         {% endfor %}

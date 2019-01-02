@@ -173,7 +173,7 @@ def scenario_edit(id):
         pass
     else:
         # Get the javascript for all blocks and data to build blockly categories
-        blocks_js, tests, actions, devices_per_clients, used_datatypes = scenario_blocks_js()
+        blocks_js, tests, actions, locations, devices_per_clients, used_datatypes = scenario_blocks_js()
 
         # ouput
         return render_template('scenario_edit.html',
@@ -183,6 +183,7 @@ def scenario_edit(id):
             blocks_js = blocks_js,
             actions = actions,
             tests = tests,
+            locations = locations,
             devices_per_clients = devices_per_clients,
             datatypes = used_datatypes,
             jso = jso,
@@ -283,6 +284,11 @@ def scenario_blocks_js():
         tests.remove(u'sensor.SensorValueDummy')
         tests.remove(u'sensor.SensorValue')
         tests.remove(u'sensor.SensorTestDummy')
+        tests.remove(u'location.LocationTest')
+        tests.remove(u'location.LocationValueDummy')
+        tests.remove(u'location.LocationValue')
+        tests.remove(u'location.LocationTestDummy')
+        tests.remove(u'geoinlocation.GeoInLocTestDummy')
     except ValueError:
         pass
 
@@ -587,6 +593,39 @@ def scenario_blocks_js():
         except:
             print(u"ERROR while looking on a device : {0}".format(traceback.format_exc()))
 
+    #### Location
+    with app.db.session_scope():
+        locations = app.db.get_all_location()
+    print(u"***************** get location **************")
+    list_locations = {}
+    for loc in locations:
+        try:
+            print(loc)
+            list_locations[loc.id] = {'ishome': loc.isHome, 'type': loc.type, 'name': loc.name}
+            ### Generate parameters
+            print(the_list)
+            papp = ""
+            color = 160
+            output = "\"null\""
+            loc_dt="DT_CoordD"
+            ### Create the block
+            block_id = u"location.LocationTest.{0}".format(loc.id)
+            block_description = u"@{0}{1}".format(loc.name, ' (Home)' if loc.isHome else '')
+            add = u"""Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            this.setColour({3});
+                            this.appendDummyInput().appendField("{1}");
+                            this.setOutput(true); /*, {2}); */
+                            this.setInputsInline(false);
+                            this.setTooltip("{1}");
+                        }}
+                    }};
+                    """.format(block_id, block_description, output, color, loc_dt)
+            js = u'{0}\n\r{1}'.format(js, add)
+        except:
+            print(u"ERROR while looking on a location : {0}".format(traceback.format_exc()))
+
+
     #### datatypes
     for dt_parent, dt_types in used_datatypes.items():
         for dt_type in dt_types:
@@ -677,4 +716,4 @@ def scenario_blocks_js():
     actions = sorted(actions)
 
     # return values
-    return js, tests, actions, devices_per_clients, used_datatypes
+    return js, tests, actions, list_locations, devices_per_clients, used_datatypes

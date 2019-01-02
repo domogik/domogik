@@ -19,8 +19,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-@author: Maikel Punie <maikel.punie@gmail.com>
-@copyright: (C) 2007-20015 Domogik project
+@author: Maikel Punie <maikel.punie@gmail.com>, Nico0084 <nico84dev@gmail.com>
+@copyright: (C) 2007-2018 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -366,6 +366,17 @@ class ScenarioInstance(MQAsyncSub):
         # a not function
         elif part['type'] == 'logic_negate':
             retlist.append( pyObj(u"not {0}".format(self.__parse_part(part['BOOL'], level, debug, parentPart))) )
+        # handle location comparator
+        elif part['type'] == "geoinlocation.GeoInLocTest":
+            test = self._create_instance("{0}.{1}-{2}".format(part['type'], part['person']['type'].split('.')[2], part['location']['type'].split('.')[2]), 'test', parentPart)
+            gpsPoint1 = pyObj("{0}".format(self.__parse_part(part['person'], level, debug, parentPart)))
+            gpsPoint2 = pyObj("{0}".format(self.__parse_part(part['location'], level, debug, parentPart)))
+            test[0].fill_parameters({ "person_hyst.text" : part['person_hyst'], "operator.op":  part['op'], "loc_hyst.text" : part['loc_hyst'] })
+            retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate({1},{2})".format(test[1], gpsPoint1, gpsPoint2), level) )
+        # handle location
+        elif part['type'] == "location.LocationTest":
+            test = self._create_instance(part['type'], 'test', parentPart)
+            retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate()".format(test[1]), level) )
         # handle hysteresis
         elif part['type'] == "trigger.Hysteresis":
             test = self._create_instance(part['type'], 'test', parentPart)
@@ -497,6 +508,9 @@ class ScenarioInstance(MQAsyncSub):
                 # If SensorTest allready exist on IF, same Sensor stay in Test mode not Value, so a dummy became SensorTestDummy and not a SensorValueDummy.
                 # This 2 class are equivalante, so finale behavior is same between SensorTestDummy and SensorValueDummy.
                 if clas == 'SensorTest' : clas='SensorValue'  # force class as SensorValue to avoid trigger evaluation
+                # If LocationTest allready exist on IF, same Location stay in Test mode not Value, so a dummy became LocationTestDummy and not a LocationValueDummy.
+                # This 2 class are equivalante, so finale behavior is same between LocationTestDummy and LocationValueDummy.
+                if clas == 'LocationTest' : clas='LocationValue'  # force class as LocationValue to avoid trigger evaluation
             objM = None
             for i in self._mapping['test'] :
                 objM = self._mapping['test'][i]
@@ -507,6 +521,17 @@ class ScenarioInstance(MQAsyncSub):
                 elif objM.__class__.__name__ == 'SensorValue' and objM._sensorId == param :
                     self._log.debug(u"SensorValue for sensor {0} allready set, move to dummy instance".format(param))
                     clas='SensorValueDummy' # force class as SensorValueDummy to avoid uncontrollable call order update
+                elif objM.__class__.__name__ == 'LocationTest' and objM._locationId == param :
+                    self._log.debug(u"LocationTest for location {0} allready set, move to dummy instance".format(param))
+                    clas='LocationTestDummy' # force class as LocationTestDummy to avoid uncontrollable call order update
+                    break
+                elif objM.__class__.__name__ == 'LocationValue' and objM._locationId == param :
+                    self._log.debug(u"LocationValue for location {0} allready set, move to dummy instance".format(param))
+                    clas='LocationValueDummy' # force class as LocationValueDummy to avoid uncontrollable call order update
+                    break
+                elif objM.__class__.__name__ == 'GeoInLocTest' and objM._testId == param :
+                    self._log.debug(u"GeoInLocTest for test location {0} allready set, move to dummy instance".format(param))
+                    clas='GeoInLocTestDummy' # force class as GeoInLocTestDummy to avoid uncontrollable call order update
                     break
                 else :
                     objM = None

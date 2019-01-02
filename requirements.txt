@@ -39,3 +39,5 @@ gunicorn==19.7.1
 cryptography>=1.7
 wit==4.2.0
 imageio==2.2.0
+pyproj==1.9.6
+Shapely==1.6.4
