@@ -117,6 +117,7 @@ def scenario_edit(id):
         jso = default_json
         dis = 0
         desc = None
+        behav = 'wait'
     else:
         with app.db.session_scope():
             scen = app.db.get_scenario(id)
@@ -124,6 +125,7 @@ def scenario_edit(id):
             dis = scen.disabled
             name = scen.name
             desc = scen.description
+            behav = scen.behavior if scen.behavior !='' else 'wait'
             jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'").replace('"', '\\"')
             if clone:
                 id = 0
@@ -131,13 +133,20 @@ def scenario_edit(id):
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
-        sname = TextField("Name", [Required()], default=name, description=u"Scenario name")
-        sdis = BooleanField("Disable", default=dis, description=u"Disabling a scenario avoid to delete it if you temporary want it not to run")
-        sdesc = TextAreaField("Description", default=desc)
+        sname = TextField(gettext("Name"), [Required()], default=name, description=gettext(u"Scenario name"))
+        sdis = BooleanField(gettext("Disable"), default=dis, description=gettext(u"Disabling a scenario avoid to delete it if you temporary want it not to run"))
+        sbehav = SelectField(gettext("Behavior threading"), choices=[('wait', gettext(u'Finish current and do next (default and advisable)')),
+                                                ('eval', gettext(u'Stop current and do next')),
+                                                ('remove', gettext(u'Finish current and not do next')),
+                                                ('parallel', gettext(u'Do them all in parallel (unsafe risk of conflict)'))],
+                             default= behav, description=gettext(u"Defines the behavior in case of simultaneous execution of the scenario"),
+                             )
+        sdesc = TextAreaField(gettext("Description"), default=desc)
         sjson = HiddenField("json")
         submit = SubmitField(u"Send")
         pass
     form = F()
+    print(" ***** form : {0}".format(form.data))
 
     if request.method == 'POST' and form.validate():
         cli = MQSyncReq(app.zmq_context)
@@ -151,6 +160,7 @@ def scenario_edit(id):
         msg.add_data('cid', form.sid.data)
         msg.add_data('dis', form.sdis.data)
         msg.add_data('desc', form.sdesc.data)
+        msg.add_data('behav', form.sbehav.data)
         res = cli.request('scenario', msg.get(), timeout=10)
         if res:
             data = res.get_data()

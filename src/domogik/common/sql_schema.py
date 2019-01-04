@@ -339,6 +339,7 @@ class Scenario(DomogikBase):
     disabled = Column(Boolean, nullable=False, default=False)
     description = Column(Text, nullable=True)
     state = Column(Unicode(32), nullable=False, default=False)
+    behavior = Column(Unicode(20), nullable=False, default=Unicode('wait'))
 
     def __init__(self, name, json, disabled=False, description=None, state=None):
         self.name = ucode(name)

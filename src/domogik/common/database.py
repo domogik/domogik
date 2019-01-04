@@ -2026,14 +2026,14 @@ class DbHelper(object):
     def get_scenario_by_name(self, s_name):
         return self.__session.query(Scenario).filter(Scenario.name==s_name).first()
 
-    def add_scenario(self, s_name, s_json, s_disabled, s_desc, s_state):
+    def add_scenario(self, s_name, s_json, s_disabled, s_desc, s_behavior, s_state):
         self.__session.expire_all()
-        scenario = Scenario(name=s_name, json=s_json, disabled=s_disabled, description=s_desc, state=s_state)
+        scenario = Scenario(name=s_name, json=s_json, disabled=s_disabled, description=s_desc, state=s_state, behavior=s_behavior)
         self.__session.add(scenario)
         self._do_commit()
         return scenario
 
-    def update_scenario(self, s_id, name=None, s_json=None, disabled=None, description=None, state=None):
+    def update_scenario(self, s_id, name=None, s_json=None, disabled=None, description=None, behavior=None, state=None):
         self.__session.expire_all()
         scenario = self.__session.query(Scenario).filter_by(id=s_id).first()
         if scenario is None:
@@ -2048,6 +2048,8 @@ class DbHelper(object):
             scenario.description = description
         if state is not None:
             scenario.state = state
+        if behavior is not None:
+            scenario.behavior = behavior
         self.__session.add(scenario)
         self._do_commit()
         return scenario

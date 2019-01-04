@@ -65,12 +65,28 @@ class AbstractAction:
             self._log = logging
         else:
             self._log = log
-      
+
         self._description = ''
         self._params = {}
+        self._do_action = None
 
     def destroy(self):
-        pass
+        self._log.debug(u"Destroy action and redirect do_action")
+        self._do_action = self.do_action
+        self.do_action = self._missAction
+#        pass
+
+    def restore_eval(self):
+        if self._do_action is not None :
+            self._log.debug(u"Restore do_action")
+            self.do_action = self._do_action
+        self._do_action = None
+
+    def _missAction(self):
+        if self._do_action is not None :
+            self._log.debug(u"Miss this action and restore do_action")
+            self.do_action = self._do_action
+        self._do_action = None
 
     def set_description(self, description):
         """ Update the description of the test
