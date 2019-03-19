@@ -41,3 +41,4 @@ wit==4.2.0
 imageio==2.2.0
 pyproj==1.9.6
 Shapely==1.6.4
+timezonefinder==3.4.2
