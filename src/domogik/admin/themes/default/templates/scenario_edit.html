@@ -416,7 +416,16 @@
         {% endautoescape %}
         Blockly.JSON.jsonToWorkspace(Blockly.getMainWorkspace(), json);
     });
-
+    function sensorUsageChange(newValue) {
+        console.log(newValue);
+        if (this.sourceBlock_._orgOutCheck == undefined) this.sourceBlock_._orgOutCheck = this.sourceBlock_.outputConnection.check_ ;
+        console.log(this.sourceBlock_._orgOutCheck);
+        if (newValue == 'value') {
+            this.sourceBlock_.outputConnection.setCheck(this.sourceBlock_._orgOutCheck);
+        } else {
+            this.sourceBlock_.outputConnection.setCheck(["Boolean"]);
+        }
+    }
     var onresize = function(e) {
       // Compute the absolute coordinates and dimensions of blocklyArea.
       var element = blocklyArea;

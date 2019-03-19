@@ -161,6 +161,8 @@ def scenario_edit(id):
         msg.add_data('dis', form.sdis.data)
         msg.add_data('desc', form.sdesc.data)
         msg.add_data('behav', form.sbehav.data)
+        print("+++++++++++++++++++++")
+        print(msg.get_data())
         res = cli.request('scenario', msg.get(), timeout=10)
         if res:
             data = res.get_data()
@@ -241,7 +243,7 @@ def scenario_croncephemdate():
         except :
             print(traceback.format_exc())
             return jsonify(result='error', reply="", content = {'error': gettext(u"Error in cron rule, can't get next date.")})
-        return jsonify(result='success', reply="", content = {'error': "", 'result': {'dates': dates}})
+        return jsonify(result='success', reply="", content = {'error': "", 'result': {'dates': dates, 'timezone': job.timeZone.zone}})
     except :
         print(traceback.format_exc())
         jsonify(result='error', reply="", content = {'error': gettext(u"Ephemeris next date, bad request parameters.")})
@@ -372,6 +374,7 @@ def scenario_blocks_js():
         else:
             #for parv in params:
             print(u"TEST={0}".format(test))
+            output = params['output']
             for parv in params['parameters']:
                 print(u"Parv : {0}".format(parv))
                 par = parv['name']
@@ -394,13 +397,13 @@ def scenario_blocks_js():
                             this.setColour(160);
                             this.appendDummyInput().appendField("{2}");
                             {1}
-                            this.setOutput(true);
+                            this.setOutput(true,{4});
                             this.setInputsInline(false);
                             this.setTooltip("{2}");
                             this.contextMenu = false;
                         }}
                     }};
-                    """.format(test, '\n'.join(p), params['description'], jso)
+                    """.format(test, '\n'.join(p), params['description'], jso, output)
             js = u'{0}\n\r{1}'.format(js, add)
 
 
@@ -503,14 +506,17 @@ def scenario_blocks_js():
                 elif sen_dt == "DT_Time":
                     color = 65
                     output = "\"Number\""
-                else:
+                elif sen_dt == "DT_String":
                     color = 160
+                    output = "\"String\""
+                else:
+                    color = 210
                     output = "\"null\""
 
+                output = "[{0},\"{1}\"{2}]".format(output, sen_dt,",\"{0}\"".format(dt_parent) if sen_dt != dt_parent else "")
                 ### Generate parameters
                 the_list = sensor_usage
-                papp = u"this.appendDummyInput().appendField(\"Mode \").appendField(new Blockly.FieldDropdown({0}), '{1}');".format(json.dumps(the_list), "usage.usage");
-
+                papp = u"this.appendDummyInput().appendField(\"Mode \").appendField(new Blockly.FieldDropdown({0}, sensorUsageChange), '{1}');".format(json.dumps(the_list), "usage.usage");
 
                 ### Create the block
                 block_id = u"sensor.SensorTest.{0}".format(sen_id)
@@ -521,7 +527,7 @@ def scenario_blocks_js():
                                 this.appendDummyInput().appendField("{2}");
                                 this.appendDummyInput().appendField("Sensor : {1} ({6})");
                                 {7}
-                                this.setOutput(true); /*, {4}); */
+                                this.setOutput(true, {4});
                                 this.setInputsInline(false);
                                 this.setTooltip("{2}");
                             }}
@@ -578,12 +584,14 @@ def scenario_blocks_js():
                                     """.format(param_key)
                     elif dt_parent == "DT_Number":
                         # numebr input
-                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck("Number");
-                                    """.format(param_key)
+                        input = "[\"Number\",\"{0}\"{1}]".format(param_dt_type,",\"{0}\"".format(dt_parent) if param_dt_type != dt_parent else "")
+                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck({1});
+                                    """.format(param_key, input)
                     else:
                         # default case : text input field
-                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck("String");
-                                    """.format(param_key)
+                        input = "[\"String\",\"{0}\"{1}]".format(param_dt_type,",\"{0}\"".format(dt_parent) if param_dt_type != dt_parent else "")
+                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck({1});
+                                    """.format(param_key, input)
                 block_id = u"command.CommandAction.{0}".format(cmd_id)
                 block_description = u"{0}@{1}".format(name, client)
                 add = u"""Blockly.Blocks['{0}'] = {{
@@ -625,7 +633,7 @@ def scenario_blocks_js():
                         init: function() {{
                             this.setColour({3});
                             this.appendDummyInput().appendField("{1}");
-                            this.setOutput(true); /*, {2}); */
+                            this.setOutput(true,["location.LocationTest"]); /*, {2}); */
                             this.setInputsInline(false);
                             this.setTooltip("{1}");
                         }}
@@ -642,7 +650,7 @@ def scenario_blocks_js():
 #            print(u"{0} => {1}".format(dt_parent, dt_type))
             if dt_parent == "DT_Bool":
                 color = 20
-                output = "\"Boolean\""
+                output = "Boolean"
                 opt = "["
                 for lab in sorted(datatypes[dt_type]['labels']):
                     opt += u"['{1} - {0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
@@ -652,13 +660,13 @@ def scenario_blocks_js():
                         """.format(opt)
             elif dt_parent == "DT_Number":
                 color = 65
-                output = "\"Number\""
+                output = "Number"
                 input = """
                          this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
                         """
             elif dt_parent == "DT_String" and dt_type == "DT_ColorRGBHexa":
                 color = 65
-                output = "\"null\""
+                output = "null"
                 input = """
                          this.appendDummyInput().appendField(new Blockly.FieldColour(""), "COLOUR");
                         """
@@ -675,15 +683,16 @@ def scenario_blocks_js():
                         js_list_options += u"['{1} - {0}', '{1}'],".format(list_options[opt], opt)
                     js_list_options += u"]"
                     color = 160
-                    output = "\"String\""
+                    output = "String"
                     input = u"""this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "TEXT");
                                 """.format(js_list_options)
                 else:
                     color = 160
-                    output = "\"null\""
+                    output = "null"
                     input = """
                              this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
                         """
+            output = "[\"{0}\",\"{1}\"{2}]".format(output, dt_type,",\"{0}\"".format(dt_parent) if dt_type != dt_parent else "")
 
             add = """Blockly.Blocks['{0}'] = {{
                         init: function() {{
@@ -726,4 +735,17 @@ def scenario_blocks_js():
     actions = sorted(actions)
 
     # return values
+#    print("*****************************************************************")
+#    print("*****************************************************************")
+#    print(js)
+#    print("************************* TESTS ************************************")
+#    print(tests)
+#    print("************************* ACTIONS *************************************")
+#    print(actions)
+#    print("************************* LIST_LOCATIONS *************************************")
+#    print(list_locations)
+#    print("************************* DEVICES *************************************")
+#    print(devices_per_clients)
+#    print("************************* DATATYPES *************************************")
+#    print(used_datatypes)
     return js, tests, actions, list_locations, devices_per_clients, used_datatypes

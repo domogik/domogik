@@ -311,7 +311,8 @@ class ScenarioManager(object):
 
                 res[name] = {"parameters": params,
                              "blockly": inst.get_blockly(),
-                             "description": inst.get_description()}
+                             "description": inst.get_description(),
+                             "output": str(inst.get_outputCheck())}
         return res
 
     def list_conditions(self):

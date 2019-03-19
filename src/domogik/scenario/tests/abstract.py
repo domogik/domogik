@@ -57,6 +57,7 @@ class AbstractTest:
         self._cond = cond
         self._params = params
         self._subMessages = []
+        self._outputCheck = []
 
     def get_subMessages(self):
         return self._subMessages
@@ -80,6 +81,21 @@ class AbstractTest:
         if not self._description:
             return ""
         return self._description
+
+    def set_outputCheck(self, output):
+        """ Update the output compatibility of the test
+        Empty or None assume compatibilty of all.
+        @param output : Array of list of output compatibility with other blockly
+        """
+        self._outputCheck = output
+
+    def get_outputCheck(self):
+        """ Return the output compatibility of the test
+        @return the current output list, "null" if is empty or None
+        """
+        if not self._outputCheck or self._outputCheck == "null":
+            return "null"
+        return self._outputCheck
 
     def set_condition(self, cond):
         """ Set the condition where this test belongs to

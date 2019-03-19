@@ -71,20 +71,20 @@ class AbstractAction:
         self._do_action = None
 
     def destroy(self):
-        self._log.debug(u"Destroy action and redirect do_action")
+        self._log.debug(u"{0} : Destroy action and redirect do_action".format(self.__class__.__name__))
         self._do_action = self.do_action
         self.do_action = self._missAction
 #        pass
 
     def restore_eval(self):
         if self._do_action is not None :
-            self._log.debug(u"Restore do_action")
+            self._log.debug(u"{0} : Restore do_action".format(self.__class__.__name__))
             self.do_action = self._do_action
         self._do_action = None
 
     def _missAction(self):
         if self._do_action is not None :
-            self._log.debug(u"Miss this action and restore do_action")
+            self._log.debug(u"{0} : Miss this action and restore do_action".format(self.__class__.__name__))
             self.do_action = self._do_action
         self._do_action = None
 

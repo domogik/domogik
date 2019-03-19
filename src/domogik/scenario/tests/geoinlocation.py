@@ -169,7 +169,7 @@ class GeoInLocTest(AbstractTest):
 
     def get_blockly(self):
         return """this.appendValueInput("person")
-                        .setCheck("sensor.SensorTest")
+                        .setCheck("DT_CoordD")
                         .appendField("Buffer")
                         .appendField(new Blockly.FieldNumber(0), "person_hyst")
                         .appendField("(m)");

@@ -34,6 +34,7 @@ class TimestampNow(AbstractTest):
 
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
+        self.set_outputCheck(["Number"])
         self.set_description("Current timestamp (seconds)")
 
 

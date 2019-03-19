@@ -37,7 +37,14 @@ import datetime
 import calendar
 import ephem
 import re
+import math
 import traceback
+from timezonefinder import TimezoneFinder
+import pytz
+
+from domogik.common.database import DbHelper
+
+tzfinder = TimezoneFinder()
 
 __all__ = ["CronExpression", "DEFAULT_EPOCH", "SUBSTITUTIONS"]
 __license__ = "Public Domain"
@@ -81,11 +88,49 @@ class CronExpression(object):
         """
         self._valid = True
         self._special = False
+        self.timeZone = pytz.utc
         for key in SPECIALS:
             if line.startswith(key):
                 self._special = True
                 # build the city object
-                self._city = ephem.city('Brussels')
+                args = line.split('@')
+#                print(u"ARGS : {0}".format(args))
+                if len(args) > 1 :
+                    subArg = args[-1].split(' ')
+                    if len(subArg) > 1 : # apply an offset
+                        locId = subArg[0].split('.')[-1]
+                        self._opOffset = subArg[1] # "add" or sub
+                        self._hOffset = int(subArg[2].split(':')[0])
+                        self._mOffset = int(subArg[2].split(':')[1])
+                    else :
+                        locId = args[-1].split('.')[-1]
+                        self._opOffset = ""
+                        self._hOffset = 0
+                        self._mOffset = 0
+                    self._db = DbHelper(owner="CronExpression")
+                    locCoord = None
+                    # get initital info from db
+                    with self._db.session_scope():
+                        params = self._db.get_location_all_param(locId)
+#                        print(u"location {0} parameters : {1}".format(locId, params))
+                        if params is not None and params != [] :
+                            locP = {}
+                            for p in params :
+                                locP[p.key] = p.value
+                            locCoord = {'lat' : float(locP['lat']), 'lng' : float(locP['lng'])}
+#                        else :
+#                            print(u"No location find in : {0}".format(line))
+                    if locCoord :
+                        self._observer = ephem.Observer()
+                        self._observer.lat = locCoord['lat'] /180.*math.pi
+                        self._observer.lon = locCoord['lng'] /180.*math.pi
+#                        print(u"Observer created : {0}".format(locCoord))
+#                        print(self._observer)
+                        tzName = tzfinder.timezone_at(lng=locCoord['lng'], lat=locCoord['lat']) # returns timezone of GPS point
+                        self.timeZone = pytz.timezone(tzName)
+#                        print(self.timeZone)
+                    else : # Default Bruxel use
+                        self._observer = ephem.city('Brussels')
         # store the original input
         self.orig_line = line
 
@@ -211,18 +256,35 @@ class CronExpression(object):
             cpm = ephem.next_solstice(date_tuple)
         elif self.string_tab in ['@dawn', '@dusk']:
             bobs = ephem.Sun()
-            date = "{0}/{1}/{2}".format(date_tuple[0], date_tuple[1], date_tuple[2])
+            date = "{0}/{1}/{2} 04:00".format(date_tuple[0], date_tuple[1], date_tuple[2])
+            self._observer.date = date
+#            print date
             if self.string_tab == '@dawn':
-                cpm = self._city.next_rising(bobs, start=date)
+                cpm = self._observer.next_rising(bobs, start=date)
             else:
-                cpm = self._city.next_setting(bobs, start=date)
-
+                cpm = self._observer.next_setting(bobs, start=date)
         if cpm:
-            return cpm.tuple()[:-1]
+            d = ephem.Date(cpm.tuple())
+#            print(u"Timezone : {0}".format(self.timeZone))
+#            print(u"Date UTC : {0}".format(d))
+#            print(u"Date Local : {0}".format(ephem.localtime(d)))
+            dd = d.datetime()
+            tzd = self.timeZone.localize(dd)
+            df = dd + tzd.utcoffset()
+#            print(u"Date timeZone : {0}, {1},{2}".format(tzd, type(tzd), tzd.utcoffset()))
+#            print(u"Datetime timeZone : {0}".format(df))
+            if self._opOffset == "add" :
+                df = df + datetime.timedelta(hours=self._hOffset, minutes=self._mOffset)
+#                print(u"Apply add Offset New Datetime timeZone : {0}".format(df))
+            elif self._opOffset == "sub" :
+                df = df - datetime.timedelta(hours=self._hOffset, minutes=self._mOffset)
+#                print(u"Apply sub Offset New Datetime timeZone : {0}".format(df))
+            return  (df.year, df.month, df.day, df.hour, df.minute)
         return None
 
     def check_trigger_now(self):
         now = datetime.datetime.now()
+#        print("now : {0}".format(now))
         return self.check_trigger((now.year, now.month, now.day, now.hour, now.minute))
 
     def check_trigger(self, date_tuple, utc_offset=0):
@@ -237,7 +299,13 @@ class CronExpression(object):
         Returns boolean indicating if the trigger is active at the given time.
         The date tuple should be in the local time.
         """
-        return date_tuple == self.get_next_date_special(date_tuple, utc_offset)
+        next = self.get_next_date_special(date_tuple, utc_offset)
+#        try :
+#            print(u"check_trigger_special: {0} => {1} = {2}".format(date_tuple, next,  date_tuple=next))
+#        except :
+#            pass
+#        return date_tuple == self.get_next_date_special(date_tuple, utc_offset)
+        return date_tuple == next
 
 
     def _check_trigger_normal(self, date_tuple, utc_offset=0):
@@ -276,7 +344,7 @@ class CronExpression(object):
 
         for value, valid_values, field_str, delta_t, field_type in quintuple:
             # All valid, static values for the fields are stored in sets
-            print(u"Match for {0} value {1} in {2}".format(field_type, value, valid_values))
+#            print(u"Match for {0} value {1} in {2}".format(field_type, value, valid_values))
             if value in valid_values:
                 continue
 
@@ -417,58 +485,65 @@ class CronExpression(object):
 
 if __name__ == "__main__":
     job = CronExpression("@fullmoon")
-    print(job)
-    print(job.check_trigger_now())
-    print(job.check_trigger((2016, 12, 14, 0, 5)))
-    print(job.get_next_date_special((2016, 12, 16, 0, 5)))
+    print(u"*** {0} ***".format(job))
+    print(u"Trigger now :  {0}".format(job.check_trigger_now()))
+    print(u"Trigger (2019, 3, 9, 7, 10) :  {0}".format(job.check_trigger((2019, 3, 9, 7, 10))))
+    print(u"next date from (2016, 12, 16, 0, 5) :  {0}".format(job.get_next_date_special((2016, 12, 16, 0, 5))))
     print("")
-    job = CronExpression("@dawn")
-    print(job)
-    print(job.check_trigger_now())
-    print(job.check_trigger((2016, 12, 7, 7, 26)))
-    print(job.get_next_date_special((2016, 12, 16, 0, 5)))
-    print("")
-    job = CronExpression("@dusk")
-    print(job)
-    print(job.check_trigger_now())
-    print(job.check_trigger((2016, 12, 7, 7, 26)))
-    print("")
-    job = CronExpression("@equinox")
-    print(job._city)
-    print(job)
-    print(job.check_trigger_now())
-    print("")
-    job = CronExpression("@solstice")
-    print(job._city)
-    print(job)
-    print(job.check_trigger_now())
-    print(job.check_trigger((2016, 12, 21, 10, 44)))
-    print(job.get_next_date_special((2016, 12, 22, 0, 5)))
-    print("")
-    #print(job.check_trigger((2010, 11, 17, 0, 0)))
-    job = CronExpression("0 0 * * 1-5/2 find /var/log -delete")
-    print(job)
-    print(job.check_trigger_now())
-    print(job.check_trigger((2010, 11, 17, 0, 0)))
-    print(job.check_trigger((2012, 12, 21, 0 , 0)))
-    print("")
-    job = CronExpression("@midnight Feed 'it'", (2010, 5, 1, 7, 0, -6))
-    print(job)
-    print(job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6))
-    print(job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6))
-    print(job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6))
-    print("")
-    print(ephem.cities.lookup("paris, france"))
-    print("**************************************************")
-    job = CronExpression(("5-10 10,16 ? 2/3 1#2 2017/100"))
-    print("cron valid : {0}".format(job.isValidate()))
-    print(job.check_trigger((2017, 2, 13, 10 , 6)))
-    print("")
-    job = CronExpression(("10 12-15 ? 1-6 5 205"))
-    print("cron valid : {0}".format(job.isValidate()))
-    print(job.check_trigger((2017, 2, 13, 10 , 6)))
-    print("")
-    job = CronExpression(("*/10 */2 * * *"))
-    print("cron valid : {0}".format(job.isValidate()))
-    print(job.check_trigger((2017, 2, 13, 10 , 20)))
-    print("")
+    job = CronExpression("@dawn @location.LocationTest.1")
+    print(u"*** {0} ***".format(job))
+    print(u"Trigger now :  {0}".format(job.check_trigger_now()))
+    print(u"Trigger (2019, 3, 9, 7, 1) :  {0}".format(job.check_trigger((2019, 3, 9, 7, 01))))
+    print(u"next date from (2019, 03, 9) :  {0}".format(job.get_next_date_special((2019, 03, 9))))
+    print(job.check_trigger((2019, 02, 20, 06, 50)))
+    print(u"next date from (2019, 03, 10, 0, 5) :  {0}".format(job.get_next_date_special((2019, 03, 10, 0, 5))))
+    print(u"next date from (2019, 03, 12, 0, 5) :  {0}".format(job.get_next_date_special((2019, 03, 12, 0, 5))))
+    print(u"next date from (2019, 03, 14, 0, 5) :  {0}".format(job.get_next_date_special((2019, 03, 14, 0, 5))))
+    job = CronExpression("@dawn @location.LocationTest.1 sub 00:50")
+    print(u"Trigger (2019, 3, 9, 6, 11) :  {0}".format(job.check_trigger((2019, 3, 9, 6, 11))))
+    print(u"next date from (2019, 03, 9) :  {0}".format(job.get_next_date_special((2019, 03, 9))))
+#    print("")
+#    job = CronExpression("@dusk")
+#    print(job)
+#    print(job.check_trigger_now())
+#    print(job.check_trigger((2016, 12, 7, 7, 26)))
+#    print("")
+#    job = CronExpression("@equinox")
+#    print(job._observer)
+#    print(job)
+#    print(job.check_trigger_now())
+#    print("")
+#    job = CronExpression("@solstice")
+#    print(job._observer)
+#    print(job)
+#    print(job.check_trigger_now())
+#    print(job.check_trigger((2016, 12, 21, 10, 44)))
+#    print(job.get_next_date_special((2016, 12, 22, 0, 5)))
+#    print("")
+#    #print(job.check_trigger((2010, 11, 17, 0, 0)))
+#    job = CronExpression("0 0 * * 1-5/2 find /var/log -delete")
+#    print(job)
+#    print(job.check_trigger_now())
+#    print(job.check_trigger((2010, 11, 17, 0, 0)))
+#    print(job.check_trigger((2012, 12, 21, 0 , 0)))
+#    print("")
+#    job = CronExpression("@midnight Feed 'it'", (2010, 5, 1, 7, 0, -6))
+#    print(job)
+#    print(job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6))
+#    print(job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6))
+#    print(job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6))
+#    print("")
+#    print(ephem.city("Paris"))
+#    print("**************************************************")
+#    job = CronExpression(("5-10 10,16 ? 2/3 1#2 2017/100"))
+#    print("cron valid : {0}".format(job.isValidate()))
+#    print(job.check_trigger((2017, 2, 13, 10 , 6)))
+#    print("")
+#    job = CronExpression(("10 12-15 ? 1-6 5 205"))
+#    print("cron valid : {0}".format(job.isValidate()))
+#    print(job.check_trigger((2017, 2, 13, 10 , 6)))
+#    print("")
+#    job = CronExpression(("*/10 */2 * * *"))
+#    print("cron valid : {0}".format(job.isValidate()))
+#    print(job.check_trigger((2017, 2, 13, 10 , 20)))
+#    print("")

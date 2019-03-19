@@ -1,10 +1,10 @@
 // Add A cron check dialog to blockly Field Cron
 
-function createCronCheckDialog(blImage, inputName) {
+function createCronCheckDialog(blImage, cronState) {
 //    var resultsName = "";
     var blocklyImage = blImage;
     var blocklyElement = blocklyImage.fieldGroup_;
-    var inputName = inputName;
+    var cronState = cronState;
     var displayTimeUnit = function (unit) {
         if (unit.toString().length == 1)
             return "0" + unit;
@@ -145,7 +145,8 @@ function createCronCheckDialog(blImage, inputName) {
         dial.appendTo('body');
         var pos = $(this).position();
         var w = dial.width();
-        $("#cronTabExp").text(blocklyImage.sourceBlock_.getFieldValue(inputName));
+ //       $("#cronTabExp").text(blocklyImage.sourceBlock_.getFieldValue(inputName));
+        $("#cronTabExp").text(cronState.value);
         $("#cronTranslate").text(blocklyImage.sourceBlock_.tooltip);
         dial.css({top: pos.top+25, left: pos.left-(w/2)+12, position:'absolute'});
         $('#datepicker1').datepicker({
@@ -179,7 +180,7 @@ function createCronCheckDialog(blImage, inputName) {
         });
         $("#nbNextDates").change(function() {
             var nb = $("#nbNextDates").val();
-            if ( $("#cronTabExp").text() in EPHEM_OPTIONS) {
+            if ( $("#cronTabExp").text().split(" ")[0] in EPHEM_OPTIONS) {
                 var dateN = new Date(); // js date month [0..11]
                 var dateC = dateN.getFullYear()+','+parseInt(dateN.getMonth()+1)+','+dateN.getDate()+','+dateN.getHours()+','+dateN.getMinutes();
                 $.getJSON('/scenario/cronruletest/getephemdate', {cronrule:$("#cronTabExp").text(), date:dateC, number:nb}, function(data, result) {
@@ -217,7 +218,7 @@ function createCronCheckDialog(blImage, inputName) {
                 };
             };
         });
-        if (blocklyImage.sourceBlock_.cron_valid) {
+        if (blocklyImage.sourceBlock_.cronStatus.valid) {
             $("#nbNextDates").trigger("change");
         } else {
             $("#nbNextDates").attr('disabled',true)

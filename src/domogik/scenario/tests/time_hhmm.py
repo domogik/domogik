@@ -35,6 +35,7 @@ class TimeHHMMTest(AbstractTest):
     def __init__(self, log = None, trigger = None, cond = None, params = None):
         AbstractTest.__init__(self, log, trigger, cond, params)
         self.set_description("Time")
+        self.set_outputCheck(["String", "time_hhmm.TimeHHMMTest"])
         self.add_parameter("time", "time_hhmm.TimeHHMMParameter")
 
     def evaluate(self):

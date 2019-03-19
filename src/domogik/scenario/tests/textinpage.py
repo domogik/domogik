@@ -34,6 +34,7 @@ class TextInPageTest(AbstractTest):
 
     def __init__(self, log = None, trigger = None, cond=None, params=None):
         AbstractTest.__init__(self, log, trigger, cond, params)
+        self.set_outputCheck(["Boolean"])
         self.set_description("Check if a web page contains some text")
         self.add_parameter("text", "text.TextParameter")
         self.add_parameter("url", "url_value.UrlParameter")
