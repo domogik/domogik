@@ -304,6 +304,7 @@ class DbHelper(object):
             return plugin
         except Exception as sql_exception:
             self.__raise_dbhelper_exception(u"SQL exception (add plugin ref) : {0}".format(sql_exception))
+            return None
 
 ####
 # Plugin config
@@ -440,20 +441,25 @@ class DbHelper(object):
                                                             ).filter_by(hostname=ucode(pl_hostname)
                                                             ).first()
         if not plugin:
-            self._add_plugin(pl_id, pl_type, pl_hostname)
-        plugin_config =  self.__session.query(
+            plugin = self._add_plugin(pl_id, pl_type, pl_hostname)
+        if plugin :
+            plugin_config =  self.__session.query(
                 PluginConfig
                     ).filter_by(plugin_id=plugin.id
                     ).filter_by(key=ucode(pl_key)
                     ).first()
-        if not plugin_config:
-            plugin_config = PluginConfig(plugin_id=plugin.id, key=pl_key, value=pl_value)
-        else:
-            plugin_config.value = ucode(pl_value)
-        self.__session.add(plugin_config)
-        self._do_commit()
-        if self._cacheDB : self._cacheDB.markAsUpdatingConfig(pl_id, pl_hostname)
-        return PluginConfigData(pl_type, pl_id, pl_hostname, pl_key, pl_value)
+            if not plugin_config:
+                plugin_config = PluginConfig(plugin_id=plugin.id, key=pl_key, value=pl_value)
+            else:
+                plugin_config.value = ucode(pl_value)
+            self.__session.add(plugin_config)
+            self._do_commit()
+            if self._cacheDB : self._cacheDB.markAsUpdatingConfig(pl_id, pl_hostname)
+            return PluginConfigData(pl_type, pl_id, pl_hostname, pl_key, pl_value)
+        else :
+            self.__raise_dbhelper_exception(u"ERROR on set plugin config : {0}-{1}.{2} ({3}={4}".format(pl_type, pl_id, pl_hostname, pl_key, pl_value))
+            return None
+
 
     def del_plugin_config(self, pl_type, pl_id, pl_hostname):
         """Delete all parameters of a plugin config and remove plugin history and reference id
