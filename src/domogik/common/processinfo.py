@@ -81,6 +81,7 @@ class ProcessInfo():
         self.num_core = psutil.cpu_count()
         self.git_branch = self.get_git_branch()
         self.git_revision = self.get_git_revision()
+        self._start_time = 0
 
     def get_git_branch(self):
         """ If the current process file source is part of a git repo, return information (branch)
@@ -99,7 +100,7 @@ class ProcessInfo():
         sp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
         out, err = sp.communicate()
         return out.strip()
-    
+
     def get_git_revision(self):
         """ If the current process file source is part of a git repo, return information (rev)
             Else, return an empty string
@@ -116,13 +117,14 @@ class ProcessInfo():
         sp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
         out, err = sp.communicate()
         return out.strip()
-    
+
 
     def start(self):
         """ Get values each <interval> seconds while process is up
         """
         if self.pid == None:
             return
+        self._start_time = time.time()
         while not self._stop.isSet():
             self._get_values()
             self._stop.wait(self._interval)
@@ -151,7 +153,7 @@ class ProcessInfo():
             memory_rss = round(memory_info[0] / divisor, 1)
             memory_vsz = round(memory_info[1] / divisor, 1)
             memory_percent = round(self.p.memory_percent(),1)
-            self.log.debug(u"Process informations|python_version={8}|psutil_version={0}|domogik_version={9}|component={1}|component_version={12}|pid={2}|cpu_percent_usage={3}|memory_total={4}|memory_percent_usage={5}|memory_rss={6}|memory_vsz={7}|num_threads={10}|num_file_descriptors_used={11}|platform={13}|num_core={14}|git_branch={15}|git_revision={16}".format(self.psutil_version, self.component_id, self.pid, cpu_percent, memory_total_phymem, memory_percent, memory_rss, memory_vsz, self.python_version, domogik_version, num_threads, num_fds, self.component_version, self.platform, self.num_core, self.git_branch, self.git_revision)) 
+            self.log.debug(u"Process informations|python_version={8}|psutil_version={0}|domogik_version={9}|component={1}|component_version={12}|pid={2}|cpu_percent_usage={3}|memory_total={4}|memory_percent_usage={5}|memory_rss={6}|memory_vsz={7}|num_threads={10}|num_file_descriptors_used={11}|platform={13}|num_core={14}|git_branch={15}|git_revision={16}".format(self.psutil_version, self.component_id, self.pid, cpu_percent, memory_total_phymem, memory_percent, memory_rss, memory_vsz, self.python_version, domogik_version, num_threads, num_fds, self.component_version, self.platform, self.num_core, self.git_branch, self.git_revision))
             if self._callback != None:
                 # the domogik installation id (key 'id') will be filled by the manager or any other component which will process the below data
                 data = {
@@ -176,6 +178,7 @@ class ProcessInfo():
                              'num_threads' : num_threads,
                              'num_file_descriptors_used' : num_fds
                          },
+                         'start_timestamp' : self._start_time,
                          'timestamp' : time.time()
                        }
                 self._callback(self.pid, data)

@@ -325,6 +325,9 @@ class ScenarioInstance(MQAsyncSub):
         # a simple static number
         elif part['type'] == 'math_number':
             retlist.append( pyObj("float(\"{0}\")".format(part['NUM'])) )
+        # a simple client status
+        elif part['type'] == 'client_status':
+            retlist.append( pyObj(u"\"{0}\"".format(part['TEXT'])) )
         # a date/time or timestamp
         elif part['type'] == 'date_time':
             retlist.append( pyObj("parser.parse(\"{0}\")".format(part['TEXT'])) )
@@ -546,11 +549,18 @@ class ScenarioInstance(MQAsyncSub):
             try:
                 mod, clas, param = inst.split('.')
             except ValueError as err:
-                mod, clas = inst.split('.')
-                param = None
+                try:
+                    mod, clas = inst.split('.')
+                    param = None
+                except ValueError as err:
+                     # get instance from client_status (eg: client_status.StatusTest.plugin-weather.vmdevubuntu16)
+                    mod, clas, param = inst.split('.', 2)
 
             module_name = "domogik.scenario.tests.{0}".format(mod)
             if parentPart : # Parent block is a DO for action, SensorTest must be redirect to SensorValue
+                # If StatusTest allready exist on IF, same Sensor stay in Test mode not Value, so a dummy became StatusTestDummy and not a StatusValueDummy.
+                # This 2 class are equivalante, so finale behavior is same between SensorTestDummy and SensorValueDummy.
+                if clas == 'StatusTest' : clas='StatusValue'  # force class as StatusValue to avoid trigger evaluation
                 # If SensorTest allready exist on IF, same Sensor stay in Test mode not Value, so a dummy became SensorTestDummy and not a SensorValueDummy.
                 # This 2 class are equivalante, so finale behavior is same between SensorTestDummy and SensorValueDummy.
                 if clas == 'SensorTest' : clas='SensorValue'  # force class as SensorValue to avoid trigger evaluation
@@ -560,6 +570,13 @@ class ScenarioInstance(MQAsyncSub):
             objM = None
             for i in self._mapping['test'] :
                 objM = self._mapping['test'][i]
+                if objM.__class__.__name__ == 'StatusTest' and objM._clientId == param :
+                    self._log.debug(u"StatusTest for client {0} allready set, move to dummy instance".format(param))
+                    clas='StatusTestDummy' # force class as StatusTestDummy to avoid uncontrollable call order update
+                    break
+                elif objM.__class__.__name__ == 'StatusValue' and objM._clientId == param :
+                    self._log.debug(u"StatusValue for client {0} allready set, move to dummy instance".format(param))
+                    clas='StatusValueDummy' # force class as StatusValueDummy to avoid uncontrollable call order update
                 if objM.__class__.__name__ == 'SensorTest' and objM._sensorId == param :
                     self._log.debug(u"SensorTest for sensor {0} allready set, move to dummy instance".format(param))
                     clas='SensorTestDummy' # force class as SensorTestDummy to avoid uncontrollable call order update

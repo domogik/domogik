@@ -5,7 +5,33 @@
 <div class="container">
 
   <h1>{% trans %}Core component {% endtrans %}{{ clientid }}</h1>
-  <div class="alert alert-info">{% trans %}There is nothing to do with this component here ;){% endtrans %}</div>
+    <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h2>{% trans %}History status{% endtrans %}</h2>
+            </div>
+            <div class="panel-body">
+              <table class="table table-bordered">
+                <tbody>
+                {% if client_history|length > 0 %}
+                    {% for hist in client_history %}
+                      <tr>
+                        <th>{{ hist.timestamp|timestamp_to_strftime }}</th>
+                        <td>{{ hist.time_running }}</td>
+                        <td>{{ hist.status }}</td>
+                        <td>{{ hist.comment }}</td>
+                      </tr>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">{% trans %}This client seems never started ;){% endtrans %}</div>
+                {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

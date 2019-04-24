@@ -160,7 +160,13 @@ def ucode2(my_string):
     else:
         return unicode(str(my_string), "utf-8")
 
+def parse_client_id(client_id):
+    tmp = client_id.split(".")
+    id = tmp[0].split("-")
+    return {'type': id[0], 'name': id[1], 'host': tmp[1]}
 
+def join_client_id(type, name, host=HOSTNAME):
+    return "{0}-{1}.{2}".format(type, name, host)
 
 def call_package_conversion(log, plugin, method, value):
     """Load the correct module, and encode the value

@@ -6,7 +6,7 @@
     <button type="button" id="install_a_plugin" class="btn btn-primary" data-toggle="modal" data-target="#install_instructions">
       <span class='glyphicon glyphicon-download-alt' aria-hidden='true'></span> {% trans %}Install a package{% endtrans %}
     </button>
-    
+
     <!-- Modal -->
     <div class="modal fade" id="install_instructions" tabindex="-1" role="dialog" aria-labelledby="installInstructions" aria-hidden="true">
       <div class="modal-dialog">
@@ -37,7 +37,7 @@
     {% if clients|length > 0 %}
       {% for host in client_list_per_host_per_type %}
         <h1>{% trans %}Clients on server{% endtrans %} {{ host }}</h1>
-  
+
           {% for type in client_list_per_host_per_type[host] %}
             <div class="list-group">
               <h2 class="list-group-item">
@@ -59,11 +59,7 @@
               {% for client in client_list_per_host_per_type[host][type] %}
                 {% if type == "core" %}
                   <!-- link -->
-                  {% if client_list_per_host_per_type[host][type][client].name == "scenario" %}
-                    <a class="list-group-item" href="/scenario">
-                  {% else %}
                     <a class="list-group-item" href="/core/{{ client_list_per_host_per_type[host][type][client]['type'] }}-{{ client_list_per_host_per_type[host][type][client]['name'] }}.{{ client_list_per_host_per_type[host][type][client]['host'] }}">
-                  {% endif %}
 
                   <!-- icon -->
                   {% if client_list_per_host_per_type[host][type][client].name == "admin" %}
@@ -90,7 +86,7 @@
                   <i class="fa fa-comments"></i>
                 {% else %}
                   <a class="list-group-item" href="#">
-                  <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span> 
+                  <span class='glyphicon glyphicon-chevron-right' aria-hidden='true'></span>
                 {% endif %}
 
                 <!-- text (name) -->
@@ -115,7 +111,7 @@
                     {% for a_client in clients %}
                       {% if a_client.split(".")[0] == compliant %}
                         <span class="list-group-item xpl_client_compliant" href="#">
-                          <span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span> 
+                          <span class='glyphicon glyphicon-paperclip' aria-hidden='true'></span>
                             <em>{{ a_client }}</em>
                           <span class="label label-info status status-label status-{{clients[a_client].status }} pull-right">{{ clients[a_client].status }}</span>
                         </span>

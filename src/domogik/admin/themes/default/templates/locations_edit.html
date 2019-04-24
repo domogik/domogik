@@ -17,6 +17,10 @@
 <script type="text/javascript" src="/static/libraries/leaflet/Leaflet.Editable.js"></script>
 <script type="text/javascript" src="/static/libraries/leaflet/Path.Drag.js"></script>
 <script type="text/javascript" src="/_themes/default/libraries/L.Control.Locate.min.js"></script>
+<!-- Extension Géoportail pour Leaflet
+<script data-key="khb10vyvhwva41wt0yk54y51" src="/static/libraries/leaflet/GpPluginLeaflet.js"></script>
+<link rel="stylesheet" href="/static/libraries/leaflet/GpPluginLeaflet.css" />-->
+
 <div class="container">
     <h1>{% trans %}Location Edit{% endtrans %}</h1>
     <form id="location_form" method="post" role="form" class="form-horizontal">
@@ -193,15 +197,56 @@
             });
         }
       }
-
-      $(function(){
+    window.onload = function () {
         var latLng = [document.getElementById('lat').value, document.getElementById('lng').value];
         // Init the map
         map = L.map(document.getElementById('map_canvas'), {editable: true}).setView(latLng, {{ map_zoom }});
         // Init tiles source layer
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+
+        var osmMap = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+                                {attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'}),
+  //          landMap = L.tileLayer('http://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png',
+//                                {attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> Contributors & <a href="http://thunderforest.com/">Thunderforest</a>'}),
+
+            //Carte géoportail orthophoto
+//            geoportailphoto = L.tileLayer('https://wxs.ign.fr/choisirgeoportail/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=ORTHOIMAGERY.ORTHOPHOTOS&format=image/jpeg&style=normal',
+//                                  {attribution: '&copy; <a href="https://geoservices.ign.fr/index.html">GeoPortail</a> '}),
+//            geoportailphoto = L.geoportalLayer.WMTS({
+//                    layer  : "ORTHOIMAGERY.ORTHOPHOTOS"}),
+            //Carte géoportail orthomap
+            geoportailmap = L.tileLayer('https://wxs.ign.fr/choisirgeoportail/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=GEOGRAPHICALGRIDSYSTEMS.MAPS&format=image/jpeg&style=normal',
+                                 {attribution: '&copy; <a href="https://geoservices.ign.fr/index.html">GeoPortail</a> '},
+	            {
+	                    minZoom:0,
+	                    maxZoom:18,
+	                    tileSize:256
+	            }),
+            geoportailmapP = L.tileLayer('https://wxs.ign.fr/khb10vyvhwva41wt0yk54y51/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=ORTHOIMAGERY.ORTHOPHOTOS&format=image/jpeg&style=normal',
+                                 {attribution: '&copy; <a href="https://geoservices.ign.fr/index.html">GeoPortail</a> '},
+	            {
+	                    minZoom:0,
+	                    maxZoom:18,
+	                    tileSize:256
+	            }),
+            geoportailCadastre = L.tileLayer('https://wxs.ign.fr/khb10vyvhwva41wt0yk54y51/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=CADASTRALPARCELS.PARCELS&format=image/jpeg&style=normal',
+                                 {attribution: '&copy; <a href="https://geoservices.ign.fr/index.html">GeoPortail</a> '},
+	            {
+	                    minZoom:0,
+	                    maxZoom:18,
+	                    tileSize:256
+	            })
+        var baseLayers = {
+            "OSM Mapnik": osmMap,
+   //         "Landscape": landMap,
+  //          "GeoPortail Pictures" : geoportailphoto,
+            "GeoPortail Map" : geoportailmap,
+            "GeoPortail Photos" : geoportailmapP,
+            "GeoPortail Cadastre" : geoportailCadastre
+        };
+        geoportailmapP.addTo(map);
+ //       map.setMaxZoom(20);
+
+        L.control.layers(baseLayers).addTo(map);
         // Show the lat and lng under the mouse cursor.
         var coordsDiv = document.getElementById('coordinates');
         map.on('mousemove', function(event) {
@@ -327,7 +372,7 @@
                 layerSelect.selectMarker.setLatLng(markerPosOk);
             }
         });
-    });
+    }
     // Hack leaflet.Editable plugin to hidden vertex center control to avoid circle drag
     L.Editable.VertexMarker.prototype.onAdd = function (map) {
         L.Marker.prototype.onAdd.call(this, map);

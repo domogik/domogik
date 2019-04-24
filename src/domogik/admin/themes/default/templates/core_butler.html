@@ -36,6 +36,34 @@
       </div>
     </div>
   </div>
+    <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h2>{% trans %}History status{% endtrans %}</h2>
+            </div>
+            <div class="panel-body">
+              <table class="table table-bordered">
+                <tbody>
+                {% if client_history|length > 0 %}
+                    {% for hist in client_history %}
+                      <tr>
+                        <th>{{ hist.timestamp|timestamp_to_strftime }}</th>
+                        <td>{{ hist.time_running }}</td>
+                        <td>{{ hist.status }}</td>
+                        <td>{{ hist.comment }}</td>
+                      </tr>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">{% trans %}This client seems never started ;){% endtrans %}</div>
+                {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+
 </div>
 
 
@@ -103,7 +131,7 @@
             data = JSON.parse(history[elt]);
             processMessage(data.msgid, data.context);
         }
-        
+
 
         ws.onmessage = function(e) {
             data = JSON.parse(e.data);
@@ -122,21 +150,21 @@
 
 
         $('a#brain_reload').bind('click', function() {
-    
+
             $('#butler_reload_progress').modal('show');
             $.get('/brain/reload', function(data) {
-               
-            }) 
+
+            })
             .done(function() {
                 $('#butler_reload_progress').modal('hide');
                 $('#butler_reload_ok').modal('show');
-            }) 
+            })
             .fail(function() {
                 $('#butler_reload_progress').modal('hide');
                 $('#butler_reload_error').modal('show');
             });
             return false;
-        });  
+        });
 
 
     });
@@ -157,7 +185,7 @@
                 else {
                     return;
                 }
-                
+
                 // generate html
                 //htmlData = "<div class='" + inOut + "'>" + content['text'] + "</div>";
 
@@ -186,7 +214,7 @@
                 }
 
                 // identity
-                if (content['identity'] != null) 
+                if (content['identity'] != null)
                     identityHtml = "<div class='identity'>" + content['identity'] + "</div>";
                 else
                     identityHtml = "";
@@ -235,7 +263,7 @@
             }
 
 
-    
+
     </script>
 
 

@@ -86,6 +86,9 @@
         <block type="logic_boolean"></block>
         <block type="math_number"></block>
         <block type="text"></block>
+        {% for const in constantes %}
+            <block type="{{ const }}"></block>
+        {% endfor %}
     </category>
     <category name="Variables" custom="VARIABLE"></category>
     <category name="Text">
@@ -218,6 +221,19 @@
             <category name="{{ p }}">
             {% for d in ds %}
                 <block type="{{ d }}"></block>
+            {% endfor %}
+            </category>
+        {% endfor %}
+    </category>
+    <category name="Clients">
+        {% for type in clients_status %}
+            <category name="{{ type }}">
+            {% for client_id in clients_status[type] %}
+                <category name="{{ client_id }}">
+                    <category name="status">
+                        <block type="client_status.StatusTest.{{ client_id }}"></block>
+                    </category>
+                </category>
             {% endfor %}
             </category>
         {% endfor %}

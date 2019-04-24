@@ -18,6 +18,7 @@ from wtforms import TextField, HiddenField, ValidationError, RadioField,\
 from wtforms.validators import Required
 from domogik.common.sql_schema import UserAccount
 from domogik.common.cron import CronExpression
+from domogik.common.plugin import LIST_CLIENT_STATUS, STATUS_HBEAT
 
 from wtforms.ext.sqlalchemy.orm import model_form
 import json
@@ -29,6 +30,7 @@ import traceback
 from operator import itemgetter
 from collections import OrderedDict
 import os
+
 
 @app.route('/scenario')
 @login_required
@@ -185,7 +187,7 @@ def scenario_edit(id):
         pass
     else:
         # Get the javascript for all blocks and data to build blockly categories
-        blocks_js, tests, actions, locations, devices_per_clients, used_datatypes = scenario_blocks_js()
+        blocks_js, constantes, tests, actions, locations, clients_status, devices_per_clients, used_datatypes = scenario_blocks_js()
 
         # ouput
         return render_template('scenario_edit.html',
@@ -193,9 +195,11 @@ def scenario_edit(id):
             form = form,
             name = name,
             blocks_js = blocks_js,
+            constantes = constantes,
             actions = actions,
             tests = tests,
             locations = locations,
+            clients_status = clients_status,
             devices_per_clients = devices_per_clients,
             datatypes = used_datatypes,
             jso = jso,
@@ -296,6 +300,10 @@ def scenario_blocks_js():
         tests.remove(u'sensor.SensorValueDummy')
         tests.remove(u'sensor.SensorValue')
         tests.remove(u'sensor.SensorTestDummy')
+        tests.remove(u'client_status.StatusTest')
+        tests.remove(u'client_status.SatusValue')
+        tests.remove(u'client_status.StatusTestDummy')
+        tests.remove(u'client_status.StatusValueDummy')
         tests.remove(u'location.LocationTest')
         tests.remove(u'location.LocationValueDummy')
         tests.remove(u'location.LocationValue')
@@ -340,16 +348,41 @@ def scenario_blocks_js():
         if 'datatypes' in res:
             datatypes = res['datatypes']
     else:
-        print(u"Error : no datatypes found!")
+        print(u"Error : no scenario datatypes found!")
         datatypes = {}
 
     # devices
     with app.db.session_scope():
         devices = app.db.list_devices()
 
+    # clients
+    msg = MQMessage()
+    msg.set_action('client.list.get')
+    res2 = cli.request('manager', msg.get(), timeout=10)
+    if res2 is not None:
+        clients  = res2.get_data()
+    else:
+        print(u"Error : no scenario clients found!")
+        clients = {}
+
+    list_status = []
+    for st in LIST_CLIENT_STATUS :
+        list_status.append([st, st])
     ### Now start the javascript generation
     js = ""
-
+    ### constantes
+    output = "[\"String\",\"ClientStatus\"]"
+    add = u"""Blockly.Blocks['client_status'] = {{
+                        init: function() {{
+                            this.setColour(240);
+                            this.appendDummyInput("STATUS").appendField(new Blockly.FieldDropdown({0}), "TEXT");
+                            this.setTooltip('Client status value');
+                            this.setOutput(true, {1});
+                            this.setInputsInline(false);
+                        }}
+                    }};""".format(json.dumps(list_status), output)
+    js = u'{0}\n\r{1}'.format(js, add)
+    constantes = [u"client_status"]
     ### tests
 #    print(u"ITEMS={0}".format(scenario_tests.items()))
 
@@ -443,7 +476,51 @@ def scenario_blocks_js():
             """.format(act, '\n'.join(p), params['description'])
         js = u'{0}\n\r{1}'.format(js, add)
 
-
+    ### clients status
+    clients_status = {}
+    # first, get the parameters
+    status_usage = []
+    for test, sensor_params in scenario_tests.items():
+        if test == "client_status.StatusTest":
+            for buf in sensor_params["parameters"]:
+                if buf["name"] == "usage.usage":
+                    status_usage = buf["values"]
+            break
+    for clientId in clients:
+        try:
+            if clients[clientId]['type'] == 'core':
+                color = 240
+            elif clients[clientId]['type'] == 'plugin':
+                color = 170
+            elif clients[clientId]['type'] == 'interface':
+                color = 290
+            else :
+                color = 345
+            if clients[clientId]['type'] in clients_status:
+                clients_status[clients[clientId]['type']].append(clientId)
+            else :
+                clients_status[clients[clientId]['type']] = [clientId]
+            ### Generate parameters
+            the_list = status_usage
+            papp = u"this.appendDummyInput().appendField(\"Mode \").appendField(new Blockly.FieldDropdown({0}, sensorUsageChange), '{1}');".format(json.dumps(the_list), "usage.usage");
+            output = "\"ClientStatus\""
+            ### Create the block
+            block_id = u"client_status.StatusTest.{0}".format(clientId)
+            block_description = u"status@{0}".format(clientId)
+            add = u"""Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            this.setColour({4});
+                            this.appendDummyInput().appendField("{1}");
+                            {5}
+                            this.setOutput(true, {3});
+                            this.setInputsInline(false);
+                            this.setTooltip("{1}");
+                        }}
+                    }};
+                    """.format(block_id, block_description, jso, output, color, papp)
+            js = u'{0}\n\r{1}'.format(js, add)
+        except:
+            print(u"ERROR while looking on a client status : {0}".format(traceback.format_exc()))
     ### devices sensors and commands
     devices_per_clients = {}
     for dev in devices:
@@ -614,14 +691,11 @@ def scenario_blocks_js():
     #### Location
     with app.db.session_scope():
         locations = app.db.get_all_location()
-    print(u"***************** get location **************")
     list_locations = {}
     for loc in locations:
         try:
-            print(loc)
             list_locations[loc.id] = {'ishome': loc.isHome, 'type': loc.type, 'name': loc.name}
             ### Generate parameters
-            print(the_list)
             papp = ""
             color = 160
             output = "\"null\""
@@ -748,4 +822,4 @@ def scenario_blocks_js():
 #    print(devices_per_clients)
 #    print("************************* DATATYPES *************************************")
 #    print(used_datatypes)
-    return js, tests, actions, list_locations, devices_per_clients, used_datatypes
+    return js, constantes, tests, actions, list_locations, clients_status, devices_per_clients, used_datatypes

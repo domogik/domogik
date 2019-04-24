@@ -33,6 +33,7 @@ from operator import itemgetter
 from domogik.common.utils import build_deviceType_from_packageJson
 from domogik.common.database import DbHelperException
 from domogikmq.pubsub.publisher import MQPub
+from datetime import datetime
 
 try:
     import html.parser
@@ -75,6 +76,40 @@ def get_client_devices(client_id):
         devices = app.db.list_devices_by_plugin(client_id)
     return devices
 
+def _timestamp_DeltaToString(t1, t2):
+    tdelta = datetime.fromtimestamp(t1) - datetime.fromtimestamp(t2)
+    return str(tdelta)
+
+def get_client_history(client_id):
+    tmp = client_id.split(".")
+    id = tmp[0].split("-")
+    cli = MQSyncReq(app.zmq_context)
+    msg = MQMessage()
+    msg.set_action('client.history.get')
+    msg.add_data('host', tmp[1])
+    msg.add_data('type', id[0])
+    msg.add_data('name', id[1])
+    res = cli.request('manager', msg.get(), timeout=10)
+    if res is not None and res.get_data()['history'] != []:
+        history = res.get_data()['history']
+        prev_h = history[0]
+        h0 = history[0] if prev_h['status'] =='alive' else False
+        prefix = 'Running since'
+        for h in history :
+            h['time_running'] = u"Duration : {0}s" .format(_timestamp_DeltaToString(prev_h['timestamp'], h['timestamp']))
+            if h['status'] =='alive' :
+                if h0 :
+                    h0['time_running'] = u"{0} : {1}s" .format(prefix, _timestamp_DeltaToString(h0['timestamp'], h['timestamp']))
+                else :
+                    h0 = h
+                    prefix = 'Has run during'
+            else :
+                h0 = False
+            prev_h = h
+    else:
+        history = []
+    return history
+
 def get_butler_history():
     cli = MQSyncReq(app.zmq_context)
     msg = MQMessage()
@@ -96,6 +131,10 @@ def get_clients_list():
     else:
         client_list = {}
     return client_list
+
+@app.template_filter('timestamp_to_strftime')
+def _filter_timestamp_to_datetime(timestamp, format='%d-%m-%Y %H:%M:%S') :
+    return datetime.fromtimestamp(timestamp).strftime(format)
 
 @app.route('/clients')
 @login_required
@@ -157,11 +196,13 @@ def clients():
 @timeit
 def client_detail(client_id):
     detail = get_client_detail(client_id)
+    history = get_client_history(client_id)
 
     return render_template('client.html',
             loop = {'index': 1},
             clientid = client_id,
             client_detail = detail,
+            client_history = history,
             mactive="clients",
             active = 'home')
 
@@ -1121,6 +1162,7 @@ def brain_reload():
 def core(client_id):
     tmp = client_id.split(".")
     name = tmp[0].split("-")[1]
+    cl_history = get_client_history(client_id)
     if name == "butler":
         brain = get_brain_content("learn")
         history = get_butler_history()
@@ -1131,6 +1173,7 @@ def core(client_id):
                 client_list = client_list,
                 history = map(json.dumps, history),
                 brain = brain,
+                client_history = cl_history,
                 mactive="clients",
                 active = 'home'
                 )
@@ -1138,6 +1181,7 @@ def core(client_id):
         return render_template('core.html',
                 loop = {'index': 1},
                 clientid = client_id,
+                client_history = cl_history,
                 mactive="clients",
                 active = 'home'
                 )

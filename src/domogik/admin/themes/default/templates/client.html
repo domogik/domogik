@@ -106,26 +106,32 @@
   {% endif %}
 
     <div class="row">
-      <div class="col-md-6">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h2>{% trans %}Developer{% endtrans %}</h2>
-          </div>
-          <div class="panel-body">
-            <a id="reload" type="button" class="btn btn-default">
-               <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> {% trans %}Reload plugin json{% endtrans %}
-           </a>
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h2>{% trans %}History status{% endtrans %}</h2>
+            </div>
+            <div class="panel-body">
+              <table class="table table-bordered">
+                <tbody>
+                {% if client_history|length > 0 %}
+                    {% for hist in client_history %}
+                      <tr>
+                        <th>{{ hist.timestamp|timestamp_to_strftime }}</th>
+                        <td>{{ hist.time_running }}</td>
+                        <td>{{ hist.status }}</td>
+                        <td>{{ hist.comment }}</td>
+                      </tr>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">{% trans %}This client seems never started ;){% endtrans %}</div>
+                {% endif %}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
     </div>
 
 </div>
-<script type="text/javascript">
-    $("#reload").click(function() {
-        console.log("reload request");
-        ws.send('{"mq_request": "plugin.reload", "data": {"type" : "{{ client_detail.type }}", "name": "{{ client_detail.name }}", "host": "{{ client_detail.host }}"}}');
-        console.log("ws send done");
-    });
-</script>
 {% endblock %}

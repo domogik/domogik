@@ -49,7 +49,7 @@ import sqlalchemy
 from sqlalchemy import Table, MetaData, and_, or_, not_, desc
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import func, extract
-from sqlalchemy.orm import sessionmaker, defer, scoped_session
+from sqlalchemy.orm import sessionmaker, defer, scoped_session, joinedload
 from sqlalchemy.orm.session import make_transient
 from sqlalchemy.pool import QueuePool
 #from sqlalchemy.cprocessors import str_to_datetime
@@ -59,13 +59,15 @@ from domogik.common import logger
 from domogik.common.configloader import Loader
 from domogik.common.sql_schema import (
         Device, DeviceParam,
-        PluginConfig, Person,
+        Plugin, PluginConfig,
+        PluginHistory, Person,
         UserAccount,
         Scenario,
         Command, CommandParam,
         Sensor, SensorHistory,
         XplCommand, XplStat, XplStatParam, XplCommandParam,
-        Location, LocationParam, Migrate
+        Location, LocationParam, Migrate,
+        RepresentableBase
 )
 from contextlib import contextmanager
 from multiprocessing.managers import SyncManager
@@ -106,6 +108,18 @@ def _get_week_nb(dt):
     """Return the week number of a datetime expression"""
     #return (dt - datetime.datetime(dt.year, 1, 1)).days / 7
     return dt.isocalendar()[1]
+
+class PluginConfigData(RepresentableBase):
+    """Class to encapsulate config parameters of plugin and replace SQLalchemy declarative_base PluginConfig
+    """
+
+    def __init__(self, pl_type, pl_id, pl_hostname, pr_key, pr_value):
+        """Set internal values to give attributes access"""
+        self.type = pl_type
+        self.id = pl_id
+        self.hostname = pl_hostname
+        self.value = pr_value
+        self.key = pr_key
 
 class DbHelperException(Exception):
     """This class provides exceptions related to the DbHelper class
@@ -278,18 +292,48 @@ class DbHelper(object):
         except Exception as sql_exception:
             self.__raise_dbhelper_exception(u"SQL exception (commit) : {0}".format(sql_exception))
 ####
+# Plugin
+####
+    def _add_plugin(self, pl_id, pl_type, pl_hostname):
+        try :
+            # Create new Plugin reference
+            plugin = Plugin(name=pl_id, type=pl_type, hostname=pl_hostname)
+            self.__session.add(plugin)
+            self._do_commit()
+            self.log.info("Add new plugin ref : {0}".format(plugin))
+            return plugin
+        except Exception as sql_exception:
+            self.__raise_dbhelper_exception(u"SQL exception (add plugin ref) : {0}".format(sql_exception))
+
+####
 # Plugin config
 ####
     def list_all_plugin_config(self):
         """Return a list of all plugin config parameters
 
-        @return a list of PluginConfig objects
+        @return a list of PluginConfigData objects
 
         """
-        return self.__session.query(PluginConfig).all()
+        list_plugins = self.__session.query(Plugin).all()
+        configs = []
+        res = []
+        # don't know why but globel resquet for all PluginConfig row don't return all row ! so we do resquest for each plugin_id
+        for plugin in list_plugins:
+            configs = []
+            configs = self.__session.query(PluginConfig).filter_by(plugin_id=plugin.id).all()
+            for item in configs :
+                if item.plugin_id == plugin.id :
+                    res.append(PluginConfigData(plugin.type, plugin.name, plugin.hostname, item.key, item.value))
+        return res
 
     def get_core_config(self, key = None):
-        cfg = self.__session.query(PluginConfig).filter_by(type=u'core').all()
+        core_plugin = self.__session.query(Plugin).filter_by(name=u'core'
+                            ).filter_by(type=u'core').all()
+        listC = []
+        for item in core_plugin :
+            listC.append(item.id)
+        self.log.debug(u"get core config : {0}".format(listC))
+        cfg = self.__session.query(PluginConfig).filter_by(plugin_id=listC).all()
         if key == None:
             res = {}
             for item in cfg:
@@ -303,9 +347,16 @@ class DbHelper(object):
 
     def set_core_config(self, cfg):
         # DELETE all
-        config_list = self.__session.query(PluginConfig).filter_by(type=u'core').all()
+        core_plugin = self.__session.query(Plugin).filter_by(name=u'core'
+                            ).filter_by(type=u'core').all()
+        listC = []
+        for item in core_plugin :
+            listC.append(item.id)
+        self.log.debug(u"set core config: {0}".format(listC))
+        config_list = self.__session.query(PluginConfig).filter_by(plugin_id=listC).all()
         for plc in config_list:
             self.__session.delete(plc)
+        self._do_commit()
         # READD
         for (key, val) in cfg.items():
             self.set_plugin_config('core', 'core', get_sanitized_hostname(), key, val)
@@ -316,19 +367,27 @@ class DbHelper(object):
         @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
-        @return a list of PluginConfig objects
+        @return a list of PluginConfigData objects
 
         """
         if self._cacheDB and self._cacheDB.upToDateConfig(pl_id, pl_hostname) :
             config = self._cacheDB.getConfig(pl_id, pl_hostname)
             if config != [] :
                return config
-        config =  self.__session.query(
+        plugins = self.__session.query(Plugin).filter_by(type=ucode(pl_type)
+                                                            ).filter_by(name=ucode(pl_id)
+                                                            ).filter_by(hostname=ucode(pl_hostname)
+                                                            ).all()
+        listP = []
+        for item in plugins :
+            listP.append(item.id)
+        cfg =  self.__session.query(
                 PluginConfig
-                    ).filter_by(type=ucode(pl_type)
-                    ).filter_by(id=ucode(pl_id)
-                    ).filter_by(hostname=ucode(pl_hostname)
+                    ).filter_by(plugin_id=listP
                     ).all()
+        config = []
+        for item in cfg:
+            config.append(PluginConfigData(pl_type, pl_id, pl_hostname, item.key, item.value))
         if self._cacheDB :
             self.log.debug(u"Set cache config for {0}.{1} : {2} parameter(s)".format( pl_id, pl_hostname, len(config)))
             self._cacheDB.setConfigData(config, pl_id, pl_hostname, self._owner)
@@ -341,19 +400,25 @@ class DbHelper(object):
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key we want the value from
-        @return a PluginConfig object
+        @return a PluginConfigData object
 
         """
         if self._cacheDB and self._cacheDB.upToDateConfig(pl_id, pl_hostname) :
             return self._cacheDB.getConfig(pl_id, pl_hostname, pl_key)
         try:
-            ret = self.__session.query(
-                PluginConfig
-                    ).filter_by(type=ucode(pl_type)
-                    ).filter_by(id=ucode(pl_id)
-                    ).filter_by(hostname=ucode(pl_hostname)
-                    ).filter_by(key=ucode(pl_key)
-                    ).first()
+            plugins = self.__session.query(Plugin).filter_by(type=ucode(pl_type)
+                                                                ).filter_by(name=ucode(pl_id)
+                                                                ).filter_by(hostname=ucode(pl_hostname)
+                                                                ).all()
+            listP = []
+            for item in plugins :
+                listP.append(item.id)
+            cfg =  self.__session.query(
+                    PluginConfig
+                        ).filter_by(plugin_id=listP
+                        ).filter_by(key=ucode(pl_key)
+                        ).first()
+            ret = PluginConfigData(pl_type, pl_id, pl_hostname, cfg.key, cfg.value)
         except:
             self.log.debug(u"oups : {0}".format(traceback.format_exc()))
         return ret
@@ -365,47 +430,62 @@ class DbHelper(object):
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key we want to add / update
         @param pl_value : key value we want to add / update
-        @return : the added / updated PluginConfig item
+        @return : the added / updated PluginConfigData item
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        plugin_config = self.__session.query(
-            PluginConfig
-                ).filter_by(type=ucode(pl_type)
-                ).filter_by(id=ucode(pl_id)
-                ).filter_by(hostname=ucode(pl_hostname)
-                ).filter_by(key=ucode(pl_key)).first()
+        plugin = self.__session.query(Plugin).filter_by(type=ucode(pl_type)
+                                                            ).filter_by(name=ucode(pl_id)
+                                                            ).filter_by(hostname=ucode(pl_hostname)
+                                                            ).first()
+        if not plugin:
+            self._add_plugin(pl_id, pl_type, pl_hostname)
+        plugin_config =  self.__session.query(
+                PluginConfig
+                    ).filter_by(plugin_id=plugin.id
+                    ).filter_by(key=ucode(pl_key)
+                    ).first()
         if not plugin_config:
-            plugin_config = PluginConfig(type=pl_type, id=pl_id, hostname=pl_hostname, key=pl_key, value=pl_value)
+            plugin_config = PluginConfig(plugin_id=plugin.id, key=pl_key, value=pl_value)
         else:
             plugin_config.value = ucode(pl_value)
         self.__session.add(plugin_config)
         self._do_commit()
         if self._cacheDB : self._cacheDB.markAsUpdatingConfig(pl_id, pl_hostname)
-        return plugin_config
+        return PluginConfigData(pl_type, pl_id, pl_hostname, pl_key, pl_value)
 
     def del_plugin_config(self, pl_type, pl_id, pl_hostname):
-        """Delete all parameters of a plugin config
+        """Delete all parameters of a plugin config and remove plugin history and reference id
 
         @param pl_type : plugin type
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
-        @return the deleted PluginConfig objects
+        @return the deleted PluginConfigData objects
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        plugin_config_list = self.__session.query(
-            PluginConfig
-                ).filter_by(type=ucode(pl_type)
-                ).filter_by(id=ucode(pl_id)
-                ).filter_by(hostname=ucode(pl_hostname)).all()
+        plugin = self.__session.query(Plugin).filter_by(type=ucode(pl_type)
+                                                            ).filter_by(name=ucode(pl_id)
+                                                            ).filter_by(hostname=ucode(pl_hostname)
+                                                            ).first()
+        if not plugin:
+            return None
+        plugin_config_list = self.__session.query(PluginConfig).filter_by(plugin_id=plugin.id).all()
         for plc in plugin_config_list:
             self.__session.delete(plc)
+        if pl_type != 'core' :
+            self.__session.delete(plugin)
+        history = self.__session.query(PluginHistory).filter_by(plugin_id=plugin.id).all()
+        for plh in history:
+            self.__session.delete(plh)
         self._do_commit()
         if self._cacheDB : self._cacheDB.markAsUpdatingConfig(pl_id, pl_hostname)
-        return plugin_config_list
+        config = []
+        for item in plugin_config_list:
+            config.append(PluginConfigData(pl_type, pl_id, pl_hostname, item.key, item.value))
+        return config
 
     def del_plugin_config_key(self, pl_type, pl_id, pl_hostname, pl_key):
         """Delete a key of a plugin config
@@ -414,23 +494,115 @@ class DbHelper(object):
         @param pl_id : plugin id
         @param pl_hostname : hostname the plugin is installed on
         @param pl_key : key of the plugin config
-        @return the deleted PluginConfig object
+        @return the deleted PluginConfigData object
 
         """
         # Make sure previously modified objects outer of this method won't be commited
         self.__session.expire_all()
-        plugin_config = self.__session.query(
+        plugin = self.__session.query(Plugin).filter_by(type=ucode(pl_type)
+                                                            ).filter_by(name=ucode(pl_id)
+                                                            ).filter_by(hostname=ucode(pl_hostname)
+                                                            ).first()
+        if not plugin:
+            return None
+        plugin_configs = self.__session.query(
             PluginConfig
-               ).filter_by(type=ucode(pl_type)
-               ).filter_by(id=ucode(pl_id)
-               ).filter_by(hostname=ucode(pl_hostname)
-               ).filter_by(key=ucode(pl_key)).first()
-        if plugin_config is not None:
-            self.__session.delete(plugin_config)
-            self._do_commit()
-        if self._cacheDB : self._cacheDB.markAsUpdatingConfig(pl_id, pl_hostname)
-        return plugin_config
+               ).filter_by(plugin_id=plugin.id).all()
+        for plugin_config in  plugin_configs :
+            if plugin_config.key == ucode(pl_key):
+                self.__session.delete(plugin_config)
+                # delete Plugin ref if plugin have no parameters
+                if len(plugin_configs) == 1 and pl_type != 'core' :
+                    self.__session.delete(plugin)
+                    history = self.__session.query(PluginHistory).filter_by(plugin_id=plugin.id).all()
+                    for plh in history:
+                        self.__session.delete(plh)
+                self._do_commit()
+                if self._cacheDB : self._cacheDB.markAsUpdatingConfig(pl_id, pl_hostname)
+                return PluginConfigData(pl_type, pl_id, pl_hostname, plugin_config.key, plugin_config.value)
+        return None
 
+####
+# Plugin history status
+####
+    def add_plugin_history(self, pl_type, pl_id, pl_hostname, pl_status, pl_comment="", date=None):
+        """Add / update a plugin parameter
+
+        @param pl_id : plugin id
+        @param pl_hostname : hostname the plugin is installed on
+        @param pl_key : key we want to add / update
+        @param pl_status : key value we want to add / update
+        @return : the added / updated PluginHistory item
+
+        """
+        # Make sure previously modified objects outer of this method won't be commited
+        self.__session.expire_all()
+        plugin = self.__session.query(Plugin).filter_by(type=ucode(pl_type)
+                                                            ).filter_by(name=ucode(pl_id)
+                                                            ).filter_by(hostname=ucode(pl_hostname)
+                                                            ).first()
+        if not plugin and pl_type == "core" :
+            # Create core client(Plugin) reference
+            plugin = self._add_plugin(pl_id, pl_type, pl_hostname)
+        if plugin:
+            ### get the last 2 value for the below analysis
+            last2 = self.__session.query(PluginHistory
+                    ).filter_by(plugin_id=plugin.id
+                    ).order_by(PluginHistory.date.desc()
+                    ).limit(2).all()
+            ### Do check about incremental to calculate the value to store
+            if date is None :
+                date = datetime.datetime.now()
+            else :
+                date = datetime.datetime.fromtimestamp(date)
+            if (len(last2) == 2) and ((last2[0].status == last2[1].status == ucode(pl_status)) and (last2[0].comment == last2[1].comment == ucode(pl_comment))) :
+                    # update only date
+                    self.__session.query(PluginHistory).filter_by(id=last2[0].id).update({'date' : date})
+#                    self.log.debug(u"Client {0} history same status, only update date : {1}".format(pl_id, date))
+            else :
+                # add new history
+                self.log.debug(u"Client {0} history add full status : {1} {2}, {3}".format(pl_id, date, pl_status, pl_comment))
+                h = PluginHistory(plugin.id, date, ucode(pl_status), ucode(pl_comment))
+                self.__session.add(h)
+            self._do_commit()
+            ### handle the history size in number of items
+            # TODO : move in a dedicated function which would be called each... ??? hours ???
+            count = self.__session.query(PluginHistory).filter_by(plugin_id=plugin.id).count()
+            if count > 20:
+                # delete from PluginHistory where id not in (select id from PluginHistory order by date desc limit x)
+                self.log.debug(u"Client {0} history count up to 20 : {1}".format(pl_id, count))
+                tokeep1 = self.__session.query(PluginHistory.id
+                        ).filter(PluginHistory.plugin_id==plugin.id
+                        ).order_by(PluginHistory.date.desc()
+                        ).limit(20
+                        ).subquery()
+                # ugly fix because mysql is not supporting limit in a subquery
+                tokeep2 = self.__session.query(tokeep1).subquery()
+                self.__session.query(PluginHistory
+                        ).filter(
+                                PluginHistory.plugin_id==plugin.id,
+                                ~PluginHistory.id.in_(tokeep2)
+                        ).delete(synchronize_session=False)
+                self._do_commit()
+            return pl_status
+        else :
+            self.log.debug(u"Add history status, client {0} {1} {2} not find.".format(pl_type, pl_id, pl_hostname))
+            return None
+
+    def list_plugin_history(self, pl_type, pl_id, pl_hostname):
+        """ Get all plugin and core status history
+        """
+        status = []
+        plugin = self.__session.query(Plugin).filter_by(type=ucode(pl_type)
+                                                            ).filter_by(name=ucode(pl_id)
+                                                            ).filter_by(hostname=ucode(pl_hostname)
+                                                            ).first()
+        if plugin:
+            for a_status in self.__session.query(PluginHistory).filter(PluginHistory.plugin_id==plugin.id).order_by(PluginHistory.date.desc()).all():
+                status.append({"status" : a_status.status,
+                       "comment" : a_status.comment,
+                       "timestamp" : time.mktime(a_status.date.timetuple()) })
+        return status
 ###
 # Devices
 ###
@@ -2275,4 +2447,3 @@ class DbHelper(object):
         if with_rollback:
             self.__session.rollback()
         raise DbHelperException(error_msg)
-

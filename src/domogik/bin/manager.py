@@ -77,9 +77,10 @@ from domogik.common import logger
 from domogik.common.utils import is_already_launched, STARTED_BY_MANAGER
 from domogik.common.deviceconsistency import DeviceConsistencyThread
 from domogik.xpl.common.plugin import XplPlugin
-from domogik.common.plugin import STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID, STATUS_HBEAT
+from domogik.common.plugin import STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_UNKNOWN, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED, PACKAGES_DIR, DMG_VENDOR_ID, STATUS_HBEAT, LIST_CLIENT_STATUS
 from domogik.common.queryconfig import Query
 from domogik.common.baseplugin import FIFO_DIR
+from domogik.common.database import DbHelper
 
 import zmq
 from domogikmq.pubsub.subscriber import MQAsyncSub
@@ -199,6 +200,15 @@ class Manager(XplPlugin, MQAsyncSub):
 
         self.log.info(u"Packages path : {0}".format(self.get_packages_directory()))
 
+        ### Start cachedevice system
+        self._cache_pid = None
+        thr__runCacheDevices = Thread(None,
+                                      self._runCacheDevices,
+                                      "run_cache_devices",
+                                      (),
+                                      {})
+        thr__runCacheDevices.start()
+
         ### Metrics
         self.metrics_processinfo = []
         self.metrics_browser = []
@@ -239,18 +249,6 @@ class Manager(XplPlugin, MQAsyncSub):
 
         ### Create the interfaces list
         self._interfaces = {}
-
-        ### Start cachedevice system
-#        if self.options.start_cachedevice:
-        self.log.info(u"Manager init cache")
-        self._cache_pid = None
-        thr__runCacheDevices = Thread(None,
-                                      self._runCacheDevices,
-                                      "run_cache_devices",
-                                      (),
-                                      {})
-        thr__runCacheDevices.start()
-        self.log.info(u"Manager instanciate cache")
 
         ### Start xpl GW
         if self.options.start_xpl:
@@ -512,6 +510,11 @@ class Manager(XplPlugin, MQAsyncSub):
                 self.log.info(u"Clients conversion request : {0}".format(msg))
                 self._mdp_reply_clients_conversion()
 
+            # retrieve the clients history status
+            elif msg.get_action() == "client.history.get":
+                self.log.info(u"Clients history request : {0}".format(msg))
+                self._mdp_reply_client_history(msg)
+
             # retrieve the datatypes
             elif msg.get_action() == "datatype.get":
                 self.log.info(u"Clients datatype request : {0}".format(msg))
@@ -605,7 +608,6 @@ class Manager(XplPlugin, MQAsyncSub):
         msg = MQMessage()
         msg.set_action('datatype.result')
 
-
         json_file = "{0}/datatypes.json".format(self.get_resources_directory())
         data = OrderedDict()
         try:
@@ -652,6 +654,31 @@ class Manager(XplPlugin, MQAsyncSub):
             msg.add_data(key, conv[key])
         self.reply(msg.get())
 
+    def _mdp_reply_client_history(self, data):
+        """ Reply on the MQ
+            @param data : msg REQ received
+        """
+        msg = MQMessage()
+        msg.set_action('client.history.result')
+        history = []
+        if 'name' not in data.get_data().keys():
+            status = False
+            reason = "Client history request : missing 'name' field"
+            self.log.error(reason)
+        else:
+            type = data.get_data()['type']
+            msg.add_data('type', type)
+            name = data.get_data()['name']
+            msg.add_data('name', name)
+            host = data.get_data()['host']
+            msg.add_data('host', host)
+            status = True
+            reason = ""
+            history = self._clients.get_client_history(type, name, host)
+        msg.add_data('history', history)
+        msg.add_data('status', status)
+        msg.add_data('reason', reason)
+        self.reply(msg.get())
 
     def _mdp_reply_plugin_start(self, data):
         """ Reply on the MQ
@@ -676,9 +703,9 @@ class Manager(XplPlugin, MQAsyncSub):
             #
             try:
                 if type == "plugin":
-                    pid = self._plugins[name].start()
+                    pid = self._plugins[name].start("")
                 elif type == "interface":
-                    pid = self._interfaces[name].start()
+                    pid = self._interfaces[name].start("")
                 else:
                     pid = 0
 
@@ -795,8 +822,6 @@ class Manager(XplPlugin, MQAsyncSub):
 
     def _runCacheDevices(self):
         self.log.info(u"Manager run cache")
-#        self.__cacheData = WorkerCache()
-#        self.log.info(u"Cache running")
         self._pid_dir_path = self.config['pid_dir_path']
         try:
             the_path = os.path.join(os.path.dirname(__file__), "{0}.py".format(('cachedb')))
@@ -893,12 +918,6 @@ class Package():
 
 
 
-
-
-
-
-
-
 class GenericComponent():
     """ This is a sample class to be used for plugins and core components
     """
@@ -943,11 +962,11 @@ class GenericComponent():
         self._clients.set_configured(self.client_id, new_status)
 
 
-    def set_status(self, new_status):
+    def set_status(self, new_status, comment=""):
         """ set the status of the component
             @param status : new status
         """
-        self._clients.set_status(self.client_id, new_status)
+        self._clients.set_status(self.client_id, new_status, comment)
 
 
     def set_pid(self, pid):
@@ -1018,7 +1037,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status'])
 
 
-    def start(self):
+    def start(self, option=None):
         """ to call to start the component
             @return : None if ko
                       the pid if ok
@@ -1033,20 +1052,20 @@ class CoreComponent(GenericComponent, MQAsyncSub):
 
         ### Start the component
         self.log.info(u"Request to start core component : {0}".format(self.name))
-        pid = self.exec_component("domogik.bin")
+        pid = self.exec_component("domogik.bin", option=option)
         self.set_pid(pid)
         if pid != 0:
             # Notice : we whould not need to do this as this information should be provided by the MQ plugin.status.
             # But as the IOLoop is not started when core components are launched with -r, -d or -x options, we don't
             # have the plugin.status message.
-            self.set_status(STATUS_ALIVE)
+            self.set_status(STATUS_STOPPED)
 
         # no need to add a step to check if the component is started as the status is given to the user directly by the pub/sub 'plugin.status'
 
         return pid
 
 
-    def exec_component(self, python_component_basepackage):
+    def exec_component(self, python_component_basepackage, option=None):
         """ to call to start a component
             @param python_component_basepackage : domogik.bin, packages
         """
@@ -1065,6 +1084,8 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         # we add the STARTED_BY_MANAGER useless command to allow the plugin to ignore this command line when it checks if it is already laucnehd or not
         #cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, component_path)
         cmd = "{0} && {1} {2}".format(STARTED_BY_MANAGER, PYTHON, the_path)
+        # add start by manager args or option
+        cmd += " -m" if option is None else " {0}".format(option)
 
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
@@ -1090,8 +1111,8 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
-                self.log.debug(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
-                self.set_status(content["event"])
+                self.log.debug(u"CoreComponent : New status received from {0} {1} on {2} => {3} {4}".format(self.type, self.name, self.host, content["event"], content["comment"]))
+                self.set_status(content["event"], content["comment"])
         #        # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
         #        if content["event"] == STATUS_STOP_REQUEST:
         #            self.log.info(u"The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
@@ -1189,7 +1210,7 @@ class Brain(GenericComponent, MQAsyncSub):
             self.log.error(u"Brain {0} : error while trying to read the json file".format(self.name))
             self.log.error(u"Brain {0} : invalid json file".format(self.name))
             self.log.error(u"Brain {0} : {1}".format(self.name, e.value))
-            self.set_status(STATUS_INVALID)
+            self.set_status(STATUS_INVALID, u"Error when read json file")
             pass
 
 
@@ -1342,8 +1363,8 @@ class Plugin(GenericComponent, MQAsyncSub):
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
-                self.log.debug(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
-                self.set_status(content["event"])
+                self.log.debug(u"Plugin : New status received from {0} {1} on {2} => {3} {4}".format(self.type, self.name, self.host, content["event"], content["comment"]))
+                self.set_status(content["event"], content["comment"])
                 # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
                 if content["event"] == STATUS_STOP_REQUEST:
                     self.log.info(u"The plugin '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
@@ -1388,7 +1409,7 @@ class Plugin(GenericComponent, MQAsyncSub):
             self.log.error(u"Plugin {0} : error while trying to read the json file".format(self.name))
             self.log.error(u"Plugin {0} : invalid json file".format(self.name))
             self.log.error(u"Plugin {0} : {1}".format(self.name, e.value))
-            self.set_status(STATUS_INVALID)
+            self.set_status(STATUS_INVALID, u"Error when read json file")
             pass
 
     # MOVED in the parent class because used also for brain, interface types
@@ -1415,7 +1436,7 @@ class Plugin(GenericComponent, MQAsyncSub):
     #                if key_found == False:
     #                    self.log.warning(u"A key '{0}' is configured for plugin {1} on host {2} but there is no such key in the json file of the plugin. You may need to clean your configuration".format(key, self.name, self.host))
 
-    def start(self):
+    def start(self, option=None):
         """ to call to start the plugin, Call real start in a thread
             @return : None if ko
                       0 if already started
@@ -1431,11 +1452,11 @@ class Plugin(GenericComponent, MQAsyncSub):
         Thread(None,
               self.__start,
               "th_Start_{0}".format(self.name),
-              (),
+              (option, ),
               {}).start()
         return 1
 
-    def __start(self):
+    def __start(self, option=None):
         """ to call to start the plugin in a thread and don't lock MQ response.
             Don't recheck already launched
             @return : Nothing
@@ -1445,20 +1466,19 @@ class Plugin(GenericComponent, MQAsyncSub):
         test_option = self._config.query(self.type, self.name, "test_option")
         test_args = ""
         if test_mode == True:
-            self.log.info("The plugin {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))
+            self.log.info(u"The plugin {0} is requested to be launched in TEST mode. Option is {1}".format(self.name, test_option))
             test_args = "-T {0}".format(test_option)
 
         ### Try to start the plugin
-        self.log.info(u"Request to start plugin : {0} {1}".format(self.name, test_args))
         pid = self.exec_component(py_file = "{0}/plugin_{1}/bin/{2}.py {3}".format(self._packages_directory, self.name, self.name, test_args), \
-                                  env_pythonpath = self._libraries_directory)
+                                  env_pythonpath = self._libraries_directory, option=option)
 
         # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way
 
         self.set_pid(pid)
         return pid
 
-    def exec_component(self, py_file, env_pythonpath = None):
+    def exec_component(self, py_file, env_pythonpath=None, option=None):
         """ to call to start a component
             @param py_file : path to the .py file
             @param env_pythonpath (optionnal): custom PYTHONPATH if needed (for packages it is needed)
@@ -1469,7 +1489,8 @@ class Plugin(GenericComponent, MQAsyncSub):
         if env_pythonpath:
             cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
         cmd += "{0} {1}".format(PYTHON, py_file.strip())
-
+        # add start by manager args or option
+        cmd += " -m" if option is None else " {0}".format(option)
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
         subp = Popen(cmd,
@@ -1619,8 +1640,8 @@ class Interface(GenericComponent, MQAsyncSub):
         #self.log.debug(u"{0}".format(content))
         if msgid == "plugin.status":
             if content["type"] == self.type and content["name"] == self.name and content["host"] == self.host:
-                self.log.debug(u"New status received from {0} {1} on {2} : {3}".format(self.type, self.name, self.host, content["event"]))
-                self.set_status(content["event"])
+                self.log.debug(u"Interface : New status received from {0} {1} on {2} => {3} {4}".format(self.type, self.name, self.host, content["event"], content["comment"]))
+                self.set_status(content["event"], content["comment"])
                 # if the status is STATUS_STOP_REQUEST, launch a check in N seconds to check if the plugin was able to shut alone
                 if content["event"] == STATUS_STOP_REQUEST:
                     self.log.info(u"The interface '{0}' is requested to stop. In 15 seconds, we will check if it has stopped".format(self.name))
@@ -1654,11 +1675,11 @@ class Interface(GenericComponent, MQAsyncSub):
             self.log.error(u"Interface {0} : error while trying to read the json file".format(self.name))
             self.log.error(u"Interface {0} : invalid json file".format(self.name))
             self.log.error(u"Interface {0} : {1}".format(self.name, e.value))
-            self.set_status(STATUS_INVALID)
+            self.set_status(STATUS_INVALID, u"Error when read json file")
             pass
 
 
-    def start(self):
+    def start(self, option=None):
         """ to call to start the interface
             @return : None if ko
                       the pid if ok
@@ -1684,7 +1705,7 @@ class Interface(GenericComponent, MQAsyncSub):
         ### Try to start the interface
         self.log.info(u"Request to start interface : {0} {1}".format(self.name, test_args))
         pid = self.exec_component(py_file = "{0}/{1}_{2}/bin/{3}.py {4}".format(self._packages_directory, self.type, self.name, self.name, test_args), \
-                                  env_pythonpath = self._libraries_directory)
+                                  env_pythonpath = self._libraries_directory, option=option)
         pid = pid
 
         # There is no need to check if it is successfully started as the plugin will send over the MQ its status the UI will get the information in this way
@@ -1693,7 +1714,7 @@ class Interface(GenericComponent, MQAsyncSub):
         return pid
 
 
-    def exec_component(self, py_file, env_pythonpath = None):
+    def exec_component(self, py_file, env_pythonpath = None, option=None):
         """ to call to start a component
             @param py_file : path to the .py file
             @param env_pythonpath (optionnal): custom PYTHONPATH if needed (for packages it is needed)
@@ -1704,6 +1725,8 @@ class Interface(GenericComponent, MQAsyncSub):
         if env_pythonpath:
             cmd += "export PYTHONPATH={0} && ".format(env_pythonpath)
         cmd += "{0} {1}".format(PYTHON, py_file.strip())
+        # add start by manager args or option
+        cmd += " -m" if option is None else " {0}".format(option)
 
         ### Execute command
         self.log.info(u"Execute command : {0}".format(cmd))
@@ -1767,6 +1790,8 @@ class Clients():
         self._clients = {}
         self._clients_with_details = {}
         self._conversions = {}
+        self._db = DbHelper(owner="Manager core clients")
+        self._lock_db = Lock()
 
         ### init logger
         log = logger.Logger('manager')
@@ -1788,6 +1813,7 @@ class Clients():
         """
         while not self._stop.isSet():
             now = time.time()
+#            self.log.debug(u"Check dead clients ({0})".format(len(self._clients)))
             for a_client in self._clients:
                 if self._clients[a_client]['type'] in ['plugin', 'core', 'interface']:
                     # check if the client is dead only when the client is alive (or partially alive)
@@ -1795,7 +1821,7 @@ class Clients():
                         delta = now - self._clients[a_client]['last_seen']
                         if delta > 2*STATUS_HBEAT:
                             # client is dead!
-                            self.set_status(a_client, STATUS_DEAD)
+                            self.set_status(a_client, STATUS_DEAD, u"Manager lost client")
 
                 elif self._clients[a_client]['type'] == 'xpl_client':
                     # check if the client is dead only when the client is alive (a xpl client can be only ALIVE or DEAD)
@@ -1807,7 +1833,7 @@ class Clients():
                         # This part may of course be improved later ;)
                         if delta > 2*(STATUS_HBEAT_XPL*60):
                             # client is dead!
-                            self.set_status(a_client, STATUS_DEAD)
+                            self.set_status(a_client, STATUS_DEAD, u"Manager lost client")
             self._stop.wait(STATUS_HBEAT)
 
     def add(self, host, type, name, client_id, xpl_source, data, conversions, configured = None):
@@ -1888,11 +1914,12 @@ class Clients():
         self.log.info("The client 'configured' flag is now set to : {0}".format(new_status))
         self.publish_update()
 
-    def set_status(self, client_id, new_status):
+    def set_status(self, client_id, new_status, comment=""):
         """ Set a new status to a client
         """
-        self.log.debug(u"Try to set a new status : {0} => {1}".format(client_id, new_status))
-        if new_status not in (STATUS_UNKNOWN, STATUS_STARTING, STATUS_ALIVE, STATUS_STOPPED, STATUS_DEAD, STATUS_INVALID, STATUS_STOP_REQUEST, STATUS_NOT_CONFIGURED):
+        status_time = time.time()
+#        self.log.debug(u"Try to set a new status : {0} => {1} {2}".format(client_id, new_status, comment))
+        if new_status not in LIST_CLIENT_STATUS :
             self.log.error(u"Invalid status : {0}".format(new_status))
             return
         if client_id not in self._clients:
@@ -1900,30 +1927,34 @@ class Clients():
         old_status = self._clients[client_id]['status']
         # in all cases, set the 'last seen' time for the clients which are not dead
         if new_status != STATUS_DEAD:
-            self._clients[client_id]['last_seen'] = time.time()
+            self._clients[client_id]['last_seen'] = status_time
         if old_status == new_status:
-            self.log.debug(u"The status was already {0} : nothing to do".format(old_status))
+#            self.log.debug(u"The status was already {0} : store current time and nothing to do".format(old_status))
+            with self._lock_db :
+                with self._db.session_scope():
+                    self._db.add_plugin_history(self._clients[client_id]['type'], self._clients[client_id]['name'], self._clients[client_id]['host'], new_status, comment, status_time)
             return
         self._clients[client_id]['status'] = new_status
         self._clients_with_details[client_id]['status'] = new_status
-        self.log.info(u"Status set : {0} => {1}".format(client_id, new_status))
+        self.log.info(u"Status set : {0} => {1}, {2}".format(client_id, new_status, comment))
         # in case the client is dead, it means that it could have been killed or anything else.
         # so the client was not able to send itself the plugin.status message with status 'dead'...
         # so the manager will do it for the client!
         if new_status == STATUS_DEAD:
             self.log.debug("Send plugin.status for client {0} and status = {1}....".format(client_id, STATUS_DEAD))
-            try:
-                package, host = client_id.split(".")
-                type, name = package.split("-")
+            if self._clients[client_id]['name'] is not None :
                 self._pub.send_event('plugin.status',
-                                     {"type" : type,
-                                      "name" : name,
-                                      "host" : host,
-                                      "event" : STATUS_DEAD})
-            except:
-                # bad data...
-                pass
+                                     {"type" : self._clients[client_id]['type'],
+                                      "name" : self._clients[client_id]['name'],
+                                      "host" : self._clients[client_id]['host'],
+                                      "event" : STATUS_DEAD,
+                                      "comment": "Manager advert client is dead"})
+
         self.publish_update()
+        if self._clients[client_id]['name'] is not None :
+            with self._lock_db :
+                with self._db.session_scope():
+                    self._db.add_plugin_history(self._clients[client_id]['type'], self._clients[client_id]['name'], self._clients[client_id]['host'], new_status, comment, status_time)
 
     def set_pid(self, client_id, pid):
         """ Set a pid to a client
@@ -1948,6 +1979,14 @@ class Clients():
         """ Return the clients conversions elements
         """
         return self._conversions
+
+    def get_client_history(self, type, plugin_id, hostname):
+        """ Return the clients conversions elements
+        """
+        with self._lock_db :
+                with self._db.session_scope():
+                    history = self._db.list_plugin_history(type, plugin_id, hostname)
+        return history
 
     def publish_update(self):
         """ Publish the clients list update over the MQ
