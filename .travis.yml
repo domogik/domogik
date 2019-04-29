@@ -23,15 +23,15 @@ branches:
     - jsl-dawndusk
 python:
  - "3.7"
- - "3.7-dev"  # 3.7 development branch
- - "3.8-dev"  # 3.8 development branch
+ - "3.8-dev"
  - "nightly"
 matrix:
   allow_failures:
     - "3.7"
-    - "3.7-dev"
-    - "3.8-dev"  # 3.8 development branch
+    - "3.8-dev"
     - "nightly"
+services:
+ - mysql
 mysql:
   adapter: mysql2
   database: domogik
