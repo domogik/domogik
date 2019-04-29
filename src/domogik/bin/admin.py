@@ -240,7 +240,7 @@ class Admin(Plugin):
         Plugin.__init__(self, name = 'admin', log_prefix='core_')
         self.log.debug(u"Init database_manager instance")
         # Check for database connexion
-        self._db = DbHelper()
+        self._db = DbHelper(owner="Admin core")
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
         self.log.debug(u"locale : {0} {1}".format(locale.getdefaultlocale()[0], locale.getdefaultlocale()[1]))
@@ -394,7 +394,7 @@ class Admin(Plugin):
         # Try gevent to allow streaming
         # Not working with the cache component... See #509 for more details
         #cmd = "{0}  -k gevent".format(cmd)
-   
+
         # Increase the timeout to allow 2 min of data streaming
         # As all UIs should refresh each video stream each minute in case of stream error, it should do the trick
         cmd = "{0}  -t 120".format(cmd)
@@ -405,12 +405,12 @@ class Admin(Plugin):
             # Get the available cipher son the system
             # We do this manually because on some systems, gunicorn provides only the 00000 cipher, so ssl is unusable!
             cmd_ciphers = "{0} ciphers".format(find_executable("openssl"))
-            self._ciphers = subprocess.Popen(cmd_ciphers, shell=True, 
-                                             stdout=subprocess.PIPE, 
+            self._ciphers = subprocess.Popen(cmd_ciphers, shell=True,
+                                             stdout=subprocess.PIPE,
                                              stderr=subprocess.PIPE)
             out, err = self._ciphers.communicate()
             CIPHERS = out.strip()
-            # Example result : 
+            # Example result :
             #CIPHERS = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA:RSA-PSK-AES256-GCM-SHA384:DHE-PSK-AES256-GCM-SHA384:RSA-PSK-CHACHA20-POLY1305:DHE-PSK-CHACHA20-POLY1305:ECDHE-PSK-CHACHA20-POLY1305:AES256-GCM-SHA384:PSK-AES256-GCM-SHA384:PSK-CHACHA20-POLY1305:RSA-PSK-AES128-GCM-SHA256:DHE-PSK-AES128-GCM-SHA256:AES128-GCM-SHA256:PSK-AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:ECDHE-PSK-AES256-CBC-SHA384:ECDHE-PSK-AES256-CBC-SHA:SRP-RSA-AES-256-CBC-SHA:SRP-AES-256-CBC-SHA:RSA-PSK-AES256-CBC-SHA384:DHE-PSK-AES256-CBC-SHA384:RSA-PSK-AES256-CBC-SHA:DHE-PSK-AES256-CBC-SHA:AES256-SHA:PSK-AES256-CBC-SHA384:PSK-AES256-CBC-SHA:ECDHE-PSK-AES128-CBC-SHA256:ECDHE-PSK-AES128-CBC-SHA:SRP-RSA-AES-128-CBC-SHA:SRP-AES-128-CBC-SHA:RSA-PSK-AES128-CBC-SHA256:DHE-PSK-AES128-CBC-SHA256:RSA-PSK-AES128-CBC-SHA:DHE-PSK-AES128-CBC-SHA:AES128-SHA:PSK-AES128-CBC-SHA256:PSK-AES128-CBC-SHA"
             cmd = "{0} --ciphers {1}".format(cmd, CIPHERS)
 
@@ -438,16 +438,6 @@ class Admin(Plugin):
         my_exception =  str(traceback.format_exc()).replace('"', "'")
         return my_exception
 
-    def get_a_dbHelper(self):
-        """ Handle a multi DbHelper. Create a DbHelper object if necessary who is deleted after use
-            @return dbHelper : new DbHelper object or self ._db if not used
-        """
-        if self._db is None :
-            self._db = DbHelper()
-        if self._db.get_session is None :
-               return self._db
-        return DbHelper()
-
     def on_mdp_request(self, msg):
         """ Handle Requests over MQ on multi-thread
             @param msg : MQ req message
@@ -457,14 +447,14 @@ class Admin(Plugin):
             Plugin.on_mdp_request(self, msg)
             # start a thread only if needed
             if msg.get_action() in ['device.params', 'config.get', 'config.set', 'config.delete', 'device.get', 'device.create', 'device.delete',
-                                    'device.update', 'deviceparam.update', 'sensor.update', 'sensor_history.get', 'person.get']:
+                                    'device.update', 'deviceparam.update', 'sensor.update', 'sensor_history.get', 'person.get', 'location.get']:
                 Thread(None,
                         self.__on_mdp_request,
                         "on_mdp_request",
                         (msg, ),
                         {}).start()
         except:
-            msg = "Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
+            msg = u"Error while processing request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
 
     def __on_mdp_request(self, msg):
@@ -476,7 +466,7 @@ class Admin(Plugin):
             if msg.get_action() == "device.params":
                 self._mdp_reply_devices_params_result(msg)
             else :
-                db = self.get_a_dbHelper()
+                db = DbHelper(owner="Admin core (temporary duplicate for MQ request : {0})".format(msg.get_action()))
                 with db.session_scope():
                     # configuration
                     if msg.get_action() == "config.get":
@@ -509,6 +499,9 @@ class Admin(Plugin):
                     # person
                     elif msg.get_action() == "person.get":
                         self._mdp_reply_person_get(msg, db)
+                    # location
+                    elif msg.get_action() == "location.get":
+                        self._mdp_reply_location_get(msg, db)
         except:
             msg = "Error while processing thread request. Message is : {0}. Error is : {1}".format(msg, traceback.format_exc())
             self.log.error(msg)
@@ -843,6 +836,7 @@ class Admin(Plugin):
     def _mdp_reply_deviceparam_update_result(self, data, db):
         status = True
         reason = False
+        publish_update = True
 
         self.log.debug(u"Updating device param : {0}".format(data))
         try:
@@ -850,6 +844,7 @@ class Admin(Plugin):
             if 'dpid' in data:
                 dpid = data['dpid']
                 val = data['value']
+                publish_update = True if 'topublish' not in data else data['topublish']
                 # do the update
                 res = db.udpate_device_param(dpid, value=val)
                 if not res:
@@ -878,7 +873,7 @@ class Admin(Plugin):
         self.log.debug(msg.get())
         self.reply(msg.get())
         # send the pub message
-        if status and res:
+        if status and res and publish_update :
             dev = db.get_device(res.device_id)
             self._pub.send_event('device.update',
                     {"device_id" : res.device_id,
@@ -1081,8 +1076,7 @@ class Admin(Plugin):
                 type = msg_data['type']
                 name = msg_data['name']
                 host = msg_data['host']
-                dev_list = db.list_devices_by_plugin("{0}-{1}.{2}".format(type, name, host))
-
+                dev_list = db.list_devices_by_plugin(u"{0}-{1}.{2}".format(type, name, host))
             #dev_json = json.dumps(dev_list, cls=domogik_encoder(), check_circular=False),
             dev_json = dev_list
             msg.add_data('status', status)
@@ -1246,7 +1240,7 @@ class Admin(Plugin):
             self.log.error(reason)
         except:
             status = False
-            reason = "Error while deleting device: {0}".format(traceback.format_exc())
+            reason = "Error while getting the persons list: {0}".format(traceback.format_exc())
             self.log.error(reason)
         # send the result
         msg = MQMessage()
@@ -1271,6 +1265,51 @@ class Admin(Plugin):
         self.log.debug(msg.get())
         self.reply(msg.get())
 
+    def _mdp_reply_location_get(self, data, db):
+        status = True
+        reason = False
+        res = None
+
+        self.log.debug(u"Get the location list : {0}".format(data))
+        try:
+            res = db.get_all_location()
+            if not res:
+                status = False
+            else:
+                status = True
+        except DbHelperException as d:
+            status = False
+            reason = u"Error while getting the location list : {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        except:
+            status = False
+            reason = u"Error while getting the location list: {0}".format(traceback.format_exc())
+            self.log.error(reason)
+        # send the result
+        msg = MQMessage()
+        msg.set_action('location.result')
+        msg.add_data('status', status)
+        if reason:
+            msg.add_data('reason', reason)
+        if res:
+            locations = []
+            for loc in res:
+                # <Location: isHome='True', type='location', name='Maison', id='1'>
+                location = {'is_home' : loc.isHome,
+                                'type' : loc.type,
+                                'name' : loc.name,
+                                'id' : loc.id,
+                                'params': {}}
+                try:
+                    params = db.get_location_all_param(loc.id)
+                    for p in params :
+                        location['params'][p.key] = p.value
+                except:
+                     self.log.error(u"Error while getting the location parameters for {0} id={1} : {2}".format(loc.name, loc.id, traceback.format_exc()))
+                locations.append(location)
+            msg.add_data('locations', locations)
+        self.log.debug(msg.get())
+        self.reply(msg.get())
 
     def convert(self, data):
         """ Do some conversions on data

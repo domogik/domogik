@@ -147,24 +147,24 @@ class CacheData(object):
                     for key in dev['sensors'] :
                         if dev['sensors'][key]['id'] == sensor_id :
                             self._to_update_devices[dev['id']] = True
-#                            self.log.debug(u"Mark to update cache mode sensor : {0}".format(sensor_id))
+#                            self.log.debug(u"Mark cache to update sensor {0} of device {1} of {2}".format(sensor_id, dev['id'], dev['client_id']))
                             break
             elif device_id is not None : # Mark one device
                 device_id = int(device_id)
                 for dev in self._devices_cache :
                     if dev['id'] == device_id :
                         self._to_update_devices[dev['id']] = True
-#                        self.log.debug(u"Mark to update cache mode device : {0}".format(device_id))
+#                        self.log.debug(u"Mark cache to update device {0} of {1}".format(dev['id'], dev['client_id']))
                         break
             elif client_id is not None : # Mark devices by client
                 for dev in self._devices_cache:
                     if dev['client_id'] == client_id :
                         self._to_update_devices[dev['id']] = True
-#                self.log.debug(u"Mark to update cache mode client : {0}".format(client_id))
+#                self.log.debug(u"Mark cache to update all devices of {0}".format(client_id))
             else : #  Mark all devices
                 for dev_n in self._devices_cache :
                     self._to_update_devices[dev['id']] = True
-#                self.log.debug(u"Mark to update cache mode all clients")
+#                self.log.debug(u"Mark cache to update mode all clients")
 
 # Plugin Config Cache Data
 
@@ -239,8 +239,8 @@ class WorkerCache(object):
         cfg = Loader('database')
         config = cfg.load()
         db_config = dict(config[1])
- 
-        port_c = 50001 if not 'portcache' in db_config else int(db_config['portcache'])
+
+        port_c = 40409 if not 'portcache' in db_config else int(db_config['portcache'])
 
         self._cache = CacheData()
         MyManager.register('get_cache', callable=lambda:self._cache)

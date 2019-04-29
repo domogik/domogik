@@ -41,7 +41,7 @@ class AbstractTest:
        * A date entry
        * Any Other things if corresponding parameter is available
      - A set_parameters method to fill parameters with the value chosen by user
-     - An evaluate method which do something with parameters, custom code, etc ... and return a boolean, or raise a CantEvaluate 
+     - An evaluate method which do something with parameters, custom code, etc ... and return a boolean, or raise a CantEvaluate
        exception if the method can't be evaluated
     """
 
@@ -58,6 +58,7 @@ class AbstractTest:
         self._cond = cond
         self._params = params
         self._subMessages = []
+        self._outputCheck = []
 
     def get_subMessages(self):
         return self._subMessages
@@ -81,7 +82,22 @@ class AbstractTest:
         if not self._description:
             return ""
         return self._description
-       
+
+    def set_outputCheck(self, output):
+        """ Update the output compatibility of the test
+        Empty or None assume compatibilty of all.
+        @param output : Array of list of output compatibility with other blockly
+        """
+        self._outputCheck = output
+
+    def get_outputCheck(self):
+        """ Return the output compatibility of the test
+        @return the current output list, "null" if is empty or None
+        """
+        if not self._outputCheck or self._outputCheck == "null":
+            return "null"
+        return self._outputCheck
+
     def set_condition(self, cond):
         """ Set the condition where this test belongs to
         @param cond : the condition_name
@@ -141,12 +157,13 @@ class AbstractTest:
         @param data: dictionnary with parameter name as key, and a dictionnary of {key: value} entries to fill the parameter
         @return True if the filling has been done
         @raise IndexError when provided name is not registered as a Parameter name
-        @raise ValueError when parameter has not been correctly filled with provided values. 
+        @raise ValueError when parameter has not been correctly filled with provided values.
         Note that this exception has to be raised by the Parameter
         """
         params = {}
         for name, val in data.items():
             param = name.split('.')
+#            print("  fill : ", name, val, param)
             if len(param) == 2:
                 paramn = param[0]
                 param = param[1]
@@ -154,8 +171,9 @@ class AbstractTest:
                     if paramn not in params:
                         params[paramn] = []
                     params[paramn].append({param: val})
+#        print("   ***** ", params)
         for test, param in params.items():
-            self._parameters[test].fill(param)            
+            self._parameters[test].fill(param)
 
     def add_parameter(self, name, classname):
         """ Helper to add a parameter's instance to your Test instance

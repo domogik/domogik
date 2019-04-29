@@ -135,6 +135,11 @@ class BasePlugin(object):
                             dest="run_in_foreground",
                             default=False,
                             help="Run the plugin in foreground, default to background.")
+        parser.add_argument("-m",
+                            action="store_true",
+                            dest="started_by_manager",
+                            default=False,
+                            help="Mark as plugin started by manager, default to manual.")
         parser.add_argument("-T",
                             dest="test_option",
                             default=None,
@@ -157,6 +162,10 @@ class BasePlugin(object):
             #l = logger.Logger(name)
             #self.log = l.get_logger()
             self.is_daemon = False
+        if self.options.run_in_foreground :
+            self._st_comment =u"Starting by shell in background"
+        else :
+            self._st_comment = u"Starting by manager as auto start" if self.options.started_by_manager else u"Starting manually by user"
 
     def should_stop(self):
         '''
@@ -176,6 +185,13 @@ class BasePlugin(object):
         Returns the name of the current plugin
         """
         return self._plugin_name
+
+    def set_status_comment(self, comment):
+        """Set the comment for next status sending
+            Use to allow more information about Plugin status saved in history status
+            Comment is reseting after pulished
+        """
+        self._st_comment = comment
 
     def register_thread(self, thread):
         '''
@@ -244,8 +260,19 @@ class BasePlugin(object):
         self._stop_cb.append(callback)
         self._lock_add_cb.release()
 
+    def remove_stop_cb(self, callback):
+        '''
+        Remove an additionnal callback to call when a stop request is received
+        '''
+        self._lock_add_cb.acquire()
+        try :
+            self._stop_cb.remove(callback)
+        except :
+            pass
+        self._lock_add_cb.release()
+
     def set_sanitized_hostname(self):
-        """ Get the sanitized hostname of the host 
+        """ Get the sanitized hostname of the host
         This will lower it and keep only the part before the first dot
 
         """

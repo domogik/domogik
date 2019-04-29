@@ -1,58 +1,608 @@
 {% extends theme("base/base.html") %}
 
 {% block content %}
-<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyD43wvlTg66qR_yPOQOgEG4zeSOMC_ubu4"></script>
-<script src="{{ theme_static('libraries/geolocation/jquery.geocomplete.min.js') }}"></script>
+<style>
+.coords {
+    background-color: black;
+    color: white;
+    padding: 5px;
+}
+</style>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="/static/libraries/leaflet/leaflet.css"/>
+<link rel="stylesheet" href="/_themes/default/libraries/L.Control.Locate.min.css"/>
+<script type="text/javascript" src="/static/libraries/leaflet/leaflet.js"></script>
+<script type="text/javascript" src="/static/libraries/leaflet/Leaflet.Editable.js"></script>
+<script type="text/javascript" src="/static/libraries/leaflet/Path.Drag.js"></script>
+<script type="text/javascript" src="/_themes/default/libraries/L.Control.Locate.min.js"></script>
+<!-- Extension Géoportail pour Leaflet
+<script data-key="khb10vyvhwva41wt0yk54y51" src="/static/libraries/leaflet/GpPluginLeaflet.js"></script>
+<link rel="stylesheet" href="/static/libraries/leaflet/GpPluginLeaflet.css" />-->
+
 <div class="container">
     <h1>{% trans %}Location Edit{% endtrans %}</h1>
-  <form id="location_form" method="post" role="form" class="form-horizontal">
-  {% for item in form %}
-    {% if item.type == "HiddenField" or item.name == "csrf_token" %}
-        {{ item }}
-    {% elif item.name == "submit" %}
-      <div class="form-group">
-	<div class="col-xs-offset-3 col-xs-9">
-	<input type="submit" value="{% trans %}Save{% endtrans %}" class="btn btn-primary">
-	</div>
-      </div>
-    {% else %}
-      <div class="form-group">
-	<label class="control-label col-xs-3">{{ item.label }}</label>
-	<div class="col-xs-9">
-	  {% if item.type == "TextField" %}
-	    {{ item(size = 50) }}
-	  {% else %}
-	    {{ item }}
-	  {% endif %}
-	  <span class="help-block">{{ item.description }}</span>
-	</div>
-      </div>
-    {% endif %}
-  {% endfor %}
-    <div class="form-group">
-        <div class="col-xs-offset-3 col-xs-9">
-            <input id="geocomplete" type="text" placeholder="Type in an address" size="50" value="{{ formatted_address }}" />
-            <input id="find" type="button" value="find" />
-            <div id="map_canvas" style="width:400px; height:400px"></div>
+    <form id="location_form" method="post" role="form" class="form-horizontal">
+    {% for item in form %}
+        {% if item.type == "HiddenField" or item.name == "csrf_token" %}
+            {{ item }}
+        {% elif item.name == "submit" %}
+        <div class="form-group">
+            <div class="col-xs-offset-3 col-xs-9">
+                <input type="submit" value="{% trans %}Save{% endtrans %}" class="btn btn-primary">
+            </div>
         </div>
-    </div>
-  </form>
+        {% else %}
+        <div class="form-group">
+            <label class="control-label col-xs-3">{{ item.label }}</label>
+            <div class="col-xs-9">
+            {% if item.type == "TextField" %}
+                {{ item(size = 50) }}
+            {% else %}
+                {{ item }}
+            {% endif %}
+                <span class="help-block">{{ item.description }}</span>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+        <div class="form-group">
+            <div class="col-xs-offset-3 col-xs-9">
+                <div class="input-group">
+                    <input id="searchLocation" type="text" class="form-control" placeholder="Type in an address" size="50" value="{{ formatted_address }}" />
+                    <span class="input-group-btn">
+                        <button id="find" class="btn btn-default" type="button">
+                          <i class="fa fa-search"></i>
+                        </button>
+                    </span>
+                </div>
+                <select id="searchResult" class="form-control" placeholder="No result">
+                    <option value=0 disabled>No result</option>
+                </select>
+                <div id="map_canvas" style="width:100%; height:400px"></div>
+                <div id="coordinates" class="coords">lat: 0.0000, lng: 0.0000</div>
+            </div>
+        </div>
+    </form>
     <script>
-      $(function(){
+      var searchLocResult = [];
+      var markerResult = [];
+      var map = null;
+      var layerGroup = null;
+      var layerSelect = null;
+      var markerPosOk;
+
+      function updateFormParams() {
+        let latlng = layerSelect.selectMarker.getLatLng();
+        document.getElementById('lat').value = latlng.lat;
+        document.getElementById('lng').value = latlng.lng;
+        document.getElementById('ctrl_type').value = layerSelect.ctrlType;
+        switch (layerSelect.ctrlType) {
+            case "circle" :
+                document.getElementById('ctrl_area').value = parseInt(layerSelect.areaCtrl.getRadius());
+                break;
+            case "polygon" :
+                let geojson = layerSelect.areaCtrl.toGeoJSON().geometry.coordinates;
+                // Switch lat <-> lng
+                let asgeojson = [];
+                for (i=0; i < geojson.length; i++) {
+                    let subjson = [];
+                    for (ii=0; ii < geojson[i].length; ii++) {
+                        subjson.push([geojson[i][ii][1], geojson[i][ii][0]])
+                    }
+                    asgeojson.push(subjson);
+                }
+                document.getElementById('ctrl_area').value = JSON.stringify(asgeojson);
+                ;
+                break;
+        }
+      }
+      function updateLocation() {
+        let latlng = layerSelect.selectMarker.getLatLng();
+        if (layerSelect.areaCtrl && layerSelect.ctrlType == "circle") {
+            let editable = layerSelect.areaCtrl.editEnabled;
+            if (editable) layerSelect.areaCtrl.disableEdit();
+            layerSelect.areaCtrl.setLatLng(latlng);
+            if (editable) layerSelect.areaCtrl.enableEdit();
+            layerSelect.areaCtrl.dragging.disable();
+        }
+      }
+
+      function updateSelectMarker(latLng) {
+        if (layerSelect.areaCtrl && layerSelect.ctrlType == "circle") {
+            layerSelect.areaCtrl.setLatLng(latLng);
+        } else {
+            switch (layerSelect.ctrlType) {
+                case "circle" :
+                    layerSelect.areaCtrl = L.circle(latLng, {radius: document.getElementById('ctrl_area').value,
+                        color:'red', fill: true, fillColor: 'red', fillOpacity: 0.2, dashArray: "4, 1, 2",
+                        draggable:false});
+                    break;
+                case "polygon" :
+                    let geojson = JSON.parse(document.getElementById('ctrl_area').value);
+                    layerSelect.areaCtrl = L.polygon(geojson, {color: 'red', fill: true, fillColor: 'red', fillOpacity: 0.2, dashArray: "4, 1, 2", draggable: true});
+                    break;
+            }
+            if (layerSelect.areaCtrl) {
+                layerSelect.addLayer(layerSelect.areaCtrl);
+                layerSelect.areaCtrl.enableEdit();
+            }
+        }
+        if (layerSelect.selectMarker) {
+            if ( !layerSelect.selectMarker.getLatLng().equals(latLng)) {
+                layerSelect.selectMarker.setLatLng(latLng);
+                layerSelect.changed = true;
+            }
+            let img = layerSelect.changed ? 'marker-icon_selected.png' : 'marker-icon_current.png';
+            if (layerSelect.selectMarker._icon.attributes["0"].nodeValue.search(img) == -1) {
+                layerSelect.selectMarker.setIcon(L.icon({iconUrl: `/static/images/${img}`,
+                                                          iconSize:     [25, 45], // size of the icon
+                                                          iconAnchor:   [12, 45], // point of the icon which will correspond to marker's location
+                                                          popupAnchor:  [0, -40] // point from which the popup should open relative to the iconAnchor
+                                                    }));
+            }
+        } else {
+            let img = layerSelect.changed ? 'marker-icon_selected.png' : 'marker-icon_current.png';
+            layerSelect.selectMarker = L.marker(latLng, {icon: L.icon({iconUrl: `/static/images/${img}`,
+                                                          iconSize:     [25, 45], // size of the icon
+                                                          iconAnchor:   [12, 45], // point of the icon which will correspond to marker's location
+                                                          popupAnchor:  [0, -40] // point from which the popup should open relative to the iconAnchor
+                                                    }), 'draggable': true});
+            layerSelect.addLayer(layerSelect.selectMarker);
+            layerSelect.selectMarker.bindPopup(function(){
+                        let popup =  '<div><ul>'+
+                            '<li>Latitude : '+this.getLatLng().lat+' </li>'+
+                            '<li>Longitude : '+this.getLatLng().lng+' </li>';
+                        switch (layerSelect.ctrlType) {
+                            case "circle" :
+                                popup += '<li>Radius : '+parseInt(layerSelect.areaCtrl.getRadius())+' m </li>';
+                                break;
+                            case "polygon" :
+                                popup += '<li>Use polygone</li>';
+                                break;
+                            default :
+                                popup += '<li>Unknow area ctrl</li>';
+                                break;
+                        }
+                        popup += '</ul></div>';
+                        return popup})
+            layerSelect.selectMarker.on('dragend ', function(){
+                if (!layerSelect.selectMarker.actived) {
+                    layerSelect.selectMarker.setIcon(L.icon({iconUrl: '/static/images/marker-icon_selected.png',
+                                                          iconSize:     [25, 45], // size of the icon
+                                                          iconAnchor:   [12, 45], // point of the icon which will correspond to marker's location
+                                                          popupAnchor:  [0, -40] // point from which the popup should open relative to the iconAnchor
+                                                          }));
+                    layerSelect.selectMarker.actived = true;
+                }
+            });
+            layerSelect.selectMarker.on('dragend', function(e){
+                        console.log("dragend");
+                        updateLocation();
+                        updateFormParams();
+            });
+            markerPosOk = layerSelect.selectMarker.getLatLng();
+            layerSelect.selectMarker.on('drag', function(e){
+                        let inside = true;
+                        if (layerSelect.ctrlType != "circle") inside = isMarkerInsidePolygon(this, layerSelect.areaCtrl);
+                        console.log("drag marker inside : "+inside);
+                        if (inside) {
+                            markerPosOk = layerSelect.selectMarker.getLatLng();
+                            updateLocation();
+                            updateFormParams();
+                        } else {
+                            this.setLatLng(markerPosOk);
+                        }
+            });
+        }
+      }
+    window.onload = function () {
+        var latLng = [document.getElementById('lat').value, document.getElementById('lng').value];
+        // Init the map
+        map = L.map(document.getElementById('map_canvas'), {editable: true}).setView(latLng, {{ map_zoom }});
+        // Init tiles source layer
+
+        var osmMap = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+                                {attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'}),
+  //          landMap = L.tileLayer('http://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png',
+//                                {attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> Contributors & <a href="http://thunderforest.com/">Thunderforest</a>'}),
+
+            //Carte géoportail orthophoto
+//            geoportailphoto = L.tileLayer('https://wxs.ign.fr/choisirgeoportail/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=ORTHOIMAGERY.ORTHOPHOTOS&format=image/jpeg&style=normal',
+//                                  {attribution: '&copy; <a href="https://geoservices.ign.fr/index.html">GeoPortail</a> '}),
+//            geoportailphoto = L.geoportalLayer.WMTS({
+//                    layer  : "ORTHOIMAGERY.ORTHOPHOTOS"}),
+            //Carte géoportail orthomap
+            geoportailmap = L.tileLayer('https://wxs.ign.fr/choisirgeoportail/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=GEOGRAPHICALGRIDSYSTEMS.MAPS&format=image/jpeg&style=normal',
+                                 {attribution: '&copy; <a href="https://geoservices.ign.fr/index.html">GeoPortail</a> '},
+	            {
+	                    minZoom:0,
+	                    maxZoom:18,
+	                    tileSize:256
+	            }),
+            geoportailmapP = L.tileLayer('https://wxs.ign.fr/khb10vyvhwva41wt0yk54y51/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=ORTHOIMAGERY.ORTHOPHOTOS&format=image/jpeg&style=normal',
+                                 {attribution: '&copy; <a href="https://geoservices.ign.fr/index.html">GeoPortail</a> '},
+	            {
+	                    minZoom:0,
+	                    maxZoom:18,
+	                    tileSize:256
+	            }),
+            geoportailCadastre = L.tileLayer('https://wxs.ign.fr/khb10vyvhwva41wt0yk54y51/geoportail/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=CADASTRALPARCELS.PARCELS&format=image/jpeg&style=normal',
+                                 {attribution: '&copy; <a href="https://geoservices.ign.fr/index.html">GeoPortail</a> '},
+	            {
+	                    minZoom:0,
+	                    maxZoom:18,
+	                    tileSize:256
+	            })
+        var baseLayers = {
+            "OSM Mapnik": osmMap,
+   //         "Landscape": landMap,
+  //          "GeoPortail Pictures" : geoportailphoto,
+            "GeoPortail Map" : geoportailmap,
+            "GeoPortail Photos" : geoportailmapP,
+            "GeoPortail Cadastre" : geoportailCadastre
+        };
+        geoportailmapP.addTo(map);
+ //       map.setMaxZoom(20);
+
+        L.control.layers(baseLayers).addTo(map);
+        // Show the lat and lng under the mouse cursor.
+        var coordsDiv = document.getElementById('coordinates');
+        map.on('mousemove', function(event) {
+            coordsDiv.textContent =
+                'lat: ' + event.latlng.lat.toFixed(6)+ ', ' +
+                'lng: ' + event.latlng.lng.toFixed(6);
+            });
+
+        layerGroup = new L.layerGroup().addTo(map);
+        layerSelect = new L.layerGroup().addTo(map);
+        layerSelect.changed =  (document.getElementById('locid').value != "0") ? false : true;
+        layerSelect.ctrlType = document.getElementById('ctrl_type').value;
+        updateSelectMarker(latLng);
+        map.fitBounds(L.latLngBounds(layerSelect.areaCtrl.getBounds()));
+
+        L.control.locate().addTo(map);
+
+        $("#radius").keyup(function(){
+            layerSelect.areaCtrl.setRadius(this.value);
+        });
+
         var options = {
           map: "#map_canvas",
           details: "#location_form"
         };
-        $("#geocomplete").geocomplete(options);
         $("#find").click(function(){
-          $("#geocomplete").trigger("geocode");
+            searchLocation(document.getElementById('searchLocation').value);
+        $('#searchLocation').submit(function(e){
+            searchLocation(document.getElementById('searchLocation').value);
+            e.preventDefault();
         });
-        $("#examples a").click(function(){
-          $("#geocomplete").val($(this).text()).trigger("geocode");
-          return false;
         });
-        $("#geocomplete").trigger("geocode");
-      });
+        $("#searchResult").change(function(){
+            map.setView(L.latLng([searchLocResult[this.value].lat, searchLocResult[this.value].lon]), 10);
+            highlight_result(searchLocResult[this.value]);
+        });
+        L.EditControl = L.Control.extend({
+
+            options: {
+                position: 'topleft',
+                callback: null,
+                kind: '',
+                html: ''
+            },
+
+            onAdd: function (map) {
+                var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar'),
+                    link = L.DomUtil.create('a', '', container);
+
+                link.href = '#';
+                link.title = 'Create a new ' + this.options.kind + ' to replace area control';
+                link.innerHTML = this.options.html;
+                L.DomEvent.on(link, 'click', L.DomEvent.stop)
+                          .on(link, 'click', function () {
+                            window.LAYER = this.options.callback.call(map.editTools);
+                          }, this);
+
+                return container;
+            }
+
+        });
+        L.NewPolygonControl = L.EditControl.extend({
+
+            options: {
+                position: 'topleft',
+                callback: startNewPolygon,
+                kind: 'polygon',
+                html: '▰'
+            }
+
+        });
+
+        L.NewCircleControl = L.EditControl.extend({
+
+            options: {
+                position: 'topleft',
+                callback: startNewCircle,
+                kind: 'circle',
+                html: '⬤'
+            }
+
+        });
+
+        map.addControl(new L.NewPolygonControl());
+        map.addControl(new L.NewCircleControl());
+
+        map.on('editable:created', function (e) {
+            console.log('editable:created');
+            let drag = (layerSelect.ctrlType == "circle") ? false : true;
+            e.layer.setStyle({color: 'red', fill: true, fillColor: 'red', fillOpacity: 0.2, dashArray: "4, 1, 2", draggable: drag});
+            layerSelect.areaCtrl = e.layer;
+        });
+        var tempPoly;
+        map.on('editable:vertex:drag', function (e) {
+            let inside = true;
+            if (layerSelect.ctrlType != "circle") inside = isMarkerInsidePolygon(layerSelect.selectMarker, layerSelect.areaCtrl);
+            console.log("editable:vertex:drag : "+inside);
+            if (!inside) {
+                markerPosOk = getLatLngInPolygone(markerPosOk, layerSelect.areaCtrl.getLatLngs());
+                layerSelect.selectMarker.setLatLng(markerPosOk);
+            }
+        });
+        map.on('editable:editing', function (e) {
+            let inside = true;
+            if (layerSelect.ctrlType != "circle") inside = isMarkerInsidePolygon(layerSelect.selectMarker, layerSelect.areaCtrl);
+            console.log("editable:editing marker inside : "+inside);
+            updateFormParams();
+        });
+        map.on('editable:drawing:end', function (e) {
+            console.log('editable:drawing:end');
+            if (layerSelect.ctrlType == "circle") {
+                e.layer.dragging.disable();
+                updateSelectMarker(e.layer.getLatLng());
+                updateFormParams();
+            }
+        });
+        map.on('editable:drag', function (e) {
+            let inside = true;
+            if (layerSelect.ctrlType != "circle") inside = isMarkerInsidePolygon(layerSelect.selectMarker, layerSelect.areaCtrl);
+            console.log("editable:drag : "+inside);
+            if (!inside) {
+                markerPosOk = getLatLngInPolygone(markerPosOk, layerSelect.areaCtrl.getLatLngs());
+                layerSelect.selectMarker.setLatLng(markerPosOk);
+            }
+        });
+    }
+    // Hack leaflet.Editable plugin to hidden vertex center control to avoid circle drag
+    L.Editable.VertexMarker.prototype.onAdd = function (map) {
+        L.Marker.prototype.onAdd.call(this, map);
+        if (this.editor.feature.options.radius !== undefined && this.getIndex() === 0) {
+            this.getElement().style.display = 'none';
+        } else {
+            this.on('drag', this.onDrag);
+            this.on('dragstart', this.onDragStart);
+            this.on('dragend', this.onDragEnd);
+            this.on('mouseup', this.onMouseup);
+            this.on('click', this.onClick);
+            this.on('contextmenu', this.onContextMenu);
+            this.on('mousedown touchstart', this.onMouseDown);
+            this.on('mouseover', this.onMouseOver);
+            this.on('mouseout', this.onMouseOut);
+        }
+        this.addMiddleMarkers();
+    }
+
+    function startNewPolygon() {
+        if (layerSelect.areaCtrl) map.removeLayer(layerSelect.areaCtrl);
+        layerSelect.ctrlType = "polygon";
+        map.editTools.startPolygon();
+    }
+
+    function startNewCircle() {
+        if (layerSelect.areaCtrl) map.removeLayer(layerSelect.areaCtrl);
+        layerSelect.ctrlType = "circle";
+        map.editTools.startCircle();
+    }
+
+    function searchLocation(value) {
+        let url = encodeURI(`https://nominatim.openstreetmap.org/search?q=${value}&format=json&polygon=1&addressdetails=1`);
+        var jqxhr = $.getJSON( url, function() {
+                        console.log( "success" );
+            })
+            .done(function(data) {
+                console.log(data);
+                searchLocResult = data;
+                let result = document.getElementById('searchResult');
+                result.options.length = 0;
+                for (i=0; i < data.length; i++) {
+                    result.options[i] = new Option(data[i].display_name, i);
+                }
+                if (result.options.length == 0) {
+                    result.options[0] =  new Option("No result", 0);
+                    result.options[0].setAttribute('disabled', "");
+                } else {
+                    result.options[0].selected = true;
+                    map.setView(L.latLng([searchLocResult[0].lat, searchLocResult[0].lon]), 10);
+                    highlight_result(searchLocResult[0]);
+                }
+            })
+            .fail(function(e) {
+                let result = document.getElementById('searchResult');
+                result.options.length = 0;
+                searchLocResult = [];
+                console.log( "error" );
+            })
+            .always(function(e) {
+                console.log( "complete" );
+            });
+      }
+
+    function circle_for_result(result){
+        return L.circleMarker([result.lat,result.lon], { radius: 10, weight: 2, fillColor: '#ff7800', color: 'blue', opacity: 0.75});
+    }
+
+    function highlight_result(result){
+        if (!result){ return }
+
+        layerGroup.clearLayers();
+
+        if (result.lat){
+
+            circle = circle_for_result(result);
+            circle.bindPopup(function(){return '<div> <span class="input-group-btn">'+
+                            '<button id="setselect" class="btn btn-primary" type="button" onclick="makeCircleRef(circle);"> set as location  '+
+                                '<i class="glyphicon glyphicon-ok-sign"></i>'+
+                            '</button>'+
+                        '</span>'+
+                    '</div>';
+            });
+        }
+        if (result.polygonpoints){
+            result.asgeojson = [];
+            for (i=0; i < result.polygonpoints.length; i++) {
+                result.asgeojson.push([result.polygonpoints[i][1], result.polygonpoints[i][0]])
+            }
+
+            let geojson_layer = L.polygon(result.asgeojson, {color: 'blue', fill: true, fillColor: 'blue', fillOpacity: 0.2});
+            layerGroup.addLayer(geojson_layer);
+            let bounds = [[result.boundingbox[0]*1,result.boundingbox[2]*1], [result.boundingbox[1]*1,result.boundingbox[3]*1]];
+            map.fitBounds(bounds);
+            if (!geojson_layer.isSelected) {
+                poly = geojson_layer;
+                geojson_layer.isSelected = true;
+                geojson_layer.bindPopup(function(){return '<div> <span class="input-group-btn">'+
+                            '<button id="seteditable" class="btn btn-primary" type="button" onclick="makePolyEditable(poly);"> use as shape reference  '+
+                                '<i class="glyphicon glyphicon-ok-sign"></i>'+
+                            '</button>'+
+                        '</span>'+
+                    '</div>';
+                })
+            }
+        }
+        else {
+            let bounds = [[result.boundingbox[0]*1,result.boundingbox[2]*1], [result.boundingbox[1]*1,result.boundingbox[3]*1]];
+            let geojson_layer = L.rectangle(bounds, {color: 'blue', fill: true, fillColor: 'blue', fillOpacity: 0.2});
+            layerGroup.addLayer(geojson_layer);
+            map.fitBounds(bounds);
+            }
+        if (circle) { layerGroup.addLayer(circle);}
+    }
+    function makeCircleRef(circle) {
+        circle.closePopup();
+        updateSelectMarker(circle.getLatLng());
+        updateFormParams();
+    }
+    function makePolyEditable(poly) {
+        poly.closePopup().unbindPopup();
+        layerGroup.clearLayers();
+        layerSelect.removeLayer(layerSelect.areaCtrl);
+        poly.setStyle({color: 'red', fill: true, fillColor: 'red', fillOpacity: 0.2, dashArray: "4, 1, 2", draggable:true}).addTo(map);
+        poly.enableEdit();
+        layerSelect.ctrlType = "polygon";
+        layerSelect.areaCtrl = poly;
+    }
+// utils positionning calcul
+    function isMarkerInsidePolygon(marker, poly) {
+        return isPointInsidePolygon(marker.getLatLng(), poly.getLatLngs());
+   /**     var inside = false;
+        var x = marker.getLatLng().lat, y = marker.getLatLng().lng;
+        for (var ii=0;ii<poly.getLatLngs().length;ii++){
+            var polyPoints = poly.getLatLngs()[ii];
+            for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+                var xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+                var xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+                var intersect = ((yi > y) != (yj > y))
+                    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+        }
+        return inside; **/
+    }
+
+    function isPointInsidePolygon(latlng, poly) {
+        var inside = false;
+        var x = latlng.lat, y = latlng.lng;
+        for (var ii=0;ii<poly.length;ii++){
+            var polyPoints = poly[ii];
+            for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+                var xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+                var xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+                var intersect = ((yi > y) != (yj > y))
+                    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+        }
+        return inside;
+    }
+
+    function getLatLngInPolygone(latlng, poly) {
+        var newLatLng = latlng;
+        let step = 0.00001;
+        let inside = false;
+        while (!inside || step >= 0.01) {
+            let points = spiral(newLatLng, step, step);
+            for (i=0; i < points.length; i++) {
+                inside = isPointInsidePolygon(points[i], poly);
+                if (inside) {
+                    newLatLng = points[i];
+                    break;
+                }
+            }
+            step = step * 2;
+        }
+        return newLatLng;
+    }
+
+    function spiral(latlng, a, b) {
+        var points = [];
+        for (i = 0; i < 720; i++) {
+            angle = 0.1 * i;
+            x = latlng.lng + (a + b * angle) * Math.cos(angle);
+            y = latlng.lat + (a + b * angle) * Math.sin(angle);
+
+            points.push({lng: x, lat: y});
+        }
+        return points;
+    }
+
+    function hull (polygons, d) {
+        var polygon = polygons[0];
+        var hull, i, xA, yA, xB, yB, xC, yC, AB, BC, xI, yI, k, xM, yM;
+        if (polygon.length < 3)
+            return (null);
+        hull = new Array ();
+        polygon.push (polygon[0]);
+        xA = polygon[polygon.length - 2].lng;
+        yA = polygon[polygon.length - 2].lat;
+        xB = polygon[0].lng;
+        yB = polygon[0].lat;
+        AB = Math.sqrt ((xB - xA) * (xB - xA) + (yB - yA) * (yB - yA));
+        i = 1;
+        while (true) {
+            xC = polygon[i].lng;
+            yC = polygon[i].lat;
+            BC = Math.sqrt ((xC - xB) * (xC - xB) + (yC - yB) * (yC - yB));
+            xI = 0.5 * ((yA - yB) / AB + xB - (yC - yB) / BC + xB);
+            yI = 0.5 * (- (xA - xB) / AB + yB + (xC - xB) / BC + yB);
+            k = d / ((xI - xB) * (xI - xB) + (yI - yB) * (yI - yB));
+            xM = k * (xI - xB) + xB;
+            yM = k * (yI - yB) + yB;
+            hull.push ({lng:xM, lat:yM});
+            i ++;
+            if (i == polygon.length)
+                break;
+            xA = xB;
+            yA = yB;
+            xB = xC;
+            yB = yC;
+            AB = BC;
+        }
+        polygon.pop ();
+        return (hull);
+    }
+
     </script>
 </div>
 {% endblock %}

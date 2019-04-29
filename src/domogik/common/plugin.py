@@ -68,6 +68,11 @@ STATUS_STOP_REQUEST = "stop-request"
 STATUS_STOPPED = "stopped"
 STATUS_DEAD = "dead"
 STATUS_INVALID = "invalid"
+LIST_CLIENT_STATUS = []
+for k in list(globals()):  # python 2 and 3
+    if k.startswith('STATUS_'):
+        LIST_CLIENT_STATUS.append(globals()[k])
+LIST_CLIENT_STATUS.sort()
 
 # time between each send of the status
 STATUS_HBEAT = 15
@@ -286,6 +291,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             if pkg_json.validate() == False:
                 # TODO : how to get the reason ?
                 self.log.error(u"Invalid json file")
+                self.set_status_comment(u"Invalid json file")
                 self.force_leave(status = STATUS_INVALID)
             else:
                 # if valid, store the data so that it can be used later
@@ -293,6 +299,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                 self.json_data = pkg_json.get_json()
         except:
             self.log.error(u"Error while trying to read the json file : {1}".format(self._name, traceback.format_exc()))
+            self.set_status_comment(u"Error while trying to read the json file")
             self.force_leave(status = STATUS_INVALID)
 
     def get_config(self, key):
@@ -726,7 +733,6 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             if ok_product == None:
                 self.log.info(u"There is no products defined for this client")
 
-
     def ready(self, ioloopstart=1):
         """ to call at the end of the __init__ of classes that inherits of this one
 
@@ -745,7 +751,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             MQAsyncSub.__init__(self, self.zmq, self._name, self._mq_subscribe_list)
 
         ### send client status : STATUS_ALIVE
-        self._set_status(STATUS_ALIVE)
+        self._set_status(STATUS_ALIVE, u"Is now ready")
 
         ### Instantiate the MQ
         # nothing can be launched after this line (blocking call!!!!)
@@ -761,9 +767,15 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             You can overwrite it, but at first your on_message method must call this basis part:
                 Plugin.on_message(self, msgid, content).
         """
+        toReload = ""
         if msgid == "device.update":
-            self.log.debug(u"Receive pub message {0}, {1}".format(msgid, content))
-            threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
+            if 'client_id' not in content :
+                toReload = "no Client defined"
+            elif content['client_id'] == self._mq_name :
+                toReload = "this client"
+            if toReload != "" :
+                self.log.debug(u"Receive pub message {0} for {1}, {2}".format(msgid, toReload, content))
+                threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
 
     def on_mdp_request(self, msg):
         """ Handle Requests over MQ
@@ -848,7 +860,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self.reply(msg.get())
 
         ### Change the client status
-        self._set_status(STATUS_STOP_REQUEST)
+        self._set_status(STATUS_STOP_REQUEST, u"Stopping from MQ request")
 
         ### Try to stop the client
         # if it fails, the manager should try to kill the client
@@ -875,7 +887,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         self.reply(msg.get())
 
 
-    def _set_status(self, status):
+    def _set_status(self, status, comment=None):
         """ Set the client status and send it
         """
         # when ctrl-c is done, there is no more self._name at this point...
@@ -895,6 +907,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
             #if self._name not in CORE_COMPONENTS:
             #    self._status = status
             #    self._send_status()
+            if comment is not None : self.set_status_comment(comment)
             self._status = status
             self._send_status()
 
@@ -921,7 +934,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                                  {"type" : type,
                                   "name" : self._name,
                                   "host" : self.get_sanitized_hostname(),
-                                  "event" : self._status})
+                                  "event" : self._status,
+                                  "comment": self._st_comment})
+            self._st_comment = ""
 
     def refresh_devices(self, max_attempt = 2):
         """ Call get_device_list from MQ, and call the registered callback if necessary.
@@ -931,7 +946,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         if self._cb_update_devices is not None and self._devices_retrieved :
             self._cb_update_devices(devices)
 
-    def udpate_device_param(self, paramId, value):
+    def udpate_device_param(self, paramId, value, topublish=True):
         """ Request the dbmgr component over MQ to update a device global parameters for this client
             @param paramId: db id of global parameters
             @param value : New parameter value
@@ -944,11 +959,11 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         msg.set_action('deviceparam.update')
         msg.add_data('dpid', paramId)
         msg.add_data('value', value)
-        result = mq_client.request('dbmgr', msg.get(), timeout=10)
+        msg.add_data('topublish', topublish)
+        result = mq_client.request('admin', msg.get(), timeout=10)
         if result is not None:
             data = result.get_data()
             if data["status"]:
-                threading.Thread(None, self.refresh_devices, "th_refresh_devices", (), {"max_attempt": 2}).start()
                 return True
             else:
                 self.log.warning(u"{0}".format(data["reason"]))
@@ -1223,9 +1238,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         #    pass
         # send stopped status over the MQ
         if status:
-            self._set_status(status)
+            self._set_status(status, u"Handle force leave")
         else:
-            self._set_status(STATUS_STOPPED)
+            self._set_status(STATUS_STOPPED, u"Stopped by force leave")
 
 
         if hasattr(self, "_timers"):

@@ -65,12 +65,12 @@ if __name__ == "__main__":
     print("Evaluate should be None : {0}".format(t.evaluate()))
     print("List of possible values is {0}".format(t.get_list_of_values()))
     print("==> Setting some wrong value for entry 'operator', should raise some error")
-    data = {"operator": "BAD"}
+    data = [{"operator": "BAD"}]
     try:
         t.fill(data)
     except ValueError:
         print("Received ValueError as expected, now try with a good operator")
-        t.fill({"operator": "<"})
+        t.fill([{"operator": "<"}])
         print("Evaluate should now return some string : {0}".format(t.evaluate()))
     else:
         print("I did not received the expected exception, check your code !")

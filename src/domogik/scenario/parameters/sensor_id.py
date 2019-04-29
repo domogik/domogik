@@ -58,13 +58,11 @@ class SensorIdParameter(AbstractParameter):
                 for sen_idx in dev['sensors']:
                     sen_name = dev['sensors'][sen_idx]['name']
                     sen_id = dev['sensors'][sen_idx]['id']
-                    sensors_list.append(['{0} : {1}'.format(name, sen_name), 
-                                         '{0}'.format(sen_id)])
+                    sensors_list.append([u'{0} : {1}'.format(name, sen_name),
+                                         u'{0}'.format(sen_id)])
             print(sensors_list)
         except:
             self.log.error("Error while getting devices list : {0}".format(traceback.format_exc()))
-
-
 
         # then, et's configure our sensor id selector :)
         self.set_type("list")
@@ -75,9 +73,8 @@ class SensorIdParameter(AbstractParameter):
     def evaluate(self):
         """ Return string, or none if no string entered yet
         """
-        self.log.debug("SensorIdParameter : evaluate") 
         p = self.get_parameters()
-        self.log.debug("SensorIdParameter : evaluate : params = {0}".format(p)) 
+        self.log.debug("SensorIdParameter : evaluate : params = {0}".format(p))
         if "sensor_id" in p:
             return p["sensor_id"]
         else:
@@ -93,6 +90,6 @@ if __name__ == "__main__":
     print("Expected entries : {0}".format(t.get_expected_entries()))
     print("Evaluate should be None : {0}".format(t.evaluate()))
     print("==> Setting some value for entry 'sensor_id'")
-    data = { "sensor_id" : "1" }
+    data = [{ "sensor_id" : "1" }]
     t.fill(data)
     print("Evaluate should now return the sensor id : {0}".format(t.evaluate()))

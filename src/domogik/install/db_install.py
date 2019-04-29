@@ -56,7 +56,7 @@ class DbInstall():
         self.db_backup_file = "{0}/domogik-{1}.sql".format(tempfile.gettempdir(), int(time.time()))
         self.alembic_cfg = Config("alembic.ini")
 
-        self._db = database.DbHelper(use_cache=False)
+        self._db = database.DbHelper(use_cache=False, owner="DbInstall")
         self._url = self._db.get_url_connection_string()
         self._engine = create_engine(self._url)
 

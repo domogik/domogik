@@ -19,8 +19,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 
-@author: Maikel Punie <maikel.punie@gmail.com>
-@copyright: (C) 2007-20015 Domogik project
+@author: Maikel Punie <maikel.punie@gmail.com>, Nico0084 <nico84dev@gmail.com>
+@copyright: (C) 2007-2018 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -38,12 +38,12 @@ from domogikmq.pubsub.subscriber import MQAsyncSub
 import zmq
 import traceback
 import logging
+import time
+from threading import Thread, Event, currentThread
 import ast
 import datetime
 from dateutil import parser
 from domogik.common.utils import ucode
-
-
 
 def to_unicode(data):
     print(u"to_unicode > type='{0}'".format(type(data)))
@@ -88,7 +88,7 @@ class ScenarioInstance(MQAsyncSub):
         "deletable": false
     }
     """
-    def __init__(self, log, dbid, name, json, disabled, state, db):
+    def __init__(self, log, dbid, name, json, disabled, state, behavior, db):
         """ Create the instance
         @param log : A logger instance
         @param dbid : The id of this scenario in the db
@@ -107,6 +107,10 @@ class ScenarioInstance(MQAsyncSub):
         self._json = json
         self._disabled = disabled
         self._state = state
+        self._behavior = behavior
+        self._waitEval = False # An new evalation is on waiting end of previous running eval.
+        self._stopWaitEval = Event() # if evaluation is running mémorize start timestamp.
+        self._threadEval = {}
         self._dbid = dbid
         self._db = db
         self._sub = None # If not None, then a asyncSubSCriber
@@ -159,6 +163,7 @@ class ScenarioInstance(MQAsyncSub):
     def destroy(self):
         """ Cleanup the class
         """
+        self._stopWaitEval.set()
         self._clean_instances()
 
     def _clean_instances(self):
@@ -173,6 +178,17 @@ class ScenarioInstance(MQAsyncSub):
         self._test_instances = {}
         self._sub = None
         self._subList = []
+
+    def stop_current_eval(self):
+        """ Only stop eval during exec """
+        for uid in reversed(self._mapping['action'].keys()):
+            self._mapping['action'][uid].destroy()
+        self._threadEval = {}
+
+    def restore_eval(self):
+        """ Restore behavior eval """
+        for uid in self._mapping['action'].keys():
+            self._mapping['action'][uid].restore_eval()
 
     def update(self, json):
         # cleanpu the instances
@@ -309,6 +325,9 @@ class ScenarioInstance(MQAsyncSub):
         # a simple static number
         elif part['type'] == 'math_number':
             retlist.append( pyObj("float(\"{0}\")".format(part['NUM'])) )
+        # a simple client status
+        elif part['type'] == 'client_status':
+            retlist.append( pyObj(u"\"{0}\"".format(part['TEXT'])) )
         # a date/time or timestamp
         elif part['type'] == 'date_time':
             retlist.append( pyObj("parser.parse(\"{0}\")".format(part['TEXT'])) )
@@ -364,6 +383,17 @@ class ScenarioInstance(MQAsyncSub):
         # a not function
         elif part['type'] == 'logic_negate':
             retlist.append( pyObj(u"not {0}".format(self.__parse_part(part['BOOL'], level, debug, parentPart))) )
+        # handle location comparator
+        elif part['type'] == "geoinlocation.GeoInLocTest":
+            test = self._create_instance("{0}.{1}-{2}".format(part['type'], part['person']['type'].split('.')[2], part['location']['type'].split('.')[2]), 'test', parentPart)
+            gpsPoint1 = pyObj("{0}".format(self.__parse_part(part['person'], level, debug, parentPart)))
+            gpsPoint2 = pyObj("{0}".format(self.__parse_part(part['location'], level, debug, parentPart)))
+            test[0].fill_parameters({ "person_hyst.text" : part['person_hyst'], "operator.op":  part['op'], "loc_hyst.text" : part['loc_hyst'] })
+            retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate({1},{2})".format(test[1], gpsPoint1, gpsPoint2), level) )
+        # handle location
+        elif part['type'] == "location.LocationTest":
+            test = self._create_instance(part['type'], 'test', parentPart)
+            retlist.append( pyObj(u"self._mapping['test']['{0}'].evaluate()".format(test[1]), level) )
         # handle hysteresis
         elif part['type'] == "trigger.Hysteresis":
             test = self._create_instance(part['type'], 'test', parentPart)
@@ -430,19 +460,65 @@ class ScenarioInstance(MQAsyncSub):
             self._log.debug(u"get_parsed_condition called but parsed_condition is empty, try to parse condition first")
         return self._parsed_condition
 
+    def _eval_condition(self):
+        """ Evaluate the condition.
+        @raise ValueError if no parsed condition is avaiable
+        @return a boolean representing result of evaluation
+        """
+        if self._threadEval != {} :
+            for ident in self._threadEval :
+                self._log.info(u"Eval {0} condition allready running since {1}s.".format(ident, "%.2f" % (time.time()-self._threadEval[ident])))
+            if self._behavior == 'wait':  # Finish current and do next (default and advisable)
+                if self._waitEval :
+                    self._log.info(u"Allready wait a new eval, abord request.")
+                    return None
+                self._waitEval = True
+                self._log.info(u"Wait end of current eval and restart a new.")
+                self._stopWaitEval.clear()
+                while not self._stopWaitEval.isSet() :
+                    time.sleep(0.1)
+                self._waitEval = False
+            elif self._behavior == 'eval': # Stop current and do next
+                self._log.info(u"Stop current eval and restart a new.")
+                self.stop_current_eval()
+            elif self._behavior == 'remove': # Finish current and not do next
+                self._log.info(u"Fisnih current eval and don't start a new.")
+                return None
+            elif self._behavior == 'parallel': # Do them all in parallel (unsafe risk of conflict)
+                self._log.info(u"Start new eval in parallel thread.")
+            else : # Unknown behavior
+                self._log.info(u"Unknown scenario behavior, Finish current eval and don't start a new.")
+                return None
+        tStart = time.time()
+        newThread = currentThread()
+        nameT = newThread.getName()
+        newThread.setName("{0}_{1}".format(nameT, "%.2f" % tStart))
+        self._threadEval.update({newThread.ident : tStart})
+        self.restore_eval()
+        self._log.debug(u"Start eval the condition in thread : {0}, ident {1}".format(newThread.getName(), newThread.ident))
+        try:
+            exec(self._compiled_condition)
+        except Exception as a:
+            self._log.error(u"Error while evaluating condition '{0}' thread: {1} ident {2}, . Error is : {3}".format(self._compiled_condition, newThread.getName(), newThread.ident, traceback.format_exc()))
+            if newThread.ident in self._threadEval : del self._threadEval[newThread.ident]
+            self._stopWaitEval.set()
+            raise
+        if newThread.ident in self._threadEval : del self._threadEval[newThread.ident]
+        self._log.debug(u"End eval the condition in thread : {0}, ident {1}".format(newThread.getName(), newThread.ident))
+        self._stopWaitEval.set()
+
+
     def eval_condition(self):
         """ Evaluate the condition.
         @raise ValueError if no parsed condition is avaiable
         @return a boolean representing result of evaluation
         """
-        self._log.debug(u"Eval the condition!")
+        self._log.debug(u"Eval the condition !")
         if self._compiled_condition is None:
             return None
-        try:
-            exec(self._compiled_condition)
-        except Exception as a:
-            self._log.error(u"Error while evaluating condition '{0}'. Error is : {1}".format(self._compiled_condition, traceback.format_exc()))
-            raise
+        eval = Thread(target=self._eval_condition, name=self._name)
+        eval.setDaemon(True)
+        eval.start()
 
     def on_message(self, did, msg):
         for (uid, item) in self._mapping['test'].items():
@@ -473,17 +549,34 @@ class ScenarioInstance(MQAsyncSub):
             try:
                 mod, clas, param = inst.split('.')
             except ValueError as err:
-                mod, clas = inst.split('.')
-                param = None
+                try:
+                    mod, clas = inst.split('.')
+                    param = None
+                except ValueError as err:
+                     # get instance from client_status (eg: client_status.StatusTest.plugin-weather.vmdevubuntu16)
+                    mod, clas, param = inst.split('.', 2)
 
             module_name = "domogik.scenario.tests.{0}".format(mod)
             if parentPart : # Parent block is a DO for action, SensorTest must be redirect to SensorValue
+                # If StatusTest allready exist on IF, same Sensor stay in Test mode not Value, so a dummy became StatusTestDummy and not a StatusValueDummy.
+                # This 2 class are equivalante, so finale behavior is same between SensorTestDummy and SensorValueDummy.
+                if clas == 'StatusTest' : clas='StatusValue'  # force class as StatusValue to avoid trigger evaluation
                 # If SensorTest allready exist on IF, same Sensor stay in Test mode not Value, so a dummy became SensorTestDummy and not a SensorValueDummy.
                 # This 2 class are equivalante, so finale behavior is same between SensorTestDummy and SensorValueDummy.
                 if clas == 'SensorTest' : clas='SensorValue'  # force class as SensorValue to avoid trigger evaluation
+                # If LocationTest allready exist on IF, same Location stay in Test mode not Value, so a dummy became LocationTestDummy and not a LocationValueDummy.
+                # This 2 class are equivalante, so finale behavior is same between LocationTestDummy and LocationValueDummy.
+                if clas == 'LocationTest' : clas='LocationValue'  # force class as LocationValue to avoid trigger evaluation
             objM = None
             for i in self._mapping['test'] :
                 objM = self._mapping['test'][i]
+                if objM.__class__.__name__ == 'StatusTest' and objM._clientId == param :
+                    self._log.debug(u"StatusTest for client {0} allready set, move to dummy instance".format(param))
+                    clas='StatusTestDummy' # force class as StatusTestDummy to avoid uncontrollable call order update
+                    break
+                elif objM.__class__.__name__ == 'StatusValue' and objM._clientId == param :
+                    self._log.debug(u"StatusValue for client {0} allready set, move to dummy instance".format(param))
+                    clas='StatusValueDummy' # force class as StatusValueDummy to avoid uncontrollable call order update
                 if objM.__class__.__name__ == 'SensorTest' and objM._sensorId == param :
                     self._log.debug(u"SensorTest for sensor {0} allready set, move to dummy instance".format(param))
                     clas='SensorTestDummy' # force class as SensorTestDummy to avoid uncontrollable call order update
@@ -491,6 +584,17 @@ class ScenarioInstance(MQAsyncSub):
                 elif objM.__class__.__name__ == 'SensorValue' and objM._sensorId == param :
                     self._log.debug(u"SensorValue for sensor {0} allready set, move to dummy instance".format(param))
                     clas='SensorValueDummy' # force class as SensorValueDummy to avoid uncontrollable call order update
+                elif objM.__class__.__name__ == 'LocationTest' and objM._locationId == param :
+                    self._log.debug(u"LocationTest for location {0} allready set, move to dummy instance".format(param))
+                    clas='LocationTestDummy' # force class as LocationTestDummy to avoid uncontrollable call order update
+                    break
+                elif objM.__class__.__name__ == 'LocationValue' and objM._locationId == param :
+                    self._log.debug(u"LocationValue for location {0} allready set, move to dummy instance".format(param))
+                    clas='LocationValueDummy' # force class as LocationValueDummy to avoid uncontrollable call order update
+                    break
+                elif objM.__class__.__name__ == 'GeoInLocTest' and objM._testId == param :
+                    self._log.debug(u"GeoInLocTest for test location {0} allready set, move to dummy instance".format(param))
+                    clas='GeoInLocTestDummy' # force class as GeoInLocTestDummy to avoid uncontrollable call order update
                     break
                 else :
                     objM = None

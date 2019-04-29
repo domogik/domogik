@@ -164,7 +164,13 @@ def ucode2(my_string):
     else:
         return unicode(str(my_string), "utf-8")
 
+def parse_client_id(client_id):
+    tmp = client_id.split(".")
+    id = tmp[0].split("-")
+    return {'type': id[0], 'name': id[1], 'host': tmp[1]}
 
+def join_client_id(type, name, host=HOSTNAME):
+    return "{0}-{1}.{2}".format(type, name, host)
 
 def call_package_conversion(log, plugin, method, value):
     """Load the correct module, and encode the value
@@ -251,7 +257,7 @@ def get_rest_url(noRest=False):
     intf = interfaces.split(',')
     # get the first ip of the first interface declared
     ip = get_ip_for_interfaces(intf)[0]
-    protocol = "http" if conf['use_ssl'] else "http"
+    protocol = "https" if conf['use_ssl'] == 'True' else "http"
     if noRest:
         return "{0}://{1}:{2}".format(protocol, ip, port)
     else:
@@ -264,7 +270,7 @@ def get_rest_ssl():
     config = cfg.load()
     conf = dict(config[1])
     ### get SSL option
-    if conf['use_ssl'] :
+    if conf['use_ssl'] == 'True' :
         return {'cert_file': conf['ssl_certificate'], 'key_file': conf['ssl_key']}
     else :
         return False

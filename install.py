@@ -245,7 +245,7 @@ def is_domogik_advanced(advanced_mode, sect, key):
         'domogik': ['libraries_path', 'src_prefix', \
                 'log_dir_path', 'pid_dir_path', 'broadcast', 'log_level', \
                 'log_when', 'log_interval', 'log_backup_count'],
-        'database': ['prefix', 'pool_recycle'],
+        'database': ['prefix', 'pool_recycle', 'portcache'],
         'admin': ['port', 'ws_port', 'use_ssl', 'ssl_certificate', 'ssl_key', 'clean_json', 'rest_auth', 'secret_key', 'http_workers_number'],
     }
     if advanced_mode:
@@ -345,7 +345,7 @@ def write_domogik_configfile_from_command_line(args, intf):
             # handle the intf parameter
 
             new_value = eval("args.{0}_{1}".format(sect, item[0]))
-            # notice that finally because of network interfaces, the newvalues will always be True... 
+            # notice that finally because of network interfaces, the newvalues will always be True...
             # TODO : improve
             if item[0] not in itf:
                 if new_value != item[1] and new_value != '' and new_value != None:
@@ -367,7 +367,7 @@ def write_domogik_configfile_from_command_line(args, intf):
                     print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                     config.set(sect, item[0], intf)
                     newvalues = True
-                   
+
 
 
             debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
@@ -400,7 +400,7 @@ def write_xplhub_configfile_from_command_line(args, intf):
                     print("Set [{0}] : {1} = {2}".format(sect, item[0], intf))
                     config.set(sect, item[0], intf)
                     newvalues = True
-               
+
                 debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
             else:
                 new_value = eval("args.{0}_{1}".format(sect, item[0]))
@@ -532,7 +532,7 @@ def install():
 
         if args.dist_packages:
             dist_packages_install_script = ''
-            #platform.dist() and platform.linux_distribution() 
+            #platform.dist() and platform.linux_distribution()
             #doesn't works with ubuntu/debian, both say debian.
             #So I not found pettiest test :(
             info("Check which distribution is installed")
@@ -612,8 +612,24 @@ def install():
 
             # do db upgrade
             try:
+                user_entry = pwd.getpwnam(user)
+            except KeyError:
+                raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
+
+            # launch db_install as the domogik user
+            #uid = user_entry.pw_uid
+            #user_home = user_entry.pw_dir
+            #os.setreuid(0,uid)
+            #old_home = os.environ['HOME']
+            #os.environ['HOME'] = user_home
+            #os.system('python src/domogik/install/db_install.py')
+            #os.setreuid(0,0)
+            #os.environ['HOME'] = old_home
+
+
+            try:
                 import traceback
-                # we must activate the domogik module as setup.py is launched from install.py and just after we try 
+                # we must activate the domogik module as setup.py is launched from install.py and just after we try
                 # to import something from the domogik package but the module is not known without doing anything...
                 pkg_resources.get_distribution("domogik").activate()
                 from domogik.install.db_install import DbInstall

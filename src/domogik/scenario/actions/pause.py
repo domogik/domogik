@@ -37,27 +37,45 @@ class PauseAction(AbstractAction):
 
     def __init__(self, log=None, params=None):
         AbstractAction.__init__(self, log)
-        self.set_description("Do a pause.")
+        self.set_description(u"Do a pause (>=1s).")
+        self.the_end = None
+        self._timer = None
 
     def do_action(self):
-        delay = self._params['delay']
-
-        self._log.info("Do a pause of {0} seconds".format(delay))
         try:
-            #time.sleep(int(delay))
+            delay = float(self._params['delay'])
+            self._log.info(u"Do a pause of {0} seconds".format(delay))
             self.the_end = threading.Event()
-            threading.Timer(int(delay), self.end_waiting, []).start()
-            while not self.the_end.is_set():
-                self._log.debug("...")
-                self.the_end.wait(1)  # 1s is the little pause we can do
+            self._timer = threading.Timer(int(delay), self.end_waiting, [])
+            self._timer.start()
+            started = time.time()
+            __delay = 0.01
+            __subdelay = (delay / 10)
+            if __subdelay < 1 : __subdelay = 1
+            __factdelay = __subdelay/ __delay
+            __cpt = 0
+            while (self._timer is not None and self.the_end is not None) and not self.the_end.is_set() :
+                if __cpt % (__factdelay) == 0.0 : # Display only seconds
+                    self._log.debug(u"Paused since {0} s / {1} s ...".format(int(time.time() - started), delay))
+                self.the_end.wait(__delay)
+                __cpt += 1;
         except:
-            self._log.error("Error while casting delay '{0}' to int value. Full error is : {1}".format(delay, traceback.format_exc()))
-        self._log.info("Pause of {0} seconds finished".format(delay))
+            self._log.error(u"Error while casting delay '{0}' to int value. Full error is : {1}".format(delay, traceback.format_exc()))
+        self._log.info(u"Pause of {0} seconds finished".format(delay))
+        self.the_end = None
 
     def end_waiting(self):
-        self._log.debug("End waiting...")
-        self.the_end.set()
-     
+        if self._timer is not None :
+            self._log.debug(u"Cancel timer.")
+            self._timer.cancel()
+        if self.the_end is not None:
+            self._log.debug(u"End waiting...")
+            self.the_end.set()
+        self._timer = None
+
+    def destroy(self):
+        AbstractAction.destroy(self)
+        self.end_waiting()
 
     def get_expected_entries(self):
         return {'delay': {'type': 'integer',

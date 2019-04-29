@@ -41,8 +41,9 @@ from setuptools import setup, find_packages
 mysql = 'pymysql'
 magic = 'python-magic >= 0.4.3'
 
-import pip
-for mod in pip.get_installed_distributions():
+import pkg_resources
+dists = [d for d in pkg_resources.working_set]
+for mod in dists:
     if ( mod.key == 'mysql-python' ):
         mysql = 'mysql-python'
     if ( mod.key == 'magic-file-extensions' ):

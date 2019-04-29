@@ -18,6 +18,7 @@ from wtforms import TextField, HiddenField, ValidationError, RadioField,\
 from wtforms.validators import Required
 from domogik.common.sql_schema import UserAccount
 from domogik.common.cron import CronExpression
+from domogik.common.plugin import LIST_CLIENT_STATUS, STATUS_HBEAT
 
 from wtforms.ext.sqlalchemy.orm import model_form
 import json
@@ -29,6 +30,7 @@ import traceback
 from operator import itemgetter
 from collections import OrderedDict
 import os
+
 
 @app.route('/scenario')
 @login_required
@@ -117,6 +119,7 @@ def scenario_edit(id):
         jso = default_json
         dis = 0
         desc = None
+        behav = 'wait'
     else:
         with app.db.session_scope():
             scen = app.db.get_scenario(id)
@@ -124,6 +127,7 @@ def scenario_edit(id):
             dis = scen.disabled
             name = scen.name
             desc = scen.description
+            behav = scen.behavior if scen.behavior !='' else 'wait'
             jso = jso.replace('\n', '').replace('\r', '').replace("'", "\\'").replace('"', '\\"')
             if clone:
                 id = 0
@@ -131,13 +135,20 @@ def scenario_edit(id):
     # create a form
     class F(Form):
         sid = HiddenField("id", default=id)
-        sname = TextField("Name", [Required()], default=name, description=u"Scenario name")
-        sdis = BooleanField("Disable", default=dis, description=u"Disabling a scenario avoid to delete it if you temporary want it not to run")
-        sdesc = TextAreaField("Description", default=desc)
+        sname = TextField(gettext("Name"), [Required()], default=name, description=gettext(u"Scenario name"))
+        sdis = BooleanField(gettext("Disable"), default=dis, description=gettext(u"Disabling a scenario avoid to delete it if you temporary want it not to run"))
+        sbehav = SelectField(gettext("Behavior threading"), choices=[('wait', gettext(u'Finish current and do next (default and advisable)')),
+                                                ('eval', gettext(u'Stop current and do next')),
+                                                ('remove', gettext(u'Finish current and not do next')),
+                                                ('parallel', gettext(u'Do them all in parallel (unsafe risk of conflict)'))],
+                             default= behav, description=gettext(u"Defines the behavior in case of simultaneous execution of the scenario"),
+                             )
+        sdesc = TextAreaField(gettext("Description"), default=desc)
         sjson = HiddenField("json")
         submit = SubmitField(u"Send")
         pass
     form = F()
+    print(" ***** form : {0}".format(form.data))
 
     if request.method == 'POST' and form.validate():
         cli = MQSyncReq(app.zmq_context)
@@ -151,6 +162,9 @@ def scenario_edit(id):
         msg.add_data('cid', form.sid.data)
         msg.add_data('dis', form.sdis.data)
         msg.add_data('desc', form.sdesc.data)
+        msg.add_data('behav', form.sbehav.data)
+        print("+++++++++++++++++++++")
+        print(msg.get_data())
         res = cli.request('scenario', msg.get(), timeout=10)
         if res:
             data = res.get_data()
@@ -173,7 +187,7 @@ def scenario_edit(id):
         pass
     else:
         # Get the javascript for all blocks and data to build blockly categories
-        blocks_js, tests, actions, devices_per_clients, used_datatypes = scenario_blocks_js()
+        blocks_js, constantes, tests, actions, locations, clients_status, devices_per_clients, used_datatypes = scenario_blocks_js()
 
         # ouput
         return render_template('scenario_edit.html',
@@ -181,8 +195,11 @@ def scenario_edit(id):
             form = form,
             name = name,
             blocks_js = blocks_js,
+            constantes = constantes,
             actions = actions,
             tests = tests,
+            locations = locations,
+            clients_status = clients_status,
             devices_per_clients = devices_per_clients,
             datatypes = used_datatypes,
             jso = jso,
@@ -230,7 +247,7 @@ def scenario_croncephemdate():
         except :
             print(traceback.format_exc())
             return jsonify(result='error', reply="", content = {'error': gettext(u"Error in cron rule, can't get next date.")})
-        return jsonify(result='success', reply="", content = {'error': "", 'result': {'dates': dates}})
+        return jsonify(result='success', reply="", content = {'error': "", 'result': {'dates': dates, 'timezone': job.timeZone.zone}})
     except :
         print(traceback.format_exc())
         jsonify(result='error', reply="", content = {'error': gettext(u"Ephemeris next date, bad request parameters.")})
@@ -283,6 +300,15 @@ def scenario_blocks_js():
         tests.remove(u'sensor.SensorValueDummy')
         tests.remove(u'sensor.SensorValue')
         tests.remove(u'sensor.SensorTestDummy')
+        tests.remove(u'client_status.StatusTest')
+        tests.remove(u'client_status.SatusValue')
+        tests.remove(u'client_status.StatusTestDummy')
+        tests.remove(u'client_status.StatusValueDummy')
+        tests.remove(u'location.LocationTest')
+        tests.remove(u'location.LocationValueDummy')
+        tests.remove(u'location.LocationValue')
+        tests.remove(u'location.LocationTestDummy')
+        tests.remove(u'geoinlocation.GeoInLocTestDummy')
     except ValueError:
         pass
 
@@ -322,16 +348,41 @@ def scenario_blocks_js():
         if 'datatypes' in res:
             datatypes = res['datatypes']
     else:
-        print(u"Error : no datatypes found!")
+        print(u"Error : no scenario datatypes found!")
         datatypes = {}
 
     # devices
     with app.db.session_scope():
         devices = app.db.list_devices()
 
+    # clients
+    msg = MQMessage()
+    msg.set_action('client.list.get')
+    res2 = cli.request('manager', msg.get(), timeout=10)
+    if res2 is not None:
+        clients  = res2.get_data()
+    else:
+        print(u"Error : no scenario clients found!")
+        clients = {}
+
+    list_status = []
+    for st in LIST_CLIENT_STATUS :
+        list_status.append([st, st])
     ### Now start the javascript generation
     js = ""
-
+    ### constantes
+    output = "[\"String\",\"ClientStatus\"]"
+    add = u"""Blockly.Blocks['client_status'] = {{
+                        init: function() {{
+                            this.setColour(240);
+                            this.appendDummyInput("STATUS").appendField(new Blockly.FieldDropdown({0}), "TEXT");
+                            this.setTooltip('Client status value');
+                            this.setOutput(true, {1});
+                            this.setInputsInline(false);
+                        }}
+                    }};""".format(json.dumps(list_status), output)
+    js = u'{0}\n\r{1}'.format(js, add)
+    constantes = [u"client_status"]
     ### tests
 #    print(u"ITEMS={0}".format(scenario_tests.items()))
 
@@ -356,6 +407,7 @@ def scenario_blocks_js():
         else:
             #for parv in params:
             print(u"TEST={0}".format(test))
+            output = params['output']
             for parv in params['parameters']:
                 print(u"Parv : {0}".format(parv))
                 par = parv['name']
@@ -378,13 +430,13 @@ def scenario_blocks_js():
                             this.setColour(160);
                             this.appendDummyInput().appendField("{2}");
                             {1}
-                            this.setOutput(true);
+                            this.setOutput(true,{4});
                             this.setInputsInline(false);
                             this.setTooltip("{2}");
                             this.contextMenu = false;
                         }}
                     }};
-                    """.format(test, '\n'.join(p), params['description'], jso)
+                    """.format(test, '\n'.join(p), params['description'], jso, output)
             js = u'{0}\n\r{1}'.format(js, add)
 
 
@@ -424,7 +476,51 @@ def scenario_blocks_js():
             """.format(act, '\n'.join(p), params['description'])
         js = u'{0}\n\r{1}'.format(js, add)
 
-
+    ### clients status
+    clients_status = {}
+    # first, get the parameters
+    status_usage = []
+    for test, sensor_params in scenario_tests.items():
+        if test == "client_status.StatusTest":
+            for buf in sensor_params["parameters"]:
+                if buf["name"] == "usage.usage":
+                    status_usage = buf["values"]
+            break
+    for clientId in clients:
+        try:
+            if clients[clientId]['type'] == 'core':
+                color = 240
+            elif clients[clientId]['type'] == 'plugin':
+                color = 170
+            elif clients[clientId]['type'] == 'interface':
+                color = 290
+            else :
+                color = 345
+            if clients[clientId]['type'] in clients_status:
+                clients_status[clients[clientId]['type']].append(clientId)
+            else :
+                clients_status[clients[clientId]['type']] = [clientId]
+            ### Generate parameters
+            the_list = status_usage
+            papp = u"this.appendDummyInput().appendField(\"Mode \").appendField(new Blockly.FieldDropdown({0}, sensorUsageChange), '{1}');".format(json.dumps(the_list), "usage.usage");
+            output = "\"ClientStatus\""
+            ### Create the block
+            block_id = u"client_status.StatusTest.{0}".format(clientId)
+            block_description = u"status@{0}".format(clientId)
+            add = u"""Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            this.setColour({4});
+                            this.appendDummyInput().appendField("{1}");
+                            {5}
+                            this.setOutput(true, {3});
+                            this.setInputsInline(false);
+                            this.setTooltip("{1}");
+                        }}
+                    }};
+                    """.format(block_id, block_description, jso, output, color, papp)
+            js = u'{0}\n\r{1}'.format(js, add)
+        except:
+            print(u"ERROR while looking on a client status : {0}".format(traceback.format_exc()))
     ### devices sensors and commands
     devices_per_clients = {}
     for dev in devices:
@@ -487,14 +583,17 @@ def scenario_blocks_js():
                 elif sen_dt == "DT_Time":
                     color = 65
                     output = "\"Number\""
-                else:
+                elif sen_dt == "DT_String":
                     color = 160
+                    output = "\"String\""
+                else:
+                    color = 210
                     output = "\"null\""
 
+                output = "[{0},\"{1}\"{2}]".format(output, sen_dt,",\"{0}\"".format(dt_parent) if sen_dt != dt_parent else "")
                 ### Generate parameters
                 the_list = sensor_usage
-                papp = u"this.appendDummyInput().appendField(\"Mode \").appendField(new Blockly.FieldDropdown({0}), '{1}');".format(json.dumps(the_list), "usage.usage");
-
+                papp = u"this.appendDummyInput().appendField(\"Mode \").appendField(new Blockly.FieldDropdown({0}, sensorUsageChange), '{1}');".format(json.dumps(the_list), "usage.usage");
 
                 ### Create the block
                 block_id = u"sensor.SensorTest.{0}".format(sen_id)
@@ -505,7 +604,7 @@ def scenario_blocks_js():
                                 this.appendDummyInput().appendField("{2}");
                                 this.appendDummyInput().appendField("Sensor : {1} ({6})");
                                 {7}
-                                this.setOutput(true); /*, {4}); */
+                                this.setOutput(true, {4});
                                 this.setInputsInline(false);
                                 this.setTooltip("{2}");
                             }}
@@ -562,12 +661,14 @@ def scenario_blocks_js():
                                     """.format(param_key)
                     elif dt_parent == "DT_Number":
                         # numebr input
-                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck("Number");
-                                    """.format(param_key)
+                        input = "[\"Number\",\"{0}\"{1}]".format(param_dt_type,",\"{0}\"".format(dt_parent) if param_dt_type != dt_parent else "")
+                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck({1});
+                                    """.format(param_key, input)
                     else:
                         # default case : text input field
-                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck("String");
-                                    """.format(param_key)
+                        input = "[\"String\",\"{0}\"{1}]".format(param_dt_type,",\"{0}\"".format(dt_parent) if param_dt_type != dt_parent else "")
+                        js_params += u"""this.appendValueInput("{0}").setAlign(Blockly.ALIGN_RIGHT).appendField("- {0} : ").setCheck({1});
+                                    """.format(param_key, input)
                 block_id = u"command.CommandAction.{0}".format(cmd_id)
                 block_description = u"{0}@{1}".format(name, client)
                 add = u"""Blockly.Blocks['{0}'] = {{
@@ -587,13 +688,43 @@ def scenario_blocks_js():
         except:
             print(u"ERROR while looking on a device : {0}".format(traceback.format_exc()))
 
+    #### Location
+    with app.db.session_scope():
+        locations = app.db.get_all_location()
+    list_locations = {}
+    for loc in locations:
+        try:
+            list_locations[loc.id] = {'ishome': loc.isHome, 'type': loc.type, 'name': loc.name}
+            ### Generate parameters
+            papp = ""
+            color = 160
+            output = "\"null\""
+            loc_dt="DT_CoordD"
+            ### Create the block
+            block_id = u"location.LocationTest.{0}".format(loc.id)
+            block_description = u"@{0}{1}".format(loc.name, ' (Home)' if loc.isHome else '')
+            add = u"""Blockly.Blocks['{0}'] = {{
+                        init: function() {{
+                            this.setColour({3});
+                            this.appendDummyInput().appendField("{1}");
+                            this.setOutput(true,["location.LocationTest"]); /*, {2}); */
+                            this.setInputsInline(false);
+                            this.setTooltip("{1}");
+                        }}
+                    }};
+                    """.format(block_id, block_description, output, color, loc_dt)
+            js = u'{0}\n\r{1}'.format(js, add)
+        except:
+            print(u"ERROR while looking on a location : {0}".format(traceback.format_exc()))
+
+
     #### datatypes
     for dt_parent, dt_types in used_datatypes.items():
         for dt_type in dt_types:
 #            print(u"{0} => {1}".format(dt_parent, dt_type))
             if dt_parent == "DT_Bool":
                 color = 20
-                output = "\"Boolean\""
+                output = "Boolean"
                 opt = "["
                 for lab in sorted(datatypes[dt_type]['labels']):
                     opt += u"['{1} - {0}', '{1}'],".format(datatypes[dt_type]['labels'][lab], lab)
@@ -603,13 +734,13 @@ def scenario_blocks_js():
                         """.format(opt)
             elif dt_parent == "DT_Number":
                 color = 65
-                output = "\"Number\""
+                output = "Number"
                 input = """
                          this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "NUM");
                         """
             elif dt_parent == "DT_String" and dt_type == "DT_ColorRGBHexa":
                 color = 65
-                output = "\"null\""
+                output = "null"
                 input = """
                          this.appendDummyInput().appendField(new Blockly.FieldColour(""), "COLOUR");
                         """
@@ -626,15 +757,16 @@ def scenario_blocks_js():
                         js_list_options += u"['{1} - {0}', '{1}'],".format(list_options[opt], opt)
                     js_list_options += u"]"
                     color = 160
-                    output = "\"String\""
+                    output = "String"
                     input = u"""this.appendDummyInput().appendField(new Blockly.FieldDropdown({0}), "TEXT");
                                 """.format(js_list_options)
                 else:
                     color = 160
-                    output = "\"null\""
+                    output = "null"
                     input = """
                              this.appendDummyInput().appendField(new Blockly.FieldTextInput(""), "TEXT");
                         """
+            output = "[\"{0}\",\"{1}\"{2}]".format(output, dt_type,",\"{0}\"".format(dt_parent) if dt_type != dt_parent else "")
 
             add = """Blockly.Blocks['{0}'] = {{
                         init: function() {{
@@ -677,4 +809,17 @@ def scenario_blocks_js():
     actions = sorted(actions)
 
     # return values
-    return js, tests, actions, devices_per_clients, used_datatypes
+#    print("*****************************************************************")
+#    print("*****************************************************************")
+#    print(js)
+#    print("************************* TESTS ************************************")
+#    print(tests)
+#    print("************************* ACTIONS *************************************")
+#    print(actions)
+#    print("************************* LIST_LOCATIONS *************************************")
+#    print(list_locations)
+#    print("************************* DEVICES *************************************")
+#    print(devices_per_clients)
+#    print("************************* DATATYPES *************************************")
+#    print(used_datatypes)
+    return js, constantes, tests, actions, list_locations, clients_status, devices_per_clients, used_datatypes

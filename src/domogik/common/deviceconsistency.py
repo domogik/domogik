@@ -45,7 +45,7 @@ class DeviceConsistencyThread(Thread):
         self._stop = stop
         self.log = log.getChild("upgrade.{0}".format(client_id))
         # start the db connection
-        self.db = DbHelper()
+        self.db = DbHelper(owner="Device consistency for client {0}".format(client_id))
 
     def run(self):
         self.log.info("Checking devices for plugin {0}".format(self.client_id))
@@ -77,7 +77,7 @@ class DeviceConsistencyException(Exception):
     """
     Package exception
     """
-    
+
     def __init__(self, code, value):
         Exception.__init__(self)
         self.value = value
@@ -328,7 +328,7 @@ class DeviceConsistency():
         print "TODO xpl stat params {0}".format(stat)
 
 if __name__ == "__main__":
-    db = DbHelper()
+    db = DbHelper(owner="Device consistency for main")
     with db.session_scope():
         device_json = db.get_device(166)
         # 138

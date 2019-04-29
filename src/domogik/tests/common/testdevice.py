@@ -35,11 +35,17 @@ Usage
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-from domogik.common.utils import get_rest_url
+from domogik.common.utils import get_rest_url, get_rest_ssl
 from domogik.common.utils import get_sanitized_hostname
-import requests
+import zmq
+from zmq.eventloop.ioloop import IOLoop
+from domogikmq.reqrep.client import MQSyncReq
+from domogikmq.message import MQMessage
+
+from datetime import datetime
 import json
 import sys
+import re
 
 
 class TestDevice():
@@ -52,6 +58,7 @@ class TestDevice():
         """
         # rest url
         self.rest_url = get_rest_url()
+        self.rest_ssl = get_rest_ssl()
 
         # package informations
         self.client_id = None
@@ -63,53 +70,58 @@ class TestDevice():
     def get_params(self, client_id, device_type):
         """CALL GET /device/params/<device_Type>
         """
-        url = "{0}/device/params/{1}/{2}".format(self.rest_url, client_id, device_type)
-        print(u"Getting device_type params {0}".format(device_type))
-        print(u"Url called is {0}".format(url))
-
-        response = requests.get(url)
-        #print(u"Response : [{0}]".format(response.status_code))
-        print(u"Response : [{0}] : {1}".format(response.status_code, response.text))
-        if response.status_code != 200:
-            raise RuntimeError("Can not get the device_type params : {0}".format(response.text))
-
-        params = json.loads(response.text)
-        print(u"The parasm are: {0}".format(params))
-        return params
+        print(u"{0} : Getting device_type params {1}".format(datetime.now(), device_type))
+        cli = MQSyncReq(zmq.Context())
+        msg = MQMessage()
+        msg.set_action('device.params')
+        msg.add_data('device_type', device_type)
+        msg.add_data('client_id', client_id)
+        response = cli.request('admin', msg.get(), timeout=15)
+        if response is not None:
+            response = response.get_data()
+            if 'result' in response :
+                print(u"{0} : The params are: {1}".format(datetime.now(), response['result']))
+                return response['result']
+            else :
+                raise RuntimeError("Error when getting devices param for {0} : {1}".format(client_id, response))
+        else :
+            raise RuntimeError("Error when getting devices param for {0}".format(client_id))
 
     def create_device(self, params):
         """ Call POST /device/... to create the device
             @param params : The filled params
             @return : the device id for the device created
         """
-        url = "{0}/device/".format(self.rest_url)
-        print(u"Create a test device with {0}".format(params))
-        print(u"Url called is {0}".format(url))
-
-        response = requests.post(url, \
-            headers={'content-type':'application/x-www-form-urlencoded'}, \
-            data="params={0}".format(json.dumps(params)))
-        
-        #print(u"Response : [{0}]".format(response.status_code))
-        print(u"Response : [{0}] {1}".format(response.status_code, response.text))
-        if response.status_code != 201:
-            raise RuntimeError("Error when creating the device : {0}".format(response))
-        else:
-            dev = json.loads(response.text)
-            print(u"The new device is: {0}".format(dev))
-            return dev
+        print(u"{0} : Create a test device <{1}> with {2} device type".format(datetime.now(), params['name'], params['device_type']))
+        cli = MQSyncReq(zmq.Context())
+        msg = MQMessage()
+        msg.set_action('device.create')
+        msg.set_data({'data': params})
+        response = cli.request('admin', msg.get(), timeout=20)
+        if response is not None:
+            response = response.get_data()
+            if 'result' in response :
+                print(u"{0} : The new device is: {1}".format(datetime.now(), response['result']))
+                return response['result']
+            else :
+                raise RuntimeError("Error when creating the device : {0} : {1}".format(params, response))
+        else :
+            raise RuntimeError("Error when creating the device : {0}".format(params))
 
     def del_device(self, id):
         """ Call DELETE /device/... to delete a device
             @param id : device id
         """
-        url = "{0}/device/{1}".format(self.rest_url, id)
-        print(u"Delete the device : id = {0}".format(id))
-        print(u"Url called is {0}".format(url))
-        response = requests.delete(url, \
-                                 headers={'content-type':'application/x-www-form-urlencoded'})
-        print(u"Response : [{0}]".format(response.status_code))
-        if response.status_code != 201:
+        print(u"{0} : Delete the device : id = {1}".format(datetime.now(), id))
+        cli = MQSyncReq(zmq.Context())
+        msg = MQMessage()
+        msg.set_action('device.delete')
+        msg.add_data('did', id)
+        response = cli.request('admin', msg.get(), timeout=15)
+        if response is not None:
+            response = response.get_data()
+            print(u"{0} : Delete response : {1}".format(datetime.now(), response))
+        else :
             raise RuntimeError("Error when deleting the device")
 
     def del_devices_by_client(self, client_id):
@@ -117,26 +129,30 @@ class TestDevice():
             Then, call del_device for each device of the given client_id
             @param client_id: the client id for which we want to delete all the devices
         """
-        url = "{0}/device/".format(self.rest_url)
-        print(u"Delete all the devices for the client id '{0}'".format(client_id))
-        print(u"Url called is {0}".format(url))
+        print(u"{0} : Delete all the devices for the client id '{1}'".format(datetime.now(), client_id))
         # first, retrieve all the devices
-        response = requests.get(url, \
-                                 headers={'content-type':'application/x-www-form-urlencoded'})
-        #print(u"Response : [{0}]".format(response.status_code))
-        print(u"Response : [{0}] : {1}".format(response.status_code, response.text))
-        if response.status_code != 200:
-            raise RuntimeError("Error when configuring the device global parameters : {0}".format(response.text))
-        if response.text == "":
-            print(u"There is no device to delete")
-            return
-        devices = device = json.loads(response.text)
-        for device in devices:
-            #print(u"Id = {0} / Client_id = {1}".format(device['id'], device['client_id']))
-            if device['client_id'] == client_id:
-                self.del_device(device['id'])
-        
-        
+        clId = clId = re.split(r"[-.]+", client_id)
+        cli = MQSyncReq(zmq.Context())
+        msg = MQMessage()
+        msg.set_action('device.get')
+        msg.add_data('type', clId[0])
+        msg.add_data('name', clId[1])
+        msg.add_data('host', clId[2])
+        response = cli.request('admin', msg.get(), timeout=15)
+        if response is not None:
+            response = response.get_data()
+            print(u"{0} : Response : {1}".format(datetime.now(), response))
+            if 'devices' in response:
+                if response['devices'] == []:
+                    print(u"{0} : There is no device to delete".format(datetime.now()))
+                    return
+                for device in response['devices']:
+                    if device['client_id'] == client_id:
+                        self.del_device(device['id'])
+            else :
+                raise RuntimeError("Error when getting devices list for {0} : {1}".format(client_id, response))
+        else :
+            raise RuntimeError("Error when getting devices list for {0}".format(client_id))
 
 
 if __name__ == "__main__":

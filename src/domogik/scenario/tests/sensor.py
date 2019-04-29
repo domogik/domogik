@@ -37,7 +37,7 @@ class AbstractSensorTest(AbstractTest):
         self._sensorId = params
         self.set_description(u"Check if value/date changes for a sensor with id {0}".format(self._sensorId))
         self.log = log
-        self._db = DbHelper()
+        self._db = DbHelper(owner="Abstract Sensor")
         self._res = None
         self._dataType = None
         self._dt_parent = None

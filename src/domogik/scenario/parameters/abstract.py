@@ -32,7 +32,7 @@ class AbstractParameter:
     """ This class provides base method for the tests' parameters
     It must not be instanciated directly but need to be extended by parameters
     A parameter contains some "tokens" that can be filled by the user and evaluated later.
-    Each parameter contains some access method, as well as an "evaluate" method, which MUST be extended by 
+    Each parameter contains some access method, as well as an "evaluate" method, which MUST be extended by
     child classes.
     """
 
@@ -118,7 +118,7 @@ class AbstractParameter:
 
     def get_expected_entries(self):
         """ Return a dictionnary of expected entries
-        The expected entries are simply the name of the tokens the scenario manager (UI) should send with values 
+        The expected entries are simply the name of the tokens the scenario manager (UI) should send with values
         filled by user, with some extra parameters : description and a type.
         Ex : { "time": {
             "type" : "timestamp",
@@ -128,12 +128,12 @@ class AbstractParameter:
             "filters" : [ "list","of","filters","or",""]
             }
         }
-        The 'type' and 'description' are only informative, but the more precise you will be, the easier it will be for UI 
+        The 'type' and 'description' are only informative, but the more precise you will be, the easier it will be for UI
         to send correct data without looking at your code to guess what you expect.
-        Most of the time, only one value will be enough (time, operator, etc ...), but with more complex parameters, 
-        maybe you'll need more (for a device state for ex, you may need the technology, the device address, maybe some 
+        Most of the time, only one value will be enough (time, operator, etc ...), but with more complex parameters,
+        maybe you'll need more (for a device state for ex, you may need the technology, the device address, maybe some
         usercode, etc ...
-        @return a list of expected parameters, or 
+        @return a list of expected parameters, or
         """
         exp = self._expected
         for item in exp.keys():
@@ -146,12 +146,12 @@ class AbstractParameter:
         """ Return the parameters
         @return the internal parameters if they have been provided by user, {} elsewhere
         """
-        return self._params 
+        return self._params
 
     def set_type(self, tname = None):
         """ Set the type.
         @param tname : name of the parameter's type.
-        The type is only a one-word to describe your parameter, it will help the UIs to better describes what you wait 
+        The type is only a one-word to describe your parameter, it will help the UIs to better describes what you wait
         to the users (the "form" for a device or a timestamp won't be the same)
         @raise ValueError if @tname is not a one-word string
         """
@@ -224,8 +224,8 @@ class AbstractParameter:
         """
         if ( type(ename) != str ) or ( type(etype) != str ) or ( ename == "" ) or ( etype == "" ) or ( edesc == "" ):
             raise ValueError("`ename` and `etype`_must be strings and no parameter can contain empty string")
-        self._expected[ename] = { 
-            "type" : etype, 
+        self._expected[ename] = {
+            "type" : etype,
             "description" : edesc
         }
 
@@ -235,21 +235,29 @@ class AbstractParameter:
         @raise ValueError if a list_of_values has been defined for an entry and the submitted value is not in this list
         """
         for entry in params:
-            #print("ENTRY={0}".format(entry))
+#            print("ENTRY={0}".format(entry))
+            finded = False
             for name, val in entry.items():
                 if name in self._expected:
-                    #print("NAME={0}".format(name))
-                    #print("VAL={0}".format(val))
-                    #print("EXPEC={0}".format(self._expected))
-                    #print("LIST_VAL={0}".format(self.get_list_of_values()))
-                    if name in self.get_list_of_values():
+                    values_list = self.get_list_of_values()
+#                    print("NAME={0}".format(name))
+#                    print("VAL={0}".format(val))
+#                    print("EXPEC={0}".format(self._expected))
+#                    print("LIST_VAL={0}".format(values_list))
+                    if name in values_list:
                         if self._expected[name]['type'] == 'list':
-                            # TODO : improve ?
-                            pass
- 
+                            for v in values_list[name] :
+#                                print(v)
+                                if v[1] == val :
+                                    finded = True
+                                    break
+                            if not finded:
+                                raise ValueError("The submitted value for entry '{0}' is not in list of authorized values.".format(entry))
+
                         else:
+#                            print("     +++ Name Not a list")
                             # for non list entries, we check in the available values
-                            if val not in self.get_list_of_values()[name]:
+                            if val not in values_list[name]:
                                 raise ValueError("The submitted value for entry '{0}' is not in list of authorized values.".format(entry))
                     self._params[name] = val
         self.call_trigger(1)
@@ -258,7 +266,7 @@ class AbstractParameter:
         """ This method is called by the Test to evaluate the parameter.
         This method must return None if the value of the parameter can't be determined yet, or the value if it can
         Most of the time, the value can be determined as soon as the @fill@ method has been called. But sometimes not,
-        for ex. the state of the device may need to wait for an xPL message. In that case None mus tbe returned until 
+        for ex. the state of the device may need to wait for an xPL message. In that case None mus tbe returned until
         the state is knonw.
         This method MUST be implemented in parameters child classes
         @return None if the value can't be determined, the value elsewhere

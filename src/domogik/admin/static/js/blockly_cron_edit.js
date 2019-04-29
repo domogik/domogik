@@ -1,17 +1,18 @@
+
 // Globals constant
 CRON_GENERAL = 'General';
 CRON_D_MONTH = 'DayOfMonth';
 CRON_D_WEEK = 'DayOfWeek';
-var todoo = "\nActually Domogik not handle personnal place, wait for next release ;)"
+var defaultLoc = "Brussels"
 var EPHEM_TRANLATION = {
-    "@fullmoon": "At each full moon from Brussels."+todoo ,
-    "@newmoon": "At each new moon from Brussels."+todoo ,
-    "@firstquarter": "At each first moon quarter from Brussels."+todoo ,
-    "@lastquarter":  "At each last moon quarter from Brussels."+todoo ,
-    "@equinox": "At each equinox from northern hemisphere."+todoo ,
-    "@solstice": "At each solstice from northern hemisphere."+todoo ,
-    "@dawn": "At each dawn from Brussels."+todoo ,
-    "@dusk": "At each dusk from Brussels."+todoo
+    "@fullmoon": "At each full moon ",
+    "@newmoon": "At each new moon ",
+    "@firstquarter": "At each first moon quarter ",
+    "@lastquarter":  "At each last moon quarter ",
+    "@equinox": "At each equinox ",
+    "@solstice": "At each solstice ",
+    "@dawn": "At each dawn ",
+    "@dusk": "At each dusk "
 };
 
 var PREDEFINED_TRANLATION = {
@@ -194,8 +195,7 @@ Blockly.Blocks['cron.CronTest'] = {
     this.setColour(120);
     this.setTooltip('');
     this.initDialCheck = false;
-    this.cron_old = "";
-    this.cron_valid = true;
+    this.cronStatus = {'value': "", 'oldVal': "", 'valid': true};
   },
   mutationToDom: function() {
     var container = document.createElement('mutation');
@@ -229,7 +229,8 @@ Blockly.Blocks['cron.CronTest'] = {
             };
             break;
         case 'ephem' :
-            this.removeInput('CronEphem');
+            this.removeInput('Location');
+            this.removeInput('offset');
             break;
         case 'predef' :
             this.removeInput('CronPredef');
@@ -241,6 +242,7 @@ Blockly.Blocks['cron.CronTest'] = {
             this.appendDummyInput('CronExp')
                 .appendField('Cron expression :')
                 .appendField(new Blockly.FieldTextInput(exp), 'cron.cron');
+            this.setInputsInline(false);
             break;
         case'blockly' :
             this.appendDummyInput('sampleExp')
@@ -251,81 +253,132 @@ Blockly.Blocks['cron.CronTest'] = {
                     .setCheck(['Array'].concat(CRON_FIELD_DATA[input].check))
                     .appendField(CRON_FIELD_DATA[input].label, CRON_FIELD_DATA[input].label)
                     .setAlign(Blockly.ALIGN_RIGHT);
-            };
+            }
+            this.setInputsInline(false);
             this.generateCronBlock_(exp);
             break;
         case 'ephem' :
-            this.appendDummyInput('CronEphem')
-                .appendField('From Brussels')
-                .appendField(new Blockly.FieldDropdown(EPHEM_OPTIONS), "cron.cron")
-                .setAlign(Blockly.ALIGN_CENTRE);
+            this.appendValueInput("Location")
+                .setCheck("location.LocationTest")
+                .setAlign(Blockly.ALIGN_RIGHT)
+                .appendField(exp,'cron.cron')
+                .appendField(new Blockly.FieldDropdown(EPHEM_OPTIONS), "cron.ephem")
+                .appendField("from the local time of");
+            this.appendValueInput("offset")
+                .setCheck("time_hhmm.TimeHHMMTest")
+                .setAlign(Blockly.ALIGN_RIGHT)
+                .appendField("(optional) Apply an offset ")
+                .appendField(new Blockly.FieldDropdown([["+","add"], ["-","sub"]]), "typeoffset");
+            this.setInputsInline(false);
+            this.getField('cron.cron').setVisible(false);
+            this.generateBlockEphem_(exp);
             break
         case 'predef':
             this.appendDummyInput('CronPredef')
                 .appendField(new Blockly.FieldDropdown(PREDEFINED_OPTIONS), "cron.cron")
                 .setAlign(Blockly.ALIGN_CENTRE);
+            this.setInputsInline(false);
+            for (let i=0; i < PREDEFINED_OPTIONS.length; i++) {
+                if (exp == PREDEFINED_OPTIONS[i][1]) {
+                    this.getField('cron.cron').setValue(exp);
+                    break;
+                }
+            }
             break;
-    };
+    }
   },
   onchange: function(changeEvent) {
     if (!this.initDialCheck) {
-        createCronCheckDialog(this.getField('btCheck'),"cron.cron");
+        createCronCheckDialog(this.getField('btCheck'), this.cronStatus);
         this.initDialCheck = true;
     };
-    if (this.getFieldValue('crontype') == 'blockly') {
-        var badInput = this.validateInputs_()
-        if (badInput != "") {
-            this.setWarningText('Input that must have a block :\n' + badInput);
-        } else {
+    this.cronStatus.valid = false;
+    var trad = "",
+          exp = "",
+          tradExp = false;
+    switch (this.getFieldValue('crontype')) {
+        case 'blockly':
+            var badInput = this.validateInputs_()
+            if (badInput != "") {
+                this.setWarningText('Input that must have a block :\n' + badInput);
+            } else {
+                this.setWarningText(null);
+            };
+            for (input in CRON_FIELD_DATA) {
+                this.setCheckLists_(input,CRON_FIELD_DATA[input].check);
+            };
+            this.setCronSample_(this.generateCronExp_());
+            exp = this.getFieldValue('cron.cron');
+            tradExp = true;
+            break;
+        case 'ephem':
+            const ephem = this.generateEphemCronExp_();
+            if (ephem.exp in EPHEM_TRANLATION) {
+                this.cronStatus.valid = true;
+                trad = EPHEM_TRANLATION[ephem.exp];
+                if (ephem.offset != "") {
+                    extra = ephem.offset.split(' ');
+                    trad += (extra[1] == 'add') ? 'plus ' : 'less '
+                    trad += extra[2].split(':')[0] +'h' + extra[2].split(':')[1] +'mm '
+                }
+                if (ephem.loc !="") {
+                    let inputBlock = this.getInput("Location").connection.targetBlock();
+                    trad += 'from ' + inputBlock.tooltip;
+                } else {
+                    trad += 'from ' +  defaultLoc;
+                }
+                this.setWarningText(null);
+            }
+            exp = ephem.exp + ephem.loc + ephem.offset;
+            this.setFieldValue(exp, 'cron.cron');
+            break;
+        case 'predef':
+            exp = this.getFieldValue('cron.cron');
+            if (exp in PREDEFINED_TRANLATION) {
+                this.cronStatus.valid = true;
+                trad = PREDEFINED_TRANLATION[exp];
+                this.setWarningText(null);
+            }
+            break;
+        default:
+            exp = this.getFieldValue('cron.cron');
             this.setWarningText(null);
-        };
-        for (input in CRON_FIELD_DATA) {
-            this.setCheckLists_(input,CRON_FIELD_DATA[input].check);
-        };
-        this.setCronSample_(this.generateCronExp_());
-    } else {
-        this.setWarningText(null);
-    };
-    var exp = this.getFieldValue('cron.cron');
-    var trad = "";
-    if (exp in EPHEM_TRANLATION) {
-        this.cron_valid = true;
-        trad = EPHEM_TRANLATION[exp];
-    } else if (exp in PREDEFINED_TRANLATION) {
-        this.cron_valid = true;
-        trad = PREDEFINED_TRANLATION[exp];
-    } else {
+            this.cronStatus.valid = true;
+            tradExp = true;
+    }
+    this.cronStatus.value = exp;
+    if (tradExp) {
         trad = "Can't translate cron expression."
         var item = exp.split(' ');
         if (item.length == 5 || item.length == 6) {
-            if (exp && this.cron_valid) {
+            if (exp && this.cronStatus.valid) {
                 try {
                     // Add second if year is set
                    var exp2 = exp;
                     if (item.length == 6) {exp2 = "0 "+exp;};
                     trad = cronstrue.toString(exp2, { locale: navigator.language, use24HourTimeFormat:true });
                 } catch (err) {};
-            };
-        };
-    };
+            }
+        }
+    }
     this.setTooltip(trad);
-    if (this.cron_old != exp) {
+    if (this.cronStatus.oldVal != exp) {
         var dateN = new Date(); // js date month [0..11]
         var dateC = dateN.getFullYear()+','+parseInt(dateN.getMonth()+1)+','+dateN.getDate()+','+dateN.getHours()+','+dateN.getMinutes();
         var that = this;
         $.getJSON('/scenario/cronruletest/checkdate', {cronrule:exp, date:dateC}, function(data, result) {
             if (result == "error" || data.content.error != "") {
-                that.cron_valid = false;
+                that.cronStatus.valid = false;
                 $("#bt_save").attr('disabled', true).attr('title', "Save disable, please fix crontab error.");
                 that.getField('btCheck').setValue('/static/images/icon-cron-invalid.png');
             } else {
                 $("#bt_save").attr('disabled', false).attr('title', "");
-                that.cron_valid = true;
+                that.cronStatus.valid = true;
                 that.getField('btCheck').setValue('/static/images/icon-cron-valid.png');
             };
         });
     };
-    this.cron_old = exp;
+    this.cronStatus.oldVal = exp;
   },
   setCheckLists_: function(inputName, check) {
     var listCreate = this.getInput(inputName).connection.targetBlock();
@@ -368,7 +421,7 @@ Blockly.Blocks['cron.CronTest'] = {
   generateCronExp_: function() {
     var exp = '';
     var inputBlock;
-    this.cron_valid = true;
+    this.cronStatus.valid = true;
     for (var input in CRON_FIELD_DATA) {
         inputBlock = this.getInput(input).connection.targetBlock()
         if (input != 'Year') {
@@ -379,7 +432,7 @@ Blockly.Blocks['cron.CronTest'] = {
                         if (item) {
                             exp += item.formatValue_() + ',';
                         } else {
-                            this.cron_valid = false;
+                            this.cronStatus.valid = false;
 //                            return 'Bad cron format ! ('+exp+')';
                             return exp;
                         };
@@ -389,7 +442,7 @@ Blockly.Blocks['cron.CronTest'] = {
                     exp += inputBlock.formatValue_() + ' ';
                 };
             } else {
-                this.cron_valid = false;
+                this.cronStatus.valid = false;
 //                            return 'Bad cron format ! ('+exp+')';
                 return exp;
             };
@@ -401,7 +454,7 @@ Blockly.Blocks['cron.CronTest'] = {
                         if (item) {
                             exp += item.formatValue_() + ',';
                         } else {
-                            this.cron_valid = false;
+                            this.cronStatus.valid = false;
 //                            return 'Bad cron format ! ('+exp+')';
                             return exp;
                         };
@@ -430,6 +483,63 @@ Blockly.Blocks['cron.CronTest'] = {
         };
     };
   },
+  generateEphemCronExp_: function() {
+    let exp = this.getFieldValue('cron.ephem');
+    let inputBlock;
+    this.cronStatus.valid = true;
+    inputBlock = this.getInput("Location").connection.targetBlock();
+    const loc = (inputBlock) ? " @" + inputBlock.type : "";
+    const op = this.getFieldValue('typeoffset');
+    let offset = "";
+    inputBlock = this.getInput("offset").connection.targetBlock();
+    if (inputBlock) {
+        const  off = inputBlock.getFieldValue('time.time');
+        offset = (off != "") ? " " + op + " " + off : "";
+    }
+    return {exp: exp, loc: loc, offset: offset};
+  },
+  generateBlockEphem_: function(exp) {
+    exp = exp.split(' ');
+    for (let i=0; i < EPHEM_OPTIONS.length; i++) {
+        if (exp[0] == EPHEM_OPTIONS[i][1]) {
+            this.getField('cron.ephem').setValue(exp[0]);
+            break;
+        }
+    }
+    let loc = (exp.length > 1) ? exp[1].split('@')[1] : ""
+    let op = "",
+         time = "";
+    for (let i=0; i < exp.length; i++) {
+        if (exp[i] == 'add' || exp[i] == 'sub') {
+            op = exp[i];
+            time = exp[i+1];
+            break;
+        }
+    }
+    if (loc != "" && loc != undefined) {
+        let nBlock = this.workspace.newBlock(loc);
+        if (nBlock.inputList.length == 0) {
+            new PNotify({
+                type: 'error',
+                title: 'Location field',
+                text: 'Unknown Location ' + loc,
+                delay: 6000
+            });
+        } else {
+            nBlock.initSvg();
+            this.getInput('Location').connection.connect(nBlock.outputConnection);
+            nBlock.render();
+        }
+    }
+    if (op != "") {
+        this.getField('typeoffset').setValue(op);
+        let nBlock = this.workspace.newBlock('time_hhmm.TimeHHMMTest');
+        nBlock.setFieldValue(time, 'time.time');
+        nBlock.initSvg();
+        this.getInput('offset').connection.connect(nBlock.outputConnection);
+        nBlock.render();
+    }
+  },
   createBlockList_: function(nbItem) {
     var nBlock = this.workspace.newBlock('lists_create_with');
     if (nbItem != nBlock.inputList.length) {
@@ -441,7 +551,7 @@ Blockly.Blocks['cron.CronTest'] = {
     return nBlock;
   },
   getValue : function() {
-        return this.getFieldValue('cron.cron')
+        return this.getFieldValue('cron.cron');
   },
   setFieldHelper_: function(input, text, notify) {
     this.getField(CRON_FIELD_DATA[input].label).setTooltip(text);
