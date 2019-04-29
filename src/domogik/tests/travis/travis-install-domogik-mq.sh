@@ -7,10 +7,10 @@ sudo chown $LOGNAME:root /var/lock/domogik
 sudo touch /var/lock/domogik/config.lock
 sudo chown $LOGNAME:root /var/lock/domogik/config.lock
 
-echo "==== Downloading domogik-mq (develop branch)"
-wget https://github.com/domogik/domogik-mq/archive/develop.zip
-unzip develop.zip
-cd domogik-mq-develop
+echo "==== Downloading domogik-mq (python3 branch)"
+wget https://github.com/domogik/domogik-mq/archive/python3.zip
+unzip python3.zip
+cd domogik-mq-python3
 
 echo "==== RUNNING SETUP.py"
 pip install .
