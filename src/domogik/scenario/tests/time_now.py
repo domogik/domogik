@@ -47,14 +47,17 @@ class TimeNow(AbstractTest):
         self._fetch_thread = Thread(target=self._fetch,name="pollthread")
         self._fetch_thread.start()
 
-
     def _fetch(self):
+        # second reference after minute to adpat wait time (2.0+ < tmRef > 58.0) and secure cpu load
+        tmRef = time.time() % 60
+        tmRef = tmRef + 2.0 if tmRef < 2.0 else tmRef
+        tmRef = tmRef - 2.0 if tmRef > 58.0 else tmRef
         while not self._event.is_set():
             now = time.time()
             self._res = int((now - get_midnight_timestamp())/60)
             if self._trigger != None:
                 self._trigger(self)
-            self._event.wait(60)
+            self._event.wait(60.0 - ((now % 60)-tmRef))
 
     def evaluate(self):
         """ Evaluate if the time is the current one
@@ -82,10 +85,8 @@ if __name__ == "__main__":
     logging.basicConfig(format=FORMAT)
     TEST = TimeNow(logging, trigger = mytrigger)
     print(TEST)
-    print("getting parameters")
-    p = TEST.get_parameters()
-    print(p)
     print("====")
-    print("set data for parameters time")
+    time.sleep(1)
     print("Trying to evaluate : {0}".format(TEST.evaluate()))
+    time.sleep(1)
     TEST.destroy()
