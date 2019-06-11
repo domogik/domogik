@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-       
+# -*- coding: utf-8 -*-
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
 License
@@ -56,13 +56,13 @@ from time import time
 from sys import stdout
 from threading import Thread, Event
 from netifaces import interfaces, ifaddresses, AF_INET
-import ConfigParser
+import configparser
 import traceback
-import sys
+#import sys
 #import copy
 #import os
 #import socket
-import IN, socket, struct
+#import IN, socket, struct
 
 # config file
 CONFIG_FILE = "/etc/domogik/xplhub.cfg"
@@ -121,7 +121,7 @@ class Hub():
 
         ### Read hub options
         # read config file
-        config_p = ConfigParser.ConfigParser()
+        config_p = configparser.ConfigParser()
         try:
             with open(CONFIG_FILE) as cfg_file:
                 config_p.readfp(cfg_file)
@@ -133,7 +133,7 @@ class Hub():
         except:
             print(u"ERROR : Unable to open configuration file '%s' : %s" % (CONFIG_FILE, traceback.format_exc()))
             return
- 
+
         ### Initiate the logger
         print(u"- Preparing the log files...")
         self.log = Logger(config['log_level'])
@@ -156,7 +156,7 @@ class Hub():
             do_log_invalid_data = False
         file_invalid_data = "%s/invalid_data.csv" % config['log_dir_path']
         interfaces_list = config['interfaces']
-        allowed_interfaces = interfaces_list.replace(" ", "").split(",") 
+        allowed_interfaces = interfaces_list.replace(" ", "").split(",")
 
         ### Start listening to udp
         print(u"- Initiating the multicast UDP client...")
@@ -206,7 +206,7 @@ class UdpHub(DatagramProtocol):
     """
        _client_list : the list of all seen clients
        _dead_client_list : the list of all dead clients
-         List of dict : 
+         List of dict :
           [{'id' : '192.168.0.1_9999',                # client id
                                                       # used to check only 1 item insteas of checking both ip and port
             'ip' : '192.168.0.1',
@@ -361,7 +361,7 @@ class UdpHub(DatagramProtocol):
         return "%s_%s" % (ip, port)
 
     def _is_new_client(self, client_id):
-        """ Check if a client is a new client or not 
+        """ Check if a client is a new client or not
             @param client_id : client id
         """
         for client in self._client_list:
@@ -427,9 +427,9 @@ class UdpHub(DatagramProtocol):
                                  'interval' : int(xpl.data['interval']),
                                  'last_seen' : time(),
                                  'alive' : ALIVE,
-                                 'nb_valid_messages' : 1,  
+                                 'nb_valid_messages' : 1,
                                  'nb_invalid_messages' : 0})
- 
+
     def _update_client(self, client_id, xpl):
         """ update the client with the new interval and the last seen date (now)
             @param client_id : client id
@@ -493,10 +493,10 @@ class UdpHub(DatagramProtocol):
         for address in delivery_addresss:
             # Activate this log line only if hub debug is needed ! Too verbose for a real use
             #self.log.info("Deliver xpl to '%s' : %s" % (address, str(xpl)))
-            self.transport.write(str(xpl), address)
+            self.transport.write(str(xpl).encode("utf-8"), address)
         pass
 
- 
+
     def _list_clients(self):
         """ List all the clients (alives and deads) in the log file
         """
@@ -644,13 +644,13 @@ class UdpHub(DatagramProtocol):
         """ Process received datagrams
             @param datagram : data received
             @param address : source ip/port
-        """        
+        """
         self.log.info(u"Data received from %s : %s" % (repr(address), repr(datagram)))
         ip = address[0]
         # the port to use to send messages to the clients is not this port! we will use the prot defined in the xpl message (which is the same in Domogik but which is not the same in xpl-perl). This port will be defined in the _add_client function
         port = address[1]
         client_id = self._get_client_id(ip, port)
- 
+
         # check if this is a valid xpl message
         is_xpl, xpl = self._decode2xpl(datagram)
         if is_xpl:
@@ -665,12 +665,12 @@ class UdpHub(DatagramProtocol):
             return
 
         # TODO : needed ????
-        # When the hub receives a hbeat.app or config.app message, the hub should extract the "remote-ip" value from the message body and compare the IP address with the list of addresses the hub is currently bound to for the local computer. If the address does not match any local addresses, the packet moves on to the delivery/rebroadcast step. 
+        # When the hub receives a hbeat.app or config.app message, the hub should extract the "remote-ip" value from the message body and compare the IP address with the list of addresses the hub is currently bound to for the local computer. If the address does not match any local addresses, the packet moves on to the delivery/rebroadcast step.
 
         # check if this is a local hbeat message
         if self._is_local_client(ip) and self._is_hbeat(xpl):
             # handle new clients
-            if self._is_new_client(client_id):  
+            if self._is_new_client(client_id):
                 self._add_client(ip, port, xpl)
                 self._display_clients()
             else:
@@ -716,7 +716,3 @@ class UdpHub(DatagramProtocol):
                 self._stop.wait(self._time)
 
 
-
-
-if __name__ == "__main__":
-    Hub(True)

@@ -18,10 +18,10 @@ echo "==== RUNNING INSTALL.py"
 # notice : we use --no-setup and --no-db-upgrade because a virtualenv is used in Travis. 
 # If we don't set these flags, these actions will be done as root user and so, 
 # the python packages (domogik) in virtualenv won't be find!
-sudo python install.py --no-setup --no-test --no-db-upgrade --user $LOGNAME --command-line --domogik_log_level debug --domogik_bind_interface lo --database_name domogik --database_user travis --admin_interfaces lo --admin_clean_json True --hub_interfaces lo --hub_log_level info --hub_log_bandwidth True --hub_log_invalid_data True --no-mq-check --metrics_id travis_build
+sudo python3 install.py --no-setup --no-test --no-db-upgrade --user $LOGNAME --command-line --domogik_log_level debug --domogik_bind_interface lo --database_name domogik --database_user travis --admin_interfaces lo --admin_clean_json True --hub_interfaces lo --hub_log_level info --hub_log_bandwidth True --hub_log_invalid_data True --no-mq-check --metrics_id travis_build
 
 echo "==== RUNNING DB_INSTALL.py"
-python src/domogik/install/db_install.py
+python3 src/domogik/install/db_install.py
 
 echo "==== SOME CLEANUP stuff"
 sudo chown $LOGNAME:root /var/lock/domogik

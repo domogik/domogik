@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 import pwd
 import sys
@@ -8,6 +8,7 @@ import sys
 import getpass
 # end debug
 import platform
+import configparser
 import argparse
 import shutil
 import errno
@@ -29,13 +30,13 @@ FAIL = '\033[91m'
 ENDC = '\033[0m'
 
 def info(msg):
-    print("{0} [ {1} ] {2}".format(BLUE,msg,ENDC))
+    print(u"{0} [ {1} ] {2}".format(BLUE,msg,ENDC))
 def ok(msg):
-    print("{0} ==> {1} {2}".format(OK,msg,ENDC))
+    print(u"{0} ==> {1}  {2}".format(OK,msg,ENDC))
 def warning(msg):
-    print("{0} ==> {1}  {2}".format(WARNING,msg,ENDC))
+    print(u"{0} ==> {1}  {2}".format(WARNING,msg,ENDC))
 def fail(msg):
-    print("{0} ==> {1}  {2}".format(FAIL,msg,ENDC))
+    print(u"{0} ==> {1}  {2}".format(FAIL,msg,ENDC))
 ### <<<<
 
 
@@ -51,7 +52,7 @@ class DbInstall():
         from alembic.config import Config
         from alembic import command
 
-        info("SQLAlchemy version is : {0}".format(sqla_version))
+        info(u"SQLAlchemy version is : {0}".format(sqla_version))
 
         self.db_backup_file = "{0}/domogik-{1}.sql".format(tempfile.gettempdir(), int(time.time()))
         self.alembic_cfg = Config("alembic.ini")
@@ -79,9 +80,9 @@ class DbInstall():
         mysql_script+= "grant all privileges on {0}.* to '{1}'@'%';\n".format(self._db.get_db_name(), self._db.get_db_user())
         mysql_script+= "flush privileges;\n".format(self._db.get_db_name(), self._db.get_db_user())
         sh_script = "mysql -p -u root << TXT\n"+mysql_script+"TXT\n"
-        print("---------------------------------------------------")
+        print(u"---------------------------------------------------")
         print(sh_script)
-        print("---------------------------------------------------")
+        print(u"---------------------------------------------------")
 
         ok("Please entrer {0} root password".format(self._db.get_db_type()))
         res = os.system(sh_script)
@@ -179,10 +180,10 @@ class DbInstall():
             warning("Can't backup your database, only mysql is supported (you have : {0})".format(self._db.get_db_type()))
             return
         if ask_confirm:
-            answer = raw_input("Do you want to backup your database? [Y/n] ")
+            answer = input("Do you want to backup your database? [Y/n] ")
             if answer == 'n':
                 return
-            answer = raw_input("Backup file? [{0}] ".format(self.db_backup_file))
+            answer = input("Backup file? [{0}] ".format(self.db_backup_file))
             if answer != '':
                 bfile = answer
             else:

@@ -33,7 +33,7 @@ Usage
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import datetime
 from threading import Event
 from domogik.xpl.common.xplconnector import Listener
@@ -80,15 +80,15 @@ class TemplateTestCase(unittest.TestCase):   #, MQAsyncSub):
             device_list = result.get_data()['devices']
 
         for dev in device_list:
-            if dev['id'] == device_id: 
+            if dev['id'] == device_id:
                 device = dev
 
         # we add 5% to the timeout as some operations may be done in the plugin and so the interval is not totally exact
-        timeout = timeout*1.05 
+        timeout = timeout*1.05
 
         # Bacause of the TestPlugin component, we can't use the MQAsyncSub class here...
         # So we will do a manual loop thanks to MQSyncSub
-        # To avoid eternal waiting for a not send message, we catch also the plugin.status messages that occurs each 
+        # To avoid eternal waiting for a not send message, we catch also the plugin.status messages that occurs each
         # 15s but we don't process them
 
         do_loop = True
@@ -97,7 +97,7 @@ class TemplateTestCase(unittest.TestCase):   #, MQAsyncSub):
             cli = MQSyncSub(zmq.Context(), "test", ["client.sensor", "plugin.status"])
             resp = cli.wait_for_event()
             # client.sensor message
-            if resp['id'].startswith("client.sensor"):
+            if resp['id'].startswith(b"client.sensor"):
                 res = json.loads(resp['content'])
                 print("MQ client.sensor message received. Data = {0}".format(res))
 
@@ -128,8 +128,8 @@ class TemplateTestCase(unittest.TestCase):   #, MQAsyncSub):
                 #print(time.time() - time_start)
                 if (time.time() - time_start) > timeout:
                     raise RuntimeError("No MQ message received before the timeout reached")
-                    
- 
+
+
 
 
         return False
@@ -156,12 +156,12 @@ class TemplateTestCase(unittest.TestCase):   #, MQAsyncSub):
                     'xplsource': xplsource}
         for key in data:
             criteria[key] = str(data[key])
-        listener = Listener(self._wait_for_xpl_cb, 
-                            self.myxpl, 
+        listener = Listener(self._wait_for_xpl_cb,
+                            self.myxpl,
                             criteria)
 
         # we add 5% to the timeout as some operations may be done in the plugin and so the interval is not totally exact
-        timeout = timeout*1.05 
+        timeout = timeout*1.05
         self._xpl_received.wait(timeout)
         if not self._xpl_received.is_set():
             raise RuntimeError("No xPL message received")
@@ -169,7 +169,7 @@ class TemplateTestCase(unittest.TestCase):   #, MQAsyncSub):
         # remove the listener
         listener.unregister()
         return True
-       
+
 
 
     def _wait_for_xpl_cb(self, message):
@@ -178,7 +178,7 @@ class TemplateTestCase(unittest.TestCase):   #, MQAsyncSub):
         """
         self._xpl_received.set()
         self.xpl_data = message
-    
+
 
     ### time tools
 

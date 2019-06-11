@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -29,11 +29,11 @@ Implements
 
 
 @author: Maxence Dunnewind <maxence@dunnewind.net>
-@copyright: (C) 2007-2012 Domogik project
+@copyright: (C) 2007-2019 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 import pwd
 import sys
@@ -90,7 +90,7 @@ def test_imports():
         warning("Can't import sqlalchemy, check installation logs!")
         good = False
     try:
-        import httplib
+        import http.client
     except ImportError:
         warning("Can't import httplib, check installation logs!")
         good = False
@@ -207,8 +207,8 @@ def _check_port_availability(s_ip, s_port, udp = False):
 
 def test_user_config_file(user_home, user_entry):
     info("Check user config file contents")
-    import ConfigParser
-    config = ConfigParser.ConfigParser()
+    import configparser
+    config = configparser.ConfigParser()
     config.read("/etc/domogik/domogik.cfg")
 
     #check [domogik] section

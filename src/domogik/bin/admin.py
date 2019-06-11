@@ -30,8 +30,8 @@ Implements
 class Admin(Plugin)
 class AdminWebSocket(WebSocketHandler, MQAsyncSub)
 
-@author:    Friz <fritz.smh@gmail.com>
-        Maikel Punie <maikel.punie@gmail.com>
+@author: 	Friz <fritz.smh@gmail.com>
+		Maikel Punie <maikel.punie@gmail.com>
 @copyright: (C) 2007-2012 Domogik project
 @license: GPL(v3)
 @organization: Domogik
@@ -209,7 +209,7 @@ class WebSocketManager(WebSocketHandler):
                 #print(u"=> message")
                 message = json_data["message"]
                 #print(message)
-                if message.startswith("ping from browser"):
+                if message.startswith(b"ping from browser"):
                     browser_info = re.sub("ping from browser", "", message)
                     self.send(json.dumps({"message" : "pong from admin {0}".format(browser_info)}))
                     return
@@ -243,7 +243,7 @@ class Admin(Plugin):
         self._db = DbHelper(owner="Admin core")
         # logging initialization
         self.log.info(u"Admin Server initialisation...")
-        self.log.debug(u"locale : {0} {1}".format(locale.getdefaultlocale()[0], locale.getdefaultlocale()[1]))
+        self.log.debug(u"locale : {0}".format(locale.getdefaultlocale()))
         try:
             try:
                 # admin config
@@ -308,7 +308,7 @@ class Admin(Plugin):
             ### Component is ready
             self.ready(0)
             IOLoop.instance().start()
-        except:
+        except :
             self.log.error(u"{0}".format(self.get_exception()))
 
     @gen.coroutine

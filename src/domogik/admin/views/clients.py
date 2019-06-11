@@ -717,7 +717,7 @@ def client_devices_new_prod(client_id, device_type_id, product):
 
 
 def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
-    print request.args
+    print(request.args)
     args = request.args.to_dict()
     if based_on:
         with app.db.session_scope():
@@ -725,8 +725,8 @@ def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
             args['Name'] = dev['name']
             args['Description'] = dev['description']
             args['Reference'] = dev['reference']
-            print dev
-    print args
+            print(dev)
+    print(args)
     detail = get_client_detail(client_id)
     (params, reason, status) = build_deviceType_from_packageJson(app.logger, app.zmq_context, device_type_id, client_id)
 
@@ -960,9 +960,9 @@ def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
                 if item in ["name", "reference", "description"]:
                     # handle the global things
                     params[item] = request.form.get(item)
-                elif item.startswith('xpl') or item.startswith('glob'):
+                elif item.startswith(b'xpl') or item.startswith(b'glob'):
                     # handle the global params
-                    if item.startswith('xpl'):
+                    if item.startswith(b'xpl'):
                         key = 'xpl'
                     else:
                         key = 'global'
@@ -973,8 +973,8 @@ def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
                         if par == param['key']:
                             params[key][i]['value'] = request.form.get(item)
                         i = i + 1
-                elif item.startswith('stat') or item.startswith('cmd'):
-                    if item.startswith('stat'):
+                elif item.startswith(b'stat') or item.startswith(b'cmd'):
+                    if item.startswith(b'stat'):
                         key = "xpl_stats"
                     else:
                         key = "xpl_commands"

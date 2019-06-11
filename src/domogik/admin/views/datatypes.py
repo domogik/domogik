@@ -2,6 +2,8 @@ import json
 import pprint
 from flask_login import login_required
 from domogik.admin.application import app, render_template, timeit
+from domogikmq.message import MQMessage
+from domogikmq.reqrep.client import MQSyncReq
 import collections
 
 @app.route('/datatypes')
@@ -42,15 +44,14 @@ def datatypes():
             @param level : level of recursivity (for information only)
         """
         tab = "  "
-        #print("{2}{0} / {1} / {3}".format(dt, level, level*tab, dt_parent))
+        print("{2}{0} / {1} / {3}".format(dt, level, level*tab, dt_parent))
         if dt_tree_subpart == None:
             dt_tree_subpart = dt_tree
         if dt_parent != None:
-            #dt_tree[dt_parent]['nodes'].append( formatDT(dt) )
-            dt_tree_subpart['nodes'][dt] =  formatDT(dt) 
+            dt_tree_subpart['nodes'][dt] =  formatDT(dt)
         else:
             dt_tree[dt] = formatDT(dt)
-        
+
         for a_child in app.datatypes[dt]['childs']:
             #print("     - child of {1} : {0}".format(a_child, dt))
             #pp = pprint.PrettyPrinter(indent=4)
@@ -64,7 +65,6 @@ def datatypes():
 
 
 
-    #dt_tree = {}
     dt_tree = collections.OrderedDict()
     app.logger.debug(u"Loop over all the datatypes...")
     for dt in app.datatypes:
@@ -79,12 +79,11 @@ def datatypes():
         if no_parent:
             app.logger.debug("  => No parent : adding in the tree")
             add_in_tree(dt, dt_tree)
-
-        
-    #pp = pprint.PrettyPrinter(indent=4)
-    #pp.pprint(dt_tree)
-
+    dt_list =[]
+    for dt in dt_tree :
+        dt_list.append(dict(dt_tree[dt]))
+    print(dt_list)
 
     return render_template('datatypes.html',
-        datatypes = json.dumps( dt_tree.values() ),
+        datatypes = json.dumps(dt_list),
         mactive = "datatypes")

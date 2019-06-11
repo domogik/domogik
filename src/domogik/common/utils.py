@@ -28,11 +28,11 @@ Implements
 
 
 @author: Marc SCHNEIDER <marc@mirelsol.org>
-@copyright: (C) 2007-2012 Domogik project
+@copyright: (C) 2007-2019 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 from subprocess import Popen, PIPE
 import os
 import sys
@@ -145,24 +145,20 @@ def ucode2(my_string):
     @return a unicode string
 
     """
-    # in Py3 all is uunicode
-    if sys.version_info[0] == 3:
-        return my_string
-
     # special case : data is None
     if my_string is None:
         return None
     # already in unicode, return unicode
-    elif isinstance(my_string, unicode):
+    elif isinstance(my_string, bytes):
         return my_string
 
     # str
     elif isinstance(my_string, str):
-        return unicode(my_string, "utf-8")
+        return my_string.encode('utf8')
 
     # other type (int, float, boolean, ...)
     else:
-        return unicode(str(my_string), "utf-8")
+        return str(my_string).encode('utf8')
 
 def parse_client_id(client_id):
     tmp = client_id.split(".")
@@ -332,7 +328,7 @@ def remove_accents(input_str):
     """ Remove accents in utf-8 strings
     """
     nfkd_form = unicodedata.normalize('NFKD', input_str)
-    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
 def build_deviceType_from_packageJson(log, zmq, dev_type_id, client_id):

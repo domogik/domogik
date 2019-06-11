@@ -1,9 +1,9 @@
-#!/bin/bash 
+#!/bin/bash
 
 # INFORMATIONS
 # ============
 #
-# * mysql-server is not installed by the install.py script as the database must 
+# * mysql-server is not installed by the install.py script as the database must
 #   be created before launching the install.py script
 
 # Make sure only root can run our script
@@ -40,48 +40,48 @@ pkg_list="\
          gettext \
          gcc\
          libssl-dev \
-         libzmq-dev \
+         libzmq3-dev \
          libpq-dev \
          libffi-dev \
          \
-         python \
-         python-dev \
-         python-pkg-resources \
-         python-setuptools \
-         python-mysqldb \
-         python-sqlalchemy \
-         python-simplejson \
-         python-openssl \
-         python-psutil  \
-         python-mysqldb  \
-         python-psycopg2 \
-         python-pip \
-         python-serial \
-         python-netifaces \
-         python-twisted \
-         python-flask \
-         python-flaskext.wtf \
-         python-tornado \
-         python-requests \
-         python-magic \
-         python-zmq \
-         python-gluon \
-         python-babel \
-         python-sphinx \
+         python3 \
+         python3-dev \
+         python3-pkg-resources \
+         python3-setuptools \
+         python3-mysqldb \
+         python3-sqlalchemy \
+         python3-simplejson \
+         python3-openssl \
+         python3-psutil  \
+         python3-mysqldb  \
+         python3-psycopg2 \
+         python3-pip \
+         python3-serial \
+         python3-netifaces \
+         python3-twisted \
+         python3-flask \
+         python3-flaskext.wtf \
+         python3-tornado \
+         python3-requests \
+         python3-magic \
+         python3-zmq \
+         python3-babel \
+         python3-sphinx \
          libusb-1.0-0-dev \
          "
+#         python-gluon \
 
 apt-get update
-continue $? 
-    
+continue $?
+
 # special case for python argparse....
-python -c "import argparse"
+python3 -c "import argparse"
 if [ $? -ne 0 ] ; then
     echo "Argparse module for python is not installed. Trying to install it..."
-    pip install argparse
+    pip3 install argparse
     if [ $? -ne 0 ] ; then
         echo "Error while installing argparse module"
-        continue $? 
+        continue $?
     fi
 
 else
@@ -101,16 +101,16 @@ fi
 #   File "./install.py", line 427, in install
 #     raise OSError("setup.py doesn't finish correctly")
 # OSError: setup.py doesn't finish correctly
-# 
+#
 # =================================
 # ERROR:root:(<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
 #  ==> (<type 'exceptions.OSError'>, OSError("setup.py doesn't finish correctly",), <traceback object at 0x7f53e6139200>)
-pip install -e git://github.com/sysr-q/flask-themes2.git#egg=flask_themes2-dev
-continue $? 
+pip3 install -e git://github.com/sysr-q/flask-themes2.git#egg=flask_themes2-dev
+continue $?
 
 # standard packages
 apt-get install $pkg_list
-continue $? 
+continue $?
 
 pip_list="Flask-Login \
           Flask-Babel \
@@ -124,8 +124,8 @@ pip_list="Flask-Login \
 
 for elt in $pip_list
   do
-    pip install $elt
-    continue $? 
+    pip3 install $elt
+    continue $?
 done
 
 

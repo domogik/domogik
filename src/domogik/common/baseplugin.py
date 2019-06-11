@@ -33,10 +33,9 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import threading
 from argparse import ArgumentParser
-from domogik.common.utils import get_sanitized_hostname
 import sys
 import os
 import pwd
@@ -152,15 +151,15 @@ class BasePlugin(object):
             sys.exit(0)
         elif not self.options.run_in_foreground and daemonize:
             self.log.info(u"Starting the plugin in background...")
-            ctx = DaemonContext()
-            #ctx = daemon.DaemonContext()
-            ctx.files_preserve = logg.get_fds([name])
-            ctx.open()
-            self.log.info(u"Daemonize plugin {0}".format(name))
-            self.is_daemon = True
+            try:
+                ctx = DaemonContext()
+                ctx.files_preserve = logg.get_fds([name])
+                ctx.open()
+                self.log.info(u"Daemonize plugin {0}".format(name))
+                self.is_daemon = True
+            except:
+                 self.log.error(u"Daemonize fail : {1}".format(traceback.format_exc()))
         else:
-            #l = logger.Logger(name)
-            #self.log = l.get_logger()
             self.is_daemon = False
         if self.options.run_in_foreground :
             self._st_comment =u"Starting by shell in background"

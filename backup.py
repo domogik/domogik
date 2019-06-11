@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -38,7 +38,7 @@ Implements
 @organization: Domogik
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 import traceback
 import time

@@ -34,7 +34,6 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 #from domogik.xpl.common.plugin import XplPlugin
 from domogik import __version__ as DMG_VERSION
 from domogik.common import logger
@@ -83,67 +82,67 @@ class TestRunner():
 
 
         parser = ArgumentParser(description="Launch all the tests that don't need hardware.")
-        parser.add_argument("directory",
+	parser.add_argument("directory",
                           help="What directory to run")
-        parser.add_argument("-a", 
-                          "--allow-alter", 
+        parser.add_argument("-a",
+                          "--allow-alter",
                           dest="allow_alter",
                           action="store_true",
                           help="Launch the tests that can alter the configuration of the plugin or the setup (devices, ...)")
-        parser.add_argument("-c", 
-                          "--criticity", 
-                          dest="criticity", 
+        parser.add_argument("-c",
+                          "--criticity",
+                          dest="criticity",
                           help="Set the minimum level of criticity to use to filter the tests to execute. low/medium/high. Default is low.")
         self.options = parser.parse_args()
-        self.testcases = {}
+	self.testcases = {}
         self.results = {}
 
         # options
         self.log.info("Domogik release : {0}".format(DMG_VERSION))
         self.log.info("Running test with the folowing parameters:")
-        if self.options.allow_alter:
-            self.log.info("- allow to alter the configuration or setup.")
-        if self.options.criticity not in (LOW, MEDIUM, HIGH):
+	if self.options.allow_alter:
+	    self.log.info("- allow to alter the configuration or setup.")
+	if self.options.criticity not in (LOW, MEDIUM, HIGH):
             self.options.criticity = LOW
-        self.log.info("- criticity : {0}".format(self.options.criticity))
+	self.log.info("- criticity : {0}".format(self.options.criticity))
 
         # check tests folder
-        self.log.info("- path {0}".format(self.options.directory))
+	self.log.info("- path {0}".format(self.options.directory))
         if not self.check_dir():
             return
 
         # check and load the json file
         self.log.info("- json file {0}".format(self.json_file))
-        if not self.load_json():
-            return
+	if not self.load_json():
+	    return
 
     def check_dir(self):
         self.path = None
-    
-        if self.options.directory == ".":
+
+	if self.options.directory == ".":
             self.path = os.path.dirname(os.path.realpath(__file__))
-        elif self.options.directory.startswith('/'):
+        elif self.options.directory.startswith(b'/'):
             self.path = self.options.directory
         else:
             self.path = "{0}/{1}".format(os.path.dirname(os.path.realpath(__file__)), self.options.directory)
-    
+
         # check if self.path is a directory
-        if not os.path.isdir(self.path):
-            self.log.error("Path {0} is not a directory".format(self.path))
-            return False
+	if not os.path.isdir(self.path):
+	    self.log.error("Path {0} is not a directory".format(self.path))
+	    return False
 
-        # cehck if we have a json file
-        self.json_file = "{0}/tests.json".format(self.path)
+	# cehck if we have a json file
+	self.json_file = "{0}/tests.json".format(self.path)
         if not os.path.isfile(self.json_file):
-            self.log.error("{0} is not a valid 'tests.json' file".format(self.json_file))
-            return False
+	    self.log.error("{0} is not a valid 'tests.json' file".format(self.json_file))
+	    return False
 
-        return True
+	return True
 
     def load_json(self):
         try:
             self.json = json.loads(open(self.json_file).read())
-        except:
+	except:
             self.log.error("Error during json file reading: {0}".format(traceback.format_exc()))
             return False
 
@@ -189,7 +188,7 @@ class TestRunner():
         self.log.info("")
         self.log.info("Tests summary :")
         self.log.info("---------------")
-       
+
         for res in self.results:
             if self.results[res]['return_code'] == 0:
                 self.log.info("Test {0} : OK".format(res))
@@ -215,7 +214,7 @@ def main():
         testr.run_testcases()
         cr = testr.get_result()
     except Exception as exp:
-        print(exp)
+        print exp
         cr = 1
     sys.exit(cr)
 

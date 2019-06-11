@@ -1,4 +1,3 @@
-from __future__ import absolute_import, division, print_function
 from domogik.xpl.common.plugin import DMG_VENDOR_ID
 from domogik.common.utils import build_deviceType_from_packageJson
 from domogik.admin.application import app, json_response, register_api, timeit
@@ -28,7 +27,7 @@ def device_since(timestamp):
     @apiSuccess {json} result The json representing of the device
 
     @apiSampleRequest /device/since/123456
-    
+
     @apiSuccessExample Success-Response:
         HTTTP/1.1 200 OK
         {
@@ -135,7 +134,7 @@ def device_params(client_id, dev_type_id):
     @apiParam {String} device_type The device type to request the parameters for
 
     @apiSuccess {json} result The json representing the device type
-    
+
     @apiSampleRequest /device/params/plugin-velbus.igor/velbus.relay
 
     @apiSuccessExample Success-Response:
@@ -423,6 +422,7 @@ class deviceAPI(MethodView):
             app.logger.debug(u"Form params : {0}".format(request.form))
             params = json.loads(request.form.get('params'))
             status = True
+            print(params)
             cli = MQSyncReq(app.zmq_context)
             msg = MQMessage()
             msg.set_action('device_types.get')
@@ -440,7 +440,7 @@ class deviceAPI(MethodView):
             if pjson is None:
                 status = False
                 reason = "The json for {0} found by manager is empty".format(params['device_type'])
-    
+
             with app.db.session_scope():
                 if status:
                     # call the add device function

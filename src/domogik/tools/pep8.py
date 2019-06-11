@@ -200,11 +200,11 @@ def blank_lines(logical_line, blank_lines, indent_level, line_number,
     """
     if line_number == 1:
         return # Don't expect blank lines before the first line
-    if previous_logical.startswith('@'):
+    if previous_logical.startswith(b'@'):
         return # Don't expect blank lines after function decorator
-    if (logical_line.startswith('def ') or
-        logical_line.startswith('class ') or
-        logical_line.startswith('@')):
+    if (logical_line.startswith(b'def ') or
+        logical_line.startswith(b'class ') or
+        logical_line.startswith(b'@')):
         if indent_level > 0 and blank_lines != 1:
             return 0, "E301 expected 1 blank line, found %d" % blank_lines
         if indent_level == 0 and blank_lines != 2:
@@ -341,7 +341,7 @@ def imports_on_separate_lines(logical_line):
     Imports should usually be on separate lines.
     """
     line = logical_line
-    if line.startswith('import '):
+    if line.startswith(b'import '):
         found = line.find(',')
         if found > -1:
             return found, "E401 multiple imports on one line"

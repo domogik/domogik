@@ -1,16 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 import pwd
 import sys
 import platform
-try:
-    # from python3 onwards
-    import configparser
-except ImportError:
-    # python 2
-    import ConfigParser as configparser
+import configparser
 import argparse
 import shutil
 import logging
@@ -30,19 +25,19 @@ ENDC = '\033[0m'
 
 def info(msg):
     logging.info(msg)
-    print("{0} [ {1} ] {2}".format(BLUE, msg, ENDC))
+    print(u"{0} [ {1} ] {2}".format(BLUE, msg, ENDC))
 
 def ok(msg):
     logging.info(msg)
-    print("{0} ==> {1}  {2}".format(OK, msg, ENDC))
+    print(u"{0} ==> {1}  {2}".format(OK, msg, ENDC))
 
 def warning(msg):
     logging.warning(msg)
-    print("{0} ==> {1}  {2}".format(WARNING, msg, ENDC))
+    print(u"{0} ==> {1}  {2}".format(WARNING, msg, ENDC))
 
 def fail(msg):
     logging.error(msg)
-    print("{0} ==> {1}  {2}".format(FAIL, msg, ENDC))
+    print(u"{0} ==> {1}  {2}".format(FAIL, msg, ENDC))
 
 def debug(msg):
     logging.debug(msg)
@@ -50,9 +45,9 @@ def debug(msg):
 ### test if script is launch as root
 
 # CHECK run as root
-info("Check this script is started as root")
+info(u"Check this script is started as root")
 assert os.getuid() == 0, "This script must be started as root"
-ok("Correctly started with root privileges.")
+ok(u"Correctly started with root privileges.")
 
 logging.basicConfig(filename='install.log', level=logging.DEBUG)
 
@@ -64,7 +59,7 @@ def get_mysql_or_mariadb_release():
     cmd = 'mysqld --version 2>/dev/null | sed "s/^.* \([0-9\.]*\)[- ].*$/\\1/"'
     subp = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
     res = subp.communicate()
-    return res[0].strip()
+    return res[0].strip().decode()
 
 def do_we_need_mariadb(release, command_line_mode = False):
     """ Check if the mysql/mariadb release is compliant with Domogik
@@ -105,7 +100,7 @@ def get_c_hub():
 
 def build_file_list(user, noXpl):
     d_files = [
-        ('/etc/domogik', [user, 0755], \
+        ('/etc/domogik', [user, 0o755], \
                 ['src/domogik/examples/config/domogik.cfg.sample']),
         ('/var/cache/domogik', [user, None], []),
         ('/var/cache/domogik/pkg-cache', [user, None], []),
@@ -120,13 +115,13 @@ def build_file_list(user, noXpl):
         ('/var/lib/domogik/resources/sphinx', [user, None], \
                 ['docs/Makefile',
                  'docs/conf-packages.py']),
-        ('/var/lock/domogik', [user, 0755], []),
-        ('/var/log/domogik', [user, 0755], []),
+        ('/var/lock/domogik', [user, 0o755], []),
+        ('/var/log/domogik', [user, 0o755], []),
     ]
 
     if not noXpl:
         d_files.append(('/var/log/xplhub', [user, None], []))
-        d_files.append(('/etc/domogik', [user, 0755], ['src/domogik/xpl/hub/examples/config/xplhub.cfg.sample']))
+        d_files.append(('/etc/domogik', [user, 0o755], ['src/domogik/xpl/hub/examples/config/xplhub.cfg.sample']))
 
     if os.path.exists('/etc/default'):
         debug("Found directory to store the system wide config: /etc/default")
@@ -147,7 +142,7 @@ def build_file_list(user, noXpl):
     if os.path.exists('/etc/systemd/system'):
         debug("SystemD found, copyinf giles")
         for f in ["domogik-mq-broker.service", "domogik-mq-forwarder.service", "domogik.service", "domogik-xpl.service"]:
-            d_files.append(('/etc/systemd/system', [user, 0755], \
+            d_files.append(('/etc/systemd/system', [user, 0o755], \
                     ['src/domogik/examples/systemd/system/{0}'.format(f)]))
 
     if os.path.exists('/etc/init.d'):
@@ -163,11 +158,13 @@ def build_file_list(user, noXpl):
 
     if os.path.exists('/etc/cron.d'):
         debug("Found directory to store the cron config: /etc/cron.d")
-        d_files.append(('/etc/cron.d/', ['root', 0644], \
+        d_files.append(('/etc/cron.d/', ['root', 0o644], \
                 ['src/domogik/examples/cron/domogik']))
     else:
         fail("Can't find directory where i can copy cron config")
         exit(1)
+
+    print(d_files)
 
     hub = get_c_hub()
     if hub is not None:
@@ -214,8 +211,8 @@ def copy_files(user, noXpl):
         raise
 
 def ask_user_name():
-    info("Create domogik user")
-    print("As what user should domogik run? [domogik]: "),
+    info(u"Create domogik user")
+    print(u"As what user should domogik run? [domogik]: "),
     new_value = sys.stdin.readline().rstrip('\n')
     if new_value == "":
         d_user = 'domogik'
@@ -225,9 +222,9 @@ def ask_user_name():
     return d_user
 
 def create_user(d_user, d_shell = "/bin/sh"):
-    info("Create domogik user")
+    info(u"Create domogik user")
     if d_user not in [x[0] for x in pwd.getpwall()]:
-        print("Creating the {0} user and add it to dialout".format(d_user))
+        print(u"Creating the {0} user and add it to dialout".format(d_user))
         cmd_line = 'adduser --system {0} --shell {1} '.format(d_user, d_shell)
         debug(cmd_line)
         os.system(cmd_line)
@@ -284,13 +281,13 @@ def write_domogik_configfile(advanced_mode, intf):
         info("Starting on section {0}".format(sect))
         if sect != "metrics":
             for item in config.items(sect):
-                if sect == 'admin'and item[0] == 'secret_key':
+                if sect == 'admin' and item[0] == 'secret_key':
                     config.set(sect, item[0], uuid.uuid4())
-                elif item[0] in itf  and not advanced_mode:
+                elif item[0] in itf and not advanced_mode:
                     config.set(sect, item[0], intf)
                     debug("Value {0} in domogik.cfg set to {1}".format(item[0], intf))
                 elif is_domogik_advanced(advanced_mode, sect, item[0]):
-                    print("- {0} [{1}]: ".format(item[0], item[1])),
+                    print(u"- {0} [{1}]: ".format(item[0], item[1])),
                     new_value = sys.stdin.readline().rstrip('\n')
                     if new_value != item[1] and new_value != '':
                         # need to write it to config file
@@ -300,12 +297,12 @@ def write_domogik_configfile(advanced_mode, intf):
         # manage metrics section
         else:
             config.set(sect, "id", uuid.getnode())   # set an unique id which is hardware dependent
-            print("Set [{0}] : {1} = {2}".format(sect, id, uuid.getnode()))
-            debug("Value {0} in domogik.cfg > [metrics] set to {1}".format(id, uuid.getnode()))
+            print(u"Set [{0}] : {1} = {2}".format(sect, id, uuid.getnode()))
+            debug(u"Value {0} in domogik.cfg > [metrics] set to {1}".format(id, uuid.getnode()))
 
     # write the config file
     with open('/etc/domogik/domogik.cfg', 'w') as configfile:
-        ok("Writing the config file")
+        ok(u"Writing the config file")
         config.write(configfile)
 
 def write_xplhub_configfile(advanced_mode, intf):
@@ -320,7 +317,7 @@ def write_xplhub_configfile(advanced_mode, intf):
                 config.set(sect, item[0], intf)
                 debug("Value {0} in xplhub.cfg set to {1}".format(item[0], intf))
             elif is_xplhub_advanced(advanced_mode, sect, item[0]):
-                print("- {0} [{1}]: ".format(item[0], item[1])),
+                print(u"- {0} [{1}]: ".format(item[0], item[1])),
                 new_value = sys.stdin.readline().rstrip('\n')
                 if new_value != item[1] and new_value != '':
                     # need to write it to config file
@@ -350,21 +347,21 @@ def write_domogik_configfile_from_command_line(args, intf):
             if item[0] not in itf:
                 if new_value != item[1] and new_value != '' and new_value != None:
                     # need to write it to config file
-                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    print(u"Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                     config.set(sect, item[0], new_value)
                     newvalues = True
             else:
                 # user changed the default value
-                print("{0} vs {1}".format(new_value, item[1]))
+                print(u"{0} vs {1}".format(new_value, item[1]))
                 if new_value != item[1] and new_value != '' and new_value != None:
                     # need to write it to config file
-                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    print(u"Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                     config.set(sect, item[0], new_value)
                     newvalues = True
                 # user didn't change the default value, we put the found network interfaces instead of the default value
                 else:
                     # need to write it to config file
-                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    print(u"Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                     config.set(sect, item[0], intf)
                     newvalues = True
 
@@ -392,12 +389,12 @@ def write_xplhub_configfile_from_command_line(args, intf):
                 # the user changed the value
                 if new_value != item[1] and new_value != '' and new_value != None:
                     # need to write it to config file
-                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    print(u"Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                     config.set(sect, item[0], new_value)
                     newvalues = True
                 # the user did not change the value
                 else:
-                    print("Set [{0}] : {1} = {2}".format(sect, item[0], intf))
+                    print(u"Set [{0}] : {1} = {2}".format(sect, item[0], intf))
                     config.set(sect, item[0], intf)
                     newvalues = True
 
@@ -406,28 +403,24 @@ def write_xplhub_configfile_from_command_line(args, intf):
                 new_value = eval("args.{0}_{1}".format(sect, item[0]))
                 if new_value != item[1] and new_value != '' and new_value != None:
                     # need to write it to config file
-                    print("Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
+                    print(u"Set [{0}] : {1} = {2}".format(sect, item[0], new_value))
                     config.set(sect, item[0], new_value)
                     newvalues = True
                 debug("Value {0} in domogik.cfg set to {1}".format(item[0], new_value))
     # write the config file
-    if newvalues:
-        with open('/etc/domogik/xplhub.cfg', 'w') as configfile:
-            ok("Writing the config file")
-            config.write(configfile)
+    with open('/etc/domogik/xplhub.cfg', 'w') as configfile:
+        ok("Writing the config file")
+        config.write(configfile)
 
 def needupdate():
     # first check if there are already some config files
     if os.path.isfile("/etc/domogik/domogik.cfg") or \
        os.path.isfile("/etc/domogik/xplhub.cfg"):
-        info("Configuration files")
-        # DEL # print("Please notice that Domogik 0.3.x configuration files are no more compliant with Domogik 0.4 :")
-        # DEL # print("- backup your Domogik 0.3 configuration files")
-        # DEL # print("- say 'n' to the question to recreate them from scratch")
-        print("Do you want to keep your current config files ? [Y/n]: ")
+        info(u"Configuration files")
+        print(u"Do you want to keep your current config files ? [Y/n]: ")
         new_value = sys.stdin.readline().rstrip('\n')
         if new_value == "y" or new_value == "Y" or new_value == '':
-            debug("keeping curent config files")
+            debug(u"keeping curent config files")
             return False
         else:
             debug("NOT keeping curent config files")
@@ -460,6 +453,8 @@ def install():
     parser = argparse.ArgumentParser(description='Domogik installation.')
     parser.add_argument('--dist-packages', dest='dist_packages', action="store_true",
                    default=False, help='Try to use distribution packages instead of pip packages')
+    parser.add_argument('--python-lib', dest='python_lib', action="store_true",
+                   default=False, help='Try to install python libraries dependencies from requirements.txt')
     parser.add_argument('--no-create-database', dest='no_create_database', action="store_true",
                    default=False, help='create and allow domogik to access to it, if it is not already created')
     parser.add_argument('--no-setup', dest='setup', action="store_true",
@@ -505,7 +500,7 @@ def install():
             exit(1)
 
         # CHECK sources not in / or /root
-        info("Check the sources location (not in /root/ or /")
+        info(u"Check the sources location (not in /root/ or /")
         print(os.getcwd())
         assert os.getcwd().startswith("/root/") == False, "Domogik sources must not be located in the /root/ folder"
 
@@ -531,30 +526,31 @@ def install():
 
 
         if args.dist_packages:
+            info("Install package from distrib")
             dist_packages_install_script = ''
             #platform.dist() and platform.linux_distribution()
             #doesn't works with ubuntu/debian, both say debian.
             #So I not found pettiest test :(
-            info("Check which distribution is installed")
-            dist = get_distribution()
-            ok(dist)
-            #if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
-            if dist == "Debian":
+            if os.system(' bash -c \'[ "`lsb_release -si`" == "Debian" ]\'') == 0:
                 dist_packages_install_script = './debian_packages_install.sh'
-            #elif os.system(' bash -c \'[ "`lsb_release -si`" == "Ubuntu" ]\'') == 0:
-            elif dist == "Ubuntu":
+            elif os.system(' bash -c \'[ "`lsb_release -si`" == "Ubuntu" ]\'') == 0:
                 dist_packages_install_script = './debian_packages_install.sh'
             elif os.system(' bash -c \'[ "`lsb_release -si`" == "Raspbian" ]\'') == 0:
                 dist_packages_install_script = './debian_packages_install.sh'
             if dist_packages_install_script == '' :
                 raise OSError("The option --dist-packages is not implemented on this distribution. \nPlease install the packages manually.\n When packages have been installed, you can re reun the installation script without the --dist-packages option.")
             if os.system(dist_packages_install_script) != 0:
-                raise OSError("Cannot install packages correctly script '{0}'".format(dist_packages_install_script))
+                raise OSError("Cannot install packages correctly script '%s'" % dist_packages_install_script)
+
+
+        if args.python_lib:
+            info("Install python lib from requirements.txt")
+            print(os.system('pip3 install -r requirements.txt'))
 
         # RUN setup.py
         if not args.setup:
             info("Run setup.py")
-            subp = Popen('python setup.py develop', shell=True)
+            subp = Popen('python3 setup.py develop', shell=True)
             res = subp.communicate()
             rc = subp.returncode
             if rc != 0:
@@ -616,17 +612,6 @@ def install():
             except KeyError:
                 raise KeyError("The user %s does not exists, you MUST create it or change the DOMOGIK_USER parameter in %s. Please report this as a bug if you used install.sh." % (user, file))
 
-            # launch db_install as the domogik user
-            #uid = user_entry.pw_uid
-            #user_home = user_entry.pw_dir
-            #os.setreuid(0,uid)
-            #old_home = os.environ['HOME']
-            #os.environ['HOME'] = user_home
-            #os.system('python src/domogik/install/db_install.py')
-            #os.setreuid(0,0)
-            #os.environ['HOME'] = old_home
-
-
             try:
                 import traceback
                 # we must activate the domogik module as setup.py is launched from install.py and just after we try
@@ -634,35 +619,31 @@ def install():
                 pkg_resources.get_distribution("domogik").activate()
                 from domogik.install.db_install import DbInstall
             except:
-                print("Trace: {0}".format(traceback.format_exc()))
+                print(u"Trace: {0}".format(traceback.format_exc()))
 
             dbi = DbInstall()
             if not args.no_create_database:
                 dbi.create_db()
             dbi.install_or_upgrade_db(args.skip_database_backup, args.command_line)
 
-        # change permissions to some files created as root during the installation to the domogik user
-        try:
-            user_entry = pwd.getpwnam(user)
-        except KeyError:
-            raise KeyError("The user {0} does not exists, you MUST create it or change the DOMOGIK_USER parameter in {1}. Please report this as a bug if you used install.sh.".format(user, file))
-        if os.path.isfile("/var/log/domogik/db_api.log"): 
+            # change permissions to some files created as root during the installation to the domogik user
             os.chown("/var/log/domogik/db_api.log", user_entry.pw_uid, -1)
-        os.chown("/var/lock/domogik/config.lock", user_entry.pw_uid, -1)
+            os.chown("/var/lock/domogik/config.lock", user_entry.pw_uid, -1)
+
 
         if not args.test:
-            print("Running test_config.py...")
-            os.system('python test_config.py')
-        print("\n\n")
+            print(u"Running test_config.py...")
+            os.system('python3 test_config.py')
+        print(u"\n\n")
     except SystemExit:
         # a sys.exit have been called, do not raise more errors
         pass
         sys.exit(1)
     except:
         import traceback
-        print("========= TRACEBACK =============")
+        print(u"========= TRACEBACK =============")
         print(traceback.format_exc())
-        print("=================================")
+        print(u"=================================")
         fail(sys.exc_info())
         sys.exit(1)
 
@@ -675,23 +656,6 @@ def add_arguments_for_config_file(parser, fle):
             key = "{0}_{1}".format(sect, item[0])
             parser.add_argument("--{0}".format(key),
                 help="Update section {0}, key {1} value".format(sect, item[0]))
-
-def get_distribution():
-    """ Find which distribution the server uses
-    """
-    try:
-        # first, try to use lsb_release tool
-        dist = check_output(["lsb_release", "-si"]).strip()
-        return dist
-    except CalledProcessError:
-        # lsb_release could not work with some python versions. 
-        # I encountered this on a Debian server : lsb_release had no python lib for python 3.x
-
-        # So we manually try to find the release, at least for Debian for now
-        if os.path.isfile("/etc/debian_version"):
-            print("Please ignore the ImportError just below")
-            return "Debian"
-        return "Unknown"
 
 if __name__ == "__main__":
     install()

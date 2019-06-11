@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 
 This module provides a class for cron-like scheduling systems, and
@@ -32,7 +32,7 @@ True
 >>> job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6)
 True
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import datetime
 import calendar
 import ephem
@@ -49,7 +49,7 @@ tzfinder = TimezoneFinder()
 __all__ = ["CronExpression", "DEFAULT_EPOCH", "SUBSTITUTIONS"]
 __license__ = "Public Domain"
 
-DAY_NAMES = zip(('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'), xrange(7))
+DAY_NAMES = zip(('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'), range(7))
 MINUTES = (0, 59)
 HOURS = (0, 23)
 DAYS_OF_MONTH = (1, 31)
@@ -59,7 +59,7 @@ YEARS = (2016, 2200)
 L_FIELDS = (DAYS_OF_WEEK, DAYS_OF_MONTH)
 FIELD_RANGES = (MINUTES, HOURS, DAYS_OF_MONTH, MONTHS, DAYS_OF_WEEK, YEARS)
 MONTH_NAMES = zip(('jan', 'feb', 'mar', 'apr', 'may', 'jun',
-                   'jul', 'aug', 'sep', 'oct', 'nov', 'dec'), xrange(1, 13))
+                   'jul', 'aug', 'sep', 'oct', 'nov', 'dec'), range(1, 13))
 DEFAULT_EPOCH = (1970, 1, 1, 0, 0, 0)
 SUBSTITUTIONS = {
     "@yearly": "0 0 1 1 *",
@@ -256,7 +256,7 @@ class CronExpression(object):
             cpm = ephem.next_solstice(date_tuple)
         elif self.string_tab in ['@dawn', '@dusk']:
             bobs = ephem.Sun()
-            date = "{0}/{1}/{2} 04:00".format(date_tuple[0], date_tuple[1], date_tuple[2])
+            date = "{0}/{1}/{2} 00:00".format(date_tuple[0], date_tuple[1], date_tuple[2])
             self._observer.date = date
 #            print date
             if self.string_tab == '@dawn':
@@ -436,7 +436,7 @@ class CronExpression(object):
             parse = parse.strip()
             increment = 1
             if parse == '*':
-                return set(xrange(minmax[0], minmax[1] + 1))
+                return set(range(minmax[0], minmax[1] + 1))
             elif parse.isdigit():
                 # A single number still needs to be returned as a set
                 value = int(parse)
@@ -471,11 +471,11 @@ class CronExpression(object):
 
                 if prefix < suffix:
                     # Example: 7-10
-                    return set(xrange(prefix, suffix + 1, increment))
+                    return set(range(prefix, suffix + 1, increment))
                 else:
                     # Example: 12-4/2; (12, 12 + n, ..., 12 + m*n) U (n_0, ..., 4)
-                    noskips = list(xrange(prefix, minmax[1] + 1))
-                    noskips+= list(xrange(minmax[0], suffix + 1))
+                    noskips = list(range(prefix, minmax[1] + 1))
+                    noskips+= list(range(minmax[0], suffix + 1))
                     return set(noskips[::increment])
         except:
             # TODO : handle the error in a better way !
@@ -487,26 +487,27 @@ if __name__ == "__main__":
     job = CronExpression("@fullmoon")
     print(u"*** {0} ***".format(job))
     print(u"Trigger now :  {0}".format(job.check_trigger_now()))
-    print(u"Trigger (2019, 3, 9, 7, 10) :  {0}".format(job.check_trigger((2019, 3, 9, 7, 10))))
-    print(u"next date from (2016, 12, 16, 0, 5) :  {0}".format(job.get_next_date_special((2016, 12, 16, 0, 5))))
+    print(u"Trigger (2019, 6, 17, 8, 30) :  {0}".format(job.check_trigger((2019, 6, 17, 8, 30))))
+    print(u"next date from (2019, 6, 5, 0, 5) :  {0}".format(job.get_next_date_special((2019, 6, 5, 0, 5))))
     print("")
     job = CronExpression("@dawn @location.LocationTest.1")
     print(u"*** {0} ***".format(job))
     print(u"Trigger now :  {0}".format(job.check_trigger_now()))
-    print(u"Trigger (2019, 3, 9, 7, 1) :  {0}".format(job.check_trigger((2019, 3, 9, 7, 01))))
-    print(u"next date from (2019, 03, 9) :  {0}".format(job.get_next_date_special((2019, 03, 9))))
-    print(job.check_trigger((2019, 02, 20, 06, 50)))
-    print(u"next date from (2019, 03, 10, 0, 5) :  {0}".format(job.get_next_date_special((2019, 03, 10, 0, 5))))
-    print(u"next date from (2019, 03, 12, 0, 5) :  {0}".format(job.get_next_date_special((2019, 03, 12, 0, 5))))
-    print(u"next date from (2019, 03, 14, 0, 5) :  {0}".format(job.get_next_date_special((2019, 03, 14, 0, 5))))
-    job = CronExpression("@dawn @location.LocationTest.1 sub 00:50")
-    print(u"Trigger (2019, 3, 9, 6, 11) :  {0}".format(job.check_trigger((2019, 3, 9, 6, 11))))
-    print(u"next date from (2019, 03, 9) :  {0}".format(job.get_next_date_special((2019, 03, 9))))
+    print(u"Trigger (2019, 6, 6, 5, 56) :  {0}".format(job.check_trigger((2019, 6, 6, 5, 56))))
+    print(u"next date from (2019, 6, 6) :  {0}".format(job.get_next_date_special((2019, 6, 6))))
+    print(job.check_trigger((2019, 2, 20, 6, 50)))
+    print(u"next date from (2019, 6, 7, 0, 5) :  {0}".format(job.get_next_date_special((2019, 6, 7, 0, 5))))
+    print(u"next date from (2019, 6, 8, 0, 5) :  {0}".format(job.get_next_date_special((2019, 6, 8, 0, 5))))
+    print(u"next date from (2019, 6, 9, 0, 5) :  {0}".format(job.get_next_date_special((2019, 6, 9, 0, 5))))
+    job = CronExpression("@dawn @location.LocationTest.1 sub 00:20")
+    print(u"Trigger (2019, 6, 6, 5, 36) :  {0}".format(job.check_trigger((2019, 6, 6, 5, 36))))
+    print(u"next date from (2019, 6, 5) :  {0}".format(job.get_next_date_special((2019, 6, 5))))
+
 #    print("")
 #    job = CronExpression("@dusk")
 #    print(job)
 #    print(job.check_trigger_now())
-#    print(job.check_trigger((2016, 12, 7, 7, 26)))
+#    print(job.check_trigger((2016, 12, 7, 7, 26,)))
 #    print("")
 #    job = CronExpression("@equinox")
 #    print(job._observer)
@@ -517,33 +518,33 @@ if __name__ == "__main__":
 #    print(job._observer)
 #    print(job)
 #    print(job.check_trigger_now())
-#    print(job.check_trigger((2016, 12, 21, 10, 44)))
-#    print(job.get_next_date_special((2016, 12, 22, 0, 5)))
+#    print(job.check_trigger((2016, 12, 21, 10, 44,)))
+#    print(job.get_next_date_special((2016, 12, 22, 0, 5,)))
 #    print("")
-#    #print(job.check_trigger((2010, 11, 17, 0, 0)))
+#    #print(job.check_trigger((2010, 11, 17, 0, 0,)))
 #    job = CronExpression("0 0 * * 1-5/2 find /var/log -delete")
 #    print(job)
 #    print(job.check_trigger_now())
-#    print(job.check_trigger((2010, 11, 17, 0, 0)))
-#    print(job.check_trigger((2012, 12, 21, 0 , 0)))
+#    print(job.check_trigger((2010, 11, 17, 0, 0,)))
+#    print(job.check_trigger((2012, 12, 21, 0 , 0,)))
 #    print("")
-#    job = CronExpression("@midnight Feed 'it'", (2010, 5, 1, 7, 0, -6))
+#    job = CronExpression("@midnight Feed 'it'", (2010, 5, 1, 7, 0, -6,))
 #    print(job)
-#    print(job.check_trigger((2010, 5, 1, 7, 0), utc_offset=-6))
-#    print(job.check_trigger((2010, 5, 1, 16, 0), utc_offset=-6))
-#    print(job.check_trigger((2010, 5, 2, 1, 0), utc_offset=-6))
+#    print(job.check_trigger((2010, 5, 1, 7, 0,), utc_offset=-6))
+#    print(job.check_trigger((2010, 5, 1, 16, 0,), utc_offset=-6))
+#    print(job.check_trigger((2010, 5, 2, 1, 0,), utc_offset=-6))
 #    print("")
 #    print(ephem.city("Paris"))
 #    print("**************************************************")
 #    job = CronExpression(("5-10 10,16 ? 2/3 1#2 2017/100"))
 #    print("cron valid : {0}".format(job.isValidate()))
-#    print(job.check_trigger((2017, 2, 13, 10 , 6)))
+#    print(job.check_trigger((2017, 2, 13, 10 , 6,)))
 #    print("")
 #    job = CronExpression(("10 12-15 ? 1-6 5 205"))
 #    print("cron valid : {0}".format(job.isValidate()))
-#    print(job.check_trigger((2017, 2, 13, 10 , 6)))
+#    print(job.check_trigger((2017, 2, 13, 10 , 6,)))
 #    print("")
 #    job = CronExpression(("*/10 */2 * * *"))
 #    print("cron valid : {0}".format(job.isValidate()))
-#    print(job.check_trigger((2017, 2, 13, 10 , 20)))
+#    print(job.check_trigger((2017, 2, 13, 10 , 20,)))
 #    print("")

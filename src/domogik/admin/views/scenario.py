@@ -211,7 +211,7 @@ def scenario_edit(id):
 def scenario_croncheckdate():
     data = {}
     try :
-        for k, v in request.args.iteritems():
+        for k, v in request.args.items():
             data[k] = v
         data['date'] = tuple ([int(i) for i in data['date'].split(',')])
         try :
@@ -234,7 +234,7 @@ def scenario_croncheckdate():
 def scenario_croncephemdate():
     data = {}
     try :
-        for k, v in request.args.iteritems():
+        for k, v in request.args.items():
             data[k] = v
         data['date'] = tuple ([int(i) for i in data['date'].split(',')])
         try :
@@ -294,7 +294,8 @@ def scenario_blocks_js():
 #   remove cron.CronTest from other sensors list
     del scenario_tests['cron.CronTest']
 
-    tests = scenario_tests.keys()
+#    tests = scenario_tests.keys()
+    tests = list(scenario_tests)
     try:
         tests.remove(u'sensor.SensorTest')
         tests.remove(u'sensor.SensorValueDummy')
@@ -327,7 +328,7 @@ def scenario_blocks_js():
         print(u"Error : no scenario actions found!")
         scenario_actions = {}
 
-    actions = scenario_actions.keys()
+    actions = list(scenario_actions)
     try:
         actions.remove(u'scenario.endis')
     except ValueError:
@@ -441,10 +442,12 @@ def scenario_blocks_js():
 
 
     ### actions
+    print("actions : {0}".format(scenario_actions))
     for act, params in scenario_actions.items():
         if act == "command.CommandAction": continue
         p = []
         jso = u""
+        print("action : {0} = {1}".format(act,  params))
         for par, parv in params['parameters'].items():
             papp = u"this.appendValueInput(\"{0}\").setAlign(Blockly.ALIGN_RIGHT)".format(par)
             papp += u".appendField(\"{0}\")".format(parv['description'])

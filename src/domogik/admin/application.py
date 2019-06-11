@@ -291,14 +291,14 @@ def jsonp_response(action_func):
 ### error pages
 @app.errorhandler(404)
 def page_not_found(e):
-    if u''.join(request.path).encode('utf-8').startswith('/rest/'):
+    if u''.join(request.path).encode('utf-8').startswith(b'/rest/'):
         return render_template('404_json.html'), 404
     else:
         return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def server_error(e):
-    if u''.join(request.path).encode('utf-8').startswith('/rest/'):
+    if u''.join(request.path).encode('utf-8').startswith(b'/rest/'):
         return render_template('500_json.html'), 500
     else:
         return render_template('500.html'), 500

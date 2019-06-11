@@ -1,10 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # Diagnostic script for Domogik
 #
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 import tempfile
 import traceback
 import os
@@ -74,7 +73,7 @@ def get_current_metrics():
         load_warn = True
     if not load_warn:
         ok("System load is ok")
-   
+
     mem = linux_metrics.mem_stat.mem_stats()
     used, total, _, _, _, _ = mem
     used = used/(1024*1024)
@@ -141,7 +140,7 @@ def test_config_files():
         error(u"Error while reading the configuration file '{0}' : {1}".format(CONFIG_FILE, traceback.format_exc()))
         solution("Make sure the Domogik installation is OK")
         return False
- 
+
 
 def test_free_disk_space():
     # TODO
@@ -188,7 +187,7 @@ def is_hub_alive():
     pass
 
 def send_xpl_and_get_it():
-    # TODO : 
+    # TODO :
     # - launch dmg_dump in a thread for 30 seconds and log in a file
     # - use dmg_send to send a xpl message
     # - check in dmg_dump logs id the xpl message was sent
@@ -246,12 +245,12 @@ def test_mq_pubsub():
     t = TestMQSub()
 
 def test_reqrep():
-    # TODO : 
+    # TODO :
     # - in a thread wait for some req and do the rep
     # - do the req
     # - chekc we get the rep
     pass
-    
+
 
 # MQ TESTS - SOME DOMOGIK MESSAGE WHILE DOMOGIK IS RUNNING
 #######################################################################################################
@@ -291,7 +290,7 @@ if __name__ == "__main__":
     # Ports
     title("Domogik web services up ?")
     test_ports_are_open()
-    
+
     # MQ
     title("Domogik Message Queue (MQ) checks")
     test_mq_mmi_services()  # test broker services

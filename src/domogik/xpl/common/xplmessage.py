@@ -73,12 +73,12 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function
+
 import re
 import copy
 
 from domogik.common.dmg_exceptions import XplMessageError
-from domogik.common.ordereddict import OrderedDict
+from collections  import OrderedDict
 
 REGEXP_TYPE = r"""(?P<type_>xpl-cmnd | xpl-trig | xpl-stat)
               """
@@ -127,7 +127,7 @@ try:
                              =
                              (?P<data_value>[%s].*)$
                          )
-                     """ % re.escape(''.join(chr(x) for x in xrange(32, 256)))
+                     """ % re.escape(''.join(chr(x) for x in range(32, 256)))
 except NameError:
     # python 3
     REGEXP_SINGLE_DATA = r"""(?P<data>
@@ -395,7 +395,7 @@ class XplMessage(object):
 
         @raise XplMessageError: invalid message packet
         """
-        match_global = XplMessage.__regexp_global.match(packet)
+        match_global = XplMessage.__regexp_global.match(packet.decode("utf-8"))
         if match_global is None:
             raise XplMessageError("Invalid message packet")
         else:
@@ -492,12 +492,12 @@ class FragmentedXplMessage(object):
         if ids[1] != self._fragment_count:
             raise ValueError("The number of fragments is not the same as previous fragments")
         self._fragments[int(ids[0])] = fragment
-        
+
     def _extract_ids(self, fragment):
         """ Extract message IDs from a fragment
         @param fragment : one fragment of the message
         @type fragment XplMessage
-        
+
         @return a tuple with (fragment number, #of fragments, the message ID)
         @raise ValueError if no message ID can be extracted
         """
@@ -583,7 +583,7 @@ class FragmentedXplMessage(object):
                     msg = FragmentedXplMessage.__init_fragment(message, uid)
                     FragmentedXplMessage.__try_add_item_to_message(msg, k, message.data[k])
                     f_id = f_id + 1
-                    
+
         message_list[f_id] = msg
         return FragmentedXplMessage.__update_fragments_ids(message_list, uid)
 
@@ -611,7 +611,7 @@ class FragmentedXplMessage(object):
         msg.set_schema("fragment.basic")
         msg.set_source(message.source)
         msg.set_target(message.target)
-        msg.add_single_data("partid","##/##:%s" % uid) 
+        msg.add_single_data("partid","##/##:%s" % uid)
         msg.add_single_data("schema", message.schema)
         return msg
 

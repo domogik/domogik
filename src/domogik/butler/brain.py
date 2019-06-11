@@ -34,7 +34,7 @@ Implements
 @organization: Domogik
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 from domogik.common.plugin import PACKAGES_DIR, RESOURCES_DIR
 from domogik.common.configloader import Loader, CONFIG_FILE
 from domogikmq.message import MQMessage
@@ -84,7 +84,7 @@ def clean_input(data):
         data = ""
 
     if isinstance(data, str):
-        data = unicode(data, 'utf-8')
+        data = bytes(data, 'utf-8').decode('utf-8')
 
     # put all in lower case
     data = data.lower()
@@ -153,7 +153,7 @@ def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, senso
     """
     # if several datatype have been provided
     dt_type_list = dt_type_list.split("|")
-       
+
     if isinstance(device_name, list):
         device_name = ' '.join(device_name)
 
@@ -165,7 +165,7 @@ def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, senso
     log.info(u"Device name = '{0}', type = '{1}'".format(device_name, type(device_name)))
     log.info(u"Datatype(s) = {0}".format(dt_type_list))
 
-    ### search for all devices of the appropriate dt_type 
+    ### search for all devices of the appropriate dt_type
     if sensor_reference:
         check_preferences = False
     else:
@@ -221,7 +221,7 @@ def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, senso
         last_received = res['values'][0]['timestamp']
 
         log.info(u"The value is : '{0}'".format(the_value))
-    
+
         # do some checks to see if we should try to convert as a float or not
         do_convert = True
         if the_value != None and len(the_value) > 0:
@@ -229,7 +229,7 @@ def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, senso
             # be converted
             if the_value[0] == "0":
                 do_convert = False
-    
+
         if do_convert:
             try:
                 if len(user_locale.split(".")) > 1:     # fr_FR.UTF-8
@@ -269,7 +269,7 @@ def _get_sensor_data(log, devices, user_locale, dt_type_list, device_name, senso
         except:
             log.error(u"ERROR : {0}".format(traceback.format_exc()))
             return None, None
-    
+
 
 def is_float_and_not_int(x):
     try:
@@ -327,7 +327,7 @@ def get_sensors_for_datatype(devices, dt_type_list, check_preferences = True, lo
             if len(candidates_for_this_device) > 1:
                 package = a_device["client_id"].split(".")[0]
                 #print(u"Check for preferences for the package '{0}'....".format(package))
-                if preferences.has_key(package): 
+                if preferences.has_key(package):
                     for a_dt_type in dt_type_list:
                         if preferences[package].has_key(a_dt_type):
                             log.info(u"Preferences found for datatype '{0}' : sensor '{1}'".format(a_dt_type, preferences[package][a_dt_type]))
@@ -344,7 +344,7 @@ def get_sensors_for_datatype(devices, dt_type_list, check_preferences = True, lo
                     for key in candidates_for_this_device:
                         candidates.append(candidates_for_this_device[key])
 
-        return candidates                
+        return candidates
     except:
         log.error(u"ERROR : {0}".format(traceback.format_exc()))
         pass
@@ -371,7 +371,7 @@ def filter_sensors_by_reference_and_device_name(candidates, reference, device_na
             pass
 
     return None
-    
+
 def filter_sensors_by_device_name(candidates, device_name, log):
     """ for each given sensor, check the most appropriate choice depending on device_name
     """
@@ -396,7 +396,7 @@ def filter_sensors_by_device_name(candidates, device_name, log):
 def learn(rs_code, comment = None):
     """ Add some rivescript code in a file
         and requets to reload the brain
-        @param rs_code : some rs_code. Example : 
+        @param rs_code : some rs_code. Example :
                   + ping
                   - pong
     """
@@ -408,7 +408,7 @@ def learn(rs_code, comment = None):
 
     utf8_data += rs_code.encode('UTF-8')
     with open(LEARN_FILE, "a") as file:
-        file.write(utf8_data + "\n\n") 
+        file.write(utf8_data + "\n\n")
 
 def do_command(log, devices, user_locale, dt_type_list, device, value, command_reference = None):
     """ Execute a command
@@ -425,7 +425,7 @@ def do_command(log, devices, user_locale, dt_type_list, device, value, command_r
     try:
         # if several datatype have been provided
         dt_type_list = dt_type_list.split("|")
-       
+
         device_name = device.lower()
         log.debug(u"Command : search device. Device name = {0}".format(device_name))
         #cli = MQSyncReq(zmq.Context())
@@ -448,7 +448,7 @@ def do_command(log, devices, user_locale, dt_type_list, device, value, command_r
                                     found = [a_device, a_command, pid]
                                     break
                         pid += 1
-                      
+
         #print("F={0}".format(found))
         if found:
             dev = found[0]
@@ -460,7 +460,7 @@ def do_command(log, devices, user_locale, dt_type_list, device, value, command_r
             msg = MQMessage()
             msg.set_action('cmd.send')
             msg.add_data('cmdid', dev['commands'][cid]['id'])
- 
+
             # special case : for DT_Trigger, the value is always 1
             if dt_type == "DT_Trigger":
                 msg.add_data('cmdparams', {dev['commands'][cid]['parameters'][pid]['key'] : 1})
@@ -543,7 +543,7 @@ def process_star(not_understood_responses, suggest_intro, rs):
     if found_suggest == False:
         query = u"{0}\n".format(query)
         with open(STAR_FILE, "a") as file:
-            file.write(query.encode('UTF-8')) 
+            file.write(query.encode('UTF-8'))
         return not_understood_responses[randint(0, len(not_understood_responses)-1)]
 
 

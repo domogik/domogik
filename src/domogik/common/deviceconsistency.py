@@ -233,7 +233,7 @@ class DeviceConsistency():
             else:
                 self._addToResult('device_param', 'del', data)
         else:
-            print "{0} = {1}".format(code, data)
+            print("{0} = {1}".format(code, data))
 
     def _validate_identity(self):
         # check its the correct file
@@ -316,16 +316,16 @@ class DeviceConsistency():
                     if xplstat not in self.d_json['xpl_stats'].keys():
                         self._raise(6, xplstat)
                     self._validate_xpl_stat(xplstat)
-        print "-6 TODO old linked xplstats for sensor"
+        print("-6 TODO old linked xplstats for sensor")
 
     def _validate_xpl_command(self, cmd):
-        print "TODO xpl command {0}".format(cmd)
-        print "TODO xpl command params {0}".format(cmd)
+        print("TODO xpl command {0}".format(cmd))
+        print("TODO xpl command params {0}".format(cmd))
 
     def _validate_xpl_stat(Self, stat):
         # check that all xpl_stats exist + all params are there
-        print "TODO xpl stat {0}".format(stat)
-        print "TODO xpl stat params {0}".format(stat)
+        print("TODO xpl stat {0}".format(stat))
+        print("TODO xpl stat params {0}".format(stat))
 
 if __name__ == "__main__":
     db = DbHelper(owner="Device consistency for main")
@@ -338,4 +338,4 @@ if __name__ == "__main__":
     # diskfree
     dc = DeviceConsistency("blah", device_json, plugin_json.json)
     dc.check()
-    print dc.get_result()
+    print(dc.get_result())

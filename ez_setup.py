@@ -1,4 +1,4 @@
-#!python
+#!/usr/bin/env python3
 """Bootstrap setuptools installation
 
 If you want to use setuptools in your package's setup.py, just include this
@@ -13,7 +13,6 @@ the appropriate options to ``use_setuptools()``.
 
 This file can also be run as a script to install or upgrade setuptools.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 import sys
 DEFAULT_VERSION = "0.6c11"
 DEFAULT_URL     = "http://pypi.python.org/packages/%s/s/setuptools/" % sys.version[:3]
@@ -93,7 +92,7 @@ def use_setuptools(
     try:
         import pkg_resources
     except ImportError:
-        return do_download()       
+        return do_download()
     try:
         pkg_resources.require("setuptools>="+version); return
     except pkg_resources.VersionConflict as e:
@@ -122,14 +121,7 @@ def download_setuptools(
     with a '/'). `to_dir` is the directory where the egg will be downloaded.
     `delay` is the number of seconds to pause before an actual download attempt.
     """
-    import shutil
-    try:
-        # For Python 3.0 and later
-        from urllib.request import urlopen
-    except ImportError:
-        # Fall back to Python 2's urllib2
-        from urllib2 import urlopen
-
+    import urllib2, shutil
     egg_name = "setuptools-%s-py%s.egg" % (version,sys.version[:3])
     url = download_base + egg_name
     saveto = os.path.join(to_dir, egg_name)
@@ -155,7 +147,7 @@ and place it in this directory before rerunning this script.)
                     version, download_base, delay, url
                 ); from time import sleep; sleep(delay)
             log.warn("Downloading %s", url)
-            src = urlopen(url)
+            src = urllib2.urlopen(url)
             # Read/write all in one block, so we don't create a corrupt file
             # if the download is interrupted.
             data = _validate_md5(egg_name, src.read())

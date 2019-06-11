@@ -7,7 +7,7 @@
 
 # TODO :
 # - magic utf8 thing in header
-# - no (" but only (u" 
+# - no (" but only (u"
 # - no while.*true
 # - no doc error
 
@@ -97,7 +97,7 @@ class Review():
     def __init__(self, pkg_dir, format):
         self.is_warning = False
         self.is_error = False
-    
+
         self.pkg_dir = pkg_dir
         self.format = format
         if self.format == "html":
@@ -135,8 +135,8 @@ class Review():
         self.doc_url_en_version = self.build_doc_url("en", self.pkg_version)
         #self.doc_url_fr_version = self.build_doc_url("fr", self.pkg_version)
         self.build_doc()
-        
-    
+
+
         ### Summary
         self.title("Manual checklist")
 
@@ -167,7 +167,7 @@ class Review():
 
     # LOG FUNCTIONS
     #######################################################################################################
-    
+
     def title(self, msg):
         if self.format == "html":
             print(u"<h2>{0}</h2>".format(msg))
@@ -177,7 +177,7 @@ class Review():
             print(u"   {0}".format(msg))
             print(u"===========================================================")
             print(u"")
-    
+
     def image(self, path):
         if self.format == "html":
             print(u"<div>")
@@ -186,7 +186,7 @@ class Review():
         else:
             # no display in shell
             pass
-    
+
     def action(self, msg):
         if self.format == "html":
             print(u"<div class='action'>")
@@ -195,7 +195,7 @@ class Review():
             print(u"</div>")
         else:
             print(u"ok[ ]  ko[ ]  n/a[ ] : {0}".format(msg))
-    
+
     def ok(self, msg, msg2 = ""):
         if self.format == "html":
             print(u"<div class='ok'>")
@@ -206,7 +206,7 @@ class Review():
             print(u"</div>")
         else:
             print(u"OK       : {0}".format(msg))
-    
+
     def info(self, msg, msg2 = ""):
         if self.format == "html":
             print(u"<div class='info'>")
@@ -219,7 +219,7 @@ class Review():
             if msg2 != "":
                 msg2 = u": {0}".format(msg2)
             print(u"INFO     : {0} {1}".format(msg, msg2))
-    
+
     def warning(self, msg, msg2 = ""):
         if self.format == "html":
             print(u"<div class='warning'>")
@@ -231,7 +231,7 @@ class Review():
         else:
             print(u"WARNING  : {0}".format(msg))
             self.is_warning = True
-    
+
     def error(self, msg, msg2 = ""):
         if self.format == "html":
             msg = msg.replace("\n", "<br>")
@@ -244,14 +244,14 @@ class Review():
         else:
             print(u"ERROR    : {0}".format(msg))
         self.is_error = True
-    
+
     def solution(self, msg):
         if self.format == "html":
             print(u"<div class='solution'><span class='glyphicon glyphicon-pencil' aria-hidden='true'></span> <span class='text'>{0}</span></div>".format(msg))
         else:
             print(u"SOLUTION : {0}".format(msg))
-    
-    
+
+
     # Dedicated HTML functions
     #######################################################################################################
 
@@ -304,10 +304,10 @@ class Review():
                       <script src="/static/js/bootstrap-3.1.1.min.js"></script>
                     </body>
                   </html>""")
-    
+
     # Json checks
     #######################################################################################################
-    
+
     def load_json(self):
         try:
             self.json_data = json.load(open(os.path.join(self.pkg_dir, "info.json")))
@@ -332,7 +332,7 @@ class Review():
         self.info("Package author             ", "{0}".format(self.pkg_author))
         self.info("Package author email       ", "{0}".format(self.pkg_author_email))
 
-    
+
     def is_xpl_plugin(self):
         try:
             self.xpl_cmds = self.json_data["xpl_commands"]
@@ -350,11 +350,11 @@ class Review():
 
     # Files checks
     #######################################################################################################
-    
+
     def check_important_files(self):
         # git related
         self.check_file_exists(".gitignore")
-    
+
         # all packages related
         self.check_file_exists("__init__.py")
 
@@ -368,25 +368,25 @@ class Review():
             self.check_file_exists("rs/en_EN")
             self.check_file_exists("rs/en_US")
             self.check_file_exists("rs/nl_NL")
-    
+
         # license related
         self.check_file_exists("LICENSE")
         self.check_file_exists("COPYING")
-    
+
         # doc related
         self.check_file_exists("README.md")
         self.check_file_exists("CHANGELOG")
         self.check_file_exists("docs/index.txt")
         self.check_file_exists("docs/{0}.txt".format(self.pkg_name))
         self.check_file_exists("docs/changelog.txt")
-    
+
         # icon related
         self.has_icon = self.check_file_exists("design/icon.png")
-    
+
         # tests related
         self.has_automated_tests = self.check_file_exists("tests/tests.json")
-        
-    
+
+
     def check_file_exists(self, filename):
         if not os.path.isfile(os.path.join(self.pkg_dir, filename)):
             self.error("A file is missing : '{0}'".format(filename))
@@ -394,10 +394,10 @@ class Review():
         else:
             self.ok("File present", "{0}".format(filename))
             return True
-    
+
     # Design
     #######################################################################################################
-    
+
     def check_design(self):
         h, w = self.get_image_size(os.path.join(self.pkg_dir, "design/icon.png"))
         if h != 96 or w != 96:
@@ -412,29 +412,29 @@ class Review():
         dependencies except the os and struct modules from core
         """
         size = os.path.getsize(file_path)
-    
+
         with open(file_path) as input:
             height = -1
             width = -1
             data = input.read(25)
-    
+
             if (size >= 10) and data[:6] in ('GIF87a', 'GIF89a'):
                 # GIFs
                 w, h = struct.unpack("<HH", data[6:10])
                 width = int(w)
                 height = int(h)
-            elif ((size >= 24) and data.startswith('\211PNG\r\n\032\n')
+            elif ((size >= 24) and data.startswith(b'\211PNG\r\n\032\n')
                   and (data[12:16] == 'IHDR')):
                 # PNGs
                 w, h = struct.unpack(">LL", data[16:24])
                 width = int(w)
                 height = int(h)
-            elif (size >= 16) and data.startswith('\211PNG\r\n\032\n'):
+            elif (size >= 16) and data.startswith(b'\211PNG\r\n\032\n'):
                 # older PNGs?
                 w, h = struct.unpack(">LL", data[8:16])
                 width = int(w)
                 height = int(h)
-            elif (size >= 2) and data.startswith('\377\330'):
+            elif (size >= 2) and data.startswith(b'\377\330'):
                 # JPEG
                 msg = " raised while trying to decode as JPEG."
                 input.seek(0)
@@ -463,7 +463,7 @@ class Review():
                 raise UnknownImageFormat(
                     "Sorry, don't know how to get information from this file."
                 )
-    
+
         return width, height
 
 
@@ -477,7 +477,7 @@ class Review():
         if version != "":
             url += "/{0}".format(version)
         return url
-    
+
     def build_doc(self):
 
         conf_py = os.path.join(DMG_SRC, "docs")
@@ -496,7 +496,7 @@ class Review():
         else:
             self.error(u"Error on compiling the doc.\n\nSTDOUT : \n{0}\n\nSTDERR :\n{1}\n\n".format(clean_input(result[0]), clean_input(result[1])))
             return
-    
+
 
     # Code
     #######################################################################################################
@@ -545,7 +545,7 @@ class Review():
 
 
 
-    
+
 class UnknownImageFormat(Exception):
     pass
 

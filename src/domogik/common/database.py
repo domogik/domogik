@@ -37,7 +37,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function
+
 import datetime, hashlib, time
 from pytz import utc, timezone
 from time import mktime
@@ -52,6 +52,7 @@ from sqlalchemy.sql.expression import func, extract
 from sqlalchemy.orm import sessionmaker, defer, scoped_session, joinedload
 from sqlalchemy.orm.session import make_transient
 from sqlalchemy.pool import QueuePool
+
 #from sqlalchemy.cprocessors import str_to_datetime
 from domogik.common.utils import ucode, get_sanitized_hostname
 from domogik.common import logger
@@ -97,7 +98,7 @@ def _make_crypted_password(clear_text_password):
 
     """
     password = hashlib.sha256()
-    password.update(clear_text_password.encode('utf-8'))
+    password.update(clear_text_password.encode('utf8'))
     return password.hexdigest()
 
 def _datetime_string_from_tstamp(ts):
@@ -173,7 +174,7 @@ class DbHelper(object):
         if use_cache :
             CacheDB.register('get_cache')
             port_c = 40409 if not 'portcache' in self.__db_config else int(self.__db_config['portcache'])
-            m = CacheDB(address=('localhost', port_c), authkey=b'{0}'.format(self.__db_config['password']))
+            m = CacheDB(address=('localhost', port_c), authkey='{0}'.format(self.__db_config['password']).encode('utf-8'))
             m.connect()
             self.log.info(u"New client connected to memory cache : {0}".format(self._owner))
             self._cacheDB = m.get_cache()
@@ -198,7 +199,7 @@ class DbHelper(object):
             if engine != None:
                 DbHelper.__engine = engine
             else:
-                DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output, encoding='utf8',
+                DbHelper.__engine = sqlalchemy.create_engine(url, echo = echo_output,
                                                              pool_recycle=pool_recycle, pool_size=20, max_overflow=10)
         if DbHelper.__session_object == None:
             DbHelper.__session_object = scoped_session(sessionmaker(bind=DbHelper.__engine, autoflush=True, expire_on_commit=False))
@@ -334,6 +335,9 @@ class DbHelper(object):
         for item in core_plugin :
             listC.append(item.id)
         self.log.debug(u"get core config : {0}".format(listC))
+        if listC == []:
+            print("No core config find !", core_plugin)
+            return {}
         cfg = self.__session.query(PluginConfig).filter_by(plugin_id=listC).all()
         if key == None:
             res = {}
@@ -382,6 +386,8 @@ class DbHelper(object):
         listP = []
         for item in plugins :
             listP.append(item.id)
+        if listP == []:
+            return []
         cfg =  self.__session.query(
                 PluginConfig
                     ).filter_by(plugin_id=listP
@@ -404,6 +410,7 @@ class DbHelper(object):
         @return a PluginConfigData object
 
         """
+        ret = []
         if self._cacheDB and self._cacheDB.upToDateConfig(pl_id, pl_hostname) :
             return self._cacheDB.getConfig(pl_id, pl_hostname, pl_key)
         try:
@@ -414,6 +421,8 @@ class DbHelper(object):
             listP = []
             for item in plugins :
                 listP.append(item.id)
+            if listP == []:
+                return []
             cfg =  self.__session.query(
                     PluginConfig
                         ).filter_by(plugin_id=listP
@@ -798,7 +807,7 @@ class DbHelper(object):
             self.__session.expire_all()
 
             ### Add the device itself
-            self.log.debug("Device creation : inserting data in core_device...")
+            self.log.debug(u"Device creation : inserting data in core_device...")
             device = Device(name=params['name'], device_type_id=params['device_type'], \
                     client_id=params['client_id'], client_version=client_data['identity']['version'], \
                     description=params['description'], reference=params['reference'], info_changed=func.now())
@@ -812,14 +821,14 @@ class DbHelper(object):
 
             ### Table core_sensor
             # first, get the sensors associated to the device_type
-            self.log.debug("Device creation : start to process the sensors")
+            self.log.debug(u"Device creation : start to process the sensors")
             device_type_sensors = client_data['device_types'][params['device_type']]['sensors']
-            self.log.debug("Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
+            self.log.debug(u"Device creation : list of sensors available for the device : {0}".format(device_type_sensors))
 
             # then, for each sensor, create it in databse for the device
             stats_list = []
             for a_sensor in device_type_sensors:
-                self.log.debug("Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
+                self.log.debug(u"Device creation : inserting data in core_sensor for '{0}'...".format(a_sensor))
                 sensor_in_client_data = client_data['sensors'][a_sensor]
                 sensor = Sensor(name = sensor_in_client_data['name'], \
                                 device_id  = device.id, \
@@ -853,9 +862,9 @@ class DbHelper(object):
 
             ### Table core_xplstat
             stats_list = list(set(stats_list))
-            self.log.debug("Device creation : xplstats to be created '{0}'...".format(stats_list))
+            self.log.debug(u"Device creation : xplstats to be created '{0}'...".format(stats_list))
             for a_xplstat in stats_list:
-                self.log.debug("Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
+                self.log.debug(u"Device creation : inserting data in xpl_stats for '{0}'...".format(a_xplstat))
                 xplstat_in_client_data = client_data['xpl_stats'][a_xplstat]
                 xplstat = self.add_device_and_commands_xplstat(device.id, created_sensors, a_xplstat, xplstat_in_client_data, params)
                 created_xpl_stats[a_xplstat] = xplstat.id
@@ -864,12 +873,12 @@ class DbHelper(object):
 
             ### Table core_command
             # first, get the commands associated to the device_type
-            self.log.debug("Device creation : start to process the commands")
+            self.log.debug(u"Device creation : start to process the commands")
             device_type_commands = client_data['device_types'][params['device_type']]['commands']
-            self.log.debug("Device creation : list of commands available for the device : {0}".format(device_type_commands))
+            self.log.debug(u"Device creation : list of commands available for the device : {0}".format(device_type_commands))
 
             for a_command in device_type_commands:
-                self.log.debug("Device creation : inserting data in core_command for '{0}'...".format(a_command))
+                self.log.debug(u"Device creation : inserting data in core_command for '{0}'...".format(a_command))
                 command_in_client_data = client_data['commands'][a_command]
                 command = Command(name = command_in_client_data['name'], \
                                   device_id = device.id, \
@@ -878,7 +887,7 @@ class DbHelper(object):
                 self.__session.add(command)
                 self.__session.flush()
 
-                self.log.debug("Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
+                self.log.debug(u"Device creation : inserting data in core_command_param for '{0}'...".format(a_command))
                 for command_param in client_data['commands'][a_command]['parameters']:
                     pa = CommandParam(command.id, \
                                       command_param['key'], \
@@ -890,7 +899,7 @@ class DbHelper(object):
 
                 ### Table core_xplcommand
                 if 'xpl_command' in command_in_client_data:
-                    self.log.debug("Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
+                    self.log.debug(u"Device creation : inserting data in core_xplcommand for '{0}'...".format(a_command))
                     x_command = client_data['xpl_commands'][command_in_client_data['xpl_command']]
                     if x_command['xplstat_name'] in created_xpl_stats.keys():
                         xplstatid = created_xpl_stats[x_command['xplstat_name']]
@@ -952,7 +961,7 @@ class DbHelper(object):
             self.log.error(u"Error when adding a device. Params = {0}      | Client_data = {1}    | Error : {2}".format(params, client_data, traceback.format_exc()))
 
     def add_device_and_commands_xplstat(self, devid, sensors, a_xplstat, xplstat_in_client_data, params):
-        self.log.debug("Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
+        self.log.debug(u"Device creation : adding xplstats '{0}'...".format(xplstat_in_client_data['name']))
         xplstat = XplStat(name = xplstat_in_client_data['name'], \
               schema = xplstat_in_client_data['schema'], \
               device_id = devid, \
@@ -962,7 +971,7 @@ class DbHelper(object):
 
         ### Table core_xplstat_param
         for a_parameter in xplstat_in_client_data['parameters']['static']:
-            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_xplstat, a_parameter))
+            self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0} : static {1}'...".format(a_xplstat, a_parameter))
             parameter =  XplStatParam(xplstat_id = xplstat.id , \
                                       sensor_id = None, \
                                       key = a_parameter['key'], \
@@ -975,7 +984,7 @@ class DbHelper(object):
 
         # dynamic parameters
         for a_parameter in xplstat_in_client_data['parameters']['dynamic']:
-            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0} : dynamic {1}'...".format(a_xplstat, a_parameter))
+            self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0} : dynamic {1}'...".format(a_xplstat, a_parameter))
             # set some values before inserting data
             if 'ignore_values' not in a_parameter:
                 a_parameter['ignore_values'] = None
@@ -992,7 +1001,7 @@ class DbHelper(object):
 
         # device parameters
         for a_parameter in xplstat_in_client_data['parameters']['device']:
-            self.log.debug("Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
+            self.log.debug(u"Device creation : inserting data in core_xplstat_param for '{0}' : device {1}'...".format(a_xplstat, a_parameter))
             for p2 in params['xpl_stats'][a_xplstat]:
                 if p2['key'] == a_parameter['key']:
                     #print p2
@@ -1146,10 +1155,10 @@ class DbHelper(object):
         llist = []
         fdo = False
         for sen in self.get_sensor_by_device_id(d_id):
-            llist.append(Scenario.json.like('%sensor.SensorTest.{0}"%'.format(sen.id)))
+            llist.append(Scenario.json.like(u'%sensor.SensorTest.{0}"%'.format(sen.id)))
             fdo = True
         for cmd in self.get_command_by_device_id(d_id):
-            llist.append(Scenario.json.like('%command.CommandAction.{0}"%'.format(cmd.id)))
+            llist.append(Scenario.json.like(u'%command.CommandAction.{0}"%'.format(cmd.id)))
             fdo = True
         if fdo:
             scens = self.__session.query(Scenario).filter( or_(*llist) ).all()
@@ -1331,7 +1340,7 @@ class DbHelper(object):
             else:
                 self.__raise_dbhelper_exception(u"Can not add history to not existing sensor: {0}".format(sid), True)
         except:
-            self.__raise_dbhelper_exception("Error when adding data to sensor history. Sensor id = {0}  | Value = {1}  | Date = {2}. Error is {3}".format(sid, value, date, traceback.format_exc()))
+            self.__raise_dbhelper_exception(u"Error when adding data to sensor history. Sensor id = {0}  | Value = {1}  | Date = {2}. Error is {3}".format(sid, value, date, traceback.format_exc()))
         return data
 
     def list_sensor_history(self, sid, num=100):
@@ -1642,10 +1651,6 @@ class DbHelper(object):
         user_account = UserAccount(login=a_login, password=_make_crypted_password(a_password),
                                    person_id=a_person_id, is_admin=a_is_admin, skin_used=a_skin_used, lock_edit=a_lock_edit, lock_delete=a_lock_delete)
         self.__session.add(user_account)
-        try:
-            self.__session.commit()
-        except Exception as sql_exception:
-            self.__raise_dbhelper_exception("SQL exception (commit) : {0}".format(sql_exception), True)
         self._do_commit()
         return user_account
 
@@ -1786,9 +1791,9 @@ class DbHelper(object):
         user_account = self.add_user_account(a_login=default_user_account_login, a_person_id=person.id, a_password='123',
                                      a_is_admin=True, a_lock_delete=True)
 
-        person = self.add_person(p_first_name='Rest', p_last_name='Anonymous',
+        person = self.add_person(p_first_name=u'Rest', p_last_name=u'Anonymous',
                                  p_birthdate=datetime.date(1900, 1, 1))
-        user_account = self.add_user_account(a_login='Anonymous', a_person_id=person.id, a_password='Anonymous',
+        user_account = self.add_user_account(a_login=u'Anonymous', a_person_id=person.id, a_password=u'Anonymous',
                                      a_is_admin=False, a_lock_delete=True, a_lock_edit=True)
         return user_account
 

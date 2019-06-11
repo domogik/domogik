@@ -37,8 +37,8 @@ Implements
 from domogik.common.defaultloader import DefaultLoader
 from domogik.common.configloader import Loader
 from domogik.common import logger
-from multiprocessing import Lock
-from multiprocessing.managers import SyncManager, active_children, current_process
+from multiprocessing import Lock, active_children, current_process
+from multiprocessing.managers import SyncManager
 from threading import Thread
 
 import signal
@@ -245,7 +245,7 @@ class WorkerCache(object):
         self._cache = CacheData()
         MyManager.register('get_cache', callable=lambda:self._cache)
         MyManager.register('force_leave', callable=lambda:self.force_leave())
-        self.cacheManager = MyManager(address=('localhost', port_c), authkey=b'{0}'.format(db_config['password']))
+        self.cacheManager = MyManager(address=('localhost', port_c), authkey='{0}'.format(db_config['password']).encode('utf-8'))
         self.cacheManager.start()
         self.log.info(u"Listening on port '{0}' [BIND]...".format(port_c))
         self._pPIDs = []

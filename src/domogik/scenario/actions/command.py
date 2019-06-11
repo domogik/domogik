@@ -24,7 +24,7 @@ along with Domogik. If not, see U{http://www.gnu.org/licenses}.
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 from domogik.scenario.actions.abstract import AbstractAction
 from domogik.common.utils import ucode
 from domogikmq.reqrep.client import MQSyncReq
@@ -53,7 +53,7 @@ class CommandAction(AbstractAction):
         # self.log.debug(u"Params = {0}".format(self._params))
         # Params = {'color1': '#ffff33', 'color2': '#ff0000'}
         for key in self._params:
-	    if type(self._params[key]) is str:
+            if type(self._params[key]) is str:
                 self._params[key] = ucode(self._params[key])
             self.log.debug(u"Command : Preprocess for param : key={0}, typeofvalue={1}, value={2}".format(key, type(self._params[key]), self._params[key]))
             params[key] = self._params[key]
@@ -61,9 +61,9 @@ class CommandAction(AbstractAction):
             # But we should not affect other variables...
             # For now, if the first character is a # we remove it
             # TODO : try improving by getting the real param type from blockly or json or whatever
-            #if key == "color" and params[key].startswith("#"):
+            #if key == "color" and params[key].startswith(b"#"):
             if isinstance(params[key], str) or isinstance(params[key], unicode):
-                if params[key].startswith("#"):
+                if params[key].startswith(b"#"):
                     self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
                     params[key] = params[key][1:]
 
@@ -77,7 +77,7 @@ class CommandAction(AbstractAction):
         msg.add_data('cmdid', self._cmdId)
         msg.add_data('cmdparams', params)
 
-        self.log.debug(u"Command : Command id = '{0}', command params = '{1}'".format(self._cmdId, params)) 
+        self.log.debug(u"Command : Command id = '{0}', command params = '{1}'".format(self._cmdId, params))
         # do the request
         res = cli.request('xplgw', msg.get(), timeout=10)
         if res:

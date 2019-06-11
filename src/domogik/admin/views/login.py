@@ -44,7 +44,7 @@ def rediret_to_login():
 @login_manager.request_loader
 @timeit
 def load_user_from_request(request):
-    if ucode(request.path).startswith('/rest/'):
+    if ucode(request.path).startswith(b'/rest/'):
         app.logger.debug("rest_auth = '{0}' (type='{1}')".format(app.dbConfig['rest_auth'], type(app.dbConfig['rest_auth'])))
         if app.dbConfig['rest_auth'] == True or app.dbConfig['rest_auth'] == 'True':
             auth = request.authorization

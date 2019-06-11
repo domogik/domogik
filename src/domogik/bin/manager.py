@@ -52,7 +52,7 @@ class Manager
 
 
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 # TODO : translate as from... import
 import os
 import sys
@@ -201,13 +201,14 @@ class Manager(XplPlugin, MQAsyncSub):
         self.log.info(u"Packages path : {0}".format(self.get_packages_directory()))
 
         ### Start cachedevice system
-        self._cache_pid = None
-        thr__runCacheDevices = Thread(None,
-                                      self._runCacheDevices,
-                                      "run_cache_devices",
-                                      (),
-                                      {})
-        thr__runCacheDevices.start()
+#        self._cache_pid = None
+#        thr__runCacheDevices = Thread(None,
+#                                      self._runCacheDevices,
+#                                      "run_cache_devices",
+#                                      (),
+#                                      {})
+#        thr__runCacheDevices.start()
+        self._runCacheDevices()
 
         ### Metrics
         self.metrics_processinfo = []
@@ -221,7 +222,6 @@ class Manager(XplPlugin, MQAsyncSub):
                                       "send_metrics",
                                       (),
                                       {})
-            thr_send_metrics.start()
 
 
 
@@ -277,6 +277,8 @@ class Manager(XplPlugin, MQAsyncSub):
                                               (),
                                               {})
         thr_check_available_packages.start()
+
+        thr_send_metrics.start()
 
         ### Check for xpl clients that are not part of Domogik
         # they are external clients
@@ -849,8 +851,8 @@ class Manager(XplPlugin, MQAsyncSub):
         fil = open(pid_file, "w")
         fil.write(str(self._cache_pid))
         fil.close()
-
-
+        # wait for end of init cache
+        self._stop.wait(2)
 
 class Package():
     """ This class is used to create a package object which contains the packages information (parts of the json).

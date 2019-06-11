@@ -1,4 +1,4 @@
-#i!/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -33,21 +33,14 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 import pkgutil
 import importlib
 import inspect
-import uuid
 import json
 import domogik.scenario.tests as s_t
-import domogik.scenario.parameters as s_p
 import domogik.scenario.actions as s_a
 from domogik.common.database import DbHelper
 from domogik.scenario.scenario import ScenarioInstance
-try:
-    from exceptions import KeyError
-except:
-    pass
 import traceback
 import time
 
@@ -257,19 +250,6 @@ class ScenarioManager(object):
             res = self._conditions[name].eval_condition()
             return {'name': name, 'result': res}
 
-    def trigger_actions(self, name):
-        """ Trigger that will be called when a condition evaluates to True
-        """
-        if name not in self._conditions_actions \
-                or name not in self._conditions:
-            raise KeyError('no key {0} in one of the _conditions tables table'.format(name))
-        else:
-            for action in self._conditions_actions[name]:
-                self._actions_mapping[action].do_action( \
-                        self._conditions[name], \
-                        self._conditions[name].get_mapping() \
-                        )
-    
     def list_actions(self):
         """ Return the list of actions
         @return a hash of hashes for the different actions

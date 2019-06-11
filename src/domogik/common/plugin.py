@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
@@ -35,7 +34,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import signal
 import threading
 import os
@@ -1010,7 +1009,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
-               os.mkdir(path, 0770)
+               os.mkdir(path, 0o770)
                self.log.info(u"Create directory {0}.".format(path))
            except:
                raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))
@@ -1051,7 +1050,7 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
                raise OSError("Can't write in directory {0}".format(path))
        else:
            try:
-               os.makedirs(path, 0777)
+               os.makedirs(path, 0o777)
                self.log.info(u"Create directory {0}.".format(path))
            except:
                raise OSError("Can't create directory {0}. Reason is : {1}.".format(path, traceback.format_exc()))
@@ -1200,9 +1199,9 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
     def __del__(self):
         if hasattr(self, "log"):
             self.log.debug(u"__del__ Single client")
-            #self.log.debug(u"the stack is :")
-            #for elt in inspect.stack():
-            #    self.log.debug(u"    {0}".format(elt))
+            self.log.debug(u"the stack is :")
+            for elt in inspect.stack():
+                self.log.debug(u"    {0}".format(elt))
             # we guess that if no "log" is defined, the client has not really started, so there is no need to call force leave (and _stop, .... won't be created)
             self.force_leave()
 
@@ -1213,10 +1212,11 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         """
         if hasattr(self, "log"):
             self.log.debug(u"force_leave called")
-            #self.log.debug(u"the stack is : {0}".format(inspect.stack()))
-            #self.log.debug(u"the stack is :")
-            #for elt in inspect.stack():
-            #    self.log.debug(u"    {0}".format(elt))
+            self.log.debug("traceback is : {0}.".format(traceback.format_exc()))
+            self.log.debug(u"the stack is : {0}".format(inspect.stack()))
+            self.log.debug(u"the stack is :")
+            for elt in inspect.stack():
+                self.log.debug(u"    {0}".format(elt))
 
         # try to stop the thread
         try:

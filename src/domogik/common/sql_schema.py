@@ -36,14 +36,11 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-import time, sys
-#from exceptions import AssertionError
 
-from sqlalchemy import ( \
-        types, create_engine, Table, Column, Index, Integer, Float, String, Enum, \
-        MetaData, ForeignKey, Boolean, DateTime, Date, Text, \
-        Unicode, UnicodeText, UniqueConstraint \
+from sqlalchemy import (
+        types, create_engine, Table, Column, Index, Integer, Float, String, Enum,
+        MetaData, ForeignKey, Boolean, DateTime, Date, Text,
+        Unicode, UnicodeText, UniqueConstraint
 )
 from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
@@ -55,12 +52,16 @@ import enum as pyEnum
 
 _cfg = Loader('database')
 _config = None
+# TODO : if no need
+#if len(sys.argv) > 1:
+#    _config = _cfg.load(sys.argv[1])
+#else:
 _config = _cfg.load()
 _db_prefix = dict(_config[1])['prefix']
 
 class RepresentableBase(object):
     def __repr__(self):
-        items = ("{0}='{1}'".format(k, v) for k, v in self.__dict__.items() if not k.startswith('_'))
+        items = ("{0}='{1}'".format(k, v) for k, v in self.__dict__.items() if not k.startswith(b'_'))
         return "<{0}: {1}>".format(self.__class__.__name__, ', '.join(items))
 
     @classmethod

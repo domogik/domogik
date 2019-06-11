@@ -1,6 +1,9 @@
 Official website : www.domogik.org
 
-[![Build Status](https://travis-ci.org/domogik/domogik.svg?branch=develop)](https://travis-ci.org/domogik/domogik)
+Branch Python3 (3.6+) only for test in developpement
+Work only with domogik-mq branche Python3 (3.6+)
+
+[![Build Status](https://travis-ci.org/domogik/domogik.svg?branch=python3)](https://travis-ci.org/domogik/domogik)
 
 INSTALL
 =======

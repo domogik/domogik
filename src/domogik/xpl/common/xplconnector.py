@@ -70,7 +70,7 @@ Implements
 @license: GPL(v3)
 @organization: Domogik
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+
 import sys
 import select
 import threading
@@ -196,7 +196,7 @@ class Manager:
                             % (self.p.get_plugin_name(), self._ip, self._port))
             self._h_timer = None
 
-      
+
             if self._nohub_mandatory == True:
                 # no xPL hub is requested for the plugin to start by the developper
                 # This means that we don't search for a xPL hub...
@@ -213,7 +213,7 @@ class Manager:
                 self.p.log.info("Plugin configure to have the xPL hub as mandatory!")
                 msg = "HUB discovery > starting"
                 self.p.log.info(msg)
-    
+
                 self._SendHeartbeat()
 
             #And finally we start network listener in a thread
@@ -263,7 +263,7 @@ class Manager:
         self.update_status(2)
         if lock:
             self.p.log.debug("Hbeat : Wait for stop flag")
-            self.get_stop().wait() 
+            self.get_stop().wait()
 
     def update_status(self, setto):
         """ Update internal plugin status
@@ -308,7 +308,7 @@ class Manager:
                         self._UDPSock.sendto(fragments[fragment].__str__(), (self._broadcast, 3865))
                 else:
                     self.p.log.debug("normal send")
-                    self._UDPSock.sendto(message.__str__(), (self._broadcast, 3865))
+                    self._UDPSock.sendto(str(message).encode("utf-8"), (self._broadcast, 3865))
             except:
                 if self.p.get_stop().is_set():
                     pass
@@ -457,7 +457,7 @@ class Listener:
         called with the message as parameter
         @param cb : the callback function
         @param manager : the manager instance
-        @param filter : dictionnary { key : value }. If value is a list, then the 
+        @param filter : dictionnary { key : value }. If value is a list, then the
         listener will check if the key equals any of these values
         """
         self.uuid = str(uuid.uuid1())
@@ -510,7 +510,7 @@ class Listener:
         if ok:
             self._manager.p.log.debug("Message match for listener {0}".format(self.uuid))
             try:
-                if self._cb_params != {} and self._callback.func_code.co_argcount > 1:  
+                if self._cb_params != {} and self._callback.func_code.co_argcount > 1:
                     thread = threading.Thread(target=self._callback, args = (message, self._cb_params), name="Manager-new-message-cb-%s" % suffixe)
                 else:
                     thread = threading.Thread(target=self._callback, args = (message,), name="Manager-new-message-cb-%s" % suffixe)
