@@ -1,5 +1,7 @@
 #!/bin/bash -e 
 # The -e option will make the bash stop if any command raise an error ($? != 0)
+# repository for python3.6-dev
+sudo add-apt-repository ppa:deadsnakes/ppa
 
 sudo apt-get update
 sudo apt-get install libzmq3-dev
