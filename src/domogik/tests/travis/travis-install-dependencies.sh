@@ -5,22 +5,22 @@ sudo add-apt-repository ppa:deadsnakes/ppa -y
 
 sudo apt-get update
 sudo apt-get install libzmq3-dev
-pip install pyzmq
-pip install argparse
+pip3 install pyzmq
+pip3 install argparse
 sudo apt-get install python3.6-dev gcc
 sudo apt-get install libssl-dev
 sudo apt-get install libmysqlclient-dev #mysql-client
-pip install psycopg2
-pip install docutils
-#pip install python-daemon==2.0.2
-#pip install netifaces
+pip3 install psycopg2
+pip3 install docutils
+#pip3 install python-daemon==2.0.2
+#pip3 install netifaces
 sudo apt-get install python-netifaces
-pip install chardet
+pip3 install chardet
 
 # for doc building
-pip install sphinx
-pip install sphinx-rtd-theme
-pip install sphinxcontrib-actdiag
-pip install sphinxcontrib-blockdiag
-pip install sphinxcontrib-nwdiag
-pip install sphinxcontrib-seqdiag
+pip3 install sphinx
+pip3 install sphinx-rtd-theme
+pip3 install sphinxcontrib-actdiag
+pip3 install sphinxcontrib-blockdiag
+pip3 install sphinxcontrib-nwdiag
+pip3 install sphinxcontrib-seqdiag

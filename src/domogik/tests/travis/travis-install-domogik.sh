@@ -8,10 +8,10 @@ sudo touch /var/lock/domogik/config.lock
 sudo chown $LOGNAME:root /var/lock/domogik/config.lock
 
 echo "==== RUNNING SETUP.py"
-pip install .
+pip3 install .
 
 echo "==== RUNNING pip install -r requirements.txt"
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 
 echo "==== RUNNING INSTALL.py"
