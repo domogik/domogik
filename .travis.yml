@@ -22,14 +22,12 @@ branches:
     - scenario
     - jsl-dawndusk
 python:
+ - "3.6"
  - "3.7"
- - "3.8-dev"
- - "nightly"
 matrix:
   allow_failures:
+    - "3.6"
     - "3.7"
-    - "3.8-dev"
-    - "nightly"
 services:
  - mysql
 mysql:

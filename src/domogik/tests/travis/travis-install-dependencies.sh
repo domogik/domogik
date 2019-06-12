@@ -2,10 +2,10 @@
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
 sudo apt-get update
-sudo apt-get install libzmq3-dev
+sudo apt-get install libzmq4-dev
 pip install pyzmq
 pip install argparse
-sudo apt-get install python2.7-dev gcc
+sudo apt-get install python3.6-dev gcc
 sudo apt-get install libssl-dev
 sudo apt-get install libmysqlclient-dev #mysql-client
 pip install psycopg2
