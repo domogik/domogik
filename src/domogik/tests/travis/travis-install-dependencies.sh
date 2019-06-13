@@ -14,7 +14,7 @@ pip3 install psycopg2
 pip3 install docutils
 #pip3 install python-daemon==2.0.2
 #pip3 install netifaces
-sudo apt-get install python-netifaces
+sudo apt-get install python3-netifaces
 pip3 install chardet
 
 # for doc building
