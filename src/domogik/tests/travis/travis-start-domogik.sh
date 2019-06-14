@@ -1,14 +1,17 @@
 #!/bin/bash -e 
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
-#source /home/travis/virtualenv/python3.6/bin/activate
+source /home/travis/virtualenv/python3.6/bin/activate
 
 # For debuging travis-ci entry_points
 echo "==== CHECK entry_points"
 echo "login: "$LOGNAME
 echo "PATH: "$PATH
 ls -l /usr/local/bin
-cat /usr/local/bin/dmg_dump
+echo "==== ls -l ~/.local"
+ls -l ~/.local
+PATH=$PATH:~/local/bin
+# cat /usr/local/bin/dmg_dump
 echo "which dmg_hub :"
 which dmg_hub
 
