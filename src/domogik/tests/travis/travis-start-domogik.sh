@@ -7,10 +7,10 @@ source /home/travis/virtualenv/python2.7/bin/activate
 echo "==== CHECK entry_points"
 echo "login: "$LOGNAME
 echo "PATH: "$PATH
+ls -l /usr/local/bin
+cat /usr/local/bin/dmg_dump
 echo "which dmg_hub :"
 which dmg_hub
-ls -l /usr/local/bin
-cat  cat /usr/local/bin/dmg_dump
 
 #sleep 10
 echo "==== START DOMOGIK"
