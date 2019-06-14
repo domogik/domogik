@@ -136,15 +136,15 @@ class PackageJson():
                                                            self.json["identity"]["name"])
             self.json["identity"]["icon_file"] = icon_file
 
-            if not self.json["identity"].has_key("xpl_clients_only"):
+            if "xpl_clients_only" not in self.json["identity"]:
                 self.json["identity"]["xpl_clients_only"] = False
 
-            if not self.json["identity"].has_key("compliant_xpl_clients"):
+            if "compliant_xpl_clients" not in self.json["identity"]:
                 self.json["identity"]["compliant_xpl_clients"] = []
 
             # common configuration items
             # to add only for a plugin with identity>xpl_clients_only not set to True !
-            if self.json["identity"]["type"] in ["plugin", "interface"] and not (self.json["identity"].has_key("xpl_clients_only") and self.json["identity"]["xpl_clients_only"] == True):
+            if self.json["identity"]["type"] in ["plugin", "interface"] and not ("xpl_clients_only" in self.json["identity"] and self.json["identity"]["xpl_clients_only"] == True):
                 auto_startup = {
                                    "default": False,
                                    "description": "Automatically start the client at Domogik startup",
@@ -158,7 +158,7 @@ class PackageJson():
                     if config_elt["key"] == "auto_startup":
                         raise PackageException("Configuration parameter 'auto_startup' has not to be defined in the json file. Please remove it")
                 self.json["configuration"].insert(0, auto_startup)
-                  
+
 
 
         except PackageException as exp:
@@ -181,7 +181,7 @@ class PackageJson():
     #    new_elt.setAttribute("priority", priority)
     #    new_elt.setAttribute("source", repo_url)
     #    top_elt.appendChild(new_elt)
-    #    cache_file = open("{0}/{1}".format(cache_folder, self.json_filename), "w") 
+    #    cache_file = open("{0}/{1}".format(cache_folder, self.json_filename), "w")
     #    cache_file.write(self.xml_content.toxml().encode("utf-8"))
     #    cache_file.close()
 
@@ -194,7 +194,7 @@ class PackageJson():
     #    new_elt = self.xml_content.createElementNS(None, 'repository')
     #    new_elt.setAttribute("source", source)
     #    top_elt.appendChild(new_elt)
-    #    my_file = open("{0}".format(self.info_file), "w") 
+    #    my_file = open("{0}".format(self.info_file), "w")
     #    my_file.write(self.xml_content.toxml().encode("utf-8"))
     #    my_file.close()
 
@@ -261,13 +261,13 @@ class PackageJson():
                 if type(devt["commands"]) != list:
                     raise PackageException("Commands list for device_type {0} is NOT a list!".format(devtype))
                 for cmd in devt["commands"]:
-                    if cmd not in self.json["commands"].keys():    
+                    if cmd not in self.json["commands"].keys():
                         raise PackageException("cmd {0} defined in device_type {1} is not found".format(cmd, devtype))
                 #check that all sensors exists inside each device type
                 if type(devt["sensors"]) != list:
                     raise PackageException("Sensors list for device_type {0} is NOT a list!".format(devtype))
                 for sens in devt["sensors"]:
-                    if sens not in self.json["sensors"].keys():    
+                    if sens not in self.json["sensors"].keys():
                         raise PackageException("sensor {0} defined in device_type {1} is not found".format(sens, devtype))
                 #see that each xplparam inside device_type has the following keys: key, description, type
                 expected = ["key", "type", "description", "xpl"]
@@ -371,7 +371,7 @@ class PackageJson():
                 for stat in xstat['parameters']['dynamic']:
                     self._validate_keys(expected, "a dynamic parameter for xpl_stat {0}".format(xstatid), stat.keys(), opt)
                     # check that the sensor exists
-                    if stat['sensor'] not in self.json["sensors"].keys():    
+                    if stat['sensor'] not in self.json["sensors"].keys():
                         raise PackageException("sensor {0} defined in xpl_stat {1} is not found".format(stat['sensor'], xstatid))
         except PackageException as exp:
             raise PackageException("Error validating the json: {0}".format(exp.value))
@@ -420,7 +420,7 @@ class PackageJson():
                     if stat['sensor'] not in ret:
                         ret[stat['sensor']] = []
                     ret[stat['sensor']].append( xstatid )
-                        
+
         return ret
 
 

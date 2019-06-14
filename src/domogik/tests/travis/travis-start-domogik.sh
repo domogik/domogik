@@ -6,14 +6,13 @@ source /home/travis/virtualenv/python3.6/bin/activate
 # For debuging travis-ci entry_points
 echo "==== CHECK entry_points"
 echo "login: "$LOGNAME
-echo "PATH: "$PATH
-ls -l /usr/local/bin
-echo "==== ls -l ~/.local"
-ls -l ~/.local
 PATH=$PATH:~/local/bin
-# cat /usr/local/bin/dmg_dump
+echo "PATH: "$PATH
+echo "==== ls -l ~/.local"
+ls -l ~/local/bin
 echo "which dmg_hub :"
 which dmg_hub
+cat /home/travis/virtualenv/python3.6.7/bin/dmg_hub
 
 #sleep 10
 echo "==== START DOMOGIK"

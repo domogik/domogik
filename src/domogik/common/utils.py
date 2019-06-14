@@ -228,7 +228,7 @@ def is_already_launched(log, type, id, manager=True):
         is_launched = True
         if log:
             log.info("Process found : {0}".format(line.rstrip("\n")))
-        the_pid = REGEXP_PS_SEPARATOR.split(line)[1]
+        the_pid = REGEXP_PS_SEPARATOR.split(line.decode("utf-8"))[1]
         pid_list.append(the_pid)
         #pid_list.append(line.rstrip("\n").split(" ")[0])
     subp.wait()
