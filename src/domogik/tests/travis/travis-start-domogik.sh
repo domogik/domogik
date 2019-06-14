@@ -1,7 +1,7 @@
 #!/bin/bash -e 
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
-source /home/travis/virtualenv/python3.6/bin/activate
+#source /home/travis/virtualenv/python3.6/bin/activate
 
 # For debuging travis-ci entry_points
 echo "==== CHECK entry_points"
