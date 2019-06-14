@@ -9,7 +9,7 @@ echo "login: "$LOGNAME
 PATH=$PATH:~/.local/bin
 echo "PATH: "$PATH
 echo "==== ls -l ~/.local"
-ls -l ~/.local/bin
+ls -l ~/.local
 echo "which dmg_hub :"
 which dmg_hub
 cat /home/travis/virtualenv/python3.6.7/bin/dmg_hub
