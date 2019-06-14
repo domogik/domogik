@@ -56,7 +56,7 @@ print(u"use: {0}".format(magic))
 print(u"******************************************")
 
 setup(
-    name = 'domogik',
+    name = 'Domogik',
     version = '0.6.5',
     url = 'http://www.domogik.org/',
     description = 'OpenSource home automation software',

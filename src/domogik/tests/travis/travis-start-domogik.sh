@@ -3,9 +3,17 @@
 
 source /home/travis/virtualenv/python2.7/bin/activate
 
-# AS of 7/01/2015 this should not be needed anymore
-#/etc/init.d/domogik-mq start
+# For debuging travis-ci entry_points
+echo "==== CHECK entry_points"
+echo "login: "$LOGNAME
+echo "PATH: "$PATH
+echo "which dmg_hub :"
+which dmg_hub
+ls -l /usr/local/bin
+cat  cat /usr/local/bin/dmg_dump
+
 #sleep 10
+echo "==== START DOMOGIK"
 /etc/init.d/domogik start
 sleep 10
 cat /var/log/domogik/core_manager.log
