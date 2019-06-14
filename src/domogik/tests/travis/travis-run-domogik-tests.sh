@@ -4,6 +4,8 @@
 #python $TRAVIS_BUILD_DIR/src/domogik/tests/unittests/scenario_parameters.py
 #python $TRAVIS_BUILD_DIR/src/domogik/tests/unittests/xplmessage_test.py
 
+echo "=== Wait 20s travis is slow ! ==="
+sleep 20
 echo "=== ps aux | grep domo ==="
 ps aux | grep domo
 echo "=== ps aux | grep dmg ==="

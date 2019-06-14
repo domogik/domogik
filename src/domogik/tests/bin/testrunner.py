@@ -137,7 +137,7 @@ class TestRunner():
             self.log.error("{0} is not a valid 'tests.json' file".format(self.json_file))
             return False
 
-	return True
+        return True
 
     def load_json(self):
         try:
