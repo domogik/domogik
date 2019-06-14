@@ -17,9 +17,6 @@ pip3 install docutils
 sudo apt-get install python3-netifaces
 pip3 install chardet
 
-# get python version
-export PYTHON_VER=python --version | cut -c8-10
-
 # for doc building
 pip3 install sphinx
 pip3 install sphinx-rtd-theme
@@ -27,3 +24,6 @@ pip3 install sphinxcontrib-actdiag
 pip3 install sphinxcontrib-blockdiag
 pip3 install sphinxcontrib-nwdiag
 pip3 install sphinxcontrib-seqdiag
+
+# get python version
+export PYTHON_VER=`python --version | cut -c8-10`
