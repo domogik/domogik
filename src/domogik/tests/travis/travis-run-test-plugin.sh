@@ -1,6 +1,6 @@
 #!/bin/bash -e
 echo "=== Start virtualenv dmg_==="
-source /home/travis/virtualenv/python3.6/bin/activate
+source /home/travis/virtualenv/python$PYTHON_VER/bin/activate
 
 echo "=== Install the plugin ==="
 dmg_package -i https://github.com/domogik/domogik-plugin-test/archive/master.zip

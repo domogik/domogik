@@ -17,6 +17,9 @@ pip3 install docutils
 sudo apt-get install python3-netifaces
 pip3 install chardet
 
+# get python version
+PYTHON_VER=python --version | cut -c8-10
+
 # for doc building
 pip3 install sphinx
 pip3 install sphinx-rtd-theme

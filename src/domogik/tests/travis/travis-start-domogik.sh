@@ -1,18 +1,8 @@
 #!/bin/bash -e 
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
-source /home/travis/virtualenv/python3.6/bin/activate
-
-# For debuging travis-ci entry_points
-echo "==== CHECK entry_points"
-echo "login: "$LOGNAME
-PATH=$PATH:~/.local/bin
-echo "PATH: "$PATH
-echo "==== ls -l ~/.local"
-ls -l ~/.local
-echo "which dmg_hub :"
-which dmg_hub
-cat /home/travis/virtualenv/python3.6.7/bin/dmg_hub
+echo "=== Start virtualenv dmg_==="
+source /home/travis/virtualenv/python$PYTHON_VER/bin/activate
 
 #sleep 10
 echo "==== START DOMOGIK"
