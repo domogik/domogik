@@ -22,6 +22,8 @@ branches:
     - jsl-dawndusk
 python:
   - "2.7"
+services:
+  - mysql
 mysql:
   adapter: mysql2
   database: domogik
