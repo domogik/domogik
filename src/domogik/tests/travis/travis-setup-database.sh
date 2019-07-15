@@ -2,6 +2,7 @@
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
 mysql -e 'create database domogik;'
-echo "USE mysql;\nUPDATE user SET password=PASSWORD('domopass') WHERE user='travis';\nFLUSH PRIVILEGES;\n" | mysql -u root
-echo "GRANT ALL PRIVILEGES ON domogik.* TO 'travis'@'%' WITH GRANT OPTION;\n" | mysql -u root
+mysql -e "USE mysql;\nUPDATE user SET authentication_string=PASSWORD('domopass') where User='root'; \nUPDATE user SET plugin='mysql_native_password';FLUSH PRIVILEGES;"
+mysql_upgrade -u root -pdomopass
+service mysql restart
 
