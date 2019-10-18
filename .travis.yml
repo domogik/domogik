@@ -22,12 +22,14 @@ branches:
     - scenario
     - jsl-dawndusk
 python:
- - "3.6"
- - "3.7"
-matrix:
-  allow_failures:
     - "3.6"
     - "3.7"
+vitualenv:
+    system_site_packages: true
+matrix:
+    allow_failures:
+        - "3.6"
+        - "3.7"
 services:
  - mysql
 mysql:
