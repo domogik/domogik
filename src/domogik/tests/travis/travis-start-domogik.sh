@@ -1,8 +1,9 @@
-#!/bin/bash -e 
+#!/bin/bash -e
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
-echo "=== Start virtualenv dmg_==="
-source /home/travis/virtualenv/python$PYTHON_VER/bin/activate
+# No needed, allready activate by travis
+#echo "=== Start virtualenv dmg_==="
+#source /home/travis/virtualenv/python$PYTHON_VER/bin/activate
 
 #sleep 10
 echo "==== START DOMOGIK"
