@@ -566,11 +566,8 @@ class DbHelper(object):
                     ).order_by(PluginHistory.date.desc()
                     ).limit(2).all()
             ### Do check about incremental to calculate the value to store
-            if date is None :
-                date = datetime.datetime.now()
-            else :
-                date = datetime.datetime.fromtimestamp(date)
-            if (len(last2) == 2) and ((last2[0].status == last2[1].status == ucode(pl_status)) and (last2[0].comment == last2[1].comment == ucode(pl_comment))) :
+            date = datetime.datetime.now() if date is None else datetime.datetime.fromtimestamp(date)
+            if (len(last2) == 2) and ((last2[0].status == last2[1].status == pl_status) and (last2[0].comment == last2[1].comment == pl_comment)) :
                     # update only date
                     self.__session.query(PluginHistory).filter_by(id=last2[0].id).update({'date' : date})
 #                    self.log.debug(u"Client {0} history same status, only update date : {1}".format(pl_id, date))

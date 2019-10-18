@@ -61,7 +61,7 @@ _db_prefix = dict(_config[1])['prefix']
 
 class RepresentableBase(object):
     def __repr__(self):
-        items = ("{0}='{1}'".format(k, v) for k, v in self.__dict__.items() if not k.startswith(b'_'))
+        items = ("{0}='{1}'".format(k, v) for k, v in self.__dict__.items() if not k.startswith('_'))
         return "<{0}: {1}>".format(self.__class__.__name__, ', '.join(items))
 
     @classmethod

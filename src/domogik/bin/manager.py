@@ -229,6 +229,7 @@ class Manager(XplPlugin, MQAsyncSub):
         # self.zmq = zmq.Context() is aleady define in XplPlugin
         # notice that Xplugin plugins already inherits of MQRep
         # notice that MQRep.__init__(self, self.zmq, self.name) is already done in XplPlugin
+        self.IOloop_inst = IOLoop.instance()
 
         ### Create the clients list
         self._clients = Clients(self._stop)
@@ -317,133 +318,137 @@ class Manager(XplPlugin, MQAsyncSub):
         """ Check the available packages and get informations on them
         """
         while not self._stop.isSet():
-            packages_updates = False
-            is_ok, pkg_list = self._list_packages()
-            if not is_ok:
-                self.log.error(u"Error while checking available packages. Exiting!")
-                sys.exit(1)
+            try:
+                packages_updates = False
+                is_ok, pkg_list = self._list_packages()
+                if not is_ok:
+                    self.log.error(u"Error while checking available packages. Exiting!")
+                    sys.exit(1)
 
-            # first, check all the packages found and process them
-            for pkg in pkg_list:
-                self.log.debug(u"Package available : {0}".format(pkg))
-                try:
-                    [type, name] = pkg.split("_")
-                except:
-                    self.log.warning(u"Invalid package : {0} (should be named like this : <type>_<name> (plugin_ipx800, ...)".format(pkg))
-                    continue
+                # first, check all the packages found and process them
+                for pkg in pkg_list:
+                    self.log.debug(u"Package available : {0}".format(pkg))
+                    try:
+                        [type, name] = pkg.split("_")
+                    except:
+                        self.log.warning(u"Invalid package : {0} (should be named like this : <type>_<name> (plugin_ipx800, ...)".format(pkg))
+                        continue
 
-                ### is the package already registered ?
-                pkg_id = "{0}-{1}".format(type, name)
-                if pkg_id not in self._packages:
-                    self.log.info(u"New package detected : type = {0} / id = {1}".format(type, name))
-                    packages_updates = True
-                    pkg_registered = False
-                else:
-                    pkg_registered = True
-
-                ### Create a package object in order to get packages details over MQ
-                pkg = Package(type, name)
-                if pkg.is_valid():
-                    if pkg_registered:
-                        json_has_changed = (self._packages[pkg_id].get_json() != pkg.get_json())
-                    else:
-                        json_has_changed = False
-                    if json_has_changed:
-                        self.log.info(u"Package {0} : the json file has been updated".format(pkg_id))
-
-                    # if the package is already registered...
-                    # ...we check if the json has been updated. If so we need to reload data
-                    # else...
-                    # ...we load data
-                    if not pkg_registered or json_has_changed:
+                    ### is the package already registered ?
+                    pkg_id = "{0}-{1}".format(type, name)
+                    if pkg_id not in self._packages:
+                        self.log.info(u"New package detected : type = {0} / id = {1}".format(type, name))
                         packages_updates = True
-                        self._packages[pkg_id] = pkg
+                        pkg_registered = False
+                    else:
+                        pkg_registered = True
 
-                        ### type = plugin
-                        if type == "plugin":
-                            if self._plugins.has_key(name):
-                                self.log.debug(u"The plugin '{0}' is already registered. Reloading its data".format(name))
-                                self._plugins[name].reload_data()
-                            else:
-                                self.log.info(u"New plugin available : {0}".format(name))
-                                self._plugins[name] = Plugin(name,
-                                                           self.get_sanitized_hostname(),
-                                                           self._clients,
-                                                           self.get_libraries_directory(),
-                                                           self.get_packages_directory(),
-                                                           self.zmq,
-                                                           self.get_stop(),
-                                                           self.get_sanitized_hostname())
-                                # The automatic startup is handled in the Plugin class in __init__
+                    ### Create a package object in order to get packages details over MQ
+                    pkg = Package(type, name)
+                    if pkg.is_valid():
+                        if pkg_registered:
+                            json_has_changed = (self._packages[pkg_id].get_json() != pkg.get_json())
+                        else:
+                            json_has_changed = False
+                        if json_has_changed:
+                            self.log.info(u"Package {0} : the json file has been updated".format(pkg_id))
 
-                                ### Create a DeviceType collection in order to send them over MQ
-                                # this is only done when a new package is found
+                        # if the package is already registered...
+                        # ...we check if the json has been updated. If so we need to reload data
+                        # else...
+                        # ...we load data
+                        if not pkg_registered or json_has_changed:
+                            packages_updates = True
+                            self._packages[pkg_id] = pkg
 
-                            ### Register all the device types
-                            for device_type in self._packages[pkg_id].get_device_types():
-                                self.log.info(u"Register device type : {0}".format(device_type))
-                                self._device_types[device_type] = self._packages[pkg_id].get_json()
+                            ### type = plugin
+                            if type == "plugin":
+                                if name in self._plugins:
+                                    self.log.debug(u"The plugin '{0}' is already registered. Reloading its data".format(name))
+                                    self._plugins[name].reload_data()
+                                else:
+                                    self.log.info(u"New plugin available : {0}".format(name))
+                                    self._plugins[name] = Plugin(name,
+                                                               self.get_sanitized_hostname(),
+                                                               self._clients,
+                                                               self.get_libraries_directory(),
+                                                               self.get_packages_directory(),
+                                                               self.zmq,
+                                                               self.get_stop(),
+                                                               self.get_sanitized_hostname(),
+                                                               self.IOloop_inst)
+                                    # The automatic startup is handled in the Plugin class in __init__
 
-                        ### type = brain
-                        elif type == "brain":
-                            if self._brains.has_key(name):
-                                self.log.debug(u"The brain '{0}' is already registered. Reloading its data".format(name))
-                                self._brains[name].reload_data()
-                            else:
-                                self.log.info(u"New brain available : {0}".format(name))
-                                self._brains[name] = Brain(name,
-                                                           self.get_sanitized_hostname(),
-                                                           self._clients,
-                                                           self.get_libraries_directory(),
-                                                           self.get_packages_directory(),
-                                                           self.zmq,
-                                                           self.get_stop(),
-                                                           self.get_sanitized_hostname())
+                                    ### Create a DeviceType collection in order to send them over MQ
+                                    # this is only done when a new package is found
 
-                        ### type = interface
-                        elif type == "interface":
-                            if self._interfaces.has_key(name):
-                                self.log.debug(u"The interface '{0}' is already registered. Reloading its data".format(name))
-                                self._interfaces[name].reload_data()
-                            else:
-                                self.log.info(u"New interface available : {0}".format(name))
-                                self._interfaces[name] = Interface(name,
-                                                           self.get_sanitized_hostname(),
-                                                           self._clients,
-                                                           self.get_libraries_directory(),
-                                                           self.get_packages_directory(),
-                                                           self.zmq,
-                                                           self.get_stop(),
-                                                           self.get_sanitized_hostname())
-                                # The automatic startup is handled in the Interface class in __init__
+                                ### Register all the device types
+                                for device_type in self._packages[pkg_id].get_device_types():
+                                    self.log.info(u"Register device type : {0}".format(device_type))
+                                    self._device_types[device_type] = self._packages[pkg_id].get_json()
+
+                            ### type = brain
+                            elif type == "brain":
+                                if name in self._brains:
+                                    self.log.debug(u"The brain '{0}' is already registered. Reloading its data".format(name))
+                                    self._brains[name].reload_data()
+                                else:
+                                    self.log.info(u"New brain available : {0}".format(name))
+                                    self._brains[name] = Brain(name,
+                                                               self.get_sanitized_hostname(),
+                                                               self._clients,
+                                                               self.get_libraries_directory(),
+                                                               self.get_packages_directory(),
+                                                               self.zmq,
+                                                               self.get_stop(),
+                                                               self.get_sanitized_hostname())
+
+                            ### type = interface
+                            elif type == "interface":
+                                if name in self._interfaces:
+                                    self.log.debug(u"The interface '{0}' is already registered. Reloading its data".format(name))
+                                    self._interfaces[name].reload_data()
+                                else:
+                                    self.log.info(u"New interface available : {0}".format(name))
+                                    self._interfaces[name] = Interface(name,
+                                                               self.get_sanitized_hostname(),
+                                                               self._clients,
+                                                               self.get_libraries_directory(),
+                                                               self.get_packages_directory(),
+                                                               self.zmq,
+                                                               self.get_stop(),
+                                                               self.get_sanitized_hostname())
+                                    # The automatic startup is handled in the Interface class in __init__
 
 
-            # finally, check if some packages has been uninstalled/removed
-            pkg_to_unregister = []
-            for pkg in self._packages:
-                # we build an id in the same format as the folders in the /var/lib/domogik/domogik_packages folder
-                if not self._packages[pkg].get_folder_basename() in pkg_list:
-                    pkg_to_unregister.append(pkg)
-
-            # and unregister some packages if needed
-            for pkg in pkg_to_unregister:
-                type = self._packages[pkg].get_type()
-                name = self._packages[pkg].get_name()
-                del(self._packages[pkg])
-                if type == 'plugin':
-                    self.log.info("Unregister plugin '{0}'".format(name))
-                    self._plugins[name].unregister()
-                    del(self._plugins[name])
-
-            # publish packages list if there are some updates or new packages
-            if packages_updates:
-                msg_data = {}
+                # finally, check if some packages has been uninstalled/removed
+                pkg_to_unregister = []
                 for pkg in self._packages:
-                    msg_data[pkg] = self._packages[pkg].get_json()
-                self._pub.send_event('package.detail',
-                                     msg_data)
+                    # we build an id in the same format as the folders in the /var/lib/domogik/domogik_packages folder
+                    if not self._packages[pkg].get_folder_basename() in pkg_list:
+                        pkg_to_unregister.append(pkg)
 
-            # wait before next check
+                # and unregister some packages if needed
+                for pkg in pkg_to_unregister:
+                    type = self._packages[pkg].get_type()
+                    name = self._packages[pkg].get_name()
+                    del(self._packages[pkg])
+                    if type == 'plugin':
+                        self.log.info("Unregister plugin '{0}'".format(name))
+                        self._plugins[name].unregister()
+                        del(self._plugins[name])
+
+                # publish packages list if there are some updates or new packages
+                if packages_updates:
+                    msg_data = {}
+                    for pkg in self._packages:
+                        msg_data[pkg] = self._packages[pkg].get_json()
+                    self._pub.send_event('package.detail',
+                                         msg_data)
+
+                # wait before next check
+            except:
+                self.log.error(u"In CHECK_FOR_NEW_PACKAGES_INTERVAL = {0}". format(str(traceback.format_exc())))
             self._stop.wait(CHECK_FOR_NEW_PACKAGES_INTERVAL)
 
     def _start_core_component(self, name):
@@ -596,7 +601,7 @@ class Manager(XplPlugin, MQAsyncSub):
                 msg.add_data(dev, self._device_types[dev])
         else:
             device_type = data.get_data()['device_type']
-            if self._device_types.has_key(device_type):
+            if device_type in self._device_types:
                 msg.add_data(device_type, self._device_types[device_type])
             else:
                 msg.add_data(device_type, None)
@@ -1035,7 +1040,7 @@ class CoreComponent(GenericComponent, MQAsyncSub):
         ### zmq context
         self.zmq = zmq_context
 
-        ### subscribe the the MQ for category = plugin and name = self.name
+        ### subscribe the MQ for category = plugin and name = self.name
         MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status'])
 
 
@@ -1176,7 +1181,7 @@ class Brain(GenericComponent, MQAsyncSub):
         #TO DEL ??#
         self.configured = False
 
-        ### subscribe the the MQ for category = plugin and name = self.name
+        ### subscribe the MQ for category = plugin and name = self.name
         MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.configuration'])
 
         ### register the plugin as a client
@@ -1231,7 +1236,7 @@ class Plugin(GenericComponent, MQAsyncSub):
                as there are currently a lot of common code in Plugin and Interface classes
     """
 
-    def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host):
+    def __init__(self, name, host, clients, libraries_directory, packages_directory, zmq_context, stop, local_host, IOloop_inst):
         """ Init a plugin
             @param name : plugin name (core, datatype, ...)
             @param host : hostname
@@ -1336,8 +1341,11 @@ class Plugin(GenericComponent, MQAsyncSub):
         ### register the plugin as a client
         self.register_component()
 
-        ### subscribe the the MQ for category = plugin and name = self.name
-        MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status', 'plugin.configuration'])
+        ### subscribe the MQ for category = plugin and name = self.name
+        try :
+            MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status', 'plugin.configuration'], IOloop_inst)
+        except:
+            self.log.error(u"In init Plugin {0} = {1}". format(name, str(traceback.format_exc())))
 
         ### check if the plugin must be started on manager startup
         startup = self._config.query(self.type, self.name, 'auto_startup')
@@ -1617,7 +1625,7 @@ class Interface(GenericComponent, MQAsyncSub):
         ### register the interface as a client
         self.register_component()
 
-        ### subscribe the the MQ for category = interface and name = self.name
+        ### subscribe the MQ for category = interface and name = self.name
         MQAsyncSub.__init__(self, self.zmq, 'manager', ['plugin.status', 'plugin.configuration'])
 
         ### check if the interface must be started on manager startup
