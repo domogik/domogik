@@ -2,9 +2,9 @@ from flask_login import login_required
 from flask import request, flash, redirect
 from domogik.admin.application import app, render_template, timeit
 try:
-    from flask_wtf import Form
+    from flask_wtf import FlaskForm
 except ImportError:
-    from flaskext.wtf import Form
+    from flaskext.wtf import FlaskForm
     pass
 try:
     from flask_babel import gettext, ngettext
@@ -85,20 +85,20 @@ def locations_edit(lid):
             lctrl_area = 10
         else:
             loc = app.db.get_location(lid)
-            formatted_address = filter(lambda n: n.key == 'formatted_address', loc.params)[0].value
+            formatted_address = list(filter(lambda n: n.key == 'formatted_address', loc.params))[0].value
             lname = loc.name
             lisHome = loc.isHome
-            llat = filter(lambda n: n.key == 'lat', loc.params)[0].value
-            llng = filter(lambda n: n.key == 'lng', loc.params)[0].value
+            llat = list(filter(lambda n: n.key == 'lat', loc.params))[0].value
+            llng = list(filter(lambda n: n.key == 'lng', loc.params))[0].value
             lzoom = 10
             try : # maintain backward compatibility with radius key
-                lctrl_type = filter(lambda n: n.key == 'ctrl_type', loc.params)[0].value
-                lctrl_area = filter(lambda n: n.key == 'ctrl_area', loc.params)[0].value
+                lctrl_type = list(filter(lambda n: n.key == 'ctrl_type', loc.params))[0].value
+                lctrl_area = list(filter(lambda n: n.key == 'ctrl_area', loc.params))[0].value
             except :
                 lctrl_type = "circle"
-                lctrl_area = filter(lambda n: n.key == 'radius', loc.params)[0].value
+                lctrl_area = list(filter(lambda n: n.key == 'radius', loc.params))[0].value
 
-        class F(Form):
+        class F(FlaskForm):
             locid = HiddenField("lid", default=lid)
             ctrl_type = HiddenField("ctrl_type", default=lctrl_type)
             lat = HiddenField("lat", default=llat)

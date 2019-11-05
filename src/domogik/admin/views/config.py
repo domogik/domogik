@@ -2,9 +2,9 @@ from flask_login import login_required
 from flask import request, flash, redirect
 from domogik.admin.application import app, render_template, timeit
 try:
-    from flask_wtf import Form
+    from flask_wtf import FlaskForm
 except ImportError:
-    from flaskext.wtf import Form
+    from flaskext.wtf import FlaskForm
     pass
 try:
     from flask_babel import gettext, ngettext
@@ -40,7 +40,7 @@ def config():
     if 'wit_token' not in cfg:
         cfg['wit_token'] = ''
 
-    class F(Form):
+    class F(FlaskForm):
         external_ip = TextField("External IP", [Required()], description='External IP or DNS name', default=cfg['external_ip'])
         external_port = TextField("External Port", [Required()], description='External Port where admin is listening', default=cfg['external_port'])
         external_ssl = BooleanField("External use SSL", description='Does external access need ssl', default=cfg['external_ssl'])

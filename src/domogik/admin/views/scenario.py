@@ -9,9 +9,9 @@ except ImportError:
     pass
 from flask_login import login_required
 try:
-    from flask_wtf import Form
+    from flask_wtf import FlaskForm
 except ImportError:
-    from flaskext.wtf import Form
+    from flaskext.wtf import FlaskForm
     pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField, TextAreaField
@@ -133,7 +133,7 @@ def scenario_edit(id):
                 id = 0
                 name = u""
     # create a form
-    class F(Form):
+    class F(FlaskForm):
         sid = HiddenField("id", default=id)
         sname = TextField(gettext("Name"), [Required()], default=name, description=gettext(u"Scenario name"))
         sdis = BooleanField(gettext("Disable"), default=dis, description=gettext(u"Disabling a scenario avoid to delete it if you temporary want it not to run"))

@@ -1,5 +1,4 @@
 from domogik.admin.application import app, login_manager, babel, render_template, timeit
-from domogik.common.utils import ucode
 from flask import request, flash, redirect, Response
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
@@ -44,7 +43,7 @@ def rediret_to_login():
 @login_manager.request_loader
 @timeit
 def load_user_from_request(request):
-    if ucode(request.path).startswith(b'/rest/'):
+    if request.path.startswith('/rest/'):
         app.logger.debug("rest_auth = '{0}' (type='{1}')".format(app.dbConfig['rest_auth'], type(app.dbConfig['rest_auth'])))
         if app.dbConfig['rest_auth'] == True or app.dbConfig['rest_auth'] == 'True':
             auth = request.authorization

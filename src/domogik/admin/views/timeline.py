@@ -39,7 +39,6 @@ def timeline_generic(the_device_id = None, the_client_id = None, asDict = False)
         print("Error : no datatypes found!")
         datatypes = {}
 
-
     # timeline
     with app.db.session_scope():
         timeline = []
@@ -48,10 +47,11 @@ def timeline_generic(the_device_id = None, the_client_id = None, asDict = False)
         previous_date = None
         sensors_changes_for_the_device = []
         has_history = False
+        previous_device_name = ""
+        previous_client = ""
         for elt in data:
-            print(elt)
             (device_name, device_id, client, sensor_name, sensor_dt_type, sensor_id, date_of_value, value) = elt
-   
+
             if sensor_dt_type in datatypes:
                 if "unit" in datatypes[sensor_dt_type]:
                     unit = datatypes[sensor_dt_type]["unit"]

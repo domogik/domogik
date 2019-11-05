@@ -9,9 +9,9 @@ except ImportError:
     pass
 from flask_login import login_required
 try:
-    from flask_wtf import Form
+    from flask_wtf import FlaskForm
 except ImportError:
-    from flaskext.wtf import Form
+    from flaskext.wtf import FlaskForm
     pass
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField, DateField, PasswordField
@@ -33,7 +33,7 @@ def users():
             #persons.append(dict(zip(per.keys(), per)))
             buf2 = {}
             # preserve person id instead of account id
-            id = per[0].id 
+            id = per[0].id
             account_id = None
             if len(per) > 1:
                 if per[1] != None:
@@ -109,7 +109,7 @@ def user_edit(person_id):
             person = None
 
 
-        class F(Form):
+        class F(FlaskForm):
             pid = HiddenField("person_id", default=person_id)
             account_exists = HiddenField("account_exists", default=the_account_exists)
             account_id = HiddenField("account_id", default=the_account_id)
@@ -155,12 +155,12 @@ def user_edit(person_id):
                         else:
                             is_admin = 0
                         if int(request.form['account_id']) == 0:
-                            app.db.add_user_account(a_login=request.form['login'], 
+                            app.db.add_user_account(a_login=request.form['login'],
                                                     a_person_id=person.id,
                                                     a_is_admin=is_admin)
                         else:
                             app.db.update_user_account(a_id=request.form['account_id'],
-                                                    a_new_login=request.form['login'], 
+                                                    a_new_login=request.form['login'],
                                                     a_person_id=person.id,
                                                     a_is_admin=is_admin)
                     flash(gettext("The user is updated"), "success")
@@ -177,7 +177,7 @@ def user_edit(person_id):
                             is_admin = 1
                         else:
                             is_admin = 0
-                        app.db.add_user_account(a_login=request.form['login'], 
+                        app.db.add_user_account(a_login=request.form['login'],
                                                 a_person_id=person.id,
                                                 a_is_admin=is_admin)
                     flash(gettext("The user is created"), "success")
@@ -187,7 +187,7 @@ def user_edit(person_id):
                 flash(gettext("There was an error during the user creation or upgrade."), "error")
                 return redirect("/users")
         elif request.method == 'POST' and not form.validate():
-            flash(gettext("Invalid input"), "error")        
+            flash(gettext("Invalid input"), "error")
 
     return render_template('user_edit.html',
             form = form,
@@ -230,7 +230,7 @@ def user_password(person_id):
             person = None
 
 
-        class F(Form):
+        class F(FlaskForm):
             pid = HiddenField("person_id", default=person_id)
             account_id = HiddenField("account_id", default=the_account_id)
             password = PasswordField("Password", [Required(), EqualTo('password2', message='You must type twice the same password')], default="")
@@ -245,7 +245,7 @@ def user_password(person_id):
                 if the_lock_edit == True:
                     flash(gettext("You can't edit locked users"), "warning")
                     return redirect("/users")
-    
+
                 if int(person_id) > 0:
                     app.db.user_change_password(request.form['account_id'], request.form['password'])
                     flash(gettext("The password is updated"), "success")
@@ -257,7 +257,7 @@ def user_password(person_id):
                 flash(gettext("There was an error during the password update for the user."), "error")
                 return redirect("/users")
         elif request.method == 'POST' and not form.validate():
-            flash(gettext("Invalid input"), "error")        
+            flash(gettext("Invalid input"), "error")
 
     return render_template('user_password.html',
             form = form,

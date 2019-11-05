@@ -8,9 +8,9 @@ import zmq
 from functools import wraps
 from flask import Flask, g, request, session, Response
 try:
-    from flask_wtf import Form, RecaptchaField
+    from flask_wtf import FlaskForm, RecaptchaField
 except ImportError:
-    from flaskext.wtf import Form, RecaptchaField
+    from flaskext.wtf import FlaskForm, RecaptchaField
     pass
 try:
     from flask_login import LoginManager, current_user
@@ -152,7 +152,7 @@ def inject_global_errors():
     err = []
     with app.db.session_scope():
         # TODO : review this part by checking only for the mandatory fields
-        if len(app.db.get_core_config()) != 5:
+        if len(app.db.get_core_config()) != 6:
             err.append(('Not all config set, you should first set the basic config','/config'))
 
         if len(app.db.list_devices(d_state=u'upgrade')) > 0:
@@ -291,14 +291,14 @@ def jsonp_response(action_func):
 ### error pages
 @app.errorhandler(404)
 def page_not_found(e):
-    if u''.join(request.path).encode('utf-8').startswith(b'/rest/'):
+    if ''.join(request.path).startswith('/rest/'):
         return render_template('404_json.html'), 404
     else:
         return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def server_error(e):
-    if u''.join(request.path).encode('utf-8').startswith(b'/rest/'):
+    if ''.join(request.path).startswith('/rest/'):
         return render_template('500_json.html'), 500
     else:
         return render_template('500.html'), 500

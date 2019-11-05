@@ -9,9 +9,9 @@ from flask import request, flash, redirect, send_from_directory
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 try:
-    from flask_wtf import Form
+    from flask_wtf import FlaskForm
 except ImportError:
-    from flaskext.wtf import Form
+    from flaskext.wtf import FlaskForm
     pass
 from wtforms import TextField, HiddenField, validators, ValidationError, RadioField,\
             BooleanField, SubmitField, SelectField, IntegerField, \
@@ -308,7 +308,7 @@ def client_sensor_edit(client_id, sensor_id):
             tmps = sorted(tmp.items(), key=operator.itemgetter(1))
         else:
             allow_data_type = False
-        class F(Form):
+        class F(FlaskForm):
             timeout = TextField("Timeout", default=sensor.timeout)
             formula = TextField("Formula", default=sensor.formula, widget=TextArea())
             history_store = BooleanField("History Store", default=sensor.history_store)
@@ -391,7 +391,7 @@ def client_global_edit(client_id, dev_id):
     with app.db.session_scope():
         dev = app.db.get_device(dev_id)
         known_items = {}
-        class F(Form):
+        class F(FlaskForm):
             pass
         for item in dev["parameters"]:
             item = dev["parameters"][item]
@@ -488,7 +488,7 @@ def client_devices_edit(client_id, did):
     with app.db.session_scope():
         device = app.db.get_device_sql(did)
         MyForm = model_form(Device, \
-                        base_class=Form, \
+                        base_class=FlaskForm, \
                         db_session=app.db.get_session(),
                         exclude=['params', 'commands', 'sensors', 'address', \
                                 'xpl_commands', 'xpl_stats', 'device_type_id', \
@@ -556,7 +556,7 @@ def client_config(client_id):
     known_items = {}
 
     # dynamically generate the wtfform
-    class F(Form):
+    class F(FlaskForm):
         submit = SubmitField("Send")
         pass
     app.logger.debug(u"Display configuration for '{0}' : ".format(client_id))
@@ -717,7 +717,7 @@ def client_devices_new_prod(client_id, device_type_id, product):
 
 
 def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
-    print(request.args)
+    print("device new : {0}".format(request.args))
     args = request.args.to_dict()
     if based_on:
         with app.db.session_scope():
@@ -726,12 +726,12 @@ def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
             args['Description'] = dev['description']
             args['Reference'] = dev['reference']
             print(dev)
-    print(args)
+    print("device new : {0}".format(args))
     detail = get_client_detail(client_id)
     (params, reason, status) = build_deviceType_from_packageJson(app.logger, app.zmq_context, device_type_id, client_id)
 
     # dynamically generate the wtfform
-    class F(Form):
+    class F(FlaskForm):
         try: default = args.get('Name')
         except: default = None
         name = TextField("Device name", [Required()], description=gettext("The display name for this device"), default=default)
@@ -742,17 +742,17 @@ def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
         except: default = None
         reference = TextField("Reference", description=gettext("A reference for this device"), default=default)
         pass
-    # Form for the Global part
-    class F_global(Form):
+    # FlaskForm for the Global part
+    class F_global(FlaskForm):
         pass
-    # Form for the xpl part
-    class F_xpl(Form):
+    # FlaskForm for the xpl part
+    class F_xpl(FlaskForm):
         pass
-    # Form for the xpl command part
-    class F_xpl_command(Form):
+    # FlaskForm for the xpl command part
+    class F_xpl_command(FlaskForm):
         pass
-    # Form for the xpl stat part
-    class F_xpl_stat(Form):
+    # FlaskForm for the xpl stat part
+    class F_xpl_stat(FlaskForm):
         pass
 
     # add the global params
@@ -950,78 +950,82 @@ def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
     form_xpl_command = F_xpl_command()
     form_xpl_stat = F_xpl_stat()
 
-    if request.method == 'POST' and form.validate():
-        try:
-            # aprams hold the stucture,
-            # append a vlaue key everywhere with the value submitted
-            # or fill in the key
-            params['client_id'] = client_id
-            for item in request.form:
-                if item in ["name", "reference", "description"]:
-                    # handle the global things
-                    params[item] = request.form.get(item)
-                elif item.startswith(b'xpl') or item.startswith(b'glob'):
-                    # handle the global params
-                    if item.startswith(b'xpl'):
-                        key = 'xpl'
+    if request.method == 'POST':
+        if form.validate():
+            print("device new POST: {0}".format(request.form))
+            try:
+                # aprams hold the stucture,
+                # append a vlaue key everywhere with the value submitted
+                # or fill in the key
+                params['client_id'] = client_id
+                for item in request.form:
+                    if item in ["name", "reference", "description"]:
+                        # handle the global things
+                        params[item] = request.form.get(item)
+                    elif item.startswith('xpl') or item.startswith('glob'):
+                        # handle the global params
+                        if item.startswith('xpl'):
+                            key = 'xpl'
+                        else:
+                            key = 'global'
+                        par = item.split('|')[1]
+                        i = 0
+                        while i < len(params[key]):
+                            param = params[key][i]
+                            if par == param['key']:
+                                params[key][i]['value'] = request.form.get(item)
+                            i = i + 1
+                    elif item.startswith('stat') or item.startswith('cmd'):
+                        if item.startswith('stat'):
+                            key = "xpl_stats"
+                        else:
+                            key = "xpl_commands"
+                        name = item.split('|')[1]
+                        par = item.split('|')[2]
+                        i = 0
+                        while i < len(params[key][name]):
+                            param = params[key][name][i]
+                            if par == param['key']:
+                                params[key][name][i]['value'] = request.form.get(item)
+                            i = i + 1
+                # we now have the json to return
+                reason = False
+                cli = MQSyncReq(app.zmq_context)
+                msg = MQMessage()
+                msg.set_action('device_types.get')
+                msg.add_data('device_type', params['device_type'])
+                res = cli.request('manager', msg.get(), timeout=10)
+                del cli
+                if res is None:
+                    status = False
+                    reason = "Manager is not replying to the mq request"
+                pjson = res.get_data()
+                if pjson is None:
+                    status = False
+                    reason = "No data for {0} found by manager".format(params['device_type'])
+                pjson = pjson[params['device_type']]
+                if pjson is None:
+                    status = False
+                    reason = "The json for {0} found by manager is empty".format(params['device_type'])
+                with app.db.session_scope():
+                    res = app.db.add_full_device(params, pjson)
+                    if res:
+                        flash(gettext("Device created succesfully"), 'success')
                     else:
-                        key = 'global'
-                    par = item.split('|')[1]
-                    i = 0
-                    while i < len(params[key]):
-                        param = params[key][i]
-                        if par == param['key']:
-                            params[key][i]['value'] = request.form.get(item)
-                        i = i + 1
-                elif item.startswith(b'stat') or item.startswith(b'cmd'):
-                    if item.startswith(b'stat'):
-                        key = "xpl_stats"
-                    else:
-                        key = "xpl_commands"
-                    name = item.split('|')[1]
-                    par = item.split('|')[2]
-                    i = 0
-                    while i < len(params[key][name]):
-                        param = params[key][name][i]
-                        if par == param['key']:
-                            params[key][name][i]['value'] = request.form.get(item)
-                        i = i + 1
-            # we now have the json to return
-            reason = False
-            cli = MQSyncReq(app.zmq_context)
-            msg = MQMessage()
-            msg.set_action('device_types.get')
-            msg.add_data('device_type', params['device_type'])
-            res = cli.request('manager', msg.get(), timeout=10)
-            del cli
-            if res is None:
-                status = False
-                reason = "Manager is not replying to the mq request"
-            pjson = res.get_data()
-            if pjson is None:
-                status = False
-                reason = "No data for {0} found by manager".format(params['device_type'])
-            pjson = pjson[params['device_type']]
-            if pjson is None:
-                status = False
-                reason = "The json for {0} found by manager is empty".format(params['device_type'])
-            with app.db.session_scope():
-                res = app.db.add_full_device(params, pjson)
-                if res:
-                    flash(gettext("Device created succesfully"), 'success')
-                else:
-                    flash(gettext("Device creation failed"), 'warning')
-                    if reason:
-                        flash(reason, 'warning')
-                # in all case we send an update event (in case of partial success...)
-                pub = MQPub(app.zmq_context, 'adminhttp')
-                pub.send_event('device.update',
-                               {"device_id" : res['id'],
-                                "client_id" : client_id})
-        except:
-            app.logger.error(u"Error while creating the device. The error is : {0}".format(traceback.format_exc()))
-            flash(gettext("Device creation failed. Please check the logs for more details."), 'warning')
-        return redirect("/client/{0}/dmg_devices/known".format(client_id))
+                        flash(gettext("Device creation failed"), 'warning')
+                        if reason:
+                            flash(reason, 'warning')
+                    # in all case we send an update event (in case of partial success...)
+                    pub = MQPub(app.zmq_context, 'adminhttp')
+                    pub.send_event('device.update',
+                                   {"device_id" : res['id'],
+                                    "client_id" : client_id})
+            except:
+                app.logger.error(u"Error while creating the device. The error is : {0}".format(traceback.format_exc()))
+                flash(gettext("Device creation failed. Please check the logs for more details."), 'warning')
+            return redirect("/client/{0}/dmg_devices/known".format(client_id))
+        else:
+            flash(gettext("Device validation failed : Please check parameters"), 'warning')
 
     return render_template('client_device_new_wiz.html',
             form = form,
