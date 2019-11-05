@@ -1242,7 +1242,6 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
         else:
             self._set_status(STATUS_STOPPED, u"Stopped by force leave")
 
-
         if hasattr(self, "_timers"):
             for t in self._timers:
                 if hasattr(self, "log"):
@@ -1280,9 +1279,11 @@ class Plugin(BasePlugin, MQRep, MQAsyncSub):
 
         if threading.activeCount() > 1:
             if hasattr(self, "log"):
-                self.log.warn(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
+                self.log.warning(u"There are more than 1 thread remaining : {0}".format(threading.enumerate()))
         if exit :
-            sys.exit()
+            pid = os.getpid()
+            self.log.debug(u"Self kill plugin by pid '{0}'".format(str(pid)))
+            os.kill(pid, signal.SIGKILL)
 
 
 class Watcher:
