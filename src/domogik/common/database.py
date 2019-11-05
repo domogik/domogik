@@ -336,8 +336,8 @@ class DbHelper(object):
             listC.append(item.id)
         self.log.debug(u"get core config : {0}".format(listC))
         if listC == []:
-            print("No core config find !", core_plugin)
-            return {}
+            self.log.debug(u"No core plugin ref !. Create it.")
+            listC.append(self._add_plugin(u'core', u'core', get_sanitized_hostname()).id)
         cfg = self.__session.query(PluginConfig).filter_by(plugin_id=listC).all()
         if key == None:
             res = {}
@@ -357,7 +357,7 @@ class DbHelper(object):
         listC = []
         for item in core_plugin :
             listC.append(item.id)
-        self.log.debug(u"set core config: {0}".format(listC))
+        self.log.debug(u"set core config : listC={0}".format(listC))
         config_list = self.__session.query(PluginConfig).filter_by(plugin_id=listC).all()
         for plc in config_list:
             self.__session.delete(plc)
@@ -2289,9 +2289,9 @@ class DbHelper(object):
                                     SensorHistory.date,
                                     SensorHistory.value_str
                              ) \
+                             .join(Sensor, Device.id == Sensor.device_id) \
+                             .join(SensorHistory, Sensor.id == SensorHistory.sensor_id) \
                              .filter(Device.id == device_id) \
-                             .join(Sensor) \
-                             .join(SensorHistory) \
                              .order_by(SensorHistory.date.desc()) \
                              .limit(100)
         elif client_id:
@@ -2305,12 +2305,11 @@ class DbHelper(object):
                                     SensorHistory.date,
                                     SensorHistory.value_str
                              ) \
+                             .join(Sensor, Device.id == Sensor.device_id) \
+                             .join(SensorHistory, Sensor.id == SensorHistory.sensor_id) \
                              .filter(Device.client_id == client_id) \
-                             .join(Sensor) \
-                             .join(SensorHistory) \
                              .order_by(SensorHistory.date.desc()) \
                              .limit(100)
-
         else:
             return self.__session.query(
                                     Device.name,
@@ -2322,8 +2321,8 @@ class DbHelper(object):
                                     SensorHistory.date,
                                     SensorHistory.value_str
                              ) \
-                             .join(Sensor) \
-                             .join(SensorHistory) \
+                             .join(Sensor, Device.id == Sensor.device_id) \
+                             .join(SensorHistory, Sensor.id == SensorHistory.sensor_id) \
                              .order_by(SensorHistory.date.desc()) \
                              .limit(100)
 
