@@ -61,9 +61,9 @@ class CommandAction(AbstractAction):
             # But we should not affect other variables...
             # For now, if the first character is a # we remove it
             # TODO : try improving by getting the real param type from blockly or json or whatever
-            #if key == "color" and params[key].startswith(b"#"):
+            #if key == "color" and params[key].startswith("#"):
             if isinstance(params[key], str) or isinstance(params[key], unicode):
-                if params[key].startswith(b"#"):
+                if params[key].startswith("#"):
                     self.log.debug(u"- Processing : for a color, if the color starts with #, remove it")
                     params[key] = params[key][1:]
 

@@ -209,7 +209,7 @@ class WebSocketManager(WebSocketHandler):
                 #print(u"=> message")
                 message = json_data["message"]
                 #print(message)
-                if message.startswith(b"ping from browser"):
+                if message.startswith("ping from browser"):
                     browser_info = re.sub("ping from browser", "", message)
                     self.send(json.dumps({"message" : "pong from admin {0}".format(browser_info)}))
                     return

@@ -121,7 +121,7 @@ class TestRunner():
 
         if self.options.directory == ".":
             self.path = os.path.dirname(os.path.realpath(__file__))
-        elif self.options.directory.startswith(b'/'):
+        elif self.options.directory.startswith('/'):
             self.path = self.options.directory
         else:
             self.path = "{0}/{1}".format(os.path.dirname(os.path.realpath(__file__)), self.options.directory)

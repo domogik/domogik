@@ -199,7 +199,7 @@ class ScenarioInstance(MQAsyncSub):
             # Only SensorTest class receive generic_trigger
             self._log.info(u"Scenario '{0}' : configure the trigger to the last item of each test instance".format(remove_accents(self._name)))
             for a_kind_of_test in self._test_instances:
-                if a_kind_of_test.startswith(b"sensor.SensorTest"):
+                if a_kind_of_test.startswith("sensor.SensorTest"):
                     self._log.debug(u"Scenario '{0}' : test instance : {1} ({2} items)".format(remove_accents(self._name), a_kind_of_test, len(self._test_instances[a_kind_of_test])))
                     for idx, val in enumerate(self._test_instances[a_kind_of_test]):
                         if val.__class__.__name__ == 'SensorTest':
@@ -270,7 +270,7 @@ class ScenarioInstance(MQAsyncSub):
             # handle all Ifx and dox
             incLev = 1 # Account for elif level to  indente an else if
             for ipart, val in sorted(part.items()):
-                if ipart.startswith(b'IF'):
+                if ipart.startswith('IF'):
                     num = int(ipart.replace('IF', ''))
                     if num == 0:
                         st = "print('---- Start evaluating ----')\nif"
@@ -331,7 +331,7 @@ class ScenarioInstance(MQAsyncSub):
         elif part['type'] == 'text_join':
             reslst = []
             for ipart, val in sorted(part.items()):
-                if ipart.startswith(b'ADD'):
+                if ipart.startswith('ADD'):
                     addp = self.__parse_part(part[ipart], level, debug, parentPart)
                     #reslst.append(u"str({0})".format(addp))
                     reslst.append(u"to_unicode({0})".format(addp))

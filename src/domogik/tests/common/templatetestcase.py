@@ -97,7 +97,7 @@ class TemplateTestCase(unittest.TestCase):   #, MQAsyncSub):
             cli = MQSyncSub(zmq.Context(), "test", ["client.sensor", "plugin.status"])
             resp = cli.wait_for_event()
             # client.sensor message
-            if resp['id'].startswith(b"client.sensor"):
+            if resp['id'].startswith("client.sensor"):
                 res = json.loads(resp['content'])
                 print("MQ client.sensor message received. Data = {0}".format(res))
 

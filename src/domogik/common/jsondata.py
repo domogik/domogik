@@ -51,7 +51,7 @@ def domogik_encoder(stop_at=[]):
                 _visited_objs.append(obj)
                 # an SQLAlchemy class
                 fields = {}
-                for field in [x for x in dir(obj) if not x.startswith(b'_') \
+                for field in [x for x in dir(obj) if not x.startswith('_') \
                     and x != 'metadata' and x != 'get_tablename' \
                     and x != 'set_password' and x not in stop_at]:
                     fields[field] = obj.__getattribute__(field)

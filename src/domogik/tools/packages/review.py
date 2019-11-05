@@ -423,18 +423,18 @@ class Review():
                 w, h = struct.unpack("<HH", data[6:10])
                 width = int(w)
                 height = int(h)
-            elif ((size >= 24) and data.startswith(b'\211PNG\r\n\032\n')
+            elif ((size >= 24) and data.startswith('\211PNG\r\n\032\n')
                   and (data[12:16] == 'IHDR')):
                 # PNGs
                 w, h = struct.unpack(">LL", data[16:24])
                 width = int(w)
                 height = int(h)
-            elif (size >= 16) and data.startswith(b'\211PNG\r\n\032\n'):
+            elif (size >= 16) and data.startswith('\211PNG\r\n\032\n'):
                 # older PNGs?
                 w, h = struct.unpack(">LL", data[8:16])
                 width = int(w)
                 height = int(h)
-            elif (size >= 2) and data.startswith(b'\377\330'):
+            elif (size >= 2) and data.startswith('\377\330'):
                 # JPEG
                 msg = " raised while trying to decode as JPEG."
                 input.seek(0)
