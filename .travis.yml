@@ -53,6 +53,6 @@ after_script:
 notifications:
   irc: "irc.freenode.net#domogik"
   on_success: never
-  on_failure: always
+  on_failure: never
 
 

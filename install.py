@@ -437,9 +437,9 @@ def find_interface():
     try:
         import traceback
 
-#        for d in pkg_resources.working_set :
-#            print(d)
-#        pkg_resources.get_distribution("Domogik").activate()
+        for d in pkg_resources.working_set :
+            print(d)
+        pkg_resources.get_distribution("Domogik").activate()
         from domogik.common.utils import get_interfaces, interface_has_ip
         for intf in get_interfaces():
             if intf == 'lo':
