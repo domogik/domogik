@@ -436,7 +436,12 @@ def find_interface():
     intf = ""
     try:
         import traceback
-        pkg_resources.get_distribution("domogik").activate()
+
+        from pip._internal.operations.freeze import freeze
+        for requirement in freeze(local_only=True):
+            print(requirement)
+
+        pkg_resources.get_distribution("Domogik").activate()
         from domogik.common.utils import get_interfaces, interface_has_ip
         for intf in get_interfaces():
             if intf == 'lo':
@@ -495,8 +500,8 @@ def install():
     print(args)
     try:
         # CHECK python version
-        if sys.version_info < (2, 6):
-            fail("Python version is to low, at least python 2.6 is needed")
+        if sys.version_info < (3, 5):
+            fail("Python version is to low, at least python 3.5 is needed")
             exit(1)
 
         # CHECK sources not in / or /root
