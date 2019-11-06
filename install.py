@@ -45,9 +45,9 @@ def debug(msg):
 ### test if script is launch as root
 
 # CHECK run as root
-#info(u"Check this script is started as root")
-#assert os.getuid() == 0, "This script must be started as root"
-#ok(u"Correctly started with root privileges.")
+info(u"Check this script is started as root")
+assert os.getuid() == 0, "This script must be started as root"
+ok(u"Correctly started with root privileges.")
 
 logging.basicConfig(filename='install.log', level=logging.DEBUG)
 
@@ -437,9 +437,9 @@ def find_interface():
     try:
         import traceback
 
-        for d in pkg_resources.working_set :
-            print(d)
-        pkg_resources.get_distribution("Domogik").activate()
+#        for d in pkg_resources.working_set :
+#            print(d)
+#        pkg_resources.get_distribution("Domogik").activate()
         from domogik.common.utils import get_interfaces, interface_has_ip
         for intf in get_interfaces():
             if intf == 'lo':
