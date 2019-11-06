@@ -45,9 +45,9 @@ def debug(msg):
 ### test if script is launch as root
 
 # CHECK run as root
-info(u"Check this script is started as root")
-assert os.getuid() == 0, "This script must be started as root"
-ok(u"Correctly started with root privileges.")
+#info(u"Check this script is started as root")
+#assert os.getuid() == 0, "This script must be started as root"
+#ok(u"Correctly started with root privileges.")
 
 logging.basicConfig(filename='install.log', level=logging.DEBUG)
 
