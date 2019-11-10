@@ -42,12 +42,13 @@ def fail(msg):
 def debug(msg):
     logging.debug(msg)
 
-### test if script is launch as root
 
-# CHECK run as root
-info(u"Check this script is started as root")
-assert os.getuid() == 0, "This script must be started as root"
-ok(u"Correctly started with root privileges.")
+def check_as_root():
+    ### test if script is launch as root
+    # CHECK run as root
+    info(u"Check this script is started as root")
+    assert os.getuid() == 0, "This script must be started as root"
+    ok(u"Correctly started with root privileges.")
 
 logging.basicConfig(filename='install.log', level=logging.DEBUG)
 
@@ -496,6 +497,9 @@ def install():
 
     args = parser.parse_args()
     print(args)
+
+    if not args.setup and not args.no_create_database:
+        check_as_root()
     try:
         # CHECK python version
         if sys.version_info < (3, 5):
