@@ -16,6 +16,12 @@ sudo mkdir -p $LOGDIR
 sudo chown $LOGNAME: $LOGDIR
 sudo mkdir -p $CACHEDIR
 sudo chown $LOGNAME: $CACHEDIR
+sudo mkdir -p /var/lib/domogik
+sudo chown $LOGNAME: /var/lib/domogik
+sudo mkdir -p /var/log/xplhub
+sudo chown $LOGNAME: /var/log/xplhub
+sudo mkdir -p /etc/domogik
+sudo chown $LOGNAME: /etc/domogik
 
 echo "==== RUNNING SETUP.py"
 pip3 install .
