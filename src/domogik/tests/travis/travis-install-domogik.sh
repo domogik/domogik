@@ -5,13 +5,13 @@ echo "==== SOME SETUP stuff"
 PIDDIR="/var/run/domogik"
 LOCKDIR="/var/lock/domogik"
 LOGDIR="/var/log/domogik"
-sudo mkdir -p /var/lock/domogik
+sudo mkdir -p $LOCKDIR
 sudo chown $LOGNAME:root $LOCKDIR
 sudo touch $LOCKDIR/config.lock
 sudo chown $LOGNAME:root $LOCKDIR/config.lock
-sudo mkdir $PIDDIR
+sudo mkdir -p $PIDDIR
 sudo chown $LOGNAME: $PIDDIR
-sudo mkdir $LOGDIR
+sudo mkdir -p $LOGDIR
 sudo chown $LOGNAME: $LOGDIR
 
 echo "==== RUNNING SETUP.py"
