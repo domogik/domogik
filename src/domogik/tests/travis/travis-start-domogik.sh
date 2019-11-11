@@ -3,7 +3,7 @@
 
 #sleep 10
 echo "==== START DOMOGIK"
-sudo /etc/init.d/domogik start
+/etc/init.d/domogik start
 sleep 10
 cat /var/log/domogik/core_manager.log
 
