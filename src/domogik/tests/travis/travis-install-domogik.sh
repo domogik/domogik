@@ -5,6 +5,7 @@ echo "==== SOME SETUP stuff"
 PIDDIR="/var/run/domogik"
 LOCKDIR="/var/lock/domogik"
 LOGDIR="/var/log/domogik"
+CACHEDIR="/var/cache/domogik"
 sudo mkdir -p $LOCKDIR
 sudo chown $LOGNAME:root $LOCKDIR
 sudo touch $LOCKDIR/config.lock
@@ -13,6 +14,8 @@ sudo mkdir -p $PIDDIR
 sudo chown $LOGNAME: $PIDDIR
 sudo mkdir -p $LOGDIR
 sudo chown $LOGNAME: $LOGDIR
+sudo mkdir -p $CACHEDIR
+sudo chown $LOGNAME: $CACHEDIR
 
 echo "==== RUNNING SETUP.py"
 pip3 install .
