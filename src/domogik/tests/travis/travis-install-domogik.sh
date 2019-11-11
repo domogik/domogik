@@ -32,6 +32,8 @@ sudo mkdir -p /etc/rc.d
 sudo chown $LOGNAME: /etc/rc.d
 sudo mkdir -p /etc/cron.d
 sudo chown $LOGNAME: /etc/cron.d
+sudo mkdir -p /usr/sbin/
+sudo chown $LOGNAME: /usr/sbin/
 
 echo "==== RUNNING SETUP.py"
 pip3 install .
