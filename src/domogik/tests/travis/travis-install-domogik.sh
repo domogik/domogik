@@ -22,6 +22,16 @@ sudo mkdir -p /var/log/xplhub
 sudo chown $LOGNAME: /var/log/xplhub
 sudo mkdir -p /etc/domogik
 sudo chown $LOGNAME: /etc/domogik
+sudo mkdir -p /etc/logrotate.d
+sudo chown $LOGNAME: /etc/logrotate.d
+sudo mkdir -p /etc/systemd/system
+sudo chown $LOGNAME: /etc/systemd/system
+sudo mkdir -p /etc/init.d
+sudo chown $LOGNAME: /etc/init.d
+sudo mkdir -p /etc/rc.d
+sudo chown $LOGNAME: /etc/rc.d
+sudo mkdir -p /etc/cron.d
+sudo chown $LOGNAME: /etc/cron.d
 
 echo "==== RUNNING SETUP.py"
 pip3 install .
