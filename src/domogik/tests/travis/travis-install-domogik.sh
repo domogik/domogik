@@ -28,3 +28,6 @@ sudo chown $LOGNAME:root /var/lock/domogik
 sudo chown $LOGNAME:root /var/lock/domogik/config.lock
 #sudo chown $LOGNAME:root /var/log/domogik/*
 ls -l /var/lock/domogik/
+ls -l /usr/local/bin/
+locate dmg_
+
