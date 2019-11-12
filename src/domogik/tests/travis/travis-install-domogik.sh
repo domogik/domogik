@@ -31,3 +31,4 @@ ls -l /var/lock/domogik/
 echo "==== PATH"
 echo $PATH
 dmg_version
+ls -l $VIRTUAL_ENV/bin/
