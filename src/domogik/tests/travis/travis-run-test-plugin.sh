@@ -1,9 +1,7 @@
 #!/bin/bash -e
-echo "=== Start virtualenv dmg_==="
-source /home/travis/virtualenv/python$PYTHON_VER/bin/activate
 
 echo "=== Install the plugin ==="
-dmg_package -i https://github.com/domogik/domogik-plugin-test/archive/master.zip
+dmg_package -i https://github.com/domogik/domogik-plugin-test/archive/python3.zip
 
 echo "=== Run the plugin testcases ==="
 dmg_testrunner --allow-alter /var/lib/domogik/domogik_packages/plugin_test/tests
