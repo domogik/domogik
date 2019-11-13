@@ -2,9 +2,6 @@
 # The -e option will make the bash stop if any command raise an error ($? != 0)
 
 #sleep 10
-echo "==== SEARCH dmg_hub"
-which dmg_hub
-sudo which dmg_hub
 echo "==== START DOMOGIK"
 sudo env "PATH=$PATH VIRTUAL_ENV=$VIRTUAL_ENV" /etc/init.d/domogik start
 sleep 10
