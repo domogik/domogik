@@ -45,8 +45,6 @@ from sqlalchemy import (
 from sqlalchemy.types import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation, backref, relationship
-
-from domogik.common.utils import ucode
 from domogik.common.configloader import Loader
 import enum as pyEnum
 
@@ -90,9 +88,9 @@ class Plugin(DomogikBase):
         @param hostname : hostname the plugin is installed on
 
         """
-        self.name = ucode(name)
-        self.type = ucode(type)
-        self.hostname = ucode(hostname)
+        self.name = name
+        self.type = type
+        self.hostname = hostname
 
 class PluginConfig(DomogikBase):
     """Configuration for a plugin (x10, plcbus, ...)"""
@@ -114,8 +112,8 @@ class PluginConfig(DomogikBase):
 
         """
         self.plugin_id = plugin_id
-        self.key = ucode(key)
-        self.value = ucode(value)
+        self.key = key
+        self.value = value
 
 class PluginHistory(DomogikBase):
     """Plugin history status"""
@@ -139,8 +137,8 @@ class PluginHistory(DomogikBase):
         """
         self.plugin_id = plugin_id
         self.date = date
-        self.status = ucode(status)
-        self.comment = ucode(comment)
+        self.status = status
+        self.comment = comment
 
 class Device(DomogikBase):
     """Device"""
@@ -173,12 +171,12 @@ class Device(DomogikBase):
         @param description : extended description, optional
 
         """
-        self.name = ucode(name)
-        self.reference = ucode(reference)
-        self.device_type_id = ucode(device_type_id)
-        self.client_id = ucode(client_id)
-        self.client_version = ucode(client_version)
-        self.description = ucode(description)
+        self.name = name
+        self.reference = reference
+        self.device_type_id = device_type_id
+        self.client_id = client_id
+        self.client_version = client_version
+        self.description = description
         self.info_changed = info_changed
 
 class DeviceParam(DomogikBase):
@@ -201,9 +199,9 @@ class DeviceParam(DomogikBase):
         @param type : The type param
         """
         self.device_id = device_id
-        self.key = ucode(key)
-        self.value = ucode(value)
-        self.type = ucode(type)
+        self.key = key
+        self.value = value
+        self.type = type
 
 class Command(DomogikBase):
     __tablename__ = '{0}_command'.format(_db_prefix)
@@ -218,9 +216,9 @@ class Command(DomogikBase):
 
     def __init__(self, device_id, name, reference, return_confirmation):
         self.device_id = device_id
-        self.name = ucode(name)
+        self.name = name
         self.return_confirmation = return_confirmation
-        self.reference = ucode(reference)
+        self.reference = reference
 
 class CommandParam(DomogikBase):
     __tablename__ = '{0}_command_param'.format(_db_prefix)
@@ -233,9 +231,9 @@ class CommandParam(DomogikBase):
 
     def __init__(self, cmd_id, key, data_type, conversion):
         self.cmd_id = cmd_id
-        self.key = ucode(key)
-        self.data_type = ucode(data_type)
-        self.conversion = ucode(conversion)
+        self.key = key
+        self.data_type = data_type
+        self.conversion = conversion
 
 class Sensor(DomogikBase):
     __tablename__ = '{0}_sensor'.format(_db_prefix)
@@ -261,12 +259,12 @@ class Sensor(DomogikBase):
 
     def __init__(self, device_id, name, reference, incremental, formula, data_type, conversion, h_store, h_max, h_expire, h_round, h_duplicate, timeout):
         self.device_id = device_id
-        self.name = ucode(name)
-        self.reference = ucode(reference)
+        self.name = name
+        self.reference = reference
         self.incremental = incremental
-        self.formula = ucode(formula)
-        self.data_type = ucode(data_type)
-        self.conversion = ucode(conversion)
+        self.formula = formula
+        self.data_type = data_type
+        self.conversion = conversion
         self.history_store = h_store
         self.history_max = h_max
         self.history_expire = h_expire
@@ -296,7 +294,7 @@ class SensorHistory(DomogikBase):
             pass
         except TypeError:
             pass
-        self.value_str = ucode(value)
+        self.value_str = value
 
 class XplStat(DomogikBase):
     __tablename__ = '{0}_xplstat'.format(_db_prefix)
@@ -310,9 +308,9 @@ class XplStat(DomogikBase):
 
     def __init__(self, device_id, name, schema, json_id):
         self.device_id = device_id
-        self.name = ucode(name)
-        self.schema = ucode(schema)
-        self.json_id = ucode(json_id)
+        self.name = name
+        self.schema = schema
+        self.json_id = json_id
 
 class XplStatParam(DomogikBase):
     __tablename__ = '{0}_xplstat_param'.format(_db_prefix)
@@ -329,13 +327,13 @@ class XplStatParam(DomogikBase):
 
     def __init__(self, xplstat_id, key, value, static, sensor_id, ignore_values, type, multiple=None):
         self.xplstat_id = xplstat_id
-        self.key = ucode(key)
-        self.value = ucode(value)
+        self.key = key
+        self.value = value
         self.static = static
         self.sensor_id = sensor_id
-        self.ignore_values = ucode(ignore_values)
-        self.type = ucode(type)
-        self.multiple = ucode(multiple)
+        self.ignore_values = ignore_values
+        self.type = type
+        self.multiple = multiple
 
 class XplCommand(DomogikBase):
     __tablename__ = '{0}_xplcommand'.format(_db_prefix)
@@ -351,10 +349,10 @@ class XplCommand(DomogikBase):
     params = relationship("XplCommandParam", backref=__tablename__, cascade="all", passive_deletes=True)
 
     def __init__(self, name, device_id, cmd_id, json_id, schema, stat_id):
-        self.name = ucode(name)
+        self.name = name
         self.device_id = device_id
         self.cmd_id = cmd_id
-        self.schema = ucode(schema)
+        self.schema = schema
         self.stat_id = stat_id
         self.json_id = json_id
 
@@ -368,8 +366,8 @@ class XplCommandParam(DomogikBase):
 
     def __init__(self, cmd_id, key, value):
         self.xplcmd_id = cmd_id
-        self.key = ucode(key)
-        self.value = ucode(value)
+        self.key = key
+        self.value = value
 
 class Scenario(DomogikBase):
     __tablename__ = '{0}_scenario'.format(_db_prefix)
@@ -383,8 +381,8 @@ class Scenario(DomogikBase):
     behavior = Column(Unicode(20), nullable=False, default=Unicode('wait'))
 
     def __init__(self, name, json, disabled=False, description=None, behavior='wait', state=None):
-        self.name = ucode(name)
-        self.json = ucode(json)
+        self.name = name
+        self.json = json
         self.disabled = disabled
         self.description = description
         self.state = state
@@ -410,8 +408,8 @@ class Person(DomogikBase):
         @param birthdate : birthdate
 
         """
-        self.first_name = ucode(first_name)
-        self.last_name = ucode(last_name)
+        self.first_name = first_name
+        self.last_name = last_name
         self.birthdate = birthdate
         self.location_sensor = location_sensor
 
@@ -442,17 +440,17 @@ class UserAccount(DomogikBase):
         @param lock_delete: True id the account is locked for deleting
 
         """
-        self.login = ucode(login)
-        self.password = ucode(password)
+        self.login = login
+        self.password = password
         self.person_id = person_id
         self.is_admin = is_admin
-        self.skin_used = ucode(skin_used)
+        self.skin_used = skin_used
         self.lock_edit = lock_edit
         self.lock_delete = lock_delete
 
     def set_password(self, password):
         """Set a password for the user"""
-        self.password = ucode(password)
+        self.password = password
 
    # Flask-Login integration
     def is_authenticated(self):
@@ -478,7 +476,7 @@ class Location(DomogikBase):
     params = relationship("LocationParam", backref=__tablename__, cascade="all", passive_deletes=True)
 
     def __init__(self, name, type, isHome=False):
-        self.name = ucode(name)
+        self.name = name
         self.type = type
         self.isHome = isHome
 
@@ -491,8 +489,8 @@ class LocationParam(DomogikBase):
 
     def __init__(self, location_id, key, value):
         self.location_id = location_id
-        self.key = ucode(key)
-        self.value = ucode(value)
+        self.key = key
+        self.value = value
 
 class MigrateType(pyEnum.Enum):
     DEVICE = "device"
