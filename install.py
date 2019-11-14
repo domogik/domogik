@@ -432,7 +432,7 @@ def update_default(user):
     os.system('sed -i "s;^DOMOGIK_USER.*$;DOMOGIK_USER={0};" /etc/default/domogik'.format(user))
 
 def find_interface():
-    info("Trying to find an interface to listen on")
+    info("Trying to find and activate Domogik module :")
     intf = ""
     try:
         import traceback
@@ -440,6 +440,7 @@ def find_interface():
         for d in pkg_resources.working_set :
             print(d)
         pkg_resources.get_distribution("Domogik").activate()
+        info("Trying to find an interface to listen on")
         from domogik.common.utils import get_interfaces, interface_has_ip
         for intf in get_interfaces():
             if intf == 'lo':
