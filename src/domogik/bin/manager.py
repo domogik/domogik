@@ -303,7 +303,7 @@ class Manager(XplPlugin, MQAsyncSub):
             dbConfig = dict(config[1])
             port_c = 40409 if not 'portcache' in dbConfig else int(dbConfig['portcache'])
             CacheDB.register('force_leave')
-            m = CacheDB(address=('localhost', port_c), authkey=b'{0}'.format(dbConfig['password']))
+            m = CacheDB(address=('localhost', port_c), authkey='{0}'.format(dbConfig['password']).encode('utf-8'))
             m.connect()
             if hasattr(self, "log"):
                 self.log.info(u"force_leave called. Exit to memory devices cache {0}".format(m))
@@ -312,6 +312,7 @@ class Manager(XplPlugin, MQAsyncSub):
                 m.force_leave()
             except :
                 pass
+        self.log.info("Force_leave completed, Domogik terminated normaly.")
         sys.exit()
 
     def _check_available_packages(self):
