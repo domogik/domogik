@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-                                                                           
+# -*- coding: utf-8 -*-
 
 """ This file is part of B{Domogik} project (U{http://www.domogik.org}).
 
@@ -29,7 +29,7 @@ Implements
 
 
 @author: Domogik project
-@copyright: (C) 2007-2012 Domogik project
+@copyright: (C) 2007-2019 Domogik project
 @license: GPL(v3)
 @organization: Domogik
 """
@@ -43,5 +43,5 @@ Implements
 #    pass
 
 # For the format of version numbers please see : http://wiki.domogik.org/Release_numbering
-__version__ = "0.6.0"
+__version__ = "0.6.5"
 __rest_api_version__ = "0.9"
