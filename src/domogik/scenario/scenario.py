@@ -92,7 +92,7 @@ class ScenarioInstance(MQAsyncSub):
         # TODO : fix for Russian names for example
         #self._log = log.getChild(remove_accents(name))
         try:
-            self._log = log.getChild(ucode(remove_accents(name)).encode('utf-8'))
+            self._log = log.getChild(remove_accents(name))
         except UnicodeDecodeError:
             self._log = log.getChild("SCENARIO")
             self._log.warning("The scenario name encountered an unicode error while trying to set the log line header with the scenario name. The scenario name will not be put in the log line. It will be replaced by 'SCENARIO'")

@@ -153,7 +153,7 @@ def scenario_edit(id):
     if request.method == 'POST' and form.validate():
         cli = MQSyncReq(app.zmq_context)
         msg = MQMessage()
-        if form.sid.data > 0:
+        if int(form.sid.data) > 0:
             msg.set_action('scenario.update')
         else:
             msg.set_action('scenario.new')
