@@ -312,6 +312,7 @@ def client_sensor_edit(client_id, sensor_id):
             timeout = TextField("Timeout", default=sensor.timeout)
             formula = TextField("Formula", default=sensor.formula, widget=TextArea())
             history_store = BooleanField("History Store", default=sensor.history_store)
+            incremental = BooleanField("Incremental", default=sensor.incremental)
             history_expire = TextField("History Expire", default=sensor.history_expire)
             history_round = TextField("History_round", default=sensor.history_round)
             history_max = TextField("History_max", default=sensor.history_max)
