@@ -42,3 +42,4 @@ imageio==2.5.0
 pyproj==2.1.3
 Shapely>=1.6.4
 timezonefinder==4.0.2
+pybabel-json==0.2.0
