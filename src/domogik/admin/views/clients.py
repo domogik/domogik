@@ -372,9 +372,9 @@ def client_sensor_edit(client_id, sensor_id):
                  formula=formula, \
                  data_type=data_type)
             if res:
-                flash(gettext("Sensor update succesfully"), 'success')
+                flash(gettext("Sensor update successfully"), 'success')
             else:
-                flash(gettext("Senor update failed"), 'warning')
+                flash(gettext("Sensor update failed"), 'warning')
             return redirect("/client/{0}/dmg_devices/known".format(client_id))
         else:
             return render_template('client_sensor.html',
@@ -438,7 +438,7 @@ def client_global_edit(client_id, dev_id):
                 with app.db.session_scope():
                     res = app.db.udpate_device_param(item["id"], value=val)
                     if res:
-                        flash(gettext("Param update succesfully"), 'success')
+                        flash(gettext("Param update successfully"), 'success')
                     else:
                         flash(gettext("Param update failed"), 'warning')
             # in all case we send an update event (in case of partial success...)
@@ -494,7 +494,7 @@ def client_devices_edit(client_id, did):
                         exclude=['params', 'commands', 'sensors', 'address', \
                                 'xpl_commands', 'xpl_stats', 'device_type_id', \
                                 'client_id', 'client_version', 'info_changed'])
-        form = MyForm(request.form, device)
+        form = MyForm(request.form, obj=device)
 
         if request.method == 'POST' and form.validate():
             res = app.db.update_device(did, \
@@ -502,7 +502,7 @@ def client_devices_edit(client_id, did):
                 d_description=request.form['description'], \
                 d_reference=request.form['reference'])
             if res:
-                flash(gettext("Device update succesfully"), 'success')
+                flash(gettext("Device update successfully"), 'success')
             else:
                 flash(gettext("Device update failed"), 'warning')
             # in all case we send an update event (in case of partial success...)
@@ -532,15 +532,15 @@ def client_devices_delete(client_id, did):
                 flash(gettext("Device deleted failed"), 'warning')
                 app.logger.error(u"Error while deleting the device (no result)...")
             else:
-                flash(gettext("Device deleted succesfully"), 'success')
-                app.logger.debug(u"Device deleted succesfully")
+                flash(gettext("Device deleted successfully"), 'success')
+                app.logger.debug(u"Device deleted successfully")
             # in all case we send an update event (in case of partial success...)
             pub = MQPub(app.zmq_context, 'adminhttp')
             pub.send_event('device.update',
                            {"device_id" : did,
                             "client_id" : res.client_id})
     except DbHelperException as e:
-        flash(gettext("Device deletion not allowed. {0}".format(e.value)), 'warning')
+        flash("{0} : {1}".format(gettext("Device deletion not allowed"), e.value), 'warning')
         app.logger.warning(u"Unable to delete the device. Reason is : {0}".format(traceback.format_exc()))
     except:
         flash(gettext("Device deletion failed"), 'warning')
@@ -1011,7 +1011,7 @@ def client_devices_new_wiz(client_id, device_type_id, product, based_on=0):
                 with app.db.session_scope():
                     res = app.db.add_full_device(params, pjson)
                     if res:
-                        flash(gettext("Device created succesfully"), 'success')
+                        flash(gettext("Device created successfully"), 'success')
                     else:
                         flash(gettext("Device creation failed"), 'warning')
                         if reason:
