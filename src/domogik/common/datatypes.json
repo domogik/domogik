@@ -821,12 +821,12 @@
         "usage" : "All the datatypes under this Experimental one are not yet stable. Use them with caution as they could be renamed/suppressed/updated/merged in the next releases of Domogik!",
         "example" : "",
         "format": "",
-        "childs": ["DT_HVACMode", 
-                   "DT_HVACHeat", 
-                   "DT_HVACVent", 
-                   "DT_HVACFan", 
-                   "DT_HeatingPilotWire", 
-                   "DT_UPSState", 
+        "childs": ["DT_HVACMode",
+                   "DT_HVACHeat",
+                   "DT_HVACVent",
+                   "DT_HVACFan",
+                   "DT_HeatingPilotWire",
+                   "DT_UPSState",
                    "DT_UPSEvent"]
     },
     "DT_HVACMode": {
@@ -939,9 +939,9 @@
         "parent" : "DT_Experimental"
     },
 
-
-
     "DT_ColorCII": {
+        "usage" : "TODO",
+        "example" : "",
         "values": {
             "W": "White",
             "O": "Orange",
@@ -952,6 +952,7 @@
             "Bk": "Black",
             "Br": "Brown"
         },
-        "childs": []
+        "childs": [],
+        "parent" : "DT_Experimental"
     }
 }
