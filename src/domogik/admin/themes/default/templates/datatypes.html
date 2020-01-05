@@ -9,35 +9,35 @@
  </div>
  <div class="row">
     <div class="col">
-      <h3>Search</h3>
+      <h3>{% trans %}Search{% endtrans %}</h3>
 	<div class="form-group">
-	  <label for="input-search" class="sr-only">Search Tree:</label>
-	  <input type="input" class="form-control" id="input-search" placeholder="Type to search..." value="">
+	  <label for="input-search" class="sr-only">{% trans %}Search Tree{% endtrans %} :</label>
+	  <input type="input" class="form-control" id="input-search" placeholder="{% trans %}Type to search{% endtrans %}..." value="">
 	</div>
 	<div class="checkbox">
 	  <label>
 	    <input type="checkbox" class="checkbox" id="chk-ignore-case" value="true">
-	    Ignore Case
+	    {% trans %}Ignore Case{% endtrans %}
 	  </label>
 	</div>
 	<div class="checkbox">
 	  <label>
 	    <input type="checkbox" class="checkbox" id="chk-exact-match" value="false">
-	    Exact Match
+	    {% trans %}Exact Match{% endtrans %}
 	  </label>
 	</div>
-	<button type="button" class="btn btn-success" id="btn-search">Search</button>
+	<button type="button" class="btn btn-success" id="btn-search">{% trans %}Search{% endtrans %}</button>
       <!-- </form> -->
     </div>
   </div>
   <div class="row">
     <div class="col-md-4">
-      <h3>Datatypes</h3>
-      <div id="treeview-searchable" class=""></div>
+      <h3>{% trans %}Datatypes{% endtrans %}</h3>
+      <div id="treeview-searchable" class="pre-scrollable"></div>
     </div>
     <div class="col-md-8">
       <div id="detail">
-      <h3>Details</h3>
+      <h3>{% trans %}Details{% endtrans %}</h3>
       <div id="search-output"></div>
       </div>
     </div>

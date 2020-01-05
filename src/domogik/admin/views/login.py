@@ -1,5 +1,5 @@
-from domogik.admin.application import app, login_manager, babel, render_template, timeit
-from flask import request, flash, redirect, Response
+from domogik.admin.application import app, login_manager, babel, render_template, timeit, TRANSLATIONS
+from flask import g, request, flash, redirect, Response
 from domogikmq.reqrep.client import MQSyncReq
 from domogikmq.message import MQMessage
 from flask_login import login_required, login_user, logout_user, current_user
@@ -76,8 +76,12 @@ def load_user_from_request(request):
 
 @babel.localeselector
 def get_locale():
-    return 'en'
-
+    # use the locale from the cookie settings or the best match if no cookies set
+    lang = request.cookies.get('dmg_language')
+    if lang is None or lang not in TRANSLATIONS :
+        lang = request.accept_languages.best_match([str(translation) for translation in TRANSLATIONS])
+    app.logger.debug("babel language selected : {0} in {1}".format(lang, TRANSLATIONS))
+    return lang
 
 @app.route('/login', methods=('GET', 'POST'))
 @timeit

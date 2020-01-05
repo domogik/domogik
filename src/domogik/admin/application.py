@@ -115,6 +115,11 @@ login_manager.init_app(app)
 
 babel = Babel()
 babel.init_app(app)
+TRANSLATIONS = {
+    'en':' English',
+    'fr': 'Français',
+    'nl_BE': 'Flemish'
+    }
 
 Themes(app, app_identifier='domogik-admin')
 
@@ -131,8 +136,21 @@ def format_babel_datetime(value, format='medium'):
 def sort_by_id(value):
     return sorted(value.items(), key=lambda x: x[1]['id'])
 
+def get_languages(value):
+    return TRANSLATIONS
+
+def current_languages(value):
+    lang = request.cookies.get('dmg_language')
+    if lang is not None and lang in TRANSLATIONS :
+        return lang
+    translations = [str(translation) for translation in babel.list_translations()]
+    return request.accept_languages.best_match(translations)
+
+
 app.jinja_env.filters['datetime'] = format_babel_datetime
 app.jinja_env.filters['sortid'] = sort_by_id
+app.jinja_env.filters['languages'] = get_languages
+app.jinja_env.filters['currentlocal'] = current_languages
 
 # create acces_log
 @app.after_request

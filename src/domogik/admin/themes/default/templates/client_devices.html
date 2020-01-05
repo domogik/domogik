@@ -71,7 +71,7 @@
             return url;
         }
     }
-    
+
     $(document).ready(function(){
         $('#detected-device').click(function() {
             $("#detected-device").html("<span class='glyphicon glyphicon-refresh gly-spin' aria-hidden='true'></span> {% trans %}Loading detected device list ...{% endtrans %}");
@@ -195,7 +195,7 @@
                                       <tr>
                                         <td colspan="2">
                                           <div class="alert alert-warning" role="alert">
-                                          <strong>{% trans %}Warning{% endtrans %}</strong> : 
+                                          <strong>{% trans %}Warning{% endtrans %}</strong> :
                                           {% trans %}The datatype used by this sensor is no more compliant with this release of Domogik. You may consider to upgrade this plugin and if needed, recreate this device.{% endtrans %}
                                           </div>
                                         </td>
@@ -217,7 +217,7 @@
                                               <em>( {{ datatypes[sen.data_type]['values'] [sen.last_value] }} )</em>
                                             {% elif sen.data_type == "DT_VideoMjpeg" or sen.data_type == "DT_Image" %}
                                               <div>
-                                                <!-- original image 
+                                                <!-- original image
                                                 <img style="max-width: 80%" src="{{sen.last_value | replace("publish://", rest_url + "/publish/")}}"/>
                                                 -->
                                                 <img id="video_{{ sen.id }}" style="max-width: 80%" src="#">
@@ -263,7 +263,7 @@
                                             <li><strong>{% trans %}Polling interval{% endtrans %}</strong> : 5s</li>
                                             <li><strong>{% trans %}JSONPath expression{% endtrans %}</strong> : $[0].value_str</li>
                                           </ul>
-  
+
                                           <h5>{% trans %}Create the sensor{% endtrans %}</h5>
                                           <p>
                                             {% trans %}You have to create a <strong>custom sensor</strong>{% endtrans %}
@@ -318,35 +318,35 @@
                                       <tr>
                                         <td>{{ param.key }}</td>
                                         <td>
-                                          <p><strong>{% trans %}Data type :{% endtrans %}</strong> {{ param.data_type }}</p>
+                                          <p><strong>{% trans %}Data type{% endtrans %} :</strong> {{ param.data_type }}</p>
 
                                           {% if datatypes[param.data_type] is defined %}
-                                            <p><strong>{% trans %}Description : {% endtrans %}</strong><em>{{ datatypes[param.data_type]['usage'] }}</em></p>
+                                            <p><strong>{% trans %}Description{% endtrans %} : </strong><em>{{ datatypes[param.data_type]['usage'] }}</em></p>
                                             <p>
-                                              <strong>{% trans %}Values : {% endtrans %}</strong>
+                                              <strong>{% trans %}Values{% endtrans %} : </strong>
                                               {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
                                                 <ul>
                                                   <li><strong>{{ datatypes[param.data_type]['labels']['0'] }}</strong> : 0</li>
                                                   <li><strong>{{ datatypes[param.data_type]['labels']['1'] }}</strong> : 1</li>
                                                 </ul>
-    
+
                                               {% elif param.data_type == "DT_Trigger" or datatypes[param.data_type]['parent'] == "DT_Trigger" %}
                                                 <ul>
                                                   <li><strong>{{ datatypes[param.data_type]['labels']['1'] }}</strong> : 1</li>
                                                 </ul>
-    
+
                                               {% elif param.data_type == "DT_ColorRGBHexa" or datatypes[param.data_type]['parent'] == "DT_ColorRGBHexa" %}
                                                 <ul>
                                                   <li><strong>{% trans %}Black (off){% endtrans %}</strong> : 000000</li>
                                                   <li><strong>{% trans %}White{% endtrans %}</strong> : ffffff</li>
                                                   <li><strong>{% trans %}Red{% endtrans %}</strong> : ff0000</li>
                                                 </ul>
-    
+
                                               {% elif param.data_type == "DT_String" %}
                                                 <ul>
                                                   <li>{% trans %}Some text{% endtrans %}</li>
                                                 </ul>
-    
+
                                               {% elif 'values' in datatypes[param.data_type] %}
                                                 <div class="input-group col-md-6">
                                                     <ul>
@@ -355,7 +355,7 @@
                                                     {% endfor %}
                                                     </ul>
                                                 </div>
-    
+
                                               {% else %}
                                                 <ul>
                                                   <li>{% trans %}A value{% endtrans %}</li>
@@ -364,7 +364,7 @@
                                             </p>
                                           {% else %}
                                             <div class="alert alert-warning" role="alert">
-                                            <strong>{% trans %}Warning{% endtrans %}</strong> : 
+                                            <strong>{% trans %}Warning{% endtrans %}</strong> :
                                             {% trans %}The datatype used by this command is no more compliant with this release of Domogik. You may consider to upgrade this plugin and if needed, recreate this device.{% endtrans %}
                                             </div>
                                           {% endif %}
@@ -383,8 +383,8 @@
                                       <th>{% trans %}REST url{% endtrans %}</th>
                                       <td>
                                         {% set url_sample = [rest_url + "/cmd/id/" + cmd.id|string + "?"] %}
-  
-  
+
+
                                         {% for param in cmd.parameters %}
                                           {% set _ = url_sample.pop() %}
                                           {% set _ = url_sample.append(_ + param.key + "=<value>&") %}
@@ -406,7 +406,7 @@
                                               <option value="0">{{ datatypes[param.data_type]['labels']['0'] }}</option>
                                               <option value="1">{{ datatypes[param.data_type]['labels']['1'] }}</option>
                                             </select>
-  
+
                                           {% elif param.data_type == "DT_Trigger" or datatypes[param.data_type]['parent'] == "DT_Trigger" %}
                                             <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="{{cmd.id}}_{{param.key}}">
                                               <option value="1">{{ datatypes[param.data_type]['labels']['1'] }}</option>
@@ -416,7 +416,7 @@
                                             <input class="mb-2 mr-sm-2 mb-sm-0" type="color" value="#563d7c" id="{{cmd.id}}_{{param.key}}">
 
                                           {% elif param.data_type == "DT_String" %}
-                                            <input class="mb-2 mr-sm-2 mb-sm-0" type="text" value="{% trans %}Some Text{% endtrans %}" id="{{cmd.id}}_{{param.key}}">
+                                            <input class="mb-2 mr-sm-2 mb-sm-0" type="text" value="{% trans %}Some text{% endtrans %}" id="{{cmd.id}}_{{param.key}}">
 
                                           {% elif 'values' in datatypes[param.data_type] %}
                                             <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="{{cmd.id}}_{{param.key}}">
@@ -446,7 +446,7 @@
                                             var cmdUrl = '{{rest_url}}/cmd/id/{{ cmd.id|string }}?';
                                             var tmpVal = undefined;
                                             {% for param in cmd.parameters %}
-                                                
+
                                               {% if param.data_type == "DT_ColorRGBHexa" or datatypes[param.data_type]['parent'] == "DT_ColorRGBHexa" %}
                                                 {# Remove the starting # for colors #}
                                                 tmpVal = $('#{{cmd.id}}_{{param.key}}').val();
@@ -455,12 +455,12 @@
                                                 tmpVal = $('#{{cmd.id}}_{{param.key}}').val();
                                               {% endif %}
                                               cmdUrl = cmdUrl + '{{param.key}}=' + tmpVal + "&";
-                                              
+
                                             {% endfor %}
                                             // remove the last &
                                             cmdUrl = cmdUrl.substring(0, cmdUrl.length-1);
-                                            
-                                            $('#debug_test_{{ cmd.id }}').html("<div class='alert alert-info' role='alert'>{% trans %}Calling url : {% endtrans %}<a href='" + cmdUrl + "'>" + cmdUrl + "</a></div>");
+
+                                            $('#debug_test_{{ cmd.id }}').html("<div class='alert alert-info' role='alert'>{% trans %}Calling url{% endtrans %} : <a href='" + cmdUrl + "'>" + cmdUrl + "</a></div>");
                                             $.ajax({
                                                   url: cmdUrl,
                                                   data: {
@@ -468,7 +468,7 @@
                                                   },
                                                   error: function(xhr, status, error) {
                                                      var err = eval("(" + xhr.responseText + ")");
-                                                     $('#debug_test_{{ cmd.id }}').append("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span> {% trans %}An error occured while sending the command. Maybe the client did not respond to the command. Please check the client is alive or the client logs.{% endtrans %}</div>");
+                                                     $('#debug_test_{{ cmd.id }}').append("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span> {% trans %}An error occurred while sending the command. Maybe the client did not respond to the command. Please check the client is alive or the client logs.{% endtrans %}</div>");
                                                   },
                                                   // dataType: 'jsonp',
                                                   success: function(data) {
@@ -478,7 +478,7 @@
                                                });
                                           });
                                         </script>
-                                        
+
                                       </td>
                                     </tr>
                                   </tbody>
@@ -492,7 +492,7 @@
                                    depending on the command type.
                                    Else, it would be hard to show examples so we put less informations #}
                                 {% if cmd.parameters | length == 1 %}
-                      
+
                                   {# ok, we do a loop only if length = 1.
                                      And so what ?
                                      This is just usefull to do it like this #}
@@ -502,7 +502,7 @@
                                         <tr>
                                           <th>{% trans %}Openremote{% endtrans %}</th>
                                           <td>
-    
+
                                             <a href="#openremote{{ cmd.id }}{{param.key}}" data-toggle="collapse">{% trans %}Usage{% endtrans %} <span class='glyphicon glyphicon-menu-down' aria-hidden='true'></span></a>
                                             <div id="openremote{{ cmd.id }}{{param.key}}" class="collapse">
                                               {% if param.data_type == "DT_Bool" or datatypes[param.data_type]['parent'] == "DT_Bool" %}
@@ -543,7 +543,7 @@
                                       <tr>
                                         <th>{% trans %}Openremote{% endtrans %}</th>
                                         <td>
-  
+
                                           <a href="#openremote{{ cmd.id }}" data-toggle="collapse">{% trans %}Usage{% endtrans %} <span class='glyphicon glyphicon-menu-down' aria-hidden='true'></span></a>
                                           <div id="openremote{{ cmd.id }}" class="collapse">
                                               <p>

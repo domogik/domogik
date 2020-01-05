@@ -45,5 +45,5 @@ def orphans_delete(did):
         if not res:
             flash(gettext("Device deleted failed"), 'warning')
         else:
-            flash(gettext("Device deleted succesfully"), 'success')
+            flash(gettext("Device deleted successfully"), 'success')
         return redirect("/orphans")

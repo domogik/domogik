@@ -180,7 +180,7 @@
                 else if (msgid == "interface.input") {
                     style = "Left";
                     icon = "user";
-                    sourceHtml = "<span class='source'>{% trans %}Source : {% endtrans %}" + content['source'] + " </span>";
+                    sourceHtml = "<span class='source'>{% trans %}Source{% endtrans %} : " + content['source'] + " </span>";
                 }
                 else {
                     return;
@@ -252,7 +252,7 @@
                                    <div>" + sexHtml + "</div>  \
                                  </div> \
                                  <p class='lead'>" + mediaHtml + " " + content['text'] + " </p>\
-                                 <p class='location'>{% trans %}Location : {% endtrans %}" + locationHtml + " \
+                                 <p class='location'>{% trans %}Location{% endtrans % : }" + locationHtml + " \
                                  " + sourceHtml + " \
                                  </p> \
                                </div> \

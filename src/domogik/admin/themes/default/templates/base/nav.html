@@ -35,9 +35,27 @@
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/logout"><i class="fa fa-sign-out"></i> {% trans %}Logout{% endtrans%}</a></li>
       </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown" id="lang">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe"></i><span  id="language"> {{ mactive|currentlocal }}</span><b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            {% set languages = mactive|languages %}
+            {% for lang, desc in languages.items()%}
+                <li id={{ lang }}><a onclick="setlanguage({{ lang }})">{{ lang }} : {{ desc }}</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+      </ul>
     </div><!-- /.navbar-collapse -->
     {% for item in global_errors: %}
     <div class="alert alert-danger clearfix" role="alert">{{ item[0] }}<a href="{{ item[1] }}" class="btn btn-sm btn-danger pull-right">Fix it</a></div>
     {% endfor %}
   </div><!-- /.container-fluid -->
 </nav>
+<script type="text/javascript">
+    function setlanguage(lang) {
+        $('#language')[0].textContent = " "+lang.id;
+        document.cookie  = 'dmg_language='+lang.id+';path=/;expires=' + new Date(2147483647 * 1000).toUTCString();
+        location.reload();
+    }
+</script>

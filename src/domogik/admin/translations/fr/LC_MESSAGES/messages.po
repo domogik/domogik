@@ -3,359 +3,3855 @@
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-14 11:56+0100\n"
-"PO-Revision-Date: 2013-11-12 12:53+0100\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2020-01-04 22:16+0000\n"
+"PO-Revision-Date: 2020-01-04 23:34+0100\n"
+"Last-Translator: \n"
+"Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.6.0\n"
+"X-Generator: Poedit 2.2.4\n"
 
-#: templates/account_edit.html:6 templates/accounts_edit.html:6
-msgid "Account Edit"
+#: datatypes.json:3
+msgid ""
+"The trigger can be used to execute some actions which returns no status. For "
+"example : request to execute a given script."
+msgstr ""
+"Trigger peut être utilisé pour exécuter certaines actions qui ne retournent "
+"aucun état. Par exemple: demande d'exécuter un script donné."
+
+#: datatypes.json:6
+msgid "Triggered"
+msgstr "Déclenché"
+
+#: datatypes.json:8 datatypes.json:37 datatypes.json:47 datatypes.json:57
+#: datatypes.json:67 datatypes.json:77 datatypes.json:87 datatypes.json:97
+#: datatypes.json:107 datatypes.json:117 datatypes.json:197 datatypes.json:206
+#: datatypes.json:215 datatypes.json:224 datatypes.json:233 datatypes.json:242
+#: datatypes.json:251 datatypes.json:260 datatypes.json:269 datatypes.json:278
+#: datatypes.json:287 datatypes.json:296 datatypes.json:305 datatypes.json:314
+#: datatypes.json:323 datatypes.json:332 datatypes.json:341 datatypes.json:350
+#: datatypes.json:359 datatypes.json:368 datatypes.json:377 datatypes.json:386
+#: datatypes.json:395 datatypes.json:404 datatypes.json:413 datatypes.json:422
+#: datatypes.json:431 datatypes.json:440 datatypes.json:449 datatypes.json:458
+#: datatypes.json:467 datatypes.json:476 datatypes.json:485 datatypes.json:494
+#: datatypes.json:503 datatypes.json:512 datatypes.json:521 datatypes.json:530
+#: datatypes.json:539 datatypes.json:548 datatypes.json:557 datatypes.json:566
+#: datatypes.json:575 datatypes.json:584 datatypes.json:593 datatypes.json:602
+#: datatypes.json:611 datatypes.json:620 datatypes.json:629 datatypes.json:638
+#: datatypes.json:647 datatypes.json:656 datatypes.json:677 datatypes.json:685
+#: datatypes.json:703 datatypes.json:728 datatypes.json:736 datatypes.json:743
+#: datatypes.json:762 datatypes.json:769 datatypes.json:776 datatypes.json:783
+#: datatypes.json:790 datatypes.json:802 datatypes.json:809 datatypes.json:815
+#: datatypes.json:842 datatypes.json:855 datatypes.json:868 datatypes.json:884
+#: datatypes.json:898 datatypes.json:909 datatypes.json:938 datatypes.json:955
+msgid "childs"
+msgstr "enfants"
+
+#: datatypes.json:11
+msgid ""
+"The Bool can be used for a command to change the state of a device (open/close, "
+"on/off, ...) and the sensor can be used to get the state of a device (opened/"
+"closed, empty/filled, ...). When you can, use one of its childs."
+msgstr ""
+"Bool peut être utilisé comme commande pour changer l'état d'un appareil "
+"(ouvert / fermé, marche / arrêt, ...) et le capteur peut être utilisé pour "
+"obtenir l'état d'un appareil (ouvert / fermé, vide / rempli, ...). Lorsque vous "
+"le pouvez, utilisez l'un de ses enfants."
+
+#: datatypes.json:12
+msgid "0 | 1"
+msgstr "0 | 1"
+
+#: datatypes.json:14
+msgid "False"
+msgstr "Faux"
+
+#: datatypes.json:15
+msgid "True"
+msgstr "Vrais"
+
+#: datatypes.json:18
+msgid "DT_Switch"
 msgstr ""
 
-#: templates/accounts.html:5
-msgid "Account list"
+#: datatypes.json:19
+msgid "DT_Enable"
 msgstr ""
 
-#: templates/accounts.html:6 templates/persons.html:6
-msgid "Add new"
+#: datatypes.json:20
+msgid "DT_Binary"
 msgstr ""
 
-#: templates/accounts.html:11 templates/login.html:6
-msgid "Login"
+#: datatypes.json:21
+msgid "DT_Step"
 msgstr ""
 
-#: templates/accounts.html:12
-msgid "Admin"
+#: datatypes.json:22
+msgid "DT_UpDown"
 msgstr ""
 
-#: templates/accounts.html:22 templates/client_devices.html:16
-#: templates/clients.html:14 templates/clients.html:31
-#: templates/orphans.html:15
-msgid "Details"
+#: datatypes.json:23
+msgid "DT_OpenClose"
 msgstr ""
 
-#: templates/accounts.html:25 templates/client_devices.html:29
-#: templates/persons.html:28
-msgid "Delete"
+#: datatypes.json:24
+msgid "DT_Start"
 msgstr ""
 
-#: templates/accounts.html:34
-msgid "No accounts found"
+#: datatypes.json:25
+msgid "DT_State"
 msgstr ""
 
-#: templates/client.html:7
+#: datatypes.json:26
+msgid "DT_Motion"
+msgstr ""
+
+#: datatypes.json:30
+msgid ""
+"The Switch can be used to control or get the state of lights, appliances, ..."
+msgstr ""
+"Switch peut être utilisé pour contrôler ou obtenir l'état des lumières, des "
+"appareils, ..."
+
+#: datatypes.json:31
+msgid "0 (Off) | 1 (On)"
+msgstr "0 (Off) | 1 (On)"
+
+#: datatypes.json:33
+msgid "Off"
+msgstr "Off"
+
+#: datatypes.json:34
+msgid "On"
+msgstr "On"
+
+#: datatypes.json:36 datatypes.json:46 datatypes.json:56 datatypes.json:66
+#: datatypes.json:76 datatypes.json:86 datatypes.json:96 datatypes.json:106
+#: datatypes.json:116
+msgid "DT_Bool"
+msgstr ""
+
+#: datatypes.json:40
+msgid ""
+"Enable will allow you to enable or disable some features and get their state. "
+"For example a virtual device could be used to enable or disable an alarm."
+msgstr ""
+"Enable vous permettra d'activer ou de désactiver certaines fonctionnalités et "
+"d'obtenir leur état. Par exemple, un périphérique virtuel peut être utilisé pour "
+"activer ou désactiver une alarme."
+
+#: datatypes.json:41
+msgid "0 (Disable) | 1 (Enable)"
+msgstr "0 (désactivé) | 1 (Activer)"
+
+#: datatypes.json:43 views/scenario.py:139
+msgid "Disable"
+msgstr "Désactivé"
+
+#: datatypes.json:44
+msgid "Enable"
+msgstr "Activé"
+
+#: datatypes.json:50
+msgid "You can use Binary for low level binary devices."
+msgstr "Vous pouvez utiliser Binary pour les périphériques binaires de bas niveau."
+
+#: datatypes.json:51
+msgid "0 (Low) | 1 (High)"
+msgstr "0 (faible) | 1 (élevé)"
+
+#: datatypes.json:53
+msgid "Low"
+msgstr "Faible"
+
+#: datatypes.json:54
+msgid "High"
+msgstr "Elevé"
+
+#: datatypes.json:61
+msgid "0 (Decrease) | 1 (Increase)"
+msgstr "0 (Diminution) | 1 (Augmentation)"
+
+#: datatypes.json:63
+msgid "Decrease"
+msgstr "Diminuer"
+
+#: datatypes.json:64
+msgid "Increase"
+msgstr "Augmenter"
+
+#: datatypes.json:70
+msgid ""
+"Use Updown to control or get the status of devices that can be up or down "
+"(rolling shutter, barrier, ...)"
+msgstr ""
+"Utilisez Updown pour contrôler ou obtenir le statut des appareils pouvant monter "
+"ou descendre (volet roulant, barrière, ...)"
+
+#: datatypes.json:71
+msgid "0 (Up) | 1 (Down)"
+msgstr "0 (Haut) | 1 (Bas)"
+
+#: datatypes.json:73
+msgid "Up"
+msgstr "Monter"
+
+#: datatypes.json:74
+msgid "Down"
+msgstr "Descendre"
+
+#: datatypes.json:80
+msgid ""
+"OpenClose will be used to control door locks, garage doors, shutters. You can "
+"also use it to get the state of doors, windows, locks, ..."
+msgstr ""
+"OpenClose sera utilisé pour contrôler les serrures de porte, portes de garage, "
+"volets. Vous pouvez également l'utiliser pour obtenir l'état des portes, "
+"fenêtres, serrures, ..."
+
+#: datatypes.json:81
+msgid "0 (Open) | 1 (Close)"
+msgstr ""
+
+#: datatypes.json:83
+msgid "Open"
+msgstr "Ouvrir"
+
+#: datatypes.json:84 themes/default/templates/clients.html:15
+#: themes/default/templates/scenario_edit.html:292
+msgid "Close"
+msgstr "Fermer"
+
+#: datatypes.json:90
+msgid "You can use Start to control and get the state of some motors"
+msgstr ""
+"Vous pouvez utiliser Start pour contrôler et obtenir l'état de certains moteurs"
+
+#: datatypes.json:91
+msgid "0 (Stop) | 1 (Start)"
+msgstr "0 (Arrêter) | 1 (Demarrer)"
+
+#: datatypes.json:93
+msgid "Stop"
+msgstr "Arrêter"
+
+#: datatypes.json:94
+msgid "Start"
+msgstr "Démarrer"
+
+#: datatypes.json:100
+msgid ""
+"With State, you can control and get the state of stuff that can be active or "
+"inactive."
+msgstr ""
+"Avec State, vous pouvez contrôler et obtenir l'état des éléments qui peuvent "
+"être actifs ou inactifs."
+
+#: datatypes.json:101
+msgid "0 (Inactive) | 1 (Active)"
+msgstr "0 (Inactif) | 1 (Actif)"
+
+#: datatypes.json:103
+msgid "Inactive"
+msgstr "Inactif"
+
+#: datatypes.json:104
+msgid "Active"
+msgstr "Actif"
+
+#: datatypes.json:110
+msgid "The Motion can be used for all motion sensors."
+msgstr "Le Motion peut être utilisé pour tous les capteurs de mouvement."
+
+#: datatypes.json:111
+msgid "0 (No motion) | 1 (Motion)"
+msgstr "0 (Pas de mouvement) | 1 (Mouvement)"
+
+#: datatypes.json:113
+msgid "No motion"
+msgstr "Pas de mouvement"
+
+#: datatypes.json:114
+msgid "Motion"
+msgstr "Mouvement"
+
+#: datatypes.json:120
+msgid ""
+"Number can be used for all kind of sensor which measure something (temperature, "
+"humidity, ...). You can also use it to control some things (a motor speed, ...). "
+"The float separator is the point, whatever language you will configure your "
+"Domogik system. When you can, use one of its childs. "
+msgstr ""
+"Number peut être utilisé pour tout type de capteur qui mesure quelque chose "
+"(température, humidité, ...). Vous pouvez également l'utiliser pour contrôler "
+"certaines choses (une vitesse du moteur, ...). Le séparateur flottant est le "
+"point, quelle que soit la langue, vous configurerez votre système Domogik. "
+"Lorsque vous le pouvez, utilisez l'un de ses enfants. "
+
+#: datatypes.json:121
+msgid "1.23 | 42 | 1000"
+msgstr ""
+
+#: datatypes.json:122 datatypes.json:181 datatypes.json:193 datatypes.json:202
+#: datatypes.json:211 datatypes.json:220 datatypes.json:229 datatypes.json:238
+#: datatypes.json:247 datatypes.json:256 datatypes.json:265 datatypes.json:274
+#: datatypes.json:283 datatypes.json:292 datatypes.json:301 datatypes.json:310
+#: datatypes.json:319 datatypes.json:328 datatypes.json:337 datatypes.json:346
+#: datatypes.json:355 datatypes.json:364 datatypes.json:373 datatypes.json:382
+#: datatypes.json:391 datatypes.json:400 datatypes.json:409 datatypes.json:418
+#: datatypes.json:427 datatypes.json:436 datatypes.json:445 datatypes.json:454
+#: datatypes.json:463 datatypes.json:472 datatypes.json:481 datatypes.json:483
+#: datatypes.json:490 datatypes.json:499 datatypes.json:508 datatypes.json:517
+#: datatypes.json:526 datatypes.json:535 datatypes.json:544 datatypes.json:553
+#: datatypes.json:562 datatypes.json:571 datatypes.json:580 datatypes.json:589
+#: datatypes.json:598 datatypes.json:607 datatypes.json:616 datatypes.json:625
+#: datatypes.json:634 datatypes.json:643 datatypes.json:652
+msgid "min"
+msgstr "min"
+
+#: datatypes.json:123 datatypes.json:182 datatypes.json:194 datatypes.json:203
+#: datatypes.json:212 datatypes.json:221 datatypes.json:230 datatypes.json:239
+#: datatypes.json:248 datatypes.json:257 datatypes.json:266 datatypes.json:275
+#: datatypes.json:284 datatypes.json:293 datatypes.json:302 datatypes.json:311
+#: datatypes.json:320 datatypes.json:329 datatypes.json:338 datatypes.json:347
+#: datatypes.json:356 datatypes.json:365 datatypes.json:374 datatypes.json:383
+#: datatypes.json:392 datatypes.json:401 datatypes.json:410 datatypes.json:419
+#: datatypes.json:428 datatypes.json:437 datatypes.json:446 datatypes.json:455
+#: datatypes.json:464 datatypes.json:473 datatypes.json:482 datatypes.json:491
+#: datatypes.json:500 datatypes.json:509 datatypes.json:518 datatypes.json:527
+#: datatypes.json:536 datatypes.json:545 datatypes.json:554 datatypes.json:563
+#: datatypes.json:572 datatypes.json:581 datatypes.json:590 datatypes.json:599
+#: datatypes.json:608 datatypes.json:617 datatypes.json:626 datatypes.json:635
+#: datatypes.json:644 datatypes.json:653
+msgid "max"
+msgstr "max"
+
+#: datatypes.json:124 datatypes.json:510
+msgid "unit"
+msgstr "unité"
+
+#: datatypes.json:126
+msgid "DT_Angle"
+msgstr ""
+
+#: datatypes.json:127
+msgid "DT_Brightness"
+msgstr ""
+
+#: datatypes.json:128
+msgid "DT_Temp"
+msgstr ""
+
+#: datatypes.json:129
+msgid "DT_TempK"
+msgstr ""
+
+#: datatypes.json:130
+msgid "DT_TempF"
+msgstr ""
+
+#: datatypes.json:131
+msgid "DT_Pressure"
+msgstr ""
+
+#: datatypes.json:132
+msgid "DT_mbarPressure"
+msgstr ""
+
+#: datatypes.json:133
+msgid "DT_barPressure"
+msgstr ""
+
+#: datatypes.json:134 datatypes.json:186
+msgid "DT_Humidity"
+msgstr ""
+
+#: datatypes.json:135
+msgid "DT_AirQuality"
+msgstr ""
+
+#: datatypes.json:136
+msgid "DT_Volt"
+msgstr ""
+
+#: datatypes.json:137
+msgid "DT_mVolt"
+msgstr ""
+
+#: datatypes.json:138
+msgid "DT_kVolt"
+msgstr ""
+
+#: datatypes.json:139
+msgid "DT_Current"
+msgstr ""
+
+#: datatypes.json:140
+msgid "DT_mCurrent"
+msgstr ""
+
+#: datatypes.json:141
+msgid "DT_kCurrent"
+msgstr ""
+
+#: datatypes.json:142
+msgid "DT_Power"
+msgstr ""
+
+#: datatypes.json:143
+msgid "DT_mPower"
+msgstr ""
+
+#: datatypes.json:144
+msgid "DT_kPower"
+msgstr ""
+
+#: datatypes.json:145
+msgid "DT_ActiveEnergy"
+msgstr ""
+
+#: datatypes.json:146
+msgid "DT_kActiveEnergy"
+msgstr ""
+
+#: datatypes.json:147
+msgid "DT_ApparantEnergy"
+msgstr ""
+
+#: datatypes.json:148
+msgid "DT_Speed"
+msgstr ""
+
+#: datatypes.json:149
+msgid "DT_kmhSpeed"
+msgstr ""
+
+#: datatypes.json:150
+msgid "DT_rpmSpeed"
+msgstr ""
+
+#: datatypes.json:151
+msgid "DT_ktsSpeed"
+msgstr ""
+
+#: datatypes.json:152
+msgid "DT_Year"
+msgstr ""
+
+#: datatypes.json:153
+msgid "DT_Month"
+msgstr ""
+
+#: datatypes.json:154
+msgid "DT_Day"
+msgstr ""
+
+#: datatypes.json:155
+msgid "DT_Hour"
+msgstr ""
+
+#: datatypes.json:156
+msgid "DT_Minute"
+msgstr ""
+
+#: datatypes.json:157
+msgid "DT_Second"
+msgstr ""
+
+#: datatypes.json:158
+msgid "DT_mSecond"
+msgstr ""
+
+#: datatypes.json:159
+msgid "DT_Timestamp"
+msgstr ""
+
+#: datatypes.json:160
+msgid "DT_mMeter"
+msgstr ""
+
+#: datatypes.json:161
+msgid "DT_kMeter"
+msgstr ""
+
+#: datatypes.json:162
+msgid "DT_mMeterHour"
+msgstr ""
+
+#: datatypes.json:163
+msgid "DT_Byte"
+msgstr ""
+
+#: datatypes.json:164
+msgid "DT_kByte"
+msgstr ""
+
+#: datatypes.json:165
+msgid "DT_MByte"
+msgstr ""
+
+#: datatypes.json:166
+msgid "DT_GByte"
+msgstr ""
+
+#: datatypes.json:167
+msgid "DT_pH"
+msgstr ""
+
+#: datatypes.json:168
+msgid "DT_Chlorine"
+msgstr ""
+
+#: datatypes.json:169
+msgid "DT_Co2"
+msgstr ""
+
+#: datatypes.json:170
+msgid "DT_Tvoc"
+msgstr ""
+
+#: datatypes.json:171
+msgid "DT_Insolation"
+msgstr ""
+
+#: datatypes.json:172
+msgid "DT_kgWeight"
+msgstr ""
+
+#: datatypes.json:173
+msgid "DT_VolumeLiter"
+msgstr ""
+
+#: datatypes.json:174
+msgid "DT_VolumeM3"
+msgstr ""
+
+#: datatypes.json:175 datatypes.json:196 datatypes.json:205
+msgid "DT_Scaling"
+msgstr ""
+
+#: datatypes.json:179
+msgid ""
+"Scaling can be used for sensors about percent values and to control a dimmable "
+"light, and anything that can have a state between on and off, opened and "
+"closed, ... If you want to manage device for which the range of allowed values "
+"is [0..255] (or whatever else), you should consider to convert this range to "
+"[0..100] by using the conversion feature of the plugins. When you can, use one "
+"of its childs. "
+msgstr ""
+"Scaling (mise à l'échelle) peut être utilisée pour les capteurs sur les valeurs "
+"de pourcentage et pour contrôler une lumière à intensité variable, et tout ce "
+"qui peut avoir un état entre marche et arrêt, ouvert et fermé, ... Si vous "
+"souhaitez gérer un appareil pour lequel la plage de valeurs autorisées est "
+"[ 0..255] (ou autre), vous devriez envisager de convertir cette plage en "
+"[0..100] en utilisant la fonction de conversion des plugins. Lorsque vous le "
+"pouvez, utilisez l'un de ses enfants. "
+
+#: datatypes.json:180
+msgid "0 | 25 | 50 | 100"
+msgstr ""
+
+#: datatypes.json:183 datatypes.json:195 datatypes.json:204
+msgid "%"
+msgstr "%"
+
+#: datatypes.json:184 datatypes.json:214 datatypes.json:223 datatypes.json:232
+#: datatypes.json:241 datatypes.json:250 datatypes.json:259 datatypes.json:268
+#: datatypes.json:277 datatypes.json:286 datatypes.json:295 datatypes.json:304
+#: datatypes.json:313 datatypes.json:322 datatypes.json:331 datatypes.json:340
+#: datatypes.json:349 datatypes.json:358 datatypes.json:367 datatypes.json:376
+#: datatypes.json:385 datatypes.json:394 datatypes.json:403 datatypes.json:412
+#: datatypes.json:421 datatypes.json:430 datatypes.json:439 datatypes.json:448
+#: datatypes.json:457 datatypes.json:466 datatypes.json:475 datatypes.json:484
+#: datatypes.json:493 datatypes.json:502 datatypes.json:511 datatypes.json:520
+#: datatypes.json:529 datatypes.json:538 datatypes.json:547 datatypes.json:556
+#: datatypes.json:565 datatypes.json:574 datatypes.json:583 datatypes.json:592
+#: datatypes.json:601 datatypes.json:610 datatypes.json:619 datatypes.json:628
+#: datatypes.json:637 datatypes.json:646 datatypes.json:655
+msgid "DT_Number"
+msgstr ""
+
+#: datatypes.json:187
+msgid "DT_Battery"
+msgstr ""
+
+#: datatypes.json:191
+msgid "Humidity can be used to measure the humidity of the air."
+msgstr "Humidity peut être utilisée pour mesurer l'humidité de l'air."
+
+#: datatypes.json:192
+msgid "0 | 50 | 100"
+msgstr ""
+
+#: datatypes.json:200
+msgid "Battery can be used to monitor a battery level in percent."
+msgstr ""
+"Battery peut être utilisée pour surveiller un niveau de batterie en pourcentage."
+
+#: datatypes.json:201
+msgid "0 (empty) | 10 (nearly empty) | 50 | 100 (full)"
+msgstr "0 (vide) | 10 (presque vide) | 50 | 100 (plein)"
+
+#: datatypes.json:209
+msgid ""
+"The Angle must be used for any device that use angles in degrees. The wind "
+"direction is a good example. Notice that 0 = 360."
+msgstr ""
+"Angle doit être utilisé pour tout appareil utilisant des angles en degrés. La "
+"direction du vent en est un bon exemple. Notez que 0 = 360."
+
+#: datatypes.json:210
+msgid "0 | 90 | 180 | 270 | 360"
+msgstr ""
+
+#: datatypes.json:213
+msgid "°"
+msgstr "°"
+
+#: datatypes.json:218
+msgid ""
+"Brightness can be used to control a light brightness in the lux unit. It can "
+"also be used by devices that measure the brightness."
+msgstr ""
+"Brightness peut être utilisée pour contrôler la luminosité de la lumière dans "
+"l'unité lux. Il peut également être utilisé par des appareils qui mesurent la "
+"luminosité."
+
+#: datatypes.json:219
+msgid ""
+"0.5 (a full moon night) | 200 to 400 (a house with lights on) | 50 000 to 100 "
+"000 (outside with full sunlight)"
+msgstr ""
+"0,5 (une nuit de pleine lune) | 200 à 400 (une maison éclairée) | 50000 à 100000 "
+"(extérieur en plein soleil)"
+
+#: datatypes.json:222
+msgid "lux"
+msgstr "lux"
+
+#: datatypes.json:227
+msgid "Use the Temp for all temperature sensors in degrees."
+msgstr "Utilisez Temp pour tous les capteurs de température en degrés."
+
+#: datatypes.json:228
+msgid "-5 | 0 | 17 | 23"
+msgstr ""
+
+#: datatypes.json:231
+msgid "°C"
+msgstr "°C"
+
+#: datatypes.json:236
+msgid "Use the TempK for all temperature sensors in kelvin."
+msgstr "Utilisez TempK pour tous les capteurs de température en Kelvin."
+
+#: datatypes.json:237 datatypes.json:246
+msgid "0 | 27 | 100"
+msgstr ""
+
+#: datatypes.json:240
+msgid "K"
+msgstr "K"
+
+#: datatypes.json:245
+msgid "Use the TempF for all temperature sensors in fahrenheit."
+msgstr "Utilisez TempF pour tous les capteurs de température en fahrenheit."
+
+#: datatypes.json:249
+msgid "°F"
+msgstr "°F"
+
+#: datatypes.json:254
+msgid "The Pressure can be used for measuring a pressure in Pascal."
+msgstr "Pressure peut être utilisée pour mesurer une pression en Pascal."
+
+#: datatypes.json:255 datatypes.json:264 datatypes.json:273
+msgid "345"
+msgstr ""
+
+#: datatypes.json:258
+msgid "Pa"
+msgstr "Pa"
+
+#: datatypes.json:263
+msgid ""
+"The mbarPressure can be used for measuring a pressure in milliBar. This is the "
+"unit used by the barometers."
+msgstr ""
+"mbarPressure peut être utilisée pour mesurer une pression en millibar. Il s'agit "
+"de l'unité utilisée par les baromètres."
+
+#: datatypes.json:267
+msgid "mbar"
+msgstr "mbar"
+
+#: datatypes.json:272
+msgid "The barPressure can be used for measuring a pressure in Bar."
+msgstr "barPressure peut être utilisée pour mesurer une pression en bar."
+
+#: datatypes.json:276
+msgid "bar"
+msgstr "bar"
+
+#: datatypes.json:281
+msgid "AirQuality can be used for sensors that measure the air quality."
+msgstr ""
+"AirQuality peut être utilisée pour des capteurs qui mesurent la qualité de l'air."
+
+#: datatypes.json:282
+msgid "400"
+msgstr ""
+
+#: datatypes.json:285 datatypes.json:609
+msgid "ppm"
+msgstr "ppm"
+
+#: datatypes.json:290
+msgid "With Volt, you can measure voltages in Volts."
+msgstr "Avec Volt, vous pouvez mesurer des tensions en Volts."
+
+#: datatypes.json:291
+msgid "3.3 | 5 | 12 | 24 | 110 | 220"
+msgstr ""
+
+#: datatypes.json:294
+msgid "V"
+msgstr "V"
+
+#: datatypes.json:299
+msgid "With mVolt, you can measure voltages in milliVolts."
+msgstr "Avec mVolt, vous pouvez mesurer des tensions en millivolts."
+
+#: datatypes.json:300 datatypes.json:309
+msgid "100 | 200"
+msgstr ""
+
+#: datatypes.json:303
+msgid "mV"
+msgstr "mV"
+
+#: datatypes.json:308
+msgid "With kVolt, you can measure voltages in kiloVolts."
+msgstr "Avec kVolt, vous pouvez mesurer des tensions en kilovolts."
+
+#: datatypes.json:312
+msgid "kV"
+msgstr "kV"
+
+#: datatypes.json:317
+msgid "With Current, you can measure a current in Ampere."
+msgstr "Avec Current, vous pouvez mesurer des tensions en Ampère."
+
+#: datatypes.json:318
+msgid "16 | 32"
+msgstr ""
+
+#: datatypes.json:321
+msgid "A"
+msgstr "A"
+
+#: datatypes.json:326
+msgid "With mCurrent, you can measure a current in milliAmpere."
+msgstr "Avec mCurrent, vous pouvez mesurer des tensions en milliampère."
+
+#: datatypes.json:327
+msgid "200 | 300"
+msgstr ""
+
+#: datatypes.json:330
+msgid "mA"
+msgstr "mA"
+
+#: datatypes.json:335
+msgid "With kCurrent, you can measure a current in kiloAmpere."
+msgstr "Avec kCurrent, vous pouvez mesurer des tensions en kiloaAmpère."
+
+#: datatypes.json:336
+msgid "5 | 10"
+msgstr ""
+
+#: datatypes.json:339
+msgid "kA"
+msgstr "kA"
+
+#: datatypes.json:344
+msgid "The Power can be used to measure a power in Watt"
+msgstr "Avec Power, vous pouvez mesurer des puissances en Watt"
+
+#: datatypes.json:345 datatypes.json:354 datatypes.json:363
+msgid "100 | 1000"
+msgstr ""
+
+#: datatypes.json:348
+msgid "W"
+msgstr "W"
+
+#: datatypes.json:353
+msgid "The mPower can be used to measure a power in milliWatt"
+msgstr "Avec mPower, vous pouvez mesurer des puissances en milliwatt"
+
+#: datatypes.json:357
+msgid "mW"
+msgstr "mW"
+
+#: datatypes.json:362
+msgid "The kPower can be used to measure a power in kiloWatt"
+msgstr "Avec kPower, vous pouvez mesurer des puissances enkilowWatt"
+
+#: datatypes.json:366
+msgid "kW"
+msgstr "kW"
+
+#: datatypes.json:371
+msgid "ActiveEnergy can be used to measure the active energy in Watt per hour"
+msgstr ""
+"ActiveEnergy peut être utilisé pour mesurer l'énergie active en Watt par heure"
+
+#: datatypes.json:372 datatypes.json:381 datatypes.json:390
+msgid "20 | 50"
+msgstr ""
+
+#: datatypes.json:375
+msgid "Wh"
+msgstr "Wh"
+
+#: datatypes.json:380
+msgid ""
+"mActiveEnergy can be used to measure the active energy in milliWatt per hour"
+msgstr ""
+"mActiveEnergy peut être utilisé pour mesurer l'énergie active en milliwatt par "
+"heure"
+
+#: datatypes.json:384
+msgid "mWh"
+msgstr "mWh"
+
+#: datatypes.json:389
+msgid "kActiveEnergy can be used to measure the active energy in kiloWatt per hour"
+msgstr ""
+"kActiveEnergy peut être utilisé pour mesurer l'énergie active en kilowatt par "
+"heure"
+
+#: datatypes.json:393
+msgid "kWh"
+msgstr "kWh"
+
+#: datatypes.json:398
+msgid ""
+"ApparantEnergy can be used for devices that measure the Apparent Energy in VAh."
+msgstr ""
+"ApparantEnergy peut être utilisé pour les appareils qui mesurent l'énergie "
+"apparente en VAh."
+
+#: datatypes.json:399
+msgid "1 | 3"
+msgstr ""
+
+#: datatypes.json:402
+msgid "VAh"
+msgstr "VAh"
+
+#: datatypes.json:407
+msgid "With Speed you can measure some speed in meters per second."
+msgstr ""
+"Avec Speed, vous pouvez mesurer une certaine vitesse en mètres par seconde."
+
+#: datatypes.json:408 datatypes.json:417 datatypes.json:426 datatypes.json:435
+msgid "1 | 7 | 34"
+msgstr ""
+
+#: datatypes.json:411
+msgid "m/s"
+msgstr "m/s"
+
+#: datatypes.json:416
+msgid ""
+"With kmhSpeed you can measure some speed in kilometers per hour. It can be use "
+"for a cas movement."
+msgstr ""
+"Avec kmhSpeed, vous pouvez mesurer une certaine vitesse en kilomètres par heure. "
+"Il peut être utilisé pour un mouvement."
+
+#: datatypes.json:420
+msgid "km/h"
+msgstr "km/h"
+
+#: datatypes.json:425
+msgid ""
+"With rpmSpeed you can measure some speed in rotation per minute. It can be use "
+"for a motor speed."
+msgstr ""
+"Avec rpmSpeed, vous pouvez mesurer une certaine vitesse de rotation par minute. "
+"Il peut être utilisé pour une vitesse de moteur."
+
+#: datatypes.json:429
+msgid "rpm"
+msgstr "rpm"
+
+#: datatypes.json:434
+msgid ""
+"With ktsSpeed you can measure some speed in knots. It can be use for wind speed "
+"in the sea."
+msgstr ""
+"Avec ktsSpeed, vous pouvez mesurer une certaine vitesse en nœuds. Il peut être "
+"utilisé pour la vitesse du vent en mer."
+
+#: datatypes.json:438
+msgid "kts"
+msgstr "kts"
+
+#: datatypes.json:443
+msgid "Used for a Year information"
+msgstr "Utilisé pendant un an"
+
+#: datatypes.json:444
+msgid "2017"
+msgstr ""
+
+#: datatypes.json:447
+msgid "Year"
+msgstr "Année"
+
+#: datatypes.json:452
+msgid "Used for a Month information"
+msgstr "Utilisé pour un mois d'informations"
+
+#: datatypes.json:453
+msgid "1 (january) | 12 (december)"
+msgstr "1 (janvier) | 12 (décembre)"
+
+#: datatypes.json:456
+msgid "Month"
+msgstr "Mois"
+
+#: datatypes.json:461
+msgid "Used for a day of the month"
+msgstr "Utilisé pour un jour du mois"
+
+#: datatypes.json:462
+msgid "1 | 10 | 31"
+msgstr ""
+
+#: datatypes.json:465
+msgid "Day"
+msgstr "Jour"
+
+#: datatypes.json:470
+msgid "User for an hour from 0 to 23"
+msgstr "Utilisateur pendant une heure de 0 à 23"
+
+#: datatypes.json:471
+msgid "0 | 23"
+msgstr ""
+
+#: datatypes.json:474
+msgid "h"
+msgstr "h"
+
+#: datatypes.json:479
+msgid "Used for a number of minute from 0 to 59"
+msgstr "Utilisé pendant un certain nombre de minutes de 0 à 59"
+
+#: datatypes.json:480 datatypes.json:489
+msgid "0 | 59"
+msgstr ""
+
+#: datatypes.json:488
+msgid "Used for a number of second from 0 to 59"
+msgstr "Utilisé pendant un certain nombre de secondes de 0 à 59"
+
+#: datatypes.json:492
+msgid "s"
+msgstr "s"
+
+#: datatypes.json:497
+msgid "Used for a number of millisecond from 0 to 999"
+msgstr "Utilisé pendant un nombre de millisecondes de 0 à 999"
+
+#: datatypes.json:498
+msgid "0 | 500 | 999"
+msgstr ""
+
+#: datatypes.json:501
+msgid "ms"
+msgstr "ms"
+
+#: datatypes.json:506
+msgid ""
+"Use Timestamp to store a time in timestamp format. For example the last update "
+"event time of a device on device point of view. The timestamp is in seconds."
+msgstr ""
+"Utilisez Timestamp pour stocker une heure au format horodatage. Par exemple, la "
+"dernière heure d'événement de mise à jour d'un appareil sur le point de vue de "
+"l'appareil. L'horodatage est en secondes."
+
+#: datatypes.json:507
+msgid "1493132287"
+msgstr ""
+
+#: datatypes.json:515
+msgid "Use mMeter for sensors that measure distances in millimeters."
+msgstr ""
+"Utilisez mMeter pour les capteurs qui mesurent les distances en millimètres."
+
+#: datatypes.json:516 datatypes.json:525 datatypes.json:534
+msgid "25 | 55"
+msgstr ""
+
+#: datatypes.json:519
+msgid "mm"
+msgstr "mm"
+
+#: datatypes.json:524
+msgid "Use Meter for sensors that measure distances in meters."
+msgstr "Utilisez Meter pour les capteurs qui mesurent les distances en mètres."
+
+#: datatypes.json:528
+msgid "m"
+msgstr "m"
+
+#: datatypes.json:533
+msgid "Use kMeter for sensors that measure distances in kilometers."
+msgstr ""
+"Utilisez kMeter pour les capteurs qui mesurent les distances en kilomètres."
+
+#: datatypes.json:537
+msgid "km"
+msgstr "km"
+
+#: datatypes.json:542
+msgid "Use mMeterHour for sensors that measure for example rain falls."
+msgstr ""
+"Utilisez mMeterHour pour les capteurs qui mesurent par exemple les chutes de "
+"pluie."
+
+#: datatypes.json:543
+msgid "5 | 8"
+msgstr ""
+
+#: datatypes.json:546
+msgid "mm/h"
+msgstr "mm/h"
+
+#: datatypes.json:551
+msgid "Use Byte to measure a size in bytes."
+msgstr "Utilisez Byte pour mesurer une taille en octets."
+
+#: datatypes.json:552 datatypes.json:561 datatypes.json:570 datatypes.json:579
+msgid "128 | 512 | 1024"
+msgstr ""
+
+#: datatypes.json:555
+msgid "b"
+msgstr "b"
+
+#: datatypes.json:560
+msgid "Use kByte to measure a size in kilobytes."
+msgstr "Utilisez kByte pour mesurer une taille en kilo-octets."
+
+#: datatypes.json:564
+msgid "kb"
+msgstr "kb"
+
+#: datatypes.json:569
+msgid "Use MByte to measure a size in megabytes."
+msgstr "Utilisez MByte pour mesurer une taille en mégaoctets."
+
+#: datatypes.json:573
+msgid "Mb"
+msgstr "Mb"
+
+#: datatypes.json:578
+msgid "Use GByte to measure a size in gigabytes."
+msgstr "Utilisez GByte pour mesurer une taille en gigaoctets."
+
+#: datatypes.json:582
+msgid "Gb"
+msgstr "Gb"
+
+#: datatypes.json:587
+msgid "Use pH to mesure a pH. This can be used for a pool sensor."
+msgstr ""
+"Utilisez pH pour mesurer un pH. Cela peut être utilisé pour un capteur de "
+"piscine."
+
+#: datatypes.json:588
+msgid "7"
+msgstr ""
+
+#: datatypes.json:591
+msgid "pH"
+msgstr "pH"
+
+#: datatypes.json:596
+msgid ""
+"Use Chlorine to measure the amount of chlore. This can be used for a pool sensor."
+msgstr ""
+"Utilisez Chlorine pour mesurer la quantité de chlore. Cela peut être utilisé "
+"pour un capteur de piscine."
+
+#: datatypes.json:597
+msgid "4"
+msgstr ""
+
+#: datatypes.json:600
+msgid "mg/l"
+msgstr "mg/l"
+
+#: datatypes.json:605
+msgid "Use Co2 to measure the amount of Co²."
+msgstr "Utilisez Co2 pour mesurer la quantité de Co²."
+
+#: datatypes.json:606
+msgid "405 (average value for ait quality)"
+msgstr "405 (valeur moyenne pour la qualité de l'air)"
+
+#: datatypes.json:614
+msgid ""
+"Use Tvoc to measure the total volatile organic compounds in indoor ait quality."
+msgstr ""
+"Utilisez Tvoc pour mesurer les composés organiques volatils totaux pour la "
+"qualité de l'air intérieur."
+
+#: datatypes.json:615
+msgid "100"
+msgstr ""
+
+#: datatypes.json:618
+msgid "ppb"
+msgstr "ppb"
+
+#: datatypes.json:623
+msgid "Use Insolation to measure the solar irradiance in W/m²."
+msgstr "Utilisez Insolation pour mesurer l'irradiance solaire en W / m²."
+
+#: datatypes.json:627
+msgid "W/m²"
+msgstr "W/m²"
+
+#: datatypes.json:632
+msgid ""
+"Use kgWeight to measure a weight, for example someone's weaight in a health "
+"related plugin."
+msgstr ""
+"Utilisez kgWeight pour mesurer un poids, par exemple le poids d'une personne "
+"dans un plugin lié à la santé."
+
+#: datatypes.json:636
+msgid "kg"
+msgstr "kg"
+
+#: datatypes.json:641
+msgid "Use VolumeLiter to measure a volume in Liters."
+msgstr "Utilisez VolumeLiter pour mesurer un volume en litres."
+
+#: datatypes.json:642
+msgid "1 | 10"
+msgstr ""
+
+#: datatypes.json:645
+msgid "L"
+msgstr "L"
+
+#: datatypes.json:650
+msgid "Use VolumeM3 to measure a volume in m3."
+msgstr "Utilisez VolumeM3 pour mesurer un volume en m3."
+
+#: datatypes.json:654
+msgid "m3"
+msgstr "m3"
+
+#: datatypes.json:659
+msgid ""
+"Use String to store any kind of data which is a string. When you can, use one of "
+"its childs."
+msgstr ""
+"Utilisez String pour stocker tout type de données qui est une chaîne. Lorsque "
+"vous le pouvez, utilisez l'un de ses enfants."
+
+#: datatypes.json:660
+msgid "a | hello | ADCO123456789 | Rainfalls"
+msgstr "a | bonjour | ADCO123456789 | La pluie tombe"
+
+#: datatypes.json:661 datatypes.json:682 datatypes.json:690 datatypes.json:700
+msgid "maxLengh"
+msgstr "longueur maximale"
+
+#: datatypes.json:662 datatypes.json:691 datatypes.json:748
+msgid "format"
+msgstr "format"
+
+#: datatypes.json:664
+msgid "DT_Char"
+msgstr ""
+
+#: datatypes.json:665
+msgid "DT_Phone"
+msgstr ""
+
+#: datatypes.json:666 datatypes.json:702
+msgid "DT_Hexa"
+msgstr ""
+
+#: datatypes.json:667 datatypes.json:694
+msgid "DT_ColorRGBHexa"
+msgstr ""
+
+#: datatypes.json:668 datatypes.json:752
+msgid "DT_CoordD"
+msgstr ""
+
+#: datatypes.json:669 datatypes.json:753
+msgid "DT_CoordDM"
+msgstr ""
+
+#: datatypes.json:670 datatypes.json:754
+msgid "DT_CoordDMS"
+msgstr ""
+
+#: datatypes.json:674
+msgid "Use Char for sensors that contains only 1 character."
+msgstr "Utilisez Char pour les capteurs qui ne contiennent qu'un seul caractère."
+
+#: datatypes.json:675
+msgid "a | Y | #"
+msgstr ""
+
+#: datatypes.json:676 datatypes.json:684 datatypes.json:692
+msgid "DT_String"
+msgstr ""
+
+#: datatypes.json:680
+msgid "Use Phone to store a phone number."
+msgstr "Utilisez Phone pour enregistrer un numéro de téléphone."
+
+#: datatypes.json:681
+msgid "+33212345678 (a french phone number)"
+msgstr "+33212345678 (un numéro de téléphone français)"
+
+#: datatypes.json:683
+msgid "+00000000000"
+msgstr ""
+
+#: datatypes.json:688
+msgid "Use DT_Hexa to store any hexadecimal data."
+msgstr "Utilisez DT_Hexa pour stocker toutes les données hexadécimales."
+
+#: datatypes.json:689
+msgid "FF | A1B2C3 | 0123456789ABCDEF"
+msgstr ""
+
+#: datatypes.json:698
+msgid "Use ColorRGBHexa to store a color in RGB hexadecimal format without the #."
+msgstr ""
+"Utilisez ColorRGBHexa pour stocker une couleur au format hexadécimal RVB sans le "
+"#."
+
+#: datatypes.json:699
+msgid ""
+"000000 (black) | FFFFFF (white) | FF0000 (red) | 00FF00 (green) | 0000FF (blue)"
+msgstr ""
+"000000 (noir) | FFFFFF (blanc) | FF0000 (rouge) | 00FF00 (vert) | 0000FF (bleu)"
+
+#: datatypes.json:701
+msgid "RRGGBB"
+msgstr "RRGGBB"
+
+#: datatypes.json:706
+msgid ""
+"Use Datetime for any datetime storage. For more limited informations, use one of "
+"its childs."
+msgstr ""
+"Utilisez Datetime pour tout stockage datetime. Pour des informations plus "
+"limitées, utilisez l'un de ses enfants."
+
+#: datatypes.json:707
+msgid "2023-04-28T09:34:55.3"
+msgstr ""
+
+#: datatypes.json:708
+msgid "YYYY-MM-DDThh:mm:ss.s"
+msgstr "YYYY-MM-DDThh:mm:ss.s"
+
+#: datatypes.json:710
+msgid "DT_DayOfWeek"
+msgstr ""
+
+#: datatypes.json:711
+msgid "DT_Date"
+msgstr ""
+
+#: datatypes.json:712
+msgid "DT_Time"
+msgstr ""
+
+#: datatypes.json:716
+msgid "Use DayOfWeek to store a day number"
+msgstr "Utilisez DayOfWeek pour enregistrer un numéro de jour"
+
+#: datatypes.json:719
+msgid "no day"
+msgstr "pas de jour"
+
+#: datatypes.json:720
+msgid "Monday"
+msgstr "Lundi"
+
+#: datatypes.json:721
+msgid "Tuesday"
+msgstr "Mardi"
+
+#: datatypes.json:722
+msgid "Wednesday"
+msgstr "Mercredi"
+
+#: datatypes.json:723
+msgid "Thursday"
+msgstr "Jeudi"
+
+#: datatypes.json:724
+msgid "Friday"
+msgstr "Vendredi"
+
+#: datatypes.json:725
+msgid "Saturday"
+msgstr "Samedi"
+
+#: datatypes.json:726
+msgid "Sunday"
+msgstr "Dimanche"
+
+#: datatypes.json:729 datatypes.json:735 datatypes.json:742
+msgid "DT_DateTime"
+msgstr ""
+
+#: datatypes.json:732
+msgid "Use Date for a date only."
+msgstr "Utilisez Date pour une date uniquement."
+
+#: datatypes.json:733
+msgid "2019-03-09"
+msgstr ""
+
+#: datatypes.json:734
+msgid "YYYY-MM-DD"
+msgstr "YYYY-MM-DD"
+
+#: datatypes.json:739
+msgid "Use Time for a time"
+msgstr "Utilisez Time pour un temps"
+
+#: datatypes.json:740
+msgid "01:45:32.6"
+msgstr ""
+
+#: datatypes.json:741
+msgid "hh:mm:ss.s"
+msgstr "hh:mm:ss.s"
+
+#: datatypes.json:746
+msgid ""
+"Use List for all sensors that needs several values separated with a comma. For "
+"example some colors, some coordinates, ... When you can, use one of its childs."
+msgstr ""
+"Utilisez Liste pour tous les capteurs qui nécessitent plusieurs valeurs séparées "
+"par une virgule. Par exemple quelques couleurs, quelques coordonnées, ... Quand "
+"vous le pouvez, utilisez l'un de ses enfants."
+
+#: datatypes.json:750
+msgid "DT_ColorRGB"
+msgstr ""
+
+#: datatypes.json:751
+msgid "DT_ColorCMYK"
+msgstr ""
+
+#: datatypes.json:758
+msgid "Use ColorRGB for a color in the format R, G, B."
+msgstr "Utilisez ColorRGB pour une couleur au format R, G, B."
+
+#: datatypes.json:759
+msgid "255, 0, 0 (red) | 0, 255, 0 (green)"
+msgstr "255, 0, 0 (rouge) | 0, 255, 0 (vert)"
+
+#: datatypes.json:760
+msgid "(R 0-255),(G 0-255),(B 0-255)"
+msgstr "(R 0-255),(G 0-255),(B 0-255)"
+
+#: datatypes.json:761 datatypes.json:768 datatypes.json:775 datatypes.json:782
+#: datatypes.json:789
+msgid "DT_List"
+msgstr ""
+
+#: datatypes.json:765
+msgid "Use ColorCMYK for a color in the format C, M, Y, K."
+msgstr "Utilisez ColorCMYK pour une couleur au format C, M, Y, K."
+
+#: datatypes.json:766
+msgid "50, 30, 45, 90"
+msgstr ""
+
+#: datatypes.json:767
+msgid "(C 0-100%),(M 0-100%),(Y 0-100%),(K 0-100%)"
+msgstr "(C 0-100%),(M 0-100%),(Y 0-100%),(K 0-100%)"
+
+#: datatypes.json:772
+msgid "Use CoordD for coordinates in the format DD.dddddd,DD.dddddd"
+msgstr "Utilisez CoordD pour les coordonnées au format DD.dddddd, DD.dddddd"
+
+#: datatypes.json:773
+msgid "48.8588377,2.2775176 (Paris, France)"
+msgstr ""
+
+#: datatypes.json:774
+msgid "DD.dddddd,DD.dddddd"
+msgstr "DD.dddddd,DD.dddddd"
+
+#: datatypes.json:779
+msgid "Use CoordDM for coordinates in the format (N|S) DD MM.mmm,(E|W) DD MM.mmm."
+msgstr ""
+"Utilisez CoordDM pour les coordonnées au format (N|S) DD MM.mmm, (E|O) DD MM.mmm."
+
+#: datatypes.json:781
+msgid "(N|S) DD MM.mmm,(E|W) DD MM.mmm"
+msgstr "(N|S) DD MM.mmm,(E|O) DD MM.mmm"
+
+#: datatypes.json:786
+msgid ""
+"Use CoordDMS for coordinates in the format (N|S) DD MM SS.s,(E|W) DD MM SS.s."
+msgstr ""
+"Utilisez CoordDMS pour les coordonnées au format (N|S) DD MM SS.s, (E|O) DD MM "
+"SS.s."
+
+#: datatypes.json:788
+msgid "(N|S) DD MM SS.s,(E|W) DD MM SS.s"
+msgstr "(N|S) DD MM SS.s,(E|O) DD MM SS.s"
+
+#: datatypes.json:793
+msgid ""
+"Use Video for a sensor with the uri of a video file. Please use one of its "
+"childs."
+msgstr ""
+"Utilisez Video pour un capteur avec l'URI d'un fichier vidéo. Veuillez utiliser "
+"l'un de ses enfants."
+
+#: datatypes.json:794
+msgid "/media/videos/myvideo.avi | http://mycamera/video.mjpeg"
+msgstr ""
+
+#: datatypes.json:795
+msgid "DT_VideoMjpeg"
+msgstr ""
+
+#: datatypes.json:795
+msgid "DT_VideoH264"
+msgstr ""
+
+#: datatypes.json:798
+msgid ""
+"Use VideoMjpeg for a sensor with the uri of a video file in the Mjpeg format."
+msgstr ""
+"Utilisez VideoMjpeg pour un capteur avec l'URI d'un fichier vidéo au format "
+"Mjpeg."
+
+#: datatypes.json:799
+msgid "/media/videos/myvideo.mjpeg | http://mycamera/video.mjpeg"
+msgstr ""
+
+#: datatypes.json:801 datatypes.json:808
+msgid "DT_Video"
+msgstr ""
+
+#: datatypes.json:805
+msgid "Use VideoH264 for a sensor with the uri of a video file in the H264 format."
+msgstr ""
+"Utilisez VideoH264 pour un capteur avec l'URI d'un fichier vidéo au format H264."
+
+#: datatypes.json:806
+msgid "/media/videos/myvideo.avi | http://mycamera/video.h264"
+msgstr ""
+
+#: datatypes.json:812
+msgid "Use Image for a sensor with the uri of an image."
+msgstr "Utilisez Image pour un capteur avec l'URI d'une image."
+
+#: datatypes.json:813
+msgid "/media/images/myimage.jpg | http://somewebsite.com/image.jpg"
+msgstr ""
+
+#: datatypes.json:821
+msgid ""
+"All the datatypes under this Experimental one are not yet stable. Use them with "
+"caution as they could be renamed/suppressed/updated/merged in the next releases "
+"of Domogik!"
+msgstr ""
+"Tous les types de données de celui-ci ne sont pas encore stables. Utilisez-les "
+"avec prudence car ils pourraient être renommés / supprimés / mis à jour / "
+"fusionnés dans les prochaines versions de Domogik !"
+
+#: datatypes.json:824
+msgid "DT_HVACMode"
+msgstr ""
+
+#: datatypes.json:825
+msgid "DT_HVACHeat"
+msgstr ""
+
+#: datatypes.json:826
+msgid "DT_HVACVent"
+msgstr ""
+
+#: datatypes.json:827
+msgid "DT_HVACFan"
+msgstr ""
+
+#: datatypes.json:828
+msgid "DT_HeatingPilotWire"
+msgstr ""
+
+#: datatypes.json:829
+msgid "DT_UPSState"
+msgstr ""
+
+#: datatypes.json:830
+msgid "DT_UPSEvent"
+msgstr ""
+
+#: datatypes.json:833 datatypes.json:846 datatypes.json:859 datatypes.json:872
+#: datatypes.json:888 datatypes.json:902 datatypes.json:913 datatypes.json:943
+msgid "TODO"
+msgstr "A FAIRE"
+
+#: datatypes.json:836 datatypes.json:849 datatypes.json:862 datatypes.json:876
+msgid "Auto"
+msgstr "Automatique"
+
+#: datatypes.json:837 datatypes.json:850 datatypes.json:891
+msgid "Comfort"
+msgstr "Confort"
+
+#: datatypes.json:838 datatypes.json:851
+msgid "Standby"
+msgstr "Veille"
+
+#: datatypes.json:839 datatypes.json:852 datatypes.json:894
+msgid "Economy"
+msgstr "Economique"
+
+#: datatypes.json:840 datatypes.json:853 datatypes.json:895
+msgid "Building Protection"
+msgstr "Horsgel"
+
+#: datatypes.json:843 datatypes.json:856 datatypes.json:869 datatypes.json:885
+#: datatypes.json:899 datatypes.json:910 datatypes.json:939 datatypes.json:956
+msgid "DT_Experimental"
+msgstr ""
+
+#: datatypes.json:863
+msgid "Heat"
+msgstr "Chauffage"
+
+#: datatypes.json:864
+msgid "Cool"
+msgstr "Refroidissement"
+
+#: datatypes.json:865
+msgid "Fan only"
+msgstr "Ventillation"
+
+#: datatypes.json:866
+msgid "Dry"
+msgstr "Sèchage"
+
+#: datatypes.json:875
+msgid "Unknown"
+msgstr "Inconnue"
+
+#: datatypes.json:877
+msgid "Lower"
+msgstr "Inférieur"
+
+#: datatypes.json:878
+msgid "Speed 1"
+msgstr "Vitesse 1"
+
+#: datatypes.json:879
+msgid "Speed 2"
+msgstr "Vitesse 2"
+
+#: datatypes.json:880
+msgid "Speed 3"
+msgstr "Vitesse 3"
+
+#: datatypes.json:881
+msgid "Speed 4"
+msgstr "Vitesse 4"
+
+#: datatypes.json:882
+msgid "Speed 5"
+msgstr "Vitesse 5"
+
+#: datatypes.json:892
+msgid "Comfort -1"
+msgstr "Confort-1"
+
+#: datatypes.json:893
+msgid "Comfort -2"
+msgstr "Confort-2"
+
+#: datatypes.json:896
+msgid "Off/Unballasting"
+msgstr "Off / Délestage"
+
+#: datatypes.json:905
+msgid "mains"
+msgstr "secteur"
+
+#: datatypes.json:906
+msgid "battery"
+msgstr "batterie"
+
+#: datatypes.json:907
+msgid "unknown"
+msgstr "inconnue"
+
+#: datatypes.json:916
+msgid "Mains power"
+msgstr "Alimentation secteur"
+
+#: datatypes.json:917
+msgid "Battery power"
+msgstr "Alimentation batterie"
+
+#: datatypes.json:918
+msgid "Battery is low"
+msgstr "Batterie faible"
+
+#: datatypes.json:919
+msgid "Battery is fully charged"
+msgstr "Batterie chargée"
+
+#: datatypes.json:920
+msgid "Battery test initiated"
+msgstr "Test de batterie lancé"
+
+#: datatypes.json:921
+msgid "Battery test passed"
+msgstr "Test de batterie réussi"
+
+#: datatypes.json:922
+msgid "Battery test failed"
+msgstr "Echec du test de batterie"
+
+#: datatypes.json:923
+msgid "Host lost UPS communication"
+msgstr "L'hôte à perdu la communication UPS"
+
+#: datatypes.json:924
+msgid "UPS communication restored"
+msgstr "Communication UPS rétablie"
+
+#: datatypes.json:925
+msgid "Input frequency out of range"
+msgstr "Fréquence d'entrée hors plage"
+
+#: datatypes.json:926
+msgid "Input frequency returns ok"
+msgstr "La fréquence d'entrée est bonne"
+
+#: datatypes.json:927
+msgid "Input voltage too high"
+msgstr "Tension d'entrée trop élevée"
+
+#: datatypes.json:928
+msgid "Input voltage too low"
+msgstr "Tension d'entrée trop faible"
+
+#: datatypes.json:929
+msgid "Input voltage returns ok"
+msgstr "La tension d'entrée redevient bonne"
+
+#: datatypes.json:930
+msgid "UPS Output voltage too high"
+msgstr "Tension de sortie de l'onduleur trop élevée"
+
+#: datatypes.json:931
+msgid "UPS Output voltage too low"
+msgstr "Tension de sortie de l'onduleur trop faible"
+
+#: datatypes.json:932
+msgid "UPS Output voltage returns ok"
+msgstr "Tension de sortie de l'onduleur redevient bonne"
+
+#: datatypes.json:933
+msgid "UPS output overload"
+msgstr "Surcharge de sortie de l'onduleur"
+
+#: datatypes.json:934
+msgid "UPS output returns ok"
+msgstr "La sortie de l'onduleur redevient bonne"
+
+#: datatypes.json:935
+msgid "UPS temperature too high"
+msgstr "Température de l'onduleur trop élevée"
+
+#: datatypes.json:936
+msgid "UPS temperature returns ok"
+msgstr "Température de l'onduleur redevient bonne"
+
+#: datatypes.json:946 themes/default/templates/client_devices.html:341
+msgid "White"
+msgstr "Blanc"
+
+#: datatypes.json:947
+msgid "Orange"
+msgstr "Orange"
+
+#: datatypes.json:948 themes/default/templates/client_devices.html:342
+msgid "Red"
+msgstr "Rouge"
+
+#: datatypes.json:949
+msgid "Yellow"
+msgstr "Jaune"
+
+#: datatypes.json:950
+msgid "Blue"
+msgstr "Bleue"
+
+#: datatypes.json:951
+msgid "Green"
+msgstr "Vert"
+
+#: datatypes.json:952
+msgid "Black"
+msgstr "Noir"
+
+#: datatypes.json:953
+msgid "Brown"
+msgstr "Marron"
+
+#: themes/default/templates/404.html:4
+msgid "404 - Page or resource not found"
+msgstr "404 - Page ou ressource non trouvée"
+
+#: themes/default/templates/404.html:5
+msgid "Hey, this is not the page you are looking for!"
+msgstr "Hé, ce n'est pas la page que vous cherchez!"
+
+#: themes/default/templates/500.html:4
+msgid "500 - Internal server error"
+msgstr "500 - Erreur de serveur interne"
+
+#: themes/default/templates/500.html:5
+msgid "Ooops! It seems that something is broken somewhere..."
+msgstr "Ooops! Il semble que quelque chose est cassé quelque part ..."
+
+#: themes/default/templates/500.html:6
+msgid ""
+"This page means that you encountered an error. If this is not expected (and why "
+"would you expect for an error ?) you could do the following to help us :"
+msgstr ""
+"Cette page signifie que vous avez rencontré une erreur. Si ce n'est pas prévu "
+"(et pourquoi vous attendez-vous à une erreur ?) vous pourriez faire ce qui suit "
+"pour nous aider :"
+
+#: themes/default/templates/500.html:8
+msgid "Check in the logs if you find anything."
+msgstr "Vérifiez dans les journaux si vous trouvez quelque chose."
+
+#: themes/default/templates/500.html:9
+msgid "If there is nothing in the logs, you could start the admin in a terminal : "
+msgstr ""
+"S'il n'y a rien dans les journaux, vous pouvez démarrer l'administrateur dans un "
+"terminal : "
+
+#: themes/default/templates/500.html:12
+msgid "Kill all admin processes for the domogik user"
+msgstr "Tuer tous les processus d'administration de l'utilisateur domogik"
+
+#: themes/default/templates/500.html:13
+msgid "to your domogik install dir"
+msgstr "dans votre répertoire d'installation de domogik"
+
+#: themes/default/templates/500.html:18
+msgid "With these informations, create a ticket on our bug tracker :"
+msgstr "Avec ces informations, créez un ticket sur notre site de suivi de bugs :"
+
+#: themes/default/templates/500.html:19
+msgid "Take a cup of coffee or tea."
+msgstr "Prenez une tasse de thé."
+
+#: themes/default/templates/battery.html:70
+msgid "Battery sensors"
+msgstr "Capteur batterie"
+
+#: themes/default/templates/battery.html:86
+msgid "Value : </strong>"
+msgstr "Valeur : <strong>"
+
+#: themes/default/templates/battery.html:88
+#: themes/default/templates/battery.html:95
+#: themes/default/templates/client_menu.html:45
+msgid "n/a"
+msgstr "n/a"
+
+#: themes/default/templates/battery.html:93
+msgid "Last udpate : </strong>"
+msgstr "Dernière mise à jour: <strong>"
+
+#: themes/default/templates/battery.html:103
+msgid "No battery sensors found!"
+msgstr "Pas de capteur batterie trouvé !"
+
+#: themes/default/templates/camera.html:37
+msgid "Mjpeg cameras"
+msgstr "Caméras mjpeg"
+
+#: themes/default/templates/camera.html:55
+msgid "No mjpeg camera to display!"
+msgstr "Pas de caméra mjpeg à afficher !"
+
+#: themes/default/templates/client.html:12
+msgid "Package details"
+msgstr "Détails du paquet"
+
+#: themes/default/templates/client.html:21
+msgid "Version"
+msgstr "Version"
+
+#: themes/default/templates/client.html:25
 msgid "Author"
-msgstr ""
+msgstr "Auteur"
 
-#: templates/client.html:9 templates/client_devices.html:12
-#: templates/client_devices.html:41 templates/client_devices.html:67
-#: templates/orphans.html:12
-msgid "Name"
-msgstr ""
+#: themes/default/templates/client.html:37
+msgid "Client informations"
+msgstr "Informations client"
 
-#: templates/client.html:10
-msgid "Email"
-msgstr ""
-
-#: templates/client_config.html:7
-msgid "Configuration"
-msgstr ""
-
-#: templates/client_detected.html:6
-msgid "Detected devices"
-msgstr ""
-
-#: templates/client_device_edit.html:6
-msgid "Device Edit"
-msgstr ""
-
-#: templates/client_device_new.html:6 templates/client_device_new_wiz.html:7
-msgid "Create a new device"
-msgstr ""
-
-#: templates/client_device_new.html:8
-msgid "Create by product"
-msgstr ""
-
-#: templates/client_device_new.html:15
-msgid "Create by device type"
-msgstr ""
-
-#: templates/client_device_new.html:20
-msgid "No device types found"
-msgstr ""
-
-#: templates/client_devices.html:6
-msgid "Known Devices"
-msgstr ""
-
-#: templates/client_devices.html:11 templates/client_devices.html:40
-#: templates/client_devices.html:65 templates/clients.html:10
-#: templates/orphans.html:10
-msgid "ID"
-msgstr ""
-
-#: templates/client_devices.html:13
-msgid "Reference"
-msgstr ""
-
-#: templates/client_devices.html:14 templates/orphans.html:13
-msgid "Device Type"
-msgstr ""
-
-#: templates/client_devices.html:15 templates/orphans.html:14
-msgid "Description"
-msgstr ""
-
-#: templates/client_devices.html:28 templates/persons.html:25
-msgid "Edit"
-msgstr ""
-
-#: templates/client_devices.html:36
-msgid "Sensors"
-msgstr ""
-
-#: templates/client_devices.html:42 templates/client_devices.html:72
-msgid "Data Type"
-msgstr ""
-
-#: templates/client_devices.html:43
-msgid "Last value"
-msgstr ""
-
-#: templates/client_devices.html:44
-msgid "Last received"
-msgstr ""
-
-#: templates/client_devices.html:61
-msgid "Commands"
-msgstr ""
-
-#: templates/client_devices.html:71
-msgid "Key"
-msgstr ""
-
-#: templates/client_devices.html:74
-msgid "Example REST Url"
-msgstr ""
-
-#: templates/client_devices.html:95
-msgid "No devices found"
-msgstr ""
-
-#: templates/client_menu.html:3 templates/orphans.html:11
-msgid "Client"
-msgstr ""
-
-#: templates/client_menu.html:5 templates/base/nav.html:27
-msgid "Home"
-msgstr ""
-
-#: templates/client_menu.html:6
-msgid "Config"
-msgstr ""
-
-#: templates/client_menu.html:8
-msgid "Devices"
-msgstr ""
-
-#: templates/client_menu.html:10
-msgid "Known"
-msgstr ""
-
-#: templates/client_menu.html:11
-msgid "Detected"
-msgstr ""
-
-#: templates/client_menu.html:12
-msgid "New"
-msgstr ""
-
-#: templates/client_overview.html:3 templates/clients.html:12
-msgid "Status"
-msgstr ""
-
-#: templates/client_overview.html:7
-#, python-format
-msgid "%(status)s"
-msgstr ""
-
-#: templates/client_overview.html:12
+#: themes/default/templates/client.html:40
+#: themes/default/templates/client_devices.html:126
+#: themes/default/templates/client_devices.html:312
+#: themes/default/templates/client_menu.html:60
+#: themes/default/templates/core_butler_menu.html:24
 msgid "Informations"
-msgstr ""
+msgstr "Informations"
 
-#: templates/client_overview.html:14
+#: themes/default/templates/client.html:42
 msgid "Package"
-msgstr ""
+msgstr "Paquet"
 
-#: templates/client_overview.html:15
+#: themes/default/templates/client.html:43
 msgid "Host"
-msgstr ""
+msgstr "Hôte"
 
-#: templates/client_overview.html:16
+#: themes/default/templates/client.html:44
 msgid "Process id"
-msgstr ""
+msgstr "Id Processus"
 
-#: templates/clients.html:5
-msgid "Client list"
-msgstr ""
+#: themes/default/templates/client.html:56
+msgid "Dependencies"
+msgstr "Dépendances"
 
-#: templates/clients.html:11
+#: themes/default/templates/client.html:60
+msgid ""
+"This package needs some dependencies to work properly. Please check they are "
+"present on your system."
+msgstr ""
+"Ce paquet a besoin de dépendances pour fonctionner. Vérifiez si elles sont "
+"présentes sur le système."
+
+#: themes/default/templates/client.html:66
+#: themes/default/templates/client_devices.html:159
+#: themes/default/templates/client_devices.html:575
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
-#: templates/clients.html:13
-msgid "Configured"
-msgstr ""
+#: themes/default/templates/client.html:67
+msgid "Detail"
+msgstr "Détails"
 
-#: templates/clients.html:59
-msgid "No clients found"
-msgstr ""
+#: themes/default/templates/client.html:91
+msgid "Udev rules"
+msgstr "Règles Udev"
 
-#: templates/orphans.html:5
+#: themes/default/templates/client.html:95
+msgid ""
+"In order to work, this package may need to install one the the below udev rules. "
+"If several rules are available, please check the documentation to find which is "
+"the appropriate one for your usage."
+msgstr ""
+"Pour fonctionner, ce paquet a besoin qu'une des règles udev ci-dessous soit "
+"installée. Si plusieurs règles sont disponibles, veuillez consulter la "
+"documentation pour trouver celle qui convient à votre utilisation."
+
+#: themes/default/templates/client.html:112 themes/default/templates/core.html:12
+msgid "History status"
+msgstr "Historique des statuts"
+
+#: themes/default/templates/client.html:127 themes/default/templates/core.html:27
+msgid "This client seems never started ;)"
+msgstr "Ce client semble n'avoir jamais démarré ;)"
+
+#: themes/default/templates/client_brain.html:8
+msgid "There is no brain part for this package."
+msgstr "Il n'y a pas de partie cerveau pour ce paquet."
+
+#: themes/default/templates/client_brain.html:10
+msgid "What is the brain ?"
+msgstr "Qu'est-ce que le cerveau ?"
+
+#: themes/default/templates/client_brain.html:14
+msgid ""
+"The butler brain uses Rivescript to describe the way you can interact with the "
+"butler. Each brain package contains one (or several) rivescript files and each "
+"contains a part of the butler brain. The more brain packages you will install, "
+"the more things the butler will be able to do!"
+msgstr ""
+"Le cerveau du majordome utilise Rivescript pour décrire la façon dont vous "
+"pouvez interagir avec le majordome. Chaque paquet cerveau contient un (ou "
+"plusieurs) fichiers rivescript et chacun contient une partie du cerveau "
+"majordome. Plus vous installerez de paquets de cerveau, plus le majordome pourra "
+"faire de choses !"
+
+#: themes/default/templates/client_brain.html:17
+msgid ""
+"Below, you will see the file(s) for your language which are contained in this "
+"package. By reading them you will be able to guess how to interact with your "
+"butler. If you have any doubt, you may read the Rivescript help."
+msgstr ""
+"Ci-dessous, vous verrez les fichiers pour votre langue qui sont contenus dans ce "
+"paquet. En les lisant, vous pourrez deviner comment interagir avec votre "
+"majordome. En cas de doute, vous pouvez lire l'aide de Rivescript."
+
+#: themes/default/templates/client_brain.html:20
+msgid "Rivescript help"
+msgstr "Aide rivescript"
+
+#: themes/default/templates/client_brain.html:23
+msgid "Files"
+msgstr "Fichiers"
+
+#: themes/default/templates/client_config.html:7
+#: themes/default/templates/client_menu.html:65
+msgid "Configuration"
+msgstr "Configuration"
+
+#: themes/default/templates/client_config.html:20
+msgid "Save the configuration"
+msgstr "Sauver la configuration"
+
+#: themes/default/templates/client_config.html:43
+msgid "There is nothing to configure for this client."
+msgstr "Il n'y a rien à configurer pour ce client."
+
+#: themes/default/templates/client_detected.html:6
+#: themes/default/templates/client_devices.html:87
+#: themes/default/templates/client_devices.html:89 views/login.py:90
+msgid "Detected devices"
+msgstr "Périphériques détectés"
+
+#: themes/default/templates/client_detected.html:8
+msgid ""
+"You should wait a few minutes after the plugin startup before looking for "
+"detected devices. Keep also in mind that each time the plugin is stopped, the "
+"list is reseted."
+msgstr ""
+"Vous devez attendre quelques minutes après le démarrage du plugin avant de "
+"rechercher les périphériques détectés. Gardez également à l'esprit que chaque "
+"fois que le plugin est arrêté, la liste est réinitialisée."
+
+#: themes/default/templates/client_detected.html:28
+msgid "Device informations"
+msgstr "Informations périphérique"
+
+#: themes/default/templates/client_detected.html:30
+msgid "Device type"
+msgstr "Type du périphérique"
+
+#: themes/default/templates/client_detected.html:31
+#: themes/default/templates/client_devices.html:157
+#: themes/default/templates/datatypes.html:84
+#: themes/default/templates/orphans.html:22
+#: themes/default/templates/upgrade.html:18 themes/default/templates/users.html:43
+#: views/scenario.py:138
+msgid "Name"
+msgstr "Nom"
+
+#: themes/default/templates/client_detected.html:32
+#: themes/default/templates/client_devices.html:136
+msgid "Reference"
+msgstr "Référence"
+
+#: themes/default/templates/client_detected.html:33
+#: themes/default/templates/client_devices.html:137
+#: themes/default/templates/client_devices.html:324
+#: themes/default/templates/orphans.html:24
+#: themes/default/templates/scenario_examples.html:30
+#: themes/default/templates/scenario_examples.html:42
+#: themes/default/templates/upgrade.html:20 views/scenario.py:146
+msgid "Description"
+msgstr "Description"
+
+#: themes/default/templates/client_detected.html:37
+#: themes/default/templates/client_devices.html:148
+msgid "Global parameters"
+msgstr "Paramètres globaux"
+
+#: themes/default/templates/client_detected.html:49
+msgid "xPL parameters"
+msgstr "Paramètres xPL"
+
+#: themes/default/templates/client_detected.html:60
+msgid "xPL command parameters"
+msgstr "Paramètres de commande xPL"
+
+#: themes/default/templates/client_detected.html:74
+msgid "xPL stat parameters"
+msgstr "Paramètres de valeur xPL"
+
+#: themes/default/templates/client_device_edit.html:7
+msgid "Edit the device"
+msgstr "Editer le périphérique"
+
+#: themes/default/templates/client_device_new.html:6
+msgid "Create a new device"
+msgstr "Créer nouveau périphérique"
+
+#: themes/default/templates/client_device_new.html:9
+msgid "Create by device type"
+msgstr "Créer par type"
+
+#: themes/default/templates/client_device_new.html:14
+msgid "No device types found"
+msgstr "Type de périphérique non trouvé"
+
+#: themes/default/templates/client_devices.html:77
+msgid "Loading detected device list ..."
+msgstr "Charge la liste des périphériques détectés..."
+
+#: themes/default/templates/client_devices.html:85
+msgid "Create a new Domogik device"
+msgstr "Créer un nouveau périphérique Domogik"
+
+#: themes/default/templates/client_devices.html:104
+msgid "Known Devices"
+msgstr "Périphériques reconnus"
+
+#: themes/default/templates/client_devices.html:127
+#: themes/default/templates/locations.html:52
+#: themes/default/templates/users.html:52
+msgid "Edit"
+msgstr "Editer"
+
+#: themes/default/templates/client_devices.html:128
+msgid "Delete the device"
+msgstr "Effacer le périphérique"
+
+#: themes/default/templates/client_devices.html:135
+msgid "Device type id"
+msgstr "Id du type de périphérique"
+
+#: themes/default/templates/client_devices.html:139
+msgid "Rest url"
+msgstr "Rest url"
+
+#: themes/default/templates/client_devices.html:140
+msgid "View the device timeline"
+msgstr "Afficher la chronologie du périphérique"
+
+#: themes/default/templates/client_devices.html:149
+#: themes/default/templates/client_devices.html:186
+msgid "Configure"
+msgstr "Configurer"
+
+#: themes/default/templates/client_devices.html:156
+#: themes/default/templates/orphans.html:20
+#: themes/default/templates/upgrade.html:16
+msgid "ID"
+msgstr "ID"
+
+#: themes/default/templates/client_devices.html:158
+#: themes/default/templates/client_devices.html:612
+#: themes/default/templates/datatypes.html:98
+#: themes/default/templates/datatypes.html:121
+msgid "Value"
+msgstr "Valeur"
+
+#: themes/default/templates/client_devices.html:180
+msgid "Sensors"
+msgstr "Capteurs"
+
+#: themes/default/templates/client_devices.html:191
+#: themes/default/templates/client_sensor.html:72
+msgid "Data Type"
+msgstr "Type de données"
+
+#: themes/default/templates/base/timeline.html:254
+#: themes/default/templates/client_devices.html:198
+#: themes/default/templates/client_devices.html:367
+msgid "Warning"
+msgstr "Attention"
+
+#: themes/default/templates/client_devices.html:199
+msgid ""
+"The datatype used by this sensor is no more compliant with this release of "
+"Domogik. You may consider to upgrade this plugin and if needed, recreate this "
+"device."
+msgstr ""
+"Le type de données utilisé par ce capteur n'est plus conforme à cette version de "
+"Domogik. Vous pouvez envisager de mettre à niveau ce plugin et si nécessaire, "
+"recréer ce périphérique."
+
+#: themes/default/templates/client_devices.html:205
+msgid "Last value"
+msgstr "Dernière valeur"
+
+#: themes/default/templates/base/timeline.html:273
+#: themes/default/templates/client_devices.html:232
+msgid "Read the video file"
+msgstr "Lire le fichier vidéo"
+
+#: themes/default/templates/client_devices.html:241
+msgid "Last received"
+msgstr "Dernière réception"
+
+#: themes/default/templates/client_devices.html:245
+msgid "REST URL"
+msgstr "REST URL"
+
+#: themes/default/templates/client_devices.html:250
+#: themes/default/templates/client_devices.html:503
+#: themes/default/templates/client_devices.html:544
+msgid "Openremote"
+msgstr "Openremote"
+
+#: themes/default/templates/client_devices.html:252
+#: themes/default/templates/client_devices.html:506
+#: themes/default/templates/client_devices.html:547
+#: themes/default/templates/datatypes.html:86
+msgid "Usage"
+msgstr "Usage"
+
+#: themes/default/templates/client_devices.html:254
+msgid "Create the command"
+msgstr "Créer la commande"
+
+#: themes/default/templates/client_devices.html:256
+msgid "To create a sensor, you need to create a command which will grab the value."
+msgstr ""
+"Pour créer un capteur, vous devez créer une commande qui saisira la valeur."
+
+#: themes/default/templates/client_devices.html:259
+msgid "You have to configure the following fields :"
+msgstr "Vous devez configurer les champs suivants :"
+
+#: themes/default/templates/client_devices.html:262
+msgid "Url"
+msgstr "Url"
+
+#: themes/default/templates/client_devices.html:263
+msgid "Polling interval"
+msgstr "Intervalle d'interrogation"
+
+#: themes/default/templates/client_devices.html:264
+msgid "JSONPath expression"
+msgstr "Expression JSONPath"
+
+#: themes/default/templates/client_devices.html:267
+#: themes/default/templates/client_devices.html:518
+msgid "Create the sensor"
+msgstr "Créer le capteur"
+
+#: themes/default/templates/client_devices.html:269
+#: themes/default/templates/client_devices.html:520
+msgid "You have to create a <strong>custom sensor</strong>"
+msgstr "Vous devez créer un <strong> capteur personnalisé </strong>"
+
+#: themes/default/templates/client_devices.html:272
+msgid "Choose the newly created command."
+msgstr "Choisissez la commande nouvellement créée."
+
+#: themes/default/templates/client_devices.html:276
+msgid "Configure the <strong>Custom state items</strong> like this :"
+msgstr "Configurez les <strong>éléments d'état personnalisés</strong> comme ceci :"
+
+#: themes/default/templates/client_devices.html:303
+msgid "Commands"
+msgstr "Commandes"
+
+#: themes/default/templates/client_devices.html:311
+msgid "Command Key"
+msgstr "Clé de commande"
+
+#: themes/default/templates/client_devices.html:321
+msgid "Data type"
+msgstr "Type de donnée"
+
+#: themes/default/templates/client_devices.html:326
+msgid "Values"
+msgstr "Valeurs"
+
+#: themes/default/templates/client_devices.html:340
+msgid "Black (off)"
+msgstr "Noir (éteint)"
+
+#: themes/default/templates/client_devices.html:347
+#: themes/default/templates/client_devices.html:419
+msgid "Some text"
+msgstr "Du texte"
+
+#: themes/default/templates/client_devices.html:361
+#: themes/default/templates/client_devices.html:432
+msgid "A value"
+msgstr "Une valeur"
+
+#: themes/default/templates/base/timeline.html:255
+#: themes/default/templates/client_devices.html:368
+msgid ""
+"The datatype used by this command is no more compliant with this release of "
+"Domogik. You may consider to upgrade this plugin and if needed, recreate this "
+"device."
+msgstr ""
+"Le type de données utilisé par cette commande n'est plus conforme à cette "
+"version de Domogik. Vous pouvez envisager de mettre à niveau ce plugin et si "
+"nécessaire, recréer ce périphérique."
+
+#: themes/default/templates/client_devices.html:383
+msgid "REST url"
+msgstr "Url ReST"
+
+#: themes/default/templates/client_devices.html:398
+#: themes/default/templates/client_devices.html:440
+msgid "Test the command"
+msgstr "Testez la commande"
+
+#: themes/default/templates/client_devices.html:463
+msgid "Calling url"
+msgstr "URL d'appel"
+
+#: themes/default/templates/client_devices.html:471
+msgid ""
+"An error occurred while sending the command. Maybe the client did not respond to "
+"the command. Please check the client is alive or the client logs."
+msgstr ""
+"Une erreur s'est produite lors de l'envoi de la commande. Peut-être que le "
+"client n'a pas répondu à la commande. Veuillez vérifier que le client est vivant "
+"ou les journaux du client."
+
+#: themes/default/templates/client_devices.html:475
+msgid ""
+"Command executed with success (the plugin replied). If you have any issue, "
+"please check in the plugin logs."
+msgstr ""
+"Commande exécutée avec succès (le plugin a répondu). Si vous avez un problème, "
+"veuillez vérifier les journaux du plugin."
+
+#: themes/default/templates/client_devices.html:509
+msgid "Create the commands"
+msgstr "Créez les commandes"
+
+#: themes/default/templates/client_devices.html:511
+msgid "You only need to configure the URL field."
+msgstr "Il vous suffit de configurer le champ URL."
+
+#: themes/default/templates/client_devices.html:514
+#: themes/default/templates/client_devices.html:515
+msgid "Url for"
+msgstr "Url pour"
+
+#: themes/default/templates/client_devices.html:516
+msgid "Url for : status"
+msgstr "Url pour : statut"
+
+#: themes/default/templates/client_devices.html:516
+msgid "see the corresponding sensor"
+msgstr "voir le capteur correspondant"
+
+#: themes/default/templates/client_devices.html:523
+msgid "For the command, select the status command created."
+msgstr "Pour la commande, sélectionnez le status de la commande créée."
+
+#: themes/default/templates/client_devices.html:525
+msgid "Create the switch"
+msgstr "Créer le commutateur"
+
+#: themes/default/templates/client_devices.html:527
+msgid "To create the switch, use the commands and the sensor created."
+msgstr "Pour créer le commutateur, utilisez les commandes et le capteur créés."
+
+#: themes/default/templates/client_devices.html:531
+msgid "Not yet documented"
+msgstr "Pas encore documenté"
+
+#: themes/default/templates/client_devices.html:550
+msgid ""
+"The current command is complex as it needs several parameters. Please refer to "
+"the command keys informations to find the appropriate usage on Openremote."
+msgstr ""
+"La commande actuelle est complexe car elle nécessite plusieurs paramètres. "
+"Veuillez vous référer aux informations des clés de commande pour trouver "
+"l'utilisation appropriée sur Openremote."
+
+#: themes/default/templates/client_devices.html:567
+msgid "xPL stats : details about xPL parameters for the sensors"
+msgstr "Statistiques xPL: détails des paramètres xPL des capteurs"
+
+#: themes/default/templates/client_devices.html:576
+#: themes/default/templates/client_devices.html:611
+msgid "Key"
+msgstr "Clé"
+
+#: themes/default/templates/client_devices.html:577
+msgid "Value or sensor"
+msgstr "Valeur ou capteur"
+
+#: themes/default/templates/client_devices.html:581
+msgid "Static"
+msgstr "Statique"
+
+#: themes/default/templates/client_devices.html:583
+msgid "value"
+msgstr "valeur"
+
+#: themes/default/templates/client_devices.html:588
+msgid "Dynamic"
+msgstr "Dynamique"
+
+#: themes/default/templates/client_devices.html:590
+msgid "sensor"
+msgstr "capteur"
+
+#: themes/default/templates/client_devices.html:603
+msgid "xPL Commands : details about xPL parameters for the commands"
+msgstr "Commandes xPL: détails des paramètres xPL des commandes"
+
+#: themes/default/templates/client_devices.html:645
+msgid "No devices found"
+msgstr "Pas de périphérique trouvé"
+
+#: themes/default/templates/client_global.html:7
+msgid "Edit the device GLOBAL parameters"
+msgstr "Modifier les paramètres GLOBAUX du périphérique"
+
+#: themes/default/templates/client_menu.html:3
+#: themes/default/templates/orphans.html:21
+#: themes/default/templates/upgrade.html:17
+msgid "Client"
+msgstr "Client"
+
+#: themes/default/templates/client_menu.html:60
+#: themes/default/templates/client_menu.html:65
+#: themes/default/templates/client_menu.html:71
+#: themes/default/templates/client_menu.html:74
+#: themes/default/templates/client_menu.html:80
+#: themes/default/templates/client_menu.html:85
+#: themes/default/templates/client_menu.html:90
+#: themes/default/templates/core_butler_menu.html:24
+#: themes/default/templates/core_butler_menu.html:27
+#: themes/default/templates/core_butler_menu.html:30
+msgid "current"
+msgstr "courant"
+
+#: themes/default/templates/client_menu.html:71
+msgid "Domogik devices"
+msgstr "Périphériques Domogik"
+
+#: themes/default/templates/base/nav.html:22
+#: themes/default/templates/base/timeline.html:239
+#: themes/default/templates/client_menu.html:74
+msgid "Timeline"
+msgstr "Chronologie"
+
+#: themes/default/templates/client_menu.html:80
+msgid "Brain details"
+msgstr "Détails du cerveau"
+
+#: themes/default/templates/client_menu.html:85
+msgid "Advanced"
+msgstr "Avancé"
+
+#: themes/default/templates/client_menu.html:90
+#: themes/default/templates/client_no_doc.html:10
+msgid "Documentation"
+msgstr "Documentation"
+
+#: themes/default/templates/client_no_doc.html:11
+msgid "There is no documentation built for this package."
+msgstr "Il n'y a pas de documentation construite pour ce paquet."
+
+#: themes/default/templates/client_nothing_adm.html:7
+msgid "There is no advanced configuration for this client."
+msgstr "Il n'y a pas de configuration avancée pour ce client."
+
+#: themes/default/templates/client_sensor.html:7
+msgid "Edit the sensor properties"
+msgstr "Modifier les propriétés du capteur"
+
+#: themes/default/templates/client_sensor.html:12
+msgid "Store the history of the sensor"
+msgstr "Stocker l'historique du capteur"
+
+#: themes/default/templates/client_sensor.html:15
+msgid ""
+"If checked, the history of the sensor will be stored in database. Else, only the "
+"last value will be kept."
+msgstr ""
+"Si coché, l'historique du capteur sera stocké dans la base de données. Sinon, "
+"seule la dernière valeur sera conservée."
+
+#: themes/default/templates/client_sensor.html:20
+msgid "Timeout"
+msgstr "Temporisation"
+
+#: themes/default/templates/client_sensor.html:23
+msgid ""
+"Define the time (in seconds) after which a sensor will considered as lost if no "
+"new value have been received. For some type of sensors, there is no need to set "
+"a timeout value."
+msgstr ""
+"Définissez le temps (en secondes) après lequel un capteur sera considéré comme "
+"perdu si aucune nouvelle valeur n'a été reçue. Pour certains types de capteurs, "
+"il n'est pas nécessaire de définir une valeur de temporisation."
+
+#: themes/default/templates/client_sensor.html:28
+msgid "Formula"
+msgstr "Formule"
+
+#: themes/default/templates/client_sensor.html:31
+msgid ""
+"If the value raised by the plugin is not correct (for example a temperature "
+"sensor that has an +1°C error) or need to be transformed (converting an input "
+"voltage into a temperature for example), you may choose to define a formula."
+msgstr ""
+"Si la valeur augmentée par le plugin n'est pas correcte (par exemple un capteur "
+"de température qui a une erreur de + 1 ° C) ou doit être transformée (conversion "
+"d'une tension d'entrée en température par exemple), vous pouvez choisir de "
+"définir une formule."
+
+#: themes/default/templates/client_sensor.html:32
+msgid "The sensor value is contained in the <strong>VALUE</strong> parameter."
+msgstr ""
+"La valeur du capteur est contenue dans le paramètre <strong>VALEUR</strong>."
+
+#: themes/default/templates/client_sensor.html:33
+msgid "To add 1 degree to a temperature sensor, just do : "
+msgstr "Pour ajouter 1 degré à un capteur de température, faites simplement : "
+
+#: themes/default/templates/client_sensor.html:34
+msgid "If the sensor value must be divided by 100, just do : "
+msgstr "Si la valeur du capteur doit être divisée par 100, faites simplement : "
+
+#: themes/default/templates/client_sensor.html:35
+msgid "You can also use more complex formula like : "
+msgstr "Vous pouvez également utiliser des formules plus complexes comme : "
+
+#: themes/default/templates/client_sensor.html:40
+msgid "Maximum number of values in database"
+msgstr "Nombre maximum de valeurs dans la base de données"
+
+#: themes/default/templates/client_sensor.html:43
+msgid ""
+"Set the maximum number of records that will be stored in the history table, if 0 "
+"the max number is infinite.."
+msgstr ""
+"Définissez le nombre maximum d'enregistrements qui seront stockés dans la table "
+"d'historique, si 0 le nombre maximum est infini."
+
+#: themes/default/templates/client_sensor.html:48
+msgid "History size in days"
+msgstr "Taille de l'historique en jours"
+
+#: themes/default/templates/client_sensor.html:51
+msgid ""
+"Define how long the history needs to be kept, if 0 the stats will bekept "
+"forever. Its counted in days, so a value of 10 means keep the history for 10 "
+"days."
+msgstr ""
+"Définissez la durée de conservation de l'historique, si 0, les statistiques "
+"seront conservées pour toujours. Le nombre correspond à des jours, donc une "
+"valeur de 10 signifie garder l'historique pendant 10 jours."
+
+#: themes/default/templates/client_sensor.html:56
+msgid "Incremental"
+msgstr "Incrémentale"
+
+#: themes/default/templates/client_sensor.html:59
+msgid "Substract previous value to new and store result value."
+msgstr ""
+"Soustrais la valeur précédente à la nouvelle et stocke la valeur du résultat."
+
+#: themes/default/templates/client_sensor.html:64
+msgid "Round value"
+msgstr "Valeur arrondie"
+
+#: themes/default/templates/client_sensor.html:67
+msgid ""
+"Set a number that will be used for the reduced stats storage. This will be "
+"evaluated only if you choose to store the history. More informations about the "
+"configuration of this option is available in the online documentation."
+msgstr ""
+"Définissez un nombre qui sera utilisé pour le stockage réduit des statistiques. "
+"Cela ne sera évalué que si vous choisissez de stocker l'historique. Plus "
+"d'informations sur la configuration de cette option sont disponibles dans la "
+"documentation en ligne."
+
+#: themes/default/templates/client_sensor.html:75
+msgid ""
+"Select a child datat_type for this sensor, this will help the UI to select the "
+"correct widget."
+msgstr ""
+"Sélectionnez un type de données enfant pour ce capteur, cela aidera l'interface "
+"utilisateur à sélectionner le widget correct."
+
+#: themes/default/templates/clients.html:7
+msgid "Install a package"
+msgstr "Installer un paquet"
+
+#: themes/default/templates/clients.html:16
+msgid "How to install a package"
+msgstr "Comment installer un paquet"
+
+#: themes/default/templates/clients.html:19
+msgid ""
+"In the current release, you can't install packages directly from this "
+"administration interface.."
+msgstr ""
+"Dans la version actuelle, vous ne pouvez pas installer de paquet directement à "
+"partir de cette interface d'administration."
+
+#: themes/default/templates/clients.html:20
+msgid ""
+"You will have to install a package from a command line, thanks to the command :"
+msgstr ""
+"Vous devrez installer un paquet depuis une ligne de commande, grâce à la "
+"commande :"
+
+#: themes/default/templates/clients.html:22
+msgid ""
+"You will be able to find the packages in the Domogik packages online "
+"repository : "
+msgstr ""
+"Vous pourrez trouver les paquet dans le référentiel en ligne des paquets "
+"Domogik : "
+
+#: themes/default/templates/clients.html:26
+msgid "OK"
+msgstr "OK"
+
+#: themes/default/templates/clients.html:39
+msgid "Clients on server"
+msgstr "Clients sur le serveur"
+
+#: themes/default/templates/clients.html:45
+msgid "Core components"
+msgstr "Composants de base"
+
+#: themes/default/templates/clients.html:47
+msgid "Brain parts"
+msgstr "Parties du cerveau"
+
+#: themes/default/templates/clients.html:49
+msgid "Plugins"
+msgstr "Plugins"
+
+#: themes/default/templates/clients.html:51
+msgid "Interfaces"
+msgstr "Interfaces"
+
+#: themes/default/templates/clients.html:53
+msgid "xPL clients"
+msgstr "Clients xPL"
+
+#: themes/default/templates/clients.html:128
+msgid "No clients found (even core components!): is Domogik manager running?"
+msgstr ""
+"Aucun client trouvé (même les composants de base !): Domogik Manager est-il en "
+"cours d'exécution ?"
+
+#: themes/default/templates/config.html:5
+msgid "Domogik configuration"
+msgstr "Configuration de Domogik"
+
+#: themes/default/templates/config.html:9
+msgid "External access"
+msgstr "Accès externe"
+
+#: themes/default/templates/config.html:11
+msgid ""
+"If you use Domogik from internet, you surely use a different url to access "
+"Domogik from internet and your local network. To allow applications like "
+"Domodroid to use the appropriate url depending on where you are, you can "
+"configure here your external access informations. "
+msgstr ""
+"Si vous utilisez Domogik depuis Internet, vous utilisez sûrement une URL "
+"différente pour accéder à Domogik depuis Internet et votre réseau local. Pour "
+"permettre à des applications comme Domodroid d'utiliser l'url appropriée selon "
+"l'endroit où vous vous trouvez, vous pouvez configurer ici vos informations "
+"d'accès externe. "
+
+#: themes/default/templates/config.html:35
+msgid "Printer configuration"
+msgstr "Configuration de l'imprimante"
+
+#: themes/default/templates/config.html:37
+msgid ""
+"Some Butler features may use the printer (to print a shopping list for example). "
+"If you want to use this kind of features, please feel the printer informations."
+msgstr ""
+"Certaines fonctionnalités du Majordome peuvent utiliser l'imprimante (pour "
+"imprimer une liste de courses par exemple). Si vous souhaitez utiliser ce type "
+"de fonctionnalités, veuillez consulter les informations de l'imprimante."
+
+#: themes/default/templates/config.html:54
+msgid "Online services configuration"
+msgstr "Configuration des services en ligne"
+
+#: themes/default/templates/config.html:56
+msgid ""
+"Some Domogik advanced features may need to use some online services (cloud based "
+"services for example). If you need to use them, you will have to fill some below "
+"informations. If you don't need them, skip this part."
+msgstr ""
+"Certaines fonctionnalités avancées de Domogik peuvent nécessiter l'utilisation "
+"de certains services en ligne (services basés sur le cloud par exemple). Si vous "
+"avez besoin de les utiliser, vous devrez remplir quelques informations ci-"
+"dessous. Si vous n'en avez pas besoin, sautez cette partie."
+
+#: themes/default/templates/config.html:58
+msgid "Wit.ai"
+msgstr "Wit.ai"
+
+#: themes/default/templates/config.html:69
+msgid "Save the configuration "
+msgstr "Sauvegardez la configuration "
+
+#: themes/default/templates/core.html:7
+#: themes/default/templates/core_butler_learned.html:8
+#: themes/default/templates/core_butler_not_understood.html:8
+msgid "Core component "
+msgstr "Composant de base "
+
+#: themes/default/templates/core_butler_learned.html:13
+msgid "Butler learned commands"
+msgstr "Le majordome a appris des commandes"
+
+#: themes/default/templates/core_butler_learned.html:16
+msgid ""
+"The butler is able to learn commands. All the commands learned are listed below. "
+"Feel free to edit the file manually if you wish."
+msgstr ""
+"Le majordome est capable d'apprendre des commandes. Toutes les commandes "
+"apprises sont répertoriées ci-dessous. N'hésitez pas à modifier le fichier "
+"manuellement si vous le souhaitez."
+
+#: themes/default/templates/core_butler_menu.html:3
+msgid "Butler"
+msgstr "Majordome"
+
+#: themes/default/templates/core_butler_menu.html:27
+msgid "Learned commands"
+msgstr "Commandes apprises"
+
+#: themes/default/templates/core_butler_menu.html:30
+msgid "Not understood queries"
+msgstr "Requêtes non comprises"
+
+#: themes/default/templates/core_butler_not_understood.html:13
+msgid "Butler not understood commands"
+msgstr "Le majordome n'a pas compris les commandes"
+
+#: themes/default/templates/core_butler_not_understood.html:16
+msgid ""
+"The butler may not understand what you request for various reasons : the query "
+"is not implemented, the voice recognition engine didn't work fine, ...."
+msgstr ""
+"Le majordome peut ne pas comprendre ce que vous demandez pour diverses raisons: "
+"la requête n'est pas implémentée, le moteur de reconnaissance vocale n'a pas "
+"bien fonctionné, ...."
+
+#: themes/default/templates/core_butler_not_understood.html:17
+msgid "Here are listed all the not understood queries."
+msgstr "Voici toutes les requêtes non comprises."
+
+#: themes/default/templates/datatypes.html:7
+msgid "Domogik DataTypes"
+msgstr "Types de données Domogik"
+
+#: themes/default/templates/datatypes.html:8
+msgid "Online help about the datatypes"
+msgstr "Aide en ligne sur les types de données"
+
+#: themes/default/templates/datatypes.html:12
+#: themes/default/templates/datatypes.html:29
+msgid "Search"
+msgstr "Chercher"
+
+#: themes/default/templates/datatypes.html:14
+msgid "Search Tree"
+msgstr "Arbre de recherche"
+
+#: themes/default/templates/datatypes.html:15
+msgid "Type to search"
+msgstr "Texte à rechercher"
+
+#: themes/default/templates/datatypes.html:20
+msgid "Ignore Case"
+msgstr "Ignorer majuscules ou minuscules"
+
+#: themes/default/templates/datatypes.html:26
+msgid "Exact Match"
+msgstr "Correspondance exacte"
+
+#: themes/default/templates/datatypes.html:35
+msgid "Datatypes"
+msgstr "Type de données"
+
+#: themes/default/templates/datatypes.html:40
+#: themes/default/templates/orphans.html:25
+#: themes/default/templates/upgrade.html:21
+msgid "Details"
+msgstr "Détails"
+
+#: themes/default/templates/datatypes.html:89
+msgid "Example values"
+msgstr "Exemples de valeurs"
+
+#: themes/default/templates/datatypes.html:92
+msgid "Unit"
+msgstr "Unité"
+
+#: themes/default/templates/datatypes.html:95
+msgid "Labels"
+msgstr "Etiquettes"
+
+#: themes/default/templates/datatypes.html:98
+msgid "Label"
+msgstr "Etiquette"
+
+#: themes/default/templates/datatypes.html:109
+msgid "Minimum value"
+msgstr "Valeur minimum"
+
+#: themes/default/templates/datatypes.html:112
+msgid "Maximum value"
+msgstr "Valeur maximale"
+
+#: themes/default/templates/datatypes.html:115
+msgid "Format"
+msgstr "Format"
+
+#: themes/default/templates/datatypes.html:118
+msgid "Allowed values"
+msgstr "Valeurs autorisées"
+
+#: themes/default/templates/datatypes.html:121
+msgid "Corresponding status"
+msgstr "Statut correspondant"
+
+#: themes/default/templates/index.html:4
+msgid "Welcome to Domogik Admin"
+msgstr "Bienvenue dans l'administration de Domogik"
+
+#: themes/default/templates/index.html:5
+msgid ""
+"If this is your first time on Domogik, you should read the online "
+"documentation : "
+msgstr ""
+"Si c'est la première fois que vous utilisez Domogik, vous devriez lire la "
+"documentation en ligne : "
+
+#: themes/default/templates/index.html:7
+msgid "To sum up, you have to :"
+msgstr "Pour résumer, vous devez :"
+
+#: themes/default/templates/index.html:9
+msgid "Install some plugins."
+msgstr "Installez certains plugins."
+
+#: themes/default/templates/index.html:10
+msgid "Create devices for these plugins."
+msgstr "Créez des périphériques pour ces plugins."
+
+#: themes/default/templates/index.html:11
+msgid "Go to Domoweb and set some widgets with your created devices."
+msgstr "Accédez à Domoweb et définissez des widgets pour vos périphériques."
+
+#: themes/default/templates/index.html:12
+msgid "Enjoy !"
+msgstr "Profiter !"
+
+#: themes/default/templates/index.html:16
+msgid ""
+"If you find a bug or need an improvment which is not related to a package "
+"(plugin, etc), please "
+msgstr ""
+"Si vous trouvez un bogue ou avez besoin d'une amélioration qui n'est pas liée à "
+"un package (plugin, etc.), veuillez "
+
+#: themes/default/templates/index.html:16
+msgid "open a ticket on our tracker"
+msgstr "ouvrir un ticket sur notre tracker"
+
+#: themes/default/templates/index.html:17
+msgid ""
+"If you find a bug or need an improvment about a package, please open a ticket in "
+"the package related GitHub tracker."
+msgstr ""
+"Si vous trouvez un bogue ou avez besoin d'une amélioration sur un paquet, "
+"veuillez ouvrir un ticket dans le tracker GitHub lié au paquet."
+
+#: themes/default/templates/index.html:19
+msgid "Configure DomoDroid"
+msgstr "Configurer DomoDroid"
+
+#: themes/default/templates/locations.html:15
+msgid "Location"
+msgstr "Localisation"
+
+#: themes/default/templates/locations.html:21
+msgid "Add a new location"
+msgstr "Ajouter une nouvelle localisation"
+
+#: themes/default/templates/locations.html:28
+msgid "No location have been defined yet!"
+msgstr "Aucune localisation n'a encore été définie !"
+
+#: themes/default/templates/locations.html:53
+#: themes/default/templates/scenario_edit.html:26
+#: themes/default/templates/users.html:57
+msgid "Delete"
+msgstr "Supprimer"
+
+#: themes/default/templates/locations.html:123
+#: themes/default/templates/locations.html:160
+msgid "Latitude"
+msgstr "Latitude"
+
+#: themes/default/templates/locations.html:124
+#: themes/default/templates/locations.html:161
+msgid "Longitude"
+msgstr "Longitude"
+
+#: themes/default/templates/locations.html:125
+msgid "Radius"
+msgstr "Rayon"
+
+#: themes/default/templates/locations.html:159
+msgid "Last seen"
+msgstr "Vu pour la dernière fois"
+
+#: themes/default/templates/locations_edit.html:25
+msgid "Location Edit"
+msgstr "Modifier la localisation"
+
+#: themes/default/templates/locations_edit.html:33
+#: themes/default/templates/scenario_edit.html:23
+msgid "Save"
+msgstr "Sauver"
+
+#: themes/default/templates/login.html:10
+msgid "Please enter username and password"
+msgstr "Veuillez saisir votre nom d'utilisateur et votre mot de passe"
+
+#: themes/default/templates/orphans.html:5
 msgid "Orphan Devices"
-msgstr ""
+msgstr "Périphériques orphelins"
 
-#: templates/orphans.html:34
+#: themes/default/templates/orphans.html:8
+msgid ""
+"Orphan devices are devices created for a client which is no more detected by "
+"Domogik. Many reasons can explain this:"
+msgstr ""
+"Les périphériques orphelins sont des périphériques créés pour un client qui "
+"n'est plus détecté par Domogik. De nombreuses raisons peuvent expliquer cela :"
+
+#: themes/default/templates/orphans.html:10
+msgid "The hostname of the server has been changed."
+msgstr "Le nom d'hôte du serveur a été modifié."
+
+#: themes/default/templates/orphans.html:11
+msgid "The device was created for a plugin which has been uninstalled."
+msgstr "Le périphérique a été créé pour un plugin qui a été désinstallé."
+
+#: themes/default/templates/orphans.html:12
+msgid ""
+"The device is related to a xPL client which is not part of Domogik. If this xPL "
+"client is shut or unplug, Domogik doesn't see it anymore and the device is set "
+"as orphan. If the client come back to life, the device won't be an orphan "
+"anymore."
+msgstr ""
+"Le périphérique est lié à un client xPL qui ne fait pas partie de Domogik. Si ce "
+"client xPL est fermé ou débranché, Domogik ne le voit plus et le périphérique "
+"est défini comme orphelin. Si le client reprend vie, l'périphérique ne sera plus "
+"orphelin."
+
+#: themes/default/templates/orphans.html:23
+#: themes/default/templates/upgrade.html:19
+msgid "Device Type"
+msgstr "Type de périphérique"
+
+#: themes/default/templates/orphans.html:44
 msgid "Hooray, no orphans found"
-msgstr ""
+msgstr "Hourra, aucun orphelin n'a été trouvé"
 
-#: templates/person_edit.html:6
-msgid "Person Edit"
-msgstr ""
+#: themes/default/templates/base/nav.html:18
+#: themes/default/templates/scenario.html:5
+msgid "Scenarios"
+msgstr "Scénarios"
 
-#: templates/persons.html:5
-msgid "Person list"
-msgstr ""
+#: themes/default/templates/scenario.html:6
+msgid "Create a new scenario"
+msgstr "Créez un nouveau scénario"
 
-#: templates/persons.html:11
-msgid "Last Name"
-msgstr ""
+#: themes/default/templates/scenario.html:35
+msgid "Clone"
+msgstr "Cloner"
 
-#: templates/persons.html:12
-msgid "First Name"
-msgstr ""
+#: themes/default/templates/scenario.html:42
+msgid "There is no scenario yet"
+msgstr "Il n'y a pas encore de scénario"
 
-#: templates/persons.html:13
-msgid "Birthdate"
-msgstr ""
+#: themes/default/templates/scenario_edit.html:6
+msgid "Scenario "
+msgstr "Scénario "
 
-#: templates/persons.html:36
-msgid "No persons found"
-msgstr ""
+#: themes/default/templates/scenario_edit.html:30
+msgid "Help"
+msgstr "Aide"
 
-#: templates/base/nav.html:10 templates/base/nav.html:28
+#: themes/default/templates/scenario_edit.html:34
+msgid "Help - examples"
+msgstr "Aide - exemples"
+
+#: themes/default/templates/scenario_edit.html:37
+msgid "Fullscreen"
+msgstr "Plein écran"
+
+#: themes/default/templates/scenario_edit.html:293
+msgid "Scenarios help"
+msgstr "Aide sur les scénarios"
+
+#: themes/default/templates/scenario_edit.html:299
+msgid "The left menu"
+msgstr "Menu de gauche"
+
+#: themes/default/templates/scenario_edit.html:300
+msgid "The left menu contains all the blocks needed to build a scenario."
+msgstr ""
+"Le menu de gauche contient tous les blocs nécessaires pour construire un "
+"scénario."
+
+#: themes/default/templates/scenario_edit.html:302
+msgid "Logic "
+msgstr "Logique "
+
+#: themes/default/templates/scenario_edit.html:303
+msgid "All logic blocks needed to do logic operations, comparisons, ..."
+msgstr ""
+"Tous les blocs logiques nécessaires pour effectuer des opérations logiques, des "
+"comparaisons, ..."
+
+#: themes/default/templates/scenario_edit.html:304
+msgid "Datatypes "
+msgstr "Type de données "
+
+#: themes/default/templates/scenario_edit.html:305
+msgid ""
+"The datatypes blocks are used to compare the devices sensors values to some "
+"values. Depending on a sensor datatype, the values to compare are not the same : "
+"on/off, open/close, a number, ... The datatypes blocks will help you to use the "
+"appropriate values."
+msgstr ""
+"Les blocs de types de données sont utilisés pour comparer les valeurs des "
+"capteurs des périphériques à certaines valeurs. Selon le type de données d'un "
+"capteur, les valeurs à comparer ne sont pas les mêmes: on / off, ouverture / "
+"fermeture, un nombre, ... Les blocs de types de données vous aideront à utiliser "
+"les valeurs appropriées."
+
+#: themes/default/templates/scenario_edit.html:306
+msgid "Devices "
+msgstr "Périphériques "
+
+#: themes/default/templates/scenario_edit.html:307
+msgid ""
+"This menu will list all the availables devices and their sensors and commands."
+msgstr ""
+"Ce menu répertorie tous les périphériques disponibles et leurs capteurs et "
+"commandes."
+
+#: themes/default/templates/scenario_edit.html:308
+msgid "Other sensors "
+msgstr "Autres capteurs "
+
+#: themes/default/templates/scenario_edit.html:309
+msgid "Some sensors not related to the devices."
+msgstr "Certains capteurs ne sont pas liés aux périphériques."
+
+#: themes/default/templates/scenario_edit.html:310
+msgid "Other commands "
+msgstr "Autres commandes "
+
+#: themes/default/templates/scenario_edit.html:311
+msgid "Some commands not related to the devices."
+msgstr "Certaines commandes non liées aux périphériques."
+
+#: themes/default/templates/scenario_edit.html:317
+msgid "Add a comparison operator"
+msgstr "Ajouter un opérateur de comparaison"
+
+#: themes/default/templates/scenario_edit.html:318
+msgid ""
+"To compare a device sensor to a value, add a comparison operator in the "
+"<strong>WHEN</strong> condition."
+msgstr ""
+"Pour comparer un capteur d'un périphérique à une valeur, ajoutez un opérateur de "
+"comparaison dans la condition <strong>QUAND</strong>."
+
+#: themes/default/templates/scenario_edit.html:323
+msgid "Choose a device sensor"
+msgstr "Choisissez un capteur du périphérique"
+
+#: themes/default/templates/scenario_edit.html:324
+msgid "You will need to choose one or several devices sensors to use."
+msgstr "Vous devrez choisir un ou plusieurs capteurs de périphériques à utiliser."
+
+#: themes/default/templates/scenario_edit.html:325
+msgid ""
+"Each device can have several sensors. Each sensor has a datatype (<em>DT_xxx</"
+"em>). The datatype is important because it will help you to choose the "
+"appropriate datatype block for comparisons."
+msgstr ""
+"Chaque périphérique peut avoir plusieurs capteurs. Chaque capteur a un type de "
+"données (<em>DT_xxx</em>). Le type de données est important car il vous aidera à "
+"choisir le bloc de type de données approprié pour les comparaisons."
+
+#: themes/default/templates/scenario_edit.html:330
+msgid "Add the device sensor"
+msgstr "Ajouter le capteur d'un périphérique"
+
+#: themes/default/templates/scenario_edit.html:331
+msgid "Add your device sensor to your scenario."
+msgstr "Ajoutez le capteur de votre périphérique à votre scénario."
+
+#: themes/default/templates/scenario_edit.html:336
+msgid "The datatypes"
+msgstr "Les types de données"
+
+#: themes/default/templates/scenario_edit.html:337
+msgid ""
+"Once your sensors are choosen, you will have use the related datatypes blocks "
+"for comparisons."
+msgstr ""
+"Une fois vos capteurs choisis, vous devrez utiliser les blocs de types de "
+"données associés pour les comparaisons."
+
+#: themes/default/templates/scenario_edit.html:338
+msgid "In the list of datatypes blocks, choose the appropriate ones."
+msgstr ""
+"Dans la liste des blocs de types de données, choisissez ceux qui conviennent."
+
+#: themes/default/templates/scenario_edit.html:343
+msgid "Add the datatype"
+msgstr "Ajouter le type de données"
+
+#: themes/default/templates/scenario_edit.html:344
+msgid "Add the datatype block to your scenario."
+msgstr "Ajoutez le bloc de type de données à votre scénario."
+
+#: themes/default/templates/scenario_edit.html:349
+msgid "The commands"
+msgstr "Les commandes"
+
+#: themes/default/templates/scenario_edit.html:350
+msgid ""
+"You can now choose a device command, for example to switch a light when the "
+"<strong>WHEN</strong> condition is ok."
+msgstr ""
+"Vous pouvez maintenant choisir une commande d'un périphérique, par exemple pour "
+"allumer une lumière lorsque la condition <strong>QUAND</strong> est correcte."
+
+#: themes/default/templates/scenario_edit.html:351
+msgid "But you can also use a command not related to a device."
+msgstr ""
+"Mais vous pouvez également utiliser une commande non liée à un périphérique."
+
+#: themes/default/templates/scenario_edit.html:356
+msgid "Add the command"
+msgstr "Ajoutez la commande"
+
+#: themes/default/templates/scenario_edit.html:357
+msgid "Add the command to your scenario in the <strong>DO</strong> part."
+msgstr ""
+"Ajoutez la commande à votre scénario dans la partie <strong>FAIRE</strong>."
+
+#: themes/default/templates/scenario_edit.html:359
+msgid "Save your scenario and enjoy :)."
+msgstr "Enregistrez votre scénario et profitez :)."
+
+#: themes/default/templates/scenario_edit.html:367
+msgid "OK, thanks"
+msgstr "OK merci"
+
+#: themes/default/templates/scenario_examples.html:5
+msgid "Scenario examples"
+msgstr "Exemples de scénarios"
+
+#: themes/default/templates/scenario_examples.html:7
+msgid "Basic rules"
+msgstr "Règles de base"
+
+#: themes/default/templates/scenario_examples.html:9
+msgid ""
+"<strong>if</strong> and <strong>else if</strong> are conditions. If the "
+"condition described is correct (true), the <strong>do</strong> part will be "
+"executed : the executed steps are called the <strong>actions</strong>."
+msgstr ""
+"<strong>si</strong> et <strong> sinon si </strong> sont des conditions. Si la "
+"condition décrite est correcte (vraie), la partie <strong>faire</strong> sera "
+"exécutée: les étapes exécutées sont appelées les <strong>actions</strong>."
+
+#: themes/default/templates/scenario_examples.html:10
+msgid ""
+"If you compare <strong>float</strong> numbers, even if you use the comma "
+"\"<strong>,</strong>\" separator in your country, you must use the dot "
+"\"<strong>.</strong>\" separator in the scenarios."
+msgstr ""
+"Si vous comparez des nombres <strong>flottants</strong>, même si vous utilisez "
+"le séparateur virgule \"<strong>, </strong>\" dans votre pays, vous devez "
+"utiliser le séparateur point \"<strong>. </strong>\" dans les scénarios."
+
+#: themes/default/templates/scenario_examples.html:11
+msgid ""
+"<strong>A condition is evaluated each time one of its element changes</strong>. "
+"For example if you have an element <strong>current time</strong> and a "
+"<strong>device sensor</strong>, the condition can be evaluated once or more in "
+"the same minute if the device sensor value change one or more time : <em>1 "
+"current time evaluation + N device sensor changes of value</em>."
+msgstr ""
+"<strong>Une condition est évaluée chaque fois que l'un de ses éléments change </"
+"strong>. Par exemple, si vous avez un élément <strong>heure actuelle</strong> et "
+"un<strong> capteur de périphérique</strong>, la condition peut être évaluée une "
+"ou plusieurs fois dans la même minute si la valeur du capteur de périphérique "
+"change une ou plusieurs fois. : <em>1 évaluation de l'heure actuelle + N "
+"changements de valeur de capteur de périphérique</em>."
+
+#: themes/default/templates/scenario_examples.html:12
+msgid ""
+"Because of the <strong>rule #2</strong>, the actions related to one condition "
+"may be executed each time the condition is true."
+msgstr ""
+"En raison de la <strong règle n ° 2</strong>, les actions liées à une condition "
+"peuvent être exécutées chaque fois que la condition est vraie."
+
+#: themes/default/templates/scenario_examples.html:14
+msgid ""
+"You may not want the actions to be executed each time : for example, you want to "
+"do an action only once when a temperature sensor is higher than 20 degrees. To "
+"handle this usage you will have to use an <strong>hysteresis</strong> block on "
+"top of your action blocks."
+msgstr ""
+"Il se peut que vous ne souhaitiez pas que les actions soient exécutées à chaque "
+"fois : par exemple, vous ne souhaitez effectuer une action qu'une seule fois "
+"lorsqu'un capteur de température est supérieur à 20 degrés. Pour gérer cette "
+"utilisation, vous devrez utiliser un bloc <strong>hystérésis</strong> qui "
+"contiendra vos blocs d'action."
+
+#: themes/default/templates/scenario_examples.html:15
+msgid ""
+"The <strong>hysteresis</strong> block will make your scenario remind which block "
+"of actions was executed the last time : the next time a condition will be true, "
+"if the related actions were already executed once, they will not be executed."
+msgstr ""
+"Le bloc <strong>hystérésis</strong> fera rappeler à votre scénario quel bloc "
+"d'actions a été exécuté la dernière fois : la prochaine fois qu'une condition "
+"sera vraie, si les actions associées ont déjà été exécutées une fois, elles ne "
+"seront pas exécutées."
+
+#: themes/default/templates/scenario_examples.html:16
+msgid ""
+"This means that <strong>you will need to have at least 2 hysteresis block in a "
+"scenario</strong>. Else, your scenario actions will be executed only once!"
+msgstr ""
+"Cela signifie que <strong>vous devrez avoir au moins 2 blocs d'hystérésis dans "
+"un scénario</strong>. Sinon, vos actions de scénario ne seront exécutées qu'une "
+"seule fois !"
+
+#: themes/default/templates/scenario_examples.html:19
+msgid ""
+"<em>\"Keep it simple, stupid\"</em>. The more a scenario will be complex, the "
+"more it will be hard for you to maintain it a few monthes after."
+msgstr ""
+"<em>\"Restez simple, stupide\"</em>. Plus un scénario sera complexe, plus il "
+"vous sera difficile de le maintenir quelques mois après."
+
+#: themes/default/templates/scenario_examples.html:23
+#: themes/default/templates/scenario_examples.html:28
+#: themes/default/templates/scenario_examples.html:31
+msgid "xxxx"
+msgstr "xxxx"
+
+#: themes/default/templates/scenario_examples.html:26
+#: themes/default/templates/scenario_examples.html:38
+msgid "Prerequisites"
+msgstr "Conditions préalables"
+
+#: themes/default/templates/scenario_examples.html:35
+msgid "Sunrise related actions"
+msgstr "Actions liées à l'aube"
+
+#: themes/default/templates/scenario_examples.html:40
+msgid "Package <strong>domogik-plugin-weather</strong>"
+msgstr "Paquet <strong>domogik-plugin-weather</strong>"
+
+#: themes/default/templates/scenario_examples.html:43
+msgid "15 minutes before the sunrise, execute some actions."
+msgstr "15 minutes avant le lever du soleil, exécutez quelques actions."
+
+#: themes/default/templates/scenario_examples.html:44
+msgid ""
+"The <strong>hysteresis</strong> block is needed to avoid a double execution of "
+"the actions."
+msgstr ""
+"Le bloc <strong>hystérésis</strong> est nécessaire pour éviter une double "
+"exécution des actions."
+
+#: themes/default/templates/scenario_examples.html:47
+msgid "Be caution with the hysteresis block!"
+msgstr "Soyez prudent avec le bloc d'hystérésis !"
+
+#: themes/default/templates/scenario_examples.html:49
+msgid "What you must not do"
+msgstr "Ce que vous ne devez pas faire"
+
+#: themes/default/templates/scenario_examples.html:51
+msgid "What is good"
+msgstr "Ce qui est bien"
+
+#: themes/default/templates/scenario_examples.html:53
+msgid "Explanation"
+msgstr "Explication"
+
+#: themes/default/templates/scenario_examples.html:54
+msgid ""
+"Each hysteresis block has its own unique identifier. When a hysteresis block is "
+"called, its identifier is stored in the scenario engine as the last hysteresis "
+"identifie encountered while running some actions for the scenario. The next time "
+"the scenario is triggered, when a hysteresis block is called, it checks first if "
+"the last identifier stored is the same as the hysteresis block. If it is the "
+"same, this hysteresis block will not be processed."
+msgstr ""
+"Chaque bloc d'hystérésis a son propre identifiant unique. Lorsqu'un bloc "
+"d'hystérésis est appelé, son identifiant est stocké dans le moteur de scénario "
+"comme la dernière hystérésis identifiée rencontrée lors de l'exécution de "
+"certaines actions pour le scénario. Lors du prochain déclenchement du scénario, "
+"lorsqu'un bloc d'hystérésis est appelé, il vérifie d'abord si le dernier "
+"identifiant stocké est le même que le bloc d'hystérésis. S'il est le même, ce "
+"bloc d'hystérésis ne sera pas traité."
+
+#: themes/default/templates/scenario_examples.html:55
+msgid ""
+"<strong>You should never use hysteresis block in different <em>IF</em> blocks</"
+"strong> : instead you should try to adapt your scenario to use them in the same "
+"<strong>IF</strong> block."
+msgstr ""
+"<strong>Vous ne devez jamais utiliser de bloc d'hystérésis dans différents "
+"blocs<em> SI</em> </strong>: essayez plutôt d'adapter votre scénario pour les "
+"utiliser dans le même bloc <strong>SI</strong>."
+
+#: themes/default/templates/upgrade.html:5
+msgid "Upgrade Devices"
+msgstr "Mettre à niveau les périphériques"
+
+#: themes/default/templates/upgrade.html:8
+msgid ""
+"Upgrade devices are devices created for a client version which is no more "
+"detected by Domogik, but a newer version is detected."
+msgstr ""
+"Les périphériques en mise à niveau sont des périphériques créés pour une version "
+"client qui n'est plus détectée par Domogik, mais une version plus récente est "
+"détectée."
+
+#: themes/default/templates/upgrade.html:9
+msgid ""
+"The devices below need manual intervention to make sure they still work "
+"correctly after the plugin is restarted."
+msgstr ""
+"Les périphériques ci-dessous nécessitent une intervention manuelle pour "
+"s'assurer qu'ils fonctionnent toujours correctement après le redémarrage du "
+"plugin."
+
+#: themes/default/templates/upgrade.html:40
+msgid "Hooray, no upgrades needed"
+msgstr "Hourra, aucune mise à niveau nécessaire"
+
+#: themes/default/templates/upgrade_input.html:5
+msgid "Upgrade Device"
+msgstr "Mettre à niveau le pérphérique"
+
+#: themes/default/templates/upgrade_input.html:43
+msgid "Copy device"
+msgstr "Copier le périphérique"
+
+#: themes/default/templates/upgrade_input.html:84
+msgid "Delete device"
+msgstr "Supprimer le périhérique"
+
+#: themes/default/templates/user_edit.html:7
+msgid "New User"
+msgstr "Nouvel utilisateur"
+
+#: themes/default/templates/user_edit.html:10
+msgid "Locked user"
+msgstr "Utilisateur verrouillé"
+
+#: themes/default/templates/user_edit.html:12
+msgid "Edit the user"
+msgstr "Editer l'utilisateur"
+
+#: themes/default/templates/user_edit.html:17
+msgid "This technical user is locked and cannot be edited!"
+msgstr "Cet utilisateur technique est verrouillé et ne peut pas être modifié !"
+
+#: themes/default/templates/user_edit.html:22
+msgid "Person informations"
+msgstr "Informations sur la personne"
+
+#: themes/default/templates/user_edit.html:27
+msgid "Related account informations"
+msgstr "Informations sur le compte associé"
+
+#: themes/default/templates/user_edit.html:29
+msgid ""
+"This user is linked to an account. An account allows this user to use some "
+"Domogik services."
+msgstr ""
+"Cet utilisateur est lié à un compte. Un compte permet à cet utilisateur "
+"d'utiliser certains services Domogik."
+
+#: themes/default/templates/user_edit.html:33
+msgid "An account is not created by default for a new user."
+msgstr "Un compte n'est pas créé par défaut pour un nouvel utilisateur."
+
+#: themes/default/templates/user_edit.html:35
+msgid "This user is <strong>not linked to an account</strong>."
+msgstr "Cet utilisateur n'est <strong>pas lié à un compte</strong>."
+
+#: themes/default/templates/user_edit.html:37
+msgid ""
+"If you want to link the user to an account to let the user access some Domogik "
+"services, fill the below informations.."
+msgstr ""
+"Si vous souhaitez associer l'utilisateur à un compte pour permettre à "
+"l'utilisateur d'accéder à certains services Domogik, remplissez les informations "
+"ci-dessous."
+
+#: themes/default/templates/user_edit.html:39
+msgid "You will need to change the password after the user creation."
+msgstr "Vous devrez changer le mot de passe après la création de l'utilisateur."
+
+#: themes/default/templates/user_edit.html:49
+msgid "Change the user password"
+msgstr "Changer le mot de passe utilisateur"
+
+#: themes/default/templates/user_password.html:7
+msgid "Locker user"
+msgstr "Utilisateur bloqué"
+
+#: themes/default/templates/user_password.html:9
+msgid "Change the password for"
+msgstr "Changer le mot de passe pour"
+
+#: themes/default/templates/user_password.html:13
+msgid "This technical user is locked and the password can't be changed!"
+msgstr ""
+"Cet utilisateur technique est verrouillé et le mot de passe ne peut pas être "
+"changé !"
+
+#: themes/default/templates/base/nav.html:30 themes/default/templates/users.html:5
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: themes/default/templates/users.html:11
+msgid "Add a new user"
+msgstr "Ajouter un nouvel utilisateur"
+
+#: themes/default/templates/users.html:44
+msgid "First name"
+msgstr "Prénom"
+
+#: themes/default/templates/users.html:47
+msgid "Birth date"
+msgstr "Date de naissance"
+
+#: themes/default/templates/users.html:54
+msgid "View"
+msgstr "Vue"
+
+#: themes/default/templates/users.html:74
+msgid "No user found"
+msgstr "Aucun utilisateur trouvé"
+
+#: themes/default/templates/base/nav.html:17
 msgid "Clients"
-msgstr ""
+msgstr "Clients"
 
-#: templates/base/nav.html:11 templates/base/nav.html:29
-msgid "Orphans"
-msgstr ""
+#: themes/default/templates/base/nav.html:20
+msgid "Views"
+msgstr "Vues"
 
-#: templates/base/nav.html:13
-msgid "Auth"
-msgstr ""
+#: themes/default/templates/base/nav.html:23
+msgid "Battery"
+msgstr "Batterie"
 
-#: templates/base/nav.html:15 templates/base/nav.html:30
-msgid "Accounts"
-msgstr ""
+#: themes/default/templates/base/nav.html:24
+msgid "Camera"
+msgstr "Caméra"
 
-#: templates/base/nav.html:16 templates/base/nav.html:31
-msgid "Persons"
-msgstr ""
+#: themes/default/templates/base/nav.html:25
+msgid "Orphan Domogik devices"
+msgstr "Périphériques Domogik orphelins"
 
-#: templates/base/nav.html:21 templates/base/nav.html:33
+#: themes/default/templates/base/nav.html:26
+msgid "Upgrade Domogik devices"
+msgstr "Mise à jour des périphériques Domogik"
+
+#: themes/default/templates/base/nav.html:27
+msgid "Domogik Data Types"
+msgstr "Types de données Domogik"
+
+#: themes/default/templates/base/nav.html:31
+msgid "Locations"
+msgstr "Localisations"
+
+#: themes/default/templates/base/nav.html:32
+msgid "Global Config"
+msgstr "Configuration globale"
+
+#: themes/default/templates/base/nav.html:33
+msgid "Rest and MQ API"
+msgstr "Rest et MQ API"
+
+#: themes/default/templates/base/nav.html:36
 msgid "Logout"
-msgstr ""
+msgstr "Déconnexion"
 
-#: templates/base/nav.html:25
-msgid "Menu"
-msgstr ""
+#: themes/default/templates/base/timeline.html:284
+msgid "No history found!"
+msgstr "Historique non trouvé !"
 
-#: templates/base/wtf.html:15
+#: themes/default/templates/base/wtf.html:15
 msgid "Reset"
-msgstr ""
+msgstr "Réinitialiser"
 
-#: views/account.py:67 views/person.py:61
-msgid "Changes saved"
-msgstr ""
+#: views/clients.py:375
+msgid "Sensor update successfully"
+msgstr "Mise à jour du capteur réussie"
 
-#: views/account.py:71 views/person.py:65
-msgid "Invallid input"
-msgstr ""
+#: views/clients.py:377
+msgid "Sensor update failed"
+msgstr "La mise à jour du capteur a échoué"
 
-#: views/clients.py:97
-msgid "Device saved"
-msgstr ""
+#: views/clients.py:441
+msgid "Param update successfully"
+msgstr "Mise à jour des paramètres réussie"
 
-#: views/clients.py:118 views/orphans.py:44
-msgid "Device deleted"
-msgstr ""
+#: views/clients.py:443
+msgid "Param update failed"
+msgstr "Échec de la mise à jour des paramètres"
 
-#: views/clients.py:210
-msgid "Config saved successfull"
-msgstr ""
+#: views/clients.py:505
+msgid "Device update successfully"
+msgstr "Mise à jour du périphérique réussie"
 
-#: views/clients.py:212
-msgid "Config saved failed"
-msgstr ""
+#: views/clients.py:507
+msgid "Device update failed"
+msgstr "Échec de la mise à jour du périphérique"
 
-#: views/clients.py:215
-msgid "DbMgr did not respond on the config.set, check the logs"
-msgstr ""
+#: views/clients.py:532 views/orphans.py:46
+msgid "Device deleted failed"
+msgstr "Échec de la suppression du périphérique"
 
-#: views/clients.py:269
-msgid "the display name for this device"
-msgstr ""
+#: views/clients.py:535 views/orphans.py:48
+msgid "Device deleted successfully"
+msgstr "Périphérique supprimé avec succès"
 
-#: views/clients.py:270
+#: views/clients.py:543
+msgid "Device deletion not allowed"
+msgstr "Suppression de périphérique non autorisée"
+
+#: views/clients.py:546
+msgid "Device deletion failed"
+msgstr "La suppression du périphérique a échoué"
+
+#: views/clients.py:646
+msgid "Config saved successfully"
+msgstr "La configuration a bien été enregistrée"
+
+#: views/clients.py:648
+msgid "Error while saving the configuration"
+msgstr "Erreur lors de l'enregistrement de la configuration"
+
+#: views/clients.py:738
+msgid "The display name for this device"
+msgstr "Le nom d'affichage de ce périphérique"
+
+#: views/clients.py:741
 msgid "A description for this device"
-msgstr ""
+msgstr "Description du périphérique"
 
-#: views/clients.py:275
+#: views/clients.py:744
 msgid "A reference for this device"
-msgstr ""
+msgstr "Référence du périphérique"
 
-#: views/clients.py:295
+#: views/clients.py:921 views/clients.py:924 views/clients.py:927
+#: views/clients.py:930 views/clients.py:936 views/clients.py:939
+#: views/clients.py:943
+msgid "This value is required"
+msgstr "Cette valeur est obligatoire"
+
+#: views/clients.py:1014
+msgid "Device created successfully"
+msgstr "Périphérique créé avec succès"
+
+#: views/clients.py:1016
 msgid "Device creation failed"
+msgstr "Echec de la création du périphérique"
+
+#: views/clients.py:1026
+msgid "Device creation failed. Please check the logs for more details."
+msgstr ""
+"La création du périphérique a échoué. Veuillez consulter les journaux pour plus "
+"de détails."
+
+#: views/clients.py:1029
+msgid "Device validation failed : Please check parameters"
+msgstr "Échec de la validation du périphérique : veuillez vérifier les paramètres"
+
+#: views/datatypes.py:75
+msgid "usage"
 msgstr ""
 
-#: views/clients.py:296
-msgid "Can not find this client id"
+#: views/datatypes.py:77
+msgid "example"
 msgstr ""
 
-#: views/clients.py:326
-msgid "device created"
+#: views/datatypes.py:80
+msgid "values"
 msgstr ""
 
-#: views/login.py:49
-msgid "Login successfull"
-msgstr ""
+#: views/locations.py:145
+msgid "Location updated successfully"
+msgstr "Localisation mis à jour avec succès"
 
-#: views/login.py:52
+#: views/login.py:101
 msgid "This user is not an admin"
-msgstr ""
+msgstr "Cet utilisateur n'est pas administrateur"
 
-#: views/login.py:54
+#: views/login.py:103
 msgid "Combination of username and password wrong"
+msgstr "Combinaison du nom d'utilisateur et mot de passe inconnue"
+
+#: views/scenario.py:75
+msgid "Scenario deleted"
+msgstr "Scénario supprimé"
+
+#: views/scenario.py:88
+msgid "Scenario enabled"
+msgstr "Scénario activé"
+
+#: views/scenario.py:101
+msgid "Scenario disabled"
+msgstr "Scénario désactivé"
+
+#: views/scenario.py:138
+msgid "Scenario name"
+msgstr "Nom du scénario"
+
+#: views/scenario.py:139
+msgid "Disabling a scenario avoid to delete it if you temporary want it not to run"
 msgstr ""
+"La désactivation d'un scénario évite de le supprimer si vous souhaitez "
+"temporairement qu'il ne s'exécute pas"
 
-#~ msgid "onfiguration"
+#: views/scenario.py:140
+msgid "Behavior threading"
+msgstr "Comportement de la tâche"
+
+#: views/scenario.py:140
+msgid "Finish current and do next (default and advisable)"
+msgstr "Terminer celle en cours puis faire la suivante (par défaut et conseillé)"
+
+#: views/scenario.py:141
+msgid "Stop current and do next"
+msgstr "Arrêtez celle en cours puis faire la suivante"
+
+#: views/scenario.py:142
+msgid "Finish current and not do next"
+msgstr "Terminer celle en cours et ne pas faire la suivante"
+
+#: views/scenario.py:143
+msgid "Do them all in parallel (unsafe risk of conflict)"
+msgstr "Les faire toutes en parallèle (comportement hasardeux, risque de conflit.)"
+
+#: views/scenario.py:144
+msgid "Defines the behavior in case of simultaneous execution of the scenario"
+msgstr "Définit le comportement en cas d'exécution simultanée du scénario"
+
+#: views/scenario.py:174
+msgid "Changes saved"
+msgstr "Changements sauvegardés"
+
+#: views/scenario.py:179
+msgid "Changes not saved"
+msgstr "Modifications non enregistrées"
+
+#: views/scenario.py:181 views/scenario.py:183 views/scenario.py:185
+msgid "Unexpected result from scenario manager"
+msgstr "Résultat inattendu du gestionnaire de scénarios"
+
+#: views/scenario.py:220
+msgid "Cron rule is not valid."
+msgstr "La règle de planification n'est pas valide."
+
+#: views/scenario.py:225
+msgid "Error in cron rule, can't trigger it."
+msgstr "Erreur dans la règle de planification, impossible de la déclencher."
+
+#: views/scenario.py:229
+msgid "Cron checking, bad request parameters."
+msgstr "Vérification de la planification, mauvais paramètres de requête."
+
+#: views/scenario.py:249
+msgid "Error in cron rule, can't get next date."
+msgstr ""
+"Erreur dans la règle de planification, impossible d'obtenir la prochaine date."
+
+#: views/scenario.py:253
+msgid "Ephemeris next date, bad request parameters."
+msgstr "Ephémérides prochaine date, mauvais paramètres de requête."
+
+#: views/users.py:62
+msgid "You can't delete this user"
+msgstr "Vous ne pouvez pas supprimer cet utilisateur"
+
+#: views/users.py:89 views/users.py:216
+msgid "There is no such user"
+msgstr "Il n'y a pas de tel utilisateur"
+
+#: views/users.py:134 views/users.py:246
+msgid "You can't edit locked users"
+msgstr "Vous ne pouvez pas modifier les utilisateurs verrouillés"
+
+#: views/users.py:166
+msgid "The user is updated"
+msgstr "L'utilisateur est mis à jour"
+
+#: views/users.py:183
+msgid "The user is created"
+msgstr "L'utilisateur est créé"
+
+#: views/users.py:187
+msgid "There was an error during the user creation or upgrade."
+msgstr ""
+"Une erreur s'est produite lors de la création ou de la mise à jour de "
+"l'utilisateur."
+
+#: views/users.py:190 views/users.py:260
+msgid "Invalid input"
+msgstr "Entrée invalide"
+
+#: views/users.py:251
+msgid "The password is updated"
+msgstr "Le mot de passe est mis à jour"
+
+#: views/users.py:253
+msgid "You can't change the password for person id = 0"
+msgstr "Vous ne pouvez pas changer le mot de passe dont la personne à un id = 0"
+
+#: views/users.py:257
+msgid "There was an error during the password update for the user."
+msgstr ""
+"Une erreur s'est produite lors de la mise à jour du mot de passe de "
+"l'utilisateur."
+
+#~ msgid "Account Edit"
+#~ msgstr "Editer compte"
+
+#~ msgid "Account list"
+#~ msgstr "Liste comptes"
+
+#~ msgid "Add new"
+#~ msgstr "Nouveau"
+
+#~ msgid "Login"
+#~ msgstr "Connexion"
+
+#~ msgid "Admin"
+#~ msgstr "Admin"
+
+#~ msgid "No accounts found"
+#~ msgstr "Compte non trouvé"
+
+#~ msgid "Email"
+#~ msgstr "Couriel"
+
+#~ msgid "Device Edit"
+#~ msgstr "Editer appareil"
+
+#~ msgid "Create by product"
+#~ msgstr "Créer par produit"
+
+#~ msgid "Example REST Url"
+#~ msgstr "Example REST Url"
+
+#~ msgid "Home"
+#~ msgstr "Maison"
+
+#~ msgid "Devices"
+#~ msgstr "Appareils"
+
+#~ msgid "Known"
+#~ msgstr "Connus"
+
+#~ msgid "Detected"
+#~ msgstr "Détecté"
+
+#~ msgid "New"
+#~ msgstr "Nouveau"
+
+#~ msgid "Status"
+#~ msgstr "Etat"
+
+#~ msgid "%(status)s"
+#~ msgstr "%(status)s"
+
+#~ msgid "Client list"
+#~ msgstr "List clients"
+
+#~ msgid "Configured"
+#~ msgstr "Configuré"
+
+#~ msgid "No clients found"
+#~ msgstr "Pas de client trouvé"
+
+#~ msgid "Person Edit"
+#~ msgstr "Editer personne"
+
+#~ msgid "Person list"
+#~ msgstr "List personnes"
+
+#~ msgid "Last Name"
+#~ msgstr "Nom"
+
+#~ msgid "First Name"
+#~ msgstr "Prénon"
+
+#~ msgid "No persons found"
+#~ msgstr "Pas de peronnes trouvées"
+
+#~ msgid "Orphans"
+#~ msgstr "Orphelins"
+
+#~ msgid "Auth"
+#~ msgstr "Authentifier"
+
+#~ msgid "Accounts"
+#~ msgstr "Comptes"
+
+#~ msgid "Persons"
+#~ msgstr "Personnes"
+
+#~ msgid "Menu"
+#~ msgstr "Menu"
+
+#~ msgid "Invallid input"
+#~ msgstr "Entrée invalide"
+
+#~ msgid "Device saved"
+#~ msgstr "Appareil enregistré"
+
+#~ msgid "Device deleted"
+#~ msgstr "Appareil supprimé"
+
+#~ msgid "Config saved successfull"
+#~ msgstr "Configuration sauvé avec succès"
+
+#~ msgid "Config saved failed"
+#~ msgstr "Echec de la sauvegarde de la configuration"
+
+#~ msgid "DbMgr did not respond on the config.set, check the logs"
+#~ msgstr "DbMgr n'a pas répondu à la requête config.set, vérifiez les journaux"
+
+#~ msgid "the display name for this device"
+#~ msgstr "nom d'affichage de l'appareil"
+
+#~ msgid "Can not find this client id"
+#~ msgstr "Ne trouve pas cet identifiant client"
+
+#~ msgid "device created"
+#~ msgstr "Appareil créé"
+
+#~ msgid "Login successfull"
+#~ msgstr "Connexion réussie"
+
+#~ msgid "The butler"
+#~ msgstr "Le majordome"
+
+#~ msgid ""
+#~ "The butler is your personnal assistant. It will help you to control your "
+#~ "house and it can also do some other tasks."
 #~ msgstr ""
+#~ "Le majordome est votre assistant personnel. Celui-ci vous aidera à contrôler "
+#~ "votre maison et peut également effectuer d'autres tâches."
 
-#~ msgid "lient"
+#~ msgid ""
+#~ "You can complete the butler capabilities by installing <em>brain</em> "
+#~ "packages."
 #~ msgstr ""
+#~ "Vous pouvez compléter les capacités du majordome en installant des paquets "
+#~ "<em>cerveau</em>."
 
-#~ msgid "Params"
+#~ msgid ""
+#~ "On this page, you can interact with the butler, and also see all the "
+#~ "interactions between the <em>interfaces</em> and the butler."
 #~ msgstr ""
+#~ "Sur cette page, vous pouvez interagir avec le majordome, et également voir "
+#~ "toutes les interactions entre les <em>interfaces</em> et le majordome."
 
+#~ msgid "Reload the brain"
+#~ msgstr "Recharger le cerveau"
+
+#~ msgid "Speak with the butler"
+#~ msgstr "Parlez avec le majordome"
+
+#~ msgid "Butler reload done"
+#~ msgstr "Rechargement du majordome terminé"
+
+#~ msgid "The butler brain is reloaded."
+#~ msgstr "Le cerveau du majordome est rechargé."
+
+#~ msgid "Butler reload failed"
+#~ msgstr "Échec du rechargement du majordome"
+
+#~ msgid ""
+#~ "The butler brain can't be reloaded. Maybe the butler component is not alive ?"
+#~ msgstr ""
+#~ "Le cerveau du majordome ne peut pas être rechargé. Peut-être que le composant "
+#~ "de majordome n'est pas vivant ?"
+
+#~ msgid "Loading..."
+#~ msgstr "Chargement..."
+
+#~ msgid "Sensor update succesfully"
+#~ msgstr "Mise à jour du capteur réussie"
+
+#~ msgid "Senor update failed"
+#~ msgstr "La mise à jour du capteur a échoué"
