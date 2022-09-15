@@ -84,6 +84,9 @@ Blockly.JSON.jsonToBlock = function(workspace, jsonBlock) {
       block = workspace.newBlock( prototypeName);
   } else {
       block = workspace.newBlock( prototypeName, jsonBlock['id']);
+      if ( prototypeName.includes('sensor.SensorTest') ) {
+          if (jsonBlock['usage.usage'] != 'value') { block.setOutput(true, ["Boolean"]); }
+      }
   }
   if (!block.svg_) { block.initSvg(); }
   var inline = jsonBlock['inline'];
