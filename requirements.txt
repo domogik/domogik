@@ -25,7 +25,7 @@ pyOpenSSL==17.0.0
 python_dateutil==2.6.0
 pyephem==3.7.6.0
 flask_session==0.3.1
-protobuf==3.3.0
+protobuf==3.18.3
 python_magic==0.4.13
 psutil==5.2.2
 simplejson==3.10.0
