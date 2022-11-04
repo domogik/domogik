@@ -18,7 +18,7 @@ lockfile==0.12.2
 pip==9.0.1
 pytz==2012c
 requests>=2.8.1
-Twisted==15.5.0
+Twisted==22.10.0
 Pygments==2.0.1
 SQLAlchemy>=1.1
 pyOpenSSL==17.0.0
