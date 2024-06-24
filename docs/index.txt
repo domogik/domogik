@@ -30,7 +30,7 @@ Then depending on your needs you will need some automation gateways (for x10, kn
 I am a newbie in Linux world, what do I need to know ?
 ------------------------------------------------------
 
-First, you should use a distribution like Ubuntu. Then, you should first learn the Linux basements.
+First, you should use a distribution like Ubuntu. Then, you should first learn the Linux basics.
 
 
 Install Domogik
