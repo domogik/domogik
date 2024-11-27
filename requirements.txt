@@ -31,7 +31,7 @@ psutil==5.2.2
 simplejson==3.10.0
 sqlalchemy_utils==0.32.14
 tornado==4.5.1
-PyYAML==3.12
+PyYAML==5.4
 pyzmq==18.0.0
 alembic==0.9.1
 PyMySQL==0.7.11
