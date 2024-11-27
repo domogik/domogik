@@ -15,7 +15,7 @@ Jinja2==2.8
 six==1.10.0
 chardet>=2.3.0
 lockfile==0.12.2
-pip==9.0.1
+pip==21.1
 pytz==2012c
 requests>=2.8.1
 Twisted==15.5.0
